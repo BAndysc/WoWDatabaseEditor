@@ -99,54 +99,75 @@ internal class FastByteSearcher
         }
     }
 
-    private static void BuildPartialMatchTable(byte[] needle, Span<int> table)
+    private static void BuildPartialMatchTable(byte[] pat, Span<int> lps)
     {
-        int prefixIndex = 0;
-        table[0] = 0;
+        // length of the previous longest prefix suffix
+        int len = 0;
 
-        for (int i = 1; i < needle.Length; i++)
+        lps[0] = 0; // lps[0] is always 0
+
+        // the loop calculates lps[i] for i = 1 to M-1
+        int i = 1;
+        while (i < pat.Length)
         {
-            while (prefixIndex > 0 && needle[i] != needle[prefixIndex])
+            if (pat[i] == pat[len])
             {
-                prefixIndex = table[prefixIndex - 1];
+                len++;
+                lps[i] = len;
+                i++;
             }
-            if (needle[i] == needle[prefixIndex])
+            else // (pat[i] != pat[len])
             {
-                prefixIndex++;
+                // This is tricky. Consider the example.
+                // AAACAAAA and i = 7. The idea is similar
+                // to search step.
+                if (len != 0) {
+                    len = lps[len - 1];
+
+                    // Also, note that we do not increment
+                    // i here
+                }
+                else // if (len == 0)
+                {
+                    lps[i] = 0;
+                    i++;
+                }
             }
-            table[i] = prefixIndex;
         }
     }
 
     private static long KmpSearch(ReadOnlySpan<byte> haystack, ReadOnlySpan<byte> needle, ReadOnlySpan<int> partialMatchTable)
     {
-        int m = 0; // Beginning of the current match in haystack
-        int i = 0; // Position of the current character in needle
+        int M = needle.Length;
+        int N = haystack.Length;
 
-        while (m + i < haystack.Length)
+        int i = 0; // index for txt[]
+        int j = 0; // index for pat[]
+        while ((N - i) >= (M - j))
         {
-            if (needle[i] == haystack[m + i])
+            if (needle[j] == haystack[i])
             {
-                if (i == needle.Length - 1)
-                {
-                    return m; // Found a match
-                }
+                j++;
                 i++;
             }
-            else
+
+            if (j == M)
             {
-                if (partialMatchTable[i] > 0)
-                {
-                    m = m + i - partialMatchTable[i];
-                    i = partialMatchTable[i];
-                }
+                return i - j;
+                j = partialMatchTable[j - 1];
+            }
+
+            // mismatch after j matches
+            else if (i < N && needle[j] != haystack[i]) {
+                // Do not match lps[0..lps[j-1]] characters,
+                // they will match anyway
+                if (j != 0)
+                    j = partialMatchTable[j - 1];
                 else
-                {
-                    i = 0;
-                    m++;
-                }
+                    i = i + 1;
             }
         }
-        return -1; // No match found
+
+        return -1;
     }
 }
