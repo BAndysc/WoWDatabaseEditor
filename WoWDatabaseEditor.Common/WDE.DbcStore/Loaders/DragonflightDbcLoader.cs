@@ -52,20 +52,5 @@ internal class DragonflightDbcLoader : BaseDbcLoader
         Load("QuestSort.db2", "SortName_lang", data.QuestSortStore);
         Load("TaxiNodes.db2",  "Name_lang", data.TaxiNodeStore);
         LoadDB2("TaxiPath.db2",  row => data.TaxiPathsStore.Add(row.ID, (row.Field<int>("FromTaxiNode"), row.Field<int>("ToTaxiNode"))));
-
-        Load("CharShipmentContainer.db2", row =>
-        {
-            var shipment = new CharShipmentContainerEntry()
-            {
-                Id = row.Key,
-                Name = row.GetString(1),
-                Description = row.GetString(2),
-            };
-            string name = shipment.Name;
-            if (name == "")
-                name = shipment.Description != "" ? shipment.Description : "- no name -";
-            data.CharShipmentContainerStore[row.Key] = name;
-            data.CharShipmentContainers.Add(shipment);
-        });
     }
 }
