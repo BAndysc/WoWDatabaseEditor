@@ -45,8 +45,8 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             query.Comment(nameProvider.GetName(item));
             query.DefineVariable("ENTRY", script.EntryOrGuid);
             var (serializedScript, serializedConditions) = scriptExporter.ToDatabaseCompatibleSmartScript(script);
-            BuildDelete(query, serializedScript);
             BuildUpdate(query);
+            BuildDelete(query, serializedScript);
             BuildInsert(query, serializedScript, serializedConditions ?? Array.Empty<IConditionLine>());
             return query.Close();
         }
