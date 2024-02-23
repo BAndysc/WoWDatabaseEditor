@@ -55,9 +55,17 @@ public class QuestStarterEnderParameter : IParameter<long>, ICustomPickerContext
             else
                 return databaseProvider.GetCreatureByGuid(0, (uint)(-script.EntryOrGuid))?.Entry;
         }
+
+        uint value = 0;
         if (script.Entry.HasValue)
-            return script.Entry.Value;
-        return (uint)script.EntryOrGuid;
+            value = script.Entry.Value;
+        else
+            value = (uint)script.EntryOrGuid;
+
+        if (script.SourceType is SmartScriptType.Template or SmartScriptType.TimedActionList)
+            value /= 100;
+
+        return value;
     }
 
     public async Task<(long, bool)> PickValue(long value, object context)
