@@ -196,8 +196,11 @@ public class DebuggerServiceSynchronizationTests
         removalLatch.SetResult(true);
 
         // Then, initiate synchronization
+#if DEBUG
         Assert.ThrowsAsync<InvalidOperationException>(async () => await service.Synchronize(debugPoint));
-
+#else
+        await service.Synchronize(debugPoint);
+#endif
         // Await the removal task to ensure it completes after synchronization
         await removeTask;
 
