@@ -188,7 +188,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         public short MaxLevel { get; set; }
 
         [Column(Name = "name")] 
-        public string Name { get; set; } = "";
+        public string? _Name { get; set; } = "";
+
+        public string Name => _Name ?? "";
         
         [Column(Name = "subname")]
         public string? SubName { get; set; } = "";
