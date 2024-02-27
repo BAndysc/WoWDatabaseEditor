@@ -471,10 +471,10 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId);
 
-        public virtual async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId)
+        public virtual async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId, uint count)
         {
             await using var model = Database();
-            return await model.SmartScriptWaypoint.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<ISmartScriptWaypoint>();
+            return await model.SmartScriptWaypoint.Where(wp => wp.PathId >= pathId && wp.PathId < pathId + count).OrderBy(wp => wp.PointId).ToListAsync<ISmartScriptWaypoint>();
         }
 
         public virtual async Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId)

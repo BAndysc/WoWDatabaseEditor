@@ -190,7 +190,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public async Task<ICreatureAddon?> GetCreatureAddon(uint entry, uint guid) => null;
         public async Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry) => null;
         public async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId) => null;
-        public async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId) => null;
+        public async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId, uint count) => null;
         public async Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId) => null;
         public async Task<IReadOnlyList<IMangosWaypoint>?> GetMangosWaypoints(uint pathId) => null;
         public async Task<IReadOnlyList<IMangosCreatureMovement>?> GetMangosCreatureMovement(uint guid) => null;

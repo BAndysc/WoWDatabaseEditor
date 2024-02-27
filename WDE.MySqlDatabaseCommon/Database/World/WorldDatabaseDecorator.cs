@@ -164,7 +164,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId) => impl.GetWaypointData(pathId);
 
-        public Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId) => impl.GetSmartScriptWaypoints(pathId);
+        public Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId, uint count) => impl.GetSmartScriptWaypoints(pathId, count);
 
         public Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId) => impl.GetScriptWaypoints(pathId);
 

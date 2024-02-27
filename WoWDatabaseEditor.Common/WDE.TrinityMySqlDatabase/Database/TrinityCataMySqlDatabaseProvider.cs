@@ -295,10 +295,10 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
             .ToListAsync<IWaypointData>();
     }
 
-    public override async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId)
+    public override async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId, uint count)
     {
         await using var model = Database();
-        return await model.SmartScriptWaypointCata.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId)
+        return await model.SmartScriptWaypointCata.Where(wp => wp.PathId >= pathId && wp.PathId < pathId + count).OrderBy(wp => wp.PointId)
             .ToListAsync<ISmartScriptWaypoint>();
     }
 

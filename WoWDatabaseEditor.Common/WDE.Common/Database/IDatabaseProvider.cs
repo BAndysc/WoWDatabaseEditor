@@ -140,7 +140,7 @@ namespace WDE.Common.Database
         Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry);
 
         Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId);
-        Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId);
+        Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId, uint count = 1);
         Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId);
         Task<IReadOnlyList<IMangosWaypoint>?> GetMangosWaypoints(uint pathId);
         Task<IReadOnlyList<IMangosCreatureMovement>?> GetMangosCreatureMovement(uint guid);

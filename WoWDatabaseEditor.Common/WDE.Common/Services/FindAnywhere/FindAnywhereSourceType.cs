@@ -17,5 +17,6 @@ public enum FindAnywhereSourceType
     EventAi = 64,
     Other = 128,
     SourceCode = 256,
-    All = Other | SmartScripts | EventAi | Spawns | Tables | Conditions | Sniffs | Dbc | SourceCode
+    Waypoints = 512,
+    All = Other | SmartScripts | EventAi | Spawns | Tables | Conditions | Sniffs | Dbc | SourceCode | Waypoints
 }

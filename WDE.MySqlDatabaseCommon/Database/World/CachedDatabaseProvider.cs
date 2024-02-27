@@ -503,7 +503,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
        
         public Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId) => WaitForCache(nonCachedDatabase.GetWaypointData(pathId));
 
-        public Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId) => WaitForCache(nonCachedDatabase.GetSmartScriptWaypoints(pathId));
+        public Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId, uint count) => WaitForCache(nonCachedDatabase.GetSmartScriptWaypoints(pathId, count));
 
         public Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId) => WaitForCache(nonCachedDatabase.GetScriptWaypoints(pathId));
 

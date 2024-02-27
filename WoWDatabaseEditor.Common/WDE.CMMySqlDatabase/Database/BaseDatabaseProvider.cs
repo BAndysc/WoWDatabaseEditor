@@ -469,7 +469,7 @@ namespace WDE.CMMySqlDatabase.Database
 
         public async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId) => null;
 
-        public async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId) => null;
+        public async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId, uint count) => null;
 
         public async Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId) => null;
 
