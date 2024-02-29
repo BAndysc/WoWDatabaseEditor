@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Debugging;
+using WDE.Common.Services;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Debugging;
@@ -179,10 +180,18 @@ public class ScriptBreakpoints : IScriptBreakpoints, System.IAsyncDisposable
 
     public async Task ResyncBreakpoints()
     {
-        await scriptDebugger.RemoveBreakpoints(entryOrGuid, type);
-        foreach (var (element, pointId) in breakpoints)
-            debugger.ForceSetPending(pointId);
-        await Task.WhenAll(breakpoints.Select(pair => debugger.Synchronize(pair.Value)));
+        try
+        {
+            await scriptDebugger.RemoveBreakpoints(entryOrGuid, type);
+            foreach (var (element, pointId) in breakpoints)
+                debugger.ForceSetPending(pointId);
+            await Task.WhenAll(breakpoints.Select(pair => debugger.Synchronize(pair.Value)));
+        }
+        catch (DebuggingFeaturesDisabledException)
+        {
+            if (breakpoints.Count > 0)
+                throw;
+        }
     }
 
     public async Task RemoveAll()
