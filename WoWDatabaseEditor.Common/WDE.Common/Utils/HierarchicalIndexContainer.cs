@@ -116,6 +116,7 @@ public interface ITableMultiSelection
     event Action? SelectionChanged;
     IDisposable PauseNotifications();
     void Set(VerticalCursor index);
+    void RemoveGroup(int group);
 }
 
 public interface ITableEfficientContainsIterator : System.IDisposable
@@ -209,6 +210,11 @@ public class TableMultiSelection : ITableMultiSelection
     {
         Clear();
         Add(index);
+    }
+
+    public void RemoveGroup(int group)
+    {
+        perGroupContainer.Remove(group);
     }
 
     private void Notify()
