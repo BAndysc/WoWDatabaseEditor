@@ -58,6 +58,9 @@ public class LootEditorModule : ModuleBase
                 
                 containerProvider.Resolve<IParameterFactory>()
                     .Register("LootReferenceParameter", new LootParameter(lootPicker, LootSourceType.Reference));
+
+                containerProvider.Resolve<IParameterFactory>()
+                    .Register("LootTreasureParameter", new LootParameter(lootPicker, LootSourceType.Treasure));
             }, true);
     }
 }

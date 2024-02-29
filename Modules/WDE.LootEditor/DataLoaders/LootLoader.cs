@@ -100,15 +100,8 @@ public class LootLoader : ILootLoader
             case LootSourceType.Milling:
             case LootSourceType.Prospecting:
             case LootSourceType.Alter:
-                return new LootEntry[] { new(solutionItemEntry) };
             case LootSourceType.Treasure:
-            {
-                var template = await databaseProvider.GetQuestTemplate(solutionItemEntry);
-                if (template == null)
-                    throw new Exception("Couldn't find quest template with entry " + solutionItemEntry);
-
-                return new LootEntry[] { new(template.QuestRewardId) };
-            }
+                return new LootEntry[] { new(solutionItemEntry) };
             case LootSourceType.Disenchant:
                 return new LootEntry[] { }; // note: this should be loaded from dbc itemsparse
             default:
