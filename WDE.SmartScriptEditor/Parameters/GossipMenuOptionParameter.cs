@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
@@ -11,7 +12,7 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters;
 
-public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>,
+public class GossipMenuOptionParameter : IAsyncContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>,
     IAffectedByOtherParametersParameter
 {
     private readonly ICachedDatabaseProvider databaseProvider;
@@ -28,7 +29,7 @@ public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseEle
     }
 
     public bool AllowUnknownItems => true;
-    
+
     private static SmartScript? GetScript(SmartBaseElement? element)
     {
         if (element is SmartSource source)
@@ -42,26 +43,26 @@ public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseEle
         return null;
     }
 
-    private uint? GetMenuEntry(SmartBaseElement? element)
+    private async ValueTask<uint?> GetMenuEntry(SmartBaseElement? element)
     {
         if (element is SmartEvent ev)
         {
             if (ev.GetParameter(0).Value > 0)
                 return (uint)ev.GetParameter(0).Value;
         }
-        
+
         var script = GetScript(element);
         if (script == null)
             return null;
-        
+
         uint? entry = 0;
         if (script.EntryOrGuid < 0)
-            entry = databaseProvider.GetCreatureByGuid(0, (uint)(-script.EntryOrGuid))?.Entry;
+            entry = (databaseProvider.GetCreatureByGuid(0, (uint)(-script.EntryOrGuid)))?.Entry;
         else if (script.Entry.HasValue)
             entry = script.Entry.Value;
         else
             entry = (uint)script.EntryOrGuid;
-        
+
         if (!entry.HasValue)
             return null;
 
@@ -70,7 +71,7 @@ public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseEle
 
     public async Task<(long, bool)> PickValue(long value, object context)
     {
-        var entry = GetMenuEntry(context as SmartBaseElement);
+        var entry = await GetMenuEntry(context as SmartBaseElement);
         if (!entry.HasValue)
         {
             return await FallbackPicker(value);
@@ -103,17 +104,27 @@ public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseEle
     public bool HasItems => true;
 
     public Dictionary<long, SelectOption>? Items { get; set; }
-    
-    public string ToString(long value, SmartBaseElement context)
+
+    public async Task<string> ToStringAsync(long value, CancellationToken token, SmartBaseElement context)
     {
-        var entry = GetMenuEntry(context);
+        var entry = await GetMenuEntry(context);
         if (entry == null)
             return value.ToString();
-        var options = databaseProvider.GetGossipMenuOptions(entry.Value);
+        var options = await databaseProvider.GetGossipMenuOptionsAsync(entry.Value);
         if (options == null || options.Count == 0)
             return value.ToString();
         var firstOrDefault = options.FirstOrDefault(x => x.OptionIndex == value);
-        return firstOrDefault == null ? value.ToString() : $"{firstOrDefault.Text?.TrimToLength(25)} ({value})";
+        if (firstOrDefault == null)
+            return value.ToString();
+        var text = firstOrDefault.Text;
+        if (text == null && firstOrDefault.BroadcastTextId > 0)
+            text = (await databaseProvider.GetBroadcastTextByIdAsync((uint)firstOrDefault.BroadcastTextId))?.FirstText();
+        return text == null ? value.ToString() : $"{text.TrimToLength(25)} ({value})";
+    }
+
+    public string ToString(long value, SmartBaseElement context)
+    {
+        return "...loading (" + (value) + ")";
     }
     
     public string ToString(long value)

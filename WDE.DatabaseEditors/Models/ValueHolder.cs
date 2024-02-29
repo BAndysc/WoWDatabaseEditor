@@ -213,8 +213,6 @@ namespace WDE.DatabaseEditors.Models
         {
             if (DefaultIsBlank && Comparer<T>.Default.Compare(value.Value, default) == 0)
                 return "";
-            if (value.IsNull)
-                return "(null)";
             
             if (hasCachedStringValue)
                 return cachedStringValue;
@@ -223,6 +221,9 @@ namespace WDE.DatabaseEditors.Models
             {
                 if (!AsyncInProgress)
                     CalculateStringAsync(value.Value!, context, asyncContextualParameter).ListenErrors();
+
+                if (value.IsNull)
+                    return "(null)";
                 return parameter.ToString(value.Value!);
             }
             
@@ -230,9 +231,15 @@ namespace WDE.DatabaseEditors.Models
             {
                 if (!AsyncInProgress)
                     CalculateStringAsync(value.Value!, asyncParameter).ListenErrors();
+
+                if (value.IsNull)
+                    return "(null)";
                 return parameter.ToString(value.Value!);
             }
-            
+
+            if (value.IsNull)
+                return "(null)";
+
             hasCachedStringValue = true;
             if (parameter is IContextualParameter<T, TContext> contextualParameter)
                 return cachedStringValue = contextualParameter.ToString(value.Value!, context);

@@ -35,22 +35,31 @@ public class GameEventService : IGameEventService
 
     public GameEventService(IDatabaseProvider databaseProvider)
     {
-        var gameEvents = databaseProvider.GetGameEvents();
-        GameEvents.AddRange(gameEvents.Select(ge => new GameEventViewModel(ge)));
-
-        ActiveEventsObservable = FunctionalExtensions.Select(ActiveEvents.ToCountChangedObservable(), _ => ActiveEvents);
-
-        foreach (var e in GameEvents)
+        // todo: replace with async
+        try
         {
-            e.ToObservable(x => x.Active)
-                .Skip(1)
-                .SubscribeAction(@is =>
-                {
-                    if (@is)
-                        ActiveEvents.Add(e);
-                    else
-                        ActiveEvents.Remove(e);
-                });
+            var gameEvents = databaseProvider.GetGameEvents();
+            GameEvents.AddRange(gameEvents.Select(ge => new GameEventViewModel(ge)));
+
+            foreach (var e in GameEvents)
+            {
+                e.ToObservable(x => x.Active)
+                    .Skip(1)
+                    .SubscribeAction(@is =>
+                    {
+                        if (@is)
+                            ActiveEvents.Add(e);
+                        else
+                            ActiveEvents.Remove(e);
+                    });
+            }
         }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        ActiveEventsObservable =
+            FunctionalExtensions.Select(ActiveEvents.ToCountChangedObservable(), _ => ActiveEvents);
     }
 }
