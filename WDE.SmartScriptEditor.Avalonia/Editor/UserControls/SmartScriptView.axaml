@@ -69,27 +69,27 @@
             <DockPanel ContextRequested="Control_OnContextRequested">
                 <DockPanel.ContextMenu>
                     <FixedContextMenu>
-                        <MenuItem Command="{CompiledBinding NewActionAboveCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New action above" />
-                        <MenuItem Command="{CompiledBinding NewActionBelowCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New action below" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_above.png" Command="{CompiledBinding NewActionAboveCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New action above" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_below.png" Command="{CompiledBinding NewActionBelowCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New action below" />
                         <Separator IsVisible="{CompiledBinding AnyEventOrActionSelected}" />
-                        <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewEventAboveCommand}" Header="New event above" />
-                        <MenuItem Command="{CompiledBinding NewEventBelowCommand}" Header="New event below" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_event_above.png" IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewEventAboveCommand}" Header="New event above" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_event_below.png" Command="{CompiledBinding NewEventBelowCommand}" Header="New event below" />
                         <Separator />
-                        <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewGroupAboveCommand}" Header="New group above" />
-                        <MenuItem Command="{CompiledBinding NewGroupBelowCommand}" Header="New group below" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_group_above.png" IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewGroupAboveCommand}" Header="New group above" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_group_below.png" Command="{CompiledBinding NewGroupBelowCommand}" Header="New group below" />
                         <Separator />
-                        <MenuItem Command="{CompiledBinding NewCommentAboveCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New comment above" />
-                        <MenuItem Command="{CompiledBinding NewCommentBelowCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New comment below" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_comment_above.png" Command="{CompiledBinding NewCommentAboveCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New comment above" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_comment_below.png" Command="{CompiledBinding NewCommentBelowCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New comment below" />
                         <Separator IsVisible="{CompiledBinding AnyEventOrActionSelected}" />
-                        <MenuItem Command="{CompiledBinding AddLinkCommand}" IsVisible="{CompiledBinding AnySelected}"  Header="Add link" />
-                        <MenuItem Command="{CompiledBinding EditConditionsCommand}" Header="Edit conditions" />
-                        <MenuItem Command="{CompiledBinding DefineGlobalVariable}" Header="Define a global variable" />
+                        <MenuItem WdeImage.MenuIcon="Icons/document_link.png" Command="{CompiledBinding AddLinkCommand}" IsVisible="{CompiledBinding AnySelected}"  Header="Add link" />
+                        <MenuItem WdeImage.MenuIcon="Icons/document_conditions.png" Command="{CompiledBinding EditConditionsCommand}" Header="Edit conditions" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_hash.png" Command="{CompiledBinding DefineGlobalVariable}" Header="Define a global variable" />
                         <Separator />
-                        <MenuItem Command="{CompiledBinding Copy}" Header="Copy" />
-                        <MenuItem Command="{CompiledBinding Cut}" Header="Cut" />
-                        <MenuItem Command="{CompiledBinding Paste}" Header="Paste" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_copy.png" Command="{CompiledBinding Copy}" Header="Copy" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_cut.png" Command="{CompiledBinding Cut}" Header="Cut" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_paste.png" Command="{CompiledBinding Paste}" Header="Paste" />
                         <Separator />
-                        <MenuItem Command="{CompiledBinding DeleteSelected}" Header="Delete" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelected}" Header="Delete" />
                     </FixedContextMenu>
                 </DockPanel.ContextMenu>
                 <userControls:VirtualizedSmartScriptPanel Background="Transparent"

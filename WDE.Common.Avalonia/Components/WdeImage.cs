@@ -16,12 +16,15 @@ namespace WDE.Common.Avalonia.Components
         // we are never releasing those intentionally
         private static Dictionary<ImageUri, Bitmap?> cache = new();
 
+        public static readonly AttachedProperty<object?> MenuIconProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, object?>("MenuIcon", typeof(WdeImage));
+
         static WdeImage()
         {
             AffectsRender<WdeImage>(ImageProperty);
             AffectsMeasure<WdeImage>(ImageProperty);
+            MenuIconProperty.Changed.AddClassHandler<MenuItem>(OnMenuIconChanged);
         }
-        
+
         public ImageUri Image
         {
             get => (ImageUri?) GetValue(ImageProperty) ?? default;
@@ -69,7 +72,7 @@ namespace WDE.Common.Avalonia.Components
 
             return bitmap;
         }
-        
+
         private static Bitmap? LoadBitmapImpl(ImageUri img)
         {
             if (img.Uri == null)
@@ -88,7 +91,7 @@ namespace WDE.Common.Avalonia.Components
                         uri = alternativeUri;
                 }
             }
-            
+
             if (GlobalApplication.HighDpi)
             {
                 var extension = Path.GetExtension(uri);
@@ -104,8 +107,47 @@ namespace WDE.Common.Avalonia.Components
 
             if (!File.Exists(path))
                 return null;
-            
+
             return new Bitmap(path);
+        }
+
+        public static object? GetMenuIcon(IAvaloniaObject obj)
+        {
+            return (object?)obj.GetValue(MenuIconProperty);
+        }
+
+        public static void SetMenuIcon(IAvaloniaObject obj, object? value)
+        {
+            obj.SetValue(MenuIconProperty, value);
+        }
+
+        private static void OnMenuIconChanged(MenuItem menuItem, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is null)
+            {
+                menuItem.Icon = null!;
+                return;
+            }
+
+            WdeImage? image = menuItem.Icon as WdeImage;
+            if (image == null)
+            {
+                image = new WdeImage();
+                menuItem.Icon = image;
+            }
+
+            if (e.NewValue is ImageUri uri)
+            {
+                image.Image = uri;
+            }
+            else if (e.NewValue is string s)
+            {
+                image.ImageUri = s;
+            }
+            else
+            {
+                throw new Exception("Invalid type: MenuIcon must be string? or ImageUri?, got " + e.NewValue.GetType() + " instead");
+            }
         }
     }
 }

@@ -75,18 +75,8 @@ public partial class DefinitionViewModel : ObservableBase, IDropTarget
     
     public ObservableCollectionExtended<ColumnGroupViewModel> Groups { get; } = new();
     
-    private IconViewModel? iconPath;
-    public IconViewModel? IconPath
-    {
-        get => iconPath;
-        set
-        {
-            iconPath = value;
-            RaisePropertyChanged(nameof(IconPath));
-            RaisePropertyChanged(nameof(IsNonNullIcon));
-        }
-    }
-    
+    [Notify] private string? iconPath;
+
     public string CompatibilityString => string.Join(", ", Compatibility.Where(x => x.IsChecked).Select(x => x.Tag));
     
     public ObservableCollectionExtended<DatabaseSourceColumnViewModel> DatabaseSourceColumns { get; } = new();
@@ -142,10 +132,7 @@ public partial class DefinitionViewModel : ObservableBase, IDropTarget
         isOnlyConditionsTable = model.IsOnlyConditionsTable;
         skipQuickLoad = model.SkipQuickLoad;
         groupName = model.GroupName;
-        iconPath = model.IconPath == null 
-            ? null 
-            : DefinitionEditorStatic.Icons.FirstOrDefault(x => x.Path == model.IconPath) ??
-              new IconViewModel(new ImageUri(model.IconPath));
+        iconPath = model.IconPath;
         reloadCommand = model.ReloadCommand;
         if (model.SortBy != null)
             SortBy.AddRange(model.SortBy.Select(col => new SortByViewModel(this, col)));
@@ -363,20 +350,6 @@ public partial class DefinitionViewModel : ObservableBase, IDropTarget
             }
             RebuildColumnPreview();
         });
-    }
-
-    public bool IsNonNullIcon
-    {
-        get => iconPath != null;
-        set
-        {
-            if (!value)
-                iconPath = null;
-            else if (iconPath == null)
-                iconPath = DefinitionEditorStatic.Icons.FirstOrDefault();
-            RaisePropertyChanged(nameof(IconPath));
-            RaisePropertyChanged(nameof(IsNonNullIcon));
-        }
     }
 
     public bool IsTemplate => recordMode == RecordMode.Template;

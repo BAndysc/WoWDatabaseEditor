@@ -9,10 +9,12 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
 using Prism.Commands;
+using WDE.Common.Avalonia.Components;
 using WDE.Common.Avalonia.Controls;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.ViewModels;
@@ -70,10 +72,11 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 temporaryMenuItems.Clear();
             }
 
-            void AddMenuItem(string header, ICommand command)
+            void AddMenuItem(string header, ImageUri? icon, ICommand command)
             {
                 var menuItem = new MenuItem()
                 {
+                    Icon = icon == null ? null! : new WdeImage(){ Image = icon.Value },
                     Header = header,
                     Command = command,
                     CommandParameter = dataContext
@@ -95,7 +98,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             {
                 if (ftb.OverContext is ParameterWithContext context)
                 {
-                    AddMenuItem("Copy parameter value", new DelegateCommand(() =>
+                    AddMenuItem("Copy parameter value", new ImageUri("Icons/icon_copy.png"), new DelegateCommand(() =>
                     {
                         AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(context.Parameter.Value.ToString()).ListenErrors();
                     }));
@@ -106,7 +109,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                     SmartSource sourceOrTarget = sourceTarget.IsSource ? sourceTarget.RelatedAction.Source : sourceTarget.RelatedAction.Target;
                     if (sourceOrTarget.IsPosition)
                     {
-                        AddMenuItem("Copy coords", new DelegateCommand(() =>
+                        AddMenuItem("Copy coords", new ImageUri("Icons/icon_copy.png"), new DelegateCommand(() =>
                         {
                             var coords = $"{sourceOrTarget.X} {sourceOrTarget.Y} {sourceOrTarget.Z} {sourceOrTarget.O}";
                             AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(coords).ListenErrors();
@@ -119,7 +122,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             if (dynamicMenuItems != null && dynamicMenuItems.Count > 0)
             {
                 foreach (var menu in dynamicMenuItems)
-                    AddMenuItem(menu.Name, menu);
+                    AddMenuItem(menu.Name, menu.Icon, menu);
                 anythingAdded = true;
             }
 
@@ -145,7 +148,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                         if (anythingAdded)
                             AddSeparator();
 
-                        AddMenuItem(header,
+                        AddMenuItem(header, null,
                             new AsyncAutoCommand(async () => { await spellDebugger.ToggleSpellDebugging(spellId); })
                                 .WrapMessageBox<Exception>(ViewBind.ResolveViewModel<IMessageBoxService>()));
                         anythingAdded = true;

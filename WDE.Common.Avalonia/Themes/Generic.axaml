@@ -4,7 +4,8 @@
         xmlns:themes="clr-namespace:WDE.Common.Avalonia.Themes"
         xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters"
         xmlns:components="clr-namespace:WDE.Common.Avalonia.Components"
-        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils">
+        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime">
     <Styles.Resources>
         <converters:LongToBoolConverter x:Key="LongToBoolConverter" />
         <converters:StripTagConverter x:Key="StripTagConverter" />
@@ -213,5 +214,28 @@
     <Style Selector="HexViewControl /template/ Border#PART_BorderElement">
         <Setter Property="Background" Value="{DynamicResource TextControlBackgroundDisabled}" />
         <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushDisabled}" />
+    </Style>
+
+    <Style Selector="WdeIconPicker">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel>
+                    <CheckBox IsChecked="{TemplateBinding IsNonNullIcon, Mode=TwoWay}" />
+                    <CompletionComboBox SelectedItem="{TemplateBinding IconPath, Mode=TwoWay}"
+                                        IsEnabled="{TemplateBinding IsNonNullIcon}"
+                                        Items="{x:Static DefinitionEditorStatic.Icons}"
+                                        x:Name="ComboBox">
+                        <CompletionComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel x:DataType="sys:String">
+                                    <WdeImage ImageUri="{CompiledBinding  .}" Width="16" Height="16" Margin="0,0,5,0" />
+                                    <TextBlock Text="{CompiledBinding  .}" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </CompletionComboBox.ItemTemplate>
+                    </CompletionComboBox>
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
     </Style>
 </Styles>

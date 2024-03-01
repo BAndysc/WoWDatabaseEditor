@@ -77,21 +77,7 @@ MultiRecord and SingleRow can be used for tables with multi (or single) column p
         <NullableTextBox Text="{CompiledBinding GroupName}" />
 
         <TextBlock ToolTip.Tip="Self explanatory, I guess? Did you really hover this to get help?">Icon:</TextBlock>
-        <DockPanel>
-            <CheckBox IsChecked="{CompiledBinding IsNonNullIcon}" />
-            <CompletionComboBox SelectedItem="{CompiledBinding IconPath}"
-                                IsEnabled="{CompiledBinding IsNonNullIcon}"
-                      Items="{x:Static tools:DefinitionEditorStatic.IconsSource}">
-                <CompletionComboBox.ItemTemplate>
-                    <DataTemplate DataType="definitionEditor:IconViewModel">
-                        <DockPanel>
-                            <WdeImage Image="{CompiledBinding  Icon}" Width="16" Height="16" Margin="0,0,5,0" />
-                            <TextBlock Text="{CompiledBinding  Path}" />
-                        </DockPanel>
-                    </DataTemplate>
-                </CompletionComboBox.ItemTemplate>
-            </CompletionComboBox>
-        </DockPanel>
+        <WdeIconPicker IconPath="{CompiledBinding IconPath}" />
 
         <TextBlock ToolTip.Tip="Comma separated (,) list of command that will be invoked upon table save. {} will be substituted by a comma separated list of values of the first column in the primary key.">Reload command:</TextBlock>
         <NullableTextBox FontFamily="Consolas,Menlo,Courier,Courier New" Watermark="Comma (,) separated list" Text="{CompiledBinding ReloadCommand}" />

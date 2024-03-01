@@ -57,7 +57,7 @@ public class DefinitionExporterService : IDefinitionExporterService
             IsOnlyConditionsTable = vm.IsOnlyConditionsTable,
             SkipQuickLoad = vm.SkipQuickLoad,
             GroupName = vm.GroupName,
-            IconPath = vm.IconPath?.Path,
+            IconPath = vm.IconPath,
             ReloadCommand = vm.ReloadCommand,
             SortBy = vm.SortBy.Count == 0 ? null : vm.SortBy.Select(s => s.ColumnName).ToArray(),
             Picker = vm.Picker?.ParameterName ?? "",

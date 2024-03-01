@@ -200,7 +200,11 @@ namespace WDE.SmartScriptEditor.Data
         [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty(PropertyName = "command")]
         public SmartContextMenuCommand Command { get; set; }
-        
+
+        [DefaultEquality]
+        [JsonProperty(PropertyName = "icon")]
+        public string? Icon { get; set; }
+
         // AddEvent
         
         [DefaultEquality]

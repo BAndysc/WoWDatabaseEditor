@@ -98,7 +98,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
                     }
                     
                     if (menuItem.EventId == null)
-                        command = new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, _ => {}, _ => false);
+                        command = new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon),_ => {}, _ => false);
                     else
                         command = GenerateAddEventCommand(menuItem);
                 }
@@ -107,7 +107,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
                     command = GenerateOpenScriptCommand(menuItem);
                 }
                 else
-                    command = new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, _ => {}, _ => false);
+                    command = new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon), _ => {}, _ => false);
                 
                 menus.Add(new Entry(command, shouldShow));
             }
@@ -116,7 +116,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
 
     private NamedDelegateCommand<SmartScriptEditorViewModel> GenerateOpenScriptCommand(SmartContextMenuData menuItem)
     {
-        return new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, vm =>
+        return new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon), vm =>
         {
             var selectedActionIndex = vm.FirstSelectedActionIndex;
             if (selectedActionIndex.eventIndex == -1 || selectedActionIndex.actionIndex == -1)
@@ -133,7 +133,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
     private NamedDelegateCommand<SmartScriptEditorViewModel> GenerateAddEventCommand(SmartContextMenuData menuItem)
     {
         var eventData = dataManager.GetDataByName(SmartType.SmartEvent, menuItem.EventId!);
-        return new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, vm =>
+        return new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon), vm =>
         {
             var selectedActionIndex = vm.FirstSelectedActionIndex;
             if (selectedActionIndex.eventIndex == -1 || selectedActionIndex.actionIndex == -1)
