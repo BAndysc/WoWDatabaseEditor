@@ -115,7 +115,17 @@
                     </StackPanel>
                 </StackPanel>
             </Border>
-            
+
+            <Border Classes="infoBox" IsVisible="{CompiledBinding !IsDotNet8Installed}">
+                <StackPanel Orientation="Vertical" TextBlock.FontSize="13">
+                    <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">You need to install .NET 8</TextBlock>
+                    <TextBlock TextWrapping="WrapWithOverflow">In the near future the editor will require the new .NET 8. You need to install it in order to continue using the editor. Why not do it now so that you are prepared?</TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Command="{CompiledBinding OpenDotNet8Website}" Margin="0,0,5,0">Okay 👍! (this will open the .net website)</Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <!-- <Border Classes="infoBox" IsVisible="{CompiledBinding ShowAnniversaryBox}"> -->
             <!--     <DockPanel> -->
             <!--         <WdeImage VerticalAlignment="Center" ImageUri="Icons/document_party_big.png" Width="32" Height="32" /> -->

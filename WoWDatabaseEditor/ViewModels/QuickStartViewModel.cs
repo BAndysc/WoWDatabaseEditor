@@ -7,6 +7,7 @@ using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
+using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Documents;
@@ -33,7 +34,7 @@ using WoWDatabaseEditorCore.Services.Statistics;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
-    public class QuickStartViewModel : ObservableBase, IDocument
+    public partial class QuickStartViewModel : ObservableBase, IDocument
     {
         private readonly ISolutionItemIconRegistry iconRegistry;
         private readonly ISolutionItemNameRegistry nameRegistry;
@@ -60,7 +61,11 @@ namespace WoWDatabaseEditorCore.ViewModels
         public string ProgramSubtitle { get; }
         
         public object? QuickStartPanel { get; }
-        
+
+        [Notify] private bool isDotNet8Installed = true;
+
+        public ICommand OpenDotNet8Website { get; }
+
         public QuickStartViewModel(ISolutionItemProvideService solutionItemProvideService, 
             IEnumerable<IWizardProvider> wizards,
             IEventAggregator eventAggregator,
@@ -172,6 +177,17 @@ namespace WoWDatabaseEditorCore.ViewModels
             } catch (Exception)
             {
             }
+
+            OpenDotNet8Website = new DelegateCommand(() =>
+            {
+                windowManager.OpenUrl(dotNetService.DownloadDotNet8Link.ToString());
+            });
+
+            async Task Initialize()
+            {
+                IsDotNet8Installed = await dotNetService.IsDotNet8Installed();
+            }
+            Initialize().ListenErrors();
         }
 
         private void ReloadMruList()
