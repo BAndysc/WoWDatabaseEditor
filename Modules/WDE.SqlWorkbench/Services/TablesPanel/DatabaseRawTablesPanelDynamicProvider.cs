@@ -25,10 +25,10 @@ internal class ConnectionsTablesToolProvider : ITablesToolGroupsProvider
     
     public IEnumerable<ITablesToolGroup> GetProviders()
     {
-        return connectionsManager.StaticConnections.Select(x =>
+        return new ITablesToolGroup[]{new Avalonia11BugDemoViewModel()}.Concat(connectionsManager.StaticConnections.Select(x =>
         {
             var vm = containerProvider.Resolve<ConnectionListToolViewModel>((typeof(IConnection), x));
             return vm;
-        });
+        }));
     }
 }

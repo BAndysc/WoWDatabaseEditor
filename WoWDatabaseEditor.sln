@@ -252,6 +252,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Model.Avalonia", "Dock
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Model.Mvvm", "Dock\src\Dock.Model.Mvvm\Dock.Model.Mvvm.csproj", "{02227B40-549A-4458-BDD3-F040341D9DD4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Settings", "Dock\src\Dock.Settings\Dock.Settings.csproj", "{9B3AD76C-45D5-4D7A-92F3-53845C0612FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -698,6 +700,10 @@ Global
 		{02227B40-549A-4458-BDD3-F040341D9DD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02227B40-549A-4458-BDD3-F040341D9DD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02227B40-549A-4458-BDD3-F040341D9DD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B3AD76C-45D5-4D7A-92F3-53845C0612FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B3AD76C-45D5-4D7A-92F3-53845C0612FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B3AD76C-45D5-4D7A-92F3-53845C0612FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B3AD76C-45D5-4D7A-92F3-53845C0612FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -798,6 +804,7 @@ Global
 		{AF918C21-15DC-4DE6-9B98-DF9EAF4FA42B} = {59AF6589-114A-4603-863D-469057E87A23}
 		{61FEC192-1BBF-45AD-81B3-265F3CA550B1} = {AE8F68E4-310D-4A59-9B78-5B44CAB1DBF6}
 		{02227B40-549A-4458-BDD3-F040341D9DD4} = {AE8F68E4-310D-4A59-9B78-5B44CAB1DBF6}
+		{9B3AD76C-45D5-4D7A-92F3-53845C0612FD} = {AE8F68E4-310D-4A59-9B78-5B44CAB1DBF6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E63D4A5-8159-4344-B556-1E1D8D63DA99}
