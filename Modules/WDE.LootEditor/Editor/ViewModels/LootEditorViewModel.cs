@@ -625,7 +625,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         
         foreach (var item in items)
         {
-            var vm = group.AddNewLootItem(LootEditorFeatures.ItemCanBeCurrency ? -item : item);
+            var vm = group.AddNewLootItem(item);
             await vm.MinCountOrRef.SetValue(-item);
         }
     }
