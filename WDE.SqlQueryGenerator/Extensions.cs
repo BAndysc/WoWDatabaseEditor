@@ -428,7 +428,6 @@ namespace WDE.SqlQueryGenerator
             if (o is Variable var)
                 return var.ToString();
             throw new Exception($"Invalid type in ToSql: {o.GetType()}");
-            return o.ToString() ?? "[INVALID TYPE]";
         }
 
         private static string StringQuotes = "'";

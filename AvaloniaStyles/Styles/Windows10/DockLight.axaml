@@ -14,26 +14,26 @@
         <Style Selector="idc|DocumentControl /template/ Border#PART_Border ContentControl#PART_ContentPresenter">
                 <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         </Style>
-        <Style Selector="idc|DocumentControl TabStripItem">
+        <Style Selector="idc|DocumentControl DocumentTabStripItem">
                 <Setter Property="Background" Value="#364E6F" />
         </Style>
-        <Style Selector="idc|DocumentControl /template/ TabStrip#PART_TabStrip TabStripItem:pointerover:not(:selected)">
+        <Style Selector="idc|DocumentControl DocumentTabStripItem:pointerover:not(:selected)">
                 <Setter Property="Background" Value="#5F7096"/>
                 <Setter Property="Foreground" Value="White" />
         </Style>
-        <Style Selector="idc|DocumentControl:not(:active) /template/ TabStrip#PART_TabStrip TabStripItem:pointerover">
+        <Style Selector="idc|DocumentControl:not(:active) DocumentTabStripItem:pointerover">
                 <Setter Property="Background" Value="#5F7096"/>
                 <Setter Property="Foreground" Value="White" />
         </Style>
-        <Style Selector="idc|ToolControl TabStrip#PART_TabStrip TabStripItem">
+        <Style Selector="idc|ToolControl ToolTabStripItem">
                 <Setter Property="Foreground" Value="White" />
                 <Setter Property="Background" Value="#515F7F" />
         </Style>
-        <Style Selector="idc|ToolControl TabStrip#PART_TabStrip TabStripItem:pointerover">
+        <Style Selector="idc|ToolControl ToolTabStripItem:pointerover">
                 <Setter Property="Foreground" Value="White" />
                 <Setter Property="Background" Value="#5F7096" />
         </Style>
-        <Style Selector="idc|ToolControl /template/ TabStrip#PART_TabStrip TabStripItem:selected">
+        <Style Selector="idc|ToolControl ToolTabStripItem:selected">
                 <Setter Property="Foreground" Value="{DynamicResource DockApplicationAccentForegroundBrush}" />
                 <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         </Style>
@@ -43,7 +43,7 @@
         <Style Selector="idc|DocumentControl /template/ Grid#PART_Grid">
                 <Setter Property="Background" Value="#515F7F"/>
         </Style>
-        <Style Selector="idc|DocumentControl:not(:active) /template/ TabStrip#PART_TabStrip TabStripItem:selected">
+        <Style Selector="idc|DocumentControl:not(:active) DocumentTabStripItem:selected">
                 <Setter Property="Background" Value="#515F7F" />
         </Style>
 </Styles>

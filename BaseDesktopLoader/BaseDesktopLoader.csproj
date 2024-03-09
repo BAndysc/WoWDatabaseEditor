@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <OutputPath>..\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+    <Import Project="..\Module.props" />
+    <Import Project="..\Avalonia.props" />
+
+    <ItemGroup>
+      <ProjectReference Include="..\Rendering\TheEngine\TheEngine.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditorCore.Avalonia\WoWDatabaseEditorCore.Avalonia.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AsyncAwaitBestPractices" Version="7.0.0" />
+    </ItemGroup>
+
+
+</Project>

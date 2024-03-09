@@ -1,33 +1,42 @@
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.Common.Providers;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters
 {
-    public class CreatureSpawnKeyParameter : IContextualParameter<long, SmartBaseElement>
+    public class CreatureSpawnKeyParameter : ICustomPickerContextualParameter<long>
     {
         private readonly IDatabaseProvider databaseProvider;
+        private readonly IItemFromListProvider itemFromListProvider;
 
-        public CreatureSpawnKeyParameter(IDatabaseProvider databaseProvider)
+        public CreatureSpawnKeyParameter(IDatabaseProvider databaseProvider,
+            IItemFromListProvider itemFromListProvider)
         {
             this.databaseProvider = databaseProvider;
+            this.itemFromListProvider = itemFromListProvider;
         }
 
         public string? Prefix => null;
-        
+
         public bool HasItems => true;
-        
+
         public bool AllowUnknownItems => true;
-        
+
         public string ToString(long value) => value.ToString();
 
         public Dictionary<long, SelectOption>? Items => null;
 
-        public Dictionary<long, SelectOption>? ItemsForContext(SmartBaseElement context)
+        public async Task<(long, bool)> PickValue(long value, object context)
         {
-            var entry = context.GetParameter(0).Value;
-            var spawns = databaseProvider.GetCreaturesByEntry((uint)entry);
+            if (context is not SmartBaseElement ctx)
+                return (0, false);
+
+            var entry = ctx.GetParameter(0).Value;
+            var spawns = await databaseProvider.GetCreaturesByEntryAsync((uint)entry);
             Dictionary<long, SelectOption>? dict = null;
             foreach (var s in spawns)
             {
@@ -36,7 +45,9 @@ namespace WDE.SmartScriptEditor.Parameters
                 dict ??= new();
                 dict[s.SpawnKey] = new SelectOption("Spawn key " + s.SpawnKey);
             }
-            return dict;
+
+            var result = await itemFromListProvider.GetItemFromList(dict, false, value);
+            return (result ?? 0, result.HasValue);
         }
 
         public string ToString(long value, SmartBaseElement context) => value.ToString();

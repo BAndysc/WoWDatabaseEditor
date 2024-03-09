@@ -11,7 +11,7 @@
   <UserControl.Styles>
     <StyleInclude Source="avares://WDE.SourceCodeIntegrationEditor/VisualStudioIntegration/Views/BalloonPopup.axaml" />
   </UserControl.Styles>
-  <ItemsControl ClipToBounds="False" Items="{CompiledBinding LoosePopups}">
+  <ItemsControl ClipToBounds="False" ItemsSource="{CompiledBinding LoosePopups}">
     <ItemsControl.ItemTemplate>
       <DataTemplate>
         <views:BreakpointHitPopupView />

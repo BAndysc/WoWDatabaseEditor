@@ -13,6 +13,7 @@
              Title="{CompiledBinding Title}"
              Name="ThisWindow"
              x:DataType="managers:IDialog"
+             Focusable="True"
              prism:ViewModelLocator.AutoWireViewModel="False">
     <controls:ExtendedWindow.KeyBindings>
         <KeyBinding Gesture="Escape" Command="{CompiledBinding Cancel}" />
@@ -21,7 +22,7 @@
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
             <controls:ToolBar.MiddleContent>
-                <ContentPresenter DataContext="{CompiledBinding #ThisWindow.DataContext}" Content="{CompiledBinding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+                <ContentControl DataContext="{CompiledBinding #ThisWindow.DataContext}" Content="{CompiledBinding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
             </controls:ToolBar.MiddleContent>
         </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>

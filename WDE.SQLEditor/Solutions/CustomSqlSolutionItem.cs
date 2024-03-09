@@ -8,7 +8,12 @@ namespace WDE.SQLEditor.Solutions
 {
     public class CustomSqlSolutionItem : ISolutionItem, IRenameableSolutionItem, IEquatable<CustomSqlSolutionItem>
     {
-        public string Id { get; set; }
+        public CustomSqlSolutionItem(string id)
+        {
+            Id = id;
+        }
+
+        public string Id { get; }
 
         public string Name { get; set; } = "Custom query";
 
@@ -26,7 +31,7 @@ namespace WDE.SQLEditor.Solutions
         
         public ISolutionItem Clone()
         {
-            return new CustomSqlSolutionItem() { Id = Id, Query = Query, Database = Database };
+            return new CustomSqlSolutionItem(Id) { Query = Query, Database = Database };
         }
 
         public void Rename(string newName)
@@ -34,14 +39,14 @@ namespace WDE.SQLEditor.Solutions
             Name = newName;
         }
 
-        public bool Equals(CustomSqlSolutionItem other)
+        public bool Equals(CustomSqlSolutionItem? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Id == other.Id;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

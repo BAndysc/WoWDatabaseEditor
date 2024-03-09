@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using WDE.Common.CoreVersion;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
 
@@ -18,6 +20,8 @@ namespace WDE.SmartScriptEditor.Inspections
     [AutoRegister]
     public class SmartScriptInspectorService : ISmartScriptInspectorService
     {
+        private readonly ISmartDataManager smartDataManager;
+        private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly IList<IScriptInspection> scriptInspections = new List<IScriptInspection>();
 
         private readonly IList<IEventInspection> eventInspections = new List<IEventInspection>();
@@ -30,19 +34,29 @@ namespace WDE.SmartScriptEditor.Inspections
 
         public SmartScriptInspectorService(ISmartDataManager smartDataManager, ICurrentCoreVersion currentCoreVersion)
         {
-            foreach (var ev in smartDataManager.GetAllData(SmartType.SmartEvent))
+            this.smartDataManager = smartDataManager;
+            this.currentCoreVersion = currentCoreVersion;
+            smartDataManager.GetAllData(SmartType.SmartEvent)
+                .CombineLatest(smartDataManager.GetAllData(SmartType.SmartAction))
+                .CombineLatest(smartDataManager.GetAllData(SmartType.SmartTarget))
+                .SubscribeAction(tuple => Load(tuple.First.First, tuple.First.Second, tuple.Second));
+        }
+
+        private void Load(IReadOnlyList<SmartGenericJsonData> events, IReadOnlyList<SmartGenericJsonData> actions, IReadOnlyList<SmartGenericJsonData> targets)
+        {
+            foreach (var ev in events)
             {
                 foreach (var inspection in GenerateRules(ev))
                     AddEventRule(inspection.Item1, inspection.Item2);
             }
             
-            foreach (var ev in smartDataManager.GetAllData(SmartType.SmartAction))
+            foreach (var ev in actions)
             {
                 foreach (var inspection in GenerateRules(ev))
                     AddActionRule(inspection.Item1, inspection.Item2);
             }
             
-            foreach (var ev in smartDataManager.GetAllData(SmartType.SmartTarget))
+            foreach (var ev in targets)
             {
                 foreach (var inspection in GenerateRules(ev))
                     AddTargetRule(inspection.Item1, inspection.Item2);
@@ -76,7 +90,7 @@ namespace WDE.SmartScriptEditor.Inspections
             eventInspections.Add(new UnusedParameterInspection());
             actionInspections.Add(new UnusedParameterInspection());
         }
-        
+
         public IReadOnlyList<IInspectionResult> GenerateInspections(SmartScriptBase script)
         {
             var list = new List<IInspectionResult>();

@@ -25,9 +25,9 @@ public class GameStandaloneWindow : TheEngineOpenTkWindow, IClipboardService
         mainThreadImpl.Tick(TimeSpan.FromSeconds(args.Time));
     }
 
-    public Task<string> GetText()
+    public Task<string?> GetText()
     {
-        return Task.FromResult(ClipboardString);
+        return Task.FromResult<string?>(ClipboardString);
     }
 
     public void SetText(string text)

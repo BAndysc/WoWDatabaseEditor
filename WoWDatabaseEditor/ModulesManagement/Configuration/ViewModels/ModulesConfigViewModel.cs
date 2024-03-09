@@ -32,7 +32,9 @@ namespace WoWDatabaseEditorCore.ModulesManagement.Configuration.ViewModels
             if (conflictingAssembly == null)
                 return "";
 
+            #pragma warning disable IL3000
             return $"Conflicts with {conflictingAssembly.GetName().Name} ({conflictingAssembly.Location})";
+            #pragma warning restore IL3000
         }
 
         public string Name => "Modules";

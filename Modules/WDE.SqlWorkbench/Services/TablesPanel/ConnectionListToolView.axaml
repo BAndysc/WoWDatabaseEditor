@@ -16,7 +16,7 @@
     <DockPanel LastChildFill="True" KeyboardNavigation.TabNavigation="Local"> 
         <TextBox TabIndex="0" Name="SearchTextBox" KeyDown="Search_KeyDown" DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
         <Panel>
-            <ScrollViewer>
+            <ScrollViewer HorizontalScrollBarVisibility="Auto">
                 <VirtualizedTreeView Items="{CompiledBinding FlatItems}"
                                      SelectedNode="{CompiledBinding Selected}"
                                      IsFiltered="True"
@@ -30,7 +30,7 @@
                         <DataTemplate DataType="tablesPanel:INamedNodeType" x:DataType="tablesPanel:INamedNodeType">
                             <DockPanel>
                                 <WdeImage Width="16" Height="16" Margin="0,0,5,0" Image="{CompiledBinding Icon}" />
-                                <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{CompiledBinding Name}" />
+                                <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Name}" />
                             </DockPanel>
                         </DataTemplate>
                         <DataTemplate DataType="tablesPanel:RowLoadingViewModel" x:DataType="tablesPanel:RowLoadingViewModel">

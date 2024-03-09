@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Types;
@@ -143,13 +144,13 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
                 ErrorIfConnectionChanged();
                 await ApplyChangesAsync(true);
             }
-            catch (TaskCanceledException e)
+            catch (TaskCanceledException)
             {
                 // ignore on purpose, because it means user canceled the operation
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e, "Error while applying changes");
                 await vm.UserQuestions.SaveErrorAsync(e);   
             }
         }, () => !RefreshInProgress);
@@ -306,7 +307,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             await ApplyChangesAsync(true);
             return true;
         }
-        catch (TaskCanceledException e)
+        catch (TaskCanceledException)
         {
             return false; // ignore on purpose, because it means user canceled the operation
         }

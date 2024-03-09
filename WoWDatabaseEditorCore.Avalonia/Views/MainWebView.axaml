@@ -1,0 +1,273 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mvvm="http://prismlibrary.com/"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
+             xmlns:docking="clr-namespace:WoWDatabaseEditorCore.Avalonia.Docking"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:types="clr-namespace:WDE.Common.Types;assembly=WDE.Common"
+             xmlns:quickAccess="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.QuickAccess"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
+             xmlns:profiles1="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.Profiles"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:menu="clr-namespace:WDE.Common.Menu;assembly=WDE.Common"
+             xmlns:controls1="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls"
+             x:DataType="viewModels:MainWindowViewModel"
+             Background="{DynamicResource WindowContentBackground}"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             utils:MenuBind.MenuItemsGestures="{CompiledBinding MenuItemProviders}"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWebView">
+    <UserControl.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        <StreamGeometry x:Key="PlayIcon">M13.586,6.529C14.094,6.834 14.406,7.384 14.406,7.977C14.406,8.571 14.094,9.121 13.586,9.426C10.677,11.171 5.84,14.074 3.086,15.726C2.661,15.981 2.131,15.988 1.699,15.743C1.267,15.499 1,15.041 1,14.545C1,11.078 1,4.759 1,1.335C1,0.854 1.259,0.41 1.677,0.173C2.095,-0.064 2.609,-0.057 3.021,0.19C5.763,1.835 10.654,4.77 13.586,6.529ZM2.5,1.627L12.814,7.815C12.871,7.849 12.906,7.911 12.906,7.977C12.906,8.044 12.871,8.106 12.814,8.14L2.5,14.328L2.5,1.627Z</StreamGeometry>
+        <GeometryGroup x:Key="ToSqlIcon">
+            <PathGeometry>M2,3L2,13</PathGeometry>
+            <PathGeometry>M12,3L12,8</PathGeometry>
+            <PathGeometry>M2,4C2,4 3,6 7,6C11,6 12,4 12,4</PathGeometry>
+            <PathGeometry>M12,3C12,3 11,1 7,1C3,1 2,3 2,3</PathGeometry>
+            <PathGeometry>M2,8C2,8 3,10 7,10C11,10 12,8 12,8</PathGeometry>
+            <PathGeometry>M2,13C2,13 3,15 7,15</PathGeometry>
+            <PathGeometry>M13,11L13,15</PathGeometry>
+            <PathGeometry>M11,13L13,15L15,13</PathGeometry>
+        </GeometryGroup>
+        <GeometryGroup  x:Key="CopyIcon">
+            <PathGeometry>M8,5.498C8,5.366 7.948,5.239 7.854,5.146C7.761,5.052 7.634,5 7.502,5C6.734,5 5.269,5 4.5,5C4.367,5 4.24,5.053 4.146,5.146C4.053,5.24 4,5.367 4,5.5C4,5.501 4,5.503 4,5.504C4,5.636 4.052,5.762 4.145,5.855C4.238,5.948 4.364,6 4.496,6C5.267,6 6.746,6 7.512,6C7.642,6 7.766,5.949 7.857,5.857C7.949,5.766 8,5.642 8,5.512C8,5.508 8,5.503 8,5.498Z</PathGeometry>
+            <PathGeometry>M10,8.498C10,8.223 9.777,8 9.502,8C8.373,8 5.631,8 4.5,8C4.224,8 4,8.224 4,8.5C4,8.501 4,8.503 4,8.504C4,8.778 4.222,9 4.496,9C5.627,9 8.389,9 9.512,9C9.642,9 9.766,8.949 9.857,8.857C9.949,8.766 10,8.642 10,8.512C10,8.508 10,8.503 10,8.498Z</PathGeometry>
+            <PathGeometry>M10,11.498C10,11.223 9.777,11 9.502,11C8.373,11 5.631,11 4.5,11C4.224,11 4,11.224 4,11.5C4,11.501 4,11.503 4,11.504C4,11.778 4.222,12 4.496,12C5.627,12 8.389,12 9.512,12C9.642,12 9.766,11.949 9.857,11.857C9.949,11.766 10,11.642 10,11.512C10,11.508 10,11.503 10,11.498Z</PathGeometry>
+            <PathGeometry>M12,3.662C12,2.744 11.256,2 10.338,2C8.457,2 5.416,2 3.573,2C3.156,2 2.756,2.166 2.461,2.461C2.166,2.756 2,3.156 2,3.573C2,5.861 2,10.085 2,12.392C2,12.819 2.169,13.228 2.471,13.529C2.772,13.831 3.181,14 3.608,14C5.481,14 8.556,14 10.418,14C11.292,14 12,13.292 12,12.418C12,10.146 12,5.978 12,3.662ZM10.5,3.662C10.5,3.662 10.5,12.418 10.5,12.418C10.5,12.463 10.463,12.5 10.418,12.5C10.418,12.5 3.608,12.5 3.608,12.5C3.579,12.5 3.552,12.489 3.532,12.468C3.511,12.448 3.5,12.421 3.5,12.392C3.5,10.085 3.5,5.861 3.5,3.573C3.5,3.553 3.508,3.535 3.521,3.521C3.535,3.508 3.553,3.5 3.573,3.5C3.573,3.5 10.338,3.5 10.338,3.5C10.427,3.5 10.5,3.573 10.5,3.662Z</PathGeometry>
+            <PathGeometry>M4.002,1.503C4.019,1.112 4.182,0.739 4.461,0.461C4.756,0.166 5.156,0 5.573,0C7.416,0 10.457,0 12.338,0C13.256,0 14,0.744 14,1.662C14,3.978 14,8.146 14,10.418C14,11.292 13.292,12 12.418,12L12,12L12,10.5L12.418,10.5C12.463,10.5 12.5,10.463 12.5,10.418C12.5,10.418 12.5,1.662 12.5,1.662C12.5,1.573 12.427,1.5 12.338,1.5C12.338,1.5 5.573,1.5 5.573,1.5C5.565,1.5 5.558,1.501 5.551,1.503L4.002,1.503Z</PathGeometry>
+        </GeometryGroup>
+        <GeometryGroup x:Key="FindAnywhereIcon">
+            <PathGeometry>M7.5,0C10.536,0 13,2.464 13,5.5C13,8.536 10.536,11 7.5,11C4.464,11 2,8.536 2,5.5C2,2.464 4.464,0 7.5,0ZM7.5,1.4C9.763,1.4 11.6,3.237 11.6,5.5C11.6,7.763 9.763,9.6 7.5,9.6C5.237,9.6 3.4,7.763 3.4,5.5C3.4,3.237 5.237,1.4 7.5,1.4Z</PathGeometry>
+            <PathGeometry>M9.158,10.539L12.205,15.304C12.503,15.769 13.122,15.905 13.587,15.608C14.052,15.311 14.188,14.692 13.89,14.227L10.842,9.461C10.545,8.996 9.926,8.86 9.461,9.158C8.996,9.455 8.86,10.074 9.158,10.539Z</PathGeometry>
+        </GeometryGroup>
+
+        <GeometryGroup x:Key="Open3DIcon">
+            <PathGeometry>M15,3L6.36,0.802L1,3L1,13L9,15L10,14.999L15,13L15,3ZM2,4.221L2,12.19L9,13.95L9,5.981L2,4.221ZM10,5.997L10,13.915L14,12.239L14,4.321L10,5.997ZM2.78,3.386L9.198,5L9.791,5L13.2,3.572L6.41,1.865L2.78,3.386Z</PathGeometry>
+        </GeometryGroup>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="views|MainWebView.win10 :is(Control).HideWin10">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="views|MainWebView.win11 :is(Control).HideWin11">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </UserControl.Styles>
+
+    <Panel>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top" utils:MenuBind.ManagedMenuItems="{CompiledBinding MenuItemProviders}" />
+
+            <DockPanel DockPanel.Dock="Top">
+                <DockPanel>
+                    <controls:ToolbarPanel Classes="TopBar HideWin10" DockPanel.Dock="Left">
+                        <Button ToolTip.Tip="Save to the database"
+                                Command="{CompiledBinding ExecuteChangedCommand}">
+                            <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="White" Data="{StaticResource PlayIcon}" />
+                        </Button>
+                        <Button Command="{CompiledBinding GenerateCurrentSqlCommand}"
+                                ToolTip.Tip="Generate the SQL"
+                                IsVisible="{CompiledBinding ShowExportButtons}">
+                            <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="White" StrokeThickness="1" Data="{StaticResource ToSqlIcon}" />
+                        </Button>
+                        <Button Command="{CompiledBinding CopyCurrentSqlCommand}"
+                                IsVisible="{CompiledBinding ShowExportButtons}"
+                                ToolTip.Tip="Copy SQL">
+                            <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="White" Data="{StaticResource CopyIcon}"/>
+                        </Button>
+                    </controls:ToolbarPanel>
+
+                    <Border Width="30"  DockPanel.Dock="Left"/>
+
+                    <profiles1:ProfilesControl DataContext="{CompiledBinding ProfilesViewModel}" DockPanel.Dock="Left"/>
+                </DockPanel>
+
+                <ToolbarPanel DockPanel.Dock="Right">
+                    <ItemsControl ItemsSource="{CompiledBinding RelatedSolutionItems.List}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="viewModels:RelatedSolutionItemViewModel">
+                                <Button Command="{CompiledBinding CreateCommand}"
+                                        ToolTip.Tip="{CompiledBinding Name}">
+                                    <components:WdeImage Image="{CompiledBinding Icon}" />
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <controls:ToolbarPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <Button x:Name="OpenSQLDocument" ToolTip.Tip="New SQL document" Command="{CompiledBinding OpenSqlDocumentCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
+                        <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource ToSqlIcon}" />
+                    </Button>
+
+                    <Button ToolTip.Tip="Open game view" IsVisible="{CompiledBinding Is3dViewSupported}" Classes="HideWin10" Command="{CompiledBinding Open3DCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
+                        <Path VerticalAlignment="Center" Width="16" Fill="{Binding $parent[Button].Foreground}" Data="{StaticResource Open3DIcon}" />
+                    </Button>
+
+                    <Button ToolTip.Tip="Find anywhere" Classes="HideWin10" Command="{CompiledBinding FindAnywhereCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
+                        <Path VerticalAlignment="Center" Width="16" Fill="{Binding $parent[Button].Foreground}" Data="{StaticResource FindAnywhereIcon}" />
+                    </Button>
+                </ToolbarPanel>
+
+                <DockPanel ClipToBounds="True" LastChildFill="False">
+                    <views:TopBarQuickAccessView DockPanel.Dock="Left" HorizontalAlignment="Left"  DataContext="{CompiledBinding TopBarQuickAccess}" />
+                </DockPanel>
+            </DockPanel>
+
+            <ToolbarPanel DockPanel.Dock="Top">
+                <ToggleButton ToolTip.Tip="Show tables list" IsChecked="{CompiledBinding ShowTablesList, Mode=TwoWay}">
+                    <WdeImage Classes.Checked="{CompiledBinding ShowTablesList}">
+                        <WdeImage.Styles>
+                            <Style Selector="WdeImage:not(.Checked)">
+                                <Setter Property="ImageUri" Value="Icons/icon_tables.png" />
+                            </Style>
+                            <Style Selector="WdeImage.Checked">
+                                <Setter Property="ImageUri" Value="Icons/icon_tables_white.png" />
+                            </Style>
+                        </WdeImage.Styles>
+                    </WdeImage>
+                </ToggleButton>
+
+                <controls:ToolbarPanel IsVisible="{CompiledBinding HasAnyType}" DataContext="{CompiledBinding QuickGoToViewModel}">
+                    <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Entry:</TextBlock>
+                    <CompletionComboBox AsyncPopulator="{CompiledBinding FindItemAsyncPopulator}" Width="150"
+                                        views:MainWindowWithDocking.OnEnterPressed="true"
+                                        Items="{CompiledBinding Items}" SelectedItem="{CompiledBinding SelectedItem}">
+                        <CompletionComboBox.ButtonItemTemplate>
+                            <DataTemplate DataType="viewModels:QuickGoToItemViewModel">
+                                <DockPanel>
+                                    <TextBlock Margin="0, 0, 10, 0" Opacity="0.75" Text="{CompiledBinding Key}"></TextBlock>
+                                    <TextBlock Text="{CompiledBinding Name}"></TextBlock>
+                                </DockPanel>
+                            </DataTemplate>
+                        </CompletionComboBox.ButtonItemTemplate>
+                        <CompletionComboBox.ItemTemplate>
+                            <DataTemplate DataType="viewModels:QuickGoToItemViewModel">
+                                <DockPanel Width="400">
+                                    <TextBlock Margin="0, 0, 10, 0" Opacity="0.75" Width="45" Text="{CompiledBinding Key}"></TextBlock>
+                                    <TextBlock Text="{CompiledBinding Name}"></TextBlock>
+                                </DockPanel>
+                            </DataTemplate>
+                        </CompletionComboBox.ItemTemplate>
+                    </CompletionComboBox>
+                    <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Type:</TextBlock>
+                    <ComboBox Width="100" ItemsSource="{CompiledBinding Providers}" SelectedItem="{CompiledBinding SelectedProvider}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{CompiledBinding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </controls:ToolbarPanel>
+
+                <controls:ToolbarPanel Classes="HideWin11">
+                    <components:ButtonImage Image="Icons/icon_play.png" IsVisible="{CompiledBinding ShowPlayButtons}" Command="{CompiledBinding ExecuteChangedCommand}" />
+                    <components:ButtonImage Command="{CompiledBinding GenerateCurrentSqlCommand}"
+                                            IsVisible="{CompiledBinding ShowExportButtons}"
+                                            Text="To SQL"
+                                            Image="Icons/icon_to_sql.png" />
+                    <components:ButtonImage Command="{CompiledBinding CopyCurrentSqlCommand}"
+                                            IsVisible="{CompiledBinding ShowExportButtons}"
+                                            ToolTip.Tip="Copy SQL"
+                                            Image="Icons/icon_copy_sql.png" />
+                </controls:ToolbarPanel>
+
+                <ContentControl DataContext="{CompiledBinding DocumentManager.ActiveDocument}" Content="{CompiledBinding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+
+                <ToolbarSpacer />
+            </ToolbarPanel>
+
+            <StatusBar DockPanel.Dock="Bottom" Height="30">
+                <views:StatusBarView  DataContext="{CompiledBinding StatusBar}" />
+            </StatusBar>
+
+            <Panel>
+                <idc:DockControl Name="DockControl">
+                    <idc:DockControl.DataTemplates>
+                        <docking:PersistentDockDataTemplate />
+                    </idc:DockControl.DataTemplates>
+                    <idc:DockControl.Styles>
+                        <Style Selector="idc|DocumentControl">
+                            <Setter Property="HeaderTemplate">
+                                <DataTemplate DataType="docking:AvaloniaDocumentDockWrapper">
+                                    <StackPanel Orientation="Horizontal">
+                                        <components:WdeImage Image="{CompiledBinding ViewModel.Icon, FallbackValue={x:Static views:MainWindowWithDocking.DocumentIcon}, TargetNullValue={x:Static views:MainWindowWithDocking.DocumentIcon}}" Width="16" Height="16"/>
+                                        <TextBlock Text="{CompiledBinding Title}" Padding="2">
+                                            <Interaction.Behaviors>
+                                                <DataTriggerBehavior Binding="{CompiledBinding ViewModel.IsModified}" ComparisonCondition="Equal" Value="False">
+                                                    <ChangePropertyAction TargetObject="{Binding #TextBlock}"
+                                                                          PropertyName="FontWeight"
+                                                                          Value="Normal" />
+                                                </DataTriggerBehavior>
+                                                <DataTriggerBehavior Binding="{CompiledBinding ViewModel.IsModified}" ComparisonCondition="Equal" Value="True">
+                                                    <ChangePropertyAction TargetObject="{Binding #TextBlock}"
+                                                                          PropertyName="FontWeight"
+                                                                          Value="Bold" />
+                                                </DataTriggerBehavior>
+                                            </Interaction.Behaviors>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Setter>
+                        </Style>
+                        <Style Selector="idc|DocumentControl ContentControl#PART_ContentPresenter > ContentPresenter ContentPresenter.documentView">
+                            <Setter Property="IsVisible" Value="{Binding ViewModel.IsLoading, FallbackValue=true, Converter={StaticResource InverseBoolConverter}}" />
+                        </Style>
+                    </idc:DockControl.Styles>
+                </idc:DockControl>
+
+                <Panel Name="PART_Overlay">
+
+                    <views:TasksPanel DataContext="{CompiledBinding TasksViewModel}"
+                                      Margin="0,0,5,0"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Bottom"
+                                      ClipToBounds="False"
+                                      IsVisible="{CompiledBinding IsPanelVisible, Mode=OneWay}" />
+
+                    <Border BorderThickness="1"
+                            Background="{DynamicResource ContentBackground}"
+                            BorderBrush="Gray"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Margin="0,0,155,0"
+                            DataContext="{CompiledBinding ConnectionsViewModel}"
+                            IsVisible="{CompiledBinding IsPanelVisible, Mode=OneWay}"
+                            CornerRadius="{DynamicResource ControlCornerRadius}"
+                            Width="300" Height="350" BoxShadow="0 0 30 5 #50000000">
+                        <ContentControl Content="{CompiledBinding .}"
+                                        ContentTemplate="{x:Static utils:ViewDataTemplate.Template}"
+                                        ClipToBounds="False" />
+                    </Border>
+
+                    <Panel Name="Panel"
+                           DataContext="{CompiledBinding QuickAccessViewModel, Mode=OneWay}"
+                           IsVisible="{CompiledBinding IsOpened, Mode=OneWay}"
+                           Background="Transparent">
+                        <quickAccess:QuickAccessView
+                            HorizontalAlignment="Center"
+                            IsVisible="{CompiledBinding IsOpened, Mode=OneWay}"
+                            Margin="0,200,0,0"
+                            VerticalAlignment="Top"/>
+                        <Interaction.Behaviors>
+                            <EventTriggerBehavior EventName="PointerPressed" SourceObject="{CompiledBinding #Panel}">
+                                <InvokeCommandAction Command="{Binding CloseQuickAccessCommand}" />
+                            </EventTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </Panel>
+                </Panel>
+            </Panel>
+        </DockPanel>
+
+        <controls1:PseudoWindowsPanel Name="PART_WindowsContainer" />
+    </Panel>
+</UserControl>

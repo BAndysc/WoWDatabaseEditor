@@ -88,10 +88,3 @@ public partial class FindAnywhereResultsViewModel : ObservableBase, IFindAnywher
         Results.Add(result);
     }
 }
-//
-// public class FindResultViewModel
-// {
-//     public ImageUri Icon { get; }
-//     public string Title { get; }
-//     public string Description { get; }
-// }

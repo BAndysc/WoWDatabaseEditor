@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Solution;
@@ -39,13 +40,13 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             this.nameProvider = nameProvider;
         }
 
-        public IQuery GetSql()
+        public async Task<IQuery> GetSql()
         {
             var query = Queries.BeginTransaction(DataDatabaseType.World);
             query.Comment(nameProvider.GetName(item));
             query.DefineVariable("ENTRY", script.EntryOrGuid);
             var (serializedScript, serializedConditions) = scriptExporter.ToDatabaseCompatibleSmartScript(script);
-            BuildUpdate(query);
+            await BuildUpdate(query);
             BuildDelete(query, serializedScript);
             BuildInsert(query, serializedScript, serializedConditions ?? Array.Empty<IConditionLine>());
             return query.Close();
@@ -168,7 +169,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             }
         }
 
-        private void BuildUpdate(IMultiQuery query)
+        private async Task BuildUpdate(IMultiQuery query)
         {
             switch (script.SourceType)
             {
@@ -180,7 +181,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     else if (script.EntryOrGuid >= 0)
                         entry = (uint)script.EntryOrGuid;
                     else
-                        entry = databaseProvider.GetCreatureByGuid(0, (uint)-script.EntryOrGuid)?.Entry;
+                        entry = (await databaseProvider.GetCreatureByGuidAsync(0, (uint)-script.EntryOrGuid))?.Entry;
 
                     if (entry.HasValue)
                     {
@@ -213,7 +214,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     else if (script.EntryOrGuid >= 0)
                         entry = (uint)script.EntryOrGuid;
                     else
-                        entry = databaseProvider.GetCreatureByGuid(0, (uint)-script.EntryOrGuid)?.Entry;
+                        entry = (await databaseProvider.GetGameObjectByGuidAsync(0, (uint)-script.EntryOrGuid))?.Entry;
 
                     if (entry.HasValue)
                     {

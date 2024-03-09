@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using WDE.Common.Database;
+using WDE.Common.Utils;
 
 namespace WDE.MySqlDatabaseCommon.Services
 {
@@ -16,7 +18,8 @@ namespace WDE.MySqlDatabaseCommon.Services
         
         public uint GetHealthFor(byte level, byte unitClass, byte expansion)
         {
-            EnsureBuildStats();
+            // @todo make it async
+            EnsureBuildStats().AsTask().ListenErrors();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
                 return 1;
@@ -26,7 +29,8 @@ namespace WDE.MySqlDatabaseCommon.Services
 
         public int GetAttackPowerBonusFor(byte level, byte unitClass)
         {
-            EnsureBuildStats();
+            // @todo make it async
+            EnsureBuildStats().AsTask().ListenErrors();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
                 return 0;
@@ -36,7 +40,8 @@ namespace WDE.MySqlDatabaseCommon.Services
 
         public int GetRangedAttackPowerBonusFor(byte level, byte unitClass)
         {
-            EnsureBuildStats();
+            // @todo make it async
+            EnsureBuildStats().AsTask().ListenErrors();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
                 return 0;
@@ -46,7 +51,8 @@ namespace WDE.MySqlDatabaseCommon.Services
         
         public int GetManaFor(byte level, byte unitClass)
         {
-            EnsureBuildStats();
+            // @todo make it async
+            EnsureBuildStats().AsTask().ListenErrors();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
                 return 0;
@@ -56,7 +62,8 @@ namespace WDE.MySqlDatabaseCommon.Services
 
         public int GetArmorFor(byte level, byte unitClass)
         {
-            EnsureBuildStats();
+            // @todo make it async
+            EnsureBuildStats().AsTask().ListenErrors();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
                 return 0;
@@ -66,7 +73,8 @@ namespace WDE.MySqlDatabaseCommon.Services
 
         public float GetDamageFor(byte level, byte unitClass, byte expansion)
         {
-            EnsureBuildStats();
+            // @todo make it async
+            EnsureBuildStats().AsTask().ListenErrors();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
                 return 1;
@@ -74,18 +82,18 @@ namespace WDE.MySqlDatabaseCommon.Services
             return stat.Damage(expansion);
         }
         
-        private void EnsureBuildStats()
+        private async ValueTask EnsureBuildStats()
         {
             if (built) 
                 return;
             
             built = true;
-            CacheStats();
+            await CacheStats();
         }
 
-        private void CacheStats()
+        private async Task CacheStats()
         {
-            foreach (var stat in databaseProvider.GetCreatureClassLevelStats())
+            foreach (var stat in await databaseProvider.GetCreatureClassLevelStatsAsync())
             {
                 stats[MakeKey(stat)] = stat;
             }

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Layout;
 using Avalonia.VisualTree;
+using WDE.Common;
 
 namespace AvaloniaStyles.Controls
 {
@@ -15,7 +17,7 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<bool> WrapOnOverflowProperty = AvaloniaProperty.Register<ToolbarPanel, bool>(nameof(WrapOnOverflow));
         public static readonly StyledProperty<double> SpacingProperty = AvaloniaProperty.Register<ToolbarPanel, double>(nameof(Spacing), 4);
 
-        private List<IControl> _overflowControls = new List<IControl>();
+        private List<Control> _overflowControls = new List<Control>();
         
         public Panel? OutOfBoundsPanel
         {
@@ -41,8 +43,17 @@ namespace AvaloniaStyles.Controls
             set => SetValue(SpacingProperty, value);
         }
 
+        delegate void InvalidateStylesType(StyledElement element, bool recurse);
+        private static InvalidateStylesType? invalidateStyle;
+
         static ToolbarPanel()
         {
+            var invalidateStyleMethod = typeof(StyledElement).GetMethod("InvalidateStyles", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (invalidateStyleMethod != null)
+                invalidateStyle = (InvalidateStylesType)Delegate.CreateDelegate(typeof(InvalidateStylesType), invalidateStyleMethod);
+            else
+                LOG.LogCritical("Failed to find InvalidateStyles method (probably due to Avalonia version update)!!!");
+    
             OutOfBoundsPanelProperty.Changed.AddClassHandler<ToolbarPanel>((panel, e) => panel.OnChangedPanel(e));
             AffectsMeasure<ToolbarPanel>(SpacingProperty);
             AffectsArrange<ToolbarPanel>(SpacingProperty);
@@ -61,6 +72,8 @@ namespace AvaloniaStyles.Controls
             foreach (var child in _overflowControls)
             {
                 OutOfBoundsPanel!.Children.Insert(0, child);
+                // @todo ava11: is that necessary?
+                child.ApplyStyling();
             }
             _overflowControls.Clear();
         }
@@ -99,6 +112,7 @@ namespace AvaloniaStyles.Controls
             int rows = 1;
             var children = Children;
             bool any = false;
+
             for (int i = 0, count = children.Count; i < count; ++i)
             {
                 var child = children[i];
@@ -245,8 +259,8 @@ namespace AvaloniaStyles.Controls
                 rcChild = rcChild.WithHeight(Math.Max(finalSize.Height, child.DesiredSize.Height));
                 // we want to stretch only content presenters, not buttons
                 // if it doesn't work for future toolbars, it can be changed 
-                if (child.HorizontalAlignment == HorizontalAlignment.Stretch && child is ContentPresenter cp &&
-                    cp.Child is not Button)
+                if (child.HorizontalAlignment == HorizontalAlignment.Stretch &&
+                    (child is ContentPresenter { Child: not Button } || (child is ContentControl)))
                 {
                     previousChildSize = child.DesiredSize.Width + Math.Max(0, leftSpace);
                     rcChild = rcChild.WithWidth(previousChildSize);
@@ -274,7 +288,7 @@ namespace AvaloniaStyles.Controls
                         {
                             var c = children[^1];
                             Children.RemoveAt(Children.Count - 1);
-                            if (((IVisual)panel).IsAttachedToVisualTree)
+                            if (panel.IsAttachedToVisualTree())
                             {
                                 panel.Children.Insert(0, c);
                                 ((ISetInheritanceParent)c).SetParent(this);
@@ -282,7 +296,7 @@ namespace AvaloniaStyles.Controls
                             else
                                 _overflowControls.Add(c);
                         }                        
-                        IsOverflow = true;
+                        SetCurrentValue(IsOverflowProperty, true);
                         return finalSize;
                     }
                 }
@@ -293,7 +307,7 @@ namespace AvaloniaStyles.Controls
             {
                 if (leftSpace > 0)
                 {
-                    IControl? child = null;
+                    Control? child = null;
                     if (_overflowControls.Count > 0)
                     {
                         child = _overflowControls[^1];
@@ -312,10 +326,17 @@ namespace AvaloniaStyles.Controls
                             else
                                 OutOfBoundsPanel.Children.RemoveAt(0);
                             Children.Add(child);
+                            // it really sucks I have to call InvalidateStyles via reflection, but without this
+                            // buttons style bug in Solution Explorer in the following case
+                            // shrink the toolbar to overflow buttons
+                            // open the flyout
+                            // expand the toolbar to show all buttons - now the buttons are not styled
+                            invalidateStyle?.Invoke(child, true);
+                            child.ApplyStyling();
                         }
                     }
                 }
-                IsOverflow = OutOfBoundsPanel.Children.Count > 0 || _overflowControls.Count > 0;
+                SetCurrentValue(IsOverflowProperty, OutOfBoundsPanel.Children.Count > 0 || _overflowControls.Count > 0);
             }
 
             return finalSize;
@@ -370,7 +391,7 @@ namespace AvaloniaStyles.Controls
         }
 
         internal virtual void ArrangeChild(
-            IControl child,
+            Control child,
             Rect rect,
             Size panelSize)
         {

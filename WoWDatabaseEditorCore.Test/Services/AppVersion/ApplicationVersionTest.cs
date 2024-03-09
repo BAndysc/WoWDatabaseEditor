@@ -7,7 +7,7 @@ namespace WoWDatabaseEditorCore.Test.Services.AppVersion
 {
     public class ApplicationVersionTest
     {
-        private IApplicationReleaseConfiguration applicationReleaseConfiguration;
+        private IApplicationReleaseConfiguration applicationReleaseConfiguration = null!;
 
         [SetUp]
         public void Init()
@@ -32,7 +32,7 @@ namespace WoWDatabaseEditorCore.Test.Services.AppVersion
         [Test]
         public void TestNoBranch()
         {
-            applicationReleaseConfiguration.GetString("BRANCH").Returns((string)null);
+            applicationReleaseConfiguration.GetString("BRANCH").Returns((string)null!);
             
             var appVersion = new ApplicationVersion(applicationReleaseConfiguration);
             Assert.AreEqual(false, appVersion.VersionKnown);
@@ -41,7 +41,7 @@ namespace WoWDatabaseEditorCore.Test.Services.AppVersion
         [Test]
         public void TestNoCommit()
         {
-            applicationReleaseConfiguration.GetString("COMMIT").Returns((string)null);
+            applicationReleaseConfiguration.GetString("COMMIT").Returns((string)null!);
             
             var appVersion = new ApplicationVersion(applicationReleaseConfiguration);
             Assert.AreEqual(false, appVersion.VersionKnown);

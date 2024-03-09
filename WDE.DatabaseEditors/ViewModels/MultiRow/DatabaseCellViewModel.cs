@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using AvaloniaStyles.Controls.FastTableView;
+using Microsoft.Extensions.Logging;
 using WDE.Common.Database;
 using WDE.Common.Disposables;
 using WDE.DatabaseEditors.Data;
@@ -84,7 +85,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     }
                     else
                     {
-                        Console.WriteLine("Couldn't find column " + contextual.AffectedByColumn);
+                        LOG.LogError("Couldn't find column " + contextual.AffectedByColumn);
                     }   
                 }
             }

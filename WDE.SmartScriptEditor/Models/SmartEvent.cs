@@ -8,6 +8,7 @@ using System.Linq;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
+using WDE.Common;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
@@ -193,12 +194,12 @@ namespace WDE.SmartScriptEditor.Models
                 }
                 catch (ParsingErrors e)
                 {
-                    Console.WriteLine(e.ToString());
+                    LOG.LogWarning(e.ToString());
                     return $"Event {Id} has invalid Readable format in events.json";
                 }
                 catch (FormattingException e)
                 {
-                    Console.WriteLine(e.ToString());
+                    LOG.LogWarning(e.ToString());
                     return $"Event {Id} has invalid Readable format in events.json";
                 }
             }

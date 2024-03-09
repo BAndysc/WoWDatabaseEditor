@@ -12,8 +12,8 @@
         <BetterKeyBinding Gesture="Ctrl+S" CustomCommand="{CompiledBinding ExecuteChangedCommand}" />
         <BetterKeyBinding Gesture="Cmd+S" CustomCommand="{CompiledBinding ExecuteChangedCommand}" />
     </UserControl.KeyBindings>
-    <ContentPresenter DataContext="{CompiledBinding MainViewModel}" Content="{Binding}" ContentTemplate="{x:Static utils:ViewDataTemplate.Template}">
-        <ContentPresenter.KeyBindings>
+    <ContentControl DataContext="{CompiledBinding MainViewModel}" Content="{Binding}" ContentTemplate="{x:Static utils:ViewDataTemplate.Template}">
+        <ContentControl.KeyBindings>
             <BetterKeyBinding Gesture="Ctrl+C" CustomCommand="{CompiledBinding Copy}" />
             <BetterKeyBinding Gesture="Ctrl+V" CustomCommand="{CompiledBinding Paste}" />
             <BetterKeyBinding Gesture="Ctrl+X" CustomCommand="{CompiledBinding Cut}" />
@@ -24,6 +24,6 @@
             <BetterKeyBinding Gesture="Cmd+X" CustomCommand="{CompiledBinding Cut}" />
             <BetterKeyBinding Gesture="Cmd+Z" CustomCommand="{CompiledBinding Undo}" />
             <BetterKeyBinding Gesture="Cmd+Y" CustomCommand="{CompiledBinding Redo}" />
-        </ContentPresenter.KeyBindings>
-    </ContentPresenter>
+        </ContentControl.KeyBindings>
+    </ContentControl>
 </UserControl>

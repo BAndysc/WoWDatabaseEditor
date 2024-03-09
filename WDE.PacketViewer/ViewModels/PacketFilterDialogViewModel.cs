@@ -90,7 +90,7 @@ namespace WDE.PacketViewer.ViewModels
                 {
                     serialized = JsonConvert.DeserializeObject<SerializedClipboardData>(text);
                 }
-                catch (Exception _)
+                catch (Exception)
                 {
                     // ignored
                 }

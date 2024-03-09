@@ -40,14 +40,8 @@
         </DrawingImage>
     </UserControl.Resources>
     
-    <Grid Margin="6">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-            <RowDefinition Height="30" />
-        </Grid.RowDefinitions>
-
-        <DockPanel Grid.Row="0" LastChildFill="True">
+    <DockPanel Margin="6" KeyboardNavigation.TabNavigation="Local">
+        <DockPanel Dock="Top" LastChildFill="True" TabIndex="0">
             <controls:FixedTextBox DockPanel.Dock="Right"
                                    Width="220"
                                    AcceptsReturn="False"
@@ -62,13 +56,23 @@
                 <TextBlock Text="{CompiledBinding SelectedItem.EnumName, FallbackValue='', TargetNullValue=''}" TextWrapping="WrapWithOverflow" Opacity="0.5" />
             </StackPanel>
         </DockPanel>
-        
-        <ListBox Items="{CompiledBinding Items}"
-                 Grid.Row="1" Grid.ColumnSpan="2"  
+
+        <Grid DockPanel.Dock="Bottom" TabIndex="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
+            <TextBlock Grid.Column="1" FontSize="9" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.3">Right click on an item to mark as favourite.</TextBlock>
+            <Button Classes="primary" Command="{CompiledBinding Accept}" Grid.Column="2" Content="Next" />
+        </Grid>
+
+        <ListBox ItemsSource="{CompiledBinding Items}"
+                 TabIndex="1"
                  SelectedItem="{CompiledBinding SelectedItem}"
                  Name="ListBox"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 VirtualizationMode="Simple"
                  Margin="0,6,0,6">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -135,16 +139,5 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="80" />
-            </Grid.ColumnDefinitions>
-            <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
-            <TextBlock Grid.Column="1" FontSize="9" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.3">Right click on an item to mark as favourite.</TextBlock>
-            <Button Classes="primary" Command="{CompiledBinding Accept}" Grid.Column="2" Content="Next" />
-        </Grid>
-    </Grid>
+    </DockPanel>
 </controls:DialogViewBase>

@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using AvaloniaEdit;
+using AvaloniaEdit.Editing;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Utils;
 using WDE.MVVM.Observable;
 
 namespace AvaloniaStyles.Controls.OptimizedVeryFastTableView;
 
-public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHandler
+public partial class VirtualizedVeryFastTableView : RenderedPanel, ICustomKeyboardNavigation
 {
     protected static double ColumnSpacing = 10;
     protected static double RowHeight = 28;
@@ -39,7 +43,7 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
     private static bool GetResource<T>(string key, T defaultVal, out T outT)
     {
         outT = defaultVal;
-        if (Application.Current!.Styles.TryGetResource(key, out var res) && res is T t)
+        if (Application.Current!.Styles.TryGetResource(key, SystemTheme.EffectiveThemeVariant, out var res) && res is T t)
         {
             outT = t;
             return true;
@@ -139,16 +143,19 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
         {
             InvalidateMeasure();
             InvalidateArrange();
+            InvalidateVisual();
         });
         if (ScrollViewer is { } sc)
         {
             sc.GetObservable(ScrollViewer.OffsetProperty).SubscribeAction(_ =>
             {
                 InvalidateArrange();
+                InvalidateVisual();
             });
             sc.GetObservable(BoundsProperty).SubscribeAction(_ =>
             {
                 InvalidateArrange();
+                InvalidateVisual();
             });
         }
     }
@@ -213,13 +220,13 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
             e.Handled = true;
         }
     }
-
-    protected override void OnPointerLeave(PointerEventArgs e)
+    
+    protected override void OnPointerExited(PointerEventArgs e)
     {
-        Cursor = Cursor.Default;
+        SetCurrentValue(CursorProperty, Cursor.Default);
         lastMouseLocation = new Point(-1, -1);
         InvalidateVisual();
-        base.OnPointerLeave(e);
+        base.OnPointerExited(e);
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -229,7 +236,7 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
         var point = currentPoint.Position;
         lastMouseLocation = point;
         lastMouseButtonPressed = currentPoint.Properties.IsLeftButtonPressed;
-        Cursor = (currentlyResizedColumn.HasValue || IsPointHeader(point) && IsOverColumnSplitter(lastMouseLocation.X, out _)) ? new Cursor(StandardCursorType.SizeWestEast) : Cursor.Default;
+        SetCurrentValue(CursorProperty, (currentlyResizedColumn.HasValue || IsPointHeader(point) && IsOverColumnSplitter(lastMouseLocation.X, out _)) ? new Cursor(StandardCursorType.SizeWestEast) : Cursor.Default);
 
         if (Controller.UpdateCursor(currentPoint.Position, currentPoint.Properties.IsLeftButtonPressed))
             InvalidateVisual();
@@ -267,7 +274,7 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
                 var index = GetRowIndexByY(e.GetPosition(this).Y);
                 if (!IsRowIndexValid(index))
                 {
-                    SelectedRowIndex = -1;
+                    SetCurrentValue(SelectedRowIndexProperty, -1);
                     MultiSelection.Clear();
                 }
                 else
@@ -308,16 +315,16 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
                             MultiSelection.Add(index);
                         }
                     }
-                    SelectedRowIndex = index;
+                    SetCurrentValue(SelectedRowIndexProperty, index);
                 }
             }
             // cell
             {
                 var index = GetColumnIndexByX(e.GetPosition(this).X);
                 if (ItemsCount == 0 || !index.HasValue)
-                    SelectedCellIndex = -1;
+                    SetCurrentValue(SelectedCellIndexProperty, -1);
                 else
-                    SelectedCellIndex = Math.Clamp(index.Value, 0, ColumnsCount - 1);
+                    SetCurrentValue(SelectedCellIndexProperty, Math.Clamp(index.Value, 0, ColumnsCount - 1));
             }
         }
         else if (IsOverColumnSplitter(e.GetPosition(this).X, out var columnIndex))
@@ -337,9 +344,9 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
                 {
                     var index = GetColumnIndexByX(e.GetPosition(this).X);
                     if (ItemsCount == 0 || !index.HasValue)
-                        SelectedCellIndex = -1;
+                        SetCurrentValue(SelectedCellIndexProperty, -1);
                     else
-                        SelectedCellIndex = Math.Clamp(index.Value, 0, ColumnsCount - 1);
+                        SetCurrentValue(SelectedCellIndexProperty, Math.Clamp(index.Value, 0, ColumnsCount - 1));
                 }
             }
             e.Handled = true;
@@ -422,7 +429,6 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
         {
             var originalText = Controller.GetCellText(SelectedRowIndex, SelectedCellIndex);
             var initialText = customText ?? originalText ?? "";
-            GetFonts(out var defaultFont, out var unicodeFallback);
             editor.Spawn(this, SelectedCellRect, initialText, customText == null, (text, action) =>
             {
                 if (originalText != text)
@@ -432,19 +438,19 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
                     switch (action)
                     {
                         case PhantomTextBox.ActionAfterSave.MoveUp:
-                            Move(this, NavigationDirection.Up);
+                            GetNext(this, NavigationDirection.Up);
                             break;
                         case PhantomTextBox.ActionAfterSave.MoveDown:
-                            Move(this, NavigationDirection.Down);
+                            GetNext(this, NavigationDirection.Down);
                             break;
                         case PhantomTextBox.ActionAfterSave.MoveNext:
-                            Move(this, NavigationDirection.Next);
+                            GetNext(this, NavigationDirection.Next);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(action), action, null);
                     }
                 }
-            }, UseFallbackUnicodeFont(initialText) ? unicodeFallback : null);   
+            });
         }
     }
     
@@ -502,7 +508,7 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
     /***
      * This is KeyBinding that forwards the gesture to the focused TextBox first
      */
-    private class BetterKeyBinding : KeyBinding, ICommand
+    public class BetterKeyBinding : KeyBinding, ICommand
     {
         public static readonly StyledProperty<ICommand> CustomCommandProperty = AvaloniaProperty.Register<KeyBinding, ICommand>(nameof (CustomCommand));
 
@@ -511,28 +517,52 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
             get => GetValue(CustomCommandProperty);
             set => SetValue(CustomCommandProperty, value);
         }
-        
+
         public BetterKeyBinding()
         {
-            Command = this;
+            SetCurrentValue(CommandProperty, this);
+        }
+
+        public static TopLevel? GetTopLevel()
+        {
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                return desktop.MainWindow;
+            }
+            if (Application.Current?.ApplicationLifetime is ISingleViewApplicationLifetime viewApp)
+            {
+                var visualRoot = viewApp.MainView?.GetVisualRoot();
+                return visualRoot as TopLevel;
+            }
+            return null;
         }
 
         public bool CanExecute(object? parameter)
         {
-            if (FocusManager.Instance!.Current is TextBox tb)
-                return true;
+            var focusManager = GetTopLevel()?.FocusManager;
+            var currentAsTextBox = focusManager?.GetFocusedElement() as TextBox;
+            var currentAsTextEditor = focusManager?.GetFocusedElement() as TextEditor;
+            var currentAsTextArea = focusManager?.GetFocusedElement() as TextArea;
+            if (currentAsTextBox != null || currentAsTextEditor != null || currentAsTextArea != null)
+                 return true;
             return CustomCommand.CanExecute(parameter);
         }
 
         public void Execute(object? parameter)
         {
-            if (FocusManager.Instance!.Current is TextBox tb)
+            var focusManager = GetTopLevel()?.FocusManager;
+            var currentAsTextBox = focusManager?.GetFocusedElement() as TextBox;
+            var currentAsTextEditor = focusManager?.GetFocusedElement() as TextEditor;
+            var currentAsTextArea = focusManager?.GetFocusedElement() as TextArea;
+            if (currentAsTextBox != null || currentAsTextEditor != null || currentAsTextArea != null)
             {
-                var ev = Activator.CreateInstance<KeyEventArgs>();
-                ev.Key = Gesture.Key;
-                ev.KeyModifiers = Gesture.KeyModifiers;
-                ev.RoutedEvent = InputElement.KeyDownEvent;
-                tb.RaiseEvent(ev);
+                var ev = new KeyEventArgs()
+                {
+                    Key = Gesture.Key,
+                    KeyModifiers = Gesture.KeyModifiers,
+                    RoutedEvent = InputElement.KeyDownEvent
+                };
+                ((Control?)currentAsTextBox ?? (Control?)currentAsTextEditor ?? currentAsTextArea)!.RaiseEvent(ev);
                 if (!ev.Handled && CanExecute(parameter))
                     CustomCommand.Execute(parameter);
             }

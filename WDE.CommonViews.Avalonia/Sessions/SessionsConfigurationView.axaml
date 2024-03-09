@@ -11,7 +11,7 @@
         <StackPanel>
             <controls:SettingsHeader Text="Recently deleted sessions" />
             <Button Command="{CompiledBinding RestoreSelectedSession}">Restore</Button>
-            <ListBox Items="{CompiledBinding DeletedSessions}" 
+            <ListBox ItemsSource="{CompiledBinding DeletedSessions}" 
                      SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>

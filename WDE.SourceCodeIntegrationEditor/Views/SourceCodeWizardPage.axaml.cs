@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.SourceCodeIntegrationEditor.Views
 {
-    public class SourceCodeWizardPage : UserControl
+    public partial class SourceCodeWizardPage : UserControl
     {
         public SourceCodeWizardPage()
         {

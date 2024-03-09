@@ -7,7 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Prism.Events;
 using WDE.Common;
+using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
@@ -30,7 +32,7 @@ namespace WDE.Sessions.Sessions
         public ObservableCollection<IEditorSessionStub> DeletedSessions => deleted;
 
         public SessionService(ISolutionItemSqlGeneratorRegistry queryGenerator,
-            IFileSystem fs, IUserSettings userSettings,
+            IFileSystem fs, IUserSettings userSettings, IEventAggregator eventAggregator,
             SessionSerializerDeserializer serializerDeserializer)
         {
             this.queryGenerator = queryGenerator;
@@ -40,6 +42,7 @@ namespace WDE.Sessions.Sessions
 
             var saved = userSettings.Get<SessionData>();
             deleteOnSave = saved.DeleteOnSave;
+            EditorSessionStub? currentSessionToLoad = null;
             if (saved.Sessions != null)
             {
                 foreach (var sess in saved.Sessions)
@@ -49,7 +52,7 @@ namespace WDE.Sessions.Sessions
                         continue;
                     Add(stub);
                     if (sess.FileName == saved.CurrentSessionFile)
-                        SafeOpen(stub);
+                        currentSessionToLoad = stub;
                 }
             }
 
@@ -69,6 +72,15 @@ namespace WDE.Sessions.Sessions
                     
                     deleted.Add(stub);
                 }   
+            }
+
+            if (currentSessionToLoad != null)
+            {
+                eventAggregator.GetEvent<AllModulesLoaded>()
+                    .Subscribe(() =>
+                    {
+                        SafeOpen(currentSessionToLoad);
+                    }, true);
             }
         }
 
@@ -90,7 +102,7 @@ namespace WDE.Sessions.Sessions
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e, "Error while opening session");
             }
         }
         
@@ -107,8 +119,19 @@ namespace WDE.Sessions.Sessions
                 return;
             
             var lines = fs.ReadLines(path);
-            CurrentSession = serializerDeserializer.Deserialize(lines, stub);
-            Save();
+            try
+            {
+                CurrentSession = serializerDeserializer.Deserialize(lines, stub);
+            }
+            catch (Exception)
+            {
+                CurrentSession = null;
+                throw;
+            }
+            finally
+            {
+                Save();
+            }
         }
 
         private void Close()

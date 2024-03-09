@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.PacketViewer.Avalonia.Views
 {
-    public class PacketFilterDialogToolBar : UserControl
+    public partial class PacketFilterDialogToolBar : UserControl
     {
         public PacketFilterDialogToolBar()
         {

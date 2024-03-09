@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,21 +20,21 @@ namespace WDE.TrinitySmartScriptEditor.Editor
             this.databaseProvider = databaseProvider;
         }
         
-        public Task<IList<ISmartScriptLine>> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
+        public Task<IReadOnlyList<ISmartScriptLine>> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
         {
             return databaseProvider.GetScriptForAsync(entry, entryOrGuid, type);
         }
         
-        public IEnumerable<IConditionLine> GetConditionsForScript(uint? entry, int entryOrGuid, SmartScriptType type)
+        public Task<IReadOnlyList<IConditionLine>> GetConditionsForScript(uint? entry, int entryOrGuid, SmartScriptType type)
         {
-            return databaseProvider.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, entryOrGuid, (int)type);
+            return databaseProvider.GetConditionsForAsync(SmartConstants.ConditionSourceSmartScript, entryOrGuid, (int)type);
         }
         
-        public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
+        public Task<IReadOnlyList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
         {
             return databaseProvider.FindSmartScriptLinesBy(conditions);
         }
 
-        public IEnumerable<IConditionLine> GetConditionsForSourceTarget(uint? entry, int entryOrGuid, SmartScriptType type) => Enumerable.Empty<IConditionLine>();
+        public async Task<IReadOnlyList<IConditionLine>> GetConditionsForSourceTarget(uint? entry, int entryOrGuid, SmartScriptType type) => Array.Empty<IConditionLine>();
     }
 }

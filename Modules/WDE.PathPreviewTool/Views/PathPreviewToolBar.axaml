@@ -8,7 +8,7 @@
              IsEnabled="{CompiledBinding IsDownloadingMapData, Converter={x:Static BoolConverters.Not}}"
              x:Class="WDE.PathPreviewTool.Views.PathPreviewToolBar">
     <ToolbarPanel>
-        <ComboBox Items="{CompiledBinding MapData.Maps}" SelectedItem="{CompiledBinding SelectedMap}">
+        <ComboBox ItemsSource="{CompiledBinding MapData.Maps}" SelectedItem="{CompiledBinding SelectedMap}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <DockPanel>

@@ -36,7 +36,7 @@ public partial class BreakpointMenuView : UserControl
             popup = new Popup()
             {
                 PlacementTarget = control,
-                PlacementMode = PlacementMode.Pointer,
+                Placement = PlacementMode.Pointer,
                 IsLightDismissEnabled = true,
                 OverlayDismissEventPassThrough = true,
                 Child = this
@@ -57,13 +57,13 @@ public partial class BreakpointMenuView : UserControl
     }
 }
 
-public class BreakpointContextMenu : ContextMenu, IStyleable
+public class BreakpointContextMenu : ContextMenu
 {
-    Type IStyleable.StyleKey => typeof(ContextMenu);
+    protected override Type StyleKeyOverride => typeof(ContextMenu);
 
     public override void Close()
     {
         base.Close();
-        this.FindAncestorOfType<BreakpointMenuView>().Close();
+        this.FindAncestorOfType<BreakpointMenuView>()?.Close();
     }
 }

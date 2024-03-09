@@ -74,23 +74,4 @@
     <Style Selector="controls1|ToolbarPanel > ContentPresenter > :is(Button):pressed">
         <Setter Property="Foreground" Value="{DynamicResource ToolBarButton.Foreground}" />
     </Style>
-    <!-- dropdown -->
-    
-    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="BoxShadow" Value="0 0 0 0 #00000000" />
-    </Style>
-    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton">
-        <Setter Property="Foreground" Value="{DynamicResource ToolBarButton.Foreground}" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0" />
-    </Style>
-    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource ToolBarButton.Background.PointerOver}" />
-    </Style>
-    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource ToolBarButton.Background.Pressed}" />
-    </Style>
-    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton:pressed">
-        <Setter Property="Foreground" Value="{DynamicResource ToolBarButton.Foreground}" />
-    </Style>
 </Styles>

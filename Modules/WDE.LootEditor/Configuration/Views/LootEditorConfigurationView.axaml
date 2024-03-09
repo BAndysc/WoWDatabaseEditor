@@ -27,7 +27,7 @@
         <ButtonImage Image="Icons/icon_add.png" Command="{CompiledBinding AddNewButtonCommand}" ToolTip.Tip="Add a new button" />
         <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedButtonsCommand}" ToolTip.Tip="Remove selected buttons" />
       </ToolbarPanel>
-      <ListBox Items="{CompiledBinding Buttons}"
+      <ListBox ItemsSource="{CompiledBinding Buttons}"
                SelectionMode="Multiple"
                SelectedItems="{CompiledBinding SelectedButtons}"
                SelectedItem="{CompiledBinding SelectedButton}"
@@ -88,10 +88,10 @@
         </TextBlock>
         
         <ScrollViewer controls:TwoColumnsPanel.ColumnSpan="2"
-                      MinHeight="300"
-                      HorizontalScrollBarVisibility="Visible"
-                      Background="{DynamicResource ContentBackground}"
-                      IsVisible="{CompiledBinding IsCustomItemSetType}">
+                           MinHeight="300"
+                           HorizontalScrollBarVisibility="Visible"
+                           Background="{DynamicResource ContentBackground}"
+                           IsVisible="{CompiledBinding IsCustomItemSetType}">
           <fastTableView:VeryFastTableView Items="{CompiledBinding .}"
                                            IsGroupingEnabled="True"
                                            ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
@@ -99,7 +99,7 @@
                                            SelectedCellIndex="{CompiledBinding FocusedCellIndex}"
                                            SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
                                            MultiSelection="{CompiledBinding MultiSelection}"
-                                           TextBlock.FontFamily="{DynamicResource MonoFont}"
+                                           TextElement.FontFamily="{DynamicResource MonoFont}"
                                            Columns="{CompiledBinding #Root.((configuration1:LootEditorConfiguration)DataContext).CustomItemsColumns}"
           >
             <fastTableView:VeryFastTableView.GroupHeaderTemplate>

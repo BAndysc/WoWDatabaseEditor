@@ -8,7 +8,7 @@ using WDE.Common.Utils;
 
 namespace AvaloniaStyles.Controls;
 
-public class VirtualizedGridCheckBox : CheckBox, IStyleable
+public class VirtualizedGridCheckBox : CheckBox
 {
     private IMultiIndexContainer? checkedIndices;
     public static readonly DirectProperty<VirtualizedGridCheckBox, IMultiIndexContainer?> CheckedIndicesProperty = 
@@ -30,7 +30,7 @@ public class VirtualizedGridCheckBox : CheckBox, IStyleable
         set => SetAndRaise(IndexProperty, ref index, value);
     }
 
-    Type IStyleable.StyleKey => typeof(CheckBox);
+    protected override Type StyleKeyOverride => typeof(CheckBox);
 
     static VirtualizedGridCheckBox()
     {

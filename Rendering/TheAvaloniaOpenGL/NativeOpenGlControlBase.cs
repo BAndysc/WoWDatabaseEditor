@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.Versioning;
 using Avalonia;
 using Avalonia.Controls;
@@ -6,15 +7,18 @@ using Avalonia.Input;
 using Avalonia.OpenGL;
 using Avalonia.Platform;
 using Avalonia.Rendering;
+using Avalonia.Rendering.Composition;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using SPB.Windowing;
 using TheAvaloniaOpenGL.Apple;
 using TheAvaloniaOpenGL.Interfaces;
 using TheAvaloniaOpenGL.Windows;
+using Pointer = Avalonia.Input.Pointer;
 
 namespace TheAvaloniaOpenGL;
 
-public class NativeOpenGlControlBase : NativeControlHost, ICustomSimpleHitTest
+public class NativeOpenGlControlBase : NativeControlHost
 {
     private IRenderingWindow? window;
     private IRenderingOpenGlContext? context;
@@ -37,7 +41,10 @@ public class NativeOpenGlControlBase : NativeControlHost, ICustomSimpleHitTest
             return new EmbeddedAppleWindow((context as EmbeddedAppleContext)!);
         throw new PlatformNotSupportedException();
     }
-    
+
+    Stopwatch sw = new Stopwatch();
+    Compositor compositor;
+
     IPlatformHandle CreateWindows(IPlatformHandle control)
     {
         bool justCreatedContext = false;
@@ -51,24 +58,30 @@ public class NativeOpenGlControlBase : NativeControlHost, ICustomSimpleHitTest
         window.OnPointerPressed += OnEmbeddedPointerPressed;
         window.OnPointerReleased += OnEmbeddedPointerReleased;
         window.OnPointerMoved += OnEmbeddedPointerMoved;
-        
+
         if (justCreatedContext)
         {
             context.MakeCurrentContext(window);
             OnOpenGlInit(null, 0);
             context.MakeCurrentContext(null);
         }
-        
-        Stopwatch sw = new Stopwatch();
+
+        var rendererType = this.GetVisualRoot()!.Renderer.GetType();
+        compositor = rendererType.GetProperty("Compositor", BindingFlags.Instance | BindingFlags.Public)
+            .GetValue(this.GetVisualRoot()?.Renderer) as Compositor;
+
+        //compositor.RequestCompositionUpdate(Render);
+
+        // Task.Run(() =>
+        // {
+        //     while (true)
+        //         Render();
+        // });
+
         timer = DispatcherTimer.Run(() =>
         {
-            sw.Restart();
-            context.MakeCurrentContext(window);
-            OnOpenGlRender(null, 0);
-            window?.SwapBuffers();
-            context?.MakeCurrentContext(null);
-            sw.Stop();
-            PresentTime = (uint)sw.Elapsed.TotalMilliseconds;
+            //Dispatcher.UIThread.RunJobs(DispatcherPriority.Input);
+            Render();
             return true;
         }, TimeSpan.FromMilliseconds(1));
         
@@ -97,6 +110,18 @@ public class NativeOpenGlControlBase : NativeControlHost, ICustomSimpleHitTest
             PresentTime = (uint)sw.Elapsed.TotalMilliseconds;
             return true;
         }, TimeSpan.FromMilliseconds(1));*/
+    }
+
+    private void Render()
+    {
+        sw.Restart();
+        context.MakeCurrentContext(window);
+        OnOpenGlRender(null, 0);
+        window?.SwapBuffers();
+        context?.MakeCurrentContext(null);
+        sw.Stop();
+        PresentTime = (uint)sw.Elapsed.TotalMilliseconds;
+        //compositor.RequestCompositionUpdate(Render);
     }
 
     private void OnEmbeddedPointerPressed(long x, long y, bool isLeft, bool isRight)

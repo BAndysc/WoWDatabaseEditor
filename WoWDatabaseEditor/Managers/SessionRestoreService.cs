@@ -104,7 +104,7 @@ public class SessionRestoreService
                         if (editor is IPeriodicSnapshotDocument psd && snapshot.State != null)
                             psd.RestoreSnapshot(snapshot.State);
                     }
-                    catch (Exception _)
+                    catch (Exception)
                     {
                         // ignore
                     }
@@ -113,7 +113,7 @@ public class SessionRestoreService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e);
             lastSessionFile.Delete();
         }
     }
@@ -152,7 +152,7 @@ public class SessionRestoreService
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Couldn't serialize " + si.SolutionItem + " " + e.Message);
+                    LOG.LogError(e, message: "Couldn't serialize " + si.SolutionItem);
                 }
             }
         }

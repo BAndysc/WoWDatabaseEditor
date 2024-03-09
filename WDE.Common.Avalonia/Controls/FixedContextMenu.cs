@@ -11,9 +11,9 @@ namespace WDE.Common.Avalonia.Controls;
 /// Avalonia has a bug: a Context menu will always keep a reference to the previous focused control, even if the menu is closed.
 /// which creates massive leaks.
 /// </summary>
-public class FixedContextMenu : ContextMenu, IStyleable
+public class FixedContextMenu : ContextMenu
 {
-    Type IStyleable.StyleKey => typeof(ContextMenu);
+    protected override Type StyleKeyOverride => typeof(ContextMenu);
 
     private static FieldInfo? previousFocusField;
     

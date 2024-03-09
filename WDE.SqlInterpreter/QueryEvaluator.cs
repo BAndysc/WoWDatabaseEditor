@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Services.QueryParser.Models;
 using WDE.Module.Attributes;
@@ -61,7 +62,7 @@ namespace WDE.SqlInterpreter
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e);
                 return null;
             }
         }

@@ -6,7 +6,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
     /// <summary>
     ///     Interaction logic for AboutView
     /// </summary>
-    public class AboutView : UserControl
+    public partial class AboutView : UserControl
     {
         public AboutView()
         {

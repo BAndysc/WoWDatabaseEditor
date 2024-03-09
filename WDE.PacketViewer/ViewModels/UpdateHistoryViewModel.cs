@@ -188,7 +188,7 @@ public class UpdateHistoryViewModel : ObservableBase
         currentHistory = historyCreator();
         foreach (var p in packets)
             currentHistory.Process(p.Packet);
-        currentHistory.Finalize();
+        currentHistory.Finish();
         
         Guids.Clear();
         Guids.AddRange(currentHistory.AllGuids);

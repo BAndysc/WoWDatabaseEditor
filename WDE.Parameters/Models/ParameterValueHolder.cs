@@ -16,6 +16,7 @@ namespace WDE.Parameters.Models
         bool ForceHidden { get; }
         string Name { get; }
         string String { get; }
+        IParameter GenericParameter { get; }
     }
     
     public interface IParameterValueHolder<T> : IParameterValueHolder where T : notnull
@@ -66,6 +67,7 @@ namespace WDE.Parameters.Models
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(String));
                 OnPropertyChanged(nameof(HasItems));
+                OnPropertyChanged(nameof(GenericParameter));
             }
         }
 
@@ -107,7 +109,9 @@ namespace WDE.Parameters.Models
         public virtual Dictionary<T, SelectOption>? Items => Parameter.Items;
 
         public string String => ToString();
-        
+
+        public IParameter GenericParameter => Parameter;
+
         public override string ToString()
         {
             if (hasCachedStringValue)

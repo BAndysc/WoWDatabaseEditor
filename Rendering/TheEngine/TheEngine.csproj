@@ -1,10 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <NoWarn>$(NoWarn),CS1570,CS1572,CS1574,CS1587,CS8765,CS8767,CS8604,CS8618,CS8600,CS8602</NoWarn>
     </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />
@@ -50,10 +52,8 @@
     
     <ItemGroup>
       <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
-      <PackageReference Include="JetBrains.Profiler.Api" Version="1.2.0" />
-      <PackageReference Include="OpenTK.Windowing.Desktop" Version="4.7.5" />
-        <PackageReference Include="OpenTK.Core" Version="4.7.5" />
-        <PackageReference Include="OpenTK.Mathematics" Version="4.7.5" />
+      <PackageReference Include="JetBrains.Profiler.Api" Version="1.4.2" />
+      <PackageReference Include="OpenTK.Windowing.Desktop" Version="4.8.2" />
     </ItemGroup>
     
     <ItemGroup>

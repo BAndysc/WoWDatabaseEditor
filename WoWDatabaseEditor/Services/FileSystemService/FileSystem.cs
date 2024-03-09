@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using WDE.Common.Profiles;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
@@ -13,7 +14,7 @@ namespace WoWDatabaseEditorCore.Services.FileSystemService
     public class FileSystem : IFileSystem
     {
         private readonly IVirtualFileSystem vfs;
-        private static readonly string APPLICATION_FOLDER = "WoWDatabaseEditor";
+        public static readonly string APPLICATION_FOLDER = "WoWDatabaseEditor";
         
         public FileSystem(IVirtualFileSystem vfs)
         {

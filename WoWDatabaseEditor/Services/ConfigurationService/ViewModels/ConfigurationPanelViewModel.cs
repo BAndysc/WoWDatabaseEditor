@@ -25,7 +25,7 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels
             this.messageBoxService = messageBoxService;
             ContainerTabItems = new ObservableCollection<IConfigurable>();
 
-            ContainerTabItems.AddRange(configs());
+            ContainerTabItems.AddRange(configs().OrderBy(x => x.Group).ThenBy(x => x.Name));
 
             foreach (var tab in ContainerTabItems)
             {

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using DynamicData;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.History;
@@ -205,7 +206,7 @@ public partial class MassParserViewModel : ObservableBase, IDocument
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e);
+                            LOG.LogError(e, "Error while processing packet");
                         }
                     }
                 }
@@ -251,7 +252,7 @@ public partial class MassParserViewModel : ObservableBase, IDocument
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e, "Error while running long task");
             throw;
         }
         finally

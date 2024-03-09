@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Controls;
 using WDE.Common.Utils;
 
@@ -12,8 +13,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
 {
     public abstract class SelectableTemplatedControl : TemplatedControl
     {
-        public static KeyModifiers MultiselectGesture { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
+        public static KeyModifiers MultiselectGesture { get; } = KeyGestures.CommandModifier;
         
         public static readonly AvaloniaProperty DeselectAllRequestProperty =
             AvaloniaProperty.Register<SelectableTemplatedControl, ICommand>(nameof(DeselectAllRequest));

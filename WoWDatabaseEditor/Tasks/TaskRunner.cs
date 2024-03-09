@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using SmartFormat.Utilities;
+using WDE.Common;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 
@@ -41,7 +42,8 @@ namespace WoWDatabaseEditorCore.Tasks
 
         private void AssertMainThread()
         {
-            Debug.Assert(SynchronizationContext.Current != null);
+            if (!OperatingSystem.IsBrowser())
+                Debug.Assert(SynchronizationContext.Current != null);
         }
 
         private void ScheduleNow(TaskCompletionSource taskCompletionSource, ITask task, ITaskProgress progress)
@@ -73,7 +75,7 @@ namespace WoWDatabaseEditorCore.Tasks
                                 taskCompletionSource.SetResult();
                             else
                             {
-                                Console.WriteLine(t.Exception);
+                                LOG.LogError(t.Exception);
                                 taskCompletionSource.SetException(t.Exception);
                             }
                             PeekNextTask();
@@ -96,9 +98,7 @@ namespace WoWDatabaseEditorCore.Tasks
                     catch (Exception e)
                     {
                         AssertMainThread();
-                        Console.WriteLine(e.Message);
-                        Console.WriteLine(e);
-                        Console.WriteLine(e.StackTrace);
+                        LOG.LogError(e);
                         progress.ReportFail();
                         taskCompletionSource.SetException(e);
                     }
@@ -189,7 +189,8 @@ namespace WoWDatabaseEditorCore.Tasks
 
             protected void InvokeUpdatedEvent()
             {
-                Debug.Assert(SynchronizationContext.Current != null);
+                if (!OperatingSystem.IsBrowser())
+                    Debug.Assert(SynchronizationContext.Current != null);
                 Updated?.Invoke(this);
             }
         }

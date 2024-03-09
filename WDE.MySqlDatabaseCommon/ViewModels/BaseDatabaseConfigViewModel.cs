@@ -84,7 +84,6 @@ namespace WDE.MySqlDatabaseCommon.ViewModels
         private string? user;
         
         private bool isModified;
-        private int? port1;
 
         public bool IsModified
         {

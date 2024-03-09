@@ -117,7 +117,7 @@ public class EditableTextBlock : TemplatedControl
             panel.Children.Add(textBox);
         }
 
-        DispatcherTimer.RunOnce(textBox.Focus, TimeSpan.FromMilliseconds(1));
+        DispatcherTimer.RunOnce(() => textBox.Focus(), TimeSpan.FromMilliseconds(1));
         if (overrideText == null)
             textBox.SelectAll();
         else
@@ -171,7 +171,7 @@ public class EditableTextBlock : TemplatedControl
         clickDisposable = null;
         
         if (save)
-            Text = textBox.Text;
+            Text = textBox.Text ?? "";
         textBox = null;
     }
 }

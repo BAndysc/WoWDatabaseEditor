@@ -12,7 +12,7 @@ namespace WDE.HistoryWindow.ViewModels
 {
     public class HistoryEvent
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         public bool IsFromFuture { get; set; }
     }
 
@@ -22,7 +22,7 @@ namespace WDE.HistoryWindow.ViewModels
     {
         private bool visibility;
 
-        private IUndoRedoWindow previousDocument;
+        private IUndoRedoWindow? previousDocument;
 
         public string UniqueId => "history_view";
         public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.Right;
@@ -50,7 +50,7 @@ namespace WDE.HistoryWindow.ViewModels
                     doc.History.Past.CollectionChanged += HistoryCollectionChanged;
                     doc.History.Future.CollectionChanged += HistoryCollectionChanged;
 
-                    HistoryCollectionChanged(null, null);
+                    HistoryCollectionChanged(null, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
                 });
         }
 
@@ -71,10 +71,10 @@ namespace WDE.HistoryWindow.ViewModels
             set => SetProperty(ref visibility, value);
         }
 
-        private void HistoryCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void HistoryCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             Items.Clear();
-            if (previousDocument.History == null)
+            if (previousDocument?.History == null)
                 return;
             
             foreach (IHistoryAction past in previousDocument.History.Past)

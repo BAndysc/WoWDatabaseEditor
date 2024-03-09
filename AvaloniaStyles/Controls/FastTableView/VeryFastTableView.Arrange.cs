@@ -28,7 +28,7 @@ public partial class VeryFastTableView
         }
         
         headerViews.Reset(template);
-        subheaderViews.Reset(AdditionalGroupSubHeaderTemplate);
+        subheaderViews.Reset(AdditionalGroupSubHeader);
 
         if (!IsGroupingEnabled)
         {

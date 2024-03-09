@@ -4,8 +4,8 @@ using Avalonia.Data;
 using Dock.Avalonia.Controls;
 using Dock.Model.Controls;
 using Dock.Model.Core;
-using Dock.Model.ReactiveUI;
-using Dock.Model.ReactiveUI.Controls;
+using Dock.Model.Mvvm;
+using Dock.Model.Mvvm.Controls;
 using WDE.Common.Windows;
 
 namespace WoWDatabaseEditorCore.Avalonia.Docking
@@ -100,17 +100,18 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
 
         public override void InitLayout(IDockable layout)
         {
-            this.ContextLocator = new Dictionary<string, Func<object>>
+            this.ContextLocator = new Dictionary<string, Func<object?>>
             {
             };
 
-            this.HostWindowLocator = new Dictionary<string, Func<IHostWindow>>
+            this.HostWindowLocator = new Dictionary<string, Func<IHostWindow?>>
             {
                 [nameof(IDockWindow)] = () =>
                 {
                     var hostWindow = new HostWindow()
                     {
-                        [!HostWindow.TitleProperty] = new Binding("ActiveDockable.Title")
+                        [!HostWindow.TitleProperty] = new Binding("ActiveDockable.Title"),
+                        DataTemplates = { new PersistentDockDataTemplate() }
                     };
                     return hostWindow;
                 }

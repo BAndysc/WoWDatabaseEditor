@@ -6,7 +6,7 @@ namespace WDE.CommonViews.Avalonia.DbcStore.Views
     /// <summary>
     ///     Interaction logic for DBCConfigView.xaml
     /// </summary>
-    public class DBCConfigView : UserControl
+    public partial class DBCConfigView : UserControl
     {
         public DBCConfigView()
         {

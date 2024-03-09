@@ -7,19 +7,11 @@ using WDE.MySqlDatabaseCommon.Tools;
 
 namespace WDE.CommonViews.Avalonia.TrinityMySqlDatabase.Tools
 {
-    public class DebugQueryToolView : ToolView
+    public partial class DebugQueryToolView : ToolView
     {
-        private TextEditor? MyAvalonEdit;
-        
         public DebugQueryToolView()
         {
             InitializeComponent();
-        }
-        
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-            MyAvalonEdit = this.FindControl<TextEditor>("MyAvalonEdit");
         }
         
         private void CodeEditorViewModelOnClear()

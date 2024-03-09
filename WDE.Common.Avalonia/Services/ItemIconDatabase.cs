@@ -70,7 +70,7 @@ internal class ItemIconDatabase : IItemIconsService
             var dest = fileSystem.ResolvePhysicalPath(ItemIconsPath);
             var destPath = dest.FullName;
 
-            Console.WriteLine("Copying new icons to -> " + destPath);
+            LOG.LogInformation("Copying new icons to -> " + destPath);
             if (Directory.Exists(destPath))
                 Directory.Delete(destPath, true);
             Directory.CreateDirectory(destPath);

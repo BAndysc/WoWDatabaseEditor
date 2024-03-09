@@ -1,0 +1,84 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Style Selector="TabStrip">
+        <Setter Property="Background" Value="{DynamicResource TabStripBackground}"/>
+        <Setter Property="BorderBrush" Value="#007ACC"/>
+        <Setter Property="Height" Value="21" />
+        <Setter Property="BorderThickness" Value="0,0,0,2" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                    ItemsPanel="{TemplateBinding ItemsPanel}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="TabStrip > TabStripItem">
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+    
+    <Style Selector="TabStripItem">
+        <Setter Property="MinHeight" Value="19" />
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="Padding" Value="4, 1, 2,0"/>
+        <Setter Property="BorderThickness" Value="0,0,0,0"/>
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="TabStripItem TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="TabStripItem:pointerover /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="#404040"/>
+    </Style>
+    <Style Selector="TabStripItem:selected /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="#007ACC" />
+    </Style>
+    
+    <Style Selector="TabStripItem Button.closeButton">
+        <Setter Property="DockPanel.Dock" Value="Right" />
+        <Setter Property="Opacity" Value="0" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border CornerRadius="3" Margin="3" ClipToBounds="True">
+                    <Image Margin="4" Stretch="Fill" Width="10" Height="10">
+                        <Image.Source>
+                            <DrawingImage>
+                                <DrawingImage.Drawing>
+                                    <DrawingGroup>
+                                        <GeometryDrawing Geometry="F0 M16,16z M0,0z M0.5,0.5L15.5,15.5">
+                                            <GeometryDrawing.Pen>
+                                                <Pen Brush="{DynamicResource ButtonForeground}" Thickness="1" LineJoin="Round" />
+                                            </GeometryDrawing.Pen>
+                                        </GeometryDrawing>
+                                        <GeometryDrawing Geometry="F0 M16,16z M0,0z M0.5,15.5L15.5,0.5">
+                                            <GeometryDrawing.Pen>
+                                                <Pen Brush="{DynamicResource ButtonForeground}" Thickness="1" LineJoin="Round" />
+                                            </GeometryDrawing.Pen>
+                                        </GeometryDrawing>
+                                    </DrawingGroup>
+                                </DrawingImage.Drawing>                            
+                            </DrawingImage>
+                        </Image.Source>
+                    </Image>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="TabStripItem:pointerover Button.closeButton">
+        <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="TabStripItem Button.closeButton /template/ Border">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="TabStripItem Button.closeButton:pointerover /template/ Border">
+        <Setter Property="Background" Value="#20000000" />
+    </Style>
+    <Style Selector="TabStripItem Button.closeButton:pressed /template/ Border">
+        <Setter Property="Background" Value="#40000000" />
+    </Style>
+</Styles>

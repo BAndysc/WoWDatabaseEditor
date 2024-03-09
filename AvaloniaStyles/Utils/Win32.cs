@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using Avalonia.Media;
+using WDE.Common;
 
 namespace AvaloniaStyles.Utils;
 
@@ -56,7 +57,7 @@ public static class Win32
         var msg = Marshal.GetExceptionForHR(result)?.Message;
         var msg2 = Marshal.GetExceptionForHR(result2)?.Message;
         
-        Console.WriteLine($"Can't set window dark mode:\n DWMWA_USE_IMMERSIVE_DARK_MODE method: {msg}\n DWMWA_USE_IMMERSIVE_DARK_MODE_OLD_WINDOWS method: {msg2}");
+        LOG.LogWarning($"Can't set window dark mode:\n DWMWA_USE_IMMERSIVE_DARK_MODE method: {msg}\n DWMWA_USE_IMMERSIVE_DARK_MODE_OLD_WINDOWS method: {msg2}");
         return false;
     }
 
@@ -88,7 +89,7 @@ public static class Win32
         }
         
         var msg = Marshal.GetExceptionForHR(result)?.Message;
-        Console.WriteLine($"Can't set window caption color: {msg}");
+        LOG.LogWarning($"Can't set window caption color: {msg}");
         return false;
     }
 }

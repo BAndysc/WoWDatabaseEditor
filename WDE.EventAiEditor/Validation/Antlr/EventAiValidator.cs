@@ -32,7 +32,7 @@ namespace WDE.EventAiEditor.Validation.Antlr
             {
                 return action(parser);
             }
-            catch (ValidationParseException e)
+            catch (ValidationParseException)
             {
                 throw;
             }
@@ -50,7 +50,6 @@ namespace WDE.EventAiEditor.Validation.Antlr
                 boolContextCached ??= parser.exprBool();
                 return visitor.Visit(boolContextCached);
             });
-           return true;
         }
         
         internal long EvaluateInteger(IEventAiValidationContext context)
@@ -61,7 +60,6 @@ namespace WDE.EventAiEditor.Validation.Antlr
                 intContextCached ??= parser.exprInt();
                 return visitor.Visit(intContextCached);
             });
-            return 0;
         }
         
         public class CustomErrorListener : IAntlrErrorListener<IToken>

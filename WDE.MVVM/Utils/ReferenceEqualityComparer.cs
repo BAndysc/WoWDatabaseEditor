@@ -17,7 +17,7 @@ namespace WDE.MVVM.Utils
         /// Gets the default instance of the
         /// <see cref="ReferenceEqualityComparer{T}"/> class.
         /// </summary>
-        /// <value>A <see cref="ReferenceEqualityComparer<T>"/> instance.</value>
+        /// <value>A &lt;see cref="ReferenceEqualityComparer&lt;T&gt;"/&gt; instance.</value>
         public static ReferenceEqualityComparer<T> Instance { get; } = new();
 
         #endregion

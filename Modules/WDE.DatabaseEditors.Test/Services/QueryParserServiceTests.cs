@@ -19,7 +19,7 @@ namespace WDE.DatabaseEditors.Test.Services;
 
 public class QueryParserServiceTests
 {
-    private IQueryParserService parserService;
+    private IQueryParserService parserService = null!;
 
     [SetUp]
     public void Setup()
@@ -67,7 +67,7 @@ public class QueryParserServiceTests
 
         dataLoader.Load(default!, default, default, default, default)
             .ReturnsForAnyArgs(
-                Task.FromResult<IDatabaseTableData>(new DatabaseTableData(definition, new List<DatabaseEntity>()
+                Task.FromResult<IDatabaseTableData?>(new DatabaseTableData(definition, new List<DatabaseEntity>()
                 {
                     new DatabaseEntity(true, new DatabaseKey(0, 18675), new Dictionary<string, IDatabaseField>(), null)
                 })));

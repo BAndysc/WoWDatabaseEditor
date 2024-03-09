@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Media;
+using Avalonia.Threading;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Services;
@@ -45,7 +46,7 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
         if (row.IsDuplicate)
         {
             var pen = DuplicateRowPen;
-            context.FillRectangle(pen.Brush, rect.Deflate(1).WithWidth(5));
+            context.FillRectangle(pen.Brush ?? Brushes.Black, rect.Deflate(1).WithWidth(5));
             context.DrawLine(pen, rect.TopLeft,rect.TopRight);
             context.DrawLine(pen, rect.BottomLeft, rect.BottomRight);
         }
@@ -77,7 +78,7 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
                 async Task FetchAsync()
                 {
                     await itemIconService.GetIcon(itemCell.Item);
-                    table.InvalidateVisual();
+                    Dispatcher.UIThread.Post(table.InvalidateVisual);
                 }
                 FetchAsync().ListenErrors();
             }

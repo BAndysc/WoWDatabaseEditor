@@ -97,7 +97,7 @@ public class ProfileService : IProfileService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e);
             return false;
         }
     }
@@ -120,7 +120,7 @@ public class ProfileService : IProfileService
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e);
             }
 
             await Task.Delay(delay);
@@ -143,7 +143,7 @@ public class ProfileService : IProfileService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e);
         }
         
         if (profiles == null)
@@ -170,7 +170,7 @@ public class ProfileService : IProfileService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e);
         }
         
         if (profiles == null)
@@ -206,7 +206,7 @@ public class ProfileService : IProfileService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e);
             return null;
         }
     }

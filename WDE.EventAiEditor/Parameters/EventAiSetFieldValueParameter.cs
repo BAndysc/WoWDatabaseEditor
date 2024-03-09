@@ -5,7 +5,7 @@ using WDE.EventAiEditor.Models;
 
 namespace WDE.EventAiEditor.Parameters;
 
-public class EventAiSetFieldValueParameter : IContextualParameter<long, EventAiBaseElement>, ICustomPickerContextualParameter<long>
+public class EventAiSetFieldValueParameter : BaseContextualParameter<long, EventAiBaseElement>, ICustomPickerContextualParameter<long>
 {
     private readonly IParameterPickerService parameterPickerService;
     private readonly IParameter<long> itemParameter;
@@ -35,18 +35,18 @@ public class EventAiSetFieldValueParameter : IContextualParameter<long, EventAiB
         return Task.FromResult<(long, bool)>((0, false));
     }
 
-    public string? Prefix => null;
-    public bool HasItems => true;
+    public override string? Prefix => null;
+    public override bool HasItems => true;
     public bool AllowUnknownItems => true;
     
-    public string ToString(long value)
+    public override string ToString(long value)
     {
         return value.ToString();
     }
 
-    public Dictionary<long, SelectOption>? Items => null;
+    public override Dictionary<long, SelectOption>? Items => null;
     
-    public string ToString(long value, EventAiBaseElement context)
+    public override string ToString(long value, EventAiBaseElement context)
     {
         var fieldType = context.GetParameter(0).Value;
         if (fieldType is 56 or 57 or 58)

@@ -154,7 +154,7 @@ internal class FastByteSearcher
             if (j == M)
             {
                 return i - j;
-                j = partialMatchTable[j - 1];
+                //j = partialMatchTable[j - 1];
             }
 
             // mismatch after j matches

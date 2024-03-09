@@ -55,4 +55,18 @@ public class CreatureTextWithFallback : StringParameter, IAsyncContextualParamet
     }
 
     public string AffectedByColumn => "broadcasttextid";
+
+    public string ToString(string value, object context)
+    {
+        if (context is DatabaseEntity entity)
+            return ToString(value, entity);
+        return value;
+    }
+
+    public async Task<string> ToStringAsync(string value, CancellationToken token, object context)
+    {
+        if (context is DatabaseEntity entity)
+            return await ToStringAsync(value, token, entity);
+        return value;
+    }
 }

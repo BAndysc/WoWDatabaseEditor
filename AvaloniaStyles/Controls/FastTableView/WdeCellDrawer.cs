@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Media;
 
@@ -46,14 +47,11 @@ public class WdeCellDrawer : ICustomCellDrawer
             context.DrawRectangle(ButtonBackgroundPen.Brush, ButtonBorderPen, rect, 4, 4);
 
             var state = context.PushClip(rect);
-            var ft = new FormattedText
-            {
-                Text = "Click",
-                Constraint = new Size(rect.Width, rect.Height),
-                Typeface = Typeface.Default,
-                FontSize = 12
-            };
-            context.DrawText(ButtonTextPen.Brush, new Point(rect.Center.X - ft.Bounds.Width / 2, rect.Center.Y - ft.Bounds.Height / 2), ft);
+            var ft = new FormattedText("Click", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Typeface.Default, 12, ButtonTextPen.Brush);
+            ft.MaxTextWidth = float.MaxValue; // rect.Width // we don't want text wrapping so pass float.MaxValue
+            ft.MaxTextHeight = rect.Height;
+            
+            context.DrawText(ft, new Point(rect.Center.X - ft.Width / 2, rect.Center.Y - ft.Height / 2));
             state.Dispose();
 
             return true;

@@ -1,0 +1,116 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net8.0-browser</TargetFramework>
+        <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+        <WasmMainJSPath>AppBundle\main.js</WasmMainJSPath>
+        <OutputType>Exe</OutputType>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+        <WasmEnableThreads>false</WasmEnableThreads> <!-- true doesn't work :< -->
+        <EmccTotalMemory>1073741824</EmccTotalMemory>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <Import Project="..\WebBuildTasks\WebBuild.Targets" />
+
+    <Import Project="..\Avalonia.props" />
+    
+    <ItemGroup>
+        <WasmExtraFilesToDeploy Include="AppBundle\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Browser" Version="11.1.999-cibuild0045717-beta"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+      <ProjectReference Include="..\Modules\WDE.AnniversaryInfo\WDE.AnniversaryInfo.csproj" />
+      <ProjectReference Include="..\Modules\WDE.EventScriptsEditor\WDE.EventScriptsEditor.csproj" />
+      <ProjectReference Include="..\Modules\WDE.HttpDatabase\WDE.HttpDatabase.csproj" />
+      <ProjectReference Include="..\Modules\WDE.LootEditor\WDE.LootEditor.csproj" />
+      <ProjectReference Include="..\Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj" />
+      <ProjectReference Include="..\Modules\WDE.Sessions\WDE.Sessions.csproj" />
+      <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.CommonViews.Avalonia\WDE.CommonViews.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
+      <ProjectReference Include="..\WDE.DatabaseEditors.Avalonia\WDE.DatabaseEditors.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
+      <ProjectReference Include="..\WDE.EventAiEditor.Avalonia\WDE.EventAiEditor.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.MapRenderer\WDE.MapRenderer.csproj" />
+      <ProjectReference Include="..\WDE.MySqlDatabaseCommon\WDE.MySqlDatabaseCommon.csproj" />
+      <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
+      <ProjectReference Include="..\WDE.SmartScriptEditor.Avalonia\WDE.SmartScriptEditor.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
+      <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
+      <ProjectReference Include="..\WDE.Spells\WDE.Spells.csproj" />
+      <ProjectReference Include="..\WDE.SqlInterpreter\WDE.SqlInterpreter.csproj" />
+      <ProjectReference Include="..\WDE.TrinitySmartScriptEditor\WDE.TrinitySmartScriptEditor.csproj" />
+      <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.DbcStore\WDE.DbcStore.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditorCore.Avalonia\WoWDatabaseEditorCore.Avalonia.csproj" />
+    </ItemGroup>
+
+    <Target Name="CopyFiles" AfterTargets="WasmBuildApp">
+        <Message Text="Copying icons..." Importance="High" />
+        <ItemGroup>
+            <IconsSource Include="$(OutputPath)Icons\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(IconsSource)" DestinationFiles ="@(IconsSource->'$(OutputPath)AppBundle\Icons\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+        <Message Text="Copying DatabaseContextualParameters..." Importance="High" />
+        <ItemGroup>
+            <DatabaseContextualParametersSource Include="$(OutputPath)DatabaseContextualParameters\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(DatabaseContextualParametersSource)" DestinationFiles ="@(DatabaseContextualParametersSource->'$(OutputPath)AppBundle\DatabaseContextualParameters\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+        <Message Text="Copying DbDefinitions..." Importance="High" />
+        <ItemGroup>
+            <DbDefinitionsSource Include="$(OutputPath)DbDefinitions\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(DbDefinitionsSource)" DestinationFiles ="@(DbDefinitionsSource->'$(OutputPath)AppBundle\DbDefinitions\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+        <Message Text="Copying Parameters..." Importance="High" />
+        <ItemGroup>
+            <ParametersSource Include="$(OutputPath)Parameters\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(ParametersSource)" DestinationFiles ="@(ParametersSource->'$(OutputPath)AppBundle\Parameters\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+        <Message Text="Copying Resources..." Importance="High" />
+        <ItemGroup>
+            <ResourcesSource Include="$(OutputPath)Resources\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(ResourcesSource)" DestinationFiles ="@(ResourcesSource->'$(OutputPath)AppBundle\Resources\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+        <Message Text="Copying SmartData..." Importance="High" />
+        <ItemGroup>
+            <SmartDataSource Include="$(OutputPath)SmartData\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(SmartDataSource)" DestinationFiles ="@(SmartDataSource->'$(OutputPath)AppBundle\SmartData\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+        <Message Text="Copying EventScriptData..." Importance="High" />
+        <ItemGroup>
+            <EventScriptDataSource Include="$(OutputPath)EventScriptData\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(EventScriptDataSource)" DestinationFiles ="@(EventScriptDataSource->'$(OutputPath)AppBundle\EventScriptData\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+        <Message Text="Copying CodeCompletionData..." Importance="High" />
+        <ItemGroup>
+            <CodeCompletionDataSource Include="$(OutputPath)CodeCompletionData\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(CodeCompletionDataSource)" DestinationFiles ="@(CodeCompletionDataSource->'$(OutputPath)AppBundle\CodeCompletionData\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+
+        <ProduceDirectoryListingTask BasePath="$(OutputPath)\AppBundle" Folder="Icons" />
+        <ProduceDirectoryListingTask BasePath="$(OutputPath)\AppBundle" Folder="DatabaseContextualParameters" />
+        <ProduceDirectoryListingTask BasePath="$(OutputPath)\AppBundle" Folder="DbDefinitions" />
+        <ProduceDirectoryListingTask BasePath="$(OutputPath)\AppBundle" Folder="Parameters" />
+        <ProduceDirectoryListingTask BasePath="$(OutputPath)\AppBundle" Folder="Resources" />
+        <ProduceDirectoryListingTask BasePath="$(OutputPath)\AppBundle" Folder="SmartData" />
+        <ProduceDirectoryListingTask BasePath="$(OutputPath)\AppBundle" Folder="EventScriptData" />
+        <ProduceDirectoryListingTask BasePath="$(OutputPath)\AppBundle" Folder="CodeCompletionData" />
+    </Target>
+
+</Project>

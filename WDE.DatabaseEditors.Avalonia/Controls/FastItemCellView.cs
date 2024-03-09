@@ -14,7 +14,7 @@ using Thickness = Avalonia.Thickness;
 
 namespace WDE.DatabaseEditors.Avalonia.Controls
 {
-    public class FastItemCellView : OpenableFastCellViewBase, IStyleable
+    public class FastItemCellView : OpenableFastCellViewBase
     {
         public static readonly DirectProperty<FastItemCellView, object?> SelectedItemProperty =
             AvaloniaProperty.RegisterDirect<FastItemCellView, object?>(
@@ -44,7 +44,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
 
         protected override bool DismissOnWindowFocusLost => true;
 
-        Type IStyleable.StyleKey => typeof(FastCellView);
+        protected override Type StyleKeyOverride => typeof(FastCellView);
         
         private CompletionComboBox? completionComboBox;
 
@@ -65,15 +65,13 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 return;
             DispatcherTimer.RunOnce(() =>
             {
-                completionComboBox!.RaiseEvent(new TextInputEventArgs
-                {
-                    Device = e.Device,
-                    Handled = false,
-                    Text = e.Text,
-                    Route = e.Route,
-                    RoutedEvent = e.RoutedEvent,
-                    Source = completionComboBox
-                });
+                var args = new TextInputEventArgs();
+                args.Handled = false;
+                args.Text = e.Text;
+                args.Route = e.Route;
+                args.RoutedEvent = e.RoutedEvent;
+                args.Source = completionComboBox;
+                completionComboBox!.RaiseEvent(args);
             }, TimeSpan.FromMilliseconds(2));
         }
 
@@ -90,7 +88,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         private void CompletionComboBoxOnClosed()
         {
             EndEditing(true);
-            FocusManager.Instance!.Focus(this, NavigationMethod.Tab);
+            Focus(NavigationMethod.Tab);
         }
 
         protected override Control CreateEditingControl()
@@ -118,9 +116,9 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 Value = l;
         }
 
-        public override void DoCopy(IClipboard clipboard)
+        public override void DoCopy()
         {
-            clipboard.SetTextAsync(Value.ToString()!);
+            TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(Value.ToString()!);
         }
 
         protected override void EndEditingInternal(bool commit)

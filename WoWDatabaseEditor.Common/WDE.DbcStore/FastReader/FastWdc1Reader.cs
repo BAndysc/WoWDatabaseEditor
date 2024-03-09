@@ -25,8 +25,10 @@ public partial class FastWdc1Reader : IDBC
     private struct OffsetMapEntry
     {
         public const int SizeOf = 6;
-        public uint Offset;
-        public ushort Size;
+        public uint Offset = 0;
+        public ushort Size = 0;
+
+        public OffsetMapEntry() { }
     }
     
     private enum FieldCompression

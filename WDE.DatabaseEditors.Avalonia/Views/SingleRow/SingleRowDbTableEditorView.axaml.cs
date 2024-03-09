@@ -9,7 +9,7 @@ using WDE.DatabaseEditors.ViewModels.SingleRow;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.SingleRow
 {
-    public class SingleRowDbTableEditorView : UserControl
+    public partial class SingleRowDbTableEditorView : UserControl
     {
         public SingleRowDbTableEditorView()
         {
@@ -38,7 +38,7 @@ namespace WDE.DatabaseEditors.Avalonia.Views.SingleRow
                 return;
 
             var contextMenu = tableView.ContextMenu!;
-            var items = contextMenu.Items as AvaloniaList<object>;
+            var items = contextMenu.ItemsSource as AvaloniaList<object>;
             if (items == null)
                 return;
 
@@ -57,7 +57,7 @@ namespace WDE.DatabaseEditors.Avalonia.Views.SingleRow
         {
             VeryFastTableView tableView = (VeryFastTableView)sender!;
             var contextMenu = tableView.ContextMenu!;
-            var items = contextMenu.Items as AvaloniaList<object>;
+            var items = contextMenu.ItemsSource as AvaloniaList<object>;
             if (items == null)
                 return;
             for (int i = 0; i < customContextMenus; ++i)

@@ -12,7 +12,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using JetBrains.Profiler.Api;
-using Microsoft.CodeAnalysis.Operations;
+using WDE.Common.Avalonia;
 using Prism.Events;
 using WDE.Common.Avalonia.Debugging;
 using WDE.Common.Avalonia.Utils;
@@ -22,6 +22,7 @@ using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.MVVM.Observable;
+using WDE.MVVM.Utils;
 using WDE.SmartScriptEditor.Avalonia.Debugging;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Debugging;
@@ -44,9 +45,9 @@ public partial class VirtualizedSmartScriptPanel : Panel
     public static readonly StyledProperty<IDataTemplate> NewActionItemTemplateProperty = AvaloniaProperty.Register<VirtualizedSmartScriptPanel, IDataTemplate>(nameof(NewActionItemTemplate));
     public static readonly StyledProperty<IDataTemplate> NewConditionItemTemplateProperty = AvaloniaProperty.Register<VirtualizedSmartScriptPanel, IDataTemplate>(nameof(NewConditionItemTemplate));
 
-    public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<VirtualizedSmartScriptPanel, IControl, bool>("Selected");
-    public static bool GetSelected(IControl control) => (bool?)control.GetValue(SelectedProperty) ?? false;
-    public static void SetSelected(IControl control, bool value) => control.SetValue(SelectedProperty, value);
+    public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<VirtualizedSmartScriptPanel, Control, bool>("Selected");
+    public static bool GetSelected(Control control) => (bool?)control.GetValue(SelectedProperty) ?? false;
+    public static void SetSelected(Control control, bool value) => control.SetValue(SelectedProperty, value);
 
     public static readonly AvaloniaProperty DropItemsProperty = AvaloniaProperty.Register<VirtualizedSmartScriptPanel, ICommand>(nameof(DropItems));
 
@@ -134,6 +135,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
     private double EventSpacing => compactView ? 2 : 10;
     private double VariableSpacing => 2;
     private VirtualizedSmartScriptPanelRenderOverlay renderOverlay;
+    private NoArrangePanel childrenContainer;
 
     private static HorizRect ConditionWidth(double totalWidth)
     {
@@ -177,7 +179,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
         var smartScriptSettings = ViewBind.ResolveViewModel<IGeneralSmartScriptSettingsProvider>();
         compactView = smartScriptSettings.ViewType == SmartScriptViewType.Compact;
 
-        var childrenContainer = new Panel();
+        childrenContainer = new NoArrangePanel();
         renderOverlay = new VirtualizedSmartScriptPanelRenderOverlay(this);
 
         // firstly children, then overlay
@@ -253,7 +255,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
         set => SetValue(NewConditionItemTemplateProperty, value);
     }
 
-    private ScrollViewer ScrollView => this.FindAncestorOfType<ScrollViewer>();
+    private ScrollViewer ScrollView => this.FindAncestorOfType<ScrollViewer>()!;
     private InverseRenderTransformPanel? Panel => this.FindAncestorOfType<InverseRenderTransformPanel>();
 
     private Rect VisibleRect
@@ -286,6 +288,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
     private SmartScriptBase? attachedScript;
     private IScriptBreakpoints? attachedBreakpoints;
     private System.IDisposable? attachedBreakpointPopupRequest;
+    private System.IDisposable? attachedScrollViewer;
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
@@ -305,10 +308,17 @@ public partial class VirtualizedSmartScriptPanel : Panel
         }
         if (ScrollView is { } sc)
         {
-            sc.GetObservable(ScrollViewer.OffsetProperty).SubscribeAction(_ =>
+            var a = sc.GetObservable(ScrollViewer.OffsetProperty).SubscribeAction(_ =>
             {
                 InvalidateArrange();
+                InvalidateVisual();
             });
+            var b = sc.GetObservable(ScrollViewer.ViewportProperty).SubscribeAction(_ =>
+            {
+                InvalidateArrange();
+                InvalidateVisual();
+            });
+            attachedScrollViewer = new CompositeDisposable(a, b);
         }
     }
 
@@ -356,6 +366,8 @@ public partial class VirtualizedSmartScriptPanel : Panel
         attachedBreakpointPopupRequest = null;
         attachedScript = null;
         attachedBreakpoints = null;
+        attachedScrollViewer?.Dispose();
+        attachedScrollViewer = null;
         base.OnDetachedFromVisualTree(e);
         MeasureProfiler.SaveData();
     }
@@ -379,8 +391,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
     
     private void UpdateIsCopying(KeyModifiers key)
     {
-        var systemWideControlModifier = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
+        var systemWideControlModifier = KeyGestures.CommandModifier;
         isCopying = key.HasFlagFast(systemWideControlModifier);
     }
 
@@ -487,7 +498,6 @@ public partial class VirtualizedSmartScriptPanel : Panel
         script != null && script.Events.Any(a => a.IsSelected && a.IsBeginGroup);
 
     private bool mouseStartPositionValid = false;
-    private bool leftMouseButtonPressed = false;
 
     private void CollectSmartElementBreakpointsAtPoint(Point point, List<SmartBaseElement> outputList)
     {
@@ -1055,9 +1065,9 @@ public partial class VirtualizedSmartScriptPanel : Panel
         return script != null && script.EditorFeatures.CanReorderConditions;
     }
 
-    protected override void OnPointerLeave(PointerEventArgs e)
+    protected override void OnPointerExited(PointerEventArgs e)
     {
-        base.OnPointerLeave(e);
+        base.OnPointerExited(e);
         mouseStartPositionValid = false;
         mouseY = -1;
         mouseY = -1;

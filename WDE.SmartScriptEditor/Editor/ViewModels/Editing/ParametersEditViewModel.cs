@@ -151,7 +151,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public event Action? BeforeAccept;
     }
     
-    public class Grouping<TKey, TVal> : ObservableCollectionExtended<TVal>, IGrouping<TKey, TVal>, IDisposable
+    public class Grouping<TKey, TVal> : ObservableCollectionExtended<TVal>, IGrouping<TKey, TVal>, IDisposable where TVal : notnull
     {
         private readonly IDisposable disposable;
         

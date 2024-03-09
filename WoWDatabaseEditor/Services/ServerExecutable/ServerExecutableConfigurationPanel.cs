@@ -11,7 +11,7 @@ using WDE.MVVM;
 
 namespace WoWDatabaseEditorCore.Services.ServerExecutable;
 
-[AutoRegister]
+[AutoRegister(Platforms.Desktop)]
 public partial class ServerExecutableConfigurationPanelViewModel : ObservableBase, IConfigurable
 {
     private readonly IWindowManager windowManager;

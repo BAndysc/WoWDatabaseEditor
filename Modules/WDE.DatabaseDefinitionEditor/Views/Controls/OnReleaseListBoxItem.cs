@@ -2,16 +2,21 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 
 namespace WDE.DatabaseDefinitionEditor.Views.Controls;
 
-// note: in avalonia 11 this is not required.
-// this changes the listbox to update the selection on pointer release rather than pointer press
-public class OnReleaseListBox : ListBox, IStyleable
+// this changes the listbox to update the selection on pointer release rather than pointer press (originally handled in ListBoxItem)
+public class OnReleaseListBox : ListBox
 {
-    Type IStyleable.StyleKey => typeof(ListBox);
+    protected override Type StyleKeyOverride => typeof(ListBox);
+
+    static OnReleaseListBox()
+    {
+        PointerPressedEvent.AddClassHandler<OnReleaseListBox>((x, e) => x.OnPointerPressed(e), RoutingStrategies.Tunnel);
+    }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
@@ -21,7 +26,7 @@ public class OnReleaseListBox : ListBox, IStyleable
     protected override void OnPointerReleased(Avalonia.Input.PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
-        if (e.Source is IVisual source)
+        if (e.Source is Visual source)
         {
             var point = e.GetCurrentPoint(source);
 
@@ -30,8 +35,8 @@ public class OnReleaseListBox : ListBox, IStyleable
                 e.Handled = UpdateSelectionFromEventSource(
                     e.Source,
                     true,
-                    e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
-                    e.KeyModifiers.HasAllFlags(KeyModifiers.Control),
+                    e.KeyModifiers.HasFlagFast(KeyModifiers.Shift),
+                    e.KeyModifiers.HasFlagFast(KeyModifiers.Control),
                     point.Properties.IsRightButtonPressed);
             }
         }

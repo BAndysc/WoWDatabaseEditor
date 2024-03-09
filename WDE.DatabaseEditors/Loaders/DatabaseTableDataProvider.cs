@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
@@ -131,7 +132,7 @@ namespace WDE.DatabaseEditors.Loaders
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                LOG.LogError(e.Message);
                 return 0;
             }
         }
@@ -297,7 +298,7 @@ namespace WDE.DatabaseEditors.Loaders
                             sourceId = (int)key[0];
                         }
                         
-                        IList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
+                        IReadOnlyList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
                             new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, sourceGroup,
                                 sourceEntry, sourceId));
                         if (conditionList != null && conditionList.Count > 0)

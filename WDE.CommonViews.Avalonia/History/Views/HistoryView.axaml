@@ -11,35 +11,35 @@
              x:DataType="viewModels:HistoryViewModel"
              d:DesignHeight="450" d:DesignWidth="800">
     
-    <components:ToolView.Icon>
-        <controls:MonochromaticIcon Name="Icon">
-            <controls:MonochromaticIcon.Source>
-                <DrawingImage>
-                    <DrawingImage.Drawing>
-                        <DrawingGroup>
-                            <DrawingGroup Opacity="1">
-                                <GeometryDrawing Brush="{Binding #Icon.Fill}">
-                                    <GeometryDrawing.Pen>
-                                        <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="1.1" LineJoin="Miter" />
-                                    </GeometryDrawing.Pen>
-                                    <GeometryDrawing.Geometry>
-                                        <EllipseGeometry RadiusX="12.494" RadiusY="12.494" Center="15.879,16.433" />
-                                    </GeometryDrawing.Geometry>
-                                </GeometryDrawing>
-                                <GeometryDrawing Geometry="F0 M32,32z M0,0z M14.094,9.294L15.879,16.433 19.449,20.003">
-                                    <GeometryDrawing.Pen>
-                                        <Pen Brush="{Binding #Icon.AlternativeBorderBrush}" Thickness="1.78" LineJoin="Miter" />
-                                    </GeometryDrawing.Pen>
-                                </GeometryDrawing>
-                            </DrawingGroup>
-                        </DrawingGroup>
-                    </DrawingImage.Drawing>
-                </DrawingImage>
-            </controls:MonochromaticIcon.Source>
-        </controls:MonochromaticIcon>
-    </components:ToolView.Icon>
+    <!-- <components:ToolView.Icon> -->
+    <!--     <controls:MonochromaticIcon Name="Icon"> -->
+    <!--         <controls:MonochromaticIcon.Source> -->
+    <!--             <DrawingImage> -->
+    <!--                 <DrawingImage.Drawing> -->
+    <!--                     <DrawingGroup> -->
+    <!--                         <DrawingGroup Opacity="1"> -->
+    <!--                             <GeometryDrawing Brush="{Binding #Icon.Fill}"> -->
+    <!--                                 <GeometryDrawing.Pen> -->
+    <!--                                     <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="1.1" LineJoin="Miter" /> -->
+    <!--                                 </GeometryDrawing.Pen> -->
+    <!--                                 <GeometryDrawing.Geometry> -->
+    <!--                                     <EllipseGeometry RadiusX="12.494" RadiusY="12.494" Center="15.879,16.433" /> -->
+    <!--                                 </GeometryDrawing.Geometry> -->
+    <!--                             </GeometryDrawing> -->
+    <!--                             <GeometryDrawing Geometry="F0 M32,32z M0,0z M14.094,9.294L15.879,16.433 19.449,20.003"> -->
+    <!--                                 <GeometryDrawing.Pen> -->
+    <!--                                     <Pen Brush="{Binding #Icon.AlternativeBorderBrush}" Thickness="1.78" LineJoin="Miter" /> -->
+    <!--                                 </GeometryDrawing.Pen> -->
+    <!--                             </GeometryDrawing> -->
+    <!--                         </DrawingGroup> -->
+    <!--                     </DrawingGroup> -->
+    <!--                 </DrawingImage.Drawing> -->
+    <!--             </DrawingImage> -->
+    <!--         </controls:MonochromaticIcon.Source> -->
+    <!--     </controls:MonochromaticIcon> -->
+    <!-- </components:ToolView.Icon> -->
     
-    <ListBox Items="{CompiledBinding Items}" BorderThickness="0" Background="Transparent">
+    <ListBox ItemsSource="{CompiledBinding Items}" BorderThickness="0" Background="Transparent">
         <ListBox.ItemTemplate>
             <DataTemplate>
                 <WrapPanel>

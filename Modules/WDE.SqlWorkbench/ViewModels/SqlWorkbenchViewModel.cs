@@ -22,6 +22,7 @@ using WDE.SqlWorkbench.Services.SyntaxValidator;
 using WDE.SqlWorkbench.Services.TextMarkers;
 using AvaloniaEdit.Document;
 using AvaloniaStyles;
+using Microsoft.Extensions.Logging;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Prism.Commands;
 using WDE.Common;
@@ -584,7 +585,9 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
     private async Task ExecuteSelectedAsync()
     {
         if (connectTask != null)
+#pragma warning disable VSTHRD003
             await connectTask;
+#pragma warning restore VSTHRD003
         
         querySplitter.UpdateRangesNow(Document);
         if (!querySplitter.AreRangesValid)
@@ -611,7 +614,9 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
             return;
 
         if (connectTask != null)
+#pragma warning disable VSTHRD003
             await connectTask;
+#pragma warning restore VSTHRD003
         
         // we do it before schedule, so that the action is added to the UI list before the execution starts
         var action = actionsOutputService.Create(queries[0]);
@@ -629,7 +634,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                 {
                     await ExecuteSingleAsync(executor, query, token, action, Preferences.CloseNonModifiedTabsOnExecute && index == 0);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     if (rollbackOnError)
                     {
@@ -650,7 +655,9 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
     private async Task ExecuteAllAsync()
     {
         if (connectTask != null)
+#pragma warning disable VSTHRD003
             await connectTask;
+#pragma warning restore VSTHRD003
 
         querySplitter.UpdateRangesNow(Document);
         if (!querySplitter.AreRangesValid)
@@ -838,7 +845,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                     }
                 }), languageServerInstance);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             LanguageServerState = LanguageServerStateEnum.NotInstalled;
             throw;
@@ -985,7 +992,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogWarning(e, "Error while computing completions");
             throw;
         }
     }

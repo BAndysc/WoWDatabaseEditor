@@ -104,7 +104,7 @@ public class WebItemIconsService // : IItemIconsService
             }
             catch (Exception e)
             {
-                Console.WriteLine("Couldn't load icon " + next + ". " + e.Message);
+                LOG.LogWarning("Couldn't load icon " + next + ". " + e.Message);
                 cachedIconsByFileId[next] = null;
                 tcs.SetResult(null);
                 pendingIconsByFileId.Remove(next);
@@ -125,7 +125,7 @@ public class WebItemIconsService // : IItemIconsService
             }
             catch (Exception e)
             {
-                Console.WriteLine("Couldn't load icon " + next + ". " + e.Message);
+                LOG.LogWarning("Couldn't load icon " + next + ". " + e.Message);
                 cachedIcons[next] = null;
                 tcs.SetResult(null);
                 pendingIcons.Remove(next);

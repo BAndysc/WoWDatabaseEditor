@@ -7,11 +7,11 @@ using Avalonia.Styling;
 
 namespace WDE.Common.Avalonia.Controls;
 
-public class CommandTextBlock : TextBlock, IStyleable
+public class CommandTextBlock : TextBlock
 {
     public static readonly StyledProperty<object?> CommandParameterProperty = AvaloniaProperty.Register<CommandTextBlock, object?>("CommandParameter");
     public static readonly StyledProperty<ICommand?> CommandProperty = AvaloniaProperty.Register<CommandTextBlock, ICommand?>("Command");
-    Type IStyleable.StyleKey => typeof(TextBlock);
+    protected override Type StyleKeyOverride => typeof(TextBlock);
 
     public object? CommandParameter
     {

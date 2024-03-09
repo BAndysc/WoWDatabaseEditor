@@ -10,7 +10,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         {
         }
 
-        public ITable<RbacPermission> RbacPermissions => GetTable<RbacPermission>();
-        public ITable<RbacLinkedPermission> RbacLinkedPermissions => GetTable<RbacLinkedPermission>();
+        public ITable<RbacPermission> RbacPermissions => this.GetTable<RbacPermission>();
+        public ITable<RbacLinkedPermission> RbacLinkedPermissions => this.GetTable<RbacLinkedPermission>();
     }
 }

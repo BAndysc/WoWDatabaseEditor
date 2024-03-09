@@ -428,7 +428,6 @@ namespace TheEngine.Managers
             public Vector2 Draw(float x, float y, float w, float h)
             {
                 float maxX = 0;
-                var total = new Vector2();
                 foreach (var child in children)
                 {
                     var measure = child.Measure();

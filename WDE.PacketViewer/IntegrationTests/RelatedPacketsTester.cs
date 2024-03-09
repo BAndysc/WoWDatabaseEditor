@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using WDE.Common;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.PacketParserIntegration;
 using WDE.PacketViewer.Processing.Processors;
@@ -101,23 +102,20 @@ namespace WDE.PacketViewer.IntegrationTests
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("FAILED: ");
-                    Console.WriteLine(e.Message);
+                    LOG.LogError("FAILED: " + e.Message);
                 }
                 finally
                 {
-                    Console.WriteLine();
-                    Console.WriteLine();
-                    Console.WriteLine();
+                    LOG.LogInformation("");
                 }
             }
         }
 
         private void TestSingle(ulong gameBuild, PacketViewModelStore store, RelatedPacketsTestCase @group, List<PacketViewModel> split)
         {
-            Console.WriteLine("\n\n" + @group.TestName);
+            LOG.LogInformation("\n\n" + @group.TestName);
             var startPackets = FindPacket(store, split, @group.SearchTextStartPacket);
-            Console.WriteLine($"Text: '{@group.SearchTextStartPacket}' found in packet id {startPackets!.Id}");
+            LOG.LogInformation($"Text: '{@group.SearchTextStartPacket}' found in packet id {startPackets!.Id}");
             var result = relatedPacketsFinder.Find(gameBuild, split, split, startPackets!.Id, CancellationToken.None);
 
             var mustIncludeGuids = @group.MustIncludeGuid.StringToGuids().ToList();
@@ -149,13 +147,13 @@ namespace WDE.PacketViewer.IntegrationTests
             foreach (var unnecessary in includesButShouldNot)
             {
                 if (result.IncludedGuids != null && !result.IncludedGuids.Contains(unnecessary))
-                    Console.WriteLine(unnecessary.ToWowParserString() + " is no longer included, that's a success!");
+                    LOG.LogInformation(unnecessary.ToWowParserString() + " is no longer included, that's a success!");
             }
 
             foreach (var necessary in notIncludesButShould)
             {
                 if (result.IncludedGuids != null && result.IncludedGuids.Contains(necessary))
-                    Console.WriteLine(necessary.ToWowParserString() + " is now included, that's a success!");
+                    LOG.LogInformation(necessary.ToWowParserString() + " is now included, that's a success!");
             }
         }
 

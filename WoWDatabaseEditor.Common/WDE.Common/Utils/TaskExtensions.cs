@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
@@ -7,36 +8,68 @@ namespace WDE.Common.Utils
 {
     public static class TaskExtensions
     {
-        public static Task ListenErrors(this Task t)
+        public static void ListenErrors(this Task t,
+            [CallerMemberName] string? caller = null,
+            [CallerFilePath] string? callerFile = null,
+            [CallerLineNumber] int? callerLineNumber = null)
         {
             if (t.IsCompleted)
             {
                 if (t.IsFaulted && t.Exception is { } aggregateException)
                 {
                     if (aggregateException.InnerExceptions.Count == 1)
-                        Console.WriteLine(aggregateException.InnerExceptions[0]);
+                        LOG.LogError(aggregateException.InnerExceptions[0], "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                     else
-                        Console.WriteLine(aggregateException);
+                        LOG.LogError(aggregateException, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                 }
-                return Task.CompletedTask;
+                return;
+//                return Task.CompletedTask;
             }
 
-            return t.ContinueWith(e =>
+            /*return*/ t.ContinueWith(e =>
             {
-                Console.WriteLine(e.Exception);
+                LOG.LogError(e.Exception, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+            }, TaskContinuationOptions.OnlyOnFaulted);
+        }
+
+        public static void ListenWarnings(this Task t,
+            [CallerMemberName] string? caller = null,
+            [CallerFilePath] string? callerFile = null,
+            [CallerLineNumber] int? callerLineNumber = null)
+        {
+            if (t.IsCompleted)
+            {
+                if (t.IsFaulted && t.Exception is { } aggregateException)
+                {
+                    if (aggregateException.InnerExceptions.Count == 1)
+                        LOG.LogWarning(aggregateException.InnerExceptions[0], "Warning in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                    else
+                        LOG.LogWarning(aggregateException, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                }
+
+                return;
+//                return Task.CompletedTask;
+            }
+
+            /*return*/ t.ContinueWith(e =>
+            {
+                LOG.LogWarning(e.Exception, "Warning in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
             }, TaskContinuationOptions.OnlyOnFaulted);
         }
         
-        public static Task ListenErrors(this Task t, IMessageBoxService messageBoxService)
+        public static Task ListenErrors(this Task t, IMessageBoxService messageBoxService,
+            [CallerMemberName] string? caller = null,
+            [CallerFilePath] string? callerFile = null,
+            [CallerLineNumber] int? callerLineNumber = null)
         {
             if (t.IsCompleted)
             {
                 if (t.IsFaulted && t.Exception is { } aggregateException)
                 {
                     if (aggregateException.InnerExceptions.Count == 1)
-                        Console.WriteLine(aggregateException.InnerExceptions[0]);
+                        LOG.LogError(aggregateException.InnerExceptions[0], "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                     else
-                        Console.WriteLine(aggregateException);
+                        LOG.LogError(aggregateException, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                 }
                 return Task.CompletedTask;
             }
@@ -49,7 +82,7 @@ namespace WDE.Common.Utils
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    LOG.LogError(e, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                     await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error")
                         .SetMainInstruction("An error occured")
                         .SetContent(e.Message)

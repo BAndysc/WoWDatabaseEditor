@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using WDE.Common.Managers;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
 
@@ -13,7 +14,16 @@ namespace WDE.SmartScriptEditor.Inspections
             
         public AwaitAfterAsyncInspection(ISmartDataManager smartDataManager)
         {
-            foreach (var a in smartDataManager.GetAllData(SmartType.SmartAction))
+            smartDataManager.GetAllData(SmartType.SmartAction).SubscribeAction(Load);
+        }
+
+        private void Load(IReadOnlyList<SmartGenericJsonData> list)
+        {
+            asyncActions.Clear();
+            beginAwait = -1;
+            finalizeAwait = -1;
+            
+            foreach (var a in list)
             {
                 if (a.Flags.HasFlagFast(ActionFlags.Async))
                     asyncActions.Add(a.Id);
@@ -23,7 +33,7 @@ namespace WDE.SmartScriptEditor.Inspections
                     finalizeAwait = a.Id;
             }
         }
-        
+
         public InspectionResult? Inspect(SmartEvent e)
         {
             bool inAwaitBlock = false;

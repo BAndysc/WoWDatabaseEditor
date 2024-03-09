@@ -58,12 +58,42 @@ namespace WDE.Common.Parameters
 
         public static ToStringOptions WithNumber => new ToStringOptions(){withNumber = true};
     }
-    
-    public interface IContextualParameter<T, R> : IParameter<T> where T : notnull
+
+    public interface IContextualParameter<T> : IParameter<T> where T : notnull
+    {
+        string ToString(T value, object context);
+        Dictionary<T, SelectOption>? ItemsForContext(object? context) => null;
+    }
+
+    public interface IContextualParameter<T, R> : IContextualParameter<T> where T : notnull
     {
         string ToString(T value, R context);
         System.Type ContextType => typeof(R);
         Dictionary<T, SelectOption>? ItemsForContext(R context) => null;
+    }
+
+    public abstract class BaseContextualParameter<T, R> : IContextualParameter<T, R> where T : notnull
+    {
+        public abstract string? Prefix { get; }
+        public abstract bool HasItems { get; }
+        public abstract string ToString(T value);
+        public abstract Dictionary<T, SelectOption>? Items { get; }
+
+        public string ToString(T value, object context)
+        {
+            if (context is R r)
+                return ToString(value, r);
+            return ToString(value);
+        }
+
+        public Dictionary<T, SelectOption>? ItemsForContext(object? context)
+        {
+            if (context is R r)
+                return ItemsForContext(r);
+            return null;
+        }
+
+        public abstract string ToString(T value, R context);
     }
 
     public interface ICustomPickerContextualParameter<T> : IParameter<T> where T : notnull
@@ -89,8 +119,38 @@ namespace WDE.Common.Parameters
         Task<string> ToStringAsync(T val, CancellationToken token);
     }
 
-    public interface IAsyncContextualParameter<T, R> : IContextualParameter<T, R> where T : notnull
+    public interface IAsyncContextualParameter<T> : IContextualParameter<T> where T : notnull
+    {
+        Task<string> ToStringAsync(T value, CancellationToken token, object context);
+    }
+
+    public interface IAsyncContextualParameter<T, R> : IAsyncContextualParameter<T>, IContextualParameter<T, R> where T : notnull
     {
         Task<string> ToStringAsync(T value, CancellationToken token, R context);
+    }
+
+    public abstract class BaseAsyncContextualParameter<T, R> : IAsyncContextualParameter<T, R> where T : notnull
+    {
+        public async Task<string> ToStringAsync(T value, CancellationToken token, object context)
+        {
+            if (context is R r)
+                return await ToStringAsync(value, token, r);
+            return ToString(value);
+        }
+
+        public abstract Task<string> ToStringAsync(T value, CancellationToken token, R context);
+        public abstract string? Prefix { get; }
+        public abstract bool HasItems { get; }
+        public abstract string ToString(T value);
+        public abstract Dictionary<T, SelectOption>? Items { get; }
+
+        public string ToString(T value, object context)
+        {
+            if (context is R r)
+                return ToString(value, r);
+            return ToString(value);
+        }
+
+        public abstract string ToString(T value, R context);
     }
 }

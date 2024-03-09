@@ -30,10 +30,6 @@ namespace TheAvaloniaOpenGL
             return device.GetInteger(n);
         }
 
-        public unsafe void GetIntegerv(GetPName n, int* rv)
-        {
-            device.GetIntegerv(n, rv);
-        }
         public void GenVertexArrays(int n, int[] rv)
         {
             device.GenVertexArrays(n, rv);
@@ -260,7 +256,7 @@ namespace TheAvaloniaOpenGL
 
         public unsafe void UniformMatrix4f(int location, ref Matrix4x4 m, bool transpose)
         {
-            device.UniformMatrix4fv(location, 1, transpose, Unsafe.AsPointer(ref m));
+            device.UniformMatrix4fv(location, 1, transpose, (float*)Unsafe.AsPointer(ref m));
         }
 
         public void TexImage2D(TextureTarget target, int level, PixelInternalFormat internalFormat, int width, int height, int border, PixelFormat format, PixelType type, IntPtr data)

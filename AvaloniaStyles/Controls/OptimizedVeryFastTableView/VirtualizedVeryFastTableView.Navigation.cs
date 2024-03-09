@@ -27,7 +27,7 @@ public partial class VirtualizedVeryFastTableView
         var next = GetNextColumnInDirection(SelectedCellIndex, 1);
         if (!next.HasValue)
             return false;
-        SelectedCellIndex = next.Value;
+        SetCurrentValue(SelectedCellIndexProperty, next.Value);
         return true;
     }
 
@@ -36,7 +36,7 @@ public partial class VirtualizedVeryFastTableView
         var prev = GetNextColumnInDirection(SelectedCellIndex, -1);
         if (!prev.HasValue)
             return false;
-        SelectedCellIndex = prev.Value;
+        SetCurrentValue(SelectedCellIndexProperty, prev.Value);
         return true;
     }
     private bool IsRowIndexValid(int row)
@@ -51,7 +51,7 @@ public partial class VirtualizedVeryFastTableView
         if (!IsRowIndexValid(newIndex))
             return false;
         
-        SelectedRowIndex = newIndex;
+        SetCurrentValue(SelectedRowIndexProperty, newIndex);
         return true;
     }
 
@@ -70,7 +70,7 @@ public partial class VirtualizedVeryFastTableView
         if (MoveCursorLeft())
             return true;
         
-        SelectedCellIndex = ColumnsCount - 1;
+        SetCurrentValue(SelectedCellIndexProperty, ColumnsCount - 1);
         return MoveCursorUp();
     }
 
@@ -78,17 +78,11 @@ public partial class VirtualizedVeryFastTableView
     {
         if (MoveCursorRight())
             return true;
-        SelectedCellIndex = 0;
+        SetCurrentValue(SelectedCellIndexProperty, 0);
         return MoveCursorDown();
     }
-
-
-    public void SetOwner(IInputRoot owner)
-    {
-        
-    }
-
-    public void Move(IInputElement element, NavigationDirection direction, KeyModifiers keyModifiers = KeyModifiers.None)
+    
+    public (bool handled, IInputElement? next) GetNext(IInputElement element, NavigationDirection direction)
     {
         switch (direction)
         {
@@ -99,12 +93,12 @@ public partial class VirtualizedVeryFastTableView
                 MoveCursorPrevious();
                 break;
             case NavigationDirection.First:
-                SelectedRowIndex = 0;
-                SelectedCellIndex = 0;
+                SetCurrentValue(SelectedRowIndexProperty, 0);
+                SetCurrentValue(SelectedCellIndexProperty, 0);
                 break;
             case NavigationDirection.Last:
-                SelectedRowIndex = ItemsCount - 1;
-                SelectedCellIndex = ColumnsCount - 1;
+                SetCurrentValue(SelectedRowIndexProperty, ItemsCount - 1);
+                SetCurrentValue(SelectedCellIndexProperty, ColumnsCount - 1);
                 break;
             case NavigationDirection.Left:
                 MoveCursorLeft();
@@ -129,6 +123,7 @@ public partial class VirtualizedVeryFastTableView
         }
         MultiSelection.Clear();
         MultiSelection.Add(SelectedRowIndex);
+        return (false, null);
     }
 
     private void EnsureRowVisible(int rowIndex)

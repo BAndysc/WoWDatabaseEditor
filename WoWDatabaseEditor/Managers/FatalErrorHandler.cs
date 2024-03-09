@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using WDE.Common;
 
 namespace WoWDatabaseEditorCore.Managers
 {
@@ -17,7 +18,7 @@ namespace WoWDatabaseEditorCore.Managers
         
         public static void ExceptionOccured(Exception e, string[] args)
         {
-            Console.WriteLine(e.ToString());
+            LOG.LogCritical(e.ToString());
 
             if (!Directory.Exists(WDE_DATA_FOLDER))
                 Directory.CreateDirectory(WDE_DATA_FOLDER);

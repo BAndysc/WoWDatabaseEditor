@@ -43,7 +43,7 @@ public class MultipleParametersPickerViewModel : ObservableBase, IDialog
 
         PickKeyCommand = new AsyncCommand<MultipleParametersPickerItemViewModel>(async item =>
         {
-            var result = await parameterPickerService.PickParameter(source, item.Key);
+            var result = await parameterPickerService.PickParameter(source, item!.Key);
             if (result.ok)
                 item.Key = result.value;
         });

@@ -13,7 +13,7 @@
                 <Button.Flyout>
                     <Flyout>
                         <ScrollViewer MaxHeight="600">
-                            <ItemsRepeater Items="{CompiledBinding Events}">
+                            <ItemsRepeater ItemsSource="{CompiledBinding Events}">
                                 <ItemsRepeater.ItemTemplate>
                                     <DataTemplate x:DataType="viewModels:GameEventViewModel">
                                         <CheckBox Margin="0,3,0,3" IsChecked="{CompiledBinding Active}">
@@ -35,7 +35,7 @@
                         <DockPanel>
                             <CheckBox DockPanel.Dock="Top" IsChecked="{CompiledBinding ShowAllPhases}">Show all phase ids and masks</CheckBox>
                             <ScrollViewer MaxHeight="600">
-                                <ItemsRepeater Items="{CompiledBinding AllPhases}">
+                                <ItemsRepeater ItemsSource="{CompiledBinding AllPhases}">
                                     <ItemsRepeater.ItemTemplate>
                                         <DataTemplate x:DataType="viewModels:GamePhaseViewModel">
                                             <CheckBox Margin="0,3,0,3" IsChecked="{CompiledBinding Active}">

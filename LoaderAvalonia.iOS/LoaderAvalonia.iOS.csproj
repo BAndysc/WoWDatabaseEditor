@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0-ios</TargetFramework>
+        <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+        <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+    </PropertyGroup>
+
+    <PropertyGroup>
+<!--        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>-->
+        <CodesignKey>Apple Development: b.andy@windowslive.com (Q5L623R3A3)</CodesignKey>
+    </PropertyGroup>
+
+    <Import Project="..\Avalonia.props" />
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.iOS" Version="$(AvaloniaVersion)"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+        <ProjectReference Include="..\Modules\WDE.AnniversaryInfo\WDE.AnniversaryInfo.csproj" />
+        <ProjectReference Include="..\Modules\WDE.EventScriptsEditor\WDE.EventScriptsEditor.csproj" />
+        <ProjectReference Include="..\Modules\WDE.HttpDatabase\WDE.HttpDatabase.csproj" />
+        <ProjectReference Include="..\Modules\WDE.LootEditor\WDE.LootEditor.csproj" />
+        <ProjectReference Include="..\Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj" />
+        <ProjectReference Include="..\Modules\WDE.Sessions\WDE.Sessions.csproj" />
+        <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.CommonViews.Avalonia\WDE.CommonViews.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
+        <ProjectReference Include="..\WDE.DatabaseEditors.Avalonia\WDE.DatabaseEditors.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
+        <ProjectReference Include="..\WDE.EventAiEditor.Avalonia\WDE.EventAiEditor.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.MapRenderer\WDE.MapRenderer.csproj" />
+        <ProjectReference Include="..\WDE.MySqlDatabaseCommon\WDE.MySqlDatabaseCommon.csproj" />
+        <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
+        <ProjectReference Include="..\WDE.SmartScriptEditor.Avalonia\WDE.SmartScriptEditor.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
+        <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
+        <ProjectReference Include="..\WDE.Spells\WDE.Spells.csproj" />
+        <ProjectReference Include="..\WDE.SqlInterpreter\WDE.SqlInterpreter.csproj" />
+        <ProjectReference Include="..\WDE.TrinitySmartScriptEditor\WDE.TrinitySmartScriptEditor.csproj" />
+        <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
+        <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+        <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.DbcStore\WDE.DbcStore.csproj" />
+        <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj" />
+        <ProjectReference Include="..\WoWDatabaseEditorCore.Avalonia\WoWDatabaseEditorCore.Avalonia.csproj" />
+    </ItemGroup>
+</Project>

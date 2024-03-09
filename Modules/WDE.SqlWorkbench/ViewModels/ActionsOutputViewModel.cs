@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Input.Platform;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
+using WDE.Common.Avalonia.Utils;
 using WDE.Common.Collections;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
@@ -54,19 +55,19 @@ public partial class ActionsOutputViewModel : ObservableBase, ITool, IActionsOut
         CopySelectedQueriesCommand = new AsyncAutoCommand(async () =>
         {
             var text = string.Join(";\n", SelectedViewModels.Select(x => x.OriginalQuery));
-            await AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(text);
+            await Application.Current!.GetTopLevel()!.Clipboard!.SetTextAsync(text);
         });
         
         CopySelectedResponsesCommand = new AsyncAutoCommand(async () => 
         {
             var text = string.Join("\n", SelectedViewModels.Select(x => x.Response));
-            await AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(text);
+            await Application.Current!.GetTopLevel()!.Clipboard!.SetTextAsync(text);
         });
         
         CopySelectedDurationsCommand = new AsyncAutoCommand(async () => 
         {
             var text = string.Join("\n", SelectedViewModels.Select(x => x.DurationAsString));
-            await AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(text);
+            await Application.Current!.GetTopLevel()!.Clipboard!.SetTextAsync(text);
         });
     }
 

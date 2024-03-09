@@ -9,6 +9,7 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Client;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Window;
 using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
+using WDE.Common;
 using WDE.Common.Services.Processes;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
@@ -110,11 +111,11 @@ internal class SqlsLanguageServer : ISqlLanguageServer
                 if (lastCrashStats[connectionId].crashCount > MaxCrashCount)
                 {
                     ForeachFile(connectionId, f => f.NotifyLanguageServerDied());
-                    Console.WriteLine("SQLS has crashed too many times in a short period of time. Stopping the server!");
+                    LOG.LogWarning("SQLS has crashed too many times in a short period of time. Stopping the server!");
                     return;
                 }
                 
-                Console.WriteLine("SQLS has crashed!!! Trying to restart the server!");
+                LOG.LogInformation("SQLS has crashed!!! Trying to restart the server!");
                 RecreateClientAsync(connectionId).ListenErrors();
             }
         };

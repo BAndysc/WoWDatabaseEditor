@@ -87,7 +87,6 @@ namespace TheEngine.Managers
 
         public ShaderHandle LoadShader(string path, bool instanced)
         {
-            path = /*engine.Configuration.ShaderDirectory + "/" +*/ path;
             var shaderDir = RemoveFileName(path);
 
             if (shaderHandles.TryGetValue((path, instanced), out var shader))

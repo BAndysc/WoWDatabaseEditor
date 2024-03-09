@@ -1,7 +1,9 @@
 using System;
+using System.Globalization;
 using System.Text;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -157,7 +159,7 @@ public class HexViewControl : TemplatedControl
         FocusableProperty.OverrideDefaultValue<HexViewControl>(true);
     }
     
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
 
@@ -177,7 +179,7 @@ public class HexViewControl : TemplatedControl
         presenter = e.NameScope.Find<HexViewPresenter>("PART_ContentHost");
     }
 
-    private static int? CoerceCaretIndex(IAvaloniaObject obj, int? value)
+    private static int? CoerceCaretIndex(AvaloniaObject obj, int? value)
     {
         if (!value.HasValue)
             return null;
@@ -188,7 +190,7 @@ public class HexViewControl : TemplatedControl
         return Math.Max(0, Math.Min(value.Value, length - 1));
     }
     
-    private static int CoerceSelectionStartIndex(IAvaloniaObject obj, int value)
+    private static int CoerceSelectionStartIndex(AvaloniaObject obj, int value)
     {
         var control = obj as HexViewControl;
         var presenter = obj as HexViewPresenter;
@@ -196,7 +198,7 @@ public class HexViewControl : TemplatedControl
         return Math.Max(0, Math.Min(value, length - 1));
     }
     
-    private static int CoerceSelectionEndIndex(IAvaloniaObject obj, int value)
+    private static int CoerceSelectionEndIndex(AvaloniaObject obj, int value)
     {
         var control = obj as HexViewControl;
         var presenter = obj as HexViewPresenter;
@@ -377,12 +379,12 @@ public class HexViewPresenter : Control, ILogicalScrollable
 
     Size ILogicalScrollable.PageScrollSize => pageScrollSize;
 
-    bool ILogicalScrollable.BringIntoView(IControl target, Rect targetRect)
+    bool ILogicalScrollable.BringIntoView(Control target, Rect targetRect)
     {
         return false;
     }
 
-    IControl? ILogicalScrollable.GetControlInDirection(NavigationDirection direction, IControl? from)
+    Control? ILogicalScrollable.GetControlInDirection(NavigationDirection direction, Control? from)
     {
         return null;
     }
@@ -411,14 +413,11 @@ public class HexViewPresenter : Control, ILogicalScrollable
             for (int i = 0; i < 256; ++i)
             {
                 formattedTextCache[i] = new FormattedText(((char)i).ToString(),
-                    //CultureInfo.CurrentCulture,
-                    //FlowDirection.LeftToRight,
+                    CultureInfo.CurrentCulture,
+                    FlowDirection.LeftToRight,
                     typeface,
                     fontSize,
-                    //_foreground
-                    TextAlignment.Left, 
-                    TextWrapping.NoWrap,
-                    Size.Infinity);
+                    foreground);
             }
         }
         return formattedTextCache[chr];
@@ -428,7 +427,10 @@ public class HexViewPresenter : Control, ILogicalScrollable
     {
         var copyCommand = new DelegateCommand(async () =>
         {
-            var clipboard = AvaloniaLocator.Current.GetRequiredService<IClipboard>();
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+            if (clipboard == null)
+                return;
+            
             if (SelectionStart >= SelectionEnd)
                 return;
             
@@ -462,7 +464,12 @@ public class HexViewPresenter : Control, ILogicalScrollable
             if (IsReadOnly)
                 return;
             
-            var text = await AvaloniaLocator.Current.GetRequiredService<IClipboard>().GetTextAsync();
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+
+            if (clipboard == null)
+                return;
+            
+            var text = await clipboard.GetTextAsync();
             if (text == null)
                 return;
 
@@ -485,22 +492,28 @@ public class HexViewPresenter : Control, ILogicalScrollable
             foreach (var b in bytes)
             {
                 var caretIndex = CaretIndex ?? SelectionStart;
-                CaretIndex = caretIndex;
+                SetCurrentValue(CaretIndexProperty, caretIndex);
                 if (SelectionStart == SelectionEnd)
-                    SelectionStart = SelectionEnd = caretIndex;
+                {
+                    SetCurrentValue(SelectionStartProperty, caretIndex);
+                    SetCurrentValue(SelectionEndProperty, caretIndex);
+                }
 
                 Bytes[caretIndex] = b;
                 CaretIndex++;
                 if (SelectionStart == SelectionEnd || caretIndex >= SelectionEnd)
-                    SelectionStart = SelectionEnd = caretIndex;
+                {
+                    SetCurrentValue(SelectionStartProperty, caretIndex);
+                    SetCurrentValue(SelectionEndProperty, caretIndex);
+                }
             }
         }, () => !IsReadOnly);
         
         var selectAllCommand = new DelegateCommand(() =>
         {
-            SelectionStart = 0;
-            SelectionEnd = Bytes.Length;
-            CaretIndex = null;
+            SetCurrentValue(SelectionStartProperty, 0);
+            SetCurrentValue(SelectionEndProperty, Bytes.Length);
+            SetCurrentValue(CaretIndexProperty, null);
         });
         
         KeyBindings.Add(new KeyBinding()
@@ -585,7 +598,7 @@ public class HexViewPresenter : Control, ILogicalScrollable
         }
     }
 
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
 
@@ -606,8 +619,9 @@ public class HexViewPresenter : Control, ILogicalScrollable
 
         if (change.Property == BytesProperty)
         {
-            CaretIndex = 0;
-            SelectionStart = SelectionEnd = 0;
+            SetCurrentValue(CaretIndexProperty, 0);
+            SetCurrentValue(SelectionStartProperty, 0);
+            SetCurrentValue(SelectionEndProperty, 0);
         }
         
         if (change.Property == CaretBlinkIntervalProperty && IsFocused)
@@ -624,14 +638,14 @@ public class HexViewPresenter : Control, ILogicalScrollable
 
     private void Invalidate()
     {
-        fontFamily = TextBlock.GetFontFamily(this);
-        fontSize = TextBlock.GetFontSize(this);
-        foreground = TextBlock.GetForeground(this);
+        fontFamily = TextElement.GetFontFamily(this);
+        fontSize = TextElement.GetFontSize(this);
+        foreground = TextElement.GetForeground(this);
         typeface = new Typeface(fontFamily);
         formattedTextCache = Array.Empty<FormattedText>();
-        var charBounds = GetFormattedText((byte)'0').Bounds;
-        lineHeight = charBounds.Height;
-        charWidth = charBounds.Width;
+        var ft = GetFormattedText((byte)'0');
+        lineHeight = ft.Height;
+        charWidth = ft.Width;
     }
 
     // a group is bytesPerGroup bytes
@@ -703,12 +717,13 @@ public class HexViewPresenter : Control, ILogicalScrollable
 
                 if (CaretIndex == index && !CaretInAscii && caretBlink && IsEffectivelyEnabled)
                 {
-                    context.FillRectangle(foreground, new Rect(x, y, 1, lineHeight));
+                    if (foreground != null)
+                        context.FillRectangle(foreground, new Rect(x, y, 1, lineHeight));
                 }
-                
-                context.DrawText(foreground, new Point(x, y), ftHigh);
+
+                context.DrawText(ftHigh, new Point(x, y));
                 x += charWidth;
-                context.DrawText(foreground, new Point(x, y), ftLow);
+                context.DrawText(ftLow, new Point(x, y));
                 x += charWidth;
                 
                 if (j % bytesPerGroup == bytesPerGroup - 1 && j != bytesPerLine - 1)
@@ -744,10 +759,11 @@ public class HexViewPresenter : Control, ILogicalScrollable
 
                 if (CaretIndex == index && CaretInAscii && caretBlink && IsEffectivelyEnabled)
                 {
-                    context.FillRectangle(foreground, new Rect(x, y, 1, lineHeight));
+                    if (foreground != null)
+                        context.FillRectangle(foreground, new Rect(x, y, 1, lineHeight));
                 }
 
-                context.DrawText(foreground, new Point(x, y), ft);
+                context.DrawText(ft, new Point(x, y));
                 x += charWidth;
                 
                 if (j % bytesPerGroup == bytesPerGroup - 1 && j != bytesPerLine - 1)
@@ -850,8 +866,10 @@ public class HexViewPresenter : Control, ILogicalScrollable
         var index = GetIndexFromCoords(point, out var pressInAscii);
         if (index.HasValue)
         {
-            CaretIndex = SelectionEnd = SelectionStart = index.Value;
-            CaretInAscii = pressInAscii;
+            SetCurrentValue(CaretIndexProperty, index.Value);
+            SetCurrentValue(SelectionEndProperty, index.Value);
+            SetCurrentValue(SelectionStartProperty, index.Value);
+            SetCurrentValue(CaretInAsciiProperty, pressInAscii);
             isSelecting = true;
             startingIndex = index;
         }
@@ -868,11 +886,11 @@ public class HexViewPresenter : Control, ILogicalScrollable
             var index = GetIndexFromCoords(point, out var pressInAscii);
             if (index.HasValue)
             {
-                SelectionStart = Math.Min(startingIndex.Value, index.Value);
-                SelectionEnd = Math.Max(startingIndex.Value, index.Value) + 1;
+                SetCurrentValue(SelectionStartProperty, Math.Min(startingIndex.Value, index.Value));
+                SetCurrentValue(SelectionEndProperty, Math.Max(startingIndex.Value, index.Value) + 1);
                 if (SelectionStart != SelectionEnd)
-                    CaretIndex = null;
-                CaretInAscii = pressInAscii;
+                    SetCurrentValue(CaretIndexProperty, null);
+                SetCurrentValue(CaretInAsciiProperty, pressInAscii);
             }
             e.Handled = true;
         }
@@ -902,14 +920,20 @@ public class HexViewPresenter : Control, ILogicalScrollable
             foreach (var b in bytes)
             {
                 var caretIndex = CaretIndex ?? SelectionStart;
-                CaretIndex = caretIndex;
+                SetCurrentValue(CaretIndexProperty, caretIndex);
                 if (SelectionStart == SelectionEnd)
-                    SelectionStart = SelectionEnd = caretIndex;
+                {
+                    SetCurrentValue(SelectionStartProperty, caretIndex);
+                    SetCurrentValue(SelectionEndProperty, caretIndex);
+                }
                 
                 Bytes[caretIndex] = b;
                 CaretIndex++;
                 if (SelectionStart == SelectionEnd || caretIndex >= SelectionEnd)
-                    SelectionStart = SelectionEnd = caretIndex;
+                {
+                    SetCurrentValue(SelectionStartProperty, caretIndex);
+                    SetCurrentValue(SelectionEndProperty, caretIndex);
+                }
 
                 e.Handled = true;
             }
@@ -947,40 +971,41 @@ public class HexViewPresenter : Control, ILogicalScrollable
                     oldCaretIndex = CaretIndex.Value;
                 
                 var newCaretIndex = oldCaretIndex + offset;
-                CaretIndex = newCaretIndex;
+                SetCurrentValue(CaretIndexProperty, newCaretIndex);
                 
                 if (Math.Abs(oldCaretIndex - SelectionStart) < Math.Abs(oldCaretIndex - SelectionEnd))
                 {
                     // The start of the selection is closer to the caret
                     if (CaretIndex < SelectionEnd)
-                        SelectionStart = newCaretIndex;
+                        SetCurrentValue(SelectionStartProperty, newCaretIndex);
                     else
                     {
                         // Switch the roles of start and end
-                        SelectionStart = SelectionEnd;
-                        SelectionEnd = newCaretIndex;
+                        SetCurrentValue(SelectionStartProperty, SelectionEnd);
+                        SetCurrentValue(SelectionEndProperty, newCaretIndex);
                     }
                 }
                 else
                 {
                     // The end of the selection is closer to the caret
                     if (CaretIndex > SelectionStart)
-                        SelectionEnd = newCaretIndex;
+                        SetCurrentValue(SelectionEndProperty, newCaretIndex);
                     else
                     {
                         // Switch the roles of start and end
-                        SelectionEnd = SelectionStart;
-                        SelectionStart = newCaretIndex;
+                        SetCurrentValue(SelectionEndProperty, SelectionStart);
+                        SetCurrentValue(SelectionStartProperty, newCaretIndex);
                     }
                 }
             }
             else
             {
                 if (!CaretIndex.HasValue)
-                    CaretIndex = offset < 0 ? SelectionStart : SelectionEnd;
+                    SetCurrentValue(CaretIndexProperty, offset < 0 ? SelectionStart : SelectionEnd);
                 else
-                    CaretIndex = CaretIndex.Value + offset;
-                SelectionStart = SelectionEnd = CaretIndex.Value;
+                    SetCurrentValue(CaretIndexProperty, CaretIndex.Value + offset);
+                SetCurrentValue(SelectionStartProperty, CaretIndex ?? 0);
+                SetCurrentValue(SelectionEndProperty, CaretIndex ?? 0);
             }
             e.Handled = true;   
         }
@@ -997,7 +1022,7 @@ public class HexViewPresenter : Control, ILogicalScrollable
                     b = (byte)(e.Key - Key.NumPad0);
 
                 var caretIndex = CaretIndex.HasValue ? CaretIndex.Value : SelectionStart;
-                CaretIndex = caretIndex;
+                SetCurrentValue(CaretIndexProperty, caretIndex);
                 
                 if (b.HasValue)
                 {
@@ -1018,7 +1043,10 @@ public class HexViewPresenter : Control, ILogicalScrollable
                         InvalidateVisual();
                         CaretIndex++;
                         if (SelectionStart == SelectionEnd || caretIndex >= SelectionEnd)
-                            SelectionStart = SelectionEnd = caretIndex;
+                        {
+                            SetCurrentValue(SelectionStartProperty, caretIndex);
+                            SetCurrentValue(SelectionEndProperty, caretIndex);
+                        }
                     }
 
                     e.Handled = true;

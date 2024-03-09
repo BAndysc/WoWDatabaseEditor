@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -18,6 +19,8 @@ public class GameRacesImage : BaseGameEnumImage
     public static readonly StyledProperty<CharacterRaces> RacesProperty = AvaloniaProperty.Register<GameRacesImage, CharacterRaces>(nameof(Races));
     public static readonly StyledProperty<bool> IgnoreIfAllPerTeamProperty = AvaloniaProperty.Register<GameRacesImage, bool>(nameof(IgnoreIfAllPerTeam));
 
+    private static Task? cacheInProgress;
+    
     public CharacterRaces Races
     {
         get => GetValue(RacesProperty);
@@ -114,6 +117,12 @@ public class GameRacesImage : BaseGameEnumImage
         });
     }
 
+    protected override async Task AdditionalCacheTaskAsync()
+    {
+        allyImage = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/icon_alliance.png"));
+        hordeImage = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/icon_horde.png"));
+    }
+
     private void CheckTeams(out bool allRaces, out bool isHordeOnly, out bool isAllyOnly)
     {
         if (allyImage == null)
@@ -122,8 +131,6 @@ public class GameRacesImage : BaseGameEnumImage
             cachedAllSupportedRaces = coreVersion.GameVersionFeatures.AllRaces;
             cachedAllyRaces = cachedAllSupportedRaces & CharacterRaces.AllAlliance;
             cachedHordeRaces = cachedAllSupportedRaces & CharacterRaces.AllHorde;
-            allyImage = WdeImage.LoadBitmap(new ImageUri("Icons/icon_alliance.png"));
-            hordeImage = WdeImage.LoadBitmap(new ImageUri("Icons/icon_horde.png"));
         }
 
         var races = Races;
@@ -161,7 +168,9 @@ public class GameRacesImage : BaseGameEnumImage
         {
             var size = Math.Min(Bounds.Width, Bounds.Height);
             var rect = new Rect(0, 0, size, size);
-            context.DrawImage(onlyAlly ? allyImage : hordeImage, rect);        
+            var image = onlyAlly ? allyImage : hordeImage;
+            if (image != null)
+                context.DrawImage(image, rect);        
         }
         else
             base.Render(context);
@@ -171,4 +180,9 @@ public class GameRacesImage : BaseGameEnumImage
     protected override List<int> EnumValues => enumValues;
     protected override List<ImageUri> Images => images;
     protected override List<Bitmap?> CachedBitmaps => cachedBitmaps;
+    protected override Task? CacheInProgress
+    {
+        get => cacheInProgress;
+        set => cacheInProgress = value;
+    }
 }

@@ -10,7 +10,7 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="Template">
             <ControlTemplate>
-                <ItemsControl Items="{TemplateBinding Items}">
+                <ItemsControl ItemsSource="{TemplateBinding Items}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <controls:NumberIndicatorItem 

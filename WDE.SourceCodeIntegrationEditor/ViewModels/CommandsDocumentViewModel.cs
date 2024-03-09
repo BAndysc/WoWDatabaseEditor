@@ -25,7 +25,6 @@ namespace WDE.SourceCodeIntegrationEditor.ViewModels
         private static uint StepTcPath = 0;
         private static uint StepPickItems = 1;
         private static uint StepDetails = 2;
-        private static uint StepFinal = 3;
         
         private readonly IAuthDatabaseProvider authDatabaseProvider;
         private readonly IDatabaseProvider databaseProvider;
@@ -118,7 +117,7 @@ namespace WDE.SourceCodeIntegrationEditor.ViewModels
                 child.Parent = parent;
             }
 
-            Dictionary<string, string?> existing = databaseProvider.GetCommands().ToDictionary(d => d.Name, d => d.Help);
+            Dictionary<string, string?> existing = (await databaseProvider.GetCommands()).ToDictionary(d => d.Name, d => d.Help);
 
             Commands.Clear();
             CommandsNoRbac.Clear();

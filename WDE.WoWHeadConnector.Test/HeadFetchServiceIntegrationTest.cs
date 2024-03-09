@@ -8,7 +8,7 @@ namespace WDE.WoWHeadConnector.Test
 {
     public class HeadFetchServiceIntegrationTest
     {
-        private IHeadFetchService headService;
+        private IHeadFetchService headService = null!;
         
         [SetUp]
         public void Setup()
@@ -55,7 +55,7 @@ namespace WDE.WoWHeadConnector.Test
         public async Task TestModes()
         {
             var abilities = await headService.FetchNpcAbilities(HeadSourceType.Master, 26554);
-            var bySpell = abilities.GroupBy(a => a.SpellId).ToDictionary(a => a.Key, a => a.SelectMany(m => m.Modes).ToList());
+            var bySpell = abilities.GroupBy(a => a.SpellId).ToDictionary(a => a.Key, a => a.SelectMany(m => m.Modes!).ToList());
             
             CollectionAssert.AreEquivalent(new MapDifficulty[]
             {

@@ -36,7 +36,7 @@ public class SmartExtensionNotification : ObservableBase
         set
         {
             isOpened = value;
-            OnPropertyChanged();
+            RaisePropertyChanged();
         }
     }
 

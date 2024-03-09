@@ -30,7 +30,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing
             base.OnGotFocus(e);
             DispatcherTimer.RunOnce(() =>
             {
-                if (FocusManager.Instance!.Current == null)
+                if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() == null)
                 {
                     if (FindFirstParameter(this) is { } firstParam)
                         FocusUtils.FocusFirstFocusableChild(firstParam);

@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.GenericSettings;
 
-public class GeneralSettingsView : UserControl
+public partial class GeneralSettingsView : UserControl
 {
     public GeneralSettingsView()
     {

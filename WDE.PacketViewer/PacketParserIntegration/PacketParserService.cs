@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using WDE.Common;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
@@ -90,7 +91,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
                 executable = "dotnet";
                 args = path + " " + args;
             }
-            Console.WriteLine($"Running {executable} {args}");
+            LOG.LogInformation("Running {@executable} {@args}", executable, args);
             var processStartInfo = new ProcessStartInfo(executable, args);
             processStartInfo.WorkingDirectory = Path.GetDirectoryName(path)!;
             processStartInfo.UseShellExecute = false;

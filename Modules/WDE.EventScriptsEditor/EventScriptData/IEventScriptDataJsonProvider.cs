@@ -1,6 +1,8 @@
+using System.Threading.Tasks;
+
 namespace WDE.EventScriptsEditor.EventScriptData;
 
 public interface IEventScriptDataJsonProvider
 {
-    string GetJson();
+    Task<string> GetJson();
 }

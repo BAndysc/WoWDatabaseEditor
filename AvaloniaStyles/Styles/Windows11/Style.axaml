@@ -1,0 +1,56 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime">
+        <Style>
+                <Style.Resources>
+                        <ResourceDictionary>
+                                <ResourceDictionary.MergedDictionaries>
+                                        <!-- <MergeResourceInclude Source="avares://AvaloniaStyles/Styles/Windows10/WindowMessageBox.axaml" /> -->
+                                        <!-- <MergeResourceInclude Source="avares://AvaloniaStyles/Styles/Windows10/Window.xaml" /> -->
+                                        <!-- <MergeResourceInclude Source="avares://AvaloniaStyles/Styles/Windows10/NativeMenuBar.xaml" /> -->
+                                </ResourceDictionary.MergedDictionaries>
+                                <system:Double x:Key="ControlContentThemeFontSize">12</system:Double>
+                                <!--<FontFamily x:Key="MainFontSans">avares://Avalonia.Themes.Fluent/Assets#Inter</FontFamily>-->
+                                <FontFamily x:Key="ContentControlThemeFontFamily">avares://AvaloniaStyles/Styles/Assets#Lato</FontFamily>
+                                <FontFamily x:Key="MainFontSans">avares://AvaloniaStyles/Styles/Assets#Lato</FontFamily>
+                        </ResourceDictionary>
+                </Style.Resources>
+        </Style>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/CompletionComboBox.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/GroupingListBox.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/VirtualizedGridViewControl/VirtualizedGridViewStyle.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/WizardPanel.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/ToolbarControl.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/SettingItem.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/InfoBar/InfoBar.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/HamburgerMenuButton.axaml" />
+
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/CompletionComboBox.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TabStrip.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GridSplitter.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows11/FocusAdorner.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/SideBar.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows11/Button.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ListBox.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows11/ListBoxItem.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/DataGrid.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows11/TextBox.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GridView.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows11/GridView.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/CheckBox.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows11/TabControl.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GroupingListBox.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TeachingTip.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TreeViewItem.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ToolbarPanel.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows11/MenuItem.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows11/ComboBox.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/WindowControlButtons.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows11/Window.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/StatusBar.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/SettingItem.axaml" />
+        <StyleInclude Source="avares://Dock.Avalonia/Themes/DockFluentTheme.axaml"/>
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Dock.axaml" />
+</Styles>

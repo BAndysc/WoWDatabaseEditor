@@ -8,7 +8,7 @@ using Prism.Commands;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.Template
 {
-    public class TemplateDbTableEditorView : UserControl
+    public partial class TemplateDbTableEditorView : UserControl
     {
         public TemplateDbTableEditorView()
         {

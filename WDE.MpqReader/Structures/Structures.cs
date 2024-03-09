@@ -80,22 +80,22 @@ namespace WDE.MpqReader.Structures
             return sequenceIdToAnimationLookup[anim_id];
             
             // this algorithm doesn't always work, it needs to be researched more
-            int i = anim_id % sequenceIdToAnimationId.Length;
-  
-            for (int stride = 1; true; ++stride)
-            {
-                if (sequenceIdToAnimationId[i] == -1)
-                {
-                    return null;
-                }
-                if (sequences[sequenceIdToAnimationId[i]].id == anim_id)
-                {
-                    return sequenceIdToAnimationId[i];
-                }
-
-                i = (i + stride * stride) % sequenceIdToAnimationId.Length;
-                // so original_i + 1, original_i + 1 + 4, original_i + 1 + 4 + 9, …
-            }
+            // int i = anim_id % sequenceIdToAnimationId.Length;
+            //
+            // for (int stride = 1; true; ++stride)
+            // {
+            //     if (sequenceIdToAnimationId[i] == -1)
+            //     {
+            //         return null;
+            //     }
+            //     if (sequences[sequenceIdToAnimationId[i]].id == anim_id)
+            //     {
+            //         return sequenceIdToAnimationId[i];
+            //     }
+            //
+            //     i = (i + stride * stride) % sequenceIdToAnimationId.Length;
+            //     // so original_i + 1, original_i + 1 + 4, original_i + 1 + 4 + 9, …
+            // }
             // unreachable
         }
 
@@ -1267,7 +1267,7 @@ namespace WDE.MpqReader.Structures
                 }
                 else
                 {
-                    return new MutableM2Array<uint>(r.ReadInt32(), r.ReadInt32(), null);
+                    return new MutableM2Array<uint>(r.ReadInt32(), r.ReadInt32(), null!);
                 }
             });
             var values = reader.ReadMutableArrayDataFromSeparateReader(reader, (idx, r) =>
@@ -1275,7 +1275,7 @@ namespace WDE.MpqReader.Structures
                 if (embeddedValues[idx])
                     return r.ReadMutableArray(read);
                 else
-                    return new MutableM2Array<T>(r.ReadInt32(), r.ReadInt32(), null);
+                    return new MutableM2Array<T>(r.ReadInt32(), r.ReadInt32(), null!);
             });
             return new MutableM2Track<T>()
             {
@@ -1412,7 +1412,7 @@ namespace WDE.MpqReader.Structures
         internal T?[] Raw => array;
         public int Offset => offset;
 
-        public ref T this[int i] => ref array![i];
+        public ref T this[int i] => ref array[i]!;
         
         public void LoadContent(IBinaryReader reader, Func<IBinaryReader, T> read)
         {

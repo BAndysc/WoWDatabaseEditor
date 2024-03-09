@@ -9,7 +9,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="profiles:ProfilesViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.Profiles.ProfilesControl">
-    
+
     <UserControl.Styles>
         <styles:StyleIncludeColorAware DarkSource="avares://WoWDatabaseEditorCore.Avalonia.GUI/Services/Profiles/ColorsDark.axaml"
                                        LightSource="avares://WoWDatabaseEditorCore.Avalonia.GUI/Services/Profiles/ColorsLight.axaml"/>
@@ -25,22 +25,22 @@
             <Setter Property="Background" Value="#40000000" />
         </Style>
     </UserControl.Styles>
-    
+
     <UserControl.Resources>
         <BoolToDoubleConverter x:Key="RunningConverter" WhenFalse="1" WhenTrue="0" />
         <DataTemplate x:Key="ProfileTemplate" DataType="profiles:ProfileViewModel">
             <DockPanel>
                 <ButtonImage Image="Icons/icon_edit_mono.png" Margin="10,0,0,0" Padding="2" Width="20" Height="20"
                              VerticalAlignment="Center"
-                             DockPanel.Dock="Right" 
-                             IsVisible="{CompiledBinding CanEdit}" 
-                             Command="{CompiledBinding EditCommand}" 
+                             DockPanel.Dock="Right"
+                             IsVisible="{CompiledBinding CanEdit}"
+                             Command="{CompiledBinding EditCommand}"
                              CommandParameter="{CompiledBinding}" />
                 <ButtonImage Image="Icons/icon_delete_mono.png" Margin="10,0,0,0" Padding="2"  Width="20" Height="20"
                              VerticalAlignment="Center"
-                             DockPanel.Dock="Right" 
-                             IsVisible="{CompiledBinding CanDelete}" 
-                             Command="{CompiledBinding DeleteCommand}" 
+                             DockPanel.Dock="Right"
+                             IsVisible="{CompiledBinding CanDelete}"
+                             Command="{CompiledBinding DeleteCommand}"
                              CommandParameter="{CompiledBinding}" />
                 <Border Classes="FakeButton" Name="Border" Padding="10,0">
                     <DockPanel Margin="0,4,0,4">
@@ -58,7 +58,7 @@
             </DockPanel>
         </DataTemplate>
     </UserControl.Resources>
-    
+
     <Border  Name="CurrentEmu" Cursor="Hand" CornerRadius="4" Height="30" Padding="16,0" VerticalAlignment="Center">
         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
             <WdeImage Height="20" Image="{CompiledBinding CurrentProfileIcon}" />
@@ -69,11 +69,11 @@
                 <Panel>
                     <StackPanel Opacity="{CompiledBinding Refreshing, Converter={StaticResource RunningConverter}}">
                         <SettingsHeader Margin="0">Running</SettingsHeader>
-                        <ItemsRepeater ItemTemplate="{StaticResource ProfileTemplate}" Items="{CompiledBinding RunningProfiles}" />
-                    
+                        <ItemsRepeater ItemTemplate="{StaticResource ProfileTemplate}" ItemsSource="{CompiledBinding RunningProfiles}" />
+
                         <SettingsHeader Margin="0,20,0,0">Open new instance</SettingsHeader>
-                        <ItemsRepeater ItemTemplate="{StaticResource ProfileTemplate}" Items="{CompiledBinding Profiles}" />
-                        
+                        <ItemsRepeater ItemTemplate="{StaticResource ProfileTemplate}" ItemsSource="{CompiledBinding Profiles}" />
+
                         <SettingsHeader Margin="0,20,0,5">Create new</SettingsHeader>
                         <Button Command="{CompiledBinding CreateNewProfileCommand}">Create a profile</Button>
                     </StackPanel>

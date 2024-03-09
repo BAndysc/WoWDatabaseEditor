@@ -8,6 +8,7 @@ using OmniSharp.Extensions.LanguageServer.Client;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
+using WDE.Common;
 using WDE.MVVM.Observable;
 
 namespace WDE.SqlWorkbench.Services.LanguageServer;
@@ -61,7 +62,7 @@ internal class SqlsLanguageServerFile : ISqlLanguageServerFile
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogWarning(e);
         }
     }
 
@@ -78,7 +79,7 @@ internal class SqlsLanguageServerFile : ISqlLanguageServerFile
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogWarning(e);
             return null;
         }
     }
@@ -99,7 +100,7 @@ internal class SqlsLanguageServerFile : ISqlLanguageServerFile
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogWarning(e);
             return new List<CompletionItem>();
         }
     }
@@ -117,7 +118,7 @@ internal class SqlsLanguageServerFile : ISqlLanguageServerFile
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogWarning(e);
             return null;
         }
     }
@@ -144,7 +145,7 @@ internal class SqlsLanguageServerFile : ISqlLanguageServerFile
                 }
             ).ToList() ?? Array.Empty<TextEdit>();
         }
-        catch (TaskCanceledException e)
+        catch (TaskCanceledException)
         {
             // sqls might hang on the format request and it doesn't support cancellation,
             // the only way to cancel it is to kill the process and let it restart
@@ -152,7 +153,7 @@ internal class SqlsLanguageServerFile : ISqlLanguageServerFile
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogWarning(e);
         }
         
 
@@ -194,7 +195,7 @@ internal class SqlsLanguageServerFile : ISqlLanguageServerFile
                     x.Range.End.Line + 1, x.Range.End.Character + 1)}
             ).ToList() ?? Array.Empty<TextEdit>();
         }
-        catch (TaskCanceledException e)
+        catch (TaskCanceledException)
         {
             // sqls might hang on the format request and it doesn't support cancellation,
             // the only way to cancel it is to kill the process and let it restart
@@ -202,7 +203,7 @@ internal class SqlsLanguageServerFile : ISqlLanguageServerFile
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogWarning(e);
         }
 
         return Array.Empty<TextEdit>(); 
@@ -227,7 +228,7 @@ internal class SqlsLanguageServerFile : ISqlLanguageServerFile
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogWarning(e);
         }
     }
 

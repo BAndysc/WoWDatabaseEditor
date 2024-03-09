@@ -12,6 +12,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles.Controls;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Services.MessageBox;
@@ -164,7 +165,7 @@ public class EditableItemsTextBlock : TemplatedControl
         AdornerLayer.SetAdornedElement(textBox, this);
         adornerLayer.Children.Add(textBox);
 
-        DispatcherTimer.RunOnce(textBox.Focus, TimeSpan.FromMilliseconds(1));
+        DispatcherTimer.RunOnce(() => textBox.Focus(), TimeSpan.FromMilliseconds(1));
         if (overrideText == null)
             textBox.SelectAll();
         else
@@ -187,7 +188,7 @@ public class EditableItemsTextBlock : TemplatedControl
                         else if (comboBox != null)
                             DespawnComboBox(false);
                         else
-                            Console.WriteLine("WTF");
+                            LOG.LogError(LOG.NonCriticalInvalidStateEventId, "EditableItemsTextBlock has neither textbox nor combobox spawned when it should have one of them spawned");
                     }
                 });
             clickDisposable = toplevel.AddDisposableHandler(PointerPressedEvent, (s, ev) =>
@@ -263,7 +264,7 @@ public class EditableItemsTextBlock : TemplatedControl
 
         if (save)
         {
-            OnNewItemRequest?.Invoke(this, new NewItemRequestArgs(textBox.Text));
+            OnNewItemRequest?.Invoke(this, new NewItemRequestArgs(textBox.Text ?? ""));
         }
         textBox = null;
     }

@@ -2,14 +2,16 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
-      <PackageReference Include="JetBrains.Profiler.Api" Version="1.2.0" />
+      <PackageReference Include="JetBrains.Profiler.Api" Version="1.4.2" />
     </ItemGroup>
 
     <Import Project="..\lib3d.props" />

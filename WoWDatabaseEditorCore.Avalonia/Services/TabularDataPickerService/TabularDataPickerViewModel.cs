@@ -7,7 +7,9 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
+using Avalonia.ReactiveUI;
 using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Avalonia.Controls;
@@ -223,7 +225,8 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
             CloseCancel?.Invoke();
         });
 
-        if (this.preferences.GetWindowState(args.Title, out _, out _, out _, out int width, out int height))
+        if (this.preferences.GetWindowState(args.Title, out _, out _, out _, out int width, out int height) &&
+            width > 0 && height > 0)
         {
             DesiredWidth = width;
             DesiredHeight = height;
@@ -298,7 +301,8 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         var searchInput = new SearchInput(input.Trim());
 
         Func<object, string, bool>? advancedFilter = null;
-        if (searchInput.UseAdvancedFiltering && propertyFilters.TryGetValue(searchInput.Column!, out advancedFilter)) ;
+        if (searchInput.UseAdvancedFiltering)
+            propertyFilters.TryGetValue(searchInput.Column!, out advancedFilter);
         
         List<object> filtered = new();
         var numberFilter = long.TryParse(searchInput.Text, out var number);
@@ -357,7 +361,7 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
     {
         if (widths.Count != args.Columns.Count)
         {
-            Console.WriteLine("When trying to save columns width, the number of columns is different from the number of widths!!! So can't save. Report to the developer.");
+            LOG.LogError("When trying to save columns width, the number of columns is different from the number of widths!!! So can't save. Report to the developer.");
             return;
         }
         

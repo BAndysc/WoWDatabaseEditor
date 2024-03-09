@@ -69,7 +69,7 @@ public class NullableDatabaseColumnCompletionBox : TemplatedControl
             return;
         
         inEvent = true;
-        IsNotNull = !string.IsNullOrWhiteSpace(columnName);
+        SetCurrentValue(IsNotNullProperty, !string.IsNullOrWhiteSpace(columnName));
         inEvent = false;
     }
     

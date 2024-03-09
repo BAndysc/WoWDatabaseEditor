@@ -555,8 +555,8 @@
   
   {
     "id": 27,
-    "name": "CONDITION_SOURCE_TYPE_PHASE_DEFINITION",
-    "description": "Allow phase definition from zone {group}, entry {entry}",
+    "name": "CONDITION_SOURCE_TYPE_GRAVEYARD",
+    "description": "Allow graveyard from zone {group}, entry {entry}",
     "targets": {
       "0": {
         "description": "Player",
@@ -564,21 +564,21 @@
       }
     },
     "group": {
-      "type": "ZoneAreaParameter",
-      "name": "Zone",
-      "description": "phase_definitions.zoneId"
+      "type": "Parameter",
+      "name": "Group",
+      "description": ""
     },
     "entry": {
       "type": "Parameter",
       "name": "Entry",
-      "description": "phase_definitions.entry"
+      "description": ""
     }
   },
 
   {
     "id": 28,
-    "name": "CONDITION_SOURCE_TYPE_SPELL_AREA",
-    "description": "Allow spell_area area {group}, spell {entry}",
+    "name": "CONDITION_SOURCE_TYPE_AREATRIGGER",
+    "description": "Allow areatrigger {group} (serverside: {entry})",
     "targets": {
       "0": {
         "description": "Player",
@@ -586,41 +586,100 @@
       }
     },
     "group": {
-      "type": "ZoneAreaParameter",
-      "name": "Area",
-      "description": "spell_area.area"
+      "type": "Parameter",
+      "name": "Areatrigger ID"
     },
     "entry": {
-      "type": "SpellParameter",
-      "name": "Spell ID",
-      "description": "spell_area.spell"
+      "type": "BoolParameter",
+      "name": "Serverside?"
     }
   },
 
   {
     "id": 29,
-    "name": "CONDITION_SOURCE_TYPE_SMART_TARGET",
-    "description": "Limit target id #{group} (sourceType: {sourceId}, entry: {entry})",
+    "name": "CONDITION_SOURCE_TYPE_CONVERSATION_LINE",
+    "description": "Limit conversation line {entry}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "entry": {
+      "type": "ConversationLineParameter",
+      "name": "Conversation line"
+    }
+  },
+
+  {
+    "id": 30,
+    "name": "CONDITION_SOURCE_TYPE_AREATRIGGER_CLIENT_TRIGGERED",
+    "description": "Limit areatrigger {entry}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "entry": {
+      "type": "AreaTriggerParameter",
+      "name": "Areatrigger"
+    }
+  },
+
+  {
+    "id": 31,
+    "name": "CONDITION_SOURCE_TYPE_TRAINER_SPELL",
+    "description": "Limit spell {entry} from trainer {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "entry": {
+      "type": "SpellParameter",
+      "name": "Spell"
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Trainer"
+    }
+  },
+
+  {
+    "id": 32,
+    "name": "CONDITION_SOURCE_TYPE_OBJECT_ID_VISIBILITY",
+    "description": "Limit object {group}, {entry} visibility",
     "targets": {
       "0": {
         "description": "Object",
         "comment": "Object"
       }
     },
+    "entry": {
+      "type": "Parameter",
+      "name": "Entry"
+    },
     "group": {
       "type": "Parameter",
-      "name": "Condition ID",
-      "description": "Any positive number, target in SAI will have set this field"
+      "name": "Object type"
+    }
+  },
+
+  {
+    "id": 33,
+    "name": "CONDITION_SOURCE_TYPE_SPAWN_GROUP",
+    "description": "Limit spawn group {entry}",
+    "targets": {
+      "0": {
+        "description": "Object",
+        "comment": "Object"
+      }
     },
     "entry": {
       "type": "Parameter",
-      "name": "Entry Or Guid",
-      "description": "smart_scripts.entryOrGuid"
-    },
-    "sourceId": {
-      "type": "Parameter",
-      "name": "SourceType",
-      "description": "smart_scripts.script_source_type"
+      "name": "Spawn group id"
     }
   }
 ]

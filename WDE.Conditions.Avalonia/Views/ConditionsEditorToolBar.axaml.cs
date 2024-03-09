@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.Conditions.Avalonia.Views
 {
-    public class ConditionsEditorToolBar : UserControl
+    public partial class ConditionsEditorToolBar : UserControl
     {
         public ConditionsEditorToolBar()
         {

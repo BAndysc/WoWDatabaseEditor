@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using WDE.WorldMap.Extensions;
 using WDE.WorldMap.Models;
 
@@ -15,7 +16,8 @@ namespace WDE.WorldMap
         private bool draggingItem;
         private Point startDrag;
         private Point startPos;
-        
+
+        #pragma warning disable AVP1002
         private double zoomBias;
         public static readonly DirectProperty<FastBoxRendererControl<T, R>, double> ZoomBiasProperty = AvaloniaProperty.RegisterDirect<FastBoxRendererControl<T, R>, double>("ZoomBias", o => o.ZoomBias, (o, v) => o.ZoomBias = v);
 
@@ -24,6 +26,7 @@ namespace WDE.WorldMap
 
         private bool renderMarkers = true;
         public static readonly DirectProperty<FastBoxRendererControl<T, R>, bool> RenderMarkersProperty = AvaloniaProperty.RegisterDirect<FastBoxRendererControl<T, R>, bool>("RenderMarkers", o => o.RenderMarkers, (o, v) => o.RenderMarkers = v);
+        #pragma warning restore AVP1002
 
         private bool isAttachedToVisualTree;
         
@@ -82,7 +85,7 @@ namespace WDE.WorldMap
                 var parent = e.Parent;
 
                 while (parent != null && parent is not WoWMapViewer)
-                    parent = parent.VisualParent;
+                    parent = parent.GetVisualParent();
 
                 if (parent is WoWMapViewer map)
                 {
@@ -251,9 +254,9 @@ namespace WDE.WorldMap
             StopDrag(e.GetPosition(this));
         }
 
-        protected override void OnPointerLeave(PointerEventArgs e)
+        protected override void OnPointerExited(PointerEventArgs e)
         {
-            base.OnPointerLeave(e);
+            base.OnPointerExited(e);
             StopDrag(null);
         }
 

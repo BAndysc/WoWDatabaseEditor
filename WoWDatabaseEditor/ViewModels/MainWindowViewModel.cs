@@ -6,6 +6,7 @@ using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
+using PropertyChanged.SourceGenerator;
 using ReactiveUI;
 using WDE.Common.CoreVersion;
 using WDE.Common.Events;
@@ -36,7 +37,7 @@ namespace WoWDatabaseEditorCore.ViewModels
 {
     [SingleInstance]
     [AutoRegister]
-    public class MainWindowViewModel : ObservableBase, ILayoutViewModelResolver, ICloseAwareViewModel
+    public partial class MainWindowViewModel : ObservableBase, ILayoutViewModelResolver, ICloseAwareViewModel
     {
         private readonly IStatusBar statusBar;
         private readonly IMessageBoxService messageBoxService;
@@ -53,6 +54,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly IUpdateViewModel updateViewModel;
 
         private readonly Dictionary<string, ITool> toolById = new();
+
+        [Notify] private bool is3dViewSupported;
 
         public MainWindowViewModel(IDocumentManager documentManager,
             StatusBarViewModel statusBarViewModel,
@@ -191,8 +194,8 @@ namespace WoWDatabaseEditorCore.ViewModels
 
             documentManager.OpenedDocuments.ToCountChangedObservable().SubscribeAction(count =>
             {
-                if (count == 0)
-                    mainThread.Dispatch(ShowStartPage);
+                if (count == 0 && !inCanClose)
+                    ShowStartPage();
             });
             //LoadDefault();
 
@@ -201,7 +204,10 @@ namespace WoWDatabaseEditorCore.ViewModels
             Watch(DocumentManager, dm => dm.ActiveSolutionItemDocument, nameof(ShowExportButtons));
             Watch(DocumentManager, dm => dm.ActiveDocument, nameof(ShowPlayButtons));
             Watch(tablesToolService, serv => serv.Visibility, nameof(ShowTablesList));
-            
+
+            eventAggregator.GetEvent<AllModulesLoaded>()
+                .Subscribe(() => Is3dViewSupported = gameViewService.Value.IsSupported);
+
             eventAggregator.GetEvent<AllModulesLoaded>()
                 .Subscribe(OpenFatalLogIfExists, ThreadOption.PublisherThread, true);
         }

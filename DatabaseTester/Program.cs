@@ -65,7 +65,7 @@ public class Program
     {
         obj = null;
         if (type == typeof(string))
-            obj = "";
+            obj = "a";
         else if (type.IsGenericType &&
                  type.GetGenericTypeDefinition() == typeof(Nullable<>) &&
                  TryGetDefaultObjectForType(type.GetGenericArguments()[0], out var innerNullable))
@@ -299,8 +299,8 @@ public class Program
         }
 
         // methods with > 1 parameters
-        worldDb.GetScriptFor(0, 0, SmartScriptType.Creature);
-        worldDb.GetConditionsFor(0, 0, 0);
+        await worldDb.GetScriptForAsync(0, 0, SmartScriptType.Creature);
+        await worldDb.GetConditionsForAsync(0, 0, 0);
         await worldDb.GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask.All, new IDatabaseProvider.ConditionKey(0, 0, 0, 0));
         await worldDb.GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask.All, new List<IDatabaseProvider.ConditionKey>(){new IDatabaseProvider.ConditionKey(0, 0, 0, 0)});
         await worldDb.FindSmartScriptLinesBy(new (IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)[] { (IDatabaseProvider.SmartLinePropertyType.Action, 0, 0, 0) });

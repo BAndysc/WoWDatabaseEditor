@@ -45,7 +45,7 @@ public sealed class SingleThreadSynchronizationContext : SynchronizationContext
     public override void OperationCompleted() { Interlocked.Decrement(ref trackedCount); }
 
     // Post will add the call to a task list to be executed later on the main thread then work will continue asynchronously
-    public override void Post(SendOrPostCallback callback, object state)
+    public override void Post(SendOrPostCallback callback, object? state)
     {
         lock (asyncWorkQueue)
         {

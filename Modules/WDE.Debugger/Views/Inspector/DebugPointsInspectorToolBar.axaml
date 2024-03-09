@@ -10,7 +10,7 @@
   <ToolbarControl> <!-- Command="{CompiledBinding #Root.OpenAddFlyoutCommand}"  -->
     <ButtonImage Text="Add" Image="Icons/icon_add.png">
       <ButtonImage.Flyout>
-        <MenuFlyout Placement="BottomEdgeAlignedLeft" Items="{CompiledBinding SourceAddList}" />
+        <MenuFlyout Placement="BottomEdgeAlignedLeft" ItemsSource="{CompiledBinding SourceAddList}" />
       </ButtonImage.Flyout>
       <ButtonImage.Styles>
         <Style Selector="MenuItem" x:DataType="inspector:AddDebugPointViewModel">

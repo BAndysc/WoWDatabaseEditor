@@ -1,0 +1,132 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Style Selector="ParameterBox">
+    <Setter Property="BoolTemplate">
+      <Template>
+        <CheckBox IsEnabled="{Binding $parent[ParameterBox].IsLongParameter}"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch"
+                  IsChecked="{Binding $parent[ParameterBox].ParameterValueAsBool, Mode=TwoWay}" />
+      </Template>
+    </Setter>
+    <Setter Property="GenericTemplate">
+      <Template>
+        <GenericParameterBox Parameter="{Binding $parent[ParameterBox].Parameter}"
+                             ParameterValue="{Binding $parent[ParameterBox].ParameterValue, Mode=TwoWay}"
+                             Context="{Binding $parent[ParameterBox].Context}"
+                             NumberToMultiply="{Binding $parent[ParameterBox].NumberToMultiply}"
+                             x:Name="PART_GenericParameterBox"
+        />
+      </Template>
+    </Setter>
+    <Setter Property="ComboBoxTemplate">
+      <Template>
+        <CompletionComboParameterBox
+          Parameter="{Binding $parent[ParameterBox].Parameter}"
+          ParameterValue="{Binding $parent[ParameterBox].ParameterValue, Mode=TwoWay}"
+          Context="{Binding $parent[ParameterBox].Context}"
+        >
+
+        </CompletionComboParameterBox>
+      </Template>
+    </Setter>
+    <Setter Property="FlagsTemplate">
+      <Template>
+        <FlagsParameterBox
+          Parameter="{Binding $parent[ParameterBox].Parameter}"
+          ParameterValue="{Binding $parent[ParameterBox].ParameterValue, Mode=TwoWay}"
+          Context="{Binding $parent[ParameterBox].Context}"
+        />
+      </Template>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Name="PART_Panel" />
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="CompletionComboParameterBox">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <CompletionComboBox Name="PART_ComboBox"
+                            IsEnabled="{TemplateBinding IsLongParameter}"
+                            SelectedItem="{TemplateBinding ParameterValue, Mode=TwoWay}"
+                            Watermark="{TemplateBinding ParameterValue}">
+          <CompletionComboBox.ButtonItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding $parent[CompletionComboParameterBox].ParameterString}" />
+            </DataTemplate>
+          </CompletionComboBox.ButtonItemTemplate>
+        </CompletionComboBox>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="FlagsParameterBox">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <FlagComboBox Name="PART_FlagsBox"
+                      SelectedItem="{TemplateBinding ParameterString}"
+                      SelectedValue="{TemplateBinding ParameterValue, Mode=TwoWay}"
+                      Watermark="{TemplateBinding ParameterValue}"
+                      Flags="{TemplateBinding Flags}" />
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="GenericParameterBox">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <DockPanel KeyboardNavigation.TabNavigation="Local">
+          <Button x:Name="PART_Pick" Content=" ... " IsVisible="{TemplateBinding CanPickItems}" TabIndex="2"
+                  DockPanel.Dock="Right" />
+          <ParameterTextBox VerticalContentAlignment="Center"
+                            Focusable="True"
+                            x:Name="PART_TextBox"
+                            Tag="{TemplateBinding NumberToMultiply}"
+                            SpecialCopying="{TemplateBinding IsFloatParameter}"
+                            Text="{TemplateBinding ParameterValueAsString, Mode=TwoWay}"
+                            FontFamily="Consolas,Menlo,Courier,Courier New"
+                            Classes="InnerContentWithPadding">
+            <ParameterTextBox.Styles>
+              <Style
+                Selector="TextBox:not(:focus) /template/ TextPresenter#PART_TextPresenter">
+                <Setter Property="IsVisible" Value="False" />
+              </Style>
+              <Style
+                Selector="TextBox:focus ContentPresenter Border">
+                <Setter Property="IsVisible" Value="False" />
+              </Style>
+            </ParameterTextBox.Styles>
+            <ParameterTextBox.InnerLeftContent>
+              <Border Cursor="Ibeam">
+                <!-- Have to use $parent[] instead of TemplateBinding, becuase this is in InnerLeftContent. TemplateBindings don't work here -->
+                <TextBlock
+                  Text="{Binding $parent[GenericParameterBox].ParameterString, Converter={x:Static StripTagConverter.Instance}}"
+                  VerticalAlignment="Center"
+                  Margin="0,0,0,0" />
+              </Border>
+            </ParameterTextBox.InnerLeftContent>
+            <ParameterTextBox.InnerRightContent>
+              <Button
+                Background="Transparent"
+                Padding="0"
+                BorderBrush="Transparent"
+                x:Name="PART_SpecialCommandButton">
+                <WdeImage ImageUri="Icons/icon_picker.png" Width="16" Height="16" />
+                <Button.IsVisible>
+                  <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="$parent[GenericParameterBox].Parameter.SpecialCommand" Converter="{x:Static NullConverter.IsNotNull}" FallbackValue="False" />
+                    <Binding Path="$parent[GenericParameterBox].SupportsSpecialCommand" />
+                  </MultiBinding>
+                </Button.IsVisible>
+              </Button>
+            </ParameterTextBox.InnerRightContent>
+          </ParameterTextBox>
+        </DockPanel>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+</Styles>

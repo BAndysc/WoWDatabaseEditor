@@ -32,7 +32,7 @@ namespace WDE.SmartScriptEditor.Validation.Antlr
             {
                 return action(parser);
             }
-            catch (ValidationParseException e)
+            catch (ValidationParseException)
             {
                 throw;
             }

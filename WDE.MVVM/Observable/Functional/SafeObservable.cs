@@ -1,4 +1,5 @@
 using System;
+using WDE.Common;
 
 namespace WDE.MVVM.Observable.Functional;
 
@@ -33,7 +34,7 @@ public class SafeObservable<T> : IObservable<T>
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e);
             }
         }
 
@@ -45,7 +46,7 @@ public class SafeObservable<T> : IObservable<T>
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e);
             }
         }
 
@@ -57,7 +58,7 @@ public class SafeObservable<T> : IObservable<T>
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e);
             }
         }
     }

@@ -22,7 +22,9 @@ class Program
 
     private static void FixCurrentDirectory()
     {
+        #pragma warning disable IL3000
         var path = Assembly.GetExecutingAssembly().Location;
+        #pragma warning restore IL3000
         if (string.IsNullOrEmpty(path))
             path = System.AppContext.BaseDirectory;
         var exePath = new FileInfo(path);
@@ -34,6 +36,6 @@ class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            //.WithInterFont() // ava11
+            .WithInterFont() 
             .LogToTrace();
 }

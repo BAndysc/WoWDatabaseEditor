@@ -22,7 +22,7 @@
             
             <TextBlock VerticalAlignment="Center" Grid.Row="6" Grid.Column="0" IsVisible="{CompiledBinding HasSpawnGroupType}">Group type:</TextBlock>
             <ComboBox Grid.Row="6" Grid.Column="2" IsVisible="{CompiledBinding HasSpawnGroupType}"
-                      Items="{CompiledBinding SpawnGroupTypes}" 
+                      ItemsSource="{CompiledBinding SpawnGroupTypes}" 
                       SelectedItem="{CompiledBinding GroupType}" />
         </Grid>
     </DockPanel>

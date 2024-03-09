@@ -6,7 +6,7 @@ namespace WDE.Common.Services
     [UniqueProvider]
     public interface IClipboardService
     {
-        Task<string> GetText();
+        Task<string?> GetText();
         void SetText(string text);
     }
 }

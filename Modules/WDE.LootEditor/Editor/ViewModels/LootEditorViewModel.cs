@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using AvaloniaStyles.Controls.FastTableView;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
@@ -15,6 +16,7 @@ using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.DBC;
+using WDE.Common.Exceptions;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
@@ -333,12 +335,14 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
                 return;
             
             var text = await clipboardService.GetText();
+            if (string.IsNullOrEmpty(text))
+                return;
             List<LootModel> entries = new List<LootModel>();
             try
             {
                 entries = JsonConvert.DeserializeObject<List<LootModel>>(text)!;
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
             
@@ -587,8 +591,6 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             default:
                 throw new ArgumentOutOfRangeException();
         }
-
-        return new AsyncAutoCommand<LootGroup>(_ => Task.CompletedTask, _ => false);
     }
 
     private async Task AddItem(LootGroup group)
@@ -812,7 +814,8 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
                 .SetContent(e.Message)
                 .WithOkButton(true)
                 .Build());
-            throw;
+            if (e is not UserException)
+                throw;
         }
         finally
         {

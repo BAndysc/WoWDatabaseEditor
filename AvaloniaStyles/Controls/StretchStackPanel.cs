@@ -14,7 +14,15 @@ public class StretchStackPanel : Panel
         get => GetValue(SpacingProperty);
         set => SetValue(SpacingProperty, value);
     }
-    
+
+    public static readonly StyledProperty<bool> StretchProperty = AvaloniaProperty.Register<StretchStackPanel, bool>(nameof(Stretch), true);
+
+    public bool Stretch
+    {
+        get => GetValue(StretchProperty);
+        set => SetValue(StretchProperty, value);
+    }
+
     protected override Size ArrangeOverride(Size finalSize)
     {
         Avalonia.Controls.Controls children = Children;
@@ -22,7 +30,7 @@ public class StretchStackPanel : Panel
         int index = 0;
         for (int count = children.Count; index < count; ++index)
         {
-            IControl control = children[index];
+            Control control = children[index];
             if (control == null)
                 continue;
             
@@ -33,11 +41,13 @@ public class StretchStackPanel : Panel
         
         double singleWidth = (finalSize.Width - Spacing * Math.Max(0, visibleChildrenCount - 1)) / visibleChildrenCount;
         double x = 0;
+        double widthLeft = finalSize.Width;
+        bool stretch = Stretch;
         
         index = 0;
         for (int count = children.Count; index < count; ++index)
         {
-            IControl control = children[index];
+            Control control = children[index];
             if (control == null)
                 continue;
             
@@ -45,9 +55,11 @@ public class StretchStackPanel : Panel
 
             if (!isVisible)
                 continue;
-            
-            control.Arrange(new Rect(x, finalSize.Height / 2 - control.DesiredSize.Height/2, singleWidth, control.DesiredSize.Height));
-            x += singleWidth + Spacing;
+
+            var width = stretch ? singleWidth : Math.Clamp(control.DesiredSize.Width, 0, widthLeft);
+            control.Arrange(new Rect(x, finalSize.Height / 2 - control.DesiredSize.Height/2, width, control.DesiredSize.Height));
+            x += width + Spacing;
+            widthLeft -= width + Spacing;
         }
 
         return finalSize;
@@ -65,7 +77,7 @@ public class StretchStackPanel : Panel
         int index = 0;
         for (int count = children.Count; index < count; ++index)
         {
-            IControl control = children[index];
+            Control control = children[index];
             if (control != null)
             {
                 bool isVisible = control.IsVisible;

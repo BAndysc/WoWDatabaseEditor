@@ -19,14 +19,14 @@
             <controls:GroupingListBox.ItemTemplate>
                 <DataTemplate x:DataType="common:IConfigurable">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{CompiledBinding Name}" />
-                        <TextBlock Text="*" IsVisible="{CompiledBinding IsModified}" />
+                        <TextBlock Name="SettingName" Text="{CompiledBinding Name}" />
+                        <TextBlock Text="*" IsVisible="{CompiledBinding IsModified}" FontWeight="Bold" />
                         <Interaction.Behaviors>
                             <DataTriggerBehavior Binding="{CompiledBinding IsModified}" ComparisonCondition="Equal" Value="False">
-                                <ChangePropertyAction TargetObject="{Binding #StackPanel}" PropertyName="StackPanel.FontWeight" Value="Normal"/>
+                                <ChangePropertyAction TargetObject="{Binding #SettingName}" PropertyName="FontWeight" Value="Normal"/>
                             </DataTriggerBehavior>
                             <DataTriggerBehavior Binding="{CompiledBinding IsModified}" ComparisonCondition="Equal" Value="True">
-                                <ChangePropertyAction TargetObject="{Binding #StackPanel}" PropertyName="StackPanel.FontWeight" Value="Bold"/>
+                                <ChangePropertyAction TargetObject="{Binding #SettingName}" PropertyName="FontWeight" Value="Bold"/>
                             </DataTriggerBehavior>
                         </Interaction.Behaviors>
                     </StackPanel>

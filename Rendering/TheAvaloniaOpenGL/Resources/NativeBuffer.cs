@@ -163,7 +163,7 @@ namespace TheAvaloniaOpenGL.Resources
                     else
                     {
                         throw new Exception("Those buffer requires Open GL >= 4.3, but we are limited to 4.1 only :|");
-                        return BufferTarget.ShaderStorageBuffer;   
+                        //return BufferTarget.ShaderStorageBuffer;
                     }
                 case BufferTypeEnum.Vertex:
                     return BufferTarget.ArrayBuffer;

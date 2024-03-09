@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.PacketViewer.Avalonia.Views;
 
-public class UpdateHistoryView : UserControl
+public partial class UpdateHistoryView : UserControl
 {
     public UpdateHistoryView()
     {

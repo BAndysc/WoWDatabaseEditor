@@ -49,10 +49,6 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 {
     public partial class SingleRowDbTableEditorViewModel : ViewModelBase, IBeforeSaveConfirmDocument
     {
-        private readonly IMessageBoxService messageBoxService;
-        private readonly IParameterFactory parameterFactory;
-        private readonly IDatabaseQueryExecutor mySqlExecutor;
-        private readonly IQueryGenerator queryGenerator;
         private readonly IDatabaseTableModelGenerator modelGenerator;
         private readonly IConditionEditService conditionEditService;
         private readonly IDatabaseEditorsSettings editorSettings;
@@ -205,10 +201,6 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         {
             this.solutionItem = solutionItem;
             this.tableDataProvider = tableDataProvider;
-            this.messageBoxService = messageBoxService;
-            this.parameterFactory = parameterFactory;
-            this.mySqlExecutor = mySqlExecutor;
-            this.queryGenerator = queryGenerator;
             this.modelGenerator = modelGenerator;
             this.conditionEditService = conditionEditService;
             this.editorSettings = editorSettings;

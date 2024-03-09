@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.Common.Avalonia.Utils
 {
-    public class LoadingSpinner : UserControl
+    public partial class LoadingSpinner : UserControl
     {
         public LoadingSpinner()
         {

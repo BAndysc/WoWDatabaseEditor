@@ -1,86 +1,55 @@
 using Avalonia;
 using Avalonia.Media;
-using Avalonia.Media.Immutable;
 using Avalonia.Metadata;
 using AvaloniaStyles.Utils;
+using HslColor = AvaloniaStyles.Utils.HslColor;
 
 namespace AvaloniaStyles.Controls;
 
-public class AccentSolidColorBrush : Brush, ISolidColorBrush
+public class Accent
 {
-    public static readonly StyledProperty<Color> BaseColorProperty =
-        AvaloniaProperty.Register<AccentSolidColorBrush, Color>(nameof(BaseColor));
+     public static readonly StyledProperty<Color> BaseColorProperty =
+        AvaloniaProperty.RegisterAttached<Accent, SolidColorBrush, Color>("BaseColor");
 
-    public static readonly StyledProperty<HslDiff> HueProperty =
-        AvaloniaProperty.Register<AccentSolidColorBrush, HslDiff>(nameof(Hue));
+     public static readonly StyledProperty<HslDiff> HueProperty =
+         AvaloniaProperty.RegisterAttached<Accent, SolidColorBrush, HslDiff>("Hue");
 
-    static AccentSolidColorBrush()
-    {
-        AffectsRender<AccentSolidColorBrush>(BaseColorProperty);
-        AffectsRender<AccentSolidColorBrush>(HueProperty);
-    }
+     static Accent()
+     {
+         HueProperty.Changed.AddClassHandler<SolidColorBrush>((brush, e) =>
+         {
+             Color baseColor;
+             if (!brush.IsSet(BaseColorProperty))
+             {
+                 baseColor = brush.Color;
+                 SetBaseColor(brush, baseColor);
+             }
+             else
+             {
+                 baseColor = brush.GetValue(BaseColorProperty);
+             }
+             var hsl = HslColor.FromRgba(baseColor).Scale(e.NewValue as HslDiff);
+             brush.Color = hsl.ToRgba();
+         });
+     }
+     
+     public static Color GetBaseColor(AvaloniaObject obj)
+     {
+         return obj.GetValue(BaseColorProperty);
+     }
 
-    public AccentSolidColorBrush(Color color, double opacity = 1.0)
-    {
-        BaseColor = color;
-        Opacity = opacity;
-    }
+     public static void SetBaseColor(AvaloniaObject obj, Color value)
+     {
+         obj.SetValue(BaseColorProperty, value);
+     }
+    
+     public static HslDiff GetHue(AvaloniaObject obj)
+     {
+         return obj.GetValue(HueProperty);
+     }
 
-    public AccentSolidColorBrush(uint color) : this(Color.FromUInt32(color))
-    {
-    }
-
-    public AccentSolidColorBrush()
-    {
-        Opacity = 1;
-    }
-
-    /// <summary>Gets or sets the color of the brush.</summary>
-    [Content]
-    public Color BaseColor
-    {
-        get => GetValue(BaseColorProperty);
-        set => SetValue(BaseColorProperty, value);
-    }
-
-    public HslDiff Hue
-    {
-        get => GetValue(HueProperty);
-        set => SetValue(HueProperty, value);
-    }
-
-    /// <summary>Parses a brush string.</summary>
-    /// <param name="s">The brush string.</param>
-    /// <returns>The <see cref="P:Avalonia.Media.SolidColorBrush.Color" />.</returns>
-    /// <remarks>
-    /// Whereas <see cref="M:Avalonia.Media.Brush.Parse(System.String)" /> may return an immutable solid color brush,
-    /// this method always returns a mutable <see cref="T:Avalonia.Media.SolidColorBrush" />.
-    /// </remarks>
-    public static AccentSolidColorBrush Parse(string s)
-    {
-        ISolidColorBrush solidColorBrush1 = (ISolidColorBrush)Brush.Parse(s);
-        return !(solidColorBrush1 is AccentSolidColorBrush solidColorBrush2)
-            ? new AccentSolidColorBrush(solidColorBrush1.Color)
-            : solidColorBrush2;
-    }
-
-    public override string ToString() => Color.ToString();
-
-    /// <inheritdoc />
-    public override IBrush ToImmutable() => new ImmutableSolidColorBrush(this);
-
-    public Color Color
-    {
-        get
-        {
-            var hsl = HslColor.FromRgba(BaseColor).Scale(Hue);
-            return hsl.ToRgba();
-        }
-        set
-        {
-            var hsl = HslColor.FromRgba(value);
-            //Hue = (float)hsl.H;
-            BaseColor = value;
-        }
-    }
+     public static void SetHue(AvaloniaObject obj, HslDiff value)
+     {
+         obj.SetValue(HueProperty, value);
+     }
 }

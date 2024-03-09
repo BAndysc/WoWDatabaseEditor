@@ -9,11 +9,11 @@
     <ScrollViewer>
        <StackPanel Grid.IsSharedSizeScope="True">
            <SettingsHeader Text="Default quick access actions" />
-           <ItemsControl Items="{CompiledBinding Parameters}">
+           <ItemsControl ItemsSource="{CompiledBinding Parameters}">
                <ItemsControl.ItemTemplate>
                    <DataTemplate>
                        <SettingItem Header="{CompiledBinding ParameterName}">
-                           <ComboBox Items="{CompiledBinding Actions}" SelectedItem="{CompiledBinding Action}">
+                           <ComboBox ItemsSource="{CompiledBinding Actions}" SelectedItem="{CompiledBinding Action}">
                                <ComboBox.ItemTemplate>
                                    <DataTemplate>
                                        <TextBlock Text="{CompiledBinding Name}" />

@@ -39,8 +39,10 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly ISolutionItemIconRegistry iconRegistry;
         private readonly ISolutionItemNameRegistry nameRegistry;
         private readonly IMostRecentlyUsedService mostRecentlyUsedService;
+        private readonly IUserSettings userSettings;
         private readonly IDotNetService dotNetService;
         private bool showGiveStarBox;
+        private bool showAvalonia11Box;
         public AboutViewModel AboutViewModel { get; }
         public ObservableCollection<NewItemPrototypeInfo> FlatItemPrototypes { get; } = new();
         public ObservableCollection<MostRecentlyUsedViewModel> MostRecentlyUsedItems { get; } = new();
@@ -55,7 +57,17 @@ namespace WoWDatabaseEditorCore.ViewModels
             get => showGiveStarBox;
             set => SetProperty(ref showGiveStarBox, value);
         }
-        
+
+        public bool ShowAvalonia11Box
+        {
+            get => showAvalonia11Box;
+            set
+            {
+                SetProperty(ref showAvalonia11Box, value);
+                UpdateSettings();
+            }
+        }
+
         public string ProgramTitle { get; }
         
         public string ProgramSubtitle { get; }
@@ -90,6 +102,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.iconRegistry = iconRegistry;
             this.nameRegistry = nameRegistry;
             this.mostRecentlyUsedService = mostRecentlyUsedService;
+            this.userSettings = userSettings;
             this.dotNetService = dotNetService;
             ProgramTitle = programNameService.Title;
             ProgramSubtitle = programNameService.Subtitle;
@@ -148,7 +161,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             DismissCommand = new DelegateCommand(() =>
             {
                 ShowGiveStarBox = false;
-                userSettings.Update(new QuickStartSettings(){DismissedLeaveStarBox = true});
+                UpdateSettings();
             });
 
             OpenGithubAndDismissCommand = new DelegateCommand(() =>
@@ -171,6 +184,8 @@ namespace WoWDatabaseEditorCore.ViewModels
                               !applicationReleaseConfiguration.GetBool("SKIP_STAR_BOX").GetValueOrDefault() &&
                               !userSettings.Get<QuickStartSettings>().DismissedLeaveStarBox;
 
+            showAvalonia11Box = !userSettings.Get<QuickStartSettings>().DismissedAvalonia11Box;
+
             try
             {
                 ReloadMruList();
@@ -188,6 +203,15 @@ namespace WoWDatabaseEditorCore.ViewModels
                 IsDotNet8Installed = await dotNetService.IsDotNet8Installed();
             }
             Initialize().ListenErrors();
+        }
+
+        private void UpdateSettings()
+        {
+            userSettings.Update(new QuickStartSettings()
+            {
+                DismissedLeaveStarBox = !ShowGiveStarBox,
+                DismissedAvalonia11Box = !showAvalonia11Box
+            });
         }
 
         private void ReloadMruList()
@@ -224,6 +248,7 @@ namespace WoWDatabaseEditorCore.ViewModels
     public struct QuickStartSettings : ISettings
     {
         public bool DismissedLeaveStarBox { get; set; }
+        public bool DismissedAvalonia11Box { get; set; }
     }
 
     public class MostRecentlyUsedViewModel

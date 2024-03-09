@@ -16,7 +16,7 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
         public DataTemplate? BoolTemplate { get; set; }
         public DataTemplate? CommandTemplate { get; set; }
 
-        public IControl Build(object param)
+        public Control? Build(object? param)
         {
             if (param is ViewModels.MultiRow.DatabaseCellViewModel { ActionCommand: { } } or 
                 ViewModels.SingleRow.SingleRecordDatabaseCellViewModel { ActionCommand: { } } or 
@@ -35,7 +35,7 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
             return GenericTemplate!.Build(param);
         }
 
-        public bool Match(object data)
+        public bool Match(object? data)
         {
             return data is DatabaseCellViewModel or
                 ViewModels.MultiRow.DatabaseCellViewModel or 

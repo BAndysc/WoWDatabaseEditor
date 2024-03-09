@@ -31,7 +31,7 @@ internal class SettingItemContentPresenter : ContentPresenter
 {
     protected override Size ArrangeOverride(Size finalSize)
     {
-        if (Child is TextBox || Child.HorizontalAlignment == HorizontalAlignment.Stretch)
+        if (Child is TextBox || Child != null && Child.HorizontalAlignment == HorizontalAlignment.Stretch)
         {
             if (HorizontalContentAlignment != HorizontalAlignment.Stretch)
                 HorizontalContentAlignment = HorizontalAlignment.Stretch;

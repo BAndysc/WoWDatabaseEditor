@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
@@ -18,7 +19,7 @@ public partial class LootEditorToolBar : UserControl
         InitializeComponent();
         focusCommand = new DelegateCommand(() =>
         {
-            TextBox tb = this.FindControl<TextBox>("SearchTextBox");
+            TextBox? tb = this.FindControl<TextBox>("SearchTextBox");
             tb?.Focus();
         });
     }
@@ -34,10 +35,19 @@ public partial class LootEditorToolBar : UserControl
             attachedRoot.KeyBindings.Add(new KeyBinding()
             {
                 Command = focusCommand,
-                Gesture = new KeyGesture(Key.F, AvaloniaLocator.Current
-                    .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control)
+                Gesture = new KeyGesture(Key.F, GetPlatformCommandKey())
             });
         }
+    }
+    
+    private static KeyModifiers GetPlatformCommandKey()
+    {            
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return KeyModifiers.Meta;
+        }
+
+        return KeyModifiers.Control;
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

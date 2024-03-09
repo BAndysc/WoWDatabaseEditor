@@ -63,7 +63,6 @@ namespace WDE.MpqReader.DBC
         
         public LightParam(GameFilesVersion ver, IWdcIterator dbcIterator, LightDataStore dataStore)
         {
-            int i = 0;
             Id = (uint)dbcIterator.Id;
             HighlightSky = dbcIterator.GetByte("HighlightSky");
             LightSkyboxID = dbcIterator.GetByte("LightSkyboxID");
@@ -274,7 +273,6 @@ namespace WDE.MpqReader.DBC
         
         public Light(IWdcIterator row, LightParamStore lightParamStore)
         {
-            int i = 0;
             Id = (uint)row.Id;
             Continent = (ushort)row.GetShort("ContinentID");
             X = row.GetFloat("GameCoords", 0); //17066.666f -  / YardToInch;

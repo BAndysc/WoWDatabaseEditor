@@ -38,7 +38,7 @@ public partial class BreakpointHitPopupView : UserControl
             popup = new Popup()
             {
                 Child = this,
-                PlacementMode = PlacementMode.AnchorAndGravity,
+                Placement = PlacementMode.AnchorAndGravity,
                 PlacementGravity = PopupGravity.BottomRight,
                 PlacementAnchor = PopupAnchor.TopLeft,
                 PlacementTarget = owner,

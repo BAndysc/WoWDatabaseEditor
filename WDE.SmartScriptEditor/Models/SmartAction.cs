@@ -6,6 +6,7 @@ using System.Linq;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
@@ -204,12 +205,12 @@ namespace WDE.SmartScriptEditor.Models
                 }
                 catch (ParsingErrors e)
                 {
-                    Console.WriteLine(e.ToString());
+                    LOG.LogWarning(e.ToString());
                     return $"Action {Id} has invalid Readable format in actions.json";
                 }
                 catch (FormattingException e)
                 {
-                    Console.WriteLine(e.ToString());
+                    LOG.LogWarning(e.ToString());
                     return $"Action {Id} has invalid Readable format in actions.json";
                 }
             }

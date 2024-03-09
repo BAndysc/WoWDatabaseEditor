@@ -93,9 +93,14 @@ public class EditorHeader : TemplatedControl
 
     private async Task DoCopy(string text)
     {
-        var clipboard = AvaloniaLocator.Current.GetRequiredService<IClipboard>();
+        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
         var statusBar = ViewBind.ResolveViewModel<IStatusBar>();
         
+        if (clipboard == null)
+        {
+            statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Cannot copy to clipboard"));
+            return;
+        }
         await clipboard.SetTextAsync(text);
         statusBar.PublishNotification(new PlainNotification(NotificationType.Info, $"Copied '{text}' to the clipboard"));
     }

@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
     
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <AssemblyVersion>0.0.0.0</AssemblyVersion>
         <FileVersion>0.0.0.0</FileVersion>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>
-        <WarningsAsErrors>nullable</WarningsAsErrors>
+        <WarningsAsErrors>$(WarningsAsErrors),nullable</WarningsAsErrors>
         <RootNamespace>WDE.SourceCodeIntegrationEditor</RootNamespace>
     </PropertyGroup>
     <Import Project="..\Avalonia.props" />
@@ -19,12 +19,6 @@
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="envdte" Version="17.9.37000" />
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Update="Settings\SourceCodeConfigurationView.axaml.cs">
-        <DependentUpon>SourceCodeConfigurationView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
     </ItemGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>

@@ -9,7 +9,7 @@
              x:DataType="viewModels:TablesToolViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Views.TablesToolView">
   <DockPanel LastChildFill="True" KeyboardNavigation.TabNavigation="Local">
-    <ComboBox Items="{CompiledBinding AllGroups}"
+    <ComboBox ItemsSource="{CompiledBinding AllGroups}"
               SelectedItem="{CompiledBinding SelectedGroup}"
               DockPanel.Dock="Bottom"
               TabIndex="2"

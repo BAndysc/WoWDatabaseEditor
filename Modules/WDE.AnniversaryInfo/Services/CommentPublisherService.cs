@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Newtonsoft.Json;
+using WDE.Common;
 using WDE.Common.Factories;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
@@ -47,7 +48,7 @@ public class CommentPublisherService : ICommentPublisherService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e);
             return CommentResult.InternetProblem;
         }
     }

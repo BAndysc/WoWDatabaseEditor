@@ -9,7 +9,7 @@ using WDE.PacketViewer.ViewModels;
 
 namespace WDE.PacketViewer.Avalonia.Views
 {
-    public class PacketFilterDialogView : DialogViewBase
+    public partial class PacketFilterDialogView : DialogViewBase
     {
         public PacketFilterDialogView()
         {

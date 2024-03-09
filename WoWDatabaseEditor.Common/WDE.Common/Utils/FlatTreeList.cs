@@ -325,7 +325,6 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
     public void Clear()
     {
         throw new Exception("not supported!");
-        innerList.Clear();
     }
 
     public bool Contains(INodeType? value) => ((IList)innerList).Contains(value);
@@ -340,19 +339,16 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
     public void Insert(int index, INodeType? value)
     {
         throw new Exception("not supported!");
-        ((IList)innerList).Insert(index, value);
     }
 
     public bool Remove(INodeType? value)
     {
         throw new Exception("not supported!");
-        ((IList)innerList).Remove(value);
     }
 
     public void RemoveAt(int index)
     {
         throw new Exception("not supported!");
-        innerList.RemoveAt(index);
     }
 
     public bool IsFixedSize => ((IList)innerList).IsFixedSize;

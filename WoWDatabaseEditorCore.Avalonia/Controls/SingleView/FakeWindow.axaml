@@ -1,0 +1,34 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:WoWDatabaseEditorCore.Avalonia.Controls"
+        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia">
+  <Design.PreviewWith>
+    <controls:FakeWindow />
+  </Design.PreviewWith>
+
+  <Style Selector="controls|FakeWindow">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{DynamicResource WindowContentBackground}"
+                BorderBrush="Gray"
+                BoxShadow="0 0 30 5 #50000000"
+                Margin="30"
+                ClipToBounds="False"
+                BorderThickness="1">
+          <DockPanel>
+            <DockPanel DockPanel.Dock="Top" MinHeight="24" LastChildFill="True" Background="{DynamicResource TitleBarBackground}">
+              <WdeImage Margin="2" Image="{TemplateBinding Icon}" Width="16" Height="16" VerticalAlignment="Center" />
+              <Button Margin="2" Background="Transparent" Padding="0" BorderThickness="0" DockPanel.Dock="Right" Width="24" Height="24" Content="X" Name="PART_CloseButton" />
+
+              <TextBlock Margin="10,2" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{TemplateBinding Title}" />
+            </DockPanel>
+            <ContentControl DockPanel.Dock="Top" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+            <ContentControl
+              Content="{TemplateBinding Content}"
+              ContentTemplate="{x:Static utils:ViewDataTemplate.Template}" />
+          </DockPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+</Styles>

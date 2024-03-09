@@ -4,6 +4,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using AvaloniaEdit;
 using AvaloniaEdit.CodeCompletion;
@@ -14,7 +16,7 @@ using WDE.PacketViewer.ViewModels;
 
 namespace WDE.PacketViewer.Avalonia.Views
 {
-    public class PacketDocumentView : UserControl
+    public partial class PacketDocumentView : UserControl
     {
         public PacketDocumentView()
         {
@@ -26,7 +28,7 @@ namespace WDE.PacketViewer.Avalonia.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            editor = this.FindControl<TextEditor>("TextEditor");
+            editor = this.GetControl<TextEditor>("TextEditor");
             editor.TextArea.TextEntered += TextAreaOnTextEntered;
 
             editor.Options.AllowScrollBelowDocument = false;
@@ -83,26 +85,27 @@ namespace WDE.PacketViewer.Avalonia.Views
                     return;
                 
                 _completionWindow = new CompletionWindow(editor.TextArea);
+                _completionWindow.Styles.Add(new StyleInclude(new Uri("resm:Styles?assembly=WDE.PacketViewer.Avalonia")){Source = new Uri("avares://WDE.PacketViewer.Avalonia/Generic.axaml")});
                 _completionWindow.Closed += CompletionWindowOnClosed;
 
                 var data = _completionWindow.CompletionList.CompletionData;
                 if (word == "packet")
                 {
-                    data.Add(new CompletionData("id", "(int) Number of packet"));
-                    data.Add(new CompletionData("originalId", "(int) Original number of packet. If split UPDATE_OBJECT is disabled, then this is the same as Id. If splitting is enabled, then this field contains original packet number"));
-                    data.Add(new CompletionData("text", "(string) Raw packet output from Packet Parser"));
-                    data.Add(new CompletionData("opcode", "(string) String representation of packet opcode (e.g. SMSG_CHAT)")); 
-                    data.Add(new CompletionData("entry", "(int) Entry of main object in packet. E.g. caster for SMSG_SPELL_GO. 0 for packets without 'main object' (e.g. SMSG_UPDATE_OBJECT)"));   
+                    data.Add(new PacketCompletionData("id", "(int) Number of packet"));
+                    data.Add(new PacketCompletionData("originalId", "(int) Original number of packet. If split UPDATE_OBJECT is disabled, then this is the same as Id. If splitting is enabled, then this field contains original packet number"));
+                    data.Add(new PacketCompletionData("text", "(string) Raw packet output from Packet Parser"));
+                    data.Add(new PacketCompletionData("opcode", "(string) String representation of packet opcode (e.g. SMSG_CHAT)"));
+                    data.Add(new PacketCompletionData("entry", "(int) Entry of main object in packet. E.g. caster for SMSG_SPELL_GO. 0 for packets without 'main object' (e.g. SMSG_UPDATE_OBJECT)"));
                 }
                 else if (word == "smsg")
                 {
                     foreach (var smsg in Enum.GetNames<ServerOpcodes>())
-                        data.Add(new CompletionData(smsg, null));
+                        data.Add(new PacketCompletionData(smsg, null));
                 }
                 else if (word == "cmsg")
                 {
                     foreach (var cmsg in Enum.GetNames<ClientOpcodes>())
-                        data.Add(new CompletionData(cmsg, null));
+                        data.Add(new PacketCompletionData(cmsg, null));
                 }
 
                 _completionWindow.Show();
@@ -131,31 +134,30 @@ namespace WDE.PacketViewer.Avalonia.Views
 
             return sb.ToString();
         }
+    }
 
-        private class CompletionData : ICompletionData
+    public class PacketCompletionData : ICompletionData
+    {
+        public PacketCompletionData(string text, string? description)
         {
-            public CompletionData(string text, string? description)
-            {
-                Text = text;
-                Description = description;
-            }
+            Text = text;
+            Description = description;
+        }
 
-            public IBitmap? Image => null;
+        public IImage? Image => null;
 
-            public string Text { get; }
+        public string Text { get; }
 
-            // Use this property if you want to show a fancy UIElement in the list.
-            public object Content => new TextBlock() {Text = Text};
+        public object? Content => null;
 
-            public object? Description { get; }
+        public object? Description { get; }
 
-            public double Priority { get; } = 0;
+        public double Priority { get; } = 0;
 
-            public void Complete(TextArea textArea, ISegment completionSegment,
-                EventArgs insertionRequestEventArgs)
-            {
-                textArea.Document.Replace(completionSegment, Text);
-            }
+        public void Complete(TextArea textArea, ISegment completionSegment,
+            EventArgs insertionRequestEventArgs)
+        {
+            textArea.Document.Replace(completionSegment, Text);
         }
     }
 }

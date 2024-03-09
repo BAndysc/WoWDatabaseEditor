@@ -53,7 +53,7 @@
 
                 <TextBlock />
                 <StackPanel Spacing="5">
-                    <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding Targets}" SelectedItem="{CompiledBinding SelectedTarget}">
+                    <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" ItemsSource="{CompiledBinding Targets}" SelectedItem="{CompiledBinding SelectedTarget}">
                         <ListBox.KeyBindings>
                             <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelectedTarget}" />
                             <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelectedTarget}" />

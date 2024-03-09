@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using WDE.Common;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Services.Http
@@ -22,7 +23,7 @@ namespace WoWDatabaseEditorCore.Services.Http
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogWarning(e);
             }
         }
     }

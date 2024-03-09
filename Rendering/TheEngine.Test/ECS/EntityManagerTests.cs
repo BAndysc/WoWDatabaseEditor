@@ -6,7 +6,7 @@ namespace TheEngine.Test.ECS
     public class EntityManagerTests
     {
         private IEntityManager entityManager = null!;
-        private Archetype empty;
+        private Archetype empty = null!;
         
         [SetUp]
         public void Setup()

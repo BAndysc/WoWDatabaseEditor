@@ -15,13 +15,13 @@
                     <TextBlock FontWeight="Bold" Text="{CompiledBinding CurrentThemeName}" />
                 </SettingItem>
                 <SettingItem Header="Theme">
-                    <ComboBox Margin="30,0,0,0" VerticalAlignment="Top" Items="{CompiledBinding Themes}"
+                    <ComboBox Margin="30,0,0,0" VerticalAlignment="Top" ItemsSource="{CompiledBinding Themes}"
                               SelectedItem="{CompiledBinding ThemeName, Mode=TwoWay}" />
                 </SettingItem>
                 <SettingItem Header="Accent color" Help="Info: Custom accent color is available only in Windows 11 Theme.">
                     <DockPanel>
                         <Slider DockPanel.Dock="Right" Orientation="Vertical" VerticalAlignment="Stretch" Value="{CompiledBinding Lightness}" Name="Lightness" Minimum="0" Maximum="1" />
-                        <ColorPicker Lightness="{CompiledBinding Lightness}" SelectedColor="{CompiledBinding Color, Mode=TwoWay}" Width="200" Height="120" />
+                        <WdeColorPicker Lightness="{CompiledBinding Lightness}" SelectedColor="{CompiledBinding Color, Mode=TwoWay}" Width="200" Height="120" />
                     </DockPanel>
                 </SettingItem>
             </StackPanel>
@@ -33,9 +33,9 @@
                 </SettingItem>
                 <SettingItem Header="Custom scaling" Help="Info: Custom scaling is available only on Windows">
                     <DockPanel IsEnabled="{CompiledBinding AllowCustomScaling}">
-                        <ToggleSwitch IsChecked="{CompiledBinding UseCustomScaling}" DockPanel.Dock="Right" />
+                        <ToggleSwitch Margin="10,0,0,0" IsChecked="{CompiledBinding UseCustomScaling}" DockPanel.Dock="Right" />
                         <TextBlock DockPanel.Dock="Left" Width="90" VerticalAlignment="Center" Text="{CompiledBinding ScalingValuePercentage, StringFormat={}{0}%}"></TextBlock>
-                        <Slider MinWidth="100" HorizontalAlignment="Stretch" Name="ScalingSlider" Minimum="0.5" Maximum="4" Value="{CompiledBinding ScalingValue, Mode=TwoWay}" SmallChange="0.1" LargeChange="0.5" />
+                        <Slider IsEnabled="{CompiledBinding UseCustomScaling}" MinWidth="100" HorizontalAlignment="Stretch" Name="ScalingSlider" Minimum="0.5" Maximum="4" Value="{CompiledBinding ScalingValue, Mode=TwoWay}" SmallChange="0.1" LargeChange="0.5" />
                     </DockPanel>
                 </SettingItem>
             </StackPanel>

@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.SingleRow;
 
-public class MySqlFilterControl : UserControl
+public partial class MySqlFilterControl : UserControl
 {
     public MySqlFilterControl()
     {

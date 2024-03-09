@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Collections;
@@ -22,7 +23,7 @@ using WDE.MVVM.Observable;
 
 namespace WDE.Common.Avalonia.Controls
 {
-    public class FlagComboBox : CompletionComboBox, IStyleable
+    public class FlagComboBox : CompletionComboBox
     {
         private AvaloniaList<Option> options = new();
             
@@ -32,7 +33,7 @@ namespace WDE.Common.Avalonia.Controls
         private Dictionary<long, SelectOption>? flags;
         
         public static readonly DirectProperty<FlagComboBox, Dictionary<long, SelectOption>?> FlagsProperty = AvaloniaProperty.RegisterDirect<FlagComboBox, Dictionary<long, SelectOption>?>("Flags", o => o.Flags, (o, v) => o.Flags = v);
-        Type IStyleable.StyleKey => typeof(CompletionComboBox);
+        protected override Type StyleKeyOverride => typeof(CompletionComboBox);
 
         public long SelectedValue
         {
@@ -197,7 +198,7 @@ namespace WDE.Common.Avalonia.Controls
                     {
                         if (disposable != null)
                             throw new Exception();
-                        disposable = completionBox.GetObservable(SelectedValueProperty).SubscribeAction(_ =>
+                        disposable = completionBox.GetObservable(SelectedValueProperty).Skip(1).SubscribeAction(_ =>
                         {
                             OnPropertyChanged(nameof(IsChecked));
                         });

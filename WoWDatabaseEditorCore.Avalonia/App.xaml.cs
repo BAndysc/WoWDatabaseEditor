@@ -8,19 +8,27 @@ using System.Runtime.Loader;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
 using Prism.Unity.Ioc;
+using Serilog;
+using Serilog.Events;
+using Serilog.Extensions.Logging;
 using Unity;
 using Unity.RegistrationByConvention;
+using WDE.Common;
 using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Events;
+using WDE.Common.Factories;
 using WDE.Common.Managers;
+using WDE.Common.Modules;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
@@ -38,7 +46,12 @@ using WoWDatabaseEditorCore.Services.FileSystemService;
 using WoWDatabaseEditorCore.Services.UserSettingsService;
 using WoWDatabaseEditorCore.ModulesManagement;
 using WoWDatabaseEditorCore.Services.DebugConsole;
+using WoWDatabaseEditorCore.Services.LoadingEvents;
+using WoWDatabaseEditorCore.Services.LogService.Logging;
+using WoWDatabaseEditorCore.Services.LogService.ReportErrorsToServer;
 using WoWDatabaseEditorCore.ViewModels;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
+using LogDataStore = WoWDatabaseEditorCore.Services.LogService.Logging.LogDataStore;
 
 namespace WoWDatabaseEditorCore.Avalonia
 {
@@ -46,9 +59,27 @@ namespace WoWDatabaseEditorCore.Avalonia
     {
         private IModulesManager? modulesManager;
         private ICurrentCoreSettings currentCoreSettings = null!;
+        private ILoggerFactory loggerFactory;
+        private ILogDataStore logDataStore;
+        private ReportErrorsSink reportErrorsSink;
 
         public App()
         {
+            reportErrorsSink = new ReportErrorsSink();
+
+            logDataStore = new LogDataStore();
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.DataStoreLoggerSink(() => logDataStore)
+                .WriteTo.Sink(reportErrorsSink)
+                .CreateLogger();
+
+            loggerFactory = new SerilogLoggerFactory(Log.Logger);
+            LOG.Initialize(loggerFactory);
+
             /*
              * .net core (and .net 5) changed the way assembly and type resolving work.
              * Preferred way to implement "plugins" is using custom AssemblyLoadContext per plugin
@@ -99,9 +130,9 @@ namespace WoWDatabaseEditorCore.Avalonia
         protected override IContainerExtension CreateContainerExtension()
         {
             IUnityContainer unity = new UnityContainer();
-            #if DEBUG
+#if DEBUG
             unity = unity.AddExtension(new Diagnostic());
-            #endif
+#endif
             var container = new UnityContainerExtension(unity);
             var mainScope = new ScopedContainer(container, container, unity);
             container.RegisterInstance<IScopedContainer>(mainScope);
@@ -109,19 +140,32 @@ namespace WoWDatabaseEditorCore.Avalonia
             DI.Container = unity;
             return container;
         }
+
+        private IUserSettings CreateUserSettings()
+        {
+            IUserSettings userSettings;
+            if (OperatingSystem.IsBrowser())
+            {
+                userSettings = new WebUserSettings();
+            }
+            else
+            {
+                var vfs = new VirtualFileSystem();
+                var fs = new FileSystem(vfs);
+                userSettings = new UserSettings(fs, new Lazy<IStatusBar>(new DummyStatusBar()));
+            }
+            return userSettings;
+        }
         
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterInstance(Container);
-            var vfs = new VirtualFileSystem();
-            var fs = new FileSystem(vfs);
-            var userSettings = new UserSettings(fs, new Lazy<IStatusBar>(new DummyStatusBar()));
-            currentCoreSettings = new CurrentCoreSettings(userSettings);
+            currentCoreSettings = new CurrentCoreSettings(CreateUserSettings());
             containerRegistry.RegisterInstance(typeof(ICurrentCoreSettings), currentCoreSettings);
             
             modulesManager = new ModulesManager(currentCoreSettings);
             var mainThread = new MainThread();
-            GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.Avalonia);
+            GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.Avalonia, IsSingleView);
             containerRegistry.RegisterInstance<IMainThread>(mainThread);
             containerRegistry.RegisterInstance(modulesManager);
         }
@@ -136,17 +180,19 @@ namespace WoWDatabaseEditorCore.Avalonia
         protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)
         {
             base.RegisterRequiredTypes(containerRegistry);
+            containerRegistry.RegisterInstance<ILogDataStore>(logDataStore);
+            containerRegistry.RegisterInstance<ILoggerFactory>(loggerFactory);
+            containerRegistry.RegisterInstance(reportErrorsSink);
             containerRegistry.RegisterSingleton<IModuleInitializer, CustomModuleInitializer>();
             containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
+            containerRegistry.RegisterSingleton<IViewLocator, ViewLocator>();
+            containerRegistry.RegisterSingleton<ILoadingEventAggregator, LoadingEventAggregator>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
             base.ConfigureModuleCatalog(moduleCatalog);
-            moduleCatalog.AddModule(typeof(MainModule));
-            moduleCatalog.AddModule(typeof(MainModuleAvalonia));
-            moduleCatalog.AddModule(typeof(CommonAvaloniaModule));
-            
+
             List<Assembly> externalAssemblies = GetPluginDlls()
                 .Select(AssemblyLoadContext.Default.LoadFromAssemblyPath)
                 .ToList();
@@ -155,10 +201,10 @@ namespace WoWDatabaseEditorCore.Avalonia
                 .Where(a =>
                 {
                     var name = a.GetName().Name!;
-                    return name.Contains("WDE") && !name.Contains("Test") && !name.Contains("WDE.Common.Avalonia");
+                    return (name.Contains("WDE") && !name.Contains("Test") && !name.Contains("WDE.Common.Avalonia")) || (name.Contains("LoaderAvalonia.Web"));
                 })
                 .ToList();
-            
+
             allAssemblies.Sort(Comparer<Assembly>.Create((a, b) =>
             {
                 var aRequires = a.GetCustomAttributes(typeof(ModuleRequiresCoreAttribute), false);
@@ -166,29 +212,43 @@ namespace WoWDatabaseEditorCore.Avalonia
                 return bRequires.Length.CompareTo(aRequires.Length);
             }));
 
-            List<Assembly> loadAssemblies = allAssemblies
-                .Where(modulesManager!.ShouldLoad)
-                .ToList();
+            List<Assembly> loadAssemblies = allAssemblies;
+
+            do
+            {
+                var newLimit = loadAssemblies.Where(modulesManager!.ShouldLoad).ToList();
+                if (newLimit.Count == loadAssemblies.Count)
+                    break;
+                loadAssemblies = newLimit;
+            } while (true);
 
             var conflicts = DetectConflicts(loadAssemblies);
 
             foreach (var conflict in conflicts)
             {
+                LOG.LogWarning($"Conflicting assemblies: {conflict.ConflictingAssembly.GetName().Name} (won't load) and {conflict.FirstAssembly.GetName().Name}");
                 modulesManager!.AddConflicted(conflict.ConflictingAssembly, conflict.FirstAssembly);
                 allAssemblies.Remove(conflict.ConflictingAssembly);
             }
 
             AddMoulesFromLoadedAssemblies(moduleCatalog, allAssemblies);
+            moduleCatalog.AddModule(typeof(MainModule));
+            moduleCatalog.AddModule(typeof(MainModuleAvalonia));
+            moduleCatalog.AddModule(typeof(CommonAvaloniaModule));
         }
 
         private IEnumerable<string> GetPluginDlls()
         {
-            //string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            //if (path == null)
-            //    return ArraySegment<string>.Empty;
-            return Directory.GetFiles(".", "WDE*.dll")
-                .Where(path => !path.Contains("Test.dll") && !path.Contains("WPF") && !path.Contains("WDE.Common.Avalonia.dll"))
-                .Select(Path.GetFullPath);
+            #if !DEBUG
+            if (OperatingSystem.IsWindows())
+            {
+                return Directory.GetFiles(".", "WDE*.dll")
+                    .Where(path => !path.Contains("Test.dll") && !path.Contains("WPF") && !path.Contains("WDE.Common.Avalonia.dll"))
+                    .Select(Path.GetFullPath);
+            }
+            #endif
+
+            return Array.Empty<string>();
         }
 
         private IList<Conflict> DetectConflicts(List<Assembly> allAssemblies)
@@ -220,7 +280,7 @@ namespace WoWDatabaseEditorCore.Avalonia
                     if (intersection.Count > 0)
                         conflictingAssemblies.Add(new Conflict(assembly, otherAssembly.Key));
                 }
-                
+
                 providedInterfaces.Add(assembly, implementedInterfaces.ToList());
             }
 
@@ -239,7 +299,9 @@ namespace WoWDatabaseEditorCore.Avalonia
                     {
                         ModuleName = module.Name,
                         ModuleType = module.AssemblyQualifiedName,
+#pragma warning disable IL3000
                         Ref = "file://" + module.Assembly.Location
+#pragma warning restore IL3000
                     });
             }
         }
@@ -249,13 +311,23 @@ namespace WoWDatabaseEditorCore.Avalonia
             return new ConfigurationModuleCatalog();
         }
 
-        protected override void OnInitialized()
+        private Window? splashScreenWindow;
+
+        private IGlobalServiceRoot? globalServiceRoot;
+        
+        protected async Task OnInitializedAsync()
         {
             this.InitializeModules();
 
             var loadedModules = Container.Resolve<IEnumerable<ModuleBase>>();
+            
             foreach (var module in loadedModules)
                 module.RegisterFallbackTypes((IContainerRegistry)Container);
+
+            var asyncInitializers = Container.Resolve<IEnumerable<IGlobalAsyncInitializer>>();
+            foreach (var init in asyncInitializers)
+                await init.Initialize();
+
             foreach (var module in loadedModules)
                 module.FinalizeRegistration((IContainerRegistry)Container);
 
@@ -266,61 +338,111 @@ namespace WoWDatabaseEditorCore.Avalonia
             IMessageBoxService messageBoxService = Container.Resolve<IMessageBoxService>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
         }
+        
+        private bool forceSingleView = false;
 
-        public static Window? MainApp;
+        public bool IsSingleView => forceSingleView || ApplicationLifetime is ISingleViewApplicationLifetime;
 
-        private Window? splashScreenWindow;
-
-        private IGlobalServiceRoot? globalServiceRoot;
-
-        public override void OnFrameworkInitializationCompleted()
+        private async Task OnFrameworkInitializationCompletedAsync()
         {
-            splashScreenWindow = new SplashScreenWindow();
-            splashScreenWindow.Show();
-
             if (Design.IsDesignMode)
                 return;
-
-            DispatcherTimer.RunOnce(() =>
+            
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)
             {
-                try
+                 splashScreenWindow = new SplashScreenWindow();
+                 splashScreenWindow.Show();
+                 await Task.Delay(1);
+            }
+            
+            base.Initialize();
+            
+            await OnInitializedAsync();
+
+            var dataContext = Container.Resolve<MainWindowViewModel>();
+
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)
+            {
+                if (forceSingleView)
                 {
-                    base.Initialize();
-                    if (AvaloniaThemeStyle.UseDock)
-                    {
-                        ((IContainerRegistry)Container).RegisterSingleton<MainWindowWithDocking>();
-                        MainApp = Container.Resolve<MainWindowWithDocking>();
-                    }
-                    else
-                    {
-                        ((IContainerRegistry)Container).RegisterSingleton<MainWindow>();
-                        MainApp = Container.Resolve<MainWindow>();
-                    }
+                    var mainApp = Container.Resolve<MainWebView>();
 
-                    MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
-                    this.InitializeShell(MainApp);
-
+                    mainApp.DataContext = dataContext;
+                    var window = Container.Resolve<Window1>();
+                    InitializeShell(window);
+                    
                     globalServiceRoot = Container.Resolve<IGlobalServiceRoot>();
 
                     IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
                     eventAggregator.GetEvent<AllModulesLoaded>().Publish();
                     Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
-                    MainApp.ShowActivated = true;
-                    MainApp.Show();
-                    splashScreenWindow.Close();
+
+                    window.Content = mainApp;
+                    window.Title = dataContext.Title;
+                    window.Show();
+                }
+                else
+                {
+                    var mainApp = Container.Resolve<MainWindowWithDocking>();
+                
+                    mainApp.DataContext = dataContext;
+                    this.InitializeShell(mainApp);
+                
+                    globalServiceRoot = Container.Resolve<IGlobalServiceRoot>();
+                
+                    IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
+                    eventAggregator.GetEvent<AllModulesLoaded>().Publish();
+                    Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
+                    mainApp.ShowActivated = true;
+                    mainApp.Show();
+                }
+                splashScreenWindow?.Close();
+            }
+            else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
+            {
+                var mainApp = Container.Resolve<MainWebView>();
+
+                mainApp.DataContext = dataContext;
+                this.InitializeShell(mainApp);
+
+                globalServiceRoot = Container.Resolve<IGlobalServiceRoot>();
+
+                IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
+                eventAggregator.GetEvent<AllModulesLoaded>().Publish();
+                Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
+
+                singleView.MainView = mainApp;
+            }
+
+            Container.Resolve<ReportErrorsSinkManager>();
+        }
+        
+        public override void OnFrameworkInitializationCompleted()
+        {
+            async Task Load()
+            {
+                try
+                {
+                    await OnFrameworkInitializationCompletedAsync();
+                    base.OnFrameworkInitializationCompleted();
                 }
                 catch (Exception e)
                 {
-                    FatalErrorHandler.ExceptionOccured(e, Program.Arguments);
+                    FatalErrorHandler.ExceptionOccured(e, GlobalApplication.Arguments.ToArray());
+                    (Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.Shutdown();
                 }
-            }, TimeSpan.FromMilliseconds(160));
+            }
+            Load().ListenErrors();
+
         }
 
         public override void Initialize()
         {
             // we have to initialize theme manager as soon as possible in order to correctly apply the style
-            var themeManager = new ThemeManager(new ThemeSettingsProvider(new UserSettings(new FileSystem(new VirtualFileSystem()), new Lazy<IStatusBar>(new DummyStatusBar()))));
-            AvaloniaXamlLoader.Load(this);
+            var themeManager = new ThemeManager(new ThemeSettingsProvider(CreateUserSettings()));
+            var color = Application.Current!.Resources["AccentHue"];
+            AvaloniaXamlLoader.Load(this); // this call loses the color in Resources :shrug:
+            Application.Current!.Resources["AccentHue"] = color;
         }
 
         private class Conflict

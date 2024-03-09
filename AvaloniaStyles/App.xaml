@@ -5,4 +5,8 @@
     <Application.Styles>
         <avaloniaStyles:SystemTheme Mode="LightWindows11" />
     </Application.Styles>
+    <Application.Resources>
+        <ResourceDictionary>
+        </ResourceDictionary>
+    </Application.Resources>
 </Application>

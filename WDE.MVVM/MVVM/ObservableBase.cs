@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using Prism.Mvvm;
 using WDE.MVVM.Observable;
 
@@ -11,7 +12,10 @@ namespace WDE.MVVM
 {
     public abstract class ObservableBase : BindableBase, IDisposable, INotifyPropertyValueChanged
     {
-        private List<IDisposable> disposables = new();
+        private List<IDisposable>? disposables;
+
+        private ILogger? logger;
+        protected ILogger LOG => logger ??= WDE.Common.LOG.Factory.CreateLogger(GetType());
 
         /// <summary>
         /// Subscribes into `obj` property extracted via `getter` (using INotifyPropertyChanged)
@@ -159,6 +163,7 @@ namespace WDE.MVVM
         /// </summary>
         public T AutoDispose<T>(T disposable) where T : System.IDisposable
         {
+            disposables ??= new List<IDisposable>();
             disposables.Add(disposable);
             return disposable;
         }
@@ -173,10 +178,13 @@ namespace WDE.MVVM
          */
         protected void DisposePartial()
         {
-            while (disposables.Count > 0)
+            if (disposables != null)
             {
-                disposables[^1].Dispose();
-                disposables.RemoveAt(disposables.Count - 1);
+                while (disposables.Count > 0)
+                {
+                    disposables[^1].Dispose();
+                    disposables.RemoveAt(disposables.Count - 1);
+                }
             }
         }
         
@@ -186,11 +194,14 @@ namespace WDE.MVVM
                 return;
             
             disposed = true;
-            
-            while (disposables.Count > 0)
+
+            if (disposables != null)
             {
-                disposables[^1].Dispose();
-                disposables.RemoveAt(disposables.Count - 1);
+                while (disposables.Count > 0)
+                {
+                    disposables[^1].Dispose();
+                    disposables.RemoveAt(disposables.Count - 1);
+                }
             }
         }
 

@@ -36,10 +36,10 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
         this.databaseProvider = databaseProvider;
     }
     
-    private ITabularDataArgs<IGameObjectTemplate> BuildTable(string? customCounterTable, uint? entry, out int index)
+    private async Task<(ITabularDataArgs<IGameObjectTemplate>, int index)> BuildTable(string? customCounterTable, uint? entry)
     {
-        index = -1;
-        var gameObjects = databaseProvider.GetGameObjectTemplates();
+        var index = -1;
+        var gameObjects = await databaseProvider.GetGameObjectTemplatesAsync();
 
         if (entry.HasValue)
         {
@@ -97,7 +97,7 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
                 }
                 else
                 {
-                    var creature = databaseProvider.GetGameObjectByGuid(0, (uint)(-entry));
+                    var creature = databaseProvider.GetCachedGameObjectByGuid(0, (uint)(-entry));
                     var template = creature == null ? null : databaseProvider.GetCachedGameObjectTemplate(creature.Entry);
                     if (template != null)
                     {
@@ -121,12 +121,12 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
                 }
             })
             .Build();
-        return table;
+        return (table, index);
     }
 
     public async Task<int?> GetEntryFromService(uint? entry, string? customCounterTable = null)
     {
-        var table = BuildTable(customCounterTable, entry, out var index);
+        var (table, index) = await BuildTable(customCounterTable, entry);
 
         var result = await tabularDataPicker.PickRow(table, index, entry.HasValue && entry > 0 ? entry.ToString() : null);
         
@@ -135,7 +135,7 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
 
     public async Task<IReadOnlyCollection<int>> GetEntriesFromService(string? customCounterTable = null)
     {
-        var table = BuildTable(customCounterTable, null, out var index);
+        var (table, index) = await BuildTable(customCounterTable, null);
 
         var result = await tabularDataPicker.PickRows(table);
         

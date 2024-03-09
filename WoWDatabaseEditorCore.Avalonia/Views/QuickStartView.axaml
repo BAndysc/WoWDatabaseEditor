@@ -9,6 +9,7 @@
              xmlns:controls1="clr-namespace:Avalonia.Controls"
              xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="Root"
@@ -75,15 +76,14 @@
             <Setter Property="Opacity" Value="0.2" />
         </Style>
         <Style Selector="Border.infoBox">
-            <Setter Property="Background" Value="{DynamicResource SlightlyHighlightedBackground}" />
-            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Background" Value="{DynamicResource InfoBarInformationalSeverityBackgroundBrush}" />
+            <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
             <Setter Property="Padding" Value="10" />
-            <Setter Property="Margin" Value="0, 10" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="Gray" />
+            <Setter Property="BorderThickness" Value="{DynamicResource InfoBarBorderThickness}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InfoBarBorderBrush}" />
         </Style>
     </UserControl.Styles>
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="20">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="20">
         <StackPanel>
             <Border BorderThickness="0,0,0,2" BorderBrush="{DynamicResource AccentColorMedium}">
                 <DockPanel VerticalAlignment="Bottom" LastChildFill="False">
@@ -101,12 +101,20 @@
                     <!--     </Interaction.Behaviors> -->
                     <!-- </WdeImage> -->
                     
-                    <ContentControl DockPanel.Dock="Right" VerticalAlignment="Stretch" VerticalContentAlignment="Center" Content="{CompiledBinding QuickStartPanel}" />
+                    <ContentControl DockPanel.Dock="Right" VerticalAlignment="Stretch" VerticalContentAlignment="Center" 
+                                    Content="{CompiledBinding QuickStartPanel}" />
                 </DockPanel>
             </Border>
-            
-            <Border Classes="infoBox" IsVisible="{CompiledBinding ShowGiveStarBox}">
-                <StackPanel Orientation="Vertical" TextBlock.FontSize="13">
+
+            <InfoBar
+                Margin="0,10,0,0"
+                IsOpen="{CompiledBinding ShowAvalonia11Box, Mode=TwoWay}"
+                Title="The editor uses new UI framework version"
+                Message="The editor has been updated to use a new version of the UI framework (Avalonia 11). This release had many game breaking changes. In case you see some new UI bugs, please report them on GitHub."
+                Severity="Informational" />
+
+            <Border Classes="infoBox" Margin="0,10, 0,0" IsVisible="{CompiledBinding ShowGiveStarBox}">
+                <StackPanel Orientation="Vertical" TextElement.FontSize="13">
                     <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">It looks like you are using Wow Database Editor for quite some time already.</TextBlock>
                     <TextBlock TextWrapping="WrapWithOverflow">How about you leave a star on github for this project? It costs you nothing, but gives authors of this app power for further development 💪! To leave a star, you need an account on github, the 'star' button can be found in the top right corner.</TextBlock>
                     <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
@@ -116,21 +124,11 @@
                 </StackPanel>
             </Border>
 
-            <Border Classes="infoBox" IsVisible="{CompiledBinding !IsDotNet8Installed}">
-                <StackPanel Orientation="Vertical" TextBlock.FontSize="13">
-                    <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">You need to install .NET 8</TextBlock>
-                    <TextBlock TextWrapping="WrapWithOverflow">In the near future the editor will require the new .NET 8. You need to install it in order to continue using the editor. Why not do it now so that you are prepared?</TextBlock>
-                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                        <Button Command="{CompiledBinding OpenDotNet8Website}" Margin="0,0,5,0">Okay 👍! (this will open the .net website)</Button>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- <Border Classes="infoBox" IsVisible="{CompiledBinding ShowAnniversaryBox}"> -->
+            <!-- <Border Classes="infoBox" Margin="0,0,10,0" IsVisible="{CompiledBinding ShowAnniversaryBox}"> -->
             <!--     <DockPanel> -->
             <!--         <WdeImage VerticalAlignment="Center" ImageUri="Icons/document_party_big.png" Width="32" Height="32" /> -->
             <!--         <Button DockPanel.Dock="Right" Command="{CompiledBinding CloseAnniversaryBox}">Dismiss</Button> -->
-            <!--         <StackPanel Orientation="Vertical" TextBlock.FontSize="13"> -->
+            <!--         <StackPanel Orientation="Vertical" TextElement.FontSize="13"> -->
             <!--             <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">Year 2021 is over!</TextBlock> -->
             <!--             <TextBlock Cursor="Hand" TextWrapping="WrapWithOverflow" x:Name="Text" -->
             <!--                        Text="Click here to see the history of the editor (including old screenshots 🤩)"> -->
@@ -153,7 +151,7 @@
                 
                 <StackPanel Margin="30,0,0,0">
                     <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10">Quick load</TextBlock>
-                    <ItemsControl Margin="20,0,0,0" Items="{CompiledBinding FlatItemPrototypes, Mode=OneTime}">
+                    <ItemsControl Margin="20,0,0,0" ItemsSource="{CompiledBinding FlatItemPrototypes, Mode=OneTime}">
                         <ItemsControl.Styles>
                             <Style Selector="ItemsControl > ContentPresenter">
                                 <Setter Property="(controls1:WrapPanelWithDivider.ForceNewLine)" Value="{Binding ForceNewLine}" />
@@ -167,6 +165,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Panel Background="Transparent"
+                                       views:QuickStartView.EnableAnimations="True"
                                        ToolTip.Tip="{CompiledBinding IsEnabled, Converter={StaticResource TipConverter}}">
                                     <Button Classes="FlattyButton" 
                                             Width="100"
@@ -183,7 +182,7 @@
                     </ItemsControl>
                     
                     <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10" IsVisible="{CompiledBinding HasWizards}">Quick wizards</TextBlock>
-                    <ItemsControl Margin="20,0,0,0" Items="{CompiledBinding Wizards, Mode=OneTime}">
+                    <ItemsControl Margin="20,0,0,0" ItemsSource="{CompiledBinding Wizards, Mode=OneTime}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel></WrapPanel>
@@ -203,7 +202,7 @@
                 <StackPanel Grid.Column="1" Margin="30,0,0,0">
                     <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10">Recent</TextBlock>
                     
-                    <ItemsControl Margin="20,0,0,0" Items="{CompiledBinding MostRecentlyUsedItems}">
+                    <ItemsControl Margin="20,0,0,0" ItemsSource="{CompiledBinding MostRecentlyUsedItems}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel></StackPanel>
@@ -229,7 +228,7 @@
                         <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,0">Settings overview</TextBlock>
                         <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow">In order to enable all features, you have to configure the editor first.</TextBlock>
                         <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow" IsVisible="{CompiledBinding AllConfigured}">Congratulations! You have everything configured properly!</TextBlock>
-                        <ItemsControl Items="{CompiledBinding ConfigurationChecks, Mode=OneTime}">
+                        <ItemsControl ItemsSource="{CompiledBinding ConfigurationChecks, Mode=OneTime}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <DockPanel LastChildFill="True" Margin="0,10,0,0">

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.Module.Attributes;
@@ -55,7 +56,7 @@ public class SourceTreeTableDefinitionEditorProvider : ITableDefinitionEditorPro
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e);
             }
         }
         

@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.PathPreviewTool.Views;
 
-public class PathPreviewView : UserControl
+public partial class PathPreviewView : UserControl
 {
     public PathPreviewView()
     {

@@ -1,0 +1,159 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls1="clr-namespace:AvaloniaStyles.Controls"
+        xmlns:converters="clr-namespace:AvaloniaStyles.Converters">
+    <Style Selector="controls1|ExtendedTitleBar">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel LastChildFill="True">
+                    <ContentPresenter Content="{TemplateBinding LeftContent}"/>
+                    <ContentPresenter Content="{TemplateBinding Content} "/>                        
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Styles.Resources>
+        <converters:ChromeToBoolConverter x:Key="ChromeToBoolConverter" NoChrome="True" AlwaysChrome="False" MacChromeOnly="True" />
+    </Styles.Resources>
+    
+    <!--<Style Selector="controls1|ToolBar StackPanel">
+        <Setter Property="Spacing" Value="10" />
+    </Style>-->
+
+    <Style Selector="controls1|ExtendedWindow">
+        <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
+        <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="24" />
+        <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
+        <Setter Property="Chrome" Value="NoSystemChrome" />
+        <Setter Property="Background" Value="{DynamicResource WindowContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel>
+                    <Border Name="PART_TransparencyFallback" IsHitTestVisible="False" />
+                    <Border Background="{TemplateBinding Background}" IsHitTestVisible="False" />
+                    <Panel Background="Transparent" Margin="{TemplateBinding WindowDecorationMargin}" />
+                    <VisualLayerManager>
+                        <VisualLayerManager.ChromeOverlayLayer>
+                            <TitleBar />
+                        </VisualLayerManager.ChromeOverlayLayer>
+                        
+                        <Border BorderThickness="1" BorderBrush="{DynamicResource AccentColorBackground}" Name="PART_windowBorder">
+                                <DockPanel LastChildFill="True" Margin="{TemplateBinding OffScreenMargin}">
+                                    <Panel DockPanel.Dock="Top">
+                                        <Border Background="{DynamicResource TitleBarBackground}" IsHitTestVisible="False" Name="PART_titlebarBorder"/>
+                                        <StackPanel>
+                                            <DockPanel Margin="6,0,0,0" Height="30">
+                                                <Image Source="{TemplateBinding ManagedIcon}" DockPanel.Dock="Left" Width="24"/>
+
+                                                <Menu DockPanel.Dock="Left"
+                                                    ItemsSource="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue={x:Null}}">
+                                                    <Menu.Styles>
+                                                        <Style Selector="MenuItem">
+                                                            <Setter Property="(converters:NativeMenuItemHelper.IsChecked)" Value="{Binding IsChecked}"></Setter>
+                                                            <Setter Property="(converters:NativeMenuItemHelper.ToggleType)" Value="{Binding ToggleType}"></Setter>
+                                                            <Setter Property="Header" Value="{Binding Header}"/>
+                                                            <Setter Property="InputGesture" Value="{Binding Gesture}"/>
+                                                            <Setter Property="HotKey" Value="{Binding Gesture}" />
+                                                            <Setter Property="ItemsSource" Value="{Binding Menu.Items}"/>
+                                                            <Setter Property="Command" Value="{Binding Command}"/>
+                                                            <Setter Property="CommandParameter" Value="{Binding CommandParameter}"/>
+                                                            <Setter Property="(NativeMenuBar.EnableMenuItemClickForwarding)" Value="True"/>
+                                                        </Style>
+                                                    </Menu.Styles>
+                                                </Menu>
+
+                                                <controls1:WindowControlButtons IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}" DockPanel.Dock="Right"/>
+                                                <ContentPresenter DockPanel.Dock="Right" Content="{Binding ToolBar.TopContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                <DockPanel ClipToBounds="True">
+                                                    <ContentPresenter DockPanel.Dock="Left" Content="{Binding ToolBar.TopLeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <TextBlock
+                                                            IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}"
+                                                            IsHitTestVisible="False"
+                                                            VerticalAlignment="Center"
+                                                            Opacity="0.9"
+                                                            Foreground="{DynamicResource TitleBarForeground}"
+                                                            Text="{TemplateBinding Title}" />
+                                                        <TextBlock
+                                                            IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}"
+                                                            IsHitTestVisible="False"
+                                                            VerticalAlignment="Center"
+                                                            Margin="10,0,0,0"
+                                                            Opacity="0.5"
+                                                            Foreground="{DynamicResource TitleBarForeground}"
+                                                            Text="{TemplateBinding SubTitle}" />
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </DockPanel>
+                                            <controls1:ToolbarPanel HorizontalAlignment="Stretch" Margin="5,2,2,2">
+                                                <ContentPresenter HorizontalAlignment="Left" Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                <ContentPresenter HorizontalAlignment="Stretch" Content="{Binding ToolBar.MiddleContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                <ContentPresenter HorizontalAlignment="Left" Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />                                        
+                                            </controls1:ToolbarPanel>
+                                        </StackPanel>
+                                    </Panel>
+                                    
+                                    <ContentPresenter Content="{TemplateBinding StatusBar}" DockPanel.Dock="Bottom" Name="StatusBar"/>
+                                    
+                                    <Border Padding="4" Name="PART_content">
+                                        <Panel>
+                                            <ContentPresenter Name="PART_ContentPresenter"
+                                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                              Content="{TemplateBinding Content}" />
+                                            <ContentPresenter Content="{TemplateBinding Overlay}" />
+                                        </Panel>
+                                    </Border>
+                                </DockPanel>
+                        </Border>
+                    </VisualLayerManager>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls1|ExtendedWindow /template/ Border#PART_content">
+        <Setter Property="Background" Value="{DynamicResource WindowContentBackground}" />
+    </Style>
+    <Style Selector="controls1|ExtendedWindow.MainWindow /template/ Border#PART_content">
+        <Setter Property="Background" Value="{DynamicResource MainWindowContentBackground}" />
+    </Style>
+    <!-- for anyone using windows theme on mac, lets make it better -->
+    <Style Selector="controls1|ExtendedWindow:macos /template/ Border#PART_windowBorder">
+        <Setter Property="CornerRadius" Value="9"/>
+    </Style>
+    <Style Selector="controls1|ExtendedWindow:macos /template/ Border#PART_titlebarBorder">
+        <Setter Property="CornerRadius" Value="9,9,0,0"/>
+    </Style>
+    <Style Selector="controls1|ExtendedWindow:macos:not(:has-statusbar) /template/ Border#PART_content">
+        <Setter Property="CornerRadius" Value="0,0,9,9"/>
+    </Style>
+    <Style Selector="controls1|ExtendedWindow:has-sidebar">
+        <Setter Property="Background" Value="{DynamicResource MainWindowBackgroundAccent}" />
+    </Style>
+    
+    <Style Selector="controls1|ExtendedWindow:has-sidebar /template/ controls1|SideBar">
+        <Setter Property="MinWidth" Value="250" />
+    </Style>
+    
+    <Style Selector="controls1|ExtendedWindow:not(:has-statusbar) /template/ ContentControl#StatusBar">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    
+    <Style Selector="controls1|ExtendedWindow:not(:has-tabstrip) /template/ Panel#Tabs">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="controls1|BaseMessageBoxWindow Separator">
+        <Setter Property="Width" Value="10" />
+    </Style>
+    <Style Selector="controls1|BaseMessageBoxWindow StackPanel">
+        <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="Spacing" Value="6" />
+    </Style>
+    <Style Selector="BaseMessageBoxWindow StretchStackPanel">
+        <Setter Property="Spacing" Value="5" />
+        <Setter Property="Stretch" Value="False" />
+    </Style>
+</Styles>

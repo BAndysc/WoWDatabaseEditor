@@ -24,21 +24,21 @@
             <components:WdeImage ImageUri="Icons/icon_split_vert.png" />
         </ToggleButton>
         
-        <ItemsPresenter Items="{CompiledBinding ToolbarCommands}">
-            <ItemsPresenter.ItemsPanel>
+        <ItemsControl ItemsSource="{CompiledBinding ToolbarCommands}">
+            <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <controls:ToolbarPanel />
                 </ItemsPanelTemplate>
-            </ItemsPresenter.ItemsPanel>
-            <ItemsPresenter.ItemTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="viewModels:TableCommandViewModel">
                     <Button Command="{CompiledBinding Command}"
                             ToolTip.Tip="{CompiledBinding Name}">
                         <components:WdeImage Image="{CompiledBinding Icon}" />
                     </Button>
                 </DataTemplate>
-            </ItemsPresenter.ItemTemplate>
-        </ItemsPresenter>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
         
         <ToolbarSpacer />
         

@@ -30,15 +30,6 @@ public class MainWindowViewModel : ITaskProgress, INotifyPropertyChanged
     
     public MainWindowViewModel()
     {
-        if (GlobalApplication.Arguments.IsArgumentSet("crashed"))
-        {
-            MainContent = new CrashReportViewModel();
-        }
-        else
-        {
-            MainContent = new NoCrashViewModel();
-        }
-
         RestartEditorWithConsoleCommand = new DelegateCommand(() =>
         {
             var locator = new ProgramFinder();
@@ -75,8 +66,9 @@ public class MainWindowViewModel : ITaskProgress, INotifyPropertyChanged
         IFileSystem fs = new FileSystem();
         var releaseConfig = new ApplicationReleaseConfiguration(fs);
         var applicationVersion = new ApplicationVersion(releaseConfig);
+        var httpFactory = new HttpClientFactory(applicationVersion);
         var updateService = new UpdateService(new UpdateServerDataProvider(releaseConfig),
-            new UpdateClientFactory(new HttpClientFactory(applicationVersion)),
+            new UpdateClientFactory(httpFactory),
             new ApplicationVersion(releaseConfig),
             new ApplicationImpl(),
             fs,
@@ -91,6 +83,16 @@ public class MainWindowViewModel : ITaskProgress, INotifyPropertyChanged
             await updateService.DownloadLatestVersion(this);
             await updateService.CloseForUpdate();
         }, () => updateService.CanCheckForUpdates());
+
+
+        if (GlobalApplication.Arguments.IsArgumentSet("crashed"))
+        {
+            MainContent = new CrashReportViewModel(releaseConfig, httpFactory);
+        }
+        else
+        {
+            MainContent = new NoCrashViewModel();
+        }
     }
 
     public TaskState State { get; set; }

@@ -9,6 +9,7 @@ using WDE.Common.Types;
 using WDE.MVVM;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.Connection;
+using HslColor = AvaloniaStyles.Utils.HslColor;
 
 namespace WDE.SqlWorkbench.Settings;
 

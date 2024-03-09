@@ -11,7 +11,8 @@
         xmlns:editing1="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.Editing;assembly=WDE.SmartScriptEditor"
         xmlns:models="clr-namespace:WDE.SmartScriptEditor.Models;assembly=WDE.SmartScriptEditor"
         xmlns:extensions="clr-namespace:WDE.SmartScriptEditor.Avalonia.Extensions"
-        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia">
+        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+        xmlns:models1="clr-namespace:WDE.Parameters.Models;assembly=WDE.Parameters">
 
     <Styles.Resources>
         <!-- this is later also used in SmartScriptPanelLayout measurement, for performance reasons-->
@@ -63,7 +64,7 @@
     <Style Selector="controls|SmartActionView:comment Border">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Border}" />
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Background}" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Comment.Foreground}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SmartScripts.Comment.Foreground}" />
     </Style>
     <Style Selector="controls|SmartActionView:action /template/ Border">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
@@ -74,7 +75,7 @@
     <Style Selector="controls|SmartActionView:comment:selected /template/ Border">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Selected.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Selected.Border}" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
     </Style>
     <Style Selector="controls|SmartActionView:action:selected /template/ extendedTextBlock|FormattedTextBlock">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Selected.Background}" />
@@ -120,7 +121,7 @@
                     <TextBlock Foreground="{DynamicResource SmartScripts.Event.Flag.Foreground}" 
                                Margin="0,1,0,0" 
                                FontSize="9" 
-                               TextAlignment="Center" 
+                               TextAlignment="Left"
                                VerticalAlignment="Center" Text="{TemplateBinding Text}"/>
                 </Panel>
             </ControlTemplate>
@@ -136,7 +137,7 @@
                                                     AltCommand="{TemplateBinding ToggleAllCommand}"
                                                     IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}" />
                         <TextBlock FontWeight="Bold" FontSize="14" Text="{TemplateBinding Header}" DockPanel.Dock="Top" TextWrapping="WrapWithOverflow" />
-                        <TextBlock Opacity="0.8" Text="{TemplateBinding Description}" TextWrapping="WrapWithOverflow" />
+                        <TextBlock Opacity="0.8" Text="{TemplateBinding Description}" IsVisible="{TemplateBinding Description, Converter={x:Static NullConverter.IsNotNull}}" TextWrapping="WrapWithOverflow" />
                     </DockPanel>
                 </Border>
             </ControlTemplate>
@@ -144,7 +145,7 @@
     </Style>
     <Style Selector="controls|SmartGroupView /template/ Border#PART_Border">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Group.Background}" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Group.Foreground}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SmartScripts.Group.Foreground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Group.Border}" />
     </Style>
     <Style Selector="controls|SmartGroupView:selected /template/ Border#PART_Border">
@@ -159,7 +160,7 @@
                     <Border Name="Main" BorderThickness="1" CornerRadius="4,0,0,4" DockPanel.Dock="Top">
                         <Border Padding="5" Background="{TemplateBinding SpecialBackground}" Name="Inner">
                             <DockPanel LastChildFill="True">
-                                <controls:SmartEventFlagsView Margin="2,0,0,0" TextBlock.Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" DockPanel.Dock="Right"/>
+                                <controls:SmartEventFlagsView Margin="2,0,0,0" TextElement.Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" DockPanel.Dock="Right"/>
                                 <Border ToolTip.Tip="Event chance" Margin="2,0,0,0" VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource SmartScripts.Event.Chance.Background}" DockPanel.Dock="Right" IsVisible="{CompiledBinding ChanceString, Converter={StaticResource NullToBoolConverter}}">
                                     <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{CompiledBinding ChanceString}"/>
                                 </Border>
@@ -229,50 +230,30 @@
     <Style Selector="controls|GlobalVariableView:selected /template/ Border#PART_Var">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Selected.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Selected.Border}" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
     </Style>
     
     
     <Style Selector="editing|ParameterEditorView">
         <Setter Property="ClipToBounds" Value="False" />
-        <Setter Property="HoldsMultipleValues" Value="{Binding HoldsMultipleValues}" />
+        <Setter Property="HoldsMultipleValues" Value="{CompiledBinding HoldsMultipleValues}" x:DataType="editing1:IEditableParameterViewModel" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
                     <DockPanel>
                         <TextBlock Margin="4" Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                   TextWrapping="Wrap" Text="{Binding Name, Mode=OneWay}" />
-                        <ContentPresenter Content="{Binding}">
-                            <ContentPresenter.DataTemplates>
+                                   TextWrapping="Wrap" Text="{CompiledBinding Name}" x:DataType="editing1:IEditableParameterViewModel"/>
+                        <ContentControl Content="{CompiledBinding}" x:DataType="editing1:IEditableParameterViewModel">
+                            <ContentControl.ContentTemplate>
                                 <views:ParameterDataTemplateSelector>
                                     <views:ParameterDataTemplateSelector.Generic>
-                                        <DataTemplate>
-                                            <extendedTextBlock:ParameterValueHolderView
-                                                DataContext="{Binding Parameter}"
-                                                Tag="{Binding Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}}"
-                                                SpecialCopying="{Binding DataContext.SpecialCopying, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}, FallbackValue=False}" 
-                                                SpecialCommand="{Binding DataContext.SpecialCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}, FallbackValue=False}" 
-                                                PickCommand="{Binding DataContext.SelectItemAction, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}}" />
+                                        <DataTemplate x:DataType="editing1:IEditableParameterViewModel">
+                                            <ParameterBox Parameter="{CompiledBinding  GenericParameter}"
+                                                          ParameterValue="{ReflectionBinding Value}"
+                                                          NumberToMultiply="{Binding Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}}"
+                                                          Context="{CompiledBinding Context}" />
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.Generic>
-                                    <views:ParameterDataTemplateSelector.BoolParameter>
-                                        <DataTemplate>
-                                            <CheckBox Focusable="True" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"
-                                                      DataContext="{Binding Parameter}"
-                                                      utils:Fix.DetachDataContext="True"
-                                                      IsChecked="{Binding Value, Converter={x:Static converters:CommonConverters.LongToBoolConverter}}" />
-                                        </DataTemplate>
-                                    </views:ParameterDataTemplateSelector.BoolParameter>
-                                    <views:ParameterDataTemplateSelector.FlagParameter>
-                                        <DataTemplate>
-                                            <extendedTextBlock:FlagComboBox SelectedItem="{Binding Parameter.String}" SelectedValue="{Binding Parameter.Value}" Watermark="{Binding Parameter.Value}"  Flags="{Binding Parameter.Items}" />
-                                        </DataTemplate>
-                                    </views:ParameterDataTemplateSelector.FlagParameter>
-                                    <views:ParameterDataTemplateSelector.ItemsParameter>
-                                        <DataTemplate>
-                                            <controls1:CompletionComboBox editing:ParameterEditorView.OnEnterPressed="true" AsyncPopulator="{x:Static extensions:SmartScriptCompletionCombobox.AsyncPopulator}" SelectedItem="{Binding OptionValue}" Watermark="{Binding OptionValue, Converter={x:Static extensions:ParameterOptionConverter.Instance}}" Items="{Binding Items}" />
-                                        </DataTemplate>
-                                    </views:ParameterDataTemplateSelector.ItemsParameter>
                                     <views:ParameterDataTemplateSelector.ButtonParameter>
                                         <DataTemplate>
                                             <Button Command="{Binding Command}" Content="{Binding ActionName}" />
@@ -288,8 +269,8 @@
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.NumberedButtonParameter>
                                 </views:ParameterDataTemplateSelector>
-                            </ContentPresenter.DataTemplates>
-                        </ContentPresenter>
+                            </ContentControl.ContentTemplate>
+                        </ContentControl>
 
                     </DockPanel>
                 </ControlTemplate>
@@ -307,6 +288,6 @@
 
     <Style Selector="views|SmartScriptEditorView Button /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="BoxShadow" Value="" />
+        <Setter Property="BoxShadow" Value="none" />
     </Style>
 </Styles>

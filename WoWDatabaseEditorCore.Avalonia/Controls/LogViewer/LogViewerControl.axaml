@@ -1,0 +1,60 @@
+<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.LogViewerControl"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.Services.LogService.ViewModels;assembly=WoWDatabaseEditorCore"
+             xmlns:logging="clr-namespace:WoWDatabaseEditorCore.Services.LogService.Logging;assembly=WoWDatabaseEditorCore"
+             xmlns:converters="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.Converters"
+             mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800"
+             x:DataType="viewModels:LogViewerControlViewModel"
+             DataContextChanged="OnDataContextChanged"
+             DetachedFromLogicalTree="OnDetachedFromLogicalTree">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.Resources>
+            <converters:EventIdConverter x:Key="EventIdConverter"/>
+        </Grid.Resources>
+        <Grid.Styles>
+            <Style Selector="DataGridRow">
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Foreground" Value="{CompiledBinding LogLevel, Converter={x:Static converters:LogLevelToForegroundConverter.Instance}}"
+                        x:DataType="logging:LogModel"
+                        />
+                <Setter Property="Background" Value="{CompiledBinding LogLevel, Converter={x:Static converters:LogLevelToBackgroundConverter.Instance}}"
+                        x:DataType="logging:LogModel" />
+            </Style>
+            <Style Selector="DataGridCell.size">
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+        </Grid.Styles>
+        <DataGrid x:Name="MyDataGrid"
+                  ItemsSource="{CompiledBinding DataStore.Entries}" AutoGenerateColumns="False"
+                  CanUserSortColumns="False"
+                  IsReadOnly="True"
+                  FontFamily="{DynamicResource MonoFont}"
+                  CanUserResizeColumns="True"
+                  LayoutUpdated="OnLayoutUpdated">
+            <DataGrid.Columns>
+                <DataGridTextColumn CellStyleClasses="size" Header="Time" Width="150"  Binding="{CompiledBinding Timestamp}"/>
+                <DataGridTextColumn CellStyleClasses="size" Header="Level" Width="90" Binding="{CompiledBinding LogLevel}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="Event Id" Width="120" Binding="{CompiledBinding EventId, Converter={StaticResource EventIdConverter}}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="State" Width="300" Binding="{CompiledBinding State}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="Exception" Width="300" Binding="{CompiledBinding Exception}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <CheckBox x:Name="CanAutoScroll"
+                  FontSize="11"
+                  Content="Auto Scroll log"
+                  IsChecked="True"
+                  Grid.Row="1"
+                  Margin="20 10" />
+
+    </Grid>
+
+</UserControl>

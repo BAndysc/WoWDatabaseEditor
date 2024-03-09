@@ -5,15 +5,15 @@ namespace WDE.Conditions.Data
 {
     public interface IConditionDataJsonProvider
     {
-        string GetConditionsJson();
-        string GetConditionSourcesJson();
-        string GetConditionGroupsJson();
+        Task<string> GetConditionsJson();
+        Task<string> GetConditionSourcesJson();
+        Task<string> GetConditionGroupsJson();
     }
 
     public interface IConditionDataProvider
     {
-        IEnumerable<ConditionJsonData> GetConditions();
-        IEnumerable<ConditionSourcesJsonData> GetConditionSources();
-        IEnumerable<ConditionGroupsJsonData> GetConditionGroups();
+        Task<IReadOnlyList<ConditionJsonData>> GetConditions();
+        Task<IReadOnlyList<ConditionSourcesJsonData>> GetConditionSources();
+        Task<IReadOnlyList<ConditionGroupsJsonData>> GetConditionGroups();
     }
 }

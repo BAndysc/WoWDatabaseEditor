@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using WDE.Common;
 
 namespace WDE.SmartScriptEditor.Data;
 
@@ -78,7 +79,7 @@ public readonly struct SmartBuiltInRule
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogWarning(e);
             return false;
         }
         return false;

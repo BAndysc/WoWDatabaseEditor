@@ -152,7 +152,7 @@ namespace WDE.EventAiEditor.Data
             {
                 string key = data.Parameters[i].Type;
                 if (!parameterFactory.IsRegisteredLong(key))
-                    Console.WriteLine("Parameter type " + key + " is not registered");
+                    LOG.LogWarning("Parameter type " + key + " is not registered");
                 
                 IParameter<long> parameter = parameterFactory.Factory(key);
                 element.GetParameter(i).Name = data.Parameters[i].Name;

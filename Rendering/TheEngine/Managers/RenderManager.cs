@@ -436,7 +436,7 @@ namespace TheEngine.Managers
             engine.Device.device.BlendEquation(BlendEquationMode.FuncAdd);
         }
 
-        private bool useDynamicScale = false;
+        private bool useDynamicScale = true;
         private float dynamicScale = 1;
         private float? pendingDynamicScale;
         private int DynamicWidth => useDynamicScale ? Math.Max(1, (int)(currentBackBufferWidth * dynamicScale)) : currentBackBufferWidth;
@@ -577,7 +577,7 @@ namespace TheEngine.Managers
                     ref var parentLocalToWorld = ref cacheLocalToWorld[parents[i].Parent];
                     localToWorld[i] = parentLocalToWorld;
                     if (parents[i].Local.HasValue)
-                        localToWorld[i] = new LocalToWorld(){Matrix = parents[i].Local.Value * localToWorld[i].Matrix};
+                        localToWorld[i] = new LocalToWorld(){Matrix = parents[i].Local!.Value * localToWorld[i].Matrix};
                     dirtyPosition[i].Enable();
                 }
             });

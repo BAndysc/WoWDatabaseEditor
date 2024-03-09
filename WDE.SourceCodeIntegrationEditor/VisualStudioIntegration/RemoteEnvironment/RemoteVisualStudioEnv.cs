@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using EnvDTE;
 using Newtonsoft.Json;
+using WDE.Common;
 using WDE.Common.Debugging;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
@@ -63,7 +64,7 @@ internal class RemoteVisualStudioEnv : IDTE
 
                 var packet = new RemoteVisualStudioPacket(header, buffer.AsSpan(0, header.BytesLength));
 
-                Console.WriteLine($"Received: [{packet.Header.Type}] {packet.Message} (len={packet.Header.BytesLength})");
+                LOG.LogInformation($"Received: [{packet.Header.Type}] {packet.Message} (len={packet.Header.BytesLength})");
 
                 if (header.Type == RemoteVisualStudioPacketType.Execute ||
                     header.Type == RemoteVisualStudioPacketType.AuthOk)
@@ -95,12 +96,12 @@ internal class RemoteVisualStudioEnv : IDTE
                 }
                 else
                 {
-                    Console.WriteLine("Unknown packet type: " + header.Type);
+                    LOG.LogError("Unknown packet type: " + header.Type);
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Listening thread encountered an exception: " + e.Message);
+                LOG.LogError(e, message: "Listening thread encountered an exception");
                 break;
             }
         }
@@ -171,7 +172,7 @@ internal class RemoteVisualStudioEnv : IDTE
                 {
                     await listenTask;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     if (disposed)
                         break;
@@ -182,7 +183,7 @@ internal class RemoteVisualStudioEnv : IDTE
         }
 
 
-        Console.WriteLine($"Conecting to Visual Studio server... {host}:{port}");
+        LOG.LogInformation($"Conecting to Visual Studio server... {host}:{port}");
         socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
         await socket.ConnectAsync(host, port);
 

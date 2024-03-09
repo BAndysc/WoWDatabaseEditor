@@ -43,19 +43,19 @@ internal class NaiveThreadPool : System.IDisposable
                 Interlocked.Decrement(ref counter);
                 resetEvent.Set();   
             }
-            catch (OperationCanceledException _)
+            catch (OperationCanceledException)
             {
                 if (running)
                     throw new Exception("ERROR, Operation cancelled, but thread still running!");
                 return;
             }
-            catch (ObjectDisposedException _)
+            catch (ObjectDisposedException)
             {
                 if (running)
                     throw new Exception("ERROR, Operation cancelled, but thread still running!");
                 return;
             }
-            catch (InvalidOperationException _)
+            catch (InvalidOperationException)
             {
                 if (running)
                     throw new Exception("ERROR, Operation cancelled, but thread still running!");

@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using Prism.Mvvm;
 using PropertyChanged.SourceGenerator;
@@ -39,7 +40,7 @@ namespace WDE.SQLEditor.ViewModels
             CustomSqlSolutionItem solutionItem)
         {
             sql.FromString(solutionItem.Query ?? "");
-            Code = sql;
+            code = sql;
             Title = solutionItem.Name;
             AutoDispose(sql.Length.SubscribeAction(_ => IsModified = true));
             IsModified = false;
@@ -58,7 +59,7 @@ namespace WDE.SQLEditor.ViewModels
                         catch (Exception e)
                         {
                             statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failure during query execution"));
-                            Console.WriteLine(e);
+                            LOG.LogError(e, "Error during query execution");
                         }
                     });
             }, () => databaseProvider.IsConnected);
@@ -95,7 +96,7 @@ namespace WDE.SQLEditor.ViewModels
         public ICommand Cut { get; } = AlwaysDisabledCommand.Command;
         public ICommand Paste { get; } = AlwaysDisabledCommand.Command;
         public IAsyncCommand Save { get; }
-        public IAsyncCommand CloseCommand { get; set; } = null;
+        public IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
 
         public bool IsModified
@@ -104,7 +105,7 @@ namespace WDE.SQLEditor.ViewModels
             private set => SetProperty(ref isModified, value);
         }
 
-        public IHistoryManager History { get; } = null;
+        public IHistoryManager? History { get; } = null;
         public ISolutionItem SolutionItem { get; }
         public Task<IQuery> GenerateQuery()
         {

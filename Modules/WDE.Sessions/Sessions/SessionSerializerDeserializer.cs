@@ -72,7 +72,9 @@ namespace WDE.Sessions.Sessions
                                 Comment = comment
                             };
                             if (!deserializerRegistry.TryDeserialize(abstractItem, out currentSolutionItem))
-                                throw new Exception("Invalid session file (can't deserialize solution item)");
+                            {
+                                throw new Exception($"Invalid session file (can't deserialize solution item: type: {abstractItem.Type}, value: {abstractItem.Value}/{abstractItem.Value2}/{abstractItem.StringValue})");
+                            }
                         }
                         else
                             throw new Exception("Invalid session file (double BEGIN)");

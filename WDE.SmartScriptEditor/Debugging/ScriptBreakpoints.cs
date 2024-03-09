@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Debugging;
 using WDE.Common.Services;
@@ -200,7 +201,7 @@ public class ScriptBreakpoints : IScriptBreakpoints, System.IAsyncDisposable
 
         if (breakpoints.Count != 0)
         {
-            Console.WriteLine($"This is not expected? Still has {breakpoints.Count} breakpoints, but they were expected to be deleted in the callback from RemoveDebugPointAsync");
+            LOG.LogError($"This is not expected? Still has {breakpoints.Count} breakpoints, but they were expected to be deleted in the callback from RemoveDebugPointAsync");
         }
         breakpoints.Clear();
     }

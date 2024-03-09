@@ -60,7 +60,8 @@ namespace WDE.WoWHeadConnector
             try
             {
                 var entries = JsonConvert.DeserializeObject<Dictionary<uint, object>>(json);
-                list.AddRange(entries.Select(pair => new Ability() { SpellId = pair.Key, Modes = FindModesForSpell(source, pair.Key) }));
+                if (entries != null)
+                    list.AddRange(entries.Select(pair => new Ability() { SpellId = pair.Key, Modes = FindModesForSpell(source, pair.Key) }));
                 return end;
             }
             catch (Exception e)

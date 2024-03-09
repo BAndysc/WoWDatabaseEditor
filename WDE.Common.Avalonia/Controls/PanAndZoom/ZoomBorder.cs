@@ -61,19 +61,19 @@ namespace WDE.WorldMap.PanAndZoom
         /// <summary>
         /// Identifies the <seealso cref="PanButton"/> avalonia property.
         /// </summary>
-        public static StyledProperty<ButtonName> PanButtonProperty =
+        public static readonly StyledProperty<ButtonName> PanButtonProperty =
             AvaloniaProperty.Register<ZoomBorder, ButtonName>(nameof(PanButton), ButtonName.Middle, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="ZoomSpeed"/> avalonia property.
         /// </summary>
-        public static StyledProperty<double> ZoomSpeedProperty =
+        public static readonly StyledProperty<double> ZoomSpeedProperty =
             AvaloniaProperty.Register<ZoomBorder, double>(nameof(ZoomSpeed), 1.2, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="Stretch"/> avalonia property.
         /// </summary>
-        public static StyledProperty<StretchMode> StretchProperty =
+        public static readonly StyledProperty<StretchMode> StretchProperty =
             AvaloniaProperty.Register<ZoomBorder, StretchMode>(nameof(Stretch), StretchMode.Uniform, false, BindingMode.TwoWay);
 
         /// <summary>
@@ -103,91 +103,91 @@ namespace WDE.WorldMap.PanAndZoom
         /// <summary>
         /// Identifies the <seealso cref="EnableConstrains"/> avalonia property.
         /// </summary>
-        public static StyledProperty<bool> EnableConstrainsProperty =
+        public static readonly StyledProperty<bool> EnableConstrainsProperty =
             AvaloniaProperty.Register<ZoomBorder, bool>(nameof(EnableConstrains), true, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="EnableZoomConstrains"/> avalonia property.
         /// </summary>
-        public static StyledProperty<bool> EnableZoomConstrainsProperty =
+        public static readonly StyledProperty<bool> EnableZoomConstrainsProperty =
             AvaloniaProperty.Register<ZoomBorder, bool>(nameof(EnableZoomConstrains), false, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="MinZoomX"/> avalonia property.
         /// </summary>
-        public static StyledProperty<double> MinZoomXProperty =
+        public static readonly StyledProperty<double> MinZoomXProperty =
             AvaloniaProperty.Register<ZoomBorder, double>(nameof(MinZoomX), double.NegativeInfinity, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="MaxZoomX"/> avalonia property.
         /// </summary>
-        public static StyledProperty<double> MaxZoomXProperty =
+        public static readonly StyledProperty<double> MaxZoomXProperty =
             AvaloniaProperty.Register<ZoomBorder, double>(nameof(MaxZoomX), double.PositiveInfinity, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="MinZoomY"/> avalonia property.
         /// </summary>
-        public static StyledProperty<double> MinZoomYProperty =
+        public static readonly StyledProperty<double> MinZoomYProperty =
             AvaloniaProperty.Register<ZoomBorder, double>(nameof(MinZoomY), double.NegativeInfinity, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="MaxZoomY"/> avalonia property.
         /// </summary>
-        public static StyledProperty<double> MaxZoomYProperty =
+        public static readonly StyledProperty<double> MaxZoomYProperty =
             AvaloniaProperty.Register<ZoomBorder, double>(nameof(MaxZoomY), double.PositiveInfinity, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="MinOffsetX"/> avalonia property.
         /// </summary>
-        public static StyledProperty<double> MinOffsetXProperty =
+        public static readonly StyledProperty<double> MinOffsetXProperty =
             AvaloniaProperty.Register<ZoomBorder, double>(nameof(MinOffsetX), double.NegativeInfinity, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="MaxOffsetX"/> avalonia property.
         /// </summary>
-        public static StyledProperty<double> MaxOffsetXProperty =
+        public static readonly StyledProperty<double> MaxOffsetXProperty =
             AvaloniaProperty.Register<ZoomBorder, double>(nameof(MaxOffsetX), double.PositiveInfinity, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="MinOffsetY"/> avalonia property.
         /// </summary>
-        public static StyledProperty<double> MinOffsetYProperty =
+        public static readonly StyledProperty<double> MinOffsetYProperty =
             AvaloniaProperty.Register<ZoomBorder, double>(nameof(MinOffsetY), double.NegativeInfinity, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="MaxOffsetY"/> avalonia property.
         /// </summary>
-        public static StyledProperty<double> MaxOffsetYProperty =
+        public static readonly StyledProperty<double> MaxOffsetYProperty =
             AvaloniaProperty.Register<ZoomBorder, double>(nameof(MaxOffsetY), double.PositiveInfinity, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="EnablePan"/> avalonia property.
         /// </summary>
-        public static StyledProperty<bool> EnablePanProperty =
+        public static readonly StyledProperty<bool> EnablePanProperty =
             AvaloniaProperty.Register<ZoomBorder, bool>(nameof(EnablePan), true, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="EnableZoom"/> avalonia property.
         /// </summary>
-        public static StyledProperty<bool> EnableZoomProperty =
+        public static readonly StyledProperty<bool> EnableZoomProperty =
             AvaloniaProperty.Register<ZoomBorder, bool>(nameof(EnableZoom), true, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="EnableGestureZoom"/> avalonia property.
         /// </summary>
-        public static StyledProperty<bool> EnableGestureZoomProperty =
+        public static readonly StyledProperty<bool> EnableGestureZoomProperty =
             AvaloniaProperty.Register<ZoomBorder, bool>(nameof(EnableGestureZoom), true, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="EnableGestureRotation"/> avalonia property.
         /// </summary>
-        public static StyledProperty<bool> EnableGestureRotationProperty =
+        public static readonly StyledProperty<bool> EnableGestureRotationProperty =
             AvaloniaProperty.Register<ZoomBorder, bool>(nameof(EnableGestureRotation), true, false, BindingMode.TwoWay);
 
         /// <summary>
         /// Identifies the <seealso cref="EnableGestureTranslation"/> avalonia property.
         /// </summary>
-        public static StyledProperty<bool> EnableGestureTranslationProperty =
+        public static readonly StyledProperty<bool> EnableGestureTranslationProperty =
             AvaloniaProperty.Register<ZoomBorder, bool>(nameof(EnableGestureTranslation), true, false, BindingMode.TwoWay);
 
         static ZoomBorder()
@@ -208,7 +208,7 @@ namespace WDE.WorldMap.PanAndZoom
 
         internal static void Log(string message) => Debug.WriteLine(message);
 
-        private IControl? _element;
+        private Control? _element;
         private Point _pan;
         private Point _previous;
         private Matrix _matrix;
@@ -493,7 +493,7 @@ namespace WDE.WorldMap.PanAndZoom
             Moved(e);
         }
 
-        private void ChildChanged(IControl? element)
+        private void ChildChanged(Control? element)
         {
             if (element != null && element != _element && _element != null)
             {
@@ -506,7 +506,7 @@ namespace WDE.WorldMap.PanAndZoom
             }
         }
 
-        private void AttachElement(IControl? element)
+        private void AttachElement(Control? element)
         {
             if (element == null)
             {
@@ -638,10 +638,11 @@ namespace WDE.WorldMap.PanAndZoom
 
             if (width > 0 && height > 0)
             {
-                MinZoomX = Bounds.Width / width;
-                MinZoomY = Bounds.Height / height;
+                SetCurrentValue(MinZoomXProperty, Bounds.Width / width);
+                SetCurrentValue(MinZoomYProperty, Bounds.Height / height);
 
-                MinZoomX = MinZoomY = Min(0.5, Min(MinZoomX, MinZoomY));
+                SetCurrentValue(MinZoomXProperty, Min(0.5, Min(MinZoomX, MinZoomY)));
+                SetCurrentValue(MinZoomYProperty, Min(0.5, Min(MinZoomX, MinZoomY)));
             }
             
             var zoomX = ClampValue(_matrix.M11, MinZoomX, MaxZoomX);
@@ -991,16 +992,16 @@ namespace WDE.WorldMap.PanAndZoom
             switch (Stretch)
             {
                 case StretchMode.None:
-                    Stretch = StretchMode.Fill;
+                    SetCurrentValue(StretchProperty, StretchMode.Fill);
                     break;
                 case StretchMode.Fill:
-                    Stretch = StretchMode.Uniform;
+                    SetCurrentValue(StretchProperty, StretchMode.Uniform);
                     break;
                 case StretchMode.Uniform:
-                    Stretch = StretchMode.UniformToFill;
+                    SetCurrentValue(StretchProperty, StretchMode.UniformToFill);
                     break;
                 case StretchMode.UniformToFill:
-                    Stretch = StretchMode.None;
+                    SetCurrentValue(StretchProperty, StretchMode.None);
                     break;
             }
         }
@@ -1111,7 +1112,7 @@ namespace WDE.WorldMap.PanAndZoom
 
         bool ILogicalScrollable.IsLogicalScrollEnabled => true;
 
-        event EventHandler ILogicalScrollable.ScrollInvalidated
+        event EventHandler? ILogicalScrollable.ScrollInvalidated
         {
             add => _scrollInvalidated += value;
             remove => _scrollInvalidated -= value;
@@ -1121,12 +1122,12 @@ namespace WDE.WorldMap.PanAndZoom
 
         Size ILogicalScrollable.PageScrollSize => new Size(10, 10);
 
-        bool ILogicalScrollable.BringIntoView(IControl target, Rect targetRect)
+        bool ILogicalScrollable.BringIntoView(Control target, Rect targetRect)
         {
             return false;
         }
 
-        IControl? ILogicalScrollable.GetControlInDirection(NavigationDirection direction, IControl from)
+        Control? ILogicalScrollable.GetControlInDirection(NavigationDirection direction, Control? from)
         {
             return null;
         }

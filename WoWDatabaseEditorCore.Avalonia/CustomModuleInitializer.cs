@@ -35,6 +35,7 @@ public class CustomModuleInitializer : IModuleInitializer
     /// </summary>
     /// <param name="containerExtension">The container that will be used to resolve the modules by specifying its type.</param>
     /// <param name="loggerFacade">The logger to use.</param>
+    /// <param name="coreVersion"></param>
     public CustomModuleInitializer(IContainerExtension containerExtension, ILoggerFacade loggerFacade
         // Custom WDE
         , ICurrentCoreSettings coreVersion

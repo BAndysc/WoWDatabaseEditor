@@ -13,9 +13,9 @@ namespace WDE.Common.Avalonia.Controls;
 /// <summary>
 /// a text control that can compute an async value and display it 
 /// </summary>
-public class AsyncDynamicTextBlock : TextBlock, IStyleable
+public class AsyncDynamicTextBlock : TextBlock
 {
-    Type IStyleable.StyleKey => typeof(TextBlock);
+    protected override Type StyleKeyOverride => typeof(TextBlock);
     
     public static readonly StyledProperty<object?> ValueProperty = AvaloniaProperty.Register<AsyncDynamicTextBlock, object?>(nameof(Value));
     

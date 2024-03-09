@@ -9,6 +9,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Events;
@@ -42,11 +43,6 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
     public partial class MultiRowDbTableEditorViewModel : ViewModelBase
     {
-        private readonly IItemFromListProvider itemFromListProvider;
-        private readonly IMessageBoxService messageBoxService;
-        private readonly IParameterFactory parameterFactory;
-        private readonly IDatabaseQueryExecutor mySqlExecutor;
-        private readonly IQueryGenerator queryGenerator;
         private readonly IDatabaseTableModelGenerator modelGenerator;
         private readonly IConditionEditService conditionEditService;
         private readonly IDatabaseEditorsSettings editorSettings;
@@ -180,13 +176,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService, commandService,
             parameterPickerService, statusBar, mySqlExecutor)
         {
-            this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
             this.tableDataProvider = tableDataProvider;
-            this.messageBoxService = messageBoxService;
-            this.parameterFactory = parameterFactory;
-            this.mySqlExecutor = mySqlExecutor;
-            this.queryGenerator = queryGenerator;
             this.modelGenerator = modelGenerator;
             this.conditionEditService = conditionEditService;
             this.editorSettings = editorSettings;
@@ -301,11 +292,16 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 try
                 {
                     var text = await clipboardService.GetText();
+                    if (string.IsNullOrEmpty(text))
+                        return;
+
                     var key = FocusedEntity?.Key ?? (Rows.Count > 0 ? Rows[0].Key : null);
                     var deserialized = serializer.Deserialize(tableDefinition, text, key);
                     if (deserialized.Count > 1)
                         bulk = BulkEdit("Paste rows");
-                    int index = focusedRowIndex.RowIndex == -1 ? (Rows.Count > 0 ? Rows[0].Count : 0) : focusedRowIndex.RowIndex + 1;
+                    int index = focusedRowIndex.RowIndex == -1
+                        ? (Rows.Count > 0 ? Rows[0].Count : 0)
+                        : focusedRowIndex.RowIndex + 1;
                     foreach (var entity in deserialized)
                     {
                         if (key.HasValue)
@@ -313,9 +309,14 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                         ForceInsertEntity(entity, index++);
                     }
                 }
+                catch (JsonReaderException e)
+                {
+                    LOG.LogWarning(e, "Can't paste rows");
+                    statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failed to paste rows (see the debug log output)"));
+                }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    LOG.LogError(e, "Can't paste rows");
                     statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failed to paste rows (see the debug log output)"));
                 }
                 finally

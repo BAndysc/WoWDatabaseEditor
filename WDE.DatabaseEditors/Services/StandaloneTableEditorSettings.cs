@@ -89,7 +89,8 @@ internal class StandaloneTableEditorSettings : IStandaloneTableEditorSettings
 
     public void SetupWindow(DatabaseTable table, IAbstractWindowView window)
     {
-        if (GetWindowState(table, out var maximized, out var x, out var y, out var width, out var height))
+        if (GetWindowState(table, out var maximized, out var x, out var y, out var width, out var height) &&
+            width > 0 && height > 0)
         {
             window.Reposition(x, y, maximized, width, height);
         }

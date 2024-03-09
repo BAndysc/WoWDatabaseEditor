@@ -5,5 +5,6 @@ namespace WDE.Common.Services;
 [UniqueProvider]
 public interface IGameViewService
 {
+    bool IsSupported { get; }
     void Open();
 }

@@ -87,7 +87,7 @@
                     <TextBlock Foreground="{DynamicResource EventAis.Event.Flag.Foreground}" 
                                Margin="0,1,0,0" 
                                FontSize="9" 
-                               TextAlignment="Center" 
+                               TextAlignment="Left"
                                VerticalAlignment="Center" Text="{TemplateBinding Text}"/>
                 </Panel>
             </ControlTemplate>
@@ -97,13 +97,13 @@
     <Style Selector="controls|EventAiEventFlagsView">
         <Setter Property="Template">
             <ControlTemplate>
-                <ItemsPresenter Items="{TemplateBinding Flags}">
-                    <ItemsPresenter.ItemsPanel>
+                <ItemsControl ItemsSource="{TemplateBinding Flags}">
+                    <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel MaxWidth="30" />
                         </ItemsPanelTemplate>
-                    </ItemsPresenter.ItemsPanel>
-                    <ItemsPresenter.ItemTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
                         <controls:EventFlagPhaseDataSelector>
                             <controls:EventFlagPhaseDataSelector.PhaseView>
                                 <controls:MiniEventIcon Background="{DynamicResource EventAis.Event.Phase.Background}" Text="{Binding Text}" ToolTip.Tip="{Binding ToolTip}" />
@@ -112,8 +112,8 @@
                                 <controls:MiniEventIcon Background="{DynamicResource EventAis.Event.Flag.Background}" Text="{Binding Text}" ToolTip.Tip="{Binding ToolTip}" />
                             </controls:EventFlagPhaseDataSelector.FlagView>
                         </controls:EventFlagPhaseDataSelector>
-                    </ItemsPresenter.ItemTemplate>
-                </ItemsPresenter>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ControlTemplate>
         </Setter>
     </Style>
@@ -215,6 +215,6 @@
 
     <Style Selector="views|EventAiEditorView Button /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="BoxShadow" Value="" />
+        <Setter Property="BoxShadow" Value="none" />
     </Style>
 </Styles>

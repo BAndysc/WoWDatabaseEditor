@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
     <Nullable>enable</Nullable>
-    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <WarningsAsErrors>$(WarningsAsErrors),nullable</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
       <OutputPath>..\bin\$(Configuration)\</OutputPath>
@@ -20,13 +20,13 @@
     <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="SmartData\*.json">
+    <None Update="SmartData\*.json" PublishFolderType="Assembly">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DynamicData">
-      <Version>7.2.1</Version>
+      <Version>8.3.27</Version>
     </PackageReference>
     <PackageReference Include="SmartFormat.NET">
       <Version>2.7.3</Version>

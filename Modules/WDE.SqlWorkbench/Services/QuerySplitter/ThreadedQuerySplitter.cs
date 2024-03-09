@@ -25,7 +25,8 @@ internal class ThreadedQuerySplitter : IQuerySplitter
     public async Task<bool> UpdateRangesAsync(ITextSource source)
     {
         AreRangesValid = false;
-        pendingUpdate?.Cancel();
+        if (pendingUpdate != null)
+            await pendingUpdate.CancelAsync();
         var cts = pendingUpdate = new CancellationTokenSource();
 
         List<StatementRange>? result = null;

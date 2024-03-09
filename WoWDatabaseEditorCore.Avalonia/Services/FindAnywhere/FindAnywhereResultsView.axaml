@@ -19,7 +19,7 @@
                        HorizontalAlignment="Center" 
                        FontWeight="Bold">No results found.</TextBlock>
             <ScrollViewer IsVisible="{CompiledBinding NoResultsFound, Converter={x:Static BoolConverters.Not}}">
-                <ItemsRepeater Items="{CompiledBinding Results}">
+                <ItemsRepeater ItemsSource="{CompiledBinding Results}">
                     <ItemsRepeater.Layout>
                         <StackLayout Spacing="10" DisableVirtualization="False"></StackLayout>
                     </ItemsRepeater.Layout>

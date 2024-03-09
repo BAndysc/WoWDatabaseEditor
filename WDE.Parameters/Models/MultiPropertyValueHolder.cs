@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using PropertyChanged.SourceGenerator;
+using WDE.Common;
 using WDE.Common.Annotations;
 using WDE.Common.Parameters;
 
@@ -59,8 +60,6 @@ public partial class MultiPropertyValueHolder<T, R> : IParameterValueHolder<T>, 
             return;
         
         bool isSameValue = true;
-        bool isSameParameter = true;
-        bool isSameName = true;
         var value = getter(values[0]);
         
         for (int i = 1; i < values.Count; ++i)
@@ -142,7 +141,7 @@ public partial class MultiPropertyValueHolder<T, R> : IParameterValueHolder<T>, 
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    LOG.LogError(e);
                 }
             }
             suspendNotifications = false;
@@ -163,7 +162,7 @@ public partial class MultiPropertyValueHolder<T, R> : IParameterValueHolder<T>, 
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    LOG.LogError(e);
                 }
             }
             suspendNotifications = false;
@@ -183,6 +182,7 @@ public partial class MultiPropertyValueHolder<T, R> : IParameterValueHolder<T>, 
     public bool ForceHidden => false;
     public string Name => "";
     public string String => holdsMultipleValues ? "-" : Value.ToString() ?? "-";
+    public IParameter GenericParameter => Parameter;
 
     public IParameter<T> Parameter => typeof(T) == typeof(int) ? 
         (IParameter<T>)IntParameter.Instance :

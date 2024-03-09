@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Newtonsoft.Json;
+using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
@@ -8,7 +9,7 @@ using WDE.Module.Attributes;
 namespace WoWDatabaseEditorCore.Services.UserSettingsService
 {
     [SingleInstance]
-    [AutoRegister]
+    [AutoRegister(Platforms.NonBrowser)]
     public class UserSettings : IUserSettings
     {
         private readonly IFileSystem fileSystem;
@@ -46,8 +47,7 @@ namespace WoWDatabaseEditorCore.Services.UserSettingsService
             catch (Exception e)
             {
                 statusBar.Value.PublishNotification(new PlainNotification(NotificationType.Error, "Error while loading settings: " + e));
-                Console.WriteLine("Error while loading settings: " + fileSystem?.ResolvePhysicalPath(settingsFile)?.FullName);
-                Console.WriteLine(e);
+                LOG.LogError(e, message: "Error while loading settings: " + fileSystem?.ResolvePhysicalPath(settingsFile)?.FullName);
                 return defaultValue;
             }
         }

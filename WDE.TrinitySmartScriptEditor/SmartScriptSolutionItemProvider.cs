@@ -288,7 +288,7 @@ namespace WDE.TrinitySmartScriptEditor
 
         public override async Task<ISolutionItem?> CreateSolutionItem()
         {
-            var areaTriggers = database.Value.GetAreaTriggerTemplates()
+            var areaTriggers = (await database.Value.GetAreaTriggerTemplatesAsync())
                 .Where(trigger => trigger.IsServerSide == serverSide)
                 .ToDictionary(at => (long)at.Id, at => new SelectOption($"Area trigger {at.Id}"));
 

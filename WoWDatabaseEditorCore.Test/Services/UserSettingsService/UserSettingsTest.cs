@@ -12,9 +12,9 @@ namespace WoWDatabaseEditorCore.Test.Services.UserSettingsService
 {
     public class UserSettingsTest
     {
-        private IFileSystem fileSystem;
-        private IStatusBar statusBar;
-        private UserSettings userSettings;
+        private IFileSystem fileSystem = null!;
+        private IStatusBar statusBar = null!;
+        private UserSettings userSettings = null!;
         
         [SetUp]
         public void Init()

@@ -8,7 +8,7 @@ public class MySqlSceneTemplate : ISceneTemplate
 {
     [PrimaryKey]
     [Column(Name = "SceneId")]
-    public int SceneId { get; set; }
+    public uint SceneId { get; set; }
     
     [Column(Name = "Flags")]
     public uint Flags { get; set; }

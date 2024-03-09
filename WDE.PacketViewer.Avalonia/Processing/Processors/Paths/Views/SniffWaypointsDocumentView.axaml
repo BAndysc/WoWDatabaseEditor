@@ -18,7 +18,7 @@
       
       <DockPanel>
         <GroupingHeader DockPanel.Dock="Top" GroupName="Units" />
-        <TreeView Items="{CompiledBinding Creatures}"
+        <TreeView ItemsSource="{CompiledBinding Creatures}"
                   SelectedItem="{CompiledBinding SelectedObject}"
         >
           <TreeView.DataTemplates>
@@ -81,9 +81,9 @@
                                      MinOffsetY="{Binding #Map.TopLeftVirtual.Y}"
                                      MaxOffsetX="{Binding #Map.BottomRightVirtual.X}"
                                      MaxOffsetY="{Binding #Map.BottomRightVirtual.Y}"
-                                     TopLeft="{TemplateBinding TopLeftVirtual, Mode=OneWayToSource}"
-                                     BottomRight="{TemplateBinding BottomRightVirtual, Mode=OneWayToSource}"
-                                     ZoomX="{TemplateBinding Zoom, Mode=OneWayToSource}"
+                                     TopLeft="{Binding TopLeftVirtual, Mode=OneWayToSource, RelativeSource={RelativeSource TemplatedParent}}"
+                                     BottomRight="{Binding BottomRightVirtual, Mode=OneWayToSource, RelativeSource={RelativeSource TemplatedParent}}"
+                                     ZoomX="{Binding Zoom, Mode=OneWayToSource, RelativeSource={RelativeSource TemplatedParent}}"
                                      -->
       <DockPanel>
         <GroupingHeader DockPanel.Dock="Top" GroupName="2D preview" />

@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -6,7 +7,7 @@ using Prism.Commands;
 
 namespace WDE.CommonViews.Avalonia.Parameters;
 
-public class StringPickerView : UserControl
+public partial class StringPickerView : UserControl
 {
     public StringPickerView()
     {
@@ -17,18 +18,17 @@ public class StringPickerView : UserControl
     {
         AvaloniaXamlLoader.Load(this);
 
-        var tb = this.FindControl<TextBox>("TextBox");
+        var tb = this.FindControl<TextBox>("TextBox") ?? throw new NullReferenceException("StringPickerView's TEMPLATE TextBox not found");
         tb.KeyBindings.Add(new KeyBinding()
         {
             Gesture = new(Key.Enter),
             Command = new DelegateCommand(() =>
             {
-                tb.RaiseEvent(new TextInputEventArgs()
-                {
-                    RoutedEvent = TextBox.TextInputEvent,
-                    Source = tb,
-                    Text = "\n"
-                });
+                var args = new TextInputEventArgs();
+                args.RoutedEvent = TextInputEvent;
+                args.Source = tb;
+                args.Text = "\n";
+                tb.RaiseEvent(args);
             })
         });
     }

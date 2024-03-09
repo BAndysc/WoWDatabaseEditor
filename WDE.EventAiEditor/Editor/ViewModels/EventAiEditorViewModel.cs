@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
@@ -220,7 +221,7 @@ namespace WDE.EventAiEditor.Editor.ViewModels
                 {
                     if (data.EventIndex < 0 || data.EventIndex >= Events.Count)
                     {
-                        Console.WriteLine("Fatal error! event index out of range");
+                        LOG.LogError("Fatal error! event index out of range");
                         return;
                     }
                     var selected = new List<EventAiAction>();
@@ -346,7 +347,7 @@ namespace WDE.EventAiEditor.Editor.ViewModels
                         EditEventCommand();
                 }
                 else if (AnyActionSelected && !MultipleActionsSelected)
-                    EditActionCommand(Events[FirstSelectedActionIndex.eventIndex].Actions[FirstSelectedActionIndex.actionIndex]);
+                    EditActionCommand(Events[FirstSelectedActionIndex.eventIndex].Actions[FirstSelectedActionIndex.actionIndex]).ListenErrors();
             });
 
             CopyCommand = new AsyncCommand(async () =>
@@ -587,7 +588,7 @@ namespace WDE.EventAiEditor.Editor.ViewModels
                 .ToList();
             if (critical.Count > 0)
                 throw new Exception("Critical errors found:   " + string.Join("\n   ", critical.Select(c => c.Message)));
-            return Task.FromResult(EventAiExporter.GenerateSql(item, script));
+            return EventAiExporter.GenerateSql(item, script);
         }
 
         public string Name => itemNameRegistry.GetName(item);
@@ -918,7 +919,7 @@ namespace WDE.EventAiEditor.Editor.ViewModels
         private void EditEventCommand()
         {
             if (SelectedItem != null)
-                EditEventCommand(SelectedItem);
+                EditEventCommand(SelectedItem).ListenErrors();
         }
 
         private ParametersEditViewModel EventEditViewModel(EventAiEvent originalEventAiEvent, bool editOriginal = false)

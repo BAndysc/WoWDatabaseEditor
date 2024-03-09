@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
@@ -412,9 +413,9 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             }
         }
 
-        public IQuery GenerateSql(ISmartScriptSolutionItem item, SmartScript script)
+        public async Task<IQuery> GenerateSql(ISmartScriptSolutionItem item, SmartScript script)
         {
-            return new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry, conditionQueryGenerator).GetSql();
+            return await new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry, conditionQueryGenerator).GetSql();
         }
 
         public int GetDatabaseScriptTypeId(SmartScriptType type)

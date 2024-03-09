@@ -50,13 +50,13 @@ public class BitmapIconSource : IconSource, IDisposable
 
     public event EventHandler<object> OnBitmapChanged;
 
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
 
         if (change.Property == UriSourceProperty)
         {
-            CreateBitmap(UriSource);
+            CreateBitmap(change.GetNewValue<Uri>());
         }
         else if (change.Property == ShowAsMonochromeProperty)
         {
@@ -87,8 +87,7 @@ public class BitmapIconSource : IconSource, IDisposable
         }
         else
         {
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            _bitmap = SKBitmap.Decode(assets.Open(src));
+            _bitmap = SKBitmap.Decode(AssetLoader.Open(src));
         }
         _originalSize = new Size(_bitmap.Width, _bitmap.Height);
 

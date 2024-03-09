@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using AvaloniaStyles.Controls.FastTableView;
+using WDE.Common.Utils;
 using WDE.LootEditor.Editor.ViewModels;
 
 namespace WDE.LootEditor.Editor.Views;
@@ -19,7 +20,7 @@ public partial class LootEditorView : UserControl
 
     private void VeryFastTableView_OnValueUpdateRequest(string text)
     {
-        (DataContext as LootEditorViewModel)!.UpdateSelectedCells(text);
+        (DataContext as LootEditorViewModel)!.UpdateSelectedCells(text).ListenErrors();
     }
 
     private int lastSortByColumnIndex = -1;

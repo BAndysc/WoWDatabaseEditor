@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using AsyncAwaitBestPractices.MVVM;
+using WDE.Common;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
@@ -43,7 +44,7 @@ internal static class CommandExtensions
             if (e is TaskCanceledException)
                 return; // this is ok, user cancelled the task, no need to inform him again
             
-            Console.WriteLine(e);
+            LOG.LogError(e);
             await userQuestions.ShowGenericErrorAsync(header ?? "Error occured while executing the command",
                 e.Message);
         });
@@ -56,7 +57,7 @@ internal static class CommandExtensions
             if (e is TaskCanceledException)
                 return; // this is ok, user cancelled the task, no need to inform him again
             
-            Console.WriteLine(e);
+            LOG.LogError(e);
             await userQuestions.ShowGenericErrorAsync(header ?? "Error occured while executing the command", e.Message);
         });
     }

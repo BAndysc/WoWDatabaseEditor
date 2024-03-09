@@ -70,6 +70,11 @@ namespace WDE.Parameters
             return StringParameter.Instance;
         }
 
+        public IParameter<float> FactoryFloat(string? type)
+        {
+            return new FloatParameter();
+        }
+
         public bool IsRegisteredLong(string? type)
         {
             if (type == null)
@@ -87,6 +92,11 @@ namespace WDE.Parameters
                 return false;
 
             return stringParameters.ContainsKey(type);
+        }
+
+        public bool IsRegisteredFloat(string? type)
+        {
+            return type == "FloatParameterFloat";
         }
 
         public T Register<T>(string key, T parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None) where T : IParameter<long>

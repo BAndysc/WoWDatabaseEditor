@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using WDE.Common;
+using WDE.Common.Modules;
 using WDE.Common.Parameters;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
@@ -23,29 +24,40 @@ public interface IContextualParametersProvider
 
 [AutoRegister]
 [SingleInstance]
-public class ContextualParametersProvider : IContextualParametersProvider 
+public class ContextualParametersProvider : IContextualParametersProvider, IGlobalAsyncInitializer
 {
+    private readonly IContextualParametersJsonProvider jsons;
+    private readonly IParameterPickerService pickerService;
+    private readonly IParameterFactory parameterFactory;
+
     public ContextualParametersProvider(IContextualParametersJsonProvider jsons,
         IParameterPickerService pickerService,
         IParameterFactory parameterFactory)
     {
-        foreach (var json in jsons.GetParameters())
+        this.jsons = jsons;
+        this.pickerService = pickerService;
+        this.parameterFactory = parameterFactory;
+    }
+
+    public async Task Initialize()
+    {
+        foreach (var json in await jsons.GetParameters())
         {
             var deserialized = JsonConvert.DeserializeObject<ContextualParameterJson>(json.content);
 
             if (deserialized == null)
             {
-                Console.WriteLine("Cannot deserialize " + json.file);
+                LOG.LogError("Cannot deserialize " + json.file);
                 continue;
             }
-            
+
             if (deserialized.SimpleSwitch != null)
             {
                 var required = deserialized.SimpleSwitch.Values.Values.ToList();
                 Debug.Assert(required.Count > 0);
 
                 var observable = parameterFactory.OnRegisterLong(required[0]).Select(_ => 1);
-                
+
                 for (var i = 1; i < required.Count; i++)
                 {
                     observable = observable.CombineLatest(parameterFactory.OnRegisterLong(required[i]), (a, _) => a + 1);
@@ -58,12 +70,12 @@ public class ContextualParametersProvider : IContextualParametersProvider
 
                     var anyIsAsync = deserialized.SimpleSwitch.Values.Values.Select(parameterFactory.Factory)
                         .Any(param => param is IAsyncParameter<long> || param is IAsyncContextualParameter<long, DatabaseEntity>);
-                    
+
                     if (anyIsAsync)
                         parameter = new AsyncDatabaseContextualParameter(parameterFactory, pickerService, deserialized.SimpleSwitch);
                     else
                         parameter = new DatabaseContextualParameter(parameterFactory, pickerService, deserialized.SimpleSwitch);
-                    
+
                     parameterFactory.Register(deserialized.Name, parameter);
                 });
             }
@@ -73,7 +85,7 @@ public class ContextualParametersProvider : IContextualParametersProvider
                 Debug.Assert(required.Count > 0);
 
                 var observable = parameterFactory.OnRegister(required[0]).Select(_ => 1);
-                
+
                 for (var i = 1; i < required.Count; i++)
                 {
                     observable = observable.CombineLatest(parameterFactory.OnRegister(required[i]), (a, _) => a + 1);
@@ -91,7 +103,7 @@ public class ContextualParametersProvider : IContextualParametersProvider
     }
 }
 
-public class DatabaseContextualParameter : IContextualParameter<long, DatabaseEntity>, ICustomPickerContextualParameter<long>, ITableAffectedByParameter
+public class DatabaseContextualParameter : BaseContextualParameter<long, DatabaseEntity>, ICustomPickerContextualParameter<long>, ITableAffectedByParameter
 {
     protected readonly IParameterPickerService pickerService;
     protected Dictionary<long, IParameter<long>> parameters = new();
@@ -140,13 +152,13 @@ public class DatabaseContextualParameter : IContextualParameter<long, DatabaseEn
         return pickerService.PickParameter(parameter, value);
     }
 
-    public string? Prefix { get; set; }
-    public bool HasItems => true;
-    public string ToString(long value) => value.ToString();
+    public override string? Prefix { get; }
+    public override bool HasItems => true;
+    public override string ToString(long value) => value.ToString();
 
-    public Dictionary<long, SelectOption>? Items { get; set; }
+    public override Dictionary<long, SelectOption>? Items => null;
     
-    public string ToString(long value, DatabaseEntity entity)
+    public override string ToString(long value, DatabaseEntity entity)
     {
         var parameter = defaultParameter;
         var cell = entity.GetTypedValueOrThrow<long>(column);
@@ -180,6 +192,13 @@ public class AsyncDatabaseContextualParameter : DatabaseContextualParameter, IAs
         
         return parameter.ToString(value);
     }
+
+    public async Task<string> ToStringAsync(long value, CancellationToken token, object context)
+    {
+        if (context is DatabaseEntity entity)
+            return await ToStringAsync(value, token, entity);
+        return ToString(value);
+    }
 }
 
 public interface ITableAffectedByParameter
@@ -188,7 +207,7 @@ public interface ITableAffectedByParameter
     public bool AffectedByConditions => false;
 }
 
-public class DatabaseStringContextualParameter : IContextualParameter<string, DatabaseEntity>, ICustomPickerContextualParameter<string>, ITableAffectedByParameter
+public class DatabaseStringContextualParameter : BaseContextualParameter<string, DatabaseEntity>, ICustomPickerContextualParameter<string>, ITableAffectedByParameter
 {
     private readonly IParameterPickerService pickerService;
     private Dictionary<string, IParameter<long>> longParameters = new();
@@ -239,15 +258,15 @@ public class DatabaseStringContextualParameter : IContextualParameter<string, Da
         return (res.value ?? "", res.ok);
     }
 
-    public string? Prefix { get; set; }
-    public bool HasItems => true;
+    public override string? Prefix { get; }
+    public override bool HasItems => true;
     public string ToString(long value) => value.ToString();
 
-    public string ToString(string value) => value;
+    public override string ToString(string value) => value;
 
-    public Dictionary<string, SelectOption>? Items => null;
+    public override Dictionary<string, SelectOption>? Items => null;
     
-    public string ToString(string value, DatabaseEntity entity)
+    public override string ToString(string value, DatabaseEntity entity)
     {
         var cell = entity.GetTypedValueOrThrow<string>(AffectedByColumn);
         if (cell == null)

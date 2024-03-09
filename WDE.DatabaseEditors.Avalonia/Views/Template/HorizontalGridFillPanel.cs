@@ -58,9 +58,9 @@ public class HorizontalGridFillPanel : Panel, INavigableContainer
     /// <param name="from">The control from which movement begins.</param>
     /// <param name="wrap">Whether to wrap around when the first or last item is reached.</param>
     /// <returns>The control.</returns>
-    IInputElement INavigableContainer.GetControl(NavigationDirection direction, IInputElement from, bool wrap)
+    IInputElement INavigableContainer.GetControl(NavigationDirection direction, IInputElement? from, bool wrap)
     {
-        var result = GetControlInDirection(direction, (from as IControl)!);
+        var result = GetControlInDirection(direction, (from as Control)!);
 
         if (result == null && wrap)
         {
@@ -88,7 +88,7 @@ public class HorizontalGridFillPanel : Panel, INavigableContainer
     /// <param name="direction">The movement direction.</param>
     /// <param name="from">The control from which movement begins.</param>
     /// <returns>The control.</returns>
-    protected virtual IInputElement? GetControlInDirection(NavigationDirection direction, IControl? from)
+    protected virtual IInputElement? GetControlInDirection(NavigationDirection direction, Control? from)
     {
         var horiz = true;
         int index = from != null ? Children.IndexOf(from) : -1;
@@ -226,7 +226,7 @@ public class HorizontalGridFillPanel : Panel, INavigableContainer
     }
 
     internal virtual void ArrangeChild(
-        IControl child,
+        Control child,
         Rect rect,
         Size panelSize,
         Orientation orientation)

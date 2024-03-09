@@ -10,9 +10,9 @@ namespace WDE.QueryGenerators.Generators.Gameobject;
 [RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "Azeroth", "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic")]
 public class TrinityGameObjectDiffQueryProvider : IUpdateQueryProvider<GameObjectDiff>
 {
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
 
-    public TrinityGameObjectDiffQueryProvider(IDatabaseProvider databaseProvider)
+    public TrinityGameObjectDiffQueryProvider(ICachedDatabaseProvider databaseProvider)
     {
         this.databaseProvider = databaseProvider;
     }
@@ -23,7 +23,7 @@ public class TrinityGameObjectDiffQueryProvider : IUpdateQueryProvider<GameObjec
     {
         var trans = Queries.BeginTransaction(DataDatabaseType.World);
 
-        var gameObjectEntry = databaseProvider.GetGameObjectByGuid(diff.Guid, diff.Entry);
+        var gameObjectEntry = databaseProvider.GetCachedGameObjectByGuid(diff.Guid, diff.Entry);
 
         if (gameObjectEntry != null)
             trans.Comment(gameObjectEntry.Guid.ToString());

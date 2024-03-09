@@ -22,7 +22,7 @@ namespace AvaloniaStyles.Controls
         private void Handler(object? sender, PointerReleasedEventArgs e)
         {
             var control = (sender as Control);
-            var popup = control.FindLogicalAncestorOfType<Popup>();
+            var popup = control?.FindLogicalAncestorOfType<Popup>();
             if (popup != null)
                 popup.IsOpen = false;
         }

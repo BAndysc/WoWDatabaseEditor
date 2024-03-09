@@ -13,7 +13,7 @@
       <SettingItem Header="Source code folders" Help="The editor will search in those folders when using Find Anywhere feature">
         <Button HorizontalAlignment="Right" Command="{CompiledBinding AddDirectoryCommand}">Add folder</Button>
       </SettingItem>
-      <ItemsControl Items="{CompiledBinding Paths}">
+      <ItemsControl ItemsSource="{CompiledBinding Paths}">
         <ItemsControl.ItemTemplate>
           <DataTemplate>
             <SettingItem Padding="20,0,0,0" Header="{CompiledBinding .}">

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using WDE.Common;
 using WDE.Module.Attributes;
+using WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
 {
@@ -14,6 +16,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
     {
         Window RootWindow { get; set; }
         Task<T> ShowDialog<T>(Window window);
+        Window TopWindow { get; }
         void Show(Window window);
     }
 
@@ -30,7 +33,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             if (windows == null)
                 throw new Exception("No windows found! Are you running it in web assembly?");
             
-            return windows.SingleOrDefault(w => w.IsActive) ?? windows.SingleOrDefault(w => w is MainWindowWithDocking);
+            var window = windows.SingleOrDefault(w => w.IsActive);
+            if (window is MessageBoxView)
+                window = window.Owner as Window;
+
+            window ??= windows.SingleOrDefault(w => w is MainWindowWithDocking);
+            return window;
         }
         
         public Task<T> ShowDialog<T>(Window window)
@@ -46,12 +54,20 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             throw new Exception("Trying to show dialog without any active window! Are you closing the editor already?");
         }
 
+        public Window TopWindow => FindTopWindow()!;
+
         public void Show(Window window)
         {
             var top = FindTopWindow();
             if (top != null && top.WindowState == WindowState.Minimized)
                 top.WindowState = WindowState.Normal;
-            window.Show(top);
+            if (top != null)
+                window.Show(top);
+            else
+            {
+                LOG.LogWarning("Trying to show a window without any active window! Are you closing the editor already?");
+                window.Show();
+            }
         }
     }
 }

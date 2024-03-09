@@ -9,34 +9,70 @@ namespace WDE.SmartScriptEditor.Data
 {
     [AutoRegister]
     [SingleInstance]
-    public class SmartRawDataProvider : ISmartRawDataProvider
+    public class SmartRawDataProviderAsync : ISmartRawDataProviderAsync
     {
-        private List<SmartGenericJsonData> actions;
-        private List<SmartGenericJsonData> events;
-        private List<SmartGenericJsonData> targets;
-        private List<SmartGroupsJsonData> eventsGroups;
-        private List<SmartGroupsJsonData> actionsGroups;
-        private List<SmartGroupsJsonData> targetsGroups;
+        private List<SmartGenericJsonData>? actions;
+        private List<SmartGenericJsonData>? events;
+        private List<SmartGenericJsonData>? targets;
+        private List<SmartGroupsJsonData>? eventsGroups;
+        private List<SmartGroupsJsonData>? actionsGroups;
+        private List<SmartGroupsJsonData>? targetsGroups;
 
-        private readonly ISmartDataJsonProvider jsonProvider;
+        private readonly ISmartDataJsonProviderAsync jsonProvider;
         private readonly ISmartDataSerializationProvider serializationProvider;
         private readonly IMessageBoxService messageBoxService;
 
-        public SmartRawDataProvider(ISmartDataJsonProvider jsonProvider,
+        public SmartRawDataProviderAsync(ISmartDataJsonProviderAsync jsonProvider,
             ISmartDataSerializationProvider serializationProvider,
             IMessageBoxService messageBoxService)
         {
             this.jsonProvider = jsonProvider;
             this.serializationProvider = serializationProvider;
             this.messageBoxService = messageBoxService;
-            actions = DeserializeData(jsonProvider.GetActionsJson(), "actions.json");
-            events = DeserializeData(jsonProvider.GetEventsJson(), "events.json");
-            targets = DeserializeData(jsonProvider.GetTargetsJson(), "targets.json");
-            eventsGroups = DeserializeGroups(jsonProvider.GetEventsGroupsJson(), "events_groups.json");
-            actionsGroups = DeserializeGroups(jsonProvider.GetActionsGroupsJson(), "actions_groups.json");
-            targetsGroups = DeserializeGroups(jsonProvider.GetTargetsGroupsJson(), "targets_groups.json");
         }
 
+        public async Task<IReadOnlyList<SmartGenericJsonData>> GetEvents()
+        {
+            if (events == null)
+                events = DeserializeData(await jsonProvider.GetEventsJson(), "events.json");
+            return events;
+        }
+
+        public async Task<IReadOnlyList<SmartGenericJsonData>> GetActions()
+        {
+            if (actions == null)
+                actions = DeserializeData(await jsonProvider.GetActionsJson(), "actions.json");
+            return actions;
+        }
+
+        public async Task<IReadOnlyList<SmartGenericJsonData>> GetTargets()
+        {
+            if (targets == null)
+                targets = DeserializeData(await jsonProvider.GetTargetsJson(), "targets.json");
+            return targets;
+        }
+
+        public async Task<IReadOnlyList<SmartGroupsJsonData>> GetEventsGroups()
+        {
+            if (eventsGroups == null)
+                eventsGroups = DeserializeGroups(await jsonProvider.GetEventsGroupsJson(), "events_groups.json");
+            return eventsGroups;
+        }
+
+        public async Task<IReadOnlyList<SmartGroupsJsonData>> GetActionsGroups()
+        {
+            if (actionsGroups == null)
+                actionsGroups = DeserializeGroups(await jsonProvider.GetActionsGroupsJson(), "actions_groups.json");
+            return actionsGroups;
+        }
+
+        public async Task<IReadOnlyList<SmartGroupsJsonData>> GetTargetsGroups()
+        {
+            if (targetsGroups == null)
+                targetsGroups = DeserializeGroups(await jsonProvider.GetTargetsGroupsJson(), "targets_groups.json");
+            return targetsGroups;
+        }
+        
         private List<SmartGenericJsonData> DeserializeData(string json, string fileName)
         {
             try
@@ -77,11 +113,5 @@ namespace WDE.SmartScriptEditor.Data
             return new List<SmartGroupsJsonData>();
         }
 
-        public IEnumerable<SmartGenericJsonData> GetActions() => actions;
-        public IEnumerable<SmartGenericJsonData> GetEvents() => events;
-        public IEnumerable<SmartGenericJsonData> GetTargets() => targets;
-        public IEnumerable<SmartGroupsJsonData> GetEventsGroups() => eventsGroups;
-        public IEnumerable<SmartGroupsJsonData> GetActionsGroups() => actionsGroups;
-        public IEnumerable<SmartGroupsJsonData> GetTargetsGroups() => targetsGroups;
     }
 }

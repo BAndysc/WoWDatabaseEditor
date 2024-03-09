@@ -331,7 +331,7 @@ internal class AntlrSyntaxValidator : ISyntaxValidator
                 {
                     throw ep;
                 }
-                catch (InputMismatchException e)
+                catch (InputMismatchException)
                 {
                     if (isEof)
                         message = "Statement is incomplete";
@@ -345,7 +345,7 @@ internal class AntlrSyntaxValidator : ISyntaxValidator
                 {
                     // For cases like "... | a ({condition}? b)", but not "... | a ({condition}? b)?".
                     string condition = e.Message;
-                    string prefix = "predicate failed: ";
+                    //string prefix = "predicate failed: ";
                     //condition.erase(0, prefix.size());
                     //condition.resize(condition.size() - 1); // Remove trailing question mark.
 
@@ -353,7 +353,7 @@ internal class AntlrSyntaxValidator : ISyntaxValidator
                     condition = condition.Replace("&&", "and");
                     message = wrongText + " is valid only for " + condition;
                 }
-                catch (NoViableAltException e)
+                catch (NoViableAltException)
                 {
                     if (isEof)
                         message = "Statement is incomplete";

@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:messageBoxService="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+             FontSize="14"
+             MinWidth="500"
+             MinHeight="150"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService.MessageBoxControlView">
+  <UserControl.KeyBindings>
+    <KeyBinding Gesture="Escape" Command="{Binding CancelButtonCommand}" />
+    <KeyBinding Gesture="Y" Command="{Binding YesButtonCommand}" />
+    <KeyBinding Gesture="N" Command="{Binding NoButtonCommand}" />
+  </UserControl.KeyBindings>
+  <Border BorderThickness="0.5" BorderBrush="{DynamicResource OuterWindowBorderColor}" Name="PART_windowBorder">
+    <Border BorderThickness="0.5" BorderBrush="{DynamicResource InnerWindowBorderColor}" Name="PART_windowBorder_inner">
+      <Panel>
+        <Panel Background="{DynamicResource SystemControlBackgroundAltHighBrush}" IsHitTestVisible="False" />
+        <DockPanel LastChildFill="True">
+          <ItemsControl KeyboardNavigation.TabNavigation="Continue" HorizontalAlignment="Stretch"
+                        Background="{DynamicResource MessageBoxBottomPanelBackground}"
+                        BorderBrush="{DynamicResource MessageBoxBottomPanelBorder}"
+                        BorderThickness="0,1,0,0"
+                        Padding="20"
+                        DockPanel.Dock="Bottom"
+                        ItemsSource="{Binding Buttons}" Name="ButtonsList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="messageBoxService:MessageBoxButtonViewModel">
+                <Button Content="{CompiledBinding Name}"
+                        Classes.primary="{CompiledBinding IsDefault}"
+                        utils:FocusUtils.FocusFirst="{Binding IsDefault}"
+                        IsDefault="{CompiledBinding IsDefault}"
+                        Command="{CompiledBinding Command}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StretchStackPanel KeyboardNavigation.TabNavigation="Continue" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+
+          <DockPanel LastChildFill="True" Margin="25,30" IsHitTestVisible="False">
+            <TextBlock Text="{Binding Model.MainInstruction}" FontWeight="Bold" TextWrapping="WrapWithOverflow" FontSize="20" DockPanel.Dock="Top" Margin="0,0,0,12" />
+            <TextBlock Text="{Binding Model.Content}" TextWrapping="WrapWithOverflow" FontSize="14" />
+          </DockPanel>
+        </DockPanel>
+      </Panel>
+    </Border>
+  </Border>
+</UserControl>

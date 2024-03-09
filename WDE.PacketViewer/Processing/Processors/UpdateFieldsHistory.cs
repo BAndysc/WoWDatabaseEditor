@@ -26,7 +26,7 @@ public interface IUpdateFieldsHistory : IPacketProcessor<Unit>
     IEnumerable<(string key, Interval<int, long> current, Interval<int, long>? previous, Interval<int, long>? next)> IntValues(UniversalGuid guid, int time);
     IEnumerable<(string key, Interval<int, float> current, Interval<int, float>? previous, Interval<int, float>? next)> FloatValues(UniversalGuid guid, int time);
     ICollection<UniversalGuid> AllGuids { get; }
-    void Finalize();
+    void Finish();
 }
 
 [AutoRegister]
@@ -112,7 +112,7 @@ public class UpdateFieldsHistory : PacketProcessor<Unit>, IUpdateFieldsHistory
         return states[guid] = new();
     }
 
-    public void Finalize()
+    public void Finish()
     {
         foreach (var state in states.Values)
         {

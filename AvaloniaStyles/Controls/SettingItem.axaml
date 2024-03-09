@@ -5,13 +5,13 @@
         <controls:SettingItem />
     </Design.PreviewWith>
 
-    <Style Selector="StackPanel > ContentPresenter:nth-child(1) > controls|SettingItem">
+    <Style Selector="ItemsControl > ContentPresenter:nth-child(1) > controls|SettingItem">
         <Setter Property="CornerRadius" Value="6,6,0,0" />
     </Style>
-    <Style Selector="StackPanel > ContentPresenter:nth-last-child(1) > controls|SettingItem">
+    <Style Selector="ItemsControl > ContentPresenter:nth-last-child(1) > controls|SettingItem">
         <Setter Property="CornerRadius" Value="0,0,6,6" />
     </Style>
-    <Style Selector="StackPanel > ContentPresenter:nth-child(1):nth-last-child(1) > controls|SettingItem">
+    <Style Selector="ItemsControl > ContentPresenter:nth-child(1):nth-last-child(1) > controls|SettingItem">
         <Setter Property="CornerRadius" Value="6,6,6,6" />
     </Style>
     
@@ -56,10 +56,10 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    <Style Selector="StackPanel > ContentPresenter:nth-last-child(1) controls|SettingItem">
+    <Style Selector="ItemsControl > ContentPresenter:nth-last-child(1) > controls|SettingItem">
         <Setter Property="Margin" Value="0" />
     </Style>
-    <Style Selector="StackPanel > controls|SettingItem:nth-last-child(1)">
+    <Style Selector="ItemsControl > controls|SettingItem:nth-last-child(1)">
         <Setter Property="Margin" Value="0" />
     </Style>
 </Styles>

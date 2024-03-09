@@ -2,7 +2,6 @@
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Metadata;
-using Avalonia.Visuals.Media.Imaging;
 
 namespace AvaloniaStyles.Controls;
 
@@ -27,7 +26,7 @@ public class ImageIcon : FAIconElement
         set => SetValue(SourceProperty, value);
     }
 
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
         if (change.Property == SourceProperty)
@@ -59,7 +58,7 @@ public class ImageIcon : FAIconElement
             Rect srcRect = new Rect(src.Size)
                 .CenterRect(new Rect(destRect.Size / scale));
 
-            context.DrawImage(src, srcRect, destRect, BitmapInterpolationMode.HighQuality);
+            context.DrawImage(src, srcRect, destRect);
         }
     }
 }

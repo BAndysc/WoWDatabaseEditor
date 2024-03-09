@@ -51,47 +51,33 @@
                 </ColumnDefinitions>
             </converters:BoolToColumnDefinitionsConverter.FalseValue>
         </converters:BoolToColumnDefinitionsConverter>
-        
+
         <ItemsPanelTemplate x:Key="HorizontalRowPanel">
-            <Grid 
+            <Grid
                 KeyboardNavigation.TabNavigation="Continue"
                 helpers:GridColumnsBinder.Columns="{Binding DataContext.Columns, ElementName=rootWindow}">
             </Grid>
         </ItemsPanelTemplate>
         <ItemsPanelTemplate x:Key="VerticalRowPanel">
-            <controls:DynamicColumnsPanel 
+            <controls:DynamicColumnsPanel
                 KeyboardNavigation.TabNavigation="Continue"
                 MaximumColumnsCount="{Binding #rootWindow.DataContext.SplitHorizontal, Converter={StaticResource BoolToInt1Max}}" ColumnWidth="400" HorizontalSpacing="10" Spacing="5"></controls:DynamicColumnsPanel>
         </ItemsPanelTemplate>
-        <DataTemplate x:Key="RowTemplate" x:DataType="vm:DatabaseEntityViewModel">
-            <multiRow:SelectablePanel>
-                <ItemsPresenter 
-                    KeyboardNavigation.TabNavigation="Continue"
-                    Items="{CompiledBinding Cells, Mode=OneTime}" 
-                    ItemsPanel="{StaticResource HorizontalRowPanel}">
-                    <ItemsPresenter.Styles>
-                        <Style Selector="Grid > ContentPresenter" x:DataType="vm:DatabaseCellViewModel">
-                            <Setter Property="(Grid.Column)" Value="{CompiledBinding ColumnIndex}" />
-                        </Style>
-                    </ItemsPresenter.Styles>
-                </ItemsPresenter>
-            </multiRow:SelectablePanel>
-        </DataTemplate>
         <DataTemplate x:Key="VerticalRowTemplate" DataType="vm:DatabaseEntityViewModel">
-            <ItemsPresenter 
+            <ItemsControl
                 KeyboardNavigation.TabNavigation="Continue"
-                Items="{CompiledBinding Cells, Mode=OneWay}"
+                ItemsSource="{CompiledBinding Cells, Mode=OneWay}"
                 ItemsPanel="{StaticResource VerticalRowPanel}">
-                <ItemsPresenter.ItemTemplate>
+                <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:DatabaseCellViewModel">
                         <DockPanel LastChildFill="True">
                             <TextBlock Text="{CompiledBinding ColumnName, StringFormat={}{0}: }" Opacity="0.7" VerticalAlignment="Center" Width="100" FontWeight="Bold" />
-                            <ContentPresenter Background="{DynamicResource ContentBackground}" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource TextControlBorderBrush}" Content="{CompiledBinding}" Margin="20,0,0,0" />
+                            <ContentControl Background="{DynamicResource ContentBackground}" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource TextControlBorderBrush}" Content="{CompiledBinding}" Margin="20,0,0,0" />
                         </DockPanel>
 
                     </DataTemplate>
-                </ItemsPresenter.ItemTemplate>
-            </ItemsPresenter>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </DataTemplate>
     </UserControl.Resources>
     <UserControl.Styles>
@@ -105,15 +91,6 @@
         <Style Selector="StackPanel">
             <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
         </Style>
-        <Style Selector="multiRow|SelectablePanel">
-            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
-        </Style>
-        <Style Selector="ContentPresenter:nth-child(2n) > multiRow|SelectablePanel">
-            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
-        </Style>
-        <Style Selector="multiRow|SelectablePanel:selected">
-            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Selected}" />
-        </Style>
         <Style Selector="Border.header">
             <Setter Property="Height" Value="32" />
             <Setter Property="Background" Value="{DynamicResource TextControlBackground}"/>
@@ -124,7 +101,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate>
-                        <Border BorderThickness="0,0,1,0" 
+                        <Border BorderThickness="0,0,1,0"
                                 Background="Transparent"
                                 BorderBrush="#3F000000" />
                     </ControlTemplate>
@@ -200,16 +177,16 @@
             </helpers:FieldValueTemplateSelector.GenericTemplate>
         </helpers:FieldValueTemplateSelector>
     </UserControl.DataTemplates>
-    
+
     <Panel>
-        
+
         <Grid utils:GridUtils.DynamicRows="{CompiledBinding SplitVertical, Converter={StaticResource RowsConverter}}"
           utils:GridUtils.DynamicColumns="{CompiledBinding SplitHorizontal, Converter={StaticResource ColumnsConverter}}">
-            <ScrollViewer Padding="0,0,15,15" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" AllowAutoHide="False">
+            <ScrollViewer BringIntoViewOnFocusChange="False" Padding="0,0,15,15" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" AllowAutoHide="False">
                 <fastTableView:VeryFastTableView
                     InteractiveHeader="True"
                     ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
-                    TextBlock.FontFamily="Consolas,Menlo,Courier,Courier New"
+                    TextElement.FontFamily="Consolas,Menlo,Courier,Courier New"
                     SelectedCellIndex="{CompiledBinding FocusedCellIndex}"
                     SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
                     MultiSelection="{CompiledBinding MultiSelection}"
@@ -237,7 +214,7 @@
                                 </controls1:GroupingHeader.CustomContent>
                                 <controls1:GroupingHeader.CustomRightContent>
                                     <StackPanel Orientation="Horizontal" Spacing="5">
-                                        <Button Width="23" Height="23" FontSize="16" 
+                                        <Button Width="23" Height="23" FontSize="16"
                                                 ToolTip.Tip="{CompiledBinding IsExpanded, Converter={StaticResource IsExpandedToTextConverter}}"
                                                 Command="{Binding ElementName=rootWindow, Path=DataContext.CollapseExpandCommand, Mode=OneTime}" CommandParameter="{CompiledBinding .}">
                                             <Panel>
@@ -268,17 +245,17 @@
             <GridSplitter IsVisible="{CompiledBinding SplitView}"
                           Classes.horizontal="{CompiledBinding SplitVertical}"
                           Classes.vertical="{CompiledBinding SplitHorizontal}"
-                          Grid.Row="{CompiledBinding SplitVertical, Converter={StaticResource BoolToInt1}}" 
+                          Grid.Row="{CompiledBinding SplitVertical, Converter={StaticResource BoolToInt1}}"
                           Grid.Column="{CompiledBinding SplitHorizontal, Converter={StaticResource BoolToInt1}}"  />
             <Border IsVisible="{CompiledBinding SplitView}"
-                    Grid.Row="{CompiledBinding SplitVertical, Converter={StaticResource BoolToInt2}}" 
-                    Grid.Column="{CompiledBinding SplitHorizontal, Converter={StaticResource BoolToInt2}}" 
+                    Grid.Row="{CompiledBinding SplitVertical, Converter={StaticResource BoolToInt2}}"
+                    Grid.Column="{CompiledBinding SplitHorizontal, Converter={StaticResource BoolToInt2}}"
                     Background="{DynamicResource SlightlyDifferentBackground}" Padding="3">
                 <DockPanel LastChildFill="True">
                     <controls1:GroupingHeader GroupName="Selected row" DockPanel.Dock="Top" />
                     <ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Disabled" Padding="8,0,16,0">
                         <ContentControl ContentTemplate="{StaticResource VerticalRowTemplate}" Content="{CompiledBinding SelectedRow}">
-                
+
                         </ContentControl>
                     </ScrollViewer>
                 </DockPanel>
@@ -289,7 +266,7 @@
                 </Border.Styles>
             </Border>
         </Grid>
-        
+
         <Border Background="{DynamicResource ContentBackground}" Opacity="0.8" IsVisible="{CompiledBinding IsLoading}">
             <TextBlock VerticalAlignment="Center" TextAlignment="Center" HorizontalAlignment="Center" FontSize="16">Loading table...</TextBlock>
         </Border>

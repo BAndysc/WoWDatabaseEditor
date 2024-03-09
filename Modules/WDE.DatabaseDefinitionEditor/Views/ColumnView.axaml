@@ -30,7 +30,7 @@
 - an actual database column
 - a button that opens the conditions editor
 - a special button which meaning can be customized (meta column)">Column type:</TextBlock>
-        <ComboBox Items="{x:Static tools:DefinitionEditorStatic.ColumnTypes}" SelectedItem="{CompiledBinding ColumnType}" />
+        <ComboBox ItemsSource="{x:Static tools:DefinitionEditorStatic.ColumnTypes}" SelectedItem="{CompiledBinding ColumnType}" />
         
         <TwoColumnsPanel TwoColumnsPanel.ColumnSpan="2"
                                IsVisible="{CompiledBinding IsDatabaseColumnType}">
@@ -93,7 +93,7 @@ This will generate a comment, it will substitute `thisString.COLUMN` with a stri
             <TextBlock>Column type:</TextBlock>
             <ComboBox
                 SelectedItem="{CompiledBinding SelectedMetaColumnType}"
-                Items="{CompiledBinding Parent.Parent.Parent.MetaColumnFactory.Types}">
+                ItemsSource="{CompiledBinding Parent.Parent.Parent.MetaColumnFactory.Types}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate x:DataType="metaColumns:MetaColumnTypeViewModel">
                          <DockPanel>

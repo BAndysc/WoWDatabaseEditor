@@ -16,18 +16,19 @@ using AvaloniaStyles.Utils;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Disposables;
 using WDE.Common.Utils;
+using HslColor = AvaloniaStyles.Utils.HslColor;
 
 namespace WDE.Common.Avalonia.Controls;
 
-public class ColorPicker : Control
+public class WdeColorPicker : Control
 {
-    private IBitmap? bitmap;
+    private Bitmap? bitmap;
     private int requestVersion = 0;
     private int currentVersion = -1;
     private int currentCalculateVersion = -1;
     private CancellationTokenSource? currentTaskSource;
 
-    public static readonly StyledProperty<double> LightnessProperty = AvaloniaProperty.Register<ColorPicker, double>(nameof(Lightness), 0.5f);
+    public static readonly StyledProperty<double> LightnessProperty = AvaloniaProperty.Register<WdeColorPicker, double>(nameof(Lightness), defaultValue: 0.5f);
 
     public double Lightness
     {
@@ -35,7 +36,7 @@ public class ColorPicker : Control
         set => SetValue(LightnessProperty, value);
     }
 
-    public static readonly StyledProperty<double> SelectedHueProperty = AvaloniaProperty.Register<ColorPicker, double>(nameof(SelectedHue));
+    public static readonly StyledProperty<double> SelectedHueProperty = AvaloniaProperty.Register<WdeColorPicker, double>(nameof(SelectedHue));
 
     public double SelectedHue
     {
@@ -43,10 +44,10 @@ public class ColorPicker : Control
         set => SetValue(SelectedHueProperty, value);
     }
 
-    public static readonly StyledProperty<double> SelectedSaturationProperty = AvaloniaProperty.Register<ColorPicker, double>(nameof(SelectedSaturation));
-    public static readonly DirectProperty<ColorPicker, HslColor> SelectedColorProperty = AvaloniaProperty.RegisterDirect<ColorPicker, HslColor>(nameof(SelectedColor), o => o.SelectedColor, (o, v) => o.SelectedColor = v, default, BindingMode.TwoWay);
-    public static readonly StyledProperty<double> HueOffsetProperty = AvaloniaProperty.Register<ColorPicker, double>(nameof(HueOffset));
-    public static readonly DirectProperty<ColorPicker, Color> RgbColorProperty = AvaloniaProperty.RegisterDirect<ColorPicker, Color>(nameof(RgbColor), o => o.RgbColor);
+    public static readonly StyledProperty<double> SelectedSaturationProperty = AvaloniaProperty.Register<WdeColorPicker, double>(nameof(SelectedSaturation));
+    public static readonly DirectProperty<WdeColorPicker, HslColor> SelectedColorProperty = AvaloniaProperty.RegisterDirect<WdeColorPicker, HslColor>("SelectedColor", o => o.SelectedColor, (o, v) => o.SelectedColor = v, default, BindingMode.TwoWay);
+    public static readonly StyledProperty<double> HueOffsetProperty = AvaloniaProperty.Register<WdeColorPicker, double>("HueOffset");
+    public static readonly DirectProperty<WdeColorPicker, Color> RgbColorProperty = AvaloniaProperty.RegisterDirect<WdeColorPicker, Color>(nameof(RgbColor), o => o.RgbColor);
 
     public Color RgbColor
     {
@@ -65,9 +66,9 @@ public class ColorPicker : Control
         set
         {
             using var _ = SuspendSelectedColorNotification();
-            SelectedHue = value.H;
-            SelectedSaturation = value.S;
-            Lightness = value.L;
+            SetCurrentValue(SelectedHueProperty, value.H);
+            SetCurrentValue(SelectedSaturationProperty, value.S);
+            SetCurrentValue(LightnessProperty, value.L);
         }
     }
 
@@ -84,8 +85,8 @@ public class ColorPicker : Control
         {
             var pos = e.GetPosition(this);
             using var _ = SuspendSelectedColorNotification();
-            SelectedHue = pos.X / Bounds.Width;
-            SelectedSaturation = 1 - pos.Y / Bounds.Height;
+            SetCurrentValue(SelectedHueProperty, pos.X / Bounds.Width);
+            SetCurrentValue(SelectedSaturationProperty, 1 - pos.Y / Bounds.Height);
         }
     }
 
@@ -96,15 +97,15 @@ public class ColorPicker : Control
         {
             var pos = e.GetPosition(this);
             using var _ = SuspendSelectedColorNotification();
-            SelectedHue = pos.X / Bounds.Width;
-            SelectedSaturation = 1 - pos.Y / Bounds.Height;
+            SetCurrentValue(SelectedHueProperty, pos.X / Bounds.Width);
+            SetCurrentValue(SelectedSaturationProperty, 1 - pos.Y / Bounds.Height);
         }
     }
 
-    static ColorPicker()
+    static WdeColorPicker()
     {
-        ClipToBoundsProperty.OverrideDefaultValue<ColorPicker>(true);
-        LightnessProperty.Changed.AddClassHandler<ColorPicker>((picker, e) =>
+        ClipToBoundsProperty.OverrideDefaultValue<WdeColorPicker>(true);
+        LightnessProperty.Changed.AddClassHandler<WdeColorPicker>((picker, e) =>
         {
             picker.requestVersion++;
             picker.InvalidateVisual();
@@ -113,22 +114,22 @@ public class ColorPicker : Control
             picker.RaisePropertyChanged(SelectedColorProperty, default, picker.SelectedColor);
             picker.RaisePropertyChanged(RgbColorProperty, default, picker.RgbColor);
         });
-        SelectedHueProperty.Changed.AddClassHandler<ColorPicker>((picker, e) =>
+        SelectedHueProperty.Changed.AddClassHandler<WdeColorPicker>((picker, e) =>
         {
             if (picker.isSuspended)
                 return;
             picker.RaisePropertyChanged(SelectedColorProperty, default, picker.SelectedColor);
             picker.RaisePropertyChanged(RgbColorProperty, default, picker.RgbColor);
         });
-        SelectedSaturationProperty.Changed.AddClassHandler<ColorPicker>((picker, e) =>
+        SelectedSaturationProperty.Changed.AddClassHandler<WdeColorPicker>((picker, e) =>
         {
             if (picker.isSuspended)
                 return;
             picker.RaisePropertyChanged(SelectedColorProperty, default, picker.SelectedColor);
             picker.RaisePropertyChanged(RgbColorProperty, default, picker.RgbColor);
         });
-        AffectsRender<ColorPicker>(SelectedHueProperty);
-        AffectsRender<ColorPicker>(SelectedSaturationProperty);
+        AffectsRender<WdeColorPicker>(SelectedHueProperty);
+        AffectsRender<WdeColorPicker>(SelectedSaturationProperty);
     }
 
     private bool isSuspended = false;
