@@ -6,6 +6,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using WDE.Common.Avalonia.Utils;
+using WDE.Common.CoreVersion;
 using WDE.Common.Parameters;
 using WDE.Common.Utils;
 
@@ -20,12 +21,21 @@ public class GenericParameterBox : BaseParameterBox
     private Button? specialCommandButton;
 
     public static readonly StyledProperty<string> ParameterValueAsStringProperty = AvaloniaProperty.Register<GenericParameterBox, string>(nameof(ParameterValueAsString));
+
     public static readonly StyledProperty<long> NumberToMultiplyProperty = AvaloniaProperty.Register<GenericParameterBox, long>(nameof(NumberToMultiply));
     public static readonly DirectProperty<GenericParameterBox, bool> CanPickItemsProperty = AvaloniaProperty.RegisterDirect<GenericParameterBox, bool>(nameof(CanPickItems), o => o.CanPickItems, (o, v) => o.CanPickItems = v);
+
+    private static bool? cachedSupportsSpecialCommand;
+    public bool SupportsSpecialCommand { get; }
 
     public GenericParameterBox()
     {
         parameterFactory = ViewBind.ResolveViewModel<IParameterFactory>();
+
+        if (!cachedSupportsSpecialCommand.HasValue)
+            cachedSupportsSpecialCommand = ViewBind.ResolveViewModel<ICurrentCoreVersion>().Current.SupportsSpecialCommands;
+
+        SupportsSpecialCommand = cachedSupportsSpecialCommand.Value;
     }
 
     public long NumberToMultiply

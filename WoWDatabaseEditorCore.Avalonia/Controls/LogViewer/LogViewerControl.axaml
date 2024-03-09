@@ -1,11 +1,11 @@
-<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.Avalonia.LogViewerControl"
+<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.LogViewerControl"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:converters1="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.Avalonia.Converters"
              xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.Services.LogService.ViewModels;assembly=WoWDatabaseEditorCore"
              xmlns:logging="clr-namespace:WoWDatabaseEditorCore.Services.LogService.Logging;assembly=WoWDatabaseEditorCore"
+             xmlns:converters="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.Converters"
              mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800"
              x:DataType="viewModels:LogViewerControlViewModel"
              DataContextChanged="OnDataContextChanged"
@@ -16,15 +16,15 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.Resources>
-            <converters1:EventIdConverter x:Key="EventIdConverter"/>
+            <converters:EventIdConverter x:Key="EventIdConverter"/>
         </Grid.Resources>
         <Grid.Styles>
             <Style Selector="DataGridRow">
                 <Setter Property="Padding" Value="0" />
-                <Setter Property="Foreground" Value="{Binding Color.Foreground}"
+                <Setter Property="Foreground" Value="{CompiledBinding LogLevel, Converter={x:Static converters:LogLevelToForegroundConverter.Instance}}"
                         x:DataType="logging:LogModel"
                         />
-                <Setter Property="Background" Value="{Binding Color.Background}"
+                <Setter Property="Background" Value="{CompiledBinding LogLevel, Converter={x:Static converters:LogLevelToBackgroundConverter.Instance}}"
                         x:DataType="logging:LogModel" />
             </Style>
             <Style Selector="DataGridCell.size">

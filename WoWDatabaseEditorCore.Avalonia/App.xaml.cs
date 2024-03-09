@@ -26,6 +26,7 @@ using WDE.Common;
 using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Events;
+using WDE.Common.Factories;
 using WDE.Common.Managers;
 using WDE.Common.Modules;
 using WDE.Common.Services;
@@ -35,8 +36,6 @@ using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.Module;
 using WDE.Module.Attributes;
-using WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.Avalonia.Converters;
-using WoWDatabaseEditorCore.Avalonia.Controls.Serilog.Sinks.LogView.Core.Extensions;
 using WoWDatabaseEditorCore.Avalonia.Managers;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers;
@@ -49,6 +48,7 @@ using WoWDatabaseEditorCore.ModulesManagement;
 using WoWDatabaseEditorCore.Services.DebugConsole;
 using WoWDatabaseEditorCore.Services.LoadingEvents;
 using WoWDatabaseEditorCore.Services.LogService.Logging;
+using WoWDatabaseEditorCore.Services.LogService.ReportErrorsToServer;
 using WoWDatabaseEditorCore.ViewModels;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using LogDataStore = WoWDatabaseEditorCore.Services.LogService.Logging.LogDataStore;
@@ -61,9 +61,12 @@ namespace WoWDatabaseEditorCore.Avalonia
         private ICurrentCoreSettings currentCoreSettings = null!;
         private ILoggerFactory loggerFactory;
         private ILogDataStore logDataStore;
+        private ReportErrorsSink reportErrorsSink;
 
         public App()
         {
+            reportErrorsSink = new ReportErrorsSink();
+
             logDataStore = new LogDataStore();
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
@@ -71,6 +74,7 @@ namespace WoWDatabaseEditorCore.Avalonia
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .WriteTo.DataStoreLoggerSink(() => logDataStore)
+                .WriteTo.Sink(reportErrorsSink)
                 .CreateLogger();
 
             loggerFactory = new SerilogLoggerFactory(Log.Logger);
@@ -126,9 +130,9 @@ namespace WoWDatabaseEditorCore.Avalonia
         protected override IContainerExtension CreateContainerExtension()
         {
             IUnityContainer unity = new UnityContainer();
-            #if DEBUG
+#if DEBUG
             unity = unity.AddExtension(new Diagnostic());
-            #endif
+#endif
             var container = new UnityContainerExtension(unity);
             var mainScope = new ScopedContainer(container, container, unity);
             container.RegisterInstance<IScopedContainer>(mainScope);
@@ -178,6 +182,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             base.RegisterRequiredTypes(containerRegistry);
             containerRegistry.RegisterInstance<ILogDataStore>(logDataStore);
             containerRegistry.RegisterInstance<ILoggerFactory>(loggerFactory);
+            containerRegistry.RegisterInstance(reportErrorsSink);
             containerRegistry.RegisterSingleton<IModuleInitializer, CustomModuleInitializer>();
             containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
             containerRegistry.RegisterSingleton<IViewLocator, ViewLocator>();
@@ -368,7 +373,6 @@ namespace WoWDatabaseEditorCore.Avalonia
                     
                     globalServiceRoot = Container.Resolve<IGlobalServiceRoot>();
 
-
                     IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
                     eventAggregator.GetEvent<AllModulesLoaded>().Publish();
                     Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
@@ -409,6 +413,8 @@ namespace WoWDatabaseEditorCore.Avalonia
 
                 singleView.MainView = mainApp;
             }
+
+            Container.Resolve<ReportErrorsSinkManager>();
         }
         
         public override void OnFrameworkInitializationCompleted()

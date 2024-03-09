@@ -1,12 +1,12 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
-using Avalonia.Markup.Xaml;
 using WoWDatabaseEditorCore.Services.LogService.Logging;
 
-namespace WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.Avalonia;
+namespace WoWDatabaseEditorCore.Avalonia.Controls.LogViewer;
 
 public partial class LogViewerControl : UserControl
 {
@@ -28,7 +28,7 @@ public partial class LogViewerControl : UserControl
     }
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        => item = MyDataGrid.ItemsSource.Cast<LogModel>().LastOrDefault();
+        => item = (MyDataGrid.ItemsSource as ObservableCollection<LogModel>)?.LastOrDefault();
 
     private void OnLayoutUpdated(object? sender, EventArgs e)
     {

@@ -3,25 +3,20 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
-using WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.Avalonia.Converters;
-using WoWDatabaseEditorCore.Services.LogService.Logging;
 
-namespace WoWDatabaseEditorCore.Avalonia.Controls.Serilog.Sinks.LogView.Core;
+namespace WoWDatabaseEditorCore.Services.LogService.Logging;
 
 public class DataStoreLoggerSink : ILogEventSink
 {
-    protected readonly Func<ILogDataStore> _dataStoreProvider;
+    protected readonly Func<ILogDataStore> dataStoreProvider;
     
-    private readonly IFormatProvider? _formatProvider;
-    private readonly Func<DataStoreLoggerConfiguration>? _getCurrentConfig;
+    private readonly IFormatProvider? formatProvider;
 
     public DataStoreLoggerSink(Func<ILogDataStore> dataStoreProvider,
-                               Func<DataStoreLoggerConfiguration>? getCurrentConfig = null,
                                IFormatProvider? formatProvider = null)
     {
-        _formatProvider = formatProvider;
-        _dataStoreProvider = dataStoreProvider;
-        _getCurrentConfig = getCurrentConfig;
+        this.formatProvider = formatProvider;
+        this.dataStoreProvider = dataStoreProvider;
     }
 
     public void Emit(LogEvent logEvent)
@@ -36,24 +31,18 @@ public class DataStoreLoggerSink : ILogEventSink
             _ => LogLevel.Information
         };
 
-        DataStoreLoggerConfiguration? config = _getCurrentConfig?.Invoke();
-
         EventId eventId = EventIdFactory(logEvent);
-        if (eventId.Id == 0 && config?.EventId != 0)
-            eventId = config?.EventId ?? 0;
 
-        string message = logEvent.RenderMessage(_formatProvider);
+        string message = logEvent.RenderMessage(formatProvider);
         
         string exception = logEvent.Exception?.Message ?? (logEvent.Level >= LogEventLevel.Error ? message : string.Empty);
 
-        LogEntryColor? color = config?.Colors[logLevel];
-
-        AddLogEntry(logLevel, eventId, message, exception, color ?? new());
+        AddLogEntry(logLevel, eventId, message, exception);
     }
 
-    protected virtual void AddLogEntry(LogLevel logLevel, EventId eventId, string message, string exception, LogEntryColor color)
+    protected virtual void AddLogEntry(LogLevel logLevel, EventId eventId, string message, string exception)
     {
-        ILogDataStore? dataStore = _dataStoreProvider.Invoke();
+        ILogDataStore? dataStore = dataStoreProvider.Invoke();
 
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (dataStore == null)
@@ -65,8 +54,7 @@ public class DataStoreLoggerSink : ILogEventSink
             LogLevel = logLevel,
             EventId = eventId,
             State = message,
-            Exception = exception,
-            Color = color
+            Exception = exception
         });
     }
 

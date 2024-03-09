@@ -17,7 +17,5 @@ public class LogModel
 
     public string? Exception { get; set; }
 
-    public LogEntryColor Color { get; set; }
-
     #endregion
 }

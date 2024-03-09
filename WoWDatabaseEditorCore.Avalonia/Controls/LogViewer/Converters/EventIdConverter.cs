@@ -3,7 +3,7 @@ using System.Globalization;
 using Avalonia.Data.Converters;
 using Microsoft.Extensions.Logging;
 
-namespace WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.Avalonia.Converters;
+namespace WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.Converters;
 
 public class EventIdConverter : IValueConverter
 {

@@ -15,15 +15,16 @@
       
     <DockPanel DockPanel.Dock="Top" Margin="0,5,0,5" >
       <Image Source="Icon.png" Width="32" Height="32" />
-      <TextBlock FontWeight="Bold" FontSize="16" DockPanel.Dock="Top">The editor has crashed 😭</TextBlock>
+      <TextBlock FontWeight="Bold" FontSize="16" DockPanel.Dock="Top" VerticalAlignment="Center">The editor has crashed 😭</TextBlock>
     </DockPanel>
       
-    <TextBlock Margin="0,5,0,5" DockPanel.Dock="Top">I am very sorry, but due to some internal problem, the editor has crashed. This report will help me prevent it in the future, so if it happens again, please report the error on github.</TextBlock>
+    <TextBlock Margin="0,5,0,5" DockPanel.Dock="Top">I am very sorry, but due to some internal problem, the editor has crashed. This report will help me prevent it in the future, so consider sending the report to the authors.</TextBlock>
 
     <TextBlock Margin="0,5,0,5" FontWeight="Bold" DockPanel.Dock="Top">Crash report:</TextBlock>
 
+    <Button Command="{CompiledBinding UploadReportCommand}" DockPanel.Dock="Top" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,5,0,15" Content="{CompiledBinding SendCrashLogButtonText}"></Button>
     
-    <TextBox IsReadOnly="False" Text="{CompiledBinding CrashReport}">
+    <TextBox IsReadOnly="True" Text="{CompiledBinding CrashReport}">
         
     </TextBox>
     

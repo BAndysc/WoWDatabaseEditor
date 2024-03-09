@@ -42,7 +42,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             Watch(parameter, p => p.IsUsed, nameof(IsHidden));
             Watch(parameter, p => p.ForceHidden, nameof(IsHidden));
             Watch(parameter, p => p.Parameter, nameof(GenericParameter));
-            Watch(parameter, p => p.Parameter, nameof(SpecialCommand));
             Watch(parameter, p => p.Name, nameof(Name));
             Watch(parameter, p => p.Value, nameof(Value));
             Watch(parameter, p => p.HoldsMultipleValues, nameof(HoldsMultipleValues));
@@ -70,8 +69,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         
         public bool IsFirstParameter { get; set; }
 
-        public Func<Task<object?>>? SpecialCommand => currentCoreVersion.Current.SupportsSpecialCommands ? Parameter.Parameter.SpecialCommand : null;
-        
         private bool IsValueNonEmpty => Parameter is MultiParameterValueHolder<long> p && p.Value != 0 ||
                                         Parameter is MultiParameterValueHolder<float> f && f.Value != 0 ||
                                         Parameter is MultiParameterValueHolder<string> s && !string.IsNullOrEmpty(s.Value);

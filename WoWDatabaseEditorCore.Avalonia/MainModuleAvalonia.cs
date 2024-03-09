@@ -3,7 +3,7 @@ using WDE.Common.Database;
 using WDE.Module;
 using WoWDatabaseEditorCore.Avalonia.Services.CreatureEntrySelectorService;
 using WDE.Common.Windows;
-using WoWDatabaseEditorCore.Avalonia.Controls.LogViewer.Avalonia;
+using WoWDatabaseEditorCore.Avalonia.Controls.LogViewer;
 using WoWDatabaseEditorCore.Avalonia.Managers;
 using WoWDatabaseEditorCore.Avalonia.Services.InputEntryProviderService;
 using WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService;

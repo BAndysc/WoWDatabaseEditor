@@ -299,13 +299,20 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     var deserialized = serializer.Deserialize(tableDefinition, text, key);
                     if (deserialized.Count > 1)
                         bulk = BulkEdit("Paste rows");
-                    int index = focusedRowIndex.RowIndex == -1 ? (Rows.Count > 0 ? Rows[0].Count : 0) : focusedRowIndex.RowIndex + 1;
+                    int index = focusedRowIndex.RowIndex == -1
+                        ? (Rows.Count > 0 ? Rows[0].Count : 0)
+                        : focusedRowIndex.RowIndex + 1;
                     foreach (var entity in deserialized)
                     {
                         if (key.HasValue)
                             entity.SetTypedCellOrThrow(tableDefinition.GroupByKeys[0], key.Value[0]);
                         ForceInsertEntity(entity, index++);
                     }
+                }
+                catch (JsonReaderException e)
+                {
+                    LOG.LogWarning(e, "Can't paste rows");
+                    statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failed to paste rows (see the debug log output)"));
                 }
                 catch (Exception e)
                 {

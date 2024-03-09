@@ -37,6 +37,9 @@ public class LocalRuntimeDataService : IRuntimeDataService
 
     public async Task<IReadOnlyList<string>> GetAllFiles(string directory, string searchPattern)
     {
+        if (!Directory.Exists(directory))
+            return Array.Empty<string>();
+        
         try
         {
             return await Task.FromResult(Directory.GetFiles(directory, searchPattern, SearchOption.AllDirectories));

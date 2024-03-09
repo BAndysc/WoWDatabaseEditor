@@ -30,8 +30,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
     {
         private readonly IMainWindowHolder mainWindowHolder;
         private bool loaded;
-        private bool dialogOpened;
-        private List<Func<Task>> pending = new();
+        private HashSet<Window> dialogOpened = new();
+        private List<(Func<Task>, Window)> pending = new();
 
         public MessageBoxService(IMainWindowHolder mainWindowHolder,
             IEventAggregator eventAggregator)
@@ -62,16 +62,22 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             loaded = true;
             if (pending.Count > 0)
             {
-                var first = pending[0];
-                pending.RemoveAt(0);
-                first().ListenErrors();
+                HashSet<Window> uniqueWindows = new();
+                foreach (var (task, owner) in pending.ToList())
+                {
+                    if (uniqueWindows.Add(owner))
+                    {
+                        pending.Remove((task, owner));
+                        task().ListenErrors();
+                    }
+                }
             }
         }
 
-        private async Task<T?> ShowNow<T>(IMessageBox<T> messageBox)
+        private async Task<T?> ShowNow<T>(IMessageBox<T> messageBox, Window owner)
         {
-            Debug.Assert(!dialogOpened);
-            dialogOpened = true;
+            Debug.Assert(!dialogOpened.Contains(owner));
+            dialogOpened.Add(owner);
             var viewModel = new MessageBoxViewModel<T>(messageBox);
             if (GlobalApplication.SingleView)
             {
@@ -101,13 +107,17 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 await mainWindowHolder.ShowDialog<bool>(view);
             }
 
-            dialogOpened = false;
+            dialogOpened.Remove(owner);
 
             if (pending.Count > 0)
             {
-                var first = pending[0];
-                pending.RemoveAt(0);
-                first().ListenErrors(); // no await! this is another dialog
+                var indexOfAnotherDialog = pending.FindIndex(x => x.Item2 == owner);
+                if (indexOfAnotherDialog == -1)
+                    return viewModel.SelectedOption;
+
+                var pendingTask = pending[indexOfAnotherDialog];
+                pending.RemoveAt(indexOfAnotherDialog);
+                pendingTask.Item1().ListenErrors(); // no await! this is another dialog
             }
 
             return viewModel.SelectedOption;
@@ -115,18 +125,20 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
         
         public Task<T?> ShowDialog<T>(IMessageBox<T> messageBox)
         {
-            if (loaded && !dialogOpened)
+            var topWindow = mainWindowHolder.TopWindow;
+
+            if (loaded && !dialogOpened.Contains(topWindow))
             {
-                return ShowNow(messageBox);
+                return ShowNow(messageBox, topWindow);
             }
 
             TaskCompletionSource<T?> completionSource = new();
             Func<Task> f = async () =>
             {
-                var result = await ShowNow(messageBox);
+                var result = await ShowNow(messageBox, topWindow);
                 completionSource.SetResult(result);
             };
-            pending.Add(f);
+            pending.Add((f, topWindow));
             return completionSource.Task;
         }
     }

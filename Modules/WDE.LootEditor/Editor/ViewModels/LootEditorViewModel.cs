@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using AvaloniaStyles.Controls.FastTableView;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
@@ -15,6 +16,7 @@ using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.DBC;
+using WDE.Common.Exceptions;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
@@ -812,7 +814,8 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
                 .SetContent(e.Message)
                 .WithOkButton(true)
                 .Build());
-            throw;
+            if (e is not UserException)
+                throw;
         }
         finally
         {

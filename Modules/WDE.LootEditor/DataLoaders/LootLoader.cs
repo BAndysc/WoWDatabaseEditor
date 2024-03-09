@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
+using WDE.Common.Exceptions;
 using WDE.LootEditor.Editor;
 using WDE.LootEditor.Models;
 using WDE.Module.Attributes;
@@ -84,11 +85,11 @@ public class LootLoader : ILootLoader
             {
                 var template = await databaseProvider.GetGameObjectTemplate(solutionItemEntry);
                 if (template == null)
-                    throw new Exception("Couldn't find gameobject template with entry " + solutionItemEntry);
+                    throw new UserException("Couldn't find gameobject template with entry " + solutionItemEntry);
 
                 var lootId = template.GetLootId();
                 if (!lootId.HasValue)
-                    throw new Exception($"Gameobject {template.Name} ({template.Entry}) is {template.Type} and doesn't have loot");
+                    throw new UserException($"Gameobject {template.Name} ({template.Entry}) is {template.Type} and doesn't have loot");
 
                 return new LootEntry[] { new(lootId.Value) };
             }

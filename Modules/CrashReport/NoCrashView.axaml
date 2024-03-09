@@ -15,10 +15,10 @@
       
     <DockPanel DockPanel.Dock="Top" Margin="0,5,0,5" >
       <Image Source="Icon.png" Width="32" Height="32" />
-      <TextBlock FontWeight="Bold" FontSize="16" DockPanel.Dock="Top">The editor has not crashed 🙂</TextBlock>
+      <TextBlock FontWeight="Bold" FontSize="16" DockPanel.Dock="Top" VerticalAlignment="Center">The editor has not crashed 🙂</TextBlock>
     </DockPanel>
       
-    <TextBlock Margin="0,5,0,5" DockPanel.Dock="Top">It looks like the editor hasn't crashed, it is just you who manually started this CrashReport app. You can use it to redownload the latest version.</TextBlock>
+    <TextBlock Margin="0,5,0,5" DockPanel.Dock="Top">It looks like the editor hasn't crashed, you just manually started this CrashReport app. You can use it to redownload the latest version.</TextBlock>
 
   </DockPanel>
 </UserControl>
