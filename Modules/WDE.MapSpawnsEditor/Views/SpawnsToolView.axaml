@@ -54,16 +54,37 @@
             </Button>
         </ToolbarPanel>
         <TextBox DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
-        <ScrollViewer>
-            <views:SpawnsFastTreeList Name="SpawnsList" SelectedNode2="{CompiledBinding SelectedNode, Mode=TwoWay}" Items2="{CompiledBinding SpawnItems}"
-                                      IsFiltered2="{CompiledBinding SearchText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" 
-                                      DoubleTapped="InputElement_OnDoubleTapped" KeyDown="SpawnsList_OnKeyDown">
-                <views:SpawnsFastTreeList.ContextMenu>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto">
+            <VirtualizedTreeView
+                Name="SpawnsList"
+                RowHeight="22"
+                SelectedNode="{CompiledBinding SelectedNode, Mode=TwoWay}"
+                Items="{CompiledBinding SpawnItems}"
+                RequestRender="{CompiledBinding FilterTrigger}"
+                IsFiltered="True"
+                DoubleTapped="InputElement_OnDoubleTapped"
+                KeyDown="SpawnsList_OnKeyDown">
+                <VirtualizedTreeView.DataTemplates>
+                    <DataTemplate x:DataType="viewModels:SpawnGroup" DataType="viewModels:SpawnGroup">
+                        <DockPanel>
+                            <WdeImage Width="16" Height="16" Margin="0,0,2,0" Image="{CompiledBinding Icon}" />
+                            <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Header}" />
+                        </DockPanel>
+                    </DataTemplate>
+                    <DataTemplate x:DataType="viewModels:SpawnInstance" DataType="viewModels:SpawnInstance">
+                        <DockPanel>
+                            <WdeImage Width="16" Height="16" Margin="0,0,2,0" Image="{CompiledBinding Icon}" />
+                            <Ellipse Width="6" Height="6" Fill="LightGray" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,4,0" IsVisible="{CompiledBinding IsSpawned}" />
+                            <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Header}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </VirtualizedTreeView.DataTemplates>
+                <VirtualizedTreeView.ContextMenu>
                     <FixedContextMenu>
                         <MenuItem Header="Spawn" Command="{CompiledBinding AddSpawn}" CommandParameter="{CompiledBinding SelectedNode}" />
                     </FixedContextMenu>
-                </views:SpawnsFastTreeList.ContextMenu>
-            </views:SpawnsFastTreeList>
+                </VirtualizedTreeView.ContextMenu>
+            </VirtualizedTreeView>
         </ScrollViewer>
     </DockPanel>
 </UserControl>

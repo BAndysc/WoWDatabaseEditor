@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
+using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -21,23 +22,29 @@ using WDE.MVVM.Utils;
 
 namespace WDE.Common.Avalonia.Controls;
 
-public class VirtualizedTreeView : Panel
+public class VirtualizedTreeView : Panel, ILogicalScrollable
 {
     public static readonly StyledProperty<IReadOnlyList<INodeType>?> ItemsProperty = AvaloniaProperty.Register<VirtualizedTreeView, IReadOnlyList<INodeType>?>(nameof(Items));
     public static readonly StyledProperty<bool> IsFilteredProperty = AvaloniaProperty.Register<VirtualizedTreeView, bool>(nameof(IsFiltered));
     public static readonly StyledProperty<bool> RequestRenderProperty = AvaloniaProperty.Register<VirtualizedTreeView, bool>(nameof(RequestRender));
     public static readonly StyledProperty<INodeType?> SelectedNodeProperty = AvaloniaProperty.Register<VirtualizedTreeView, INodeType?>(nameof(SelectedNode), defaultBindingMode: BindingMode.TwoWay);
-    
-    public const float RowHeight = 28;
+    public static readonly DirectProperty<VirtualizedTreeView, float> RowHeightProperty = AvaloniaProperty.RegisterDirect<VirtualizedTreeView, float>(nameof(RowHeight), x => x.RowHeight, (x, v) => x.RowHeight = v);
 
+    private float rowHeight = 28;
     private RecyclableViewList[] views;
+
+    private bool pendingScrollToSelected;
 
     static VirtualizedTreeView()
     {
         SelectedNodeProperty.Changed.AddClassHandler<VirtualizedTreeView>((tree, args) =>
         {
             if (args.NewValue is INodeType node)
-                tree.ScrollToNode(node);
+            {
+                tree.pendingScrollToSelected = true;
+                tree.InvalidateMeasure();
+                tree.InvalidateArrange();
+            }
         });
         ItemsProperty.Changed.AddClassHandler<VirtualizedTreeView>((tree, args) => tree.ItemsChanged(args));
         AffectsArrange<VirtualizedTreeView>(IsFilteredProperty);
@@ -46,6 +53,15 @@ public class VirtualizedTreeView : Panel
         AffectsMeasure<VirtualizedTreeView>(RequestRenderProperty);
         AffectsArrange<VirtualizedTreeView>(SelectedNodeProperty);
         FocusableProperty.OverrideDefaultValue<VirtualizedTreeView>(true);
+
+        AffectsMeasure<VirtualizedTreeView>(BoundsProperty);
+        AffectsArrange<VirtualizedTreeView>(BoundsProperty);
+    }
+
+    public float RowHeight
+    {
+        get => rowHeight;
+        set => SetAndRaise(RowHeightProperty, ref rowHeight, value);
     }
 
     public VirtualizedTreeView()
@@ -211,9 +227,6 @@ public class VirtualizedTreeView : Panel
     {
         if (Items is not { } items)
             return;
-        
-        if (ScrollViewer is not { } scrollViewer)
-            return;
 
         var index = items.IndexOf(node);
         var rowRect = GetRowRect(index);
@@ -221,18 +234,18 @@ public class VirtualizedTreeView : Panel
         if (rowRect == null)
             return;
         
-        var startOffset = scrollViewer.Offset.Y;
-        var endOffset = startOffset + scrollViewer.Viewport.Height;
+        var startOffset = Offset.Y;
+        var endOffset = startOffset + Viewport.Height;
 
-        var visibleRect = new Rect(0, startOffset, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height);
+        var visibleRect = new Rect(0, startOffset, Viewport.Width, Viewport.Height);
 
         if (visibleRect.Intersects(rowRect.Value))
             return;
         
         if (rowRect.Value.Bottom > endOffset)
-            scrollViewer.Offset = new Vector(scrollViewer.Offset.X, rowRect.Value.Bottom - scrollViewer.Viewport.Height);
+            Offset = new Vector(Offset.X, rowRect.Value.Bottom - Viewport.Height);
         else if (rowRect.Value.Top < startOffset)
-            scrollViewer.Offset = new Vector(scrollViewer.Offset.X, rowRect.Value.Top);
+            Offset = new Vector(Offset.X, rowRect.Value.Top);
     }
 
     private Rect? GetRowRect(int index)
@@ -287,7 +300,7 @@ public class VirtualizedTreeView : Panel
             views[i].Reset(new FuncDataTemplate(template.Match, (_, _) => new VirtualizedTreeViewItem(){ContentTemplate = template}));
         }
 
-        if (ScrollViewer is not { } scrollViewer || Items is not { } items)
+        if (Items is not { } items)
         {
             for (int i = 0; i < views.Length; ++i)
                 views[i].Finish();
@@ -295,11 +308,12 @@ public class VirtualizedTreeView : Panel
         }
         
         // determine the first and last visible row
-        var actualWidth = finalSize.Width;
-        var startOffset = scrollViewer.Offset.Y;
-        var endOffset = startOffset + scrollViewer.Viewport.Height;
-        var startIndex = Math.Max(0, (int)(scrollViewer.Offset.Y / RowHeight) - 1);
-        var endIndex = Math.Min(startIndex + scrollViewer.Viewport.Height / RowHeight + 2, Items.Count);
+        var extentWidth = Math.Max(Extent.Width, finalSize.Width);
+        var startOffset = Offset.Y;
+        var endOffset = startOffset + Viewport.Height;
+        var startIndex = Math.Max(0, (int)(Offset.Y / RowHeight) - 1);
+        var endIndex = Math.Min(startIndex + Viewport.Height / RowHeight + 2, Items.Count);
+        var xOffset = -Offset.X;
         
         var font = new Typeface(TextBlock.GetFontFamily(this));
         var foreground = TextBlock.GetForeground(this);
@@ -321,7 +335,7 @@ public class VirtualizedTreeView : Panel
             
             if (y + RowHeight >= startOffset)
             {
-                var rowRect = new Rect(0, y, actualWidth, RowHeight);
+                var rowRect = new Rect(xOffset, y - startOffset, extentWidth, RowHeight);
                 var isSelected = SelectedNode == row;
 
                 VirtualizedTreeViewItem? element = null;
@@ -354,36 +368,18 @@ public class VirtualizedTreeView : Panel
         for (int i = 0; i < views.Length; ++i)
             views[i].Finish();
 
+        RaiseScrollInvalidated(EventArgs.Empty);
+
+        if (pendingScrollToSelected && SelectedNode != null)
+        {
+            ScrollToNode(SelectedNode);
+            pendingScrollToSelected = false;
+        }
+
         return finalSize;
     }
 
-    private IDisposable? visualTreeSubscription;
     public static readonly StyledProperty<bool> NeverShrinkWidthProperty = AvaloniaProperty.Register<VirtualizedTreeView, bool>("NeverShrinkWidth");
-
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnAttachedToVisualTree(e);
-
-        if (ScrollViewer is { } sc)
-        {
-            visualTreeSubscription = new CompositeDisposable(
-                sc.GetObservable(ScrollViewer.OffsetProperty).SubscribeAction(_ =>
-                {
-                    InvalidateArrange();
-                }),
-                sc.GetObservable(BoundsProperty).SubscribeAction(_ =>
-                {
-                    InvalidateArrange();
-                }));
-        }
-    }
-
-    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        visualTreeSubscription?.Dispose();
-        visualTreeSubscription = null;
-        base.OnDetachedFromVisualTree(e);
-    }
 
     public override void Render(DrawingContext context)
     {
@@ -392,7 +388,7 @@ public class VirtualizedTreeView : Panel
         if (Items == null)
             return;
 
-        if (ScrollViewer is not { } scrollViewer)
+        if (this.FindAncestorOfType<ScrollViewer>() is not { } scrollViewer)
         {
             context.DrawText(Brushes.Red, default,
                 new FormattedText("VirtualizedTreeView must be wrapped in ScrollViewer!",
@@ -407,12 +403,14 @@ public class VirtualizedTreeView : Panel
         context.FillRectangle(Brushes.Transparent, new Rect(scrollViewer.Offset.X, scrollViewer.Offset.Y, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height));
     }
 
-    protected ScrollViewer? ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
+    //protected ScrollViewer? ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
 
     protected double lastDesiredWidth = 0;
 
     protected override Size MeasureOverride(Size availableSize)
     {
+        if (CanHorizontallyScroll)
+            availableSize = availableSize.WithWidth(double.PositiveInfinity);
         double desiredWidth = 0;
         foreach (var child in Children)
         {
@@ -424,6 +422,8 @@ public class VirtualizedTreeView : Panel
             desiredWidth = Math.Max(lastDesiredWidth, desiredWidth);
         lastDesiredWidth = desiredWidth;
 
+        var finalSize = new Size(0, 0);
+
         if (IsFiltered)
         {
             int visibleCount = 0;
@@ -434,10 +434,14 @@ public class VirtualizedTreeView : Panel
                     if (items[i].IsVisible)
                         visibleCount++;
             }
-            return new Size(desiredWidth, RowHeight * visibleCount);
+            finalSize = new Size(desiredWidth, RowHeight * visibleCount);
         }
         else
-            return new Size(desiredWidth, RowHeight * (Items?.Count ?? 0));
+            finalSize = new Size(desiredWidth, RowHeight * (Items?.Count ?? 0));
+
+        Extent = finalSize;
+        Viewport = Bounds.Size;
+        return finalSize;
     }
 
     public bool IsFiltered
@@ -468,5 +472,88 @@ public class VirtualizedTreeView : Panel
     {
         get => GetValue(NeverShrinkWidthProperty);
         set => SetValue(NeverShrinkWidthProperty, value);
+    }
+
+    public bool CanVerticallyScroll { get; set; }
+
+    public bool IsLogicalScrollEnabled => true;
+
+    public Size ScrollSize => new Size(rowHeight, rowHeight);
+
+    public Size PageScrollSize => new Size(rowHeight, rowHeight * (int)((Viewport.Height + rowHeight - 1) / rowHeight));
+
+    public bool BringIntoView(IControl target, Rect targetRect)
+    {
+        return false;
+    }
+
+    public IControl GetControlInDirection(NavigationDirection direction, IControl from)
+    {
+        return from;
+    }
+
+    public void RaiseScrollInvalidated(EventArgs e)
+    {
+        ScrollInvalidated?.Invoke(this, e);
+    }
+
+    private bool canHorizontallyScroll = true;
+
+    public bool CanHorizontallyScroll
+    {
+        get => canHorizontallyScroll;
+        set
+        {
+            if (canHorizontallyScroll != value)
+            {
+                canHorizontallyScroll = value;
+                InvalidateMeasure();
+            }
+        }
+    }
+
+    public event EventHandler? ScrollInvalidated;
+
+    private Size extent;
+    public Size Extent
+    {
+        get => extent;
+        set
+        {
+            if (extent != value)
+            {
+                extent = value;
+                ScrollInvalidated?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
+
+    private Vector offset;
+    public Vector Offset
+    {
+        get => offset;
+        set
+        {
+            if (offset != value)
+            {
+                offset = value;
+                ScrollInvalidated?.Invoke(this, EventArgs.Empty);
+                InvalidateArrange();
+            }
+        }
+    }
+
+    private Size viewport;
+    public Size Viewport
+    {
+        get => viewport;
+        set
+        {
+            if (viewport != value)
+            {
+                viewport = value;
+                ScrollInvalidated?.Invoke(this, EventArgs.Empty);
+            }
+        }
     }
 }

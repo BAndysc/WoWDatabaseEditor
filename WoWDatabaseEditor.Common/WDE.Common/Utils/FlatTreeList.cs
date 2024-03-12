@@ -110,6 +110,7 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
                 UninstallParent(oldParent, startIndex);
             }
         }
+        SourceCollectionChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnParentPropChanged(object? sender, PropertyChangedEventArgs e)
@@ -121,47 +122,51 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
         var startIndex = innerList.IndexOf(parent);
         if (parent.IsExpanded)
         {
-            expandedParents.Add(parent);
-            int i = 0;
+            if (expandedParents.Add(parent))
+            {
+                int i = 0;
 
-            if (parent.NestedParents.Count > 0)
-            {
-                var bulk = innerList.SuspendNotifications();
-                foreach (var nestedParent in parent.NestedParents)
+                if (parent.NestedParents.Count > 0)
                 {
-                    i += InstallParent((P)nestedParent, startIndex + i + 1, parent.NestLevel + 1);
+                    var bulk = innerList.SuspendNotifications();
+                    foreach (var nestedParent in parent.NestedParents)
+                    {
+                        i += InstallParent((P)nestedParent, startIndex + i + 1, parent.NestLevel + 1);
+                    }
+                    bulk.Dispose();
+                    //CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)parent.Children, startIndex + 1));
                 }
-                bulk.Dispose();
-                //CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)parent.Children, startIndex + 1));                
-            }
-            if (parent.Children.Count > 0)
-            {
-                var bulk = innerList.SuspendNotifications();
-                foreach (var child in parent.Children)
+                if (parent.Children.Count > 0)
                 {
-                    child.NestLevel = parent.NestLevel + 1;
-                    innerList.Insert(startIndex + ++i, child);
+                    var bulk = innerList.SuspendNotifications();
+                    foreach (var child in parent.Children)
+                    {
+                        child.NestLevel = parent.NestLevel + 1;
+                        innerList.Insert(startIndex + ++i, child);
+                    }
+                    bulk.Dispose();
+                    //CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)parent.Children, startIndex + 1));
                 }
-                bulk.Dispose();
-                //CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)parent.Children, startIndex + 1));                
             }
         }
         else
         {
-            expandedParents.Remove(parent);
-            if (parent.Children.Count + parent.NestedParents.Count > 0)
+            if (expandedParents.Remove(parent))
             {
-                var bulk = innerList.SuspendNotifications();
-                foreach (var nestedParent in parent.NestedParents)
+                if (parent.Children.Count + parent.NestedParents.Count > 0)
                 {
-                    UninstallParent((P)nestedParent, startIndex + 1);
+                    var bulk = innerList.SuspendNotifications();
+                    foreach (var nestedParent in parent.NestedParents)
+                    {
+                        UninstallParent((P)nestedParent, startIndex + 1);
+                    }
+                    foreach (var child in parent.Children)
+                    {
+                        innerList.RemoveAt(startIndex + 1);
+                    }
+                    bulk.Dispose();
+                    //CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)parent.Children, startIndex + 1));
                 }
-                foreach (var child in parent.Children)
-                {
-                    innerList.RemoveAt(startIndex + 1);
-                }
-                bulk.Dispose();
-                //CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)parent.Children, startIndex + 1));                
             }
         }
     }
@@ -194,6 +199,8 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
     private void OnNestedParentsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         P parent = (P)sender!;
+        SourceCollectionChanged?.Invoke(this, EventArgs.Empty);
+
         if (!expandedParents.Contains(parent))
             return;
 
@@ -221,6 +228,8 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
     private void OnChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         P parent = (P)sender!;
+        SourceCollectionChanged?.Invoke(this, EventArgs.Empty);
+
         if (!expandedParents.Contains(parent))
             return;
 
@@ -298,6 +307,8 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
     {
         return innerList.GetEnumerator();
     }
+
+    public event EventHandler? SourceCollectionChanged;
 
     public event NotifyCollectionChangedEventHandler? CollectionChanged
     {

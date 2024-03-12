@@ -1,12 +1,15 @@
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using TheEngine.ECS;
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MapRenderer.Managers.Entities;
 using WDE.MapSpawnsEditor.Models;
 
 namespace WDE.MapSpawnsEditor.ViewModels;
 
-public abstract class SpawnInstance : IChildType, IManagedComponentData
+public abstract class SpawnInstance : IChildType, IManagedComponentData, INotifyPropertyChanged
 {
     public abstract uint Guid { get; }
     public abstract uint Entry { get; }
@@ -27,4 +30,19 @@ public abstract class SpawnInstance : IChildType, IManagedComponentData
     public bool IsVisible { get; set; }
     public IParentType? Parent { get; set; }
     public bool CanBeExpanded => false;
+    public abstract ImageUri Icon { get; }
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
 }

@@ -6,6 +6,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using TheEngine;
+using WDE.Common.Avalonia.Controls;
 using WDE.Common.Utils;
 using WDE.MapSpawnsEditor.ViewModels;
 using WDE.MVVM;
@@ -15,9 +16,7 @@ namespace WDE.MapSpawnsEditor.Views;
 
 public class SpawnsToolView : UserControl
 {
-    private SpawnsFastTreeList spawns = null!;
-    private System.IDisposable? disposable;
-    
+    private VirtualizedTreeView spawns = null!;
     public SpawnsToolView()
     {
         InitializeComponent();
@@ -26,18 +25,12 @@ public class SpawnsToolView : UserControl
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
-        spawns = this.FindControl<SpawnsFastTreeList>("SpawnsList");
+        spawns = this.FindControl<VirtualizedTreeView>("SpawnsList");
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        disposable = ((SpawnsToolViewModel)DataContext!)!.ToObservable(x => x.SearchText)
-            .SubscribeAction(_ =>
-            {
-                spawns.InvalidateMeasure();
-                spawns.InvalidateVisual();
-            });
         ((SpawnsToolViewModel)DataContext!).FocusRequest += OnFocusRequest;
     }
 
@@ -56,8 +49,6 @@ public class SpawnsToolView : UserControl
     {
         base.OnDetachedFromVisualTree(e);
         ((SpawnsToolViewModel)DataContext!).FocusRequest -= OnFocusRequest;
-        disposable?.Dispose();
-        disposable = null;
     }
 
     private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
