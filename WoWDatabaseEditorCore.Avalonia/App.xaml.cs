@@ -146,10 +146,12 @@ namespace WoWDatabaseEditorCore.Avalonia
             moduleCatalog.AddModule(typeof(MainModule));
             moduleCatalog.AddModule(typeof(MainModuleAvalonia));
             moduleCatalog.AddModule(typeof(CommonAvaloniaModule));
-            
+
+            #if !DEBUG
             List<Assembly> externalAssemblies = GetPluginDlls()
                 .Select(AssemblyLoadContext.Default.LoadFromAssemblyPath)
                 .ToList();
+            #endif
 
             var allAssemblies = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a =>
