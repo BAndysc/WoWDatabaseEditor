@@ -1,4 +1,5 @@
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MapRenderer.Managers.Entities;
 using WDE.MapRenderer.StaticData;
@@ -21,12 +22,22 @@ public class CreatureSpawnInstance : SpawnInstance
     public override (int, int) Chunk => new Vector3(data.X, data.Y, data.Z).WoWPositionToChunk();
     public sealed override string Header { get; protected set; } = "";
     public override WorldObjectInstance? WorldObject => Creature;
-    public CreatureInstance? Creature { get; set; }
+    private CreatureInstance? creature;
+    public CreatureInstance? Creature
+    {
+        get => creature;
+        set
+        {
+            creature = value;
+            OnPropertyChanged(nameof(IsSpawned));
+        }
+    }
     public float Orientation => data.O;
     public uint CreatureDisplayId => data.Model;
     public IReadOnlyList<IGameEventCreature>? GameEvents { get; set; }
     public IBaseCreatureAddon? Addon { get; set; }
     public IBaseEquipmentTemplate? Equipment { get; set; }
+    public override ImageUri Icon { get; } = new ImageUri("Icons/document_creature_template.png");
 
     public CreatureSpawnInstance(ICreature data, ICreatureTemplate creatureTemplate, ISpawnGroupTemplate? spawnGroup)
     {

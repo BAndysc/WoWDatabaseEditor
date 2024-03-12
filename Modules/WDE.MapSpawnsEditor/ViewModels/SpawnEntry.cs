@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 
 namespace WDE.MapSpawnsEditor.ViewModels;
@@ -17,21 +18,69 @@ public partial class SpawnGroup : IParentType
         Header = (name + " (" + Entry + ")");
         Nested.CollectionChanged += (_, e) => NestedParentsChanged?.Invoke(this, e);
         Spawns.CollectionChanged += (_, e) => ChildrenChanged?.Invoke(this, e);
+        switch (type)
+        {
+            case GroupType.Creature:
+                Icon = new ImageUri("Icons/document_gameobjects.png");
+                break;
+            case GroupType.GameObject:
+                Icon = new ImageUri("Icons/document_gameobjects.png");
+                break;
+            case GroupType.Map:
+                Icon = new ImageUri("Icons/icon_world.png");
+                break;
+            case GroupType.Zone:
+            case GroupType.Area:
+                Icon = new ImageUri("Icons/icon_folder_2.png");
+                break;
+            case GroupType.SpawnGroup:
+                Icon = new ImageUri("Icons/icon_spawngroup.png");
+                break;
+        }
     }
     
     public SpawnGroup(ICreatureTemplate creatureTemplate) : this(GroupType.Creature, creatureTemplate.Entry, creatureTemplate.Name)
     {
+        Icon = new ImageUri("Icons/document_creatures.png");
     }
     
     public SpawnGroup(IGameObjectTemplate gameObjectTemplate) : this(GroupType.Creature, gameObjectTemplate.Entry, gameObjectTemplate.Name)
     {
+        Icon = new ImageUri("Icons/document_gameobjects.png");
     }
 
-    [Notify] private bool isExpanded;
+    private bool isExpanded;
+    private bool isTemporaryExpanded;
+
+    public bool IsTemporaryExpanded
+    {
+        set
+        {
+            isTemporaryExpanded = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsExpanded)));
+            if (Type is GroupType.Area or GroupType.Zone)
+                Icon = IsExpanded ? new ImageUri("Icons/icon_folder_2_opened.png") : new ImageUri("Icons/icon_folder_2.png");
+        }
+    }
+
+    public bool IsExpanded
+    {
+        get => isExpanded || isTemporaryExpanded;
+        set
+        {
+            isTemporaryExpanded = false;
+            isExpanded = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsExpanded)));
+            if (Type is GroupType.Area or GroupType.Zone)
+                Icon = IsExpanded ? new ImageUri("Icons/icon_folder_2_opened.png") : new ImageUri("Icons/icon_folder_2.png");
+        }
+    }
+
     public uint Entry { get; }
     public GroupType Type { get; }
     public string Name { get; }
     public string Header { get;  }
+    [Notify] private ImageUri icon;
 
     public override string ToString() => Header;
 

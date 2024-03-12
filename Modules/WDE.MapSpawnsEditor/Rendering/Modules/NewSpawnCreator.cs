@@ -194,7 +194,10 @@ public class NewSpawnCreator : System.IDisposable, IMapSpawnModule
             TaskCompletionSource<uint?> guidTask = new();
             yield return GetNextGuid(creature ? GuidType.Creature : GuidType.GameObject, guidTask);
             if (!guidTask.Task.Result.HasValue)
+            {
+                worldObjectInstance.Dispose();
                 yield break;
+            }
             var guid = guidTask.Task.Result.Value;
 
             if (creature)
