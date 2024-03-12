@@ -22,7 +22,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             Title = document.Title;
             ViewModel = document;
             CanClose = true;
-            CanFloat = false;
+            CanFloat = true;
             CanPin = false;
             
             var title = document.ToObservable(d => d.Title);
