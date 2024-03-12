@@ -503,12 +503,12 @@ public class VirtualizedTreeView : RenderedPanel, ILogicalScrollable
 
     public Size PageScrollSize => new Size(rowHeight, rowHeight * (int)((Viewport.Height + rowHeight - 1) / rowHeight));
 
-    public bool BringIntoView(IControl target, Rect targetRect)
+    public bool BringIntoView(Control target, Rect targetRect)
     {
         return false;
     }
 
-    public IControl GetControlInDirection(NavigationDirection direction, IControl from)
+    public Control? GetControlInDirection(NavigationDirection direction, Control? from)
     {
         return from;
     }
