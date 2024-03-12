@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Dock.Model.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -8,6 +9,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public SerializedDockableType DockableType { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Alignment ToolAlignment { get; set; }
         public string UniqueId { get; set; } = "";
         public bool Horizontal { get; set; }
         public double Proportion { get; set; }

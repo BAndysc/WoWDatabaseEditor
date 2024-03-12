@@ -71,6 +71,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
                         return null;
                     
                     IToolDock toolDock = dockFactory.CreateToolDock();
+                    toolDock.Alignment = serializedDock.ToolAlignment;
                     toolDock.Proportion = serializedDock.Proportion;
                     toolDock.VisibleDockables = dockFactory.CreateList<IDockable>();
                     DeserializeChildren(toolDock.VisibleDockables, serializedDock.Children);
@@ -88,31 +89,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
                         rootDock.ActiveDockable = rootDock.VisibleDockables[0];
                         rootDock.DefaultDockable = rootDock.VisibleDockables[0];
                     }
-
-                    // if (serializedDock.LeftPinnedDockables?.Count > 0)
-                    // {
-                    //     rootDock.LeftPinnedDockables = dockFactory.CreateList<IDockable>();
-                    //     DeserializeChildren(rootDock.LeftPinnedDockables, serializedDock.LeftPinnedDockables);
-                    // }
-                    //
-                    // if (serializedDock.RightPinnedDockables?.Count > 0)
-                    // {
-                    //     rootDock.RightPinnedDockables = dockFactory.CreateList<IDockable>();
-                    //     DeserializeChildren(rootDock.RightPinnedDockables, serializedDock.RightPinnedDockables);
-                    // }
-                    //
-                    // if (serializedDock.TopPinnedDockables?.Count > 0)
-                    // {
-                    //     rootDock.TopPinnedDockables = dockFactory.CreateList<IDockable>();
-                    //     DeserializeChildren(rootDock.TopPinnedDockables, serializedDock.TopPinnedDockables);
-                    // }
-                    //
-                    // if (serializedDock.BottomPinnedDockables?.Count > 0)
-                    // {
-                    //     rootDock.BottomPinnedDockables = dockFactory.CreateList<IDockable>();
-                    //     DeserializeChildren(rootDock.BottomPinnedDockables, serializedDock.BottomPinnedDockables);
-                    // }
-
                     return rootDock;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -225,6 +201,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
             {
                 serialized.DockableType = SerializedDockableType.ToolDock;
                 serialized.Proportion = toolDock.Proportion;
+                serialized.ToolAlignment = toolDock.Alignment;
             }
             else if (dockable is IProportionalDockSplitter splitterDockable)
             {
@@ -237,30 +214,21 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
             }
             else if (dockable is IRootDock root)
             {
-                if (root.LeftPinnedDockables is { } left)
+                void ProcessPinnedDockables(IList<IDockable>? dockables)
                 {
-                    foreach (var p in left.ToList())
+                    if (dockables != null)
                     {
-                        dockFactory.PinDockable(p); // unpin to serialize
-                        tempPinnedDockables.Add(p);
+                        foreach (var p in dockables.ToList())
+                        {
+                            dockFactory.PinDockable(p); // unpin to serialize
+                            tempPinnedDockables.Add(p);
+                        }
                     }
-                    //serialized.LeftPinnedDockables = left.Select(x => SerializeDockable(x)!).ToList();
                 }
-
-                // if (root.RightPinnedDockables is { } right)
-                // {
-                //     serialized.RightPinnedDockables = right.Select(x => SerializeDockable(x)!).ToList();
-                // }
-                //
-                // if (root.TopPinnedDockables is { } top)
-                // {
-                //     serialized.TopPinnedDockables = top.Select(x => SerializeDockable(x)!).ToList();
-                // }
-                //
-                // if (root.BottomPinnedDockables is { } bottom)
-                // {
-                //     serialized.BottomPinnedDockables = bottom.Select(x => SerializeDockable(x)!).ToList();
-                // }
+                ProcessPinnedDockables(root.LeftPinnedDockables);
+                ProcessPinnedDockables(root.RightPinnedDockables);
+                ProcessPinnedDockables(root.TopPinnedDockables);
+                ProcessPinnedDockables(root.BottomPinnedDockables);
 
                 serialized.DockableType = SerializedDockableType.RootDock;
             }
