@@ -75,17 +75,25 @@ internal class MySqlDumpService : IMySqlDumpService
     {
         List<string> arguments = new List<string>();
         AddOptions(options, arguments);
-        
-        arguments.Add("--host");
-        arguments.Add(credentials.Host);
-        arguments.Add("--port");
-        arguments.Add(credentials.Port.ToString());
-        arguments.Add("--user");
-        arguments.Add(credentials.User);
-        if (!string.IsNullOrEmpty(credentials.Passwd))
-            arguments.Add($"--password={credentials.Passwd}");
+
+        if (credentials.Host.StartsWith("/"))
+        {
+            arguments.Add("--socket");
+            arguments.Add(credentials.Host);
+        }
         else
-            arguments.Add("--skip-password");
+        {
+            arguments.Add("--host");
+            arguments.Add(credentials.Host);
+            arguments.Add("--port");
+            arguments.Add(credentials.Port.ToString());
+            arguments.Add("--user");
+            arguments.Add(credentials.User);
+            if (!string.IsNullOrEmpty(credentials.Passwd))
+                arguments.Add($"--password={credentials.Passwd}");
+            else
+                arguments.Add("--skip-password");
+        }
         
         arguments.Add("--databases");
         arguments.Add(credentials.SchemaName);
