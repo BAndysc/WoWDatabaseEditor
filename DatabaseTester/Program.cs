@@ -213,15 +213,44 @@ public class Program
                 var tableColumns = await sqlExecutor.GetTableColumns(table.Key);
                 var columnsByName = tableColumns
                     .GroupBy(g => g.ColumnName)
-                    .ToDictionary(g => g.Key, g => g.FirstOrDefault());
+                    .ToDictionary(g => g.Key, g => g.FirstOrDefault(), StringComparer.OrdinalIgnoreCase);
             
                 foreach (var column in columnsByName.Keys)
                 {
-                    if (table.Value.Find(t => t.DbColumnName == column) == null &&
+                    if (table.Value.Find(t => t.DbColumnName.Equals(column, StringComparison.OrdinalIgnoreCase)) == null &&
                         (definition.ForeignTable == null ||
-                        definition.ForeignTable.FirstOrDefault(f => f.TableName == table.Key) is { } x &&
-                        !(x.ForeignKeys?.Contains(column) ?? false)))
-                        Console.WriteLine($" [ ERROR ] Column {table.Key}.{column} not found in definition!");
+                         definition.ForeignTable.FirstOrDefault(f => f.TableName == table.Key) is { } x &&
+                         !(x.ForeignKeys?.Contains(
+                             column) ?? false)))
+                    {
+
+                        var top = FuzzySharp.Process.ExtractTop(column,
+                                table.Value.Select(x => x.DbColumnName).ToList(), limit: 1)
+                            .FirstOrDefault()?.Value;
+
+                        var didYouMean = top != null ? " did you mean: " + top : "";
+
+                        Console.WriteLine($" [ ERROR ] Column {table.Key}.{column} not found in definition!   " + didYouMean);
+                    }
+                }
+
+                bool anySuperfluous = false;
+                foreach (var definitionColumn in table.Value)
+                {
+                    if (!columnsByName.ContainsKey(definitionColumn.DbColumnName))
+                    {
+                        var top = FuzzySharp.Process.ExtractTop(definitionColumn.DbColumnName,
+                                columnsByName.Values.Select(x => x.ColumnName).ToList(), limit: 1)
+                            .FirstOrDefault()?.Value;
+                        var didYouMean = top != null ? " did you mean: " + top : "";
+                        Console.WriteLine($" [ ERROR ] Column {table.Key}.{definitionColumn.DbColumnName} in definition but NOT in database!   " + didYouMean);
+                        anySuperfluous = true;
+                    }
+                }
+
+                if (anySuperfluous)
+                {
+                    Console.WriteLine("   did you mean: " + string.Join(", ", columnsByName.Keys));
                 }
             }
             

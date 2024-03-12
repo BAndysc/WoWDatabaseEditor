@@ -3249,8 +3249,8 @@
         "name_readable": "Override weather",
         "parameters": [
             {
-                "name": "Zone or area",
-                "type": "ZoneAreaParameter"
+                "name": "Zone",
+                "type": "ZoneParameter"
             },
             {
                 "name": "Weather state",

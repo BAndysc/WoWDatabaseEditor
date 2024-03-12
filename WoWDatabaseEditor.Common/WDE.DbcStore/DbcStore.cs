@@ -127,6 +127,7 @@ namespace WDE.DbcStore
         public Dictionary<long, Dictionary<long, long>> ScenarioToStepStore { get; internal set; } = new();
 
         public IReadOnlyList<IArea> Areas { get; internal set; } = Array.Empty<IArea>();
+        public IReadOnlyList<IArea> ZonesOnly { get; internal set; } = Array.Empty<IArea>();
         public Dictionary<uint, IArea> AreaById { get; internal set; } = new();
 
         public IReadOnlyList<IMap> Maps { get; internal set; } = Array.Empty<IMap>();
@@ -233,6 +234,7 @@ namespace WDE.DbcStore
                 store.BattlePetSpeciesIdStore = data.BattlePetSpeciesIdStore;
                 store.CurrencyTypeStore = data.CurrencyTypeStore;
                 store.Areas = data.Areas;
+                store.ZonesOnly = data.Areas.Where(a => a.ParentAreaId == 0).ToList();
                 store.CharShipmentContainers = data.CharShipmentContainers;
                 store.AreaById = data.Areas.ToDictionary(a => a.Id, a => (IArea)a);
                 store.Missions = data.Missions;
@@ -397,11 +399,11 @@ namespace WDE.DbcStore
                 }
                 RegisterCharShipmentContainerParameter("CharShipmentContainerParameter");
 
-                void RegisterZoneAreParameter(string key, TabularDataAsyncColumn<uint>? counterColumn = null)
+                void RegisterZoneAreaParameter(string key, TabularDataAsyncColumn<uint>? counterColumn = null, bool onlyZones = false)
                 {
                     parameterFactory.Register(key, 
                         new DbcParameterWithPicker<IArea>(dataPicker, data.AreaStore, "zone or area", area => area.Id,
-                            () => store.Areas,
+                            () => onlyZones ? store.ZonesOnly : store.Areas,
                             (area, text) => area.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase) || area.Id.Contains(text) || 
                                 area.MapId.Contains(text) || (area.Map != null && area.Map.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase)) ||
                                 area.ParentAreaId.Contains(text) || (area.ParentArea != null && area.ParentArea.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase)),
@@ -419,15 +421,16 @@ namespace WDE.DbcStore
                             new TabularDataColumn(nameof(IArea.Map) + "." + nameof(IMap.Name), "Map name", 120),
                             counterColumn), QuickAccessMode.Limited);
                 }
-                RegisterZoneAreParameter("ZoneAreaParameter");
-                RegisterZoneAreParameter("ZoneArea(spell_area)Parameter", 
+                RegisterZoneAreaParameter("ZoneAreaParameter");
+                RegisterZoneAreaParameter("ZoneParameter", onlyZones: true);
+                RegisterZoneAreaParameter("ZoneArea(spell_area)Parameter",
                     new TabularDataAsyncColumn<uint>(nameof(IArea.Id), "Count", async (zoneId, token) =>
                 {
                     if (zoneId == 0)
                         return "0";
                     return (await store.databaseRowsCountProvider.GetRowsCountByPrimaryKey(DatabaseTable.WorldTable("spell_area"), zoneId, token)).ToString();
                 }, 50));
-                RegisterZoneAreParameter("ZoneArea(phase_definitions)Parameter", 
+                RegisterZoneAreaParameter("ZoneArea(phase_definitions)Parameter",
                     new TabularDataAsyncColumn<uint>(nameof(IArea.Id), "Count", async (zoneId, token) =>
                 {
                     if (zoneId == 0)
