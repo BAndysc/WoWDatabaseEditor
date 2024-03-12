@@ -365,5 +365,15 @@ internal class LegionDbcLoader : BaseDbcLoader
                 ItemAppearanceId = row.GetUInt(3)
             });
         });
+        Load("Vehicle.db2", data.Vehicles, row =>
+        {
+            var veh = new Vehicle()
+            {
+                Id = (uint)row.Key,
+            };
+            for (int i = 0; i < IVehicle.MaxSeats; ++i)
+                veh.Seats[i] = row.GetUShort(13, i);
+            return veh;
+        });
     }
 }

@@ -167,5 +167,15 @@ internal class MopDbcLoader : BaseDbcLoader
         LoadAndRegister(data,"SpellDuration.dbc", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
         LoadAndRegister(data, "SpellRange.dbc", "SpellRangeParameter", 0, row => GetRangeDescription(row.GetFloat(1), row.GetFloat(3), row.GetString(6), row.GetFloat(2), row.GetFloat(4)));
         LoadAndRegister(data,"SpellRadius.dbc", "SpellRadiusParameter", 0, row => GetRadiusDescription(row.GetFloat(1), row.GetFloat(2), row.GetFloat(4)));
+        Load("Vehicle.dbc", data.Vehicles, row =>
+        {
+            var veh = new Vehicle()
+            {
+                Id = (uint)row.GetUInt(0),
+            };
+            for (int i = 0; i < IVehicle.MaxSeats; ++i)
+                veh.Seats[i] = row.GetUShort(7 + i);
+            return veh;
+        });
     }
 }

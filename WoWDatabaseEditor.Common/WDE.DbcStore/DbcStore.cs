@@ -62,7 +62,7 @@ namespace WDE.DbcStore
 
     [AutoRegister]
     [SingleInstance]
-    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore, IGarrMissionStore, IItemStore, IConversationLineStore
+    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore, IGarrMissionStore, IItemStore, IConversationLineStore, IVehicleStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -154,7 +154,11 @@ namespace WDE.DbcStore
         public IMap? GetMapById(uint id) => MapById.TryGetValue(id, out var map) ? map : null;
         public FactionTemplate? GetFactionTemplate(uint templateId) => FactionTemplateById.TryGetValue(templateId, out var faction) ? faction : null;
         public Faction? GetFaction(ushort factionId) => FactionsById.TryGetValue(factionId, out var faction) ? faction : null;
-        
+
+        public IReadOnlyList<IVehicle> Vehicles { get; internal set; } = Array.Empty<IVehicle>();
+        public Dictionary<uint, IVehicle> VehiclesById { get; internal set; } = new();
+        public IVehicle? GetVehicleById(uint id) => VehiclesById.TryGetValue(id, out var vehicle) ? vehicle : null;
+
         public IReadOnlyList<IItemDisplayInfo> ItemDisplayInfos { get; internal set; } = Array.Empty<IItemDisplayInfo>();
         public Dictionary<uint, ItemDisplayInfoEntry> ItemDisplayInfosById { get; internal set; } = new();
         public IItemDisplayInfo? GetItemDisplayInfoById(uint id) => ItemDisplayInfosById.TryGetValue(id, out var item) ? item : null;
@@ -243,6 +247,8 @@ namespace WDE.DbcStore
                 store.GarrMissionById = data.Missions.ToDictionary(a => a.Id, a => (IGarrMission)a);
                 store.ConversationLines = data.ConversationLines;
                 store.ConversationLineById = data.ConversationLines.ToDictionary(a => a.Id, a => (IConversationLine)a);
+                store.Vehicles = data.Vehicles;
+                store.VehiclesById = data.Vehicles.ToDictionary(a => a.Id, a => (IVehicle)a);
                 store.Maps = data.Maps;
                 store.ItemStore = data.ItemStore;
                 store.MapById = data.Maps.ToDictionary(a => a.Id, a => (IMap)a);
