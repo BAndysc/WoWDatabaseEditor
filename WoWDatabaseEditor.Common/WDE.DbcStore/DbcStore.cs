@@ -157,7 +157,9 @@ namespace WDE.DbcStore
 
         public IReadOnlyList<IVehicle> Vehicles { get; internal set; } = Array.Empty<IVehicle>();
         public Dictionary<uint, IVehicle> VehiclesById { get; internal set; } = new();
+        public Dictionary<uint, IVehicle> VehiclesBySeat { get; internal set; } = new();
         public IVehicle? GetVehicleById(uint id) => VehiclesById.TryGetValue(id, out var vehicle) ? vehicle : null;
+        public IVehicle? GetVehicleBySeatId(uint id) => VehiclesBySeat.TryGetValue(id, out var vehicle) ? vehicle : null;
 
         public IReadOnlyList<IItemDisplayInfo> ItemDisplayInfos { get; internal set; } = Array.Empty<IItemDisplayInfo>();
         public Dictionary<uint, ItemDisplayInfoEntry> ItemDisplayInfosById { get; internal set; } = new();
@@ -249,6 +251,10 @@ namespace WDE.DbcStore
                 store.ConversationLineById = data.ConversationLines.ToDictionary(a => a.Id, a => (IConversationLine)a);
                 store.Vehicles = data.Vehicles;
                 store.VehiclesById = data.Vehicles.ToDictionary(a => a.Id, a => (IVehicle)a);
+                store.VehiclesBySeat = data.Vehicles
+                    .SelectMany(veh => veh.Seats.Select(seatId => (veh, seatId)))
+                    .Where(pair => pair.seatId != 0)
+                    .ToDictionary(x => x.seatId, x => (IVehicle)x.veh);
                 store.Maps = data.Maps;
                 store.ItemStore = data.ItemStore;
                 store.MapById = data.Maps.ToDictionary(a => a.Id, a => (IMap)a);
@@ -379,6 +385,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("ConversationLineParameter", new DbcParameter(data.ConversationLineStore));
                 parameterFactory.Register("ItemVisualParameter", new ItemVisualParameter(store));
                 parameterFactory.Register("ScenarioEventParameter", Parameter.Instance);
+                parameterFactory.Register("VehicleIdParameter", new DbcParameter(data.Vehicles.ToDictionary(x => (long)x.Id, x => new SelectOption("", "Seats: " + string.Join(", ", x.Seats.Where(x => x != 0))))));
 
                 parameterFactory.RegisterCombined("CharShipmentParameter", "SpellParameter", "CreatureParameter", "ItemParameter",
                     (spells, creatures, items) => new CharShipmentParameter(dataPicker, store.CharShipments, spells, creatures, items), QuickAccessMode.Limited);
@@ -578,6 +585,11 @@ namespace WDE.DbcStore
                 Items.Add(key, new SelectOption(value));
         }
 
+        public DbcParameter(Dictionary<long, SelectOption> storage)
+        {
+            Items = storage;
+        }
+
         public bool AllowUnknownItems => true;
     }
 
@@ -603,7 +615,7 @@ namespace WDE.DbcStore
         
         public Task<(long, bool)> PickValue(long value)
         {
-            windowManager.OpenUrl($"https://wow.tools/dbc/?dbc={dbcName}&build={buildString}#page=1&colFilter[0]=exact%3A{value}");
+            windowManager.OpenUrl($"https://wow.tools/dbc/?dbc={dbcName}&build={buildString}#page=1&colFilter[0]=exact:{value}");
             return Task.FromResult((0L, false));
         }
     }
@@ -630,7 +642,7 @@ namespace WDE.DbcStore
         
         public Task<(long, bool)> PickValue(long value)
         {
-            windowManager.OpenUrl($"https://wow.tools/dbc/?dbc={dbcName}&build={buildString}#page=1&colFilter[0]=exact%3A{value}");
+            windowManager.OpenUrl($"https://wow.tools/dbc/?dbc={dbcName}&build={buildString}#page=1&colFilter[0]=exact:{value}");
             return Task.FromResult((0L, false));
         }
     }
