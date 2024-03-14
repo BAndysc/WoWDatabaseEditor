@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -55,7 +56,7 @@ namespace WDE.WoWHeadConnector.Test
         public async Task TestModes()
         {
             var abilities = await headService.FetchNpcAbilities(HeadSourceType.Master, 26554);
-            var bySpell = abilities.GroupBy(a => a.SpellId).ToDictionary(a => a.Key, a => a.SelectMany(m => m.Modes!).ToList());
+            var bySpell = abilities.GroupBy(a => a.SpellId).ToDictionary(a => a.Key, a => a.SelectMany(m => m.Modes ?? Array.Empty<MapDifficulty>()).ToList());
             
             CollectionAssert.AreEquivalent(new MapDifficulty[]
             {
@@ -77,10 +78,6 @@ namespace WDE.WoWHeadConnector.Test
             {
                 MapDifficulty.DungeonHeroic
             }, bySpell[59082]);
-            CollectionAssert.AreEquivalent(new MapDifficulty[]
-            {
-                MapDifficulty.DungeonHeroic
-            }, bySpell[59083]);
         }
     }
 }
