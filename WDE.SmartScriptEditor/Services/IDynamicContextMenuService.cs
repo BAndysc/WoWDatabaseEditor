@@ -105,10 +105,17 @@ public class DynamicContextMenuService : IDynamicContextMenuService
                         };
                     }
                     
-                    if (menuItem.EventId == null)
+                    if (menuItem.EventActionId == null)
                         command = new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon),_ => {}, _ => false);
                     else
                         command = GenerateAddEventCommand(menuItem);
+                }
+                else if (menuItem.Command == SmartContextMenuCommand.AddAction)
+                {
+                    if (menuItem.EventActionId == null)
+                        command = new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon),_ => {}, _ => false);
+                    else
+                        command = GenerateAddActionCommand(menuItem);
                 }
                 else if (menuItem.Command == SmartContextMenuCommand.OpenScript)
                 {
@@ -138,9 +145,39 @@ public class DynamicContextMenuService : IDynamicContextMenuService
         });
     }
 
+    private NamedDelegateCommand<SmartScriptEditorViewModel> GenerateAddActionCommand(SmartContextMenuData menuItem)
+    {
+        var actionData = dataManager.GetDataByName(SmartType.SmartAction, menuItem.EventActionId!);
+        return new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon), vm =>
+        {
+            var selectedActionIndex = vm.FirstSelectedActionIndex;
+            if (selectedActionIndex.eventIndex == -1 || selectedActionIndex.actionIndex == -1)
+                return;
+            
+            var selectedAction = vm.Events[selectedActionIndex.eventIndex].Actions[selectedActionIndex.actionIndex];
+                            
+            using var _ = vm.Script.BulkEdit(menuItem.Header);
+            var newAction = smartFactory.ActionFactory(actionData.Id, selectedAction.Source.Copy(), selectedAction.Target.Copy());
+            if (menuItem.FillParameters != null)
+            {
+                foreach (var param in menuItem.FillParameters)
+                {
+                    if (!param.Const.HasValue && !param.From.HasValue)
+                        continue;
+                    
+                    var destParam = newAction.GetParameter(param.To);
+                    destParam.Value = param.Const ?? selectedAction.GetParameter(param.From!.Value).Value;
+                }
+            }
+            vm.Events[selectedActionIndex.eventIndex].Actions.Insert(selectedActionIndex.actionIndex + 1, newAction); // +1 to add below
+            vm.DeselectAll.Execute();
+            newAction.IsSelected = true;
+        });
+    }
+    
     private NamedDelegateCommand<SmartScriptEditorViewModel> GenerateAddEventCommand(SmartContextMenuData menuItem)
     {
-        var eventData = dataManager.GetDataByName(SmartType.SmartEvent, menuItem.EventId!);
+        var eventData = dataManager.GetDataByName(SmartType.SmartEvent, menuItem.EventActionId!);
         return new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon), vm =>
         {
             var selectedActionIndex = vm.FirstSelectedActionIndex;

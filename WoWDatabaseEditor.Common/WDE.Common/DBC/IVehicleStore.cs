@@ -7,4 +7,5 @@ public interface IVehicleStore
 {
     IReadOnlyList<IVehicle> Vehicles { get; }
     IVehicle? GetVehicleById(uint id);
+    IVehicle? GetVehicleBySeatId(uint id);
 }

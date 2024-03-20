@@ -170,7 +170,8 @@ namespace WDE.SmartScriptEditor.Data
         /// it is enough
         /// </summary>
         AddEventIfAura,
-        OpenScript
+        OpenScript,
+        AddAction
     }
 
     [Equatable]
@@ -209,7 +210,7 @@ namespace WDE.SmartScriptEditor.Data
         
         [DefaultEquality]
         [JsonProperty(PropertyName = "event_id")]
-        public string? EventId { get; set; }
+        public string? EventActionId { get; set; }
 
         [OrderedEquality]
         [JsonProperty(PropertyName = "fill_parameters")]
