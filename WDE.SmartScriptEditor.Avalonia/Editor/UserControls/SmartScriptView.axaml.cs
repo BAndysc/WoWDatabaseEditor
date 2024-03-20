@@ -63,9 +63,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
             var dynamicMenuItems = dataContext.GetDynamicContextMenuForSelected();
             
-            var items = contextMenu.ItemsSource as AvaloniaList<object>;
-            if (items == null)
-                return;
+            var items = contextMenu.Items;
 
             if (temporaryMenuItems.Count != 0)
             {
@@ -170,9 +168,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             if (contextMenu == null)
                 return;
 
-            var items = contextMenu.ItemsSource as AvaloniaList<object>;
-            if (items == null)
-                return;
+            var items = contextMenu.Items;
 
             for (int i = 0; i < temporaryMenuItems.Count; ++i)
                 items.Remove(temporaryMenuItems[i]);
