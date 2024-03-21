@@ -118,7 +118,7 @@
                 <WdeImage ImageUri="Icons/icon_picker.png" Width="16" Height="16" />
                 <Button.IsVisible>
                   <MultiBinding Converter="{x:Static BoolConverters.And}">
-                    <Binding Path="$parent[GenericParameterBox].Parameter.SpecialCommand" Converter="{x:Static NullConverter.IsNotNull}" FallbackValue="False" />
+                    <Binding Path="$parent[GenericParameterBox].Parameter.SpecialCommand" Converter="{x:Static NullConverter.IsNotNull}" FallbackValue="{x:False}" />
                     <Binding Path="$parent[GenericParameterBox].SupportsSpecialCommand" />
                   </MultiBinding>
                 </Button.IsVisible>
