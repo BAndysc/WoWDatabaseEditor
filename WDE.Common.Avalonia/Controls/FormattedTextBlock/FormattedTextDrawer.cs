@@ -19,19 +19,15 @@ namespace WDE.Common.Avalonia.Controls
         {
             cache.AddStyle(index, fontFamily, fontSize, color);
             styles[index] = (color, new Pen(color));
+            
+            var ft = cache.GetFormattedText("A", index);
+            lineHeight = Math.Max(lineHeight, ft.Height);
+            fontBaseLine = Math.Max(fontBaseLine, ft.Baseline);
         }
         
         public (bool, Rect) Draw(DrawingContext context, string text, int styleId, bool canWrap, ref double x, ref double y, double leftPadding, double maxX)
         {
             var ft = cache.GetFormattedText(text, styleId);
-            var ftHeight = ft.Height;
-            if (text.Length == 0 || text.Length == 1 && char.IsWhiteSpace(text[0]))
-                ftHeight = 0;
-            lineHeight = Math.Max(lineHeight, ftHeight);
-            fontBaseLine = Math.Max(fontBaseLine, ft.Baseline);
-
-            if (!styles.TryGetValue(styleId, out var style))
-                return (false, default);
 
             bool wrapped = false;
 
