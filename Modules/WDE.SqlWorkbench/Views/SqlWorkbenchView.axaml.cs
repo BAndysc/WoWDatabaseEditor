@@ -19,8 +19,8 @@ using AvaloniaEdit.Highlighting.Xshd;
 using DynamicData;
 using Markdown.Avalonia;
 using Prism.Commands;
+using WDE.Common.Avalonia.Controls.TextMarkers;
 using WDE.Common.Utils;
-using WDE.SqlWorkbench.Services.TextMarkers;
 using WDE.SqlWorkbench.ViewModels;
 
 namespace WDE.SqlWorkbench.Views;

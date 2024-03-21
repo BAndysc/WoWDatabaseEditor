@@ -25,12 +25,12 @@ using Avalonia.Threading;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Rendering;
 
-namespace WDE.SqlWorkbench.Services.TextMarkers
+namespace WDE.Common.Avalonia.Controls.TextMarkers
 {
     /// <summary>
     /// Handles the text markers for a code editor.
     /// </summary>
-    internal sealed class TextMarkerService : DocumentColorizingTransformer, IBackgroundRenderer, ITextMarkerService,
+    public sealed class TextMarkerService : DocumentColorizingTransformer, IBackgroundRenderer, ITextMarkerService,
         ITextViewConnect
     {
         private readonly Dictionary<TextMarkerTypes, TextSegmentCollection<TextMarker>> markers;

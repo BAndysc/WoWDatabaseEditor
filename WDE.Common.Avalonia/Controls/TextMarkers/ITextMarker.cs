@@ -19,12 +19,12 @@
 using System;
 using Avalonia.Media;
 
-namespace WDE.SqlWorkbench.Services.TextMarkers
+namespace WDE.Common.Avalonia.Controls.TextMarkers
 {
 	/// <summary>
 	/// Represents a text marker.
 	/// </summary>
-	internal interface ITextMarker
+	public interface ITextMarker
 	{
 		/// <summary>
 		/// Gets the start offset of the marked text region.

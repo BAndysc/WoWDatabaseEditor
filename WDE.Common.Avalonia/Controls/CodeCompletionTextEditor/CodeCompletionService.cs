@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AvaloniaEdit.Document;
 using Newtonsoft.Json;
+using WDE.Common.Avalonia.Utils;
 using WDE.Common.Modules;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
@@ -59,22 +60,11 @@ public class CodeCompletionService : ICodeCompletionService, IGlobalAsyncInitial
         }
     }
 
-    private string GetLastWord(ITextSource src, int endPosition, out int startPos)
-    {
-        startPos = endPosition;
-        while (startPos >= 0 && !char.IsWhiteSpace(src.GetCharAt(startPos)) && src.GetCharAt(startPos) != '.')
-            startPos--;
-        startPos++;
-        if (endPosition - startPos + 1 <= 0)
-            return "";
-        return src.GetText(startPos, endPosition - startPos + 1);
-    }
-
     public IReadOnlyList<(string property, string type)>? GetCompletions(string? rootKey, ITextSource str, int position)
     {
         position--;
         List<string> callChain = new();
-        var lastWord = GetLastWord(str, position, out var startPosition);
+        var lastWord = str.GetLastWord(position, out var startPosition);
         if (lastWord.Length == 0 && startPosition > 0 && str.GetCharAt(startPosition - 1) != '.')
             return null;
 
@@ -83,7 +73,7 @@ public class CodeCompletionService : ICodeCompletionService, IGlobalAsyncInitial
         while (startPosition > 0 && str.GetCharAt(startPosition - 1) == '.')
         {
             startPosition -= 2;
-            lastWord = GetLastWord(str, startPosition, out startPosition);
+            lastWord = str.GetLastWord(startPosition, out startPosition);
             callChain.Add(lastWord);
         }
 

@@ -48,25 +48,25 @@ namespace WDE.Common.Avalonia.Controls
             if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Foreground", null, out var eventColor)
                 && eventColor is IBrush eventBrush)
             {
-                drawer.AddStyle(STYLE_DEFAULT, new Typeface(mainFontSansFamily), 12, eventBrush, 0);
+                drawer.AddStyle(STYLE_DEFAULT, new Typeface(mainFontSansFamily), 12, eventBrush);
             }
             
             if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Selected.Foreground", null, out var eventSelectedColor)
                 && eventSelectedColor is IBrush eventSelectedBrush)
             {
-                drawer.AddStyle(STYLE_DEFAULT_SELECTED, new Typeface(mainFontSansFamily), 12, eventSelectedBrush, 0);
+                drawer.AddStyle(STYLE_DEFAULT_SELECTED, new Typeface(mainFontSansFamily), 12, eventSelectedBrush);
             }
             
             if (Application.Current.Styles.TryGetResource("SmartScripts.Parameter.Foreground", null, out var parameterColor)
                 && parameterColor is IBrush parameterBrush)
             {
-                drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, parameterBrush, 1);
+                drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, parameterBrush);
             }
             
             if (Application.Current.Styles.TryGetResource("SmartScripts.Source.Foreground", null, out var sourceColor)
                 && sourceColor is IBrush sourceBrush)
             {
-                drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, sourceBrush, 1);
+                drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, sourceBrush);
             }
         }
 

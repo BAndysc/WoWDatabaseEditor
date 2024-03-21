@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-namespace WDE.SqlWorkbench.Services.TextMarkers;
+namespace WDE.Common.Avalonia.Controls.TextMarkers;
 
-internal interface ITextMarkerService
+public interface ITextMarkerService
 {
     /// <summary>
     /// Creates a new text marker. The text marker will be invisible at first,

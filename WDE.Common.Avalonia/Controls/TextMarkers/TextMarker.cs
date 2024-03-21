@@ -2,9 +2,9 @@ using System;
 using Avalonia.Media;
 using AvaloniaEdit.Document;
 
-namespace WDE.SqlWorkbench.Services.TextMarkers;
+namespace WDE.Common.Avalonia.Controls.TextMarkers;
 
-internal sealed class TextMarker : TextSegment, ITextMarker
+public sealed class TextMarker : TextSegment, ITextMarker
 {
     readonly TextMarkerService service;
 

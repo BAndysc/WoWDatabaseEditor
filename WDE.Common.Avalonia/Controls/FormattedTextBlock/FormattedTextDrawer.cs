@@ -11,13 +11,14 @@ namespace WDE.Common.Avalonia.Controls
         
         private double lineHeight = 0;
         private FormattedTextCache cache = new();
-        private Dictionary<int, (IBrush brush, IPen pen, int yoffset)> styles = new();
+        private Dictionary<int, (IBrush brush, IPen pen)> styles = new();
         public double LineHeight => lineHeight;
+        private double fontBaseLine = 0;
 
-        public void AddStyle(int index, Typeface fontFamily, int fontSize, IBrush color, int yoffset)
+        public void AddStyle(int index, Typeface fontFamily, int fontSize, IBrush color)
         {
             cache.AddStyle(index, fontFamily, fontSize, color);
-            styles[index] = (color, new Pen(color), yoffset);
+            styles[index] = (color, new Pen(color));
         }
         
         public (bool, Rect) Draw(DrawingContext context, string text, int styleId, bool canWrap, ref double x, ref double y, double leftPadding, double maxX)
@@ -27,6 +28,7 @@ namespace WDE.Common.Avalonia.Controls
             if (text.Length == 0 || text.Length == 1 && char.IsWhiteSpace(text[0]))
                 ftHeight = 0;
             lineHeight = Math.Max(lineHeight, ftHeight);
+            fontBaseLine = Math.Max(fontBaseLine, ft.Baseline);
 
             if (!styles.TryGetValue(styleId, out var style))
                 return (false, default);
@@ -39,10 +41,10 @@ namespace WDE.Common.Avalonia.Controls
                 y += lineHeight;
                 wrapped = true;
             }
+
+            double alignedY = y + (lineHeight - ft.Height) + fontBaseLine - ft.Baseline;
             
-            double alignedY = y + (lineHeight - ft.Height);
-            
-            context.DrawText(ft, new Point(x, alignedY + style.yoffset));
+            context.DrawText(ft, new Point(x, alignedY));
 
             double startX = x;
             x += ft.Width;
