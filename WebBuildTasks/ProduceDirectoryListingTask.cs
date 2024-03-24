@@ -9,6 +9,11 @@ public class ProduceDirectoryListingTask : Task
 
     public override bool Execute()
     {
+        if (!Directory.Exists(Path.Join(BasePath, Folder)))
+        {
+            Directory.CreateDirectory(Path.Join(BasePath, Folder));
+        }
+        
         List<string> files = new();
         foreach (string file in Directory.EnumerateFiles(Path.Join(BasePath, Folder), "*", SearchOption.AllDirectories))
         {
