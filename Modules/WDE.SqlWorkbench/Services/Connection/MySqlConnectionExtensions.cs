@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MySqlConnector;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Models.DataTypes;
 
@@ -24,9 +25,9 @@ internal static class MySqlConnectionExtensions
 
     public static async Task<IReadOnlyList<TableInfo>> GetTablesAsync(this IMySqlQueryExecutor conn, string schemaName, CancellationToken token = default, string? tableName = null)
     {
-        var where = $"`TABLE_SCHEMA` = '{schemaName}'";
+        var where = $"`TABLE_SCHEMA` = '{MySqlHelper.EscapeString(schemaName)}'";
         if (tableName != null)
-            where += $" AND `TABLE_NAME` = '{tableName}'";
+            where += $" AND `TABLE_NAME` = '{MySqlHelper.EscapeString(tableName)}'";
         var results = await conn.ExecuteSqlAsync($"SELECT `TABLE_SCHEMA`, `TABLE_NAME`, `TABLE_TYPE`, `ENGINE`, `ROW_FORMAT`, `TABLE_COLLATION`, `DATA_LENGTH`, `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE {where} ORDER BY `TABLE_NAME`;", null, token);
 
         if (results.IsNonQuery || results.Columns.Length == 0)
@@ -48,7 +49,7 @@ internal static class MySqlConnectionExtensions
     
     public static async Task<IReadOnlyList<RoutineInfo>> GetRoutinesAsync(this IMySqlQueryExecutor conn, string schemaName, CancellationToken token)
     {
-        var results = await conn.ExecuteSqlAsync($"SELECT `SPECIFIC_NAME`, `ROUTINE_SCHEMA`, `ROUTINE_TYPE`, `DATA_TYPE`, `DTD_IDENTIFIER`, `ROUTINE_DEFINITION`, `IS_DETERMINISTIC`, `SQL_DATA_ACCESS`, `SECURITY_TYPE`, `CREATED`, `LAST_ALTERED`, `ROUTINE_COMMENT`, `DEFINER` FROM `information_schema`.`routines` WHERE `ROUTINE_SCHEMA` = '{schemaName}' ORDER BY `SPECIFIC_NAME`;", null, token);
+        var results = await conn.ExecuteSqlAsync($"SELECT `SPECIFIC_NAME`, `ROUTINE_SCHEMA`, `ROUTINE_TYPE`, `DATA_TYPE`, `DTD_IDENTIFIER`, `ROUTINE_DEFINITION`, `IS_DETERMINISTIC`, `SQL_DATA_ACCESS`, `SECURITY_TYPE`, `CREATED`, `LAST_ALTERED`, `ROUTINE_COMMENT`, `DEFINER` FROM `information_schema`.`routines` WHERE `ROUTINE_SCHEMA` = '{MySqlHelper.EscapeString(schemaName)}' ORDER BY `SPECIFIC_NAME`;", null, token);
 
         if (results.IsNonQuery || results.Columns.Length == 0)
             return Array.Empty<RoutineInfo>();
@@ -91,7 +92,7 @@ internal static class MySqlConnectionExtensions
 
     public static async Task<TableType?> GetTableTypeAsync(this IMySqlQueryExecutor conn, string? schema, string tableName, CancellationToken token)
     {
-        string where = string.IsNullOrEmpty(schema) ? "" : $" IN `{schema}`";
+        string where = string.IsNullOrEmpty(schema) ? "" : $" IN `{MySqlHelper.EscapeString(schema)}`";
         var results = await conn.ExecuteSqlAsync($"SHOW FULL TABLES{where};", null, token);
         var tableNames = (StringColumnData)results.Columns[0]!;
         var tableTypes = (StringColumnData)results.Columns[1]!;
@@ -108,7 +109,7 @@ internal static class MySqlConnectionExtensions
     public static async Task<IReadOnlyList<ColumnInfo>> GetTableColumnsAsync(this IMySqlQueryExecutor conn, string schema, string tableName, CancellationToken token)
     {
         List<ColumnInfo> columns = new();
-        var databases = await conn.ExecuteSqlAsync($"SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = '{schema}' AND `TABLE_NAME` = '{tableName}' ORDER BY `ORDINAL_POSITION`", null, token);
+        var databases = await conn.ExecuteSqlAsync($"SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = '{MySqlHelper.EscapeString(schema)}' AND `TABLE_NAME` = '{MySqlHelper.EscapeString(tableName)}' ORDER BY `ORDINAL_POSITION`", null, token);
         if (token.IsCancellationRequested)
             return columns;
 
@@ -139,7 +140,7 @@ internal static class MySqlConnectionExtensions
     
     public static async Task<string> GetCreateTableAsync(this IMySqlQueryExecutor conn, string schema, string tableName, CancellationToken token = default)
     {
-        var databases = await conn.ExecuteSqlAsync($"SHOW CREATE TABLE `{schema}`.`{tableName}`", null, token);
+        var databases = await conn.ExecuteSqlAsync($"SHOW CREATE TABLE `{MySqlHelper.EscapeString(schema)}`.`{MySqlHelper.EscapeString(tableName)}`", null, token);
         if (token.IsCancellationRequested)
             return "";
 
@@ -210,9 +211,9 @@ internal static class MySqlConnectionExtensions
 
     public static async Task<Dictionary<string, List<ShowIndexEntry>>> GetIndexesAsync(this IMySqlQueryExecutor conn, string? schema, string table, CancellationToken token = default)
     {
-        var from = $"`{table}`";
+        var from = $"`{MySqlHelper.EscapeString(table)}`";
         if (schema != null)
-            from = $"`{schema}`.{from}";
+            from = $"`{MySqlHelper.EscapeString(schema)}`.{MySqlHelper.EscapeString(from)}";
         
         var results = await conn.ExecuteSqlAsync($"SHOW INDEX FROM {from}", null, token);
 
