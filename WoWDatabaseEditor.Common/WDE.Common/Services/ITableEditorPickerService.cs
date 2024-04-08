@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WDE.Common.Database;
+using WDE.Common.Exceptions;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Services;
@@ -284,7 +285,7 @@ public class DatabaseKeyConverter : JsonConverter
     }
 }
 
-public class UnsupportedTableException : Exception
+public class UnsupportedTableException : UserException
 {
     public UnsupportedTableException(DatabaseTable table) : base($"Table {table} is not supported")
     {
