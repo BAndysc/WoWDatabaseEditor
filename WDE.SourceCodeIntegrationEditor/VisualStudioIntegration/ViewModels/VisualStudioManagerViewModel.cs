@@ -79,8 +79,6 @@ internal class VisualStudioManagerViewModel : IVisualStudioManagerViewModel
         {
             try
             {
-                await instance.ConnectAsync();
-
                 if (!instance.SkipSolutionPathValidation)
                 {
                     var solutionPath = await instance.GetSolutionFullPath();
@@ -92,6 +90,8 @@ internal class VisualStudioManagerViewModel : IVisualStudioManagerViewModel
                     if (!sourceCodePathService.SourceCodePaths.Any(dir => solutionPathUri.FullName.StartsWith(dir)))
                         continue;
                 }
+
+                await instance.ConnectAsync();
 
                 ConnectToVisualStudioInstance(instance);
             }

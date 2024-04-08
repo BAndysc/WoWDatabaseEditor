@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using WDE.Common.Exceptions;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 
@@ -18,17 +20,26 @@ namespace WDE.Common.Utils
                 if (t.IsFaulted && t.Exception is { } aggregateException)
                 {
                     if (aggregateException.InnerExceptions.Count == 1)
-                        LOG.LogError(aggregateException.InnerExceptions[0], "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                    {
+                        if (aggregateException.InnerExceptions[0] is UserException)
+                            LOG.LogWarning(aggregateException.InnerExceptions[0], "User error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                        else
+                            LOG.LogError(aggregateException.InnerExceptions[0], "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                    }
                     else
+                    {
                         LOG.LogError(aggregateException, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                    }
                 }
                 return;
-//                return Task.CompletedTask;
             }
 
-            /*return*/ t.ContinueWith(e =>
+            t.ContinueWith(e =>
             {
-                LOG.LogError(e.Exception, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                if (e.Exception != null && e.Exception.InnerExceptions.All(e => e is UserException))
+                    LOG.LogWarning(e.Exception, "User error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                else
+                    LOG.LogError(e.Exception, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
             }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
@@ -48,10 +59,9 @@ namespace WDE.Common.Utils
                 }
 
                 return;
-//                return Task.CompletedTask;
             }
 
-            /*return*/ t.ContinueWith(e =>
+            t.ContinueWith(e =>
             {
                 LOG.LogWarning(e.Exception, "Warning in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
             }, TaskContinuationOptions.OnlyOnFaulted);
@@ -67,9 +77,20 @@ namespace WDE.Common.Utils
                 if (t.IsFaulted && t.Exception is { } aggregateException)
                 {
                     if (aggregateException.InnerExceptions.Count == 1)
-                        LOG.LogError(aggregateException.InnerExceptions[0], "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                    {
+                        if (aggregateException.InnerExceptions[0] is UserException)
+                            LOG.LogWarning(aggregateException.InnerExceptions[0], "User error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                        else
+                            LOG.LogError(aggregateException.InnerExceptions[0], "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                    }
                     else
                         LOG.LogError(aggregateException, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+
+                    return messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error")
+                        .SetMainInstruction("An error occured")
+                        .SetContent(aggregateException.InnerExceptions.Count == 1 ? aggregateException.InnerExceptions[0].Message : aggregateException.Message + "\n" + string.Join("\n", aggregateException.InnerExceptions.Select(x => " - " + x.Message)))
+                        .WithOkButton(true)
+                        .Build());
                 }
                 return Task.CompletedTask;
             }
@@ -82,7 +103,10 @@ namespace WDE.Common.Utils
                 }
                 catch (Exception e)
                 {
-                    LOG.LogError(e, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                    if (e is UserException)
+                        LOG.LogWarning(e, "User error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                    else
+                        LOG.LogError(e, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                     await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error")
                         .SetMainInstruction("An error occured")
                         .SetContent(e.Message)

@@ -107,6 +107,6 @@ public class ReportErrorsSink : ILogEventSink
             log = logBuilder.ToString()
         };
 
-        await client.PostAsync(Path.Join(serverUri, "Log", "Send"), new StringContent(JsonConvert.SerializeObject(request), new MediaTypeHeaderValue("application/json")));
+        await client.PostAsync(serverUri + "/Log/Send", new StringContent(JsonConvert.SerializeObject(request), new MediaTypeHeaderValue("application/json")));
     }
 }
