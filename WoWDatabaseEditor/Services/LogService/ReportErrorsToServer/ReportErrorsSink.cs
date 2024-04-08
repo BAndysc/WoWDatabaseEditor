@@ -20,6 +20,7 @@ public class ReportErrorsSink : ILogEventSink
     private HttpClient? client;
     private bool sinkClosed;
     private string? serverUri;
+    private int sendingCounter;
 
     private ConcurrentQueue<LogEvent> queue = new();
 
@@ -52,6 +53,9 @@ public class ReportErrorsSink : ILogEventSink
 
     public void Emit(LogEvent logEvent)
     {
+        if (sendingCounter >= 2)
+            return; // ignore errors raised during error reporting
+
         if (sinkClosed)
             return;
 
@@ -66,10 +70,18 @@ public class ReportErrorsSink : ILogEventSink
 
     private async Task ReportError(HttpClient client, LogEvent logEvent)
     {
-        while (queue.TryDequeue(out var log))
-            await UploadLog(client, log);
+        try
+        {
+            sendingCounter++;
+            while (queue.TryDequeue(out var log))
+                await UploadLog(client, log);
 
-        await UploadLog(client, logEvent);
+            await UploadLog(client, logEvent);
+        }
+        finally
+        {
+            sendingCounter--;
+        }
     }
 
     private HttpClient? TryGetClient()
