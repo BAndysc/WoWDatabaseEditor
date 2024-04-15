@@ -2353,6 +2353,7 @@
     {
         "id": 97,
         "name": "SMART_ACTION_JUMP_TO_POS",
+        "tags": ["TrinityWrath", "TrinityCata", "Azeroth"],
         "name_readable": "Jump to pos",
         "parameters": [
             {
@@ -2368,6 +2369,44 @@
         "target_types": "Creature",
         "uses_target_position": true,
         "target_is_source": true
+    },
+    {
+        "id": 97,
+        "name": "SMART_ACTION_JUMP_TO_POS_MASTER",
+        "tags": ["TrinityMaster"],
+        "name_readable": "Jump to pos",
+        "parameters": [
+            {
+                "name": "Speed XY",
+                "type": "Parameter"
+            },
+            {
+                "name": "Speed Z",
+                "type": "Parameter"
+            },
+            {
+                "name": "Gravity",
+                "type": "Parameter"
+            },
+            {
+                "name": "Use default gravity",
+                "type": "BoolParameter",
+                "defaultVal": 1
+            },
+            {
+                "name": "Point id",
+                "type": "Parameter"
+            },
+            {
+                "name": "Contact distance",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Jump to pos {target_position} with speed XY {pram1}, speed Z {pram2}{pram4value:choose(0):| and gravity {pram3}}",
+        "target_types": "Creature",
+        "uses_target_position": true,
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 98,
