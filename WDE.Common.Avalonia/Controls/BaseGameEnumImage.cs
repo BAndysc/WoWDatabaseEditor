@@ -28,33 +28,47 @@ public abstract class BaseGameEnumImage : Control
         AffectsMeasure<BaseGameEnumImage>(SpacingProperty);
     }
 
-    protected abstract int Value { get; }
+    protected abstract uint Value { get; }
     
-    protected abstract List<int> EnumValues { get; }
+    protected abstract List<uint> EnumValues { get; }
     
     protected abstract List<ImageUri> Images { get; }
     
     protected abstract List<Bitmap?> CachedBitmaps { get; }
     
     protected abstract Task? CacheInProgress { get; set; }
-    
-    protected override Size MeasureOverride(Size availableSize)
-    {
-        int icons = 0;
-        var enumValue = Value;
-        foreach (var icon in EnumValues)
-        {
-            if ((enumValue & icon) == 0)
-                continue;
 
-            icons++;
+    protected Size MeasureInternal(int icons, uint enumValue, Size availableSize)
+    {
+        if (enumValue > 0)
+        {
+            foreach (var icon in EnumValues)
+            {
+                if ((enumValue & icon) == 0)
+                    continue;
+
+                icons++;
+            }
         }
+
+        if (icons == 0)
+            return default;
+
+        var maxSizeDueToWidth = double.IsInfinity(availableSize.Width) || double.IsNaN(availableSize.Width) ? 1024 : availableSize.Width / icons;
 
         var allHeight = availableSize.Height;
         if (double.IsInfinity(allHeight) || double.IsNaN(allHeight))
             allHeight = 1024;
-        
+        allHeight = Math.Min(maxSizeDueToWidth, allHeight);
+
         return new Size(icons * allHeight + Math.Max(0, icons - 1) * Spacing, allHeight);
+    }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        int icons = 0;
+        var enumValue = Value;
+        return MeasureInternal(icons, enumValue, availableSize);
     }
 
     private bool instanceWaitingForCache = false;
@@ -112,25 +126,20 @@ public abstract class BaseGameEnumImage : Control
     }
     
     protected virtual async Task AdditionalCacheTaskAsync() { }
-    
-    public override void Render(DrawingContext context)
+
+    protected void DrawAt(DrawingContext context, uint enumValue, double x)
     {
-        var enumValue = Value;
-        if (enumValue == 0)
-            return;
-        
-        var x = 0d;
         var size = Math.Min(Bounds.Width, Bounds.Height);
         var spacing = Spacing;
         if (!CacheBitmaps(CachedBitmaps, Images))
             return;
-      
+
         for (var index = 0; index < Images.Count; index++)
         {
             var icon = EnumValues[index];
             if ((enumValue & icon) == 0)
                 continue;
-            
+
             var rect = new Rect(x, 0, size, size);
             x += size + spacing;
 
@@ -142,5 +151,15 @@ public abstract class BaseGameEnumImage : Control
         }
 
         base.Render(context);
+    }
+
+    public override void Render(DrawingContext context)
+    {
+        var enumValue = Value;
+        if (enumValue == 0)
+            return;
+        
+        var x = 0d;
+        DrawAt(context, enumValue, x);
     }
 }

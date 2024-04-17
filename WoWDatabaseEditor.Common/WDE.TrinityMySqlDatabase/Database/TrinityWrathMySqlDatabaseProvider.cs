@@ -189,13 +189,13 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
         return model.GameObject.FirstOrDefaultAsync<IGameObject>(g => g.Guid == guid);
     }
     
-    public override async Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map)
+    public override async Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(int map)
     {
         await using var model = Database();
         return await model.Creature.Where(c => c.Map == map).ToListAsync<ICreature>();
     }
 
-    public override async Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map)
+    public override async Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(int map)
     {
         await using var model = Database();
         return await model.GameObject.Where(c => c.Map == map).ToListAsync<IGameObject>();

@@ -70,7 +70,7 @@ internal struct MySqlDumpOptions
 
     [Argument("events")]
     [Description("Dump events from dumped databases")]
-    public bool Events = true;
+    public bool Events = false;
 
     [Argument("extended-insert")]
     [Description("Use multiple-row INSERT syntax")]

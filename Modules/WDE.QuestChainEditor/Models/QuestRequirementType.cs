@@ -2,8 +2,7 @@ namespace WDE.QuestChainEditor.Models;
 
 public enum QuestRequirementType
 {
-    AllCompleted,
+    Completed,
     MustBeActive,
-    OnlyOneCompleted,
     Breadcrumb
 }

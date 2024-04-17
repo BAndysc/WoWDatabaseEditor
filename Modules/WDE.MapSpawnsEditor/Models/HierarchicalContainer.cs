@@ -8,9 +8,9 @@ internal class HierarchicalContainer
 {
     private readonly DbcManager dbcManager;
     private IList<SpawnGroup> roots;
-    private Dictionary<uint, SpawnGroup> maps = new();
-    private Dictionary<uint, SpawnGroup> zones = new();
-    private Dictionary<uint, SpawnGroup> areas = new();
+    private Dictionary<int, SpawnGroup> maps = new();
+    private Dictionary<int, SpawnGroup> zones = new();
+    private Dictionary<int, SpawnGroup> areas = new();
     private Dictionary<(int, uint), SpawnGroup> creatures = new();
     private Dictionary<(int, uint), SpawnGroup> gameobjects = new();
     private Dictionary<uint, SpawnGroup> spawnGroupTemplates = new();
@@ -21,7 +21,7 @@ internal class HierarchicalContainer
         this.dbcManager = dbcManager;
     }
     
-    private SpawnGroup GetMap(uint mapId)
+    private SpawnGroup GetMap(int mapId)
     {
         if (maps.TryGetValue(mapId, out var mapEntry))
             return mapEntry;
@@ -33,12 +33,12 @@ internal class HierarchicalContainer
         return mapEntry;
     }
 
-    private SpawnGroup GetZone(uint zoneId)
+    private SpawnGroup GetZone(int zoneId)
     {
         if (zones.TryGetValue(zoneId, out var zoneEntry))
             return zoneEntry;
 
-        dbcManager.AreaTableStore.TryGetValue(zoneId, out var zone);
+        dbcManager.AreaTableStore.TryGetValue((uint)zoneId, out var zone);
 
         zones[zoneId] = zoneEntry = new(GroupType.Zone, zoneId, zone?.Name ?? "(unknown zone)");
 
@@ -46,7 +46,7 @@ internal class HierarchicalContainer
             roots.Add(zoneEntry);
         else
         {
-            var mapEntry = GetMap(zone.MapId);
+            var mapEntry = GetMap((int)zone.MapId);
             mapEntry.Nested.Add(zoneEntry);
             zoneEntry.Parent = mapEntry;
         }
@@ -54,44 +54,44 @@ internal class HierarchicalContainer
         return zoneEntry;
     }
 
-    private SpawnGroup GetArea(uint areaId)
+    private SpawnGroup GetArea(int areaId)
     {
         if (areas.TryGetValue(areaId, out var areaEntry))
             return areaEntry;
 
-        if (!dbcManager.AreaTableStore.TryGetValue(areaId, out var area))
+        if (!dbcManager.AreaTableStore.TryGetValue((uint)areaId, out var area))
             return GetMap(areaId);
 
         if (area.ParentAreaId == 0)
         {
-            var zone = GetZone(area.Id);
+            var zone = GetZone((int)area.Id);
             areas[zone.Entry] = zone;
             return zone;
         }
                 
-        areas[areaId] = areaEntry = new(GroupType.Area, areaId, area.Name);
+        areas[areaId] = areaEntry = new(GroupType.Area, (int)areaId, area.Name);
 
-        var zoneEntry = GetZone(area.ParentAreaId);
+        var zoneEntry = GetZone((int)area.ParentAreaId);
         zoneEntry.Nested.Add(areaEntry); 
         areaEntry.Parent = zoneEntry;
         
         return areaEntry;
     }
 
-    public SpawnGroup GetSpawnGroupTemplate(ISpawnGroupTemplate groupTemplate, uint? areaId, uint fallbackMapId)
+    public SpawnGroup GetSpawnGroupTemplate(ISpawnGroupTemplate groupTemplate, int? areaId, int fallbackMapId)
     {
         if (spawnGroupTemplates.TryGetValue(groupTemplate.Id, out var templateEntry))
             return templateEntry;
         
         var areaEntry = areaId.HasValue ? GetArea(areaId.Value) : GetMap(fallbackMapId);
-        spawnGroupTemplates[groupTemplate.Id] = templateEntry = new(GroupType.SpawnGroup, groupTemplate.Id, groupTemplate.Name);
+        spawnGroupTemplates[groupTemplate.Id] = templateEntry = new(GroupType.SpawnGroup, (int)groupTemplate.Id, groupTemplate.Name);
         areaEntry.Nested.Add(templateEntry);
         templateEntry.Parent = areaEntry;
         
         return templateEntry;
     }
 
-    public SpawnGroup GetCreature(uint? areaId, uint fallbackMapId, ICreatureTemplate template, ISpawnGroupTemplate? spawnGroup)
+    public SpawnGroup GetCreature(int? areaId, int fallbackMapId, ICreatureTemplate template, ISpawnGroupTemplate? spawnGroup)
     {
         if (spawnGroup != null)
         {
@@ -109,7 +109,7 @@ internal class HierarchicalContainer
             if (creatures.TryGetValue(key, out var creatureEntry))
                 return creatureEntry;
             
-            creatures[key] = creatureEntry = new(GroupType.Creature, template.Entry, template.Name);
+            creatures[key] = creatureEntry = new(GroupType.Creature, (int)template.Entry, template.Name);
 
             if (areaId.HasValue)
             {
@@ -128,7 +128,7 @@ internal class HierarchicalContainer
         }
     }
 
-    public SpawnGroup GetGameObject(uint? areaId, uint fallbackMapId, IGameObjectTemplate template, ISpawnGroupTemplate? spawnGroup)
+    public SpawnGroup GetGameObject(int? areaId, int fallbackMapId, IGameObjectTemplate template, ISpawnGroupTemplate? spawnGroup)
     {
         if (spawnGroup != null)
         {
@@ -146,7 +146,7 @@ internal class HierarchicalContainer
             if (gameobjects.TryGetValue(key, out var gobjectEntry))
                 return gobjectEntry;
 
-            gameobjects[key] = gobjectEntry = new(GroupType.GameObject, template.Entry, template.Name);
+            gameobjects[key] = gobjectEntry = new(GroupType.GameObject, (int)template.Entry, template.Name);
 
             if (areaId.HasValue)
             {

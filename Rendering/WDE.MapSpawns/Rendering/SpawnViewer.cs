@@ -171,17 +171,17 @@ public class SpawnViewer : IGameModule
         spawnDragger.RenderTransparent();
     }
 
-    private uint? loadedMap;
+    private int? loadedMap;
     private void UpdateSpawnsData()
     {
         if (loadedMap.HasValue && loadedMap.Value == gameContext.CurrentMap.Id)
             return;
 
-        loadedMap = (uint)gameContext.CurrentMap.Id;
+        loadedMap = (int)gameContext.CurrentMap.Id;
         gameContext.StartCoroutine(LoadSpawnDataCoroutine(loadedMap.Value));
     }
 
-    private IEnumerator LoadSpawnDataCoroutine(uint mapId)
+    private IEnumerator LoadSpawnDataCoroutine(int mapId)
     {
         while (spawnsContainer.IsLoading && gameContext.CurrentMap.Id == mapId)
             yield return null;

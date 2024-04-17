@@ -10,7 +10,7 @@ namespace WDE.MapSpawnsEditor.ViewModels;
 
 public partial class SpawnGroup : IParentType
 {
-    public SpawnGroup(GroupType type, uint entry, string name)
+    public SpawnGroup(GroupType type, int entry, string name)
     {
         Entry = entry;
         Type = type;
@@ -39,12 +39,12 @@ public partial class SpawnGroup : IParentType
         }
     }
     
-    public SpawnGroup(ICreatureTemplate creatureTemplate) : this(GroupType.Creature, creatureTemplate.Entry, creatureTemplate.Name)
+    public SpawnGroup(ICreatureTemplate creatureTemplate) : this(GroupType.Creature, (int)creatureTemplate.Entry, creatureTemplate.Name)
     {
         Icon = new ImageUri("Icons/document_creatures.png");
     }
     
-    public SpawnGroup(IGameObjectTemplate gameObjectTemplate) : this(GroupType.Creature, gameObjectTemplate.Entry, gameObjectTemplate.Name)
+    public SpawnGroup(IGameObjectTemplate gameObjectTemplate) : this(GroupType.Creature, (int)gameObjectTemplate.Entry, gameObjectTemplate.Name)
     {
         Icon = new ImageUri("Icons/document_gameobjects.png");
     }
@@ -76,7 +76,7 @@ public partial class SpawnGroup : IParentType
         }
     }
 
-    public uint Entry { get; }
+    public int Entry { get; }
     public GroupType Type { get; }
     public string Name { get; }
     public string Header { get;  }

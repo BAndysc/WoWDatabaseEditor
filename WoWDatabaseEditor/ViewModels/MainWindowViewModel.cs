@@ -131,7 +131,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                     return;
                 }
 
-                solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!);
+                solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!).ListenErrors(this.messageBoxService);
             }, () => (DocumentManager.ActiveSolutionItemDocument != null &&
                      (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase)) ||
                      (DocumentManager.ActiveDocument is {} doc && doc.Save.CanExecute(null)));

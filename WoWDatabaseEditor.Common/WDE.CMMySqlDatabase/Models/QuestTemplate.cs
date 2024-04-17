@@ -23,8 +23,7 @@ namespace WDE.CMMySqlDatabase.Models
         
 //         [Column(Name="AllowableRaces")]
 //         public CharacterRaces AllowableRaces { get; set; }
-        //[Column("RequiredRaces"                            )] public CharacterRaces AllowableRaces   { get; set; } // smallint(5) unsigned
-        public CharacterRaces AllowableRaces { get; set; } = 0;
+        [Column("RequiredRaces"                             )] public CharacterRaces AllowableRaces   { get; set; } // smallint(5) unsigned
 
         [Column("PrevQuestId"                                )] public int     PrevQuestId            { get; set; } // mediumint(9)
 
@@ -34,8 +33,7 @@ namespace WDE.CMMySqlDatabase.Models
         
         [Column("BreadcrumbForQuestId"                       )] public int     BreadcrumbForQuestId   { get; set; } // mediumint(9) unsigned
 
-        //[Column("RequiredClasses"                            )] public CharacterClasses AllowableClasses { get; set; } // smallint(5) unsigned
-        public CharacterClasses AllowableClasses { get; set; } = 0;
+        [Column("RequiredClasses"                            )] public CharacterClasses AllowableClasses { get; set; } // smallint(5) unsigned
 
         //         [Column(Name = "RewardNextQuest")]
         //         public uint NextQuestInChain { get; set; }
@@ -46,7 +44,7 @@ namespace WDE.CMMySqlDatabase.Models
         public uint QuestRewardId => 0;
 
         // TODO: remove this hack by setting NextQuestInChain as int instead uint (this will ignore next quest id < 0)
-        [Column("NextQuestId"                                )] public int    NextQuestInChainU            { get; set; } // mediumint(9)
+        [Column("NextQuestInChain"                                )] public int    NextQuestInChainU            { get; set; } // mediumint(9)
         public uint NextQuestInChain => NextQuestInChainU > 0 ? (uint)NextQuestInChainU : 0;
 // 
 //         public QuestTemplateWoTLK SetAddon(MySqlQuestTemplateAddon? addon)

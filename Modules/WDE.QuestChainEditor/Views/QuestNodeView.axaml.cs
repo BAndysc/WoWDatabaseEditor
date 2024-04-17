@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.QuestChainEditor.Views;
 
-public class QuestNodeView : UserControl
+public partial class QuestNodeView : UserControl
 {
     public QuestNodeView()
     {

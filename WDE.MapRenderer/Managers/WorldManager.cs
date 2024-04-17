@@ -36,18 +36,18 @@ public class WorldManager : System.IDisposable
     public WDT? CurrentWdt { get; private set; }
     public WDL? CurrentWdl { get; private set; }
 
-    private uint? prevAreaId;
+    private int? prevAreaId;
     public void Update(float delta)
     {
-        var areaId = zoneAreaManager.GetAreaId((uint)gameContext.CurrentMap.Id, cameraManager.Position);
+        var areaId = zoneAreaManager.GetAreaId(gameContext.CurrentMap.Id, cameraManager.Position);
         if (areaId != prevAreaId)
         {
             prevAreaId = areaId;
             if (areaId.HasValue)
             {
-                if (areaTableStore.Contains(areaId.Value))
+                if (areaTableStore.Contains((uint)areaId.Value))
                 {
-                    var areaName = areaTableStore[areaId.Value];
+                    var areaName = areaTableStore[(uint)areaId.Value];
                     notificationsCenter.ShowMessage(areaName.Name);
                 }
             }

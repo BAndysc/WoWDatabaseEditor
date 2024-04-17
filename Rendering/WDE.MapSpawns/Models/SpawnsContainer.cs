@@ -13,8 +13,8 @@ namespace WDE.MapSpawns.Models;
 public interface ISpawnsContainer
 {
     bool IsLoading { get; }
-    uint? LoadedMap { get; }
-    void LoadMap(uint mapId);
+    int? LoadedMap { get; }
+    void LoadMap(int mapId);
     PerChunkHolder<List<SpawnInstance>> SpawnsPerChunk { get; }
     FlatTreeList<SpawnEntry, SpawnInstance> Spawns { get; }
     void Clear();
@@ -26,7 +26,7 @@ public class SpawnsContainer : ISpawnsContainer
 {
     private readonly IDatabaseProvider databaseProvider;
     public bool IsLoading { get; private set; }
-    public uint? LoadedMap { get; private set; }
+    public int? LoadedMap { get; private set; }
 
     private ObservableCollection<SpawnEntry> entries = new();
     private PerChunkHolder<List<SpawnInstance>> spawnsPerChunk = new();
@@ -40,7 +40,7 @@ public class SpawnsContainer : ISpawnsContainer
         spawns = new FlatTreeList<SpawnEntry, SpawnInstance>(entries);
     }
     
-    public void LoadMap(uint mapId)
+    public void LoadMap(int mapId)
     {
         if (mapId == LoadedMap)
             return;
@@ -58,7 +58,7 @@ public class SpawnsContainer : ISpawnsContainer
         LoadedMap = null;
     }
 
-    private async Task LoadModelsTasks(uint mapId)
+    private async Task LoadModelsTasks(int mapId)
     {
         IsLoading = true;
         try

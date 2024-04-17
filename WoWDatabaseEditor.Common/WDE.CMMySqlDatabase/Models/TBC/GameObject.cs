@@ -15,7 +15,7 @@ namespace WDE.CMMySqlDatabase.Models.TBC
         [Column(Name = "id")]
         public uint Entry { get; set; }
         [Column(Name = "map")]
-        public uint Map { get; set; }
+        public int Map { get; set; }
 
         public uint? PhaseMask => null;
 

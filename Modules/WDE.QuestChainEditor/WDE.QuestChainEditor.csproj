@@ -7,14 +7,15 @@
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
     <ItemGroup>
+        <ProjectReference Include="..\automatic-graph-layout\GraphLayout\MSAGL\AutomaticGraphLayout.csproj" />
+        <ProjectReference Include="..\nodify\Nodify\Nodify.csproj" />
         <ProjectReference Include="..\..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
         <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
-        <ProjectReference Include="..\AvaloniaGraph\AvaloniaGraph.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="AutomaticGraphLayout" Version="1.1.12" />
       <PackageReference Include="FuzzySharp" Version="2.0.2" />
+      <PackageReference Include="GraphX" Version="3.0.0" />
     </ItemGroup>
     <Import Project="..\..\Avalonia.props" />
     <PropertyGroup>

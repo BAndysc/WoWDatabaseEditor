@@ -81,7 +81,7 @@ public partial class SpawnsToolViewModel : ObservableBase, ITool
             if (node is not SpawnGroup s)
                 return;
             FocusRequest?.Invoke();
-            spawnViewerProxy.CurrentViewer!.SpawnAndDrag(s.Type == GroupType.Creature, s.Entry);
+            spawnViewerProxy.CurrentViewer!.SpawnAndDrag(s.Type == GroupType.Creature, (uint)s.Entry);
         }, node => node is SpawnGroup e && e.Type is GroupType.Creature or GroupType.GameObject);
 
         SpawnItems.SourceCollectionChanged += (_, _) =>

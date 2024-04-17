@@ -23,7 +23,7 @@ namespace WDE.Common.Managers
     {
         Task<bool> ShallSavePreventClosing();
     }
-    
+
     public interface IDocument : IUndoRedoWindow, IDisposable, INotifyPropertyChanged
     {
         string Title { get; }

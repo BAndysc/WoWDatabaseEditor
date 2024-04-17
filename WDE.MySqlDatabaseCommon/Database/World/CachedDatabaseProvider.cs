@@ -347,9 +347,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids) => nonCachedDatabase.GetGameObjectsAsync(guids);
 
-        public Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map) => WaitForCache(nonCachedDatabase.GetCreaturesByMapAsync(map));
+        public Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(int map) => WaitForCache(nonCachedDatabase.GetCreaturesByMapAsync(map));
         
-        public Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map) => WaitForCache(nonCachedDatabase.GetGameObjectsByMapAsync(map));
+        public Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(int map) => WaitForCache(nonCachedDatabase.GetGameObjectsByMapAsync(map));
 
         public Task<IReadOnlyList<IQuestObjective>> GetQuestObjectives(uint questId) => WaitForCache(nonCachedDatabase.GetQuestObjectives(questId));
 
@@ -475,6 +475,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                 return info;
             return null;
         }
+
+        public Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId) => WaitForCache(nonCachedDatabase.GetQuestStarters(questId));
+
+        public Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId) => WaitForCache(nonCachedDatabase.GetQuestEnders(questId));
 
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => WaitForCache(nonCachedDatabase.GetSceneTemplateAsync(sceneId));
 

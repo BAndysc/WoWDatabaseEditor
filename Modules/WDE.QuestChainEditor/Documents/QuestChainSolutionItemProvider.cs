@@ -1,11 +1,9 @@
-using System;
 using System.Threading.Tasks;
 using Prism.Ioc;
 using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Managers;
-using WDE.Common.Services;
 using WDE.Common.Solution;
 using WDE.Common.Types;
 using WDE.Module.Attributes;
@@ -13,7 +11,7 @@ using WDE.QuestChainEditor.ViewModels;
 
 namespace WDE.QuestChainEditor.Documents;
 
-[AutoRegister]
+[AutoRegisterToParentScope]
 [SingleInstance]
 public class QuestChainSolutionItemProvider : ISolutionItemProvider,
     ISolutionItemEditorProvider<QuestChainSolutionItem>,
@@ -23,16 +21,13 @@ public class QuestChainSolutionItemProvider : ISolutionItemProvider,
     ISolutionItemSerializer<QuestChainSolutionItem>
 {
     private readonly IContainerProvider containerProvider;
-    private readonly IDatabaseProvider databaseProvider;
-    private readonly ICreatureEntryOrGuidProviderService creatureEntryOrGuidProviderService;
+    private readonly IQuestEntryProviderService questEntryProviderService;
 
     public QuestChainSolutionItemProvider(IContainerProvider containerProvider,
-        IDatabaseProvider databaseProvider,
-        ICreatureEntryOrGuidProviderService creatureEntryOrGuidProviderService)
+        IQuestEntryProviderService questEntryProviderService)
     {
         this.containerProvider = containerProvider;
-        this.databaseProvider = databaseProvider;
-        this.creatureEntryOrGuidProviderService = creatureEntryOrGuidProviderService;
+        this.questEntryProviderService = questEntryProviderService;
     }
 
     public string GetName() => "Quest chain";
@@ -47,7 +42,15 @@ public class QuestChainSolutionItemProvider : ISolutionItemProvider,
 
     public async Task<ISolutionItem?> CreateSolutionItem()
     {
-        return new QuestChainSolutionItem();
+        var quest = await questEntryProviderService.GetEntryFromService();
+        if (quest.HasValue)
+        {
+            var item = new QuestChainSolutionItem();
+            item.AddEntry(quest.Value);
+            return item;
+        }
+
+        return null;
     }
 
     public IDocument GetEditor(QuestChainSolutionItem item)

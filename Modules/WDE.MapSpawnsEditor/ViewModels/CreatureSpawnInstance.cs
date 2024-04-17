@@ -16,7 +16,7 @@ public class CreatureSpawnInstance : SpawnInstance
     public override Vector3 Position => new Vector3(data.X, data.Y, data.Z);
     public override uint PhaseMask => data.PhaseMask ?? 0;
     public override SmallReadOnlyList<int>? Phases => data.PhaseId;
-    public override uint Map => data.Map;
+    public override int Map => data.Map;
     public MovementType MovementType => data.MovementType;
     public float WanderDistance => data.WanderDistance;
     public override (int, int) Chunk => new Vector3(data.X, data.Y, data.Z).WoWPositionToChunk();

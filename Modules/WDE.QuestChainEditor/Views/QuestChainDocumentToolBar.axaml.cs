@@ -1,10 +1,9 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 namespace WDE.QuestChainEditor.Views;
 
-public class QuestChainDocumentToolBar : UserControl
+public partial class QuestChainDocumentToolBar : UserControl
 {
     public QuestChainDocumentToolBar()
     {

@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+    </PropertyGroup>
+    <PropertyGroup>
+        <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+    <Import Project="..\..\Module.props" />
+    <Import Project="..\..\Avalonia.props" />
+    <ItemGroup>
+        <ProjectReference Include="..\WDE.QuestChainEditor\WDE.QuestChainEditor.csproj" />
+        <ProjectReference Include="..\..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+        <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
+    </ItemGroup>
+</Project>

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using Prism.Commands;
@@ -27,6 +28,9 @@ namespace WDE.Common.History
         void RemoveHandler(HistoryHandler handler);
         void Clear();
         void LimitStack(int limit);
+
+        event Action? OnUndo;
+        event Action? OnRedo;
     }
 
     public static class HistoryExtension

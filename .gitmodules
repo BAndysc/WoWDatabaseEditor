@@ -13,3 +13,9 @@
 [submodule "DBCD"]
 	path = DBCD
 	url = https://github.com/BAndysc/DBCD
+[submodule "Modules/nodify"]
+	path = Modules/nodify
+	url = https://github.com/BAndysc/nodify-avalonia
+[submodule "Modules/automatic-graph-layout"]
+	path = Modules/automatic-graph-layout
+	url = https://github.com/microsoft/automatic-graph-layout

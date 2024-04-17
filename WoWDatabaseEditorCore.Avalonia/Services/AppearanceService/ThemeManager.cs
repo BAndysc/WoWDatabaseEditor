@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Avalonia;
+using Avalonia.Styling;
 using AvaloniaStyles;
 using AvaloniaStyles.Utils;
 using WDE.Common.Factories.Http;
 using WDE.Common.Managers;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers;
 

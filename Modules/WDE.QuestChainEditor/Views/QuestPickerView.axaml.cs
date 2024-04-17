@@ -11,7 +11,7 @@ using WDE.QuestChainEditor.ViewModels;
 
 namespace WDE.QuestChainEditor.Views;
 
-public class QuestPickerView : UserControl
+public partial class QuestPickerView : UserControl
 {
     public QuestPickerView()
     {
@@ -22,14 +22,14 @@ public class QuestPickerView : UserControl
     {
         AvaloniaXamlLoader.Load(this);
         
-        searchBox = this.FindControl<TextBox>("SearchBox");
-        resultsList = this.FindControl<ListBox>("ResultsList");
+        searchBox = this.GetControl<TextBox>("SearchBox");
+        resultsList = this.GetControl<ListBox>("ResultsList");
         adapter = new SelectingItemsControlSelectionAdapter(resultsList);
         adapter.Commit += ResultCommit;
         searchBox.GotFocus += (_, _) =>
         {
             if (searchBoxMoveToEnd)
-                searchBox.SelectionEnd = searchBox.SelectionStart = searchBox.Text.Length;
+                searchBox.SelectionEnd = searchBox.SelectionStart = searchBox.Text?.Length ?? 0;
             else
                 searchBox.SelectAll();
         };

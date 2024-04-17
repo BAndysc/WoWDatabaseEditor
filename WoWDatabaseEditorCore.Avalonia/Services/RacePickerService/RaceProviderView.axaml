@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:racePickerService="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.RacePickerService"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="racePickerService:RaceProviderViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.RacePickerService.RaceProviderView">
+  <DockPanel>
+    <TextBox
+      Text="{CompiledBinding SearchText}"
+      Watermark="Search"
+      KeyDown="SearchBox_OnKeyDown"
+      DockPanel.Dock="Top"
+      Name="SearchBox"
+      utils:FocusUtils.FocusFirst="True" />
+    <OkCancelButtons DockPanel.Dock="Bottom"
+                     AcceptCommand="{CompiledBinding Accept}"
+                     CancelCommand="{CompiledBinding Cancel}" />
+    <ComboBox ItemsSource="{CompiledBinding Expansions}"
+              SelectedItem="{CompiledBinding SelectedExpansion}"
+              DockPanel.Dock="Bottom"
+              HorizontalAlignment="Stretch"
+              DisplayMemberBinding="{CompiledBinding Name}"
+              SelectedValueBinding="{CompiledBinding Name}"
+              Margin="0,0,0,10">
+    </ComboBox>
+    <ListBox
+      Name="ListBox"
+      Margin="0,10,0,10"
+      ItemsSource="{CompiledBinding FilteredItems}"
+      KeyDown="GridView_OnKeyDown">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <DockPanel>
+              <CheckBox IsChecked="{CompiledBinding IsChecked}" />
+              <GameRacesImage IsVisible="{CompiledBinding DrawIcon}" Width="16" Height="16" Races="{CompiledBinding Race}" />
+              <GameTeamImage DockPanel.Dock="Right" Mode="MustContainAny" Height="16" Races="{CompiledBinding Race}" />
+              <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Name}" />
+            </DockPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+      <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="DoubleTapped">
+          <InvokeCommandAction Command="{CompiledBinding Accept}" />
+        </EventTriggerBehavior>
+      </Interaction.Behaviors>
+    </ListBox>
+  </DockPanel>
+</UserControl>

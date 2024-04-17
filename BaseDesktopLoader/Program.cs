@@ -104,6 +104,10 @@ namespace BaseDesktopLoader
             
             var configuration = AppBuilder.Configure<App>()
                 .UsePlatformDetect()
+                .With(new AvaloniaNativePlatformOptions()
+                {
+                    RenderingMode = new[] { /*AvaloniaNativeRenderingMode.Metal, */AvaloniaNativeRenderingMode.OpenGl, AvaloniaNativeRenderingMode.Software }
+                })
                 .UseReactiveUI()
                 .LogToTrace();
 

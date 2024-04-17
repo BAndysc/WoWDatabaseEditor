@@ -99,9 +99,54 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         WindowLifetimeTask(table, key, customWhere, window, task).ListenErrors();
     }
 
-    public void OpenEditor(string tableId, string? customWhere)
+    public void OpenTemplatesEditor(IReadOnlyList<DatabaseKey> keys, DatabaseTable table)
     {
-        
+        var definition = definitionProvider.GetDefinitionByTableName(table);
+        if (definition == null)
+            throw new UnsupportedTableException(table);
+
+        if (definition.RecordMode != RecordMode.Template)
+            throw new UnsupportedTableException(table, nameof(OpenTemplatesEditor) + " can be called only for template tables");
+
+        var solutionItem = new DatabaseTableSolutionItem(table, false);
+        solutionItem.Entries.AddRange(keys.Select(key => new SolutionItemDatabaseEntity(key, true, false, null)));
+
+        bool openInNoSaveMode = false;
+        var template = containerProvider.Resolve<TemplateDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), template), (typeof(bool), openInNoSaveMode));
+        var window = windowManager.ShowWindow(viewModel, out var task);
+        windowsSettings.SetupWindow(table, window);
+    }
+
+    public void OpenMultiRecordEditor(IReadOnlyList<DatabaseKey> partialKeys, DatabaseTable table, params DatabaseTable[] fallbackTables)
+    {
+        var definition = definitionProvider.GetDefinitionByTableName(table);
+        if (definition == null)
+        {
+            foreach (var fallback in fallbackTables)
+            {
+                definition = definitionProvider.GetDefinitionByTableName(fallback);
+                if (definition != null)
+                {
+                    table = fallback;
+                    break;
+                }
+            }
+            if (definition == null)
+                throw new UnsupportedTableException(table);
+        }
+
+        if (definition.RecordMode != RecordMode.MultiRecord)
+            throw new UnsupportedTableException(table, nameof(OpenTemplatesEditor) + " can be called only for multi record tables");
+
+        var solutionItem = new DatabaseTableSolutionItem(table, false);
+        solutionItem.Entries.AddRange(partialKeys.Select(key => new SolutionItemDatabaseEntity(key, true, false, null)));
+
+        bool openInNoSaveMode = false;
+        var template = containerProvider.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), template), (typeof(bool), openInNoSaveMode));
+        var window = windowManager.ShowWindow(viewModel, out var task);
+        windowsSettings.SetupWindow(table, window);
     }
 
     private async Task WindowLifetimeTask(DatabaseTable table, DatabaseKey? key, string? customWhere, IAbstractWindowView window, Task lifetime)

@@ -31,6 +31,7 @@ namespace WoWDatabaseEditorCore.Providers
         private readonly IEventAggregator eventAggregator;
         private readonly INewItemService newItemService;
         private readonly IConfigureService settings;
+        private readonly Lazy<IMessageBoxService> messageBoxService;
         public IDocumentManager DocumentManager { get; }
         
         public string ItemName { get; } = "_File";
@@ -38,13 +39,14 @@ namespace WoWDatabaseEditorCore.Providers
         public MainMenuItemSortPriority SortPriority { get; } = MainMenuItemSortPriority.PriorityVeryHigh;
 
         public EditorFileMenuItemProvider(ISolutionManager solutionManager, IEventAggregator eventAggregator, INewItemService newItemService,  IDocumentManager documentManager, IConfigureService settings,
-            IApplication application, ISolutionTasksService solutionTasksService, ISolutionSqlService solutionSqlService)
+            IApplication application, ISolutionTasksService solutionTasksService, ISolutionSqlService solutionSqlService, Lazy<IMessageBoxService> messageBoxService)
         {
             this.solutionManager = solutionManager;
             this.eventAggregator = eventAggregator;
             this.newItemService = newItemService;
             DocumentManager = documentManager;
             this.settings = settings;
+            this.messageBoxService = messageBoxService;
             SubItems = new List<IMenuItem>();
             if (solutionManager.CanContainAnyItem)
             {
@@ -63,7 +65,7 @@ namespace WoWDatabaseEditorCore.Providers
                             if (DocumentManager.SelectedTool != null && DocumentManager.SelectedTool is ISavableTool savable)
                                 savable.Save.Execute(null);
                             else if (DocumentManager.ActiveSolutionItemDocument != null)
-                                solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!).ListenErrors();
+                                solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!).ListenErrors(this.messageBoxService.Value);
                             else
                             {
                                 async Task Func()
@@ -96,7 +98,7 @@ namespace WoWDatabaseEditorCore.Providers
                                     continue;
                                 
                                 if (x is ISolutionItemDocument sid)
-                                    solutionTasksService.Save(sid).ListenErrors(); // it adds 'save' to the queue, so it's ok not to wait here
+                                    solutionTasksService.Save(sid).ListenErrors(this.messageBoxService.Value); // it adds 'save' to the queue, so it's ok not to wait here
                                 else
                                 {
                                     async Task Func()

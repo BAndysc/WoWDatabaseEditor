@@ -116,9 +116,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public async Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids) => Array.Empty<IGameObject>();
 
-        public Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map) => Task.FromResult<IReadOnlyList<ICreature>>(new List<ICreature>());
+        public Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(int map) => Task.FromResult<IReadOnlyList<ICreature>>(new List<ICreature>());
         
-        public Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map) => Task.FromResult<IReadOnlyList<IGameObject>>(new List<IGameObject>());
+        public Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(int map) => Task.FromResult<IReadOnlyList<IGameObject>>(new List<IGameObject>());
 
         public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry) => Enumerable.Empty<IGameObject>();
 
@@ -176,7 +176,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         {
             return null;
         }
-        
+
+        public async Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId) => Array.Empty<IQuestRelation>();
+
+        public async Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId) => Array.Empty<IQuestRelation>();
+
         public ISceneTemplate? GetSceneTemplate(uint sceneId) => null;
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => Task.FromResult<ISceneTemplate?>(null);
         public Task<IReadOnlyList<ISceneTemplate>?> GetSceneTemplatesAsync() => Task.FromResult<IReadOnlyList<ISceneTemplate>?>(null);

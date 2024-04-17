@@ -46,8 +46,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                 if (ViewBind.TryResolve(documentDockWrapper.ViewModel, out var documentView) && documentView is Control control)
                 {
                     documents[documentDockWrapper.ViewModel] = control;
-                    documents[documentDockWrapper.ViewModel].Classes.Add("documentView");
-                    documents[documentDockWrapper.ViewModel].DataContext = documentDockWrapper.ViewModel;
+                    control.Classes.Add("documentView");
+                    control.DataContext = documentDockWrapper.ViewModel;
                     return control;
                 }
             }

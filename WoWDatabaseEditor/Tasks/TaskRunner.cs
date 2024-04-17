@@ -6,7 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using SmartFormat.Utilities;
 using WDE.Common;
+using WDE.Common.Exceptions;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Tasks
@@ -17,10 +20,12 @@ namespace WoWDatabaseEditorCore.Tasks
     public class TaskRunner : ITaskRunner
     {
         private readonly IMainThread mainThread;
+        private readonly Lazy<IMessageBoxService> messageBoxService;
 
-        public TaskRunner(IMainThread mainThread)
+        public TaskRunner(IMainThread mainThread, Lazy<IMessageBoxService> messageBoxService)
         {
             this.mainThread = mainThread;
+            this.messageBoxService = messageBoxService;
         }
         
         public ObservableCollection<(ITask, ITaskProgress)> Tasks { get; } =
@@ -73,6 +78,13 @@ namespace WoWDatabaseEditorCore.Tasks
                             Tasks.Remove((task, progress));
                             if (t.Exception == null)
                                 taskCompletionSource.SetResult();
+                            else if (t.Exception.InnerExceptions.Count == 1 &&
+                                     t.Exception.InnerExceptions[0] is UserException userException)
+                            {
+                                LOG.LogWarning(userException);
+                                messageBoxService.Value.SimpleDialog("Error", "Error", userException.Message);
+                                taskCompletionSource.SetException(userException);
+                            }
                             else
                             {
                                 LOG.LogError(t.Exception);
@@ -94,6 +106,14 @@ namespace WoWDatabaseEditorCore.Tasks
                         AssertMainThread();
                         progress.ReportFinished();
                         taskCompletionSource.SetResult();
+                    }
+                    catch (UserException e)
+                    {
+                        AssertMainThread();
+                        LOG.LogWarning(e);
+                        messageBoxService.Value.SimpleDialog("Error", "Error", e.Message).ListenErrors();
+                        progress.ReportFail();
+                        taskCompletionSource.SetException(e);
                     }
                     catch (Exception e)
                     {

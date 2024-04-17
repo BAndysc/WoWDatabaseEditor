@@ -31,7 +31,7 @@ public class LootLoader : ILootLoader
             {
                 var template = await databaseProvider.GetCreatureTemplate(solutionItemEntry);
                 if (template == null)
-                    throw new Exception("Couldn't find creature template with entry " + solutionItemEntry);
+                    throw new UserException("Couldn't find creature template with entry " + solutionItemEntry);
 
                 var loots = Enumerable.Range(0, template.LootCount)
                     .Select(idx => new LootEntry(template.GetLootId(idx)))
@@ -53,7 +53,7 @@ public class LootLoader : ILootLoader
             {
                 var template = await databaseProvider.GetCreatureTemplate(solutionItemEntry);
                 if (template == null)
-                    throw new Exception("Couldn't find creature template with entry " + solutionItemEntry);
+                    throw new UserException("Couldn't find creature template with entry " + solutionItemEntry);
 
                 if (template.SkinningLootId == 0 || difficulty > 0)
                 {
@@ -69,7 +69,7 @@ public class LootLoader : ILootLoader
             {
                 var template = await databaseProvider.GetCreatureTemplate(solutionItemEntry);
                 if (template == null)
-                    throw new Exception("Couldn't find creature template with entry " + solutionItemEntry);
+                    throw new UserException("Couldn't find creature template with entry " + solutionItemEntry);
 
                 if (template.PickpocketLootId == 0 || difficulty > 0)
                 {

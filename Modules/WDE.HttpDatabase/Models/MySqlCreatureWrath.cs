@@ -14,7 +14,7 @@ namespace WDE.HttpDatabase.Models
         public uint Entry { get; set; }
 
         
-        public uint Map { get; set; }
+        public int Map { get; set; }
 
         
         public uint? PhaseMask { get; set; }
@@ -61,7 +61,7 @@ namespace WDE.HttpDatabase.Models
         public uint Entry { get; set; }
 
         
-        public uint Map { get; set; }
+        public int Map { get; set; }
 
         
         public uint? PhaseMask { get; set; }
@@ -107,7 +107,7 @@ namespace WDE.HttpDatabase.Models
         public uint Entry { get; set; }
 
         
-        public uint Map { get; set; }
+        public int Map { get; set; }
 
         public uint? PhaseMask => null;
         
@@ -157,7 +157,7 @@ namespace WDE.HttpDatabase.Models
         public uint Entry { get; set; }
 
         
-        public uint Map { get; set; }
+        public int Map { get; set; }
 
         public uint? PhaseMask => null;
 

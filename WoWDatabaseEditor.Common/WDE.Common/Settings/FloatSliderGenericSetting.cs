@@ -11,15 +11,17 @@ public class FloatSliderGenericSetting : IFloatSliderGenericSetting
     public string? Help { get; }
     public float Min { get; }
     public float Max { get; }
+    public bool WholeNumbers { get; }
     private float value;
 
-    public FloatSliderGenericSetting(string name, float value, float min, float max, string? help = null)
+    public FloatSliderGenericSetting(string name, float value, float min, float max, string? help = null, bool wholeNumbers = false)
     {
         Name = name;
         this.value = value;
         Min = min;
         Max = max;
         Help = help;
+        WholeNumbers = wholeNumbers;
     }
 
     public float Value

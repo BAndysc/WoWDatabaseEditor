@@ -314,8 +314,8 @@ namespace WDE.CMMySqlDatabase.Database
 
 
         public abstract IReadOnlyList<ICreature> GetCreatures();
-        public abstract Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map);
-        public abstract Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map);
+        public abstract Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(int map);
+        public abstract Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(int map);
         public abstract IEnumerable<IGameObject> GetGameObjects();
 
         public async Task<IReadOnlyList<ICoreCommandHelp>> GetCommands()
@@ -705,6 +705,24 @@ namespace WDE.CMMySqlDatabase.Database
                 (t1, t2) => t1.TemplateId == t2.Id && t2.Type == type,
                 (t1, t2) => t1)
                 .FirstOrDefaultAsync(t1 => t1.Guid == guid);
+        }
+
+        public async Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId)
+        {
+            await using var model = Database();
+            var creatures = await model.CreatureQuestStarters.Where(x => x.Quest == questId).ToListAsync<IQuestRelation>();
+            var gameobjects = await model.GameObjectQuestStarters.Where(x => x.Quest == questId).ToListAsync<IQuestRelation>();
+            creatures.AddRange(gameobjects);
+            return creatures;
+        }
+
+        public async Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId)
+        {
+            await using var model = Database();
+            var creatures = await model.CreatureQuestEnders.Where(x => x.Quest == questId).ToListAsync<IQuestRelation>();
+            var gameobjects = await model.GameObjectQuestEnders.Where(x => x.Quest == questId).ToListAsync<IQuestRelation>();
+            creatures.AddRange(gameobjects);
+            return creatures;
         }
     }
 }

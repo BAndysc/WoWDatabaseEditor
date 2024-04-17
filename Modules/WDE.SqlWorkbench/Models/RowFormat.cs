@@ -7,5 +7,6 @@ internal enum RowFormat
     Compressed,
     Redundant,
     Compact,
-    Paged
+    Paged,
+    Page
 }

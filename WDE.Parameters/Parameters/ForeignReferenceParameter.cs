@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common.Database;
@@ -8,12 +9,12 @@ namespace WDE.Parameters.Parameters;
 
 public class ForeignReferenceParameter : ICustomPickerParameter<long>
 {
-    private readonly ITableEditorPickerService tableEditorPickerService;
+    private readonly Lazy<ITableEditorPickerService> tableEditorPickerService;
     private readonly DatabaseTable tableName;
     private readonly string columnName;
 
     public ForeignReferenceParameter(
-        ITableEditorPickerService tableEditorPickerService,
+        Lazy<ITableEditorPickerService> tableEditorPickerService,
         DatabaseTable tableName,
         string columnName)
     {
@@ -24,7 +25,7 @@ public class ForeignReferenceParameter : ICustomPickerParameter<long>
     
     public async Task<(long, bool)> PickValue(long value)
     {
-        var result = await tableEditorPickerService.PickByColumn(tableName, default, columnName, value);
+        var result = await tableEditorPickerService.Value.PickByColumn(tableName, default, columnName, value);
         if (result.HasValue)
             return (result.Value, true);
         return (0, false);

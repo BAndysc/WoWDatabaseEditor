@@ -35,7 +35,7 @@ public class TableEditorPickerService : ITableEditorPickerService
     private readonly ITableDefinitionProvider definitionProvider;
     private readonly IContainerProvider containerProvider;
     private readonly IMainThread mainThread;
-    private readonly ISessionService sessionService;
+    private readonly Lazy<ISessionService> sessionService;
     private readonly Lazy<IDocumentManager> documentManager;
     private readonly IMessageBoxService messageBoxService;
     private readonly IWindowManager windowManager;
@@ -46,7 +46,7 @@ public class TableEditorPickerService : ITableEditorPickerService
         ITableDefinitionProvider definitionProvider, 
         IContainerProvider containerProvider,
         IMainThread mainThread,
-        ISessionService sessionService,
+        Lazy<ISessionService> sessionService,
         Lazy<IDocumentManager> documentManager,
         IMessageBoxService messageBoxService,
         IWindowManager windowManager,
@@ -267,7 +267,7 @@ public class TableEditorPickerService : ITableEditorPickerService
     private bool IsItemAlreadyOpened(DatabaseTableSolutionItem fakeSolutionItem, out ISolutionItemDocument document)
     {
         document = null!;
-        if (sessionService.IsOpened && !sessionService.IsPaused &&
+        if (sessionService.Value.IsOpened && !sessionService.Value.IsPaused &&
             documentManager.Value.TryFindDocument(fakeSolutionItem) is { } openedDocument)
         {
             document = openedDocument;

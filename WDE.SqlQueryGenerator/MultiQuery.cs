@@ -38,6 +38,20 @@ namespace WDE.SqlQueryGenerator
             }
         }
 
+        public void Prepend(IQuery? query)
+        {
+            if (query != null)
+            {
+                if (query.Database != Database)
+                    throw new ArgumentException($"IMultiQuery may only store queries for a single database, this instance was build for {Database}, but trying to append {query.Database} database");
+
+                if (query is BlankQuery)
+                    queries.Insert(0, null);
+                else
+                    queries.Insert(0, query);
+            }
+        }
+
         public IQuery Close()
         {
             return new Query(new DummyMultiQuery(Database), string.Join(Environment.NewLine, queries.Select(q => (q?.QueryString ?? Environment.NewLine, q == null)).Where(q => q.Item2 || !string.IsNullOrWhiteSpace(q.Item1)).Select(q => q.Item1)));
@@ -54,6 +68,10 @@ namespace WDE.SqlQueryGenerator
         public DataDatabaseType Database { get; }
 
         public void Add(IQuery? query)
+        {
+        }
+
+        public void Prepend(IQuery? query)
         {
         }
 

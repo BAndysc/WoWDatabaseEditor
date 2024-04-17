@@ -14,30 +14,6 @@
                     <DockPanel>
                         <SettingsHeader DockPanel.Dock="Top" Margin="0,10" Text="{CompiledBinding Name}" />
                         <ItemsControl ItemsSource="{CompiledBinding Settings}">
-                            <ItemsControl.DataTemplates>
-                                <DataTemplate DataType="settings:IBoolGenericSetting">
-                                    <SettingItem Help="{CompiledBinding Help}" Header="{CompiledBinding Name}">
-                                        <ToggleSwitch OnContent="" OffContent="" IsChecked="{CompiledBinding Value}"></ToggleSwitch>
-                                    </SettingItem>
-                                 </DataTemplate>
-                                <DataTemplate DataType="settings:IListOptionGenericSetting">
-                                    <SettingItem Help="{CompiledBinding Help}" Header="{CompiledBinding Name}">
-                                        <ComboBox Margin="10,0,0,0" ItemsSource="{CompiledBinding Options}" SelectedItem="{CompiledBinding SelectedOption}"></ComboBox>
-                                    </SettingItem>
-                                </DataTemplate>
-                                <DataTemplate DataType="settings:IFloatSliderGenericSetting">
-                                    <SettingItem Help="{CompiledBinding Help}" Header="{CompiledBinding Name}">
-                                       <Grid ColumnDefinitions="*,10,Auto">
-                                           <TextBox Grid.Column="2" VerticalAlignment="Center" DockPanel.Dock="Right" Text="{CompiledBinding Value}" />
-                                           <Slider Grid.Column="0"
-                                                   MinWidth="100"
-                                                   Minimum="{CompiledBinding Min}"
-                                                   Maximum="{CompiledBinding Max}"
-                                                   Value="{CompiledBinding Value}" />
-                                       </Grid>
-                                    </SettingItem>
-                                </DataTemplate>
-                            </ItemsControl.DataTemplates>
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Spacing="0" />

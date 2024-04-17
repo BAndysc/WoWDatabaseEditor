@@ -15,6 +15,10 @@ public class UserException : Exception
         Header = header;
     }
 
+    public UserException(Exception inner) : base(inner.Message, inner)
+    {
+    }
+
     public UserException(string message) : base(message)
     {
     }

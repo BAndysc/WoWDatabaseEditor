@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.QuestChainEditor.GraphLayouting.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:GraphLayoutSettingsViewModel"
+             x:Class="WDE.QuestChainEditor.GraphLayouting.Views.GraphLayoutSettingsView">
+  <DockPanel>
+    <ComboBox  DockPanel.Dock="Top"
+               ItemsSource="{CompiledBinding Algorithms}"
+               SelectedItem="{CompiledBinding CurrentAlgorithm}"
+               HorizontalAlignment="Stretch">
+      <ComboBox.ItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{CompiledBinding Name}" />
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" Grid.IsSharedSizeScope="True" DataContext="{CompiledBinding CurrentAlgorithm}">
+      <ItemsControl ItemsSource="{CompiledBinding Settings}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Spacing="0" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+      </ItemsControl>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

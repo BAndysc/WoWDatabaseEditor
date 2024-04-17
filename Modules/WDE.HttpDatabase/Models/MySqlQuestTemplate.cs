@@ -7,12 +7,9 @@ namespace WDE.HttpDatabase.Models
     {
         public uint Entry { get; set; }
 
-        
         public string Name { get; set; } = "";
 
-        
         public int MinLevel { get; set; }
-
         
         public int QuestSortId { get; set; }
         
@@ -28,7 +25,6 @@ namespace WDE.HttpDatabase.Models
         
         public int BreadcrumbForQuestId  { get; set; }
 
-        
         public uint NextQuestInChain { get; set; }
 
         public uint RewardMailTemplateId { get; set; }

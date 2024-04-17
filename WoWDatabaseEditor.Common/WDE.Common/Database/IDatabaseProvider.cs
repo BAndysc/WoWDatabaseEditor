@@ -74,8 +74,8 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync();
         Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids);
         Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids);
-        Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map);
-        Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map);
+        Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(int map);
+        Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(int map);
 
         Task<IReadOnlyList<ITrinityString>> GetStringsAsync();
         Task<IReadOnlyList<IDatabaseSpellDbc>> GetSpellDbcAsync();
@@ -144,6 +144,9 @@ namespace WDE.Common.Database
         Task<ICreature?> GetCreatureByGuidAsync(uint entry, uint guid);
         Task<IReadOnlyList<ICoreCommandHelp>> GetCommands();
         Task<ICreatureModelInfo?> GetCreatureModelInfo(uint displayId);
+        
+        Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId);
+        Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId);
 
         // @todo: make it async one day
         IList<IPhaseName>? GetPhaseNames();

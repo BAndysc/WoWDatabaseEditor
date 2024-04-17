@@ -6,14 +6,12 @@ namespace WDE.HttpDatabase.Models
 
     public class JsonGameObjectWrath : IGameObject
     {
-        
-        
         public uint Guid { get; set; }
 
         
         public uint Entry { get; set; }
         
-        public uint Map { get; set; }
+        public int Map { get; set; }
 
         public SmallReadOnlyList<int>? PhaseId => null;
         
@@ -71,7 +69,7 @@ namespace WDE.HttpDatabase.Models
         
         public uint Entry { get; set; }
         
-        public uint Map { get; set; }
+        public int Map { get; set; }
 
         public uint? PhaseMask => null;
 

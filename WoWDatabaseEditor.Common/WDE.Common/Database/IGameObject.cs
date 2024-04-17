@@ -7,7 +7,7 @@ namespace WDE.Common.Database
         uint Guid { get; }
         uint Entry { get; }
 
-        public uint Map { get; }
+        public int Map { get; }
         public uint? PhaseMask { get; }
         SmallReadOnlyList<int>? PhaseId { get; }
         int? PhaseGroup { get; }
