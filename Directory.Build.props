@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
     <PropertyGroup>
+        <DirectoryBuildPropsPath>$(MSBuildThisFileDirectory)..\</DirectoryBuildPropsPath>
+        <DirectoryBuildPropsFilePath>$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(DirectoryBuildPropsPath)'))</DirectoryBuildPropsFilePath>
+        <DirectoryBuildPropsExists Condition="Exists('$(DirectoryBuildPropsFilePath)')">true</DirectoryBuildPropsExists>
+    </PropertyGroup>
+    
+    <Import Project="$(DirectoryBuildPropsFilePath)" Condition="'$(DirectoryBuildPropsExists)' == 'true'" />
+
+    <PropertyGroup>
         <RestoreAdditionalProjectSources>
             https://nuget-feed-all.avaloniaui.net/v3/index.json;https://www.myget.org/F/xamlbehaviors-nightly/api/v3/index.json
         </RestoreAdditionalProjectSources>
@@ -24,11 +32,11 @@
         <!-- SolutionDir is not defined when building projects explicitly -->
         <SolutionDir Condition=" '$(SolutionDir)' == '' ">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), WoWDatabaseEditor.sln))\</SolutionDir>
         <!-- Output paths -->
-        <BaseIntermediateOutputPath>$(SolutionDir)bin\obj\$(Configuration)\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
-        <IntermediateOutputPath>$(SolutionDir)bin\obj\$(Configuration)\$(MSBuildProjectName)\</IntermediateOutputPath>
-        <MSBuildProjectExtensionsPath>$(IntermediateOutputPath)\</MSBuildProjectExtensionsPath>
+        <BaseIntermediateOutputPath Condition="'$(WDEPropertiesSet)' == ''">$(SolutionDir)bin\obj\$(Configuration)\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+        <IntermediateOutputPath Condition="'$(WDEPropertiesSet)' == ''">$(SolutionDir)bin\obj\$(Configuration)\$(MSBuildProjectName)\</IntermediateOutputPath>
+        <MSBuildProjectExtensionsPath Condition="'$(WDEPropertiesSet)' == ''">$(IntermediateOutputPath)\</MSBuildProjectExtensionsPath>
         <!-- <OutputPath>$(SolutionDir)bin\out\$(Configuration)\</OutputPath>-->
-        <OutDir>$(OutputPath)</OutDir>
-        <DocumentationFile>$(SolutionDir)bin\doc\$(Configuration)\$(MSBuildProjectName).xml</DocumentationFile>
+        <OutDir Condition="'$(WDEPropertiesSet)' == ''">$(OutputPath)</OutDir>
+        <DocumentationFile Condition="'$(WDEPropertiesSet)' == ''">$(SolutionDir)bin\doc\$(Configuration)\$(MSBuildProjectName).xml</DocumentationFile>
     </PropertyGroup>
 </Project>

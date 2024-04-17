@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <AvaloniaVersion>11.2.999-cibuild0046385-alpha</AvaloniaVersion>
+        <AvaloniaVersion>11.2.999-cibuild0047298-alpha</AvaloniaVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
@@ -10,7 +10,7 @@
         <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.1.0-beta1" />
         <PackageReference Include="Projektanker.Icons.Avalonia" Version="9.1.1" />
         <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" Version="9.1.1" />
         <ProjectReference Include="$(MSBuildThisFileDirectory)\Prism.Avalonia\src\Prism.Avalonia\Prism.Avalonia.csproj" />
