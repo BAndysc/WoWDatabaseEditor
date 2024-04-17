@@ -91,12 +91,22 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             }, true);
         }
 
-        private void Refresh(Func<Task<System.Type>> refreshingFunc)
+        private void Refresh(Func<Task<Type>> refreshingFunc)
         {
+            var taskCompletionSource = new TaskCompletionSource();
+            refreshTasks.Add(taskCompletionSource.Task);
             taskRunner.ScheduleTask("Refresh database", async () =>
                 {
-                    var type = await refreshingFunc();
-                    eventAggregator.GetEvent<DatabaseCacheReloaded>().Publish(type);
+                    try
+                    {
+                        var type = await refreshingFunc();
+                        eventAggregator.GetEvent<DatabaseCacheReloaded>().Publish(type);
+                    }
+                    finally
+                    {
+                        refreshTasks.Remove(taskCompletionSource.Task);
+                        taskCompletionSource.SetResult();
+                    }
                 }).ListenErrors();
         }
         
@@ -347,9 +357,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids) => nonCachedDatabase.GetGameObjectsAsync(guids);
 
-        public Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map) => WaitForCache(nonCachedDatabase.GetCreaturesByMapAsync(map));
+        public Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(int map) => WaitForCache(nonCachedDatabase.GetCreaturesByMapAsync(map));
         
-        public Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map) => WaitForCache(nonCachedDatabase.GetGameObjectsByMapAsync(map));
+        public Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(int map) => WaitForCache(nonCachedDatabase.GetGameObjectsByMapAsync(map));
 
         public Task<IReadOnlyList<IQuestObjective>> GetQuestObjectives(uint questId) => WaitForCache(nonCachedDatabase.GetQuestObjectives(questId));
 
@@ -476,6 +486,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return null;
         }
 
+        public Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId) => WaitForCache(nonCachedDatabase.GetQuestStarters(questId));
+
+        public Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId) => WaitForCache(nonCachedDatabase.GetQuestEnders(questId));
+
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => WaitForCache(nonCachedDatabase.GetSceneTemplateAsync(sceneId));
 
         public Task<IReadOnlyList<ISceneTemplate>?> GetSceneTemplatesAsync() => WaitForCache(nonCachedDatabase.GetSceneTemplatesAsync());
@@ -578,13 +592,24 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         private bool cacheInProgress = false;
         private Task cacheTask = Task.CompletedTask;
+        private List<Task> refreshTasks = new();
 
         public async Task WaitForCache()
         {
-            if (!cacheInProgress)
+            if (!cacheInProgress && refreshTasks.Count == 0)
                 return;
 
-            await cacheTask;
+            if (cacheInProgress)
+                await cacheTask;
+            // vv this doesn't work with sequential Tasks (waiting for one to finish before starting another)
+            //else if (!cacheInProgress)
+            //    await Task.WhenAll(refreshTasks.ToList());
+            //else
+            //{
+            //    var tasksToWait = refreshTasks.ToList();
+            //    tasksToWait.Add(cacheTask);
+            //    await Task.WhenAll(tasksToWait);
+            //}
         }
 
         public async Task<T> WaitForCache<T>(Task<T> inner)

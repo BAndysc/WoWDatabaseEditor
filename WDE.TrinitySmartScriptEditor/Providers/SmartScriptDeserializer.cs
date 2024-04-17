@@ -20,7 +20,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
             return true;
         }
 
-        public ISmartScriptProjectItem Serialize(SmartScriptSolutionItem item, bool forMostRecentlyUsed)
+        public ISmartScriptProjectItem? Serialize(SmartScriptSolutionItem item, bool forMostRecentlyUsed)
         {
             return new AbstractSmartScriptProjectItem()
             {

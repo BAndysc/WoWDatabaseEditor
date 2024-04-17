@@ -74,7 +74,7 @@ public class TabularDataPickerPreferences : ITabularDataPickerPreferences
 
     public void SetupWindow(string key, IAbstractWindowView window)
     {
-        window.OnClosing += () =>
+        window.OnClosing += _ =>
         {
             var position = window.Position;
             var size = window.LogicalSize; // we use LogicalSize here, because then we set Width directly

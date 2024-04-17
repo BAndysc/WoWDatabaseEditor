@@ -49,7 +49,7 @@ internal class QueryDocumentSolutionProviders :
         return document;
     }
 
-    public ISmartScriptProjectItem Serialize(QueryDocumentSolutionItem item, bool forMostRecentlyUsed)
+    public ISmartScriptProjectItem? Serialize(QueryDocumentSolutionItem item, bool forMostRecentlyUsed)
     {
         return new AbstractSmartScriptProjectItem()
         {

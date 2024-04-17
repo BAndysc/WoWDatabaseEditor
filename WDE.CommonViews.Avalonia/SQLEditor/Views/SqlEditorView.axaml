@@ -10,9 +10,13 @@
              xmlns:viewModels="clr-namespace:WDE.SQLEditor.ViewModels;assembly=WDE.SQLEditor"
              x:DataType="viewModels:SqlEditorViewModel"
              Name="SqlUserControl">
-    <avaloniaEdit:TextEditor controls:AvalonEditExtra.SyntaxExtension="sql" Document="{Binding Code, Converter={x:Static NativeTextDocumentConverter.Instance}}" Padding="5" x:Name="MyAvalonEdit"
-                             ShowLineNumbers="True"
-                             BorderThickness="0"
-                             utils:FocusUtils.FocusFirst="True"
-                             FontFamily="Consolas,Menlo,Courier,Courier New" />
+    <Panel>
+      <avaloniaEdit:TextEditor controls:AvalonEditExtra.SyntaxExtension="sql" Document="{Binding Code, Converter={x:Static NativeTextDocumentConverter.Instance}}" Padding="5" x:Name="MyAvalonEdit"
+                               ShowLineNumbers="True"
+                               BorderThickness="0"
+                               utils:FocusUtils.FocusFirst="True"
+                               IsEnabled="{CompiledBinding !IsLoading}"
+                               FontFamily="Consolas,Menlo,Courier,Courier New" />
+      <TextBlock Text="Generating..." IsVisible="{CompiledBinding IsLoading}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Light" FontSize="14" />
+    </Panel>
 </UserControl>

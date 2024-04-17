@@ -19,7 +19,7 @@ namespace WDE.Solutions.Manager
                 Register((dynamic) provider);
         }
 
-        public ISmartScriptProjectItem Serialize(ISolutionItem item, bool forMostRecentlyUsed)
+        public ISmartScriptProjectItem? Serialize(ISolutionItem item, bool forMostRecentlyUsed)
         {
             return Serialize((dynamic) item, forMostRecentlyUsed);
         }
@@ -29,7 +29,7 @@ namespace WDE.Solutions.Manager
             serializers.Add(typeof(T), provider);
         }
 
-        private ISmartScriptProjectItem Serialize<T>(T item, bool forMostRecentlyUsed) where T : ISolutionItem
+        private ISmartScriptProjectItem? Serialize<T>(T item, bool forMostRecentlyUsed) where T : ISolutionItem
         {
             if (!serializers.TryGetValue(item.GetType(), out var serializer))
                 throw new Exception("No serializer for type " + item.GetType());

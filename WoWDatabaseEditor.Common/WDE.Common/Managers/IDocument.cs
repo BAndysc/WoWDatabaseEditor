@@ -23,7 +23,7 @@ namespace WDE.Common.Managers
     {
         Task<bool> ShallSavePreventClosing();
     }
-    
+
     public interface IDocument : IUndoRedoWindow, IDisposable, INotifyPropertyChanged
     {
         string Title { get; }
@@ -42,6 +42,12 @@ namespace WDE.Common.Managers
         Task<IQuery> GenerateQuery();
         bool ShowExportToolbarButtons => true;
         bool IsLoading => false;
+    }
+
+    // this is a hack for quest chains
+    public interface ISolutionItemManualUpdateSessionOnSave
+    {
+
     }
 
     public interface IPeriodicSnapshotDocument : IDocument

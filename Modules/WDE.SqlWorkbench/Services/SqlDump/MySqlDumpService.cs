@@ -74,6 +74,9 @@ internal class MySqlDumpService : IMySqlDumpService
         CancellationToken token)
     {
         List<string> arguments = new List<string>();
+
+        arguments.Add(credentials.SchemaName);
+
         AddOptions(options, arguments);
 
         if (credentials.Host.StartsWith("/"))
@@ -94,10 +97,7 @@ internal class MySqlDumpService : IMySqlDumpService
             else
                 arguments.Add("--skip-password");
         }
-        
-        arguments.Add("--databases");
-        arguments.Add(credentials.SchemaName);
-        
+
         foreach (var ignoredTable in allTables.Except(tables))
         {
             arguments.Add("--ignore-table");

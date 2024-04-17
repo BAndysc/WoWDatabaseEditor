@@ -6,11 +6,38 @@
              xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:avalonia="clr-namespace:WoWDatabaseEditorCore.Avalonia"
+             xmlns:settings="clr-namespace:WDE.Common.Settings;assembly=WDE.Common"
              x:Class="WoWDatabaseEditorCore.Avalonia.App"
              RequestedThemeVariant="Light"
              Name="WoW Database Editor">
      <Application.DataTemplates>
         <avalonia:AvaloniaViewLocator />
+
+        <DataTemplate DataType="settings:IBoolGenericSetting">
+            <SettingItem Help="{CompiledBinding Help}" Header="{CompiledBinding Name}">
+                <ToggleSwitch OnContent="" OffContent="" IsChecked="{CompiledBinding Value}"></ToggleSwitch>
+            </SettingItem>
+        </DataTemplate>
+        <DataTemplate DataType="settings:IListOptionGenericSetting">
+            <SettingItem Help="{CompiledBinding Help}" Header="{CompiledBinding Name}">
+                <ComboBox Margin="10,0,0,0" ItemsSource="{CompiledBinding Options}" SelectedItem="{CompiledBinding SelectedOption}"></ComboBox>
+            </SettingItem>
+        </DataTemplate>
+        <DataTemplate DataType="settings:IFloatSliderGenericSetting">
+            <SettingItem Help="{CompiledBinding Help}" Header="{CompiledBinding Name}">
+                <Grid ColumnDefinitions="*,10,Auto">
+                    <TextBox Grid.Column="2" VerticalAlignment="Center" DockPanel.Dock="Right" Text="{CompiledBinding Value}" />
+                    <Slider Grid.Column="0"
+                            MinWidth="100"
+                            IsSnapToTickEnabled="{CompiledBinding WholeNumbers}"
+                            TickPlacement="None"
+                            TickFrequency="1"
+                            Minimum="{CompiledBinding Min}"
+                            Maximum="{CompiledBinding Max}"
+                            Value="{CompiledBinding Value}" />
+                </Grid>
+            </SettingItem>
+        </DataTemplate>
     </Application.DataTemplates>
     <Application.Resources>
 
@@ -64,7 +91,6 @@
     <Application.Styles>
         <appearanceService:AvaloniaThemeStyle />
         <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
-        <StyleInclude Source="avares://AvaloniaGraph/Style.axaml" />
         <StyleInclude Source="avares://WDE.Common.Avalonia/Themes/Generic.axaml" />
         <StyleInclude Source="avares://WDE.SmartScriptEditor.Avalonia/Themes/Generic.axaml"/>
         <StyleInclude Source="avares://WDE.EventAiEditor.Avalonia/Themes/Generic.axaml"/>

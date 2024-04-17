@@ -2,136 +2,723 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:graphing="clr-namespace:AvaloniaGraph.Controls;assembly=AvaloniaGraph"
              xmlns:viewModels="clr-namespace:WDE.QuestChainEditor.ViewModels"
              xmlns:views="clr-namespace:WDE.QuestChainEditor.Views"
              xmlns:panAndZoom="clr-namespace:WDE.WorldMap.PanAndZoom;assembly=WDE.Common.Avalonia"
              xmlns:mvvm="http://prismlibrary.com/"
+             xmlns:nodify="https://miroiu.github.io/nodify"
+             xmlns:converters="clr-namespace:WDE.QuestChainEditor.Views.Converters"
+             xmlns:models="clr-namespace:WDE.QuestChainEditor.Models"
+             xmlns:collections="clr-namespace:System.Collections;assembly=System.Runtime"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:QuestChainDocumentViewModel"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
+             Background="{DynamicResource ContentBackground}"
              x:Name="Root"
              x:Class="WDE.QuestChainEditor.Views.QuestChainDocumentView">
     <UserControl.Resources>
-        <views:AttachModeToBoolConverter x:Key="AttachModeToBoolConverter" TrueValue="Bottom" />
-                                   
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                    <Color x:Key="GridLinesColor">#7EB4EA</Color>
+                    <SolidColorBrush x:Key="CHAINS_QuestNodeBackgroundBrush" Color="#D4E9F7" />
+                    <SolidColorBrush x:Key="CHAINS_QuestNodeBorderBrush" Color="#0094FF" />
+                    <SolidColorBrush x:Key="CHAINS_PickQuestBrush" Color="#5C6A98"/>
+                    <SolidColorBrush x:Key="CHAINS_PickQuestHeaderForeground" Color="White"/>
+                    <SolidColorBrush x:Key="CHAINS_ExclusiveGroupBackgroundBrush" Color="#47FFFFFF" />
+                    <SolidColorBrush x:Key="CHAINS_AllGroupForeground" Color="#D7BFF8"/>
+                    <SolidColorBrush x:Key="CHAINS_OneOfGroupForeground" Color="#C3F7A8"/>
+                    <SolidColorBrush x:Key="CHAINS_AllGroupBorderBrush" Color="#816098"/>
+                    <SolidColorBrush x:Key="CHAINS_OneOfGroupBorderBrush" Color="#6A987C"/>
+                    <SolidColorBrush x:Key="CHAINS_AllGroupBackground" Color="#CCC6DF"/>
+                    <SolidColorBrush x:Key="CHAINS_OneOfGroupBackground" Color="#D0DEDE"/>
+                    <SolidColorBrush x:Key="CHAINS_QuestBackground" Color="#C6D0DE"/>
+
+                    <ControlTheme TargetType="Border" x:Key="Grip">
+                        <Setter Property="Background">
+                            <VisualBrush SourceRect="0,0,4,5"
+                                         DestinationRect="0,0,4,5"
+                                         TileMode="Tile"
+                                         Stretch="UniformToFill">
+                                <VisualBrush.Visual>
+                                    <Canvas Width="4" Height="5" Background="Transparent">
+                                        <Rectangle Height="1" Width="1" Fill="#D4D4D4" />
+                                        <Rectangle Height="1" Width="1" Fill="#D4D4D4" Canvas.Top="2" Canvas.Left="2" />
+                                        <Rectangle Height="1" Width="1" Fill="#D4D4D4" Canvas.Top="4" />
+                                    </Canvas>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Setter>
+                    </ControlTheme>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <Color x:Key="GridLinesColor">#333337</Color>
+                    <SolidColorBrush x:Key="CHAINS_PickQuestBrush" Color="#434E71" />
+                    <SolidColorBrush x:Key="CHAINS_QuestNodeBackgroundBrush" Color="#2C3C47" />
+                    <SolidColorBrush x:Key="CHAINS_QuestNodeBorderBrush" Color="#005DA0" />
+                    <SolidColorBrush x:Key="CHAINS_ExclusiveGroupBackgroundBrush" Color="#47FFFFFF" />
+                    <SolidColorBrush x:Key="CHAINS_AllGroupForeground" Color="#D7BFF8"/>
+                    <SolidColorBrush x:Key="CHAINS_OneOfGroupForeground" Color="#C3F7A8"/>
+                    <SolidColorBrush x:Key="CHAINS_AllGroupBorderBrush" Color="#816098"/>
+                    <SolidColorBrush x:Key="CHAINS_OneOfGroupBorderBrush" Color="#597E68"/>
+                    <SolidColorBrush x:Key="CHAINS_AllGroupBackground" Color="#504B5B"/>
+                    <SolidColorBrush x:Key="CHAINS_OneOfGroupBackground" Color="#5F6A64"/>
+                    <SolidColorBrush x:Key="CHAINS_QuestBackground" Color="#32353B"/>
+
+                    <ControlTheme TargetType="Border" x:Key="Grip">
+                        <Setter Property="Background">
+                            <VisualBrush SourceRect="0,0,4,5"
+                                         DestinationRect="0,0,4,5"
+                                         TileMode="Tile"
+                                         Stretch="UniformToFill">
+                                <VisualBrush.Visual>
+                                    <Canvas Width="4" Height="5" Background="Transparent">
+                                        <Rectangle Height="1" Width="1" Fill="#474747" />
+                                        <Rectangle Height="1" Width="1" Fill="#474747" Canvas.Top="2" Canvas.Left="2" />
+                                        <Rectangle Height="1" Width="1" Fill="#474747" Canvas.Top="4" />
+                                    </Canvas>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Setter>
+                    </ControlTheme>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://Nodify/Theme.axaml" />
+                <ResourceDictionary>
+                    <ControlTheme TargetType="views:ExclusiveGroupView" x:Key="{x:Type views:ExclusiveGroupView}">
+                        <Setter Property="ClipToBounds" Value="False" />
+                        <Setter Property="Template">
+                            <ControlTemplate>
+                                <!-- <Border Background="{DynamicResource CHAINS_ExclusiveGroupBackgroundBrush}" CornerRadius="5"> -->
+                                    <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                <!-- </Border> -->
+                            </ControlTemplate>
+                        </Setter>
+                    </ControlTheme>
+                    <converters:ConnectionTypeToBrushConverter x:Key="RequirementTypeToBrush"
+                                                                         Completed="#5CA2C9"
+                                                                         MustBeActive="#5DC796"
+                                                                         Breadcrumb="#C75571" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
-    
+
+    <UserControl.Styles>
+        <Style Selector="nodify|ConnectionContainer:selected nodify|LineConnection">
+            <Setter Property="Stroke" Value="Orange" />
+            <Setter Property="Fill" Value="Orange" />
+        </Style>
+    </UserControl.Styles>
+
     <UserControl.KeyBindings>
-        <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelected}" />
-        <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelected}" />
+        <BetterKeyBinding Gesture="Back" CustomCommand="{CompiledBinding DeleteSelectedCommand}" />
+        <BetterKeyBinding Gesture="Delete" CustomCommand="{CompiledBinding DeleteSelectedCommand}" />
+        <BetterKeyBinding Gesture="Ctrl+G" CustomCommand="{CompiledBinding GroupSelectedQuestsCommand}" />
+        <BetterKeyBinding Gesture="Cmd+G" CustomCommand="{CompiledBinding GroupSelectedQuestsCommand}" />
+        <BetterKeyBinding Gesture="Ctrl+H" CustomCommand="{CompiledBinding SetQuestHordeOnlyCommand}" />
+        <BetterKeyBinding Gesture="Cmd+H" CustomCommand="{CompiledBinding SetQuestHordeOnlyCommand}" />
+        <BetterKeyBinding Gesture="Ctrl+A" CustomCommand="{CompiledBinding SetQuestAllianceOnlyCommand}" />
+        <BetterKeyBinding Gesture="Cmd+A" CustomCommand="{CompiledBinding SetQuestAllianceOnlyCommand}" />
+        <BetterKeyBinding Gesture="Ctrl+F" CustomCommand="{CompiledBinding ToggleSearchBoxCommand}" />
+        <BetterKeyBinding Gesture="Cmd+F" CustomCommand="{CompiledBinding ToggleSearchBoxCommand}" />
     </UserControl.KeyBindings>
     <Panel>
-        <panAndZoom:ExtendedZoomBorder EnablePan="True" PanButton="Left"
-                                       Focusable="True"
-                                       Stretch="None"
-                                       VerticalAlignment="Stretch" 
-                                       EnableConstrains="False">
-            <graphing:GraphControl x:Name="GraphControl" Background="#FF363636"
-                                   Width="100000"
-                                   Height="100000"
-                                   SelectedConnections="{CompiledBinding SelectedConnections}"
-                                   ElementsSource="{CompiledBinding Elements}"
-                                   ConnectionsSource="{CompiledBinding Connections}"
-                                   ConnectionDragStarted="OnGraphControlConnectionDragStarted"
-                                   ConnectionDragging="OnGraphControlConnectionDragging"
-                                   ConnectionDragCompleted="OnGraphControlConnectionDragCompleted">
-                <graphing:GraphControl.Styles>
-                    <Style Selector="Canvas">
-                        <Setter Property="Margin" Value="50000, 50000, 0, 0" />
-                        <Setter Property="ClipToBounds" Value="False" />
-                    </Style>
-                    <Style Selector="graphing|ConnectorItem">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate>
-                                    <Ellipse Width="12" Height="12" Margin="0,2,0,0" StrokeThickness="1"
-                                             Classes.isEmpty="{Binding NonEmpty, Converter={x:Static BoolConverters.Not}}" />
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                    
-                    <Style Selector="graphing|ConnectorItem /template/ Ellipse">
-                        <Setter Property="Fill" Value="Blue" />
-                        <Setter Property="Stroke" Value="Blue" />
-                    </Style>
-                    <Style Selector="graphing|ConnectorItem /template/ Ellipse.isEmpty">
-                        <Setter Property="Fill" Value="Transparent" />
-                    </Style>
-                    
-                    <Style Selector="graphing|UniversalBezierLine">
-                        <Setter Property="Stroke" Value="Green" />
-                        <Setter Property="StrokeThickness" Value="2" />
-                        <Setter Property="StrokeDashArray" Value="2,2" />
-                    </Style>
-                    
-                    <Style Selector="graphing|UniversalBezierLine.isAnd">
-                        <Setter Property="Stroke" Value="Orange" />
-                        <Setter Property="StrokeThickness" Value="4" />
-                        <Setter Property="StrokeDashArray" Value="{x:Null}" />
-                    </Style>
-                    <Style Selector="graphing|UniversalBezierLine.isOneOf">
-                        <Setter Property="Stroke" Value="Violet" />
-                        <Setter Property="StrokeThickness" Value="4" />
-                        <Setter Property="StrokeDashArray" Value="{x:Null}" />
-                    </Style>
-                    <Style Selector="graphing|UniversalBezierLine.isOr">
-                        <Setter Property="Stroke" Value="Green" />
-                        <Setter Property="StrokeThickness" Value="2" />
-                        <Setter Property="StrokeDashArray" Value="{x:Null}" />
-                    </Style>
-                    <Style Selector="graphing|UniversalBezierLine.isHierarchy">
-                        <Setter Property="Stroke" Value="LightSkyBlue" />
-                        <Setter Property="StrokeThickness" Value="4" />
-                        <Setter Property="StrokeDashArray" Value="{x:Null}" />
-                    </Style>
-                    <Style Selector="graphing|UniversalBezierLine.selected">
-                        <Setter Property="Stroke" Value="Red" />
-                    </Style>
-                    
-                    
-                </graphing:GraphControl.Styles>
+        <Panel.Resources>
+            
+            <GeometryDrawing x:Key="SmallGridGeometry"
+                             Geometry="M0,0 L0,1 0.03,1 0.03,0.03 1,0.03 1,0 Z"
+                             Brush="{DynamicResource GridLinesColor}" />
 
-                <graphing:GraphControl.ElementItemTemplate>
-                    <DataTemplate>
-                        <views:QuestNodeView />
-                    </DataTemplate>
-                </graphing:GraphControl.ElementItemTemplate>
+            <GeometryDrawing x:Key="LargeGridGeometry"
+                             Geometry="M0,0 L0,1 0.015,1 0.015,0.015 1,0.015 1,0 Z"
+                             Brush="{DynamicResource GridLinesColor}" />
 
-                <graphing:GraphControl.ConnectionItemTemplate>
-                    <DataTemplate x:DataType="viewModels:QuestConnectionViewModel">
-                        <Panel>
-                            <graphing:UniversalBezierLine StrokeThickness="20"
-                                                          Stroke="Transparent"
-                                                          StartMode="{Binding StartAttachMode}"
-                                                          EndMode="{Binding EndAttachMode}"
-                                                          StartPoint="{Binding FromPosition}"
-                                                          EndPoint="{Binding ToPosition}" />
-                            <graphing:UniversalBezierLine IsHitTestVisible="False"
-                                                          StartMode="{Binding StartAttachMode}"
-                                                          EndMode="{Binding EndAttachMode}"
-                                                          Classes.selected="{Binding IsSelected}"
-                                                          Classes.isHierarchy="{Binding IsHierarchyConnection}"
-                                                          Classes.isAnd="{Binding IsAndConnection}"
-                                                          Classes.isOr="{Binding IsOrConnection}"
-                                                          Classes.isOneOf="{Binding IsOneOfConnection}"
-                                                          StartPoint="{Binding FromPosition}"
-                                                          EndPoint="{Binding ToPosition}" />
-                            <TextBlock Text="{Binding Text}" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
-                        </Panel>
-                    </DataTemplate>
-                </graphing:GraphControl.ConnectionItemTemplate>
+            <DrawingBrush x:Key="SmallGridLinesDrawingBrush"
+                          TileMode="Tile"
+                          DestinationRect="0 0 15 15"
+                          TransformOrigin="0,0"
+                          Transform="{Binding DpiScaledViewportTransform, ElementName=Editor}"
+                          Drawing="{StaticResource SmallGridGeometry}" />
 
-            </graphing:GraphControl>
-        </panAndZoom:ExtendedZoomBorder>
-        <Popup PlacementAnchor="Top" PlacementConstraintAdjustment="ResizeY" IsLightDismissEnabled="True" WindowManagerAddShadowHint="False" PlacementMode="Pointer" IsOpen="{CompiledBinding IsPickingQuest, Mode=TwoWay}" MaxHeight="500" Width="250">
-            <Border CornerRadius="3" Background="#242424" BorderThickness="3" BorderBrush="BlueViolet">
+            <DrawingBrush x:Key="LargeGridLinesDrawingBrush"
+                          TileMode="Tile"
+                          Opacity="0.5"
+                          DestinationRect="0 0 150 150"
+                          Transform="{Binding DpiScaledViewportTransform, ElementName=Editor}"
+                          Drawing="{StaticResource LargeGridGeometry}" />
+
+        </Panel.Resources>
+        <Border Background="{StaticResource LargeGridLinesDrawingBrush}" />
+        <nodify:NodifyEditor x:Name="Editor"
+                             DisplayConnectionsOnTop="True"
+                             Background="{StaticResource SmallGridLinesDrawingBrush}"
+                             PendingConnection="{CompiledBinding PendingConnection}"
+                             Connections="{CompiledBinding Connections}"
+                             ItemsSource="{CompiledBinding Elements}"
+                             SelectedItems="{CompiledBinding SelectedItems}"
+                             SelectedConnections="{CompiledBinding SelectedConnections}"
+                             BringIntoViewMaxDuration="2"
+                             BringIntoViewSpeed="200"
+                             ViewportLocation="{CompiledBinding ViewportLocation, Mode=TwoWay}"
+                             >
+
+            <nodify:NodifyEditor.Resources>
+                <ControlTheme TargetType="{x:Type nodify:NodeInput}" x:Key="{x:Type nodify:NodeInput}"
+                              BasedOn="{StaticResource {x:Type nodify:NodeInput}}">
+                    <Setter Property="Template">
+                        <ControlTemplate TargetType="nodify:NodeInput">
+                            <TemplatedControl x:Name="PART_Connector"
+                                              Focusable="False"
+                                              VerticalAlignment="Center"
+                                              Background="Transparent"
+                                              BorderBrush="{TemplateBinding BorderBrush}"
+                                              Template="{TemplateBinding ConnectorTemplate}" />
+                        </ControlTemplate>
+                    </Setter>
+                </ControlTheme>
+                <ControlTheme TargetType="{x:Type nodify:NodeOutput}" x:Key="{x:Type nodify:NodeOutput}"
+                              BasedOn="{StaticResource {x:Type nodify:NodeOutput}}">
+                    <Setter Property="Template">
+                        <ControlTemplate TargetType="nodify:NodeOutput">
+                            <TemplatedControl x:Name="PART_Connector"
+                                              Focusable="False"
+                                              VerticalAlignment="Center"
+                                              Background="Transparent"
+                                              BorderBrush="{TemplateBinding BorderBrush}"
+                                              Template="{TemplateBinding ConnectorTemplate}" />
+                        </ControlTemplate>
+                    </Setter>
+                </ControlTheme>
+                <ControlTheme TargetType="{x:Type views:HeaderedStateNode}" x:Key="{x:Type views:HeaderedStateNode}">
+                    <Setter Property="BorderBrush" Value="{DynamicResource StateNode.BackgroundColor}" />
+                    <Setter Property="Background" Value="{DynamicResource CHAINS_QuestBackground}" />
+                    <Setter Property="ClipToBounds" Value="False" />
+                    <Setter Property="Template">
+                        <ControlTemplate>
+                            <Panel>
+                                <Border CornerRadius="5"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="2"
+                                        ClipToBounds="True">
+                                    <DockPanel>
+                                        <ContentControl Name="PART_Content" DockPanel.Dock="Top" Background="{TemplateBinding BorderBrush}"
+                                                        Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                            ></ContentControl>
+                                        <ContentControl Margin="7,0,7,7" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                    </DockPanel>
+                                </Border>
+                                <TextBlock Foreground="Red" FontWeight="Bold" FontSize="28" Text="!" IsVisible="{CompiledBinding IsProblematic}"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Top"
+                                           Margin="0,-8,0,0"
+                                           x:DataType="viewModels:BaseQuestViewModel">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect Color="Red" BlurRadius="10" OffsetX="0" OffsetY="0" />
+                                    </TextBlock.Effect>
+                                </TextBlock>
+                            </Panel>
+                        </ControlTemplate>
+                    </Setter>
+                </ControlTheme>
+            </nodify:NodifyEditor.Resources>
+
+            <nodify:NodifyEditor.PendingConnectionTemplate>
+                <DataTemplate x:DataType="viewModels:PendingConnectionViewModel">
+                    <nodify:PendingConnection IsVisible="{CompiledBinding IsVisible}"
+                                              Source="{CompiledBinding From, Mode=OneWayToSource}"
+                                              Target="{CompiledBinding To, Mode=OneWayToSource}"
+                                              TargetAnchor="{CompiledBinding TargetLocation, Mode=OneWayToSource}"
+                                              StartedCommand="{CompiledBinding ((viewModels:QuestChainDocumentViewModel)DataContext).StartConnectionCommand, RelativeSource={RelativeSource AncestorType={x:Type nodify:NodifyEditor}}}"
+                                              CompletedCommand="{CompiledBinding ((viewModels:QuestChainDocumentViewModel)DataContext).CreateConnectionCommand, RelativeSource={RelativeSource AncestorType={x:Type nodify:NodifyEditor}}}">
+                        <nodify:PendingConnection.Template>
+                            <ControlTemplate TargetType="nodify:PendingConnection" x:DataType="viewModels:PendingConnectionViewModel">
+                                <nodify:LineConnection Source="{TemplateBinding SourceAnchor}"
+                                                       Target="{TemplateBinding TargetAnchor}"
+                                                       StrokeThickness="{TemplateBinding StrokeThickness}"
+                                                       StrokeDashArray="{TemplateBinding StrokeDashArray}"
+                                                       SourceOffset="{Binding From.Bounds.Size, Converter={x:Static converters:ConnectorOffsetConverter.Instance}}"
+                                                       Spacing="0"
+                                                       SourceOffsetMode="Edge"
+                                                       TargetOffsetMode="Edge" />
+                            </ControlTemplate>
+                        </nodify:PendingConnection.Template>
+                    </nodify:PendingConnection>
+                </DataTemplate>
+            </nodify:NodifyEditor.PendingConnectionTemplate>
+
+            <nodify:NodifyEditor.ItemContainerTheme>
+                <ControlTheme TargetType="{x:Type nodify:ItemContainer}"
+                              BasedOn="{StaticResource {x:Type nodify:ItemContainer}}">
+                    <Setter Property="ClipToBounds"
+                            Value="False" />
+                    <Setter Property="BorderBrush"
+                            Value="Transparent"/>
+                    <Setter Property="BorderThickness"
+                            Value="2"/>
+                    <Setter Property="Bounds" x:DataType="viewModels:BaseQuestViewModel"
+                            Value="{CompiledBinding Bounds, Mode=OneWayToSource}" />
+                    <Setter Property="Location" x:DataType="viewModels:BaseQuestViewModel"
+                            Value="{CompiledBinding Location}" />
+                    <Setter Property="IsSelected" x:DataType="viewModels:BaseQuestViewModel"
+                            Value="{CompiledBinding IsSelected, Mode=OneWayToSource}" />
+                    <Style Selector="^.groupable">
+                        <Setter Property="BorderBrush"
+                                Value="Aqua"/>
+                    </Style>
+                    <Setter Property="ContextMenu">
+                        <ContextMenu Closed="NodeContextMenuClosed">
+                            <MenuItem Header="Set ANY"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).ToggleExclusiveGroupTypeCommand}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      x:DataType="viewModels:ExclusiveGroupViewModel"
+                                      IsVisible="{CompiledBinding IsAllGroupType, FallbackValue={x:False}}" />
+                            <MenuItem Header="Set ALL"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).ToggleExclusiveGroupTypeCommand}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      x:DataType="viewModels:ExclusiveGroupViewModel"
+                                      IsVisible="{CompiledBinding IsAnyGroupType, FallbackValue={x:False}}" />
+                            <Separator IsVisible="{CompiledBinding ., Converter={x:Static converters:IsExclusiveGroupConverter.Instance}}" />
+
+                            <MenuItem Header="Delete outgoing connections"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).DeleteOutgoingConnectionsCommand}"
+                                      />
+
+                            <MenuItem Header="Delete incoming connections"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).DeleteIncomingConnectionsCommand}"
+                                      />
+
+                            <MenuItem Header="Delete exclusive group"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).DeleteSelectedExclusiveGroupsCommand}"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsExclusiveGroupConverter.Instance}}" />
+
+                            <Separator IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+
+                            <MenuItem Header="Set any race"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).SetQuestAnyTeamCommand}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+                            <MenuItem Header="Set Horde only"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).SetQuestHordeOnlyCommand}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      InputGesture="Ctrl+H"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+                            <MenuItem Header="Set Alliance only"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).SetQuestAllianceOnlyCommand}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      InputGesture="Ctrl+A"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+                            <MenuItem Header="Pick allowable classes"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).PickQuestClassesCommand}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+                            <MenuItem Header="Pick allowable races"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).PickQuestRacesCommand}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+
+                            <MenuItem Header="Edit Show Quest Conditions"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).EditShowQuestMarkConditions}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+
+                            <Separator IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+
+                            <MenuItem Header="Edit"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" >
+                                <MenuItem Header="Edit template"
+                                          Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).EditTemplateCommand}"
+                                          CommandParameter="{CompiledBinding .}"/>
+
+                                <MenuItem Header="Edit creature quest starters"
+                                          Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).EditCreatureStartersCommand}"
+                                          CommandParameter="{CompiledBinding .}"/>
+
+                                <MenuItem Header="Edit creature quest enders"
+                                          Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).EditCreatureQuestEndersCommand}"
+                                          CommandParameter="{CompiledBinding .}"/>
+
+                                <MenuItem Header="Edit gameobject quest starters"
+                                          Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).EditGameobjectStartersCommand}"
+                                          CommandParameter="{CompiledBinding .}"/>
+
+                                <MenuItem Header="Edit gameobject quest enders"
+                                          Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).EditGameobjectQuestEndersCommand}"
+                                          CommandParameter="{CompiledBinding .}"/>
+                            </MenuItem>
+
+
+                            <Separator IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+
+                            <MenuItem Header="Group selected quests"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).GroupSelectedQuestsCommand}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      InputGesture="Ctrl+G"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+
+                            <Separator>
+                                <Separator.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="DataContext.RemoteCommandsSupported" ElementName="Root" />
+                                        <CompiledBinding Converter="{x:Static converters:IsQuestConverter.Instance}" />
+                                    </MultiBinding>
+                                </Separator.IsVisible>
+                            </Separator>
+
+                            <MenuItem Header="Add quest to player's log"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).AddQuestToPlayerCommand}"
+                                      CommandParameter="{CompiledBinding .}">
+                                <MenuItem.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="DataContext.RemoteCommandsSupported" ElementName="Root" />
+                                        <CompiledBinding Converter="{x:Static converters:IsQuestConverter.Instance}" />
+                                    </MultiBinding>
+                                </MenuItem.IsVisible>
+                            </MenuItem>
+
+                            <MenuItem Header="Remove quest from player's log"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).RemoveQuestFromPlayerCommand}"
+                                      CommandParameter="{CompiledBinding .}">
+                                <MenuItem.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="DataContext.RemoteCommandsSupported" ElementName="Root" />
+                                        <CompiledBinding Converter="{x:Static converters:IsQuestConverter.Instance}" />
+                                    </MultiBinding>
+                                </MenuItem.IsVisible>
+                            </MenuItem>
+
+                            <MenuItem Header="Complete quest for player"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).CompleteQuestForPlayerCommand}"
+                                      CommandParameter="{CompiledBinding .}">
+                                <MenuItem.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="DataContext.RemoteCommandsSupported" ElementName="Root" />
+                                        <CompiledBinding Converter="{x:Static converters:IsQuestConverter.Instance}" />
+                                    </MultiBinding>
+                                </MenuItem.IsVisible>
+                            </MenuItem>
+
+                            <MenuItem Header="Reward quest for player"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).RewardQuestForPlayerCommand}"
+                                      CommandParameter="{CompiledBinding .}">
+                                <MenuItem.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="DataContext.RemoteCommandsSupported" ElementName="Root" />
+                                        <CompiledBinding Converter="{x:Static converters:IsQuestConverter.Instance}" />
+                                    </MultiBinding>
+                                </MenuItem.IsVisible>
+                            </MenuItem>
+
+                            <MenuItem Header="Teleport to quest starter"
+                                      CommandParameter="{CompiledBinding .}"
+                                      x:Name="TeleportToQuestStarterMenu">
+                                <MenuItem.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="DataContext.RemoteCommandsSupported" ElementName="Root" />
+                                        <CompiledBinding Converter="{x:Static converters:IsQuestConverter.Instance}" />
+                                    </MultiBinding>
+                                </MenuItem.IsVisible>
+                                <MenuItem Header="(loading)" />
+                            </MenuItem>
+
+                            <MenuItem Header="Teleport to quest ender"
+                                      CommandParameter="{CompiledBinding .}"
+                                      x:Name="TeleportToQuestEnderMenu">
+                                <MenuItem.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="DataContext.RemoteCommandsSupported" ElementName="Root" />
+                                        <CompiledBinding Converter="{x:Static converters:IsQuestConverter.Instance}" />
+                                    </MultiBinding>
+                                </MenuItem.IsVisible>
+                                <MenuItem Header="(loading)" />
+                            </MenuItem>
+
+                            <Separator />
+
+                            <MenuItem Header="Copy entry"
+                                      InputGesture="Ctrl+C"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).Copy}" />
+
+                            <MenuItem Header="Open WowHead"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).OpenWowHeadCommand}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+
+                            <Separator IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+
+                            <MenuItem Header="Unload this chain"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).UnloadThisChainCommand}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+                        </ContextMenu>
+                    </Setter>
+                </ControlTheme>
+            </nodify:NodifyEditor.ItemContainerTheme>
+
+            <nodify:NodifyEditor.Styles>
+                <Style Selector="nodify|ConnectionContainer">
+                    <Setter Property="ContextMenu">
+                        <ContextMenu>
+                            <MenuItem Header="Set Required"
+                                      CommandParameter="{CompiledBinding .}"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).SetConnectionRequiredCommand}" />
+                            <MenuItem Header="Set Breadcrumb"
+                                      CommandParameter="{CompiledBinding .}"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).SetConnectionBreadcrumbCommand}"/>
+                            <MenuItem Header="Set Must be Active"
+                                      CommandParameter="{CompiledBinding .}"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).SetConnectionMustBeActiveCommand}"/>
+                            <Separator />
+                            <MenuItem Header="Delete connection"
+                                      CommandParameter="{CompiledBinding .}"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).DeleteSelectedCommand}"/>
+                        </ContextMenu>
+                    </Setter>
+                </Style>
+                <Style Selector="nodify|ItemContainer.groupable > :is(Control)">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.3" IterationCount="INFINITE">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="RotateTransform.Angle" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="25%">
+                                <Setter Property="RotateTransform.Angle" Value="2"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="50%">
+                                <Setter Property="RotateTransform.Angle" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="75%">
+                                <Setter Property="RotateTransform.Angle" Value="-2"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="RotateTransform.Angle" Value="0"/>
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </nodify:NodifyEditor.Styles>
+
+            <nodify:NodifyEditor.ConnectionTemplate>
+                <DataTemplate x:DataType="viewModels:ConnectionViewModel">
+                    <Panel>
+                        <!-- for easier selecting by clicking -->
+                        <nodify:LineConnection Source="{CompiledBinding From.Anchor}"
+                                               Target="{CompiledBinding To.Anchor}"
+                                               Spacing="0"
+                                               StrokeThickness="15"
+                                               Stroke="Transparent"
+                                               ArrowEnds="None"
+                                               SourceOffset="{CompiledBinding FromNode.Bounds.Size, Converter={x:Static converters:ConnectorOffsetConverter.Instance}, ConverterParameter=20}"
+                                               TargetOffset="{CompiledBinding ToNode.Bounds.Size, Converter={x:Static converters:ConnectorOffsetConverter.Instance}, ConverterParameter=20}"
+                                               SourceOffsetMode="Rectangle"
+                                               TargetOffsetMode="Rectangle" />
+                        <nodify:LineConnection Source="{CompiledBinding From.Anchor}"
+                                               Target="{CompiledBinding To.Anchor}"
+                                               Spacing="0"
+                                               ArrowEnds="{CompiledBinding RequirementType, Converter={x:Static converters:ConnectionTypeToArrowEndsConverter.Instance}}"
+                                               StrokeDashArray="{CompiledBinding RequirementType, Converter={x:Static converters:ConnectionTypeToStrokeDashArrayConverter.Instance}}"
+                                               SourceOffset="{CompiledBinding FromNode.Bounds.Size, Converter={x:Static converters:ConnectorOffsetConverter.Instance}}"
+                                               TargetOffset="{CompiledBinding ToNode.Bounds.Size, Converter={x:Static converters:ConnectorOffsetConverter.Instance}}"
+                                               SourceOffsetMode="Rectangle"
+                                               Text="{CompiledBinding Text}"
+                                               TextPositionFactor="{CompiledBinding RequirementType, Converter={x:Static converters:ConnectionTypeToDoubleConverter.Instance}}"
+                                               TargetOffsetMode="Rectangle">
+                            <nodify:LineConnection.Styles>
+                                <Style Selector="nodify|LineConnection">
+                                    <Setter Property="Stroke" Value="{CompiledBinding RequirementType, Converter={StaticResource RequirementTypeToBrush}}" x:DataType="viewModels:ConnectionViewModel" />
+                                    <Setter Property="Fill" Value="{CompiledBinding RequirementType, Converter={StaticResource RequirementTypeToBrush}}" x:DataType="viewModels:ConnectionViewModel" />
+                                </Style>
+                            </nodify:LineConnection.Styles>
+                        </nodify:LineConnection>
+                    </Panel>
+                </DataTemplate>
+            </nodify:NodifyEditor.ConnectionTemplate>
+
+            <nodify:NodifyEditor.DataTemplates>
+                <DataTemplate DataType="{x:Type viewModels:ExclusiveGroupViewModel}">
+                    <views:HeaderedStateNode IsConnected="True"
+                                              Padding="0"
+                                              CornerRadius="5"
+                                              Header="{CompiledBinding .}"
+                                              Anchor="{CompiledBinding Connector.Anchor, Mode=OneWayToSource}">
+                        <views:HeaderedStateNode.HeaderTemplate>
+                            <DataTemplate x:DataType="viewModels:ExclusiveGroupViewModel">
+                                <TextBlock HorizontalAlignment="Center"
+                                           TextAlignment="Center"
+                                           FontWeight="Bold" Margin="0,0,0,2"
+                                           Text="{CompiledBinding Header}"
+                                           Foreground="{DynamicResource StateNode.ForegroundColor}"/>
+                            </DataTemplate>
+                        </views:HeaderedStateNode.HeaderTemplate>
+                        <views:ExclusiveGroupView
+                            ActualSize="{Binding Size}">
+                                <!-- -->
+                                <!-- <nodify:NodeInput DockPanel.Dock="Top" -->
+                                <!--                    Width="0" Header="0" -->
+                                <!--                    HorizontalAlignment="Center" -->
+                                <!--                    VerticalAlignment="Center" -->
+                                <!--                    DataContext="{CompiledBinding RequiresConnector}" -->
+                                <!--                    IsConnected="{CompiledBinding NonEmpty}" -->
+                                <!--                    Anchor="{Binding Anchor, Mode=OneWayToSource}"> -->
+                                <!-- </nodify:NodeInput> -->
+                                <!-- -->
+                                <!-- ~1~ Margin="0,0,0,-9" @1@ -->
+                                <!-- <nodify:NodeOutput DockPanel.Dock="Top" -->
+                                <!--                    Width="0" Header="0" -->
+                                <!--                    HorizontalAlignment="Center" -->
+                                <!--                    VerticalAlignment="Center" -->
+                                <!--                    DataContext="{CompiledBinding IsRequiredByConnector}" -->
+                                <!--                    IsConnected="{CompiledBinding NonEmpty}" -->
+                                <!--                    Anchor="{Binding Anchor, Mode=OneWayToSource}"> -->
+                                <!-- </nodify:NodeOutput> -->
+                        </views:ExclusiveGroupView>
+
+                        <views:HeaderedStateNode.Styles>
+                            <Style Selector="views|HeaderedStateNode.isAll">
+                                <Setter Property="BorderBrush" Value="{DynamicResource CHAINS_AllGroupBorderBrush}" />
+                                <Setter Property="Background" Value="{DynamicResource CHAINS_AllGroupBackground}" />
+                            </Style>
+                            <Style Selector="views|HeaderedStateNode.isOneOf">
+                                <Setter Property="BorderBrush" Value="{DynamicResource CHAINS_OneOfGroupBorderBrush}" />
+                                <Setter Property="Background" Value="{DynamicResource CHAINS_OneOfGroupBackground}" />
+                            </Style>
+                            <Style Selector="views|HeaderedStateNode.isAll TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource CHAINS_AllGroupForeground}" />
+                            </Style>
+                            <Style Selector="views|HeaderedStateNode.isOneOf TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource CHAINS_OneOfGroupForeground}" />
+                            </Style>
+                        </views:HeaderedStateNode.Styles>
+
+                        <Interaction.Behaviors>
+                            <DataTriggerBehavior Binding="{Binding GroupType}" ComparisonCondition="Equal" Value="{x:Static models:QuestGroupType.All}">
+                                <AddClassAction ClassName="isAll" />
+                                <RemoveClassAction ClassName="isOneOf" />
+                            </DataTriggerBehavior>
+                            <DataTriggerBehavior Binding="{Binding GroupType}" ComparisonCondition="Equal" Value="{x:Static models:QuestGroupType.OneOf}">
+                                <AddClassAction ClassName="isOneOf" />
+                                <RemoveClassAction ClassName="isAll" />
+                            </DataTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </views:HeaderedStateNode>
+                </DataTemplate>
+                <DataTemplate x:DataType="viewModels:QuestViewModel">
+                    <views:HeaderedStateNode
+                        IsConnected="True"
+                        Header="{CompiledBinding .}"
+                        Anchor="{CompiledBinding Connector.Anchor, Mode=OneWayToSource}">
+                        <views:HeaderedStateNode.HeaderTemplate>
+                            <DataTemplate x:DataType="viewModels:QuestViewModel">
+                                <DockPanel>
+                                    <!-- It's beautiful, but slows down rendering a lot :( -->
+                                    <!-- <Border Grid.Column="1" Opacity="0.3" Height="5" Theme="{StaticResource Grip}" /> -->
+
+                                    <WdeImage Width="16" Height="16" IsVisible="{CompiledBinding PlayerCanStartChecks, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <WdeImage.Image>
+                                            <MultiBinding Converter="{x:Static converters:QuestStatusToIconConverter.Instance}">
+                                                <CompiledBinding Path="PlayerQuestStatus" />
+                                                <CompiledBinding Path="PlayerCanStart" />
+                                            </MultiBinding>
+                                        </WdeImage.Image>
+                                        <ToolTip.Tip>
+                                            <MultiBinding Converter="{x:Static converters:QuestStatusToToolTipConverter.Instance}">
+                                                <CompiledBinding Path="PlayerQuestStatus" />
+                                                <CompiledBinding Path="PlayerCanStart" />
+                                                <CompiledBinding Path="PlayerCanStartChecks" />
+                                            </MultiBinding>
+                                        </ToolTip.Tip>
+                                    </WdeImage>
+
+                                    <Button
+                                        DockPanel.Dock="Right"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Padding="0"
+                                        Command="{CompiledBinding #Root.((viewModels:QuestChainDocumentViewModel)DataContext).EditShowQuestMarkConditions}"
+                                        CommandParameter="{CompiledBinding .}"
+                                        IsVisible="{CompiledBinding HasConditions, TargetNullValue={x:False}}">
+                                        <WdeImage
+                                            ImageUri="Icons/document_conditions.png"
+                                            Width="16"
+                                            Height="16"/>
+                                    </Button>
+
+                                    <TextBlock HorizontalAlignment="Center"
+                                               TextAlignment="Center"
+                                               FontWeight="Bold" Margin="0,0,0,2"
+                                               Text="{CompiledBinding Header}"
+                                               Foreground="{DynamicResource StateNode.ForegroundColor}"/>
+                                    <!-- <Border Grid.Column="5" Height="5" Opacity="0.3" Theme="{StaticResource Grip}" /> -->
+                                </DockPanel>
+                            </DataTemplate>
+                        </views:HeaderedStateNode.HeaderTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="WrapWithOverflow" Text="{CompiledBinding Name}" />
+                            <!-- <TextBlock HorizontalAlignment="Center" TextAlignment="Center" Text="{CompiledBinding Entry}" Opacity="0.5" FontSize="9" /> -->
+
+                            <!-- races -->
+                            <GameRacesImage HorizontalAlignment="Center" MaxHeight="16" Races="{CompiledBinding Races}" />
+                            <GameClassesImage HorizontalAlignment="Center" MaxHeight="16" GameClasses="{CompiledBinding Classes}" />
+                        </StackPanel>
+                    </views:HeaderedStateNode>
+                </DataTemplate>
+            </nodify:NodifyEditor.DataTemplates>
+
+            <nodify:NodifyEditor.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Load quest" Click="LoadQuest_MenuItemClick" />
+                    <MenuItem Header="Layout graph now" Command="{CompiledBinding DoLayoutGraphCommand}" />
+                    <MenuItem Header="Evaluate quest states"
+                              IsVisible="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).RemoteCommandsSupported}"
+                              Command="{CompiledBinding EvaluateQuestStatusCommand}" />
+                    <Separator />
+                    <MenuItem Header="Fit to screen" Click="FitToScreen" />
+                    <!-- <MenuItem Header="Screenshot" Click="DoScreenshot" /> -->
+                </ContextMenu>
+            </nodify:NodifyEditor.ContextMenu>
+        </nodify:NodifyEditor>
+
+        <Border Background="{DynamicResource SlightlyHighlightedBackground}" Opacity="0.5" IsVisible="{CompiledBinding IsLoading}">
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Loading...</TextBlock>
+        </Border>
+
+        <Border Background="{DynamicResource SlightlyHighlightedBackground}" Opacity="0.5" IsHitTestVisible="False">
+            <Border.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <CompiledBinding Path="IsEmpty" />
+                    <CompiledBinding Path="IsLoading" Converter="{x:Static BoolConverters.Not}" />
+                </MultiBinding>
+            </Border.IsVisible>
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Press a spacebar or open the context menu to load a quest.</TextBlock>
+        </Border>
+
+
+        <DockPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="16" IsHitTestVisible="False" IsVisible="{CompiledBinding IsCalculatingGraphLayout}">
+            <utils:LoadingSpinner />
+            <TextBlock FontSize="10" Opacity="0.5">Calculating graph layout</TextBlock>
+        </DockPanel>
+
+        <Border HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                x:Name="SearchBox"
+                Padding="10"
+                IsVisible="{CompiledBinding IsSearchBoxVisible}"
+                Background="{DynamicResource ContentBackground}" ClipToBounds="False" BoxShadow="0 5 20 2 #40000000">
+            <DockPanel KeyboardNavigation.TabNavigation="Local">
+                <ButtonImage Command="{CompiledBinding ToggleSearchBoxCommand}" Image="Icons/icon_remove_mono.png" TabIndex="2" Margin="10,0,0,0" Height="32" Width="32" BorderThickness="0" Background="Transparent" ToolTip.Tip="Close" DockPanel.Dock="Right" />
+                <TextBlock DockPanel.Dock="Right" Text="No results" Opacity="0.5" VerticalAlignment="Center" Margin="10,0,0,0" Name="NoResultsTextBlock" />
+                <TextBox KeyDown="SearchTextBox_OnKeyDown" Name="SearchTextBox" TextChanged="SearchTextBox_OnTextChanged" Watermark="Find" TabIndex="1" MinWidth="200" />
+            </DockPanel>
+        </Border>
+
+        <Popup PlacementAnchor="Top" PlacementConstraintAdjustment="ResizeY" IsLightDismissEnabled="True" WindowManagerAddShadowHint="False" Placement="Pointer" IsOpen="{CompiledBinding IsPickingQuest, Mode=TwoWay}" MaxHeight="500" Width="450">
+            <Border CornerRadius="3" Background="{DynamicResource CHAINS_QuestBackground}" BorderThickness="3" BorderBrush="{DynamicResource CHAINS_PickQuestBrush}">
                 <DockPanel>
-                    <Border Background="BlueViolet" Padding="5" DockPanel.Dock="Top" BorderThickness="0, 0, 0, 1" BorderBrush="BlueViolet" >
-                        <TextBlock HorizontalAlignment="Stretch"
-                                   TextAlignment="Center"
-                                   Foreground="White">Pick a quest</TextBlock>
+                    <Border Background="{DynamicResource CHAINS_PickQuestBrush}" Padding="5" DockPanel.Dock="Top" BorderThickness="0, 0, 0, 1" BorderBrush="{DynamicResource CHAINS_PickQuestBrush}" >
+                        <TextBlock HorizontalAlignment="Stretch" Foreground="{DynamicResource CHAINS_PickQuestHeaderForeground}" TextAlignment="Center">Pick a quest</TextBlock>
                     </Border>
                     <views:QuestPickerView IsVisible="{Binding #Root.DataContext.IsPickingQuest}" DataContext="{CompiledBinding QuestPicker}" />
                 </DockPanel>

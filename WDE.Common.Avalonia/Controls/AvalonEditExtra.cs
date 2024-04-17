@@ -90,9 +90,9 @@ namespace WDE.Common.Avalonia.Controls
         private Dictionary<string, IHighlightingDefinition?> definitions = new();
         private Dictionary<string, IHighlightingDefinition?> definitionsByExtension = new();
 
-        public IHighlightingDefinition? GetCachedDefinition(string path)
+        public IHighlightingDefinition? GetCachedDefinition(string? path)
         {
-            if (definitions.TryGetValue(path, out var definition))
+            if (path != null && definitions.TryGetValue(path, out var definition))
                 return definition;
             return null;
         }
@@ -136,8 +136,11 @@ namespace WDE.Common.Avalonia.Controls
             return syntax;
         }
 
-        public async Task<IHighlightingDefinition?> GetDefinitionForExtension(string extension)
+        public async Task<IHighlightingDefinition?> GetDefinitionForExtension(string? extension)
         {
+            if (extension == null)
+                return null;
+
             if (definitionsByExtension.TryGetValue(extension, out var definition))
                 return definition;
 

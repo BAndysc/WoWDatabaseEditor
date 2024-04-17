@@ -72,7 +72,7 @@ public class PerEntityLootSolutionItemProviders :
             return item.Type.ToString() + " " + item.Entry + " loot";
     }
 
-    public ISmartScriptProjectItem Serialize(PerEntityLootSolutionItem item, bool forMostRecentlyUsed)
+    public ISmartScriptProjectItem? Serialize(PerEntityLootSolutionItem item, bool forMostRecentlyUsed)
     {
         return new AbstractSmartScriptProjectItem()
         {

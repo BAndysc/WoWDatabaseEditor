@@ -14,7 +14,7 @@ public class GameObjectSpawnInstance : SpawnInstance
     public override uint Guid => data.Guid;
     public override uint Entry => data.Entry;
     public override Vector3 Position => new Vector3(data.X, data.Y, data.Z);
-    public override uint Map => data.Map;
+    public override int Map => data.Map;
     public override uint PhaseMask => data.PhaseMask ?? 0;
     public override SmallReadOnlyList<int>? Phases => data.PhaseId;
     public Quaternion Rotation => new Quaternion(data.Rotation0, data.Rotation1, data.Rotation2, data.Rotation3);

@@ -51,7 +51,7 @@ namespace WDE.Parameters
                 var referenceDatabaseAndTable = type.Substring("TableReference(".Length, indexOf - "TableReference(".Length);
                 var referenceTable = DatabaseTable.Parse(referenceDatabaseAndTable);
                 var referenceColumn = type.Substring(indexOf + 1, indexOfEnd - indexOf - 1);
-                parameter = new ForeignReferenceParameter(tableEditorPickerService.Value, referenceTable, referenceColumn);
+                parameter = new ForeignReferenceParameter(tableEditorPickerService, referenceTable, referenceColumn);
                 Register(type, parameter);
                 return parameter;
             }

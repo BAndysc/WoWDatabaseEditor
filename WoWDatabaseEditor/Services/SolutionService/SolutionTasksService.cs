@@ -85,7 +85,8 @@ namespace WoWDatabaseEditor.Services.SolutionService
         public async Task SaveSolutionToDatabaseTask(ISolutionItemDocument document)
         {
             await SaveSolutionToDatabaseTask(document.SolutionItem, document, (_, doc) => doc!.GenerateQuery());
-            await sessionService.UpdateQuery(document);
+            if (document is not ISolutionItemManualUpdateSessionOnSave)
+                await sessionService.UpdateQuery(document);
         }
         
         public Task SaveSolutionToDatabaseTask(ISolutionItem i)
@@ -193,7 +194,8 @@ namespace WoWDatabaseEditor.Services.SolutionService
                 else
                     document.Save.Execute(null);
 
-                await sessionService.UpdateQuery(document);
+                if (document is not ISolutionItemManualUpdateSessionOnSave)
+                    await sessionService.UpdateQuery(document);
                 
                 if (CanReloadRemotely)
                     await ReloadSolutionRemotelyTask(document.SolutionItem);
@@ -203,7 +205,8 @@ namespace WoWDatabaseEditor.Services.SolutionService
                 if (CanSaveAndReloadRemotely)
                 {
                     await SaveAndReloadSolutionTask(document.SolutionItem);
-                    await sessionService.UpdateQuery(document);
+                    if (document is not ISolutionItemManualUpdateSessionOnSave)
+                        await sessionService.UpdateQuery(document);
                 }
                 else if (CanSaveToDatabase)
                     await SaveSolutionToDatabaseTask(document);

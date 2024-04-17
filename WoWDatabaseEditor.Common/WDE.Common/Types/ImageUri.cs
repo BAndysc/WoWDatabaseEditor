@@ -38,5 +38,10 @@ namespace WDE.Common.Types
         {
             return Uri?.GetHashCode() ?? 0;
         }
+
+        public override string ToString()
+        {
+            return Uri ?? "(-)";
+        }
     }
 }

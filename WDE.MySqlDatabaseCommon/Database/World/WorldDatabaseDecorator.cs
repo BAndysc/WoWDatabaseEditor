@@ -146,8 +146,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IReadOnlyList<ICreature>> GetCreaturesAsync() => impl.GetCreaturesAsync();
         public Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync() => impl.GetGameObjectsAsync();
-        public Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map) => impl.GetCreaturesByMapAsync(map);
-        public Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map) => impl.GetGameObjectsByMapAsync(map);
+        public Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(int map) => impl.GetCreaturesByMapAsync(map);
+        public Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(int map) => impl.GetGameObjectsByMapAsync(map);
 
         public Task<IReadOnlyList<ICoreCommandHelp>> GetCommands() => impl.GetCommands();
         public Task<IReadOnlyList<ITrinityString>> GetStringsAsync() => impl.GetStringsAsync();
@@ -157,6 +157,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IReadOnlyList<ICreatureModelInfo>> GetCreatureModelInfoAsync() => impl.GetCreatureModelInfoAsync();
 
         public Task<ICreatureModelInfo?> GetCreatureModelInfo(uint displayId) => impl.GetCreatureModelInfo(displayId);
+
+        public Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId) => impl.GetQuestStarters(questId);
+        public Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId) => impl.GetQuestEnders(questId);
+
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => impl.GetSceneTemplateAsync(sceneId);
         public Task<IReadOnlyList<ISceneTemplate>?> GetSceneTemplatesAsync() => impl.GetSceneTemplatesAsync();
         public Task<IPhaseName?> GetPhaseNameAsync(uint phaseId) => impl.GetPhaseNameAsync(phaseId);

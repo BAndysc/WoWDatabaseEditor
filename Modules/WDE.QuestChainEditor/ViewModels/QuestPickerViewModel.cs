@@ -1,75 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using FuzzySharp;
+using DynamicData.Binding;
 using Prism.Commands;
 using WDE.Common.Database;
 using WDE.Common.Managers;
-using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 
 namespace WDE.QuestChainEditor.ViewModels;
 
-public class QuestListItemViewModel
-{
-    public QuestListItemViewModel(uint entry, string title)
-    {
-        Entry = entry;
-        Title = title;
-    }
-
-    public uint Entry { get; }
-    public string Title { get; }
-}
-
 [AutoRegister]
 [SingleInstance]
-public class QuestPickerService
-{
-    private readonly IWindowManager windowManager;
-    private readonly Func<QuestPickerViewModel> questPickerViewModelFactory;
-    private QuestPickerViewModel? questPickerViewModel;
-
-    private QuestPickerViewModel ViewModel
-    {
-        get
-        {
-            if (questPickerViewModel != null)
-                return questPickerViewModel;
-            questPickerViewModel = questPickerViewModelFactory();
-            return questPickerViewModel;
-        }
-    }
-
-    public QuestPickerService(IWindowManager windowManager, Func<QuestPickerViewModel> questPickerViewModelFactory)
-    {
-        this.windowManager = windowManager;
-        this.questPickerViewModelFactory = questPickerViewModelFactory;
-    }
-
-    public async Task<uint?> PickQuest()
-    {
-        ViewModel.Reset();
-        var result = await windowManager.ShowDialog(ViewModel);
-        if (!result)
-            return null;
-        return ViewModel.SelectedQuest;
-    }
-}
-
 public class QuestPickerViewModel : ObservableBase, IDialog
 {
+    private readonly IDatabaseProvider databaseProvider;
     private List<QuestListItemViewModel> quests;
     private Dictionary<uint, int> questById;
     private List<string> questNames;
     private string searchText = "";
-    public ObservableCollection<QuestListItemViewModel> Quests { get; } = new();
+    public ObservableCollectionExtended<QuestListItemViewModel> Quests { get; } = new();
 
     public string SearchText
     {
@@ -80,13 +34,22 @@ public class QuestPickerViewModel : ObservableBase, IDialog
     private CancellationTokenSource? filteringToken = null;
     public uint? SelectedQuest { get; set; }
 
+    private async Task LoadAsync()
+    {
+        quests = (await databaseProvider.GetQuestTemplatesAsync()).Select(qt => new QuestListItemViewModel(qt.Entry, qt.Name, qt.AllowableRaces, qt.AllowableClasses))
+            .ToList();
+        questById = quests.Select((quest, index) => (quest, index)).SafeToDictionary(pair => pair.quest.Entry, pair => pair.index);
+        questNames = quests.Where(q => q.Title != null).Select(q => q.Title.ToLower()).ToList();
+    }
+    
     public QuestPickerViewModel(IDatabaseProvider databaseProvider)
     {
-        quests = databaseProvider.GetQuestTemplates().Select(qt => new QuestListItemViewModel(qt.Entry, qt.Name))
-            .ToList();
-        questById = quests.Select((quest, index) => (quest, index)).ToDictionary(pair => pair.quest.Entry, pair => pair.index);
-        questNames = quests.Select(q => q.Title.ToLower()).ToList();
-        
+        quests = new();
+        questById = new();
+        questNames = new();
+        this.databaseProvider = databaseProvider;
+        LoadAsync().ListenErrors();
+
         On(() => SearchText, searchText =>
         {
             if (filteringToken != null)
@@ -96,7 +59,7 @@ public class QuestPickerViewModel : ObservableBase, IDialog
             }
 
             filteringToken = new CancellationTokenSource();
-            DoFilter(searchText, filteringToken).ListenErrors();
+            DoFilter(searchText, filteringToken.Token).ListenErrors();
         });
 
         CloseOkCommand = new DelegateCommand<uint?>(entry =>
@@ -122,49 +85,50 @@ public class QuestPickerViewModel : ObservableBase, IDialog
         SelectedQuest = null;
     }
 
-    private async Task DoFilter(string searchText, CancellationTokenSource cancellationToken)
+    private async Task DoFilter(string searchText, CancellationToken cancellationToken)
     {
-        if (uint.TryParse(searchText, out var entryInt) && questById.TryGetValue(entryInt, out var questIndex))
+        if (uint.TryParse(searchText, out var entryInt))
         {
-            if (filteringToken == cancellationToken)
+            using var _ = Quests.SuspendNotifications();
+            Quests.Clear();
+            foreach (var quest in quests)
             {
-                Quests.Clear();
-                Quests.Add(quests[questIndex]);
+                if (quest.Entry.Contains(searchText))
+                    Quests.Add(quest);
             }
             return;
         }
-        
-        await Task.Delay(50, cancellationToken.Token);
+
+        await Task.Delay(50, cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
             return;
 
         if (string.IsNullOrEmpty(searchText))
         {
-            if (filteringToken == cancellationToken)
-            {
-                Quests.Clear();
-                Quests.AddRange(quests);
-            }
+            using var _ = Quests.SuspendNotifications();
+            Quests.Clear();
+            Quests.AddRange(quests);
             return;
         }
         
-        var results = await Task.Run(() => Process.ExtractSorted(searchText.ToLower(), questNames, null, null, 70));
+        var results = await Task.Run(() =>
+        {
+            List<QuestListItemViewModel> output = new();
+            foreach (var quest in quests)
+            {
+                if (quest.Entry.Contains(searchText) || quest.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                    output.Add(quest);
+            }
+            return output;
+        }, cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
             return;
 
-        if (filteringToken == cancellationToken)
-        {
-            Quests.Clear();
-            foreach (var r in results)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                    return;
-            
-                Quests.Add(quests[r.Index]);
-            }
-        }
+        using var __ = Quests.SuspendNotifications();
+        Quests.Clear();
+        Quests.AddRange(results);
     }
 
     public int DesiredWidth => 250;

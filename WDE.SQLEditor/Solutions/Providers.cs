@@ -61,7 +61,7 @@ namespace WDE.SQLEditor.Solutions
             return false;
         }
 
-        public ISmartScriptProjectItem Serialize(CustomSqlSolutionItem item, bool forMostRecentlyUsed)
+        public ISmartScriptProjectItem? Serialize(CustomSqlSolutionItem item, bool forMostRecentlyUsed)
         {
             return new AbstractSmartScriptProjectItem()
             {

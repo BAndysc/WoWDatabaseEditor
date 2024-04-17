@@ -19,7 +19,7 @@ namespace WDE.Module
     
     public abstract class ModuleBase : IEditorModule
     {
-        private string? coreTag;
+        protected string? coreTag;
 
         public ModuleBase()
         {

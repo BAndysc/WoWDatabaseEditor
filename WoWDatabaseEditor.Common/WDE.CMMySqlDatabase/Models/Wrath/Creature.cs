@@ -16,7 +16,7 @@ namespace WDE.CMMySqlDatabase.Models.Wrath
         public uint Entry { get; set; }
 
         [Column(Name = "map")]
-        public uint Map { get; set; }
+        public int Map { get; set; }
 
         [Column(Name = "phaseMask")]
         public uint? PhaseMask { get; set; }

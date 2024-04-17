@@ -282,17 +282,17 @@ public class SpawnViewer : IGameModule, ISavable
             module.RenderTransparent(0); // todo: pass delta here
     }
 
-    private uint? loadedMap;
+    private int? loadedMap;
     private void UpdateSpawnsData()
     {
         if (loadedMap.HasValue && loadedMap.Value == gameContext.CurrentMap.Id)
             return;
 
-        loadedMap = (uint)gameContext.CurrentMap.Id;
+        loadedMap = (int)gameContext.CurrentMap.Id;
         gameContext.StartCoroutine(LoadSpawnDataCoroutine(loadedMap.Value));
     }
 
-    private IEnumerator LoadSpawnDataCoroutine(uint mapId)
+    private IEnumerator LoadSpawnDataCoroutine(int mapId)
     {
         while (spawnsContainer.IsLoading && gameContext.CurrentMap.Id == mapId)
             yield return null;
@@ -458,7 +458,7 @@ public class DummyCreature : ICreature
 {
     public uint Guid { get; set; }
     public uint Entry { get; set; }
-    public uint Map { get; set; }
+    public int Map { get; set; }
     public uint? PhaseMask { get; set; }
     public SmallReadOnlyList<int>? PhaseId { get; set; }
     public int? PhaseGroup { get; set; }
@@ -476,7 +476,7 @@ public class DummyGameObject : IGameObject
 {
     public uint Guid { get; set; }
     public uint Entry { get; set; }
-    public uint Map { get; set; }
+    public int Map { get; set; }
     public uint? PhaseMask { get; set; }
     public SmallReadOnlyList<int>? PhaseId { get; set; }
     public int? PhaseGroup { get; set; }

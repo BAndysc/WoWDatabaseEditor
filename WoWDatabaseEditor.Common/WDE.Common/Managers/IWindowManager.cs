@@ -38,7 +38,7 @@ namespace WDE.Common.Managers
         (int x, int y) Size { get; }
         (int x, int y) LogicalSize { get; }
         void Reposition(int x, int y, bool isMaximized, int width, int height);
-        event Action? OnClosing;
+        event Action<IAbstractWindowView>? OnClosing;
     }
 
     public static class WindowManagerExtensions

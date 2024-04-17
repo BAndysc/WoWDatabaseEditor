@@ -33,6 +33,8 @@ namespace WDE.Sessions.Sessions
             foreach (var pair in session)
             {
                 var serialize = serializerRegistry.Serialize(pair.Item1, false);
+                if (serialize == null)
+                    throw new Exception("This solution item can't be serialized: " + pair.Item1);
                 sb.AppendLine($"{Begin}{serialize.Type};{serialize.Value};{serialize.Value2 ?? 0};{serialize.StringValue}");
                 sb.AppendLine(" -- " + serialize.Comment);
                 sb.Append(pair.Item2);

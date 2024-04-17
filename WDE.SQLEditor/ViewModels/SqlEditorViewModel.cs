@@ -98,17 +98,8 @@ namespace WDE.SQLEditor.ViewModels
 
                         Database = previousType ?? DataDatabaseType.World;
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
-                        LOG.LogError(e);
-#pragma warning disable CS4014
-                        messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                            .SetTitle("Error while generating the SQL")
-                            .SetMainInstruction("Couldn't generate the sql")
-                            .SetContent(e.Message)
-                            .WithOkButton(true)
-                            .Build()).ListenErrors();
-#pragma warning restore CS4014
                         mainThread.Delay(() => CloseCommand?.ExecuteAsync(), TimeSpan.FromMilliseconds(1));
                         throw;
                     }

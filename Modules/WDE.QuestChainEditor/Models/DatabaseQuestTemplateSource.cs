@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Module.Attributes;
 
@@ -15,26 +16,32 @@ public class DatabaseQuestTemplateSource : IQuestTemplateSource
         this.databaseProvider = databaseProvider;
     }
     
-    public IQuestTemplate? GetTemplate(uint entry)
+    public Task<IQuestTemplate?> GetTemplate(uint entry)
     {
         return databaseProvider.GetQuestTemplate(entry);
     }
 
-    public IEnumerable<IQuestTemplate> GetByPreviousQuestId(uint previous)
+    public async Task<IEnumerable<IQuestTemplate>> GetByExclusiveGroup(int exclusiveGroup)
     {
         // optimize this!
-        return databaseProvider.GetQuestTemplates().Where(qt => qt.PrevQuestId == previous || qt.PrevQuestId == -(int)previous);
+        return (await databaseProvider.GetQuestTemplatesAsync()).Where(qt => qt.ExclusiveGroup == exclusiveGroup);
     }
 
-    public IEnumerable<IQuestTemplate> GetByNextQuestId(uint previous)
+    public async Task<IEnumerable<IQuestTemplate>> GetByPreviousQuestId(uint previous)
     {
         // optimize this!
-        return databaseProvider.GetQuestTemplates().Where(qt => qt.NextQuestId == previous);
+        return (await databaseProvider.GetQuestTemplatesAsync()).Where(qt => qt.PrevQuestId == previous || qt.PrevQuestId == -(int)previous);
     }
 
-    public IEnumerable<IQuestTemplate> GetByBreadCrumbQuestId(uint questId)
+    public async Task<IEnumerable<IQuestTemplate>> GetByNextQuestId(uint previous)
     {
         // optimize this!
-        return databaseProvider.GetQuestTemplates().Where(qt => qt.BreadcrumbForQuestId == questId);
+        return (await databaseProvider.GetQuestTemplatesAsync()).Where(qt => qt.NextQuestId == previous);
+    }
+
+    public async Task<IEnumerable<IQuestTemplate>> GetByBreadCrumbQuestId(uint questId)
+    {
+        // optimize this!
+        return (await databaseProvider.GetQuestTemplatesAsync()).Where(qt => qt.BreadcrumbForQuestId == questId);
     }
 }

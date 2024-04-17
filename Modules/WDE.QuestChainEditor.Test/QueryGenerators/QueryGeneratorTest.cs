@@ -67,7 +67,7 @@ public class QueryGeneratorTest
     {
         var store = CreateStore(quests.Select(q=>(q.Id, q.PrevQuestId, (uint)q.NextQuestId, q.ExclusiveGroup)).ToList());
         store.LoadQuest(loadQuest);
-        var queryGenerator = new QueryGenerator();
+        var queryGenerator = new ChainGenerator();
         var generated = queryGenerator.Generate(store).ToList();
         CollectionAssert.AreEquivalent(quests, generated);
     }

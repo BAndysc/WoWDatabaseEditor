@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using WDE.Common.History;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
 namespace WDE.History
@@ -63,6 +64,8 @@ namespace WDE.History
         public bool IsUndoing => !acceptNew;
         public int UndoCount => Past.Count;
         public int RedoCount => Future.Count;
+        public event Action? OnUndo;
+        public event Action? OnRedo;
 
         public void RemoveHandler(HistoryHandler handler)
         {
@@ -90,8 +93,9 @@ namespace WDE.History
                 Past.Add(action);
                 Future.Clear();
                 RecalculateValues();
-            
+
                 action.Redo();
+                OnRedo?.Invoke();
             }
             finally
             {
@@ -118,6 +122,7 @@ namespace WDE.History
 
         public void Undo()
         {
+            Profiler.Start();
             if (Past.Count == 0)
                 throw new NothingToUndoException();
 
@@ -129,6 +134,9 @@ namespace WDE.History
             acceptNew = true;
 
             RecalculateValues();
+
+            OnUndo?.Invoke();
+            Profiler.Stop();
         }
 
         public void Redo()
@@ -144,6 +152,8 @@ namespace WDE.History
             acceptNew = true;
 
             RecalculateValues();
+
+            OnRedo?.Invoke();
         }
 
         public void MarkAsSaved()

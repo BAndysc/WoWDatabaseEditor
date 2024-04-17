@@ -6,21 +6,15 @@ namespace WDE.HttpDatabase.Models
 
     public abstract class JsonBaseQuestTemplateAddon
     {
-        
         public uint Entry { get; set; }
 
-        
         public int PrevQuestId { get; set; }
 
-        
         public int NextQuestId { get; set; }
 
-        
         public int ExclusiveGroup { get; set; }
         
-        
         public uint AllowableClasses { get; set; }
-        
         
         public uint RewardMailTemplateId { get; set; }
 

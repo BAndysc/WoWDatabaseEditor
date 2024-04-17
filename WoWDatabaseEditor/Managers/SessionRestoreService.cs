@@ -147,6 +147,8 @@ public class SessionRestoreService
                 try
                 {
                     var serialized = serializerRegistry.Serialize(si.SolutionItem, true);
+                    if (serialized == null)
+                        continue;
                     var item = new AbstractSmartScriptProjectItem(serialized);
                     items.Add(new SavedSnapshot() { Item = item, State = state });
                 }

@@ -16,14 +16,17 @@ namespace WDE.Solutions.Manager
     public class SolutionItemSqlGeneratorRegistry : ISolutionItemSqlGeneratorRegistry
     {
         private readonly Lazy<IDocumentManager> documentManager;
+        private readonly Lazy<ICachedDatabaseProvider> cacheDatabaseProvider;
         private readonly IEventAggregator eventAggregator;
         private readonly Dictionary<Type, object> sqlProviders = new();
 
         public SolutionItemSqlGeneratorRegistry(IEnumerable<ISolutionItemSqlProvider> providers, 
             Lazy<IDocumentManager> documentManager,
+            Lazy<ICachedDatabaseProvider> cacheDatabaseProvider,
             IEventAggregator eventAggregator)
         {
             this.documentManager = documentManager;
+            this.cacheDatabaseProvider = cacheDatabaseProvider;
             this.eventAggregator = eventAggregator;
             // handy trick with (dynamic) cast, thanks to this proper Generic method will be called!
             foreach (ISolutionItemSqlProvider provider in providers)

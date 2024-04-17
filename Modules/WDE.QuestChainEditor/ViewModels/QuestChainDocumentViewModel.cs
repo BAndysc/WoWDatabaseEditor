@@ -1,498 +1,1020 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Avalonia;
-using Avalonia.Media;
-using Avalonia.Threading;
-using AvaloniaGraph.GraphLayout;
-using AvaloniaGraph.ViewModels;
-using Microsoft.Msagl.Core.Layout;
-using Microsoft.Msagl.Layout.Incremental;
+using DynamicData.Binding;
 using Prism.Commands;
+using PropertyChanged.SourceGenerator;
 using WDE.Common;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Disposables;
+using WDE.Common.Exceptions;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Parameters;
+using WDE.Common.Providers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Sessions;
 using WDE.Common.Tasks;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WDE.QuestChainEditor.Documents;
+using WDE.QuestChainEditor.GraphLayouting;
+using WDE.QuestChainEditor.GraphLayouting.ViewModels;
 using WDE.QuestChainEditor.Models;
 using WDE.QuestChainEditor.QueryGenerators;
+using WDE.QuestChainEditor.Services;
 using WDE.SqlQueryGenerator;
 
 namespace WDE.QuestChainEditor.ViewModels;
 
 [AutoRegister]
-public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
+public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument, IProblemSourceDocument, IWindowViewModel, ISolutionItemManualUpdateSessionOnSave
 {
+    [Notify] private Point viewportLocation; // must be bound or else BringToView animation won't work
+    [Notify] private bool isSearchBoxVisible;
+
     private readonly IQuestTemplateSource questTemplateSource;
+    private readonly IChainGenerator chainGenerator;
     private readonly IQueryGenerator queryGenerator;
-    private readonly ISqlGenerator sqlGenerator;
     private readonly IMessageBoxService messageBoxService;
-    private readonly IMiniIcons miniIcons;
+    private readonly IQuestChainLoader questChainLoader;
+    private readonly IAutomaticGraphLayouter automaticGraphLayouter;
+    private readonly ICurrentCoreVersion currentCoreVersion;
+    private readonly IMainThread mainThread;
+    private readonly IConditionEditService conditionEditService;
+    private readonly IQuestChainEditorConfiguration configuration;
+    private readonly IItemFromListProvider itemFromListProvider;
     private readonly QuestPickerService questPickerService;
+    private readonly IQuestChainEditorPreferences userPreferences;
+    private readonly ITeachingTipService teachingTipService;
     private readonly QuestChainSolutionItem solutionItem;
-    
-    public ObservableCollection<QuestViewModel> Elements { get; } = new();
-    public ObservableCollection<QuestConnectionViewModel> Connections { get; } = new();
-    public List<QuestConnectionViewModel> SelectedConnections { get; } = new();
+
+    private HistoryHandler historyHandler;
+    public HistoryHandler HistoryHandler => historyHandler;
+
+    private bool hasQuestStatus;
+
+    public ObservableCollectionExtended<BaseQuestViewModel> Elements { get; } = new();
+    public ObservableCollectionExtended<ConnectionViewModel> Connections { get; } = new();
+    public ObservableCollectionExtended<ConnectionViewModel> SelectedConnections { get; } = new();
+    public ObservableCollectionExtended<BaseQuestViewModel> SelectedItems { get; } = new();
+
+    public IReadOnlyList<ExclusiveGroupViewModel> SelectedGroupsSnapshot() => SelectedItems.Select(x => x as ExclusiveGroupViewModel).Where(x => x != null).Select(x => x!).ToList();
+
+    public IReadOnlyList<QuestViewModel> SelectedQuestsSnapshot() => SelectedItems.Select(x => x as QuestViewModel).Where(x => x != null).Select(x => x!).ToList();
+
+    public IReadOnlyList<ConnectionViewModel> SelectedConnectionsSnapshot() => SelectedConnections.ToList();
 
     private Dictionary<uint, QuestViewModel> entryToQuest = new();
     private Dictionary<uint, ChainRawData> existingData = new();
-    private AlternativeTreeLayout a = new AlternativeTreeLayout();
+    private Dictionary<uint, ChainRawData> removedQuestsToReSave = new();
+    private Dictionary<uint, IReadOnlyList<ICondition>> removedQuestConditionsToReSave = new();
+    private Dictionary<uint, IReadOnlyList<ICondition>> existingConditions = new();
 
-    private QuestViewModel GetOrCreate(Quest q)
+    public PendingConnectionViewModel PendingConnection { get; } = new();
+
+    public DelegateCommand<ExclusiveGroupViewModel> ToggleExclusiveGroupTypeCommand { get; }
+    public DelegateCommand SetQuestHordeOnlyCommand { get; }
+    public DelegateCommand SetQuestAllianceOnlyCommand { get; }
+    public DelegateCommand<QuestViewModel> SetQuestAnyTeamCommand { get; }
+    public DelegateCommand<ConnectionViewModel> SetConnectionRequiredCommand { get; }
+    public DelegateCommand<ConnectionViewModel> SetConnectionBreadcrumbCommand { get; }
+    public DelegateCommand<ConnectionViewModel> SetConnectionMustBeActiveCommand { get; }
+    public AsyncAutoCommand<QuestViewModel> PickQuestClassesCommand { get; }
+    public AsyncAutoCommand<QuestViewModel> PickQuestRacesCommand { get; }
+    public AsyncCommand<QuestViewModel> EditShowQuestMarkConditions { get; }
+    public DelegateCommand GroupSelectedQuestsCommand { get; }
+    public IAsyncCommand EditTemplateCommand { get; }
+    public IAsyncCommand EditCreatureStartersCommand { get; }
+    public IAsyncCommand EditCreatureQuestEndersCommand { get; }
+    public IAsyncCommand EditGameobjectStartersCommand { get; }
+    public IAsyncCommand EditGameobjectQuestEndersCommand { get; }
+    public DelegateCommand DoLayoutGraphCommand { get; }
+    public DelegateCommand DeleteOutgoingConnectionsCommand { get; }
+    public DelegateCommand DeleteIncomingConnectionsCommand { get; }
+    public DelegateCommand DeleteSelectedExclusiveGroupsCommand { get; }
+    public DelegateCommand EvaluateQuestStatusCommand { get; }
+    public IAsyncCommand AddQuestToPlayerCommand { get; }
+    public IAsyncCommand RemoveQuestFromPlayerCommand { get; }
+    public IAsyncCommand CompleteQuestForPlayerCommand { get; }
+    public IAsyncCommand RewardQuestForPlayerCommand { get; }
+    public DelegateCommand<QuestViewModel> OpenWowHeadCommand { get; }
+    public DelegateCommand ToggleSearchBoxCommand { get; }
+    public IAsyncCommand<QuestViewModel> UnloadThisChainCommand { get; }
+
+    private bool TryGetQuest(uint entry, out QuestViewModel quest)
     {
-        if (entryToQuest.TryGetValue(q.Entry, out var quest))
-            return quest;
-        quest = entryToQuest[q.Entry] = new(q.Template, miniIcons);
-        Elements.Add(quest);
-        return quest;
+        if (entryToQuest.TryGetValue(entry, out var quest_))
+        {
+            quest = quest_;
+            return true;
+        }
+        quest = null!;
+        return false;
     }
 
     public QuestChainDocumentViewModel(QuestChainSolutionItem solutionItem,
-        IHistoryManager history, IQuestTemplateSource questTemplateSource,
+        IHistoryManager history,
+        IQuestTemplateSource questTemplateSource,
+        IChainGenerator chainGenerator,
         IQueryGenerator queryGenerator,
-        ISqlGenerator sqlGenerator,
         ITaskRunner taskRunner,
         IMySqlExecutor mySqlExecutor,
-        IDatabaseProvider databaseProvider,
+        ICachedDatabaseProvider databaseProvider,
         QuestPickerViewModel questPicker,
         IMessageBoxService messageBoxService,
-        IMiniIcons miniIcons,
-        QuestPickerService questPickerService)
+        IQuestChainLoader questChainLoader,
+        IAutomaticGraphLayouter automaticGraphLayouter,
+        IClipboardService clipboardService,
+        ICurrentCoreVersion currentCoreVersion,
+        IMainThread mainThread,
+        IConditionEditService conditionEditService,
+        IQuestChainEditorConfiguration configuration,
+        IParameterPickerService parameterPickerService,
+        IStandaloneTableEditService tableEditService,
+        IQuestChainsServerIntegrationService questChainsServerIntegrationService,
+        IItemFromListProvider itemFromListProvider,
+        QuestPickerService questPickerService,
+        IWindowManager windowManager,
+        ISessionService sessionService,
+        IQuestChainEditorPreferences userPreferences,
+        ITeachingTipService teachingTipService,
+        GraphLayoutSettingsViewModel layoutSettingsViewModel)
     {
         this.questTemplateSource = questTemplateSource;
+        this.chainGenerator = chainGenerator;
         this.queryGenerator = queryGenerator;
-        this.sqlGenerator = sqlGenerator;
         this.messageBoxService = messageBoxService;
-        this.miniIcons = miniIcons;
+        this.questChainLoader = questChainLoader;
+        this.automaticGraphLayouter = automaticGraphLayouter;
+        this.currentCoreVersion = currentCoreVersion;
+        this.mainThread = mainThread;
+        this.conditionEditService = conditionEditService;
+        this.configuration = configuration;
+        this.itemFromListProvider = itemFromListProvider;
         this.questPickerService = questPickerService;
-        this.QuestPicker = questPicker;
+        this.userPreferences = userPreferences;
+        this.teachingTipService = teachingTipService;
+        QuestPicker = questPicker;
+        QuestChainsServerIntegrationService = questChainsServerIntegrationService;
+        LayoutSettingsViewModel = layoutSettingsViewModel;
         SolutionItem = this.solutionItem = solutionItem;
-        existingData = solutionItem.ExistingData.ToDictionary(e => e.Key, e=>e.Value);
+        RemoteCommandsSupported = QuestChainsServerIntegrationService.IsSupported;
+        existingData = solutionItem.ExistingData.SafeToDictionary(e => e.Key, e=>e.Value);
+        existingConditions = solutionItem.ExistingConditions
+            .Where(x => x.Value != null && x.Value.Count > 0)
+            .SafeToDictionary(x => x.Key, x => (IReadOnlyList<ICondition>)x.Value.Select(c => (ICondition)c).ToList());
+        autoLayout = userPreferences.AutoLayout;
+
+        if (sessionService.CurrentSession is { } currentSession &&
+            !sessionService.IsPaused)
+        {
+            var sessionSolutionItem = currentSession.Find(solutionItem) as QuestChainSolutionItem;
+            if (sessionSolutionItem != null)
+            {
+                foreach (var (questId, sessionExistingData) in sessionSolutionItem.ExistingData)
+                {
+                    existingData[questId] = sessionExistingData;
+                }
+
+                foreach (var (questId, sessionCondition) in sessionSolutionItem.ExistingConditions)
+                {
+                    if (sessionCondition.Count > 0)
+                        existingConditions[questId] = sessionCondition;
+                }
+            }
+        }
+
         History = history;
+        DatabaseProvider = databaseProvider;
         Undo = history.UndoCommand();
         Redo = history.RedoCommand();
+        historyHandler = new HistoryHandler();
+        history.AddHandler(historyHandler);
 
-        QuestPicker.CloseCancel += () =>
+        Elements.ToCountChangedObservable().SubscribeAction(_ => RaisePropertyChanged(nameof(IsEmpty)));
+
+        void RelayoutGraph() => ReLayoutGraph(Elements, Connections);
+
+        layoutSettingsViewModel.SettingsChanged += RelayoutGraph;
+        AutoDispose(new ActionDisposable(() => layoutSettingsViewModel.SettingsChanged -= RelayoutGraph));
+
+        History.OnRedo += () =>
         {
-            questPickingTask?.SetResult(null);
-            questPickingTask = null;
-            isPickingQuest = false;
-            RaisePropertyChanged(nameof(IsPickingQuest));
+            RefreshProblems();
+            ReLayoutGraph(Elements, Connections);
         };
-        QuestPicker.CloseOk += () =>
+        History.OnUndo += () =>
         {
-            questPickingTask?.SetResult(QuestPicker.SelectedQuest);
-            questPickingTask = null;
-            isPickingQuest = false;
-            RaisePropertyChanged(nameof(IsPickingQuest));
+            RefreshProblems();
+            ReLayoutGraph(Elements, Connections);
         };
+
+        QuestPicker.CloseCancel += OnCancelQuestPicker;
+        QuestPicker.CloseOk += OnOkQuestPicker;
+
+        AutoDispose(new ActionDisposable(() =>
+        {
+            QuestPicker.CloseCancel -= OnCancelQuestPicker;
+            QuestPicker.CloseOk -= OnOkQuestPicker;
+        }));
+
+        ToggleSearchBoxCommand = new DelegateCommand(() =>
+        {
+            IsSearchBoxVisible = !IsSearchBoxVisible;
+        });
 
         Save = new AsyncAutoCommand(async () =>
         {
-            var store = BuildCurrentQuestStore();
-            var query = queryGenerator.Generate(store);
-            var sql = sqlGenerator.GenerateQuery(query.ToList(), null); // passing null as 'existing' to generate all
+            var store = await BuildCurrentQuestStore();
+            var newConditions = store.Where(x => x.Conditions.Count > 0).ToDictionary(x => x.Entry, x => x.Conditions);
+            var query = await chainGenerator.Generate(store, existingData);
+            var sql = queryGenerator.GenerateQuery(query.Concat(removedQuestsToReSave.Values).ToList(), null, newConditions, null); // passing null as 'existing' to generate all
             await taskRunner.ScheduleTask("Save chain", async () =>
             {
-                await mySqlExecutor.ExecuteSql(sql);
+                await mySqlExecutor.ExecuteSql(await sql);
+                removedQuestsToReSave.Clear();
+                removedQuestConditionsToReSave.Clear();
+                history.MarkAsSaved();
+                if (sessionService.CurrentSession is { } currentSession)
+                {
+                    var sessionSolutionItem = currentSession.Find(solutionItem) as QuestChainSolutionItem ?? new QuestChainSolutionItem();
+                    foreach (var (quest, data) in existingData)
+                    {
+                        if (existingConditions.TryGetValue(quest, out var existingCondition) && existingCondition.Count > 0)
+                            sessionSolutionItem.UpdateEntry(quest, data, existingCondition);
+                        else
+                            sessionSolutionItem.UpdateEntry(quest, data, null);
+                    }
+                    await sessionService.UpdateQuery(sessionSolutionItem);
+                }
             });
         });
 
-        DeleteSelected = new DelegateCommand(() =>
+        Copy = new DelegateCommand(() =>
         {
-            foreach (var conn in SelectedConnections.ToList())
+            if (SelectedItems.Count > 0)
             {
-                conn.Detach();
-                Connections.Remove(conn);
+                clipboardService.SetText(string.Join(",", SelectedItems.Where(x => x is QuestViewModel)
+                    .Select(x => x.EntryOrExclusiveGroupId)));
             }
         });
 
-        // HashSet<uint> done = new();
-        // List<(int, uint, string)> top = new();
-        // foreach (var q in databaseProvider.GetQuestTemplates())
-        // {
-        //     if (!done.Add(q.Entry))
-        //         continue;
-        //     var questStore = new QuestStore(questTemplateSource);
-        //     questStore.LoadQuest(q.Entry);
-        //     foreach (var quest in questStore)
-        //     {
-        //         done.Add(quest.Entry);
-        //     }
-        //     top.Add((questStore.Count(), q.Entry, q.Name));
-        // }
-        // top.Sort();
-        //
-        // for (int i = top.Count - 1; i >= top.Count - 100; --i)
-        // {
-        //     Console.WriteLine(top[i].Item1 + " " + top[i].Item2 + " " + top[i].Item3);
-        // }
-        
-        LoadQuestWithDependencies(100000);
-
-        DispatcherTimer.Run(Update, TimeSpan.FromMilliseconds(16));
-    }
-
-    private QuestViewModel LoadQuestWithDependencies(uint quest)
-    {
-        QuestViewModel? mainQuest = null;
-        
-        var quests = new QuestStore(questTemplateSource);
-        quests.LoadQuest(quest);
-        foreach (var q in quests)
+        ToggleExclusiveGroupTypeCommand = new DelegateCommand<ExclusiveGroupViewModel>(group =>
         {
-            var template = questTemplateSource.GetTemplate(q.Entry);
-            if (!existingData.ContainsKey(q.Entry))
-                existingData[q.Entry] = new ChainRawData(template!);
-            
-            var viewModel = GetOrCreate(q);
-            if (q.Entry == quest)
-                mainQuest = viewModel;
+            var newType = group.IsAnyGroupType ? QuestGroupType.All : QuestGroupType.OneOf;
+            SetExclusiveGroupsType(SelectedGroupsSnapshot(), newType);
+        });
 
-            if (q.Requirements.Count == 1 && q.Requirements[0].RequirementType == QuestRequirementType.AllCompleted)
+        SetQuestHordeOnlyCommand = new DelegateCommand(() =>
+        {
+            SetQuestsRace(SelectedQuestsSnapshot(), currentCoreVersion.Current.GameVersionFeatures.AllRaces & CharacterRaces.AllHorde);
+        });
+
+        SetQuestAllianceOnlyCommand = new DelegateCommand(() =>
+        {
+            SetQuestsRace(SelectedQuestsSnapshot(), currentCoreVersion.Current.GameVersionFeatures.AllRaces & CharacterRaces.AllAlliance);
+        });
+
+        SetQuestAnyTeamCommand = new DelegateCommand<QuestViewModel>(quest =>
+        {
+            SetQuestsRace(SelectedQuestsSnapshot(), 0);
+        });
+
+        SetConnectionRequiredCommand = new DelegateCommand<ConnectionViewModel>(conn =>
+        {
+            SetConnectionsType(SelectedConnectionsSnapshot(), QuestRequirementType.Completed);
+        });
+
+        SetConnectionBreadcrumbCommand = new DelegateCommand<ConnectionViewModel>(conn =>
+        {
+            SetConnectionsType(SelectedConnectionsSnapshot(), QuestRequirementType.Breadcrumb);
+        });
+
+        SetConnectionMustBeActiveCommand = new DelegateCommand<ConnectionViewModel>(conn =>
+        {
+            SetConnectionsType(SelectedConnectionsSnapshot(), QuestRequirementType.MustBeActive);
+        });
+
+        PickQuestClassesCommand = new AsyncAutoCommand<QuestViewModel>(async q =>
+        {
+            var (classes, ok) = await parameterPickerService.PickParameter("ClassMaskParameter", (long)q.Classes);
+            if (ok)
+                SetQuestsClasses(SelectedQuestsSnapshot(), (CharacterClasses)classes);
+        });
+
+        PickQuestRacesCommand = new AsyncAutoCommand<QuestViewModel>(async q =>
+        {
+            var (races, ok) = await parameterPickerService.PickParameter("RaceMaskParameter", (long)q.Races);
+            if (ok)
+                SetQuestsRace(SelectedQuestsSnapshot(), (CharacterRaces)races);
+        });
+
+        EditShowQuestMarkConditions = new AsyncCommand<QuestViewModel>(async q =>
+        {
+            if (this.configuration.ShowMarkConditionSourceType is not { } cond)
+                return;
+
+            var newConditions = await conditionEditService.EditConditions(new IDatabaseProvider.ConditionKey(cond, null, (int)q!.Entry, null), q.Conditions);
+
+            if (newConditions == null)
+                return;
+
+            var conditions = newConditions.ToList();
+            SetConditionsForQuests(SelectedQuestsSnapshot(), conditions);
+        }, _ => this.configuration.ShowMarkConditionSourceType.HasValue);
+
+        EditTemplateCommand = new AsyncCommand(async () =>
+        {
+            var selectedQuests = SelectedQuestsSnapshot();
+            if (selectedQuests.Count > 0)
+                tableEditService.OpenTemplatesEditor(selectedQuests.Select(q => new DatabaseKey(q.Entry)).ToList(), DatabaseTable.WorldTable("quest_template"));
+        }).WrapMessageBox<Exception>(this.messageBoxService);
+
+        EditCreatureStartersCommand = new AsyncCommand(async () =>
+        {
+            var selectedQuests = SelectedQuestsSnapshot();
+            if (selectedQuests.Count > 0)
             {
-                foreach (var requiredQuestEntry in q.Requirements[0].Quests)
+                try
                 {
-                    var requiredQuest = GetOrCreate(quests[requiredQuestEntry]);
-                    var connection = new QuestConnectionViewModel(requiredQuest.IsRequiredByConnector, viewModel.RequiresConnector, QuestConnectionType.Hierarchy);
-                    Connections.Add(connection);
+                    tableEditService.OpenMultiRecordEditor(
+                        selectedQuests.Select(q => new DatabaseKey(q.Entry)).ToList(),
+                        DatabaseTable.WorldTable("creature_queststarter"),
+                        DatabaseTable.WorldTable("creature_quest_starter"),
+                        DatabaseTable.WorldTable("creature_questrelation"));
+                }
+                catch (UnsupportedTableException)
+                {
+                    tableEditService.OpenEditor(DatabaseTable.WorldTable("creature_questrelation"), null, "`quest` IN (" + string.Join(",", selectedQuests.Select(q => q.Entry)) + ")");
                 }
             }
-            else
-            {
-                QuestViewModel? prev = null;
-                QuestConnectionType type;
-                foreach (var requirementGroup in q.Requirements)
-                {
-                    type = QuestConnectionType.Or;
-                    foreach (var requiredQuestEntry in requirementGroup.Quests)
-                    {
-                        var requiredQuest = GetOrCreate(quests[requiredQuestEntry]);
-                        var connection = new QuestConnectionViewModel(requiredQuest.IsRequiredByConnector, viewModel.RequiresConnector, QuestConnectionType.Hierarchy);
-                        Connections.Add(connection);
+        }).WrapMessageBox<Exception>(this.messageBoxService);
 
-                        if (prev != null)
+        EditCreatureQuestEndersCommand = new AsyncCommand(async () =>
+        {
+            var selectedQuests = SelectedQuestsSnapshot();
+            if (selectedQuests.Count > 0)
+            {
+                try
+                {
+                    tableEditService.OpenMultiRecordEditor(
+                        selectedQuests.Select(q => new DatabaseKey(q.Entry)).ToList(),
+                        DatabaseTable.WorldTable("creature_questender"),
+                        DatabaseTable.WorldTable("creature_quest_ender"),
+                        DatabaseTable.WorldTable("creature_involvedrelation"));
+                }
+                catch (UnsupportedTableException)
+                {
+                    tableEditService.OpenEditor(DatabaseTable.WorldTable("creature_involvedrelation"), null, "`quest` IN (" + string.Join(",", selectedQuests.Select(q => q.Entry)) + ")");
+                }
+            }
+        }).WrapMessageBox<Exception>(this.messageBoxService);
+
+        EditGameobjectStartersCommand = new AsyncCommand(async () =>
+        {
+            var selectedQuests = SelectedQuestsSnapshot();
+            if (selectedQuests.Count > 0)
+            {
+                try
+                {
+                    tableEditService.OpenMultiRecordEditor(
+                        selectedQuests.Select(q => new DatabaseKey(q.Entry)).ToList(),
+                        DatabaseTable.WorldTable("gameobject_queststarter"),
+                        DatabaseTable.WorldTable("gameobject_questrelation"));
+                }
+                catch (UnsupportedTableException)
+                {
+                    tableEditService.OpenEditor(DatabaseTable.WorldTable("gameobject_questrelation"), null, "`quest` IN (" + string.Join(",", selectedQuests.Select(q => q.Entry)) + ")");
+                }
+            }
+        }).WrapMessageBox<Exception>(this.messageBoxService);
+
+        EditGameobjectQuestEndersCommand = new AsyncCommand(async () =>
+        {
+            var selectedQuests = SelectedQuestsSnapshot();
+            if (selectedQuests.Count > 0)
+            {
+                try
+                {
+                    tableEditService.OpenMultiRecordEditor(
+                        selectedQuests.Select(q => new DatabaseKey(q.Entry)).ToList(),
+                        DatabaseTable.WorldTable("gameobject_questender"),
+                        DatabaseTable.WorldTable("gameobject_involvedrelation"));
+                }
+                catch (UnsupportedTableException)
+                {
+                    tableEditService.OpenEditor(DatabaseTable.WorldTable("gameobject_involvedrelation"), null, "`quest` IN (" + string.Join(",", selectedQuests.Select(q => q.Entry)) + ")");
+                }
+            }
+        }).WrapMessageBox<Exception>(this.messageBoxService);
+
+        EvaluateQuestStatusCommand = new DelegateCommand(() =>
+        {
+            EvaluateQuestStatus().ListenErrors(messageBoxService);
+        });
+
+        AddQuestToPlayerCommand = new AsyncCommand(async () =>
+        {
+            if (await PickPlayerName() is not { } playerName)
+                return;
+
+            await questChainsServerIntegrationService.AddQuests(playerName, SelectedQuestsSnapshot().Select(q => q.Entry).ToList());
+            if (hasQuestStatus)
+                await EvaluateQuestStatus();
+        }).WrapMessageBox<Exception>(messageBoxService);
+
+        RemoveQuestFromPlayerCommand = new AsyncCommand(async () =>
+        {
+            if (await PickPlayerName() is not { } playerName)
+                return;
+
+            await questChainsServerIntegrationService.RemoveQuests(playerName, SelectedQuestsSnapshot().Select(q => q.Entry).ToList());
+            if (hasQuestStatus)
+                await EvaluateQuestStatus();
+        }).WrapMessageBox<Exception>(messageBoxService);
+
+        CompleteQuestForPlayerCommand = new AsyncCommand(async () =>
+        {
+            if (await PickPlayerName() is not { } playerName)
+                return;
+
+            await questChainsServerIntegrationService.CompleteQuests(playerName, SelectedQuestsSnapshot().Select(q => q.Entry).ToList());
+            if (hasQuestStatus)
+                await EvaluateQuestStatus();
+        }).WrapMessageBox<Exception>(messageBoxService);
+
+        RewardQuestForPlayerCommand = new AsyncCommand(async () =>
+        {
+            if (await PickPlayerName() is not { } playerName)
+                return;
+
+            await questChainsServerIntegrationService.RewardQuests(playerName, SelectedQuestsSnapshot().Select(q => q.Entry).ToList());
+            if (hasQuestStatus)
+                await EvaluateQuestStatus();
+        }).WrapMessageBox<Exception>(messageBoxService);
+
+        GroupSelectedQuestsCommand = new DelegateCommand(() =>
+        {
+            CreateAndGroupSelectedQuests(null);
+        });
+
+        StartConnectionCommand = new DelegateCommand(() =>
+        {
+            PendingConnection.IsVisible = true;
+        });
+
+        DeleteOutgoingConnectionsCommand = new DelegateCommand(() =>
+        {
+            var connections = SelectedItems
+                .SelectMany(q => q.RequirementFor.Select(tuple => tuple.conn))
+                .ToList();
+            DeleteConnections(connections);
+        });
+
+        DeleteIncomingConnectionsCommand = new DelegateCommand(() =>
+        {
+            var connections = SelectedItems
+                .SelectMany(q => q.Prerequisites.Select(tuple => tuple.conn))
+                .ToList();
+            DeleteConnections(connections);
+        });
+
+        CreateConnectionCommand = new AsyncAutoCommand(async () =>
+        {
+            if (PendingConnection.To == null)
+            {
+                var quest = await PickQuest();
+                if (!quest.HasValue)
+                    return;
+
+                var vm = await LoadQuestWithDependencies(quest.Value, PendingConnection.TargetLocation);
+                AddConnection(PendingConnection.From!, vm);
+            }
+            else
+               AddConnection(PendingConnection.From!, PendingConnection.To!);
+        }, () => PendingConnection.From != null && PendingConnection.From != PendingConnection.To);
+
+        DeleteSelectedExclusiveGroupsCommand = new DelegateCommand(() =>
+        {
+            DeleteGroups(SelectedGroupsSnapshot());
+        });
+
+        DeleteSelectedCommand = new DelegateCommand(() =>
+        {
+            DeleteSelectedConnections();
+            DeleteGroups(SelectedGroupsSnapshot());
+        });
+
+        OpenWowHeadCommand = new DelegateCommand<QuestViewModel>(quest =>
+        {
+            string exp = currentCoreVersion.Current.Version.Major switch
+            {
+                1 => "wotlk/",
+                2 => "wotlk/",
+                3 => "wotlk/",
+                4 => "cataclysm/",
+                _ => ""
+            };
+            var url = $"https://wowhead.com/{exp}quest={quest.Entry}";
+            windowManager.OpenUrl(url);
+        });
+
+        UnloadThisChainCommand = new AsyncCommand<QuestViewModel>(async quest =>
+        {
+            await AskToSave();
+            UnloadConnectedNodesAndConnections(quest!);
+        }).WrapMessageBox<Exception, QuestViewModel>(messageBoxService);
+
+        DoLayoutGraphCommand = new DelegateCommand(DoLayoutGraphNow);
+
+        History.ToObservable(x => x.IsSaved).SubscribeAction(_ => RaisePropertyChanged((nameof(IsModified))));
+        //LoadQuestWithDependencies(25134, default).ListenErrors();
+
+        if (solutionItem.Entries.Count > 0)
+        {
+            LoadingStack++;
+            taskRunner.ScheduleTask("Load quests", async () =>
+            {
+                foreach (var quest in solutionItem.Entries)
+                    await LoadQuestWithDependencies(quest, default);
+                LoadingStack--;
+                History.Clear();
+            });
+        }
+
+        if (this.teachingTipService.ShowTip("QUEST_CHAIN_BETA"))
+        {
+            messageBoxService.SimpleDialog("Quest chain editor", "Quest chain editor is a beta version", "This quest chain editor has been tested, but it still may contain bugs, please pay attention to the generate queries until it is well tested.");
+        }
+    }
+
+    public async Task AskToSave()
+    {
+        if (!History.IsSaved)
+        {
+            var result = await messageBoxService.ShowDialog(new MessageBoxFactory<SaveDialogResult>()
+                .SetTitle("Save changes?")
+                .SetMainInstruction("You have unsaved changes")
+                .SetContent("Do you want to save the changes before unloading the chain?")
+                .WithYesButton(SaveDialogResult.Save)
+                .WithNoButton(SaveDialogResult.DontSave)
+                .WithCancelButton(SaveDialogResult.Cancel)
+                .Build());
+
+            if (result == SaveDialogResult.Save)
+                await Save.ExecuteAsync();
+
+            if (result == SaveDialogResult.Cancel)
+                throw new TaskCanceledException();
+        }
+    }
+
+    private void OnOkQuestPicker()
+    {
+        if (!isPickingQuest)
+            return;
+
+        questPickingTask?.SetResult(QuestPicker.SelectedQuest);
+        questPickingTask = null;
+        isPickingQuest = false;
+        RaisePropertyChanged(nameof(IsPickingQuest));
+    }
+
+    private void OnCancelQuestPicker()
+    {
+        if (!isPickingQuest)
+            return;
+
+        questPickingTask?.SetResult(null);
+        questPickingTask = null;
+        isPickingQuest = false;
+        RaisePropertyChanged(nameof(IsPickingQuest));
+    }
+
+    public async Task<QuestViewModel> LoadQuestWithDependencies(uint quest, Point targetLocation)
+    {
+        if (entryToQuest.TryGetValue(quest, out var existingQuestViewModel))
+            return existingQuestViewModel;
+
+        LoadingStack++;
+        try
+        {
+            QuestViewModel? mainQuest = null;
+            Dictionary<int, ExclusiveGroupViewModel> groups = new();
+
+            var questStore = new QuestStore();
+            List<string> nonFatalErrors = new();
+            await questChainLoader.LoadChain(quest, questStore, nonFatalErrors);
+
+            Dictionary<uint, QuestViewModel> addedQuestsByEntry = new();
+            List<BaseQuestViewModel> addedQuests = new();
+            List<ConnectionViewModel> addedConnections = new();
+
+            QuestViewModel GetOrCreate(IQuestTemplate template)
+            {
+                if (TryGetQuest(template.Entry, out var vm))
+                    return vm;
+
+                if (addedQuestsByEntry.TryGetValue(template.Entry, out var vm2))
+                    return vm2;
+
+                vm = addedQuestsByEntry[template.Entry] = new QuestViewModel(this, template, currentCoreVersion)
+                {
+                    Bounds = new Rect(0, 0, 120, 50)
+                };
+                addedQuests.Add(vm);
+                return vm;
+            }
+
+            foreach (var q in questStore)
+            {
+                if (q.Template == null)
+                    throw new Exception($"Quest {q.Entry} is referenced, but it doesn't exist in the database. Please fix the database.");
+
+                var viewModel = GetOrCreate(q.Template);
+
+                viewModel.Conditions = q.Conditions;
+
+                if (q.Entry == quest)
+                    mainQuest = viewModel;
+
+                void LoadGroups(QuestRequirementType type, IReadOnlyList<IQuestGroup> questGroups)
+                {
+                    foreach (var requirementGroup in questGroups)
+                    {
+                        ExclusiveGroupViewModel? group = null;
+                        if (requirementGroup.Quests.Count > 1 &&
+                            requirementGroup.GroupId != 0 &&
+                            !groups.TryGetValue(requirementGroup.GroupId, out group))
                         {
-                            connection = new QuestConnectionViewModel(prev.RightOutputConnector, requiredQuest.LeftInputConnector, type);
-                            Connections.Add(connection);
+                            group = new ExclusiveGroupViewModel(this, requirementGroup.GroupType)
+                            {
+                                Size = new Size(100, 100)
+                            };
+                            addedQuests.Add(group);
+                            groups[requirementGroup.GroupId] = group;
                         }
 
-                        if (requirementGroup.RequirementType == QuestRequirementType.AllCompleted)
-                            type = QuestConnectionType.And;
-                        else if (requirementGroup.RequirementType == QuestRequirementType.MustBeActive)
-                            type = QuestConnectionType.And;
-                        else if (requirementGroup.RequirementType == QuestRequirementType.OnlyOneCompleted ||
-                                 requirementGroup.RequirementType == QuestRequirementType.Breadcrumb)
-                            type = QuestConnectionType.OneOf;
+                        foreach (var requiredQuestEntry in requirementGroup.Quests)
+                        {
+                            var requiredQuest = GetOrCreate(questStore[requiredQuestEntry].Template);
 
-                        prev = requiredQuest;
+                            group?.AddQuest(requiredQuest);
+
+                            if (group != null)
+                            {
+                                if (group.RequirementFor.All(conn => conn.Item1 != viewModel))
+                                {
+                                    var connection = new ConnectionViewModel(type, group, viewModel);
+                                    addedConnections.Add(connection);
+                                }
+                            }
+                            else
+                            {
+                                var connection = new ConnectionViewModel(type, requiredQuest, viewModel);
+                                addedConnections.Add(connection);
+                            }
+                        }
+                    }
+                }
+                LoadGroups(QuestRequirementType.Completed, q.MustBeCompleted);
+                LoadGroups(QuestRequirementType.MustBeActive, q.MustBeActive);
+                LoadGroups(QuestRequirementType.Breadcrumb, q.Breadcrumbs);
+            }
+
+            foreach (var (groupType, questIds) in questStore.GetAdditionalGroups())
+            {
+                var group = new ExclusiveGroupViewModel(this, groupType);
+                addedQuests.Add(group);
+                foreach (var questId in questIds)
+                {
+                    var questViewModel = GetOrCreate(questStore[questId].Template);
+                    if (questViewModel.ExclusiveGroup != null)
+                        throw new Exception("Cannot add quest to group, it already belongs to another group");
+                    group.AddQuest(questViewModel);
+                }
+            }
+
+            foreach (var element in addedQuests)
+            {
+                if (element is ExclusiveGroupViewModel groupViewModel)
+                {
+                    if (groupViewModel.Quests.Count == 0 || !groupViewModel.Quests[0].Prerequisites.Any())
+                        continue;
+
+                    var requires = groupViewModel.Quests[0].Prerequisites.First();
+                    var originalFrom = requires.Item1;
+                    if (groupViewModel.Quests.All(q => q.Prerequisites.Count() == 1 && q.Prerequisites.First() is {} first && first.prerequisite == requires.prerequisite && first.requirementType == requires.requirementType))
+                    {
+                        foreach (var questInGroup in groupViewModel.Quests)
+                        {
+                            for (var index = questInGroup.Connector.Connections.Count - 1; index >= 0; index--)
+                            {
+                                var conn = questInGroup.Connector.Connections[index];
+                                if (conn.ToNode == questInGroup)
+                                {
+                                    conn.Detach();
+                                    addedConnections.Remove(conn);
+                                }
+                            }
+                        }
+
+                        var connectionToGroup = new ConnectionViewModel(requires.Item2, originalFrom, groupViewModel);
+                        addedConnections.Add(connectionToGroup);
+                    }
+                }
+            }
+
+            foreach (var group in addedQuests.OfType<ExclusiveGroupViewModel>())
+                group.Arrange(default);
+
+            automaticGraphLayouter.DoLayoutNow(LayoutSettingsViewModel.CurrentAlgorithm!, addedQuests, addedConnections, false);
+
+            //var maxRight = Elements.Select(x => x.Bounds.Right).DefaultIfEmpty().Max();
+            var offset = targetLocation - new Point(mainQuest!.PerfectX, mainQuest!.PerfectY);
+
+            foreach (var node in addedQuests)
+            {
+                node.PerfectX += offset.X;
+                node.PerfectY += offset.Y;
+                node.Location = new Point(node.PerfectX, node.PerfectY);
+            }
+
+            if (nonFatalErrors.Count > 0)
+            {
+                await messageBoxService.SimpleDialog("Warning", "Incorrect database data", "Some data in the database is out of correct range: \n" + string.Join("\n", nonFatalErrors.Select(x => " - " + x)));
+            }
+
+            List<ChainRawData> newExistingData = new();
+            List<(uint, IReadOnlyList<ICondition>)> newExistingConditions = new();
+            foreach (var q in questStore)
+            {
+                if (!existingData.ContainsKey(q.Entry))
+                    newExistingData.Add(new ChainRawData(q.Template));
+                if (!existingConditions.ContainsKey(q.Entry) && q.Conditions.Count > 0)
+                    newExistingConditions.Add((q.Entry, q.Conditions));
+            }
+
+            var wasSavedBeforeLoad = History.IsSaved;
+
+            historyHandler.DoAction(new AnonymousHistoryAction("Load quest", () =>
+            {
+                //using var _ = Elements.SuspendNotifications();
+                //using var __ = Connections.SuspendNotifications();
+                foreach (var data in newExistingData)
+                {
+                    removedQuestsToReSave[data.Id] = data;
+                    existingData.Remove(data.Id);
+                }
+
+                foreach (var (quest, data) in newExistingConditions)
+                {
+                    removedQuestConditionsToReSave[quest] = data;
+                    existingConditions.Remove(quest);
+                }
+
+                foreach (var conn in addedConnections)
+                    Connections.Remove(conn);
+
+                foreach (var toAdd in addedQuests)
+                {
+                    if (toAdd is QuestViewModel questViewModel)
+                        entryToQuest.Remove(questViewModel.Entry);
+
+                    Elements.Remove(toAdd);
+                }
+            }, () =>
+            {
+                //using var _ = Elements.SuspendNotifications();
+                //using var __ = Connections.SuspendNotifications();
+                foreach (var toAdd in addedQuests)
+                {
+                    if (toAdd is ExclusiveGroupViewModel group)
+                        Elements.Insert(0, group);
+                    else if (toAdd is QuestViewModel qVm)
+                    {
+                        entryToQuest[qVm.Entry] = qVm;
+                        Elements.Add(toAdd);
+                    }
+                    else
+                        throw new InvalidOperationException("Unknown type of element to add");
+                }
+                foreach (var conn in addedConnections)
+                {
+                    Connections.Add(conn);
+                }
+
+                foreach (var data in newExistingData)
+                {
+                    existingData[data.Id] = data;
+                    removedQuestsToReSave.Remove(data.Id);
+                }
+
+                foreach (var (quest, data) in newExistingConditions)
+                {
+                    existingConditions[quest] = data;
+                    removedQuestConditionsToReSave.Remove(quest);
+                }
+            }));
+
+            if (wasSavedBeforeLoad)
+            {
+                History.MarkAsSaved();
+            }
+
+            return mainQuest!;
+        }
+        finally
+        {
+            LoadingStack--;
+        }
+    }
+
+    private void RefreshProblems()
+    {
+        List<(IReadOnlyList<BaseQuestViewModel> affected, string explanation)> problemsOutput = new();
+        VerifyImpossibleChains(problemsOutput);
+
+        foreach (var old in problems.Value)
+        {
+            if (old is QuestChainInspectionResult result)
+            {
+                foreach (var affected in result.Affected)
+                    affected.IsProblematic = false;
+            }
+        }
+
+        if (problemsOutput.Count > 0)
+        {
+            problems.Value = problemsOutput.Select(x =>
+                    new QuestChainInspectionResult(x.affected[0].EntryOrExclusiveGroupId, DiagnosticSeverity.Error,
+                        x.explanation, x.affected))
+                .ToList();
+            foreach (var affected in problemsOutput.SelectMany(q => q.affected))
+                affected.IsProblematic = true;
+        }
+        else
+        {
+            problems.Value = Array.Empty<IInspectionResult>();
+        }
+    }
+
+    internal async Task<QuestStore> BuildCurrentQuestStore()
+    {
+        RefreshProblems();
+
+        if (problems.Value.Count > 0)
+        {
+            throw new ImpossibleChainException(problems.Value[0].Message);
+        }
+
+        QuestStore store = new QuestStore();
+        HashSet<ExclusiveGroupViewModel> processedGroups = new();
+        foreach (var viewModel in Elements)
+        {
+            if (viewModel is QuestViewModel quest)
+            {
+                var model = await store.GetOrCreate(quest.Entry, questTemplateSource.GetTemplate);
+                model.AllowableRaces = quest.Races;
+                model.AllowableClasses = quest.Classes;
+                if (quest.HasConditions)
+                    model.Conditions = quest.Conditions;
+
+                foreach (var (prerequisite, requirementType, _) in quest.Prerequisites
+                             .Concat(quest.ExclusiveGroup?.Prerequisites ?? Enumerable.Empty<(BaseQuestViewModel, QuestRequirementType, ConnectionViewModel)>()))
+                {
+                    if (prerequisite is QuestViewModel requiredQuest)
+                    {
+                        var group = requiredQuest.ExclusiveGroup;
+                        var groupType = group?.GroupType ?? QuestGroupType.All;
+                        var groupEntry = group?.EntryOrExclusiveGroupId ?? 0;
+                        if (requirementType == QuestRequirementType.Breadcrumb) // breadcrumbs are never supposed to be grupped
+                        {
+                            groupType = QuestGroupType.All;
+                            groupEntry = 0;
+                        }
+                        model.AddRequirement(requirementType, new QuestGroup(groupType, groupEntry, new[]{requiredQuest.Entry}));
+                    }
+                    else if (prerequisite is ExclusiveGroupViewModel requiredGroup)
+                    {
+                        processedGroups.Add(requiredGroup);
+                        var groupId = (int)requiredGroup.Quests.Select(q => q.Entry).Min();
+                        groupId *= requiredGroup.GroupType == QuestGroupType.All ? -1 : 1;
+                        model.AddRequirement(requirementType, new QuestGroup(requiredGroup.GroupType, groupId, requiredGroup.Quests.Select(q => q.Entry).ToArray()));
                     }
                 }
             }
         }
 
-        return mainQuest!;
-    }
-
-    private QuestStore BuildCurrentQuestStore()
-    {
-        Dictionary<uint, Quest> quests = new();
-        foreach (var questViewModel in Elements)
+        // hanging groups, i.e. XOR group means only one quest can be accepted, yet the group is not connected to anything
+        foreach (var viewModel in Elements)
         {
-            if (!quests.TryGetValue(questViewModel.Entry, out var questModel))
-                questModel = quests[questViewModel.Entry] = new(questTemplateSource.GetTemplate(questViewModel.Entry)!);
-            
-            if (questViewModel.RequiresConnector.Connections.Count == 0)
-                continue;
-            
-            var required = questViewModel.RequiresConnector.Connections.Select(cn => cn.From!.Node).ToList();
-            
-            questModel.AddRequirement(new QuestGroup(QuestRequirementType.AllCompleted, 1, required.Select(s => s.Entry).ToArray()));
+            if (viewModel is ExclusiveGroupViewModel group)
+            {
+                if (!processedGroups.Contains(group))
+                {
+                    store.AddAdditionalGroup(group.GroupType, group.Quests.Select(q => q.Entry).ToList());
+                }
+            }
         }
-        var store = new QuestStore(questTemplateSource, quests);
+
         return store;
     }
     
     public async Task<IQuery> GenerateQuery()
     {
-        var store = BuildCurrentQuestStore();
-        var query = queryGenerator.Generate(store);
-        var sql = sqlGenerator.GenerateQuery(query.ToList(), existingData);
-        return sql;
+        var store = await BuildCurrentQuestStore();
+        var newConditions = store.Where(x => x.Conditions.Count > 0).ToDictionary(x => x.Entry, x => x.Conditions);
+        var query = await chainGenerator.Generate(store, existingData);
+        var sql = await queryGenerator.GenerateQuery(query.ToList(), existingData, newConditions, existingConditions);
+        if (removedQuestsToReSave.Count == 0)
+            return sql;
+
+        var oldSave = await queryGenerator.GenerateQuery(removedQuestsToReSave.Values.ToList(), null, removedQuestConditionsToReSave, null);
+        IMultiQuery transaction = Queries.BeginTransaction(DataDatabaseType.World);
+        transaction.Add(sql);
+        transaction.BlankLine();
+        transaction.Comment("Restore values for quests that were loaded, then unloaded");
+        transaction.Add(oldSave);
+        return transaction.Close();
     }
 
-    public bool AutoLayout
+    public void ScheduleReLayoutGraph()
     {
-        get => autoLayout;
-        set => SetProperty(ref autoLayout, value);
-    }
+        if (pendingRelayout)
+            return;
 
-    private QuestViewModel GetLeftMostNode(QuestViewModel quest)
-    {
-        QuestViewModel left = quest;
-        while (left.LeftInputConnector.Connections.Count == 1 &&
-               left.LeftInputConnector.Connections[0].From != null)
+        pendingRelayout = true;
+
+        mainThread.StartTimer(() =>
         {
-            left = left.LeftInputConnector.Connections[0].From!.Node;
+            ReLayoutGraph(Elements, Connections);
+            pendingRelayout = false;
+            return false;
+        }, TimeSpan.FromMilliseconds(1));
+    }
+
+    private void ReLayoutGraph(IReadOnlyList<BaseQuestViewModel> nodes, IReadOnlyList<ConnectionViewModel> connections)
+    {
+        if (!autoLayout)
+            return;
+
+        previousRelayout?.Cancel();
+        previousRelayout = new CancellationTokenSource();
+
+        async Task Calculate(CancellationToken token)
+        {
+            try
+            {
+                CalculatingGraphLayoutStack++;
+                await automaticGraphLayouter.DoLayout(LayoutSettingsViewModel.CurrentAlgorithm!, nodes, connections, token);
+            }
+            finally
+            {
+                CalculatingGraphLayoutStack--;
+            }
         }
 
-        return left;
+        Calculate(previousRelayout.Token).ListenWarnings();
     }
-    
-    private bool Update()
+
+    public bool Update()
     {
         if (!autoLayout)
             return true;
-        
-        List<QuestViewModel> roots = Elements.Where(e => e.RequiresConnector.Connections.Count == 0 ||
-                                                         e.RequiresConnector.Connections[0].From == null).ToList();
-        if (roots == null || roots.Count == 0)
-            return true;
-        
-        a.DoLayout(roots);
 
-        foreach (var e in Elements)
-        {
-            QuestViewModel left = GetLeftMostNode(e);
-
-            QuestViewModel? node = left;
-            double max = double.MinValue;
-            while (node != null)
-            {
-                max = Math.Max(max, node.PerfectY);
-                node = node.RightOutputConnector.Connections.Count == 1 ? node.RightOutputConnector.Connections[0].To?.Node : null;
-            }
-            
-            node = left;
-            while (node != null)
-            {
-                node.PerfectY = max;
-                node = node.RightOutputConnector.Connections.Count == 1 ? node.RightOutputConnector.Connections[0].To?.Node : null;
-            }
-        }
-
-        
         foreach (var e in Elements)
             e.Force = new Vector2((float)e.X - (float)e.PerfectX, (float)e.Y - (float)e.PerfectY) * -1 * 1.1f;
 
-        for (var index = 0; index < Elements.Count; index++)
-        {
-            var e1 = Elements[index];
-            for (var i = index + 1; i < Elements.Count; i++)
-            {
-                var e2 = Elements[i];
-                var pos = new Vector2((float)e1.X, (float)e1.Y);
-                var dir = new Vector2((float)e2.X, (float)e2.Y) - pos;
-                var force = dir / Math.Max(dir.LengthSquared(), 0.01f);
-                force *= new Vector2(10000, 10000);
-                if (e1.Y > e2.Y)
-                    force *= new Vector2(1, -1f);
-                //e1.Force += force * -1;
-                //e2.Force += force;
-            }
-        }
-        
         foreach (var e in Elements)
         {
             if (e.IsDragging)
                 continue;
-            e.X += e.Force.X * 0.05f;
-            e.Y += e.Force.Y * 0.05f;
+
+            if (e is QuestViewModel quest && quest.ExclusiveGroup != null)
+                continue;
+
+            e.Location += e.Force * 0.05f;
         }
-        
+
         return true;
     }
 
-    #region Draggin
-
-    private bool connectingTo;
-    private bool connectingHierarchy;
-    private Point currentDragPoint;
     private bool isPickingQuest;
 
-    public QuestConnectionViewModel? OnConnectionDragStarted(ConnectorViewModel<QuestViewModel, QuestConnectionViewModel> sourceConnector, Point currentDragPoint)
-    {
-        if (sourceConnector == sourceConnector.Node.IsRequiredByConnector)
-        {
-            connectingTo = true;
-            connectingHierarchy = true;
-            QuestConnectionViewModel connection = new(sourceConnector.Node.IsRequiredByConnector, QuestConnectionType.Hierarchy)
-            {
-                ToPosition = currentDragPoint
-            };
-
-            Connections.Add(connection);
-
-            return connection;
-        }
-
-        if (sourceConnector == sourceConnector.Node.RequiresConnector)
-        {
-            connectingTo = false;
-            connectingHierarchy = true;
-            QuestConnectionViewModel connection = new(sourceConnector.Node.RequiresConnector, QuestConnectionType.Hierarchy)
-            {
-                FromPosition = currentDragPoint
-            };
-
-            Connections.Add(connection);
-
-            return connection;
-        }
-        
-        if (sourceConnector == sourceConnector.Node.RightOutputConnector)
-        {
-            connectingTo = true;
-            connectingHierarchy = false;
-            QuestConnectionViewModel connection = new(sourceConnector.Node.RightOutputConnector, QuestConnectionType.And)
-            {
-                FromPosition = currentDragPoint
-            };
-
-            Connections.Add(connection);
-
-            return connection;
-        }
-
-        if (sourceConnector == sourceConnector.Node.LeftInputConnector)
-        {
-            connectingTo = false;
-            connectingHierarchy = false;
-            QuestConnectionViewModel connection = new(sourceConnector.Node.LeftInputConnector, QuestConnectionType.And)
-            {
-                ToPosition = currentDragPoint
-            };
-
-            Connections.Add(connection);
-
-            return connection;
-        }
-
-        return null;
-    }
-
-    public void OnConnectionDragging(Point currentDragPoint, QuestConnectionViewModel connection)
-    {
-        // If current drag point is close to an input connector, show its snapped position.
-        ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>? nearbyConnector = null;
-
-        if (connectingHierarchy)
-        {
-            if (connectingTo)
-                nearbyConnector = FindNearbyInputConnector(connection, currentDragPoint);
-            else
-                nearbyConnector = FindNearbyOutputConnector(connection, currentDragPoint);   
-        }
-        else
-        {
-            nearbyConnector = FindNearbyNonHierarchyConnector(connection, currentDragPoint);
-        }
-
-        var pnt = nearbyConnector?.Position ?? currentDragPoint;
-
-        if (connectingTo)
-            connection.ToPosition = pnt;
-        else
-            connection.FromPosition = pnt;
-    }
-
-    private bool AddNonHierarchyConnection(QuestViewModel from, QuestViewModel to, QuestConnectionType type)
-    {
-        if (from == to)
-            return false;
-
-        if (DoesNewEdgeIntroducesCycle(from, to, true, true)||
-            DoesNewEdgeIntroducesCycle(to, from, true, true))
-            return false;
-        
-        while (from.RightOutputConnector.NonEmpty)
-        {
-            Connections.Remove(from.RightOutputConnector.Connections[0]);
-            from.RightOutputConnector.Connections[0].Detach();
-        }
-        while (to.LeftInputConnector.NonEmpty)
-        {
-            Connections.Remove(to.LeftInputConnector.Connections[0]);
-            to.LeftInputConnector.Connections[0].Detach();
-        }
-        
-        var connection = new QuestConnectionViewModel(from.RightOutputConnector, to.LeftInputConnector, type);
-        Connections.Add(connection);
-        return true;
-    }
-    
-    private bool AddConnection(QuestViewModel from, QuestViewModel to)
-    {
-        if (from == to)
-            return false;
-
-        if (DoesNewEdgeIntroducesCycle(from, to))
-            return false;
-            
-        RemoveConflictingConnections(to, from);
-        var connection = new QuestConnectionViewModel(from.IsRequiredByConnector, to.RequiresConnector, QuestConnectionType.Hierarchy);
-        Connections.Add(connection);
-        return true;
-    }
-
-    public void OnConnectionDragCompleted(Point currentDragPoint,
-        QuestConnectionViewModel newConnection,
-        ConnectorViewModel<QuestViewModel, QuestConnectionViewModel> sourceConnector)
-    {
-        var fromNewConnection = newConnection.From?.Node!;
-        var toNewConnection = newConnection.To?.Node!;
-
-        newConnection.Detach();
-        Connections.Remove(newConnection);
-
-        this.currentDragPoint = currentDragPoint;
-
-        if (connectingHierarchy)
-        {
-            if (connectingTo)
-            {
-                var nearbyConnector = FindNearbyInputConnector(newConnection, currentDragPoint);
-
-                if (nearbyConnector == null)
-                    AsyncTryConnect((sourceConnector as OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>)!, newConnection.ToPosition).ListenErrors();
-                else
-                   AddConnection(sourceConnector.Node, nearbyConnector.Node);
-            }
-            else
-            {
-                var nearbyConnector = FindNearbyOutputConnector(newConnection, currentDragPoint);
-
-                if (nearbyConnector == null)
-                    AsyncTryConnectTo((sourceConnector as InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>)!, newConnection.FromPosition).ListenErrors();
-                else
-                    AddConnection(nearbyConnector.Node, sourceConnector.Node);
-            }   
-        }
-        else
-        {
-            var nearbyConnector = FindNearbyNonHierarchyConnector(newConnection, currentDragPoint);
-            if (nearbyConnector != null)
-            {
-                if (nearbyConnector == nearbyConnector.Node.LeftInputConnector)
-                    AddNonHierarchyConnection(sourceConnector.Node, nearbyConnector.Node, QuestConnectionType.And);
-                else
-                    AddNonHierarchyConnection(nearbyConnector.Node, sourceConnector.Node, QuestConnectionType.And);
-            }
-        }
-    }
-
-    private bool DoesNewEdgeIntroducesCycle(QuestViewModel from, QuestViewModel to, bool includingSiblings = false, bool bothWays = false)
+    private bool DoesNewEdgeIntroducesCycle(BaseQuestViewModel from, BaseQuestViewModel to, bool includingSiblings = false, bool bothWays = false)
     {
         if (IsElementInChildren(from, to) ||
             (bothWays && IsElementInChildren(to, from)))
@@ -507,89 +1029,56 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
             return true;
         }
 
-        if (includingSiblings)
-        {
-            var left = GetLeftMostNode(from);
-            while (left != null)
-            {
-                if (DoesNewEdgeIntroducesCycle(left, to, false, bothWays))
-                    return true;
-                if (left.RightOutputConnector.Connections.Count == 0)
-                    left = null;
-                else
-                    left = left.RightOutputConnector.Connections[0].To?.Node;
-            }
-        }
-
         return false;
     }
 
-    private void RemoveConflictingConnections(QuestViewModel newChild, QuestViewModel newParent)
+    private List<ConnectionViewModel>? GetConflictingConnections(BaseQuestViewModel from, BaseQuestViewModel to)
     {
-        var inputConnections = newChild.RequiresConnector.Connections;
+        List<ConnectionViewModel>? conflicting = null;
+
+        // if there is already a connection To -> From, then it conflicts with potential From -> To
+        foreach (var (requirementFor, type, conn) in to.RequirementFor)
+        {
+            if (requirementFor == from)
+            {
+                conflicting ??= new();
+                conflicting.Add(conn);
+            }
+        }
+
+        // if there is already a connection From -> To, then it conflicts with potential new From -> To
+        foreach (var (requirementFor, type, conn) in from.RequirementFor)
+        {
+            if (requirementFor == to)
+            {
+                conflicting ??= new();
+                conflicting.Add(conn);
+            }
+        }
+
+        return conflicting;
+    }
+
+    private void RemoveConflictingConnectionsOld(BaseQuestViewModel newChild, BaseQuestViewModel newParent)
+    {
+        var inputConnections = newChild.Prerequisites.ToList();
         for (var index = inputConnections.Count - 1; index >= 0; index--)
         {
-            var existing = inputConnections[index] as QuestConnectionViewModel;
-            if (IsOnInputsPath(newParent, existing!.FromNode) || IsElementInChildren(newParent, existing.FromNode))
+            var existing = inputConnections[index];
+            if (IsOnInputsPath(newParent, existing.prerequisite as QuestViewModel) || IsElementInChildren(newParent, existing.prerequisite))
             {
-                existing.Detach();
-                Connections.Remove(existing);
+                existing.conn.Detach();
+                Connections.Remove(existing.conn);
             }
         }
     }
-    
-    private async Task AsyncTryConnectTo(InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel> destination, Point newConnectionToPosition)
-    {
-        var id = await PickQuest();
-        if (!id.HasValue)
-            return;
 
-        var existing = Elements.FirstOrDefault(e => e.Entry == id.Value);
-        if (existing != null)
-        {
-            AddConnection(existing, destination.Node);
-        }
-        else
-        {
-            var newQuest = LoadQuestWithDependencies(id.Value);
-        
-            newQuest.X = newConnectionToPosition.X;
-            newQuest.Y = newConnectionToPosition.Y;
-        
-            var connection = new QuestConnectionViewModel(newQuest.IsRequiredByConnector, destination, QuestConnectionType.Hierarchy);
-            Connections.Add(connection);
-        }
-    }
-    
-    private async Task AsyncTryConnect(OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel> source, Point newConnectionToPosition)
-    {
-        var id = await PickQuest();
-        if (!id.HasValue)
-            return;
-
-        var existing = Elements.FirstOrDefault(e => e.Entry == id.Value);
-        if (existing != null)
-        {
-            AddConnection(source.Node, existing);
-        }
-        else
-        {
-            var newQuest = LoadQuestWithDependencies(id.Value);
-        
-            newQuest.X = newConnectionToPosition.X;
-            newQuest.Y = newConnectionToPosition.Y;
-        
-            var connection = new QuestConnectionViewModel(source, newQuest.RequiresConnector, QuestConnectionType.Hierarchy);
-            Connections.Add(connection);
-        }
-    }
-
-    private bool IsElementInChildren(ITreeNode nodeToFind, QuestViewModel? nodeToFindIn)
+    private bool IsElementInChildren(BaseQuestViewModel nodeToFind, BaseQuestViewModel? nodeToFindIn)
     {
         if (nodeToFindIn == null)
             return false;
         
-        Queue<QuestViewModel> leafs = new Queue<QuestViewModel>();
+        Queue<BaseQuestViewModel> leafs = new Queue<BaseQuestViewModel>();
         leafs.Enqueue(nodeToFindIn);
 
         while (leafs.Count > 0)
@@ -597,7 +1086,7 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
             nodeToFindIn = leafs.Dequeue();
             if (nodeToFindIn == nodeToFind)
                 return true;
-            foreach (var conn in nodeToFindIn.IsRequiredByConnector.Connections)
+            foreach (var (_, _, conn) in nodeToFindIn.RequirementFor)
             {
                 if (conn.ToNode != null)
                     leafs.Enqueue((QuestViewModel)conn.ToNode);
@@ -607,7 +1096,7 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
         return false;
     }
 
-    private bool IsOnInputsPath(ITreeNode nodeToFind, QuestViewModel? leaf)
+    private bool IsOnInputsPath(BaseQuestViewModel nodeToFind, QuestViewModel? leaf)
     {
         if (leaf == null)
             return false;
@@ -620,74 +1109,202 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
             leaf = leafs.Dequeue();
             if (leaf == nodeToFind)
                 return true;
-            foreach (var parent in leaf.RequiresConnector.Connections)
+            foreach (var (parent, _, _) in leaf.Prerequisites)
             {
-                if (parent.FromNode == null)
-                    continue;
-                leafs.Enqueue(parent.FromNode);
+                leafs.Enqueue((QuestViewModel)parent);
             }
         }
 
         return false;
     }
 
-    private T? FindNearby<T>(Point position, Func<QuestViewModel, ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>> getConnector)
-        where T : ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>
+    private void VerifyImpossibleChains(List<(IReadOnlyList<BaseQuestViewModel> affected, string explanation)> problems)
     {
-        foreach (var element in Elements)
+        void AddProblem(string explanation, params BaseQuestViewModel[] affected)
         {
-            var connector = getConnector(element);
-            if (AreClose(connector.Position, position, 20))
-                return (T)connector;
+            problems.Add((affected.ToList(), explanation));
         }
 
-        return null;
-    }
-    
-    private InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>? FindNearbyInputConnector(QuestConnectionViewModel connection, Point mousePosition)
-    {
-        return FindNearby<InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>>(mousePosition, x => x.RequiresConnector);
+        void DetectOverlappingExclusiveGroups()
+        {
+            foreach (var element in Elements)
+            {
+                if (element is QuestViewModel quest)
+                {
+                    if (quest.ExclusiveGroup != null)
+                    {
+                        foreach (var (requirement, reqType, _) in quest.RequirementFor
+                                     .Where(x => x.requirementType is QuestRequirementType.Completed or QuestRequirementType.MustBeActive))
+                        {
+                            // all quests in the groups should have this connections, otherwise it's a problem
+
+                            foreach (var q in quest.ExclusiveGroup.Quests)
+                            {
+                                if (!HasConnection(q, requirement, reqType))
+                                {
+                                    AddProblem($"Quest {quest} is a prerequisite to {requirement} but {q} is not even though they belong to the same group. It is impossible, if a quest belong to a group, all quests in the group become the prerequisites. Add missing connection or remove this connection.", quest, q);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // ALL groups that have only one quests are pointless
+#pragma warning disable CS8321 // Local function is declared but never used
+        void DetectHangingAllGroups()
+#pragma warning restore CS8321 // Local function is declared but never used
+        {
+            foreach (var element in Elements)
+            {
+                if (element is ExclusiveGroupViewModel group)
+                {
+                    if (group.IsAllGroupType && group.Quests.Count == 1)
+                    {
+                        AddProblem("ALL group with only one quest is pointless. Remove the group.", group);
+                    }
+                }
+            }
+        }
+
+        // each quest can have only one breadcrumb and it can't be a grup
+        void OnlySingleBreadcrumbs()
+        {
+            foreach (var element in Elements)
+            {
+                if (element is QuestViewModel)
+                {
+                    bool alreadyHasBreadcrumb = false;
+                    foreach (var (to, type, _) in element.RequirementFor)
+                    {
+                        if (type == QuestRequirementType.Breadcrumb)
+                        {
+                            if (alreadyHasBreadcrumb)
+                            {
+                                AddProblem($"Quest {element} has more than one breadcrumb (optional) connection, this is not possible.", element);
+                                break;
+                            }
+
+                            if (to is ExclusiveGroupViewModel)
+                            {
+                                AddProblem("Breadcrumb (optional) connection can only lead to a quest, not to a group", element, to);
+                                break;
+                            }
+
+                            alreadyHasBreadcrumb = true;
+                        }
+                    }
+                }
+                else if (element is ExclusiveGroupViewModel)
+                {
+                    foreach (var (to, type, _) in element.RequirementFor)
+                    {
+                        if (type == QuestRequirementType.Breadcrumb)
+                        {
+                            AddProblem("Exclusive groups can't have breadcrumb (optional) connections", element, to);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        DetectOverlappingExclusiveGroups();
+        //DetectHangingAllGroups(); // maybe they are not pointless? idk
+        OnlySingleBreadcrumbs();
     }
 
-    private OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>? FindNearbyOutputConnector(QuestConnectionViewModel connection, Point mousePosition)
+    private bool HasConnection(BaseQuestViewModel from, BaseQuestViewModel to, QuestRequirementType? expectedType = null)
     {
-        return FindNearby<OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>>(mousePosition, x => x.IsRequiredByConnector);
-    }
-    
-    private ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>? FindNearbyNonHierarchyConnector(QuestConnectionViewModel connection, Point mousePosition)
-    {
-        var nearby = FindNearby<ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>>(mousePosition, x => x.LeftInputConnector);
-        if (nearby != null)
-            return nearby;
-        return FindNearby<ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>>(mousePosition, x => x.RightOutputConnector);
+        return from.Connector.Connections.Any(x => x.FromNode == from && x.ToNode == to && (!expectedType.HasValue || x.RequirementType == expectedType.Value));
     }
 
-    private static bool AreClose(Point point1, Point point2, double distance)
+    public async Task<string?> PickPlayerName()
     {
-        var d = point1 - point2;
-        return d.X * d.X + d.Y * d.Y < distance * distance;
+        var players = await QuestChainsServerIntegrationService.GetPlayersAsync();
+        if (players.Count == 0)
+            throw new UserException("No logged players found");
+
+        string? playerName;
+
+        if (players.Count > 1)
+            playerName = await itemFromListProvider.GetItemFromList(players.ToDictionary(x => x, x => new SelectOption(x)), false, "Select player");
+        else
+            playerName = players[0];
+
+        return playerName;
     }
 
-    #endregion
-    
-    public ICommand DeleteSelected { get; }
+    public async Task EvaluateQuestStatus()
+    {
+        if (await PickPlayerName() is not { } playerName)
+            return;
+
+        var questIds = Elements.OfType<QuestViewModel>().Select(x => x.Entry).ToList();
+        var questStates = await QuestChainsServerIntegrationService.GetQuestStatesAsync(playerName, questIds);
+
+        foreach (var state in questStates)
+        {
+            if (!entryToQuest.TryGetValue(state.QuestId, out var vm))
+                continue;
+
+            vm.PlayerQuestStatus = state.Status;
+            vm.PlayerCanStart = state.CanStart;
+            vm.PlayerCanStartChecks = string.Join("\n", state.Checks.Where(x => !x.Item2).Select(x => $"{x.Item1}: {x.Item2}"));
+        }
+
+        hasQuestStatus = true;
+    }
+
+    public bool AutoLayout
+    {
+        get => autoLayout;
+        set
+        {
+            SetProperty(ref autoLayout, value);
+            userPreferences.AutoLayout = value;
+            ReLayoutGraph(Elements, Connections);
+        }
+    }
+
+    private CancellationTokenSource? previousRelayout;
+
+    [Notify] [AlsoNotify(nameof(IsCalculatingGraphLayout))] private int calculatingGraphLayoutStack;
+    public bool IsCalculatingGraphLayout => calculatingGraphLayoutStack > 0;
+
+    [Notify] [AlsoNotify(nameof(IsLoading))] private int loadingStack;
+    public bool IsLoading => loadingStack > 0;
+
+    public bool IsEmpty => Elements.Count == 0;
+
+    private bool pendingRelayout;
+
+    public ICommand DeleteSelectedCommand { get; }
     public ICommand Undo { get; set; }
     public ICommand Redo { get; set; }
-    public IHistoryManager? History { get; set; }
-    public bool IsModified { get; set; }
+    public IHistoryManager History { get; }
+    public ICachedDatabaseProvider DatabaseProvider { get; }
+    public bool IsModified => !History.IsSaved;
+    public int DesiredWidth => 1024;
+    public int DesiredHeight => 720;
     public string Title => "Quest chain";
-    public ICommand Copy => AlwaysDisabledCommand.Command;
+    public bool Resizeable => true;
+    public ICommand Copy { get; }
     public ICommand Cut => AlwaysDisabledCommand.Command;
     public ICommand Paste => AlwaysDisabledCommand.Command;
-    public ICommand Save { get; }
+    public IAsyncCommand Save { get; }
     public IAsyncCommand? CloseCommand { get; set; }
     public bool CanClose => true;
     public ISolutionItem SolutionItem { get; set; }
+    public bool RemoteCommandsSupported { get; }
 
     public QuestPickerViewModel QuestPicker { get; }
+    public IQuestChainsServerIntegrationService QuestChainsServerIntegrationService { get; }
+    public GraphLayoutSettingsViewModel LayoutSettingsViewModel { get; }
 
     private TaskCompletionSource<uint?>? questPickingTask;
-    private bool autoLayout = true;
+    private bool autoLayout;
 
     public bool IsPickingQuest
     {
@@ -703,11 +1320,26 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
         }
     }
 
+    public ICommand StartConnectionCommand { get; }
+    public ICommand CreateConnectionCommand { get; }
+
     protected Task<uint?> PickQuest()
     {
         questPickingTask = new();
         QuestPicker.Reset();
         IsPickingQuest = true;
         return questPickingTask.Task;
+    }
+
+    private ReactiveProperty<IReadOnlyList<IInspectionResult>> problems = new(Array.Empty<IInspectionResult>());
+    public IObservable<IReadOnlyList<IInspectionResult>> Problems => problems;
+
+    public ImageUri? Icon => new ImageUri("Icons/document_quest_chain.png");
+
+    public async Task LoadNewQuest(Point editorMouseLocation)
+    {
+        var quest = await PickQuest();
+        if (quest.HasValue)
+            await LoadQuestWithDependencies(quest.Value, editorMouseLocation);
     }
 }

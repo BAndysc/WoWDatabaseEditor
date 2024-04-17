@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.QuestChainEditor.ViewModels"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:StandaloneQuestChainEditorViewModel"
+             x:Class="WDE.QuestChainEditor.Views.StandaloneQuestChainEditorToolBar">
+  <ToolbarPanel>
+    <ButtonImage Image="Icons/icon_save.png" ToolTip.Tip="Save conditions" Command="{CompiledBinding SaveCommand}" />
+
+    <ButtonImage Image="Icons/icon_to_sql.png" ToolTip.Tip="Generate query" Command="{CompiledBinding GenerateQueryCommand}" />
+
+    <ContentControl DataContext="{CompiledBinding ViewModel}"
+                    Content="{CompiledBinding .}"
+                    IsEnabled="{CompiledBinding ., Converter={x:Static NullConverter.IsNotNull}}"
+                    ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}"
+    />
+  </ToolbarPanel>
+</UserControl>

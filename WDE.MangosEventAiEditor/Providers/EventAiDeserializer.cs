@@ -20,7 +20,7 @@ namespace WDE.MangosEventAiEditor.Providers
             return true;
         }
 
-        public ISmartScriptProjectItem Serialize(EventAiSolutionItem item, bool forMostRecentlyUsed)
+        public ISmartScriptProjectItem? Serialize(EventAiSolutionItem item, bool forMostRecentlyUsed)
         {
             return new AbstractSmartScriptProjectItem()
             {

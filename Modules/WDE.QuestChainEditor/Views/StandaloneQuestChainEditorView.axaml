@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.QuestChainEditor.ViewModels"
+             xmlns:views="clr-namespace:WDE.QuestChainEditor.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:StandaloneQuestChainEditorViewModel"
+             x:Class="WDE.QuestChainEditor.Views.StandaloneQuestChainEditorView">
+  <views:QuestChainDocumentView DataContext="{CompiledBinding ViewModel}">
+    <views:QuestChainDocumentView.KeyBindings>
+      <BetterKeyBinding Gesture="Ctrl+S" CustomCommand="{CompiledBinding Save}" />
+      <BetterKeyBinding Gesture="Cmd+S" CustomCommand="{CompiledBinding Save}" />
+      <BetterKeyBinding Gesture="Ctrl+C" CustomCommand="{CompiledBinding Copy}" />
+      <BetterKeyBinding Gesture="Ctrl+V" CustomCommand="{CompiledBinding Paste}" />
+      <BetterKeyBinding Gesture="Ctrl+X" CustomCommand="{CompiledBinding Cut}" />
+      <BetterKeyBinding Gesture="Ctrl+Z" CustomCommand="{CompiledBinding Undo}" />
+      <BetterKeyBinding Gesture="Ctrl+Y" CustomCommand="{CompiledBinding Redo}" />
+      <BetterKeyBinding Gesture="Cmd+C" CustomCommand="{CompiledBinding Copy}" />
+      <BetterKeyBinding Gesture="Cmd+V" CustomCommand="{CompiledBinding Paste}" />
+      <BetterKeyBinding Gesture="Cmd+X" CustomCommand="{CompiledBinding Cut}" />
+      <BetterKeyBinding Gesture="Cmd+Z" CustomCommand="{CompiledBinding Undo}" />
+      <BetterKeyBinding Gesture="Cmd+Y" CustomCommand="{CompiledBinding Redo}" />
+    </views:QuestChainDocumentView.KeyBindings>
+  </views:QuestChainDocumentView>
+</UserControl>

@@ -6,6 +6,16 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:QuestPickerViewModel"
              x:Class="WDE.QuestChainEditor.Views.QuestPickerView">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                </ResourceDictionary>
+                </ResourceDictionary.ThemeDictionaries>
+            </ResourceDictionary>
+    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="TextBox /template/ Border#PART_BorderElement">
             <Setter Property="Background" Value="Transparent" />
@@ -19,23 +29,24 @@
     </UserControl.Styles>
     <DockPanel>
         <Border BorderThickness="0,0,0,1"
-                BorderBrush="BlueViolet"
+                BorderBrush="{DynamicResource CHAINS_PickQuestBrush}"
             DockPanel.Dock="Top">
             <TextBox Text="{CompiledBinding SearchText, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                      BorderThickness="0,0,0,0"
                      Background="Transparent"
-                     Foreground="#e0e0e0"
                      x:Name="SearchBox" />
         </Border>
         <ListBox Background="Transparent"
                  BorderThickness="0" 
                  x:Name="ResultsList"
-                 Items="{CompiledBinding Quests}">
+                 ItemsSource="{CompiledBinding Quests}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <DockPanel LastChildFill="True">
-                        <TextBlock Foreground="#e0e0e0" Opacity="0.7" Text="{CompiledBinding Entry}" DockPanel.Dock="Right" />
-                        <TextBlock Foreground="#e0e0e0" Text="{CompiledBinding Title}" />
+                    <DockPanel LastChildFill="False">
+                        <TextBlock Opacity="0.7" Text="{CompiledBinding Entry}" Width="60" Margin="0,0,10,0" DockPanel.Dock="Left" />
+                        <TextBlock Text="{CompiledBinding Title}" DockPanel.Dock="Left" Margin="0,0,20,0" />
+                        <GameRacesImage Races="{CompiledBinding Races}" DockPanel.Dock="Right" Height="16" />
+                        <GameClassesImage GameClasses="{CompiledBinding Classes}" DockPanel.Dock="Right" Height="16" />
                     </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>

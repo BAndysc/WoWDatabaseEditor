@@ -64,7 +64,7 @@ namespace WDE.DatabaseEditors.Solution
             return false;
         }
 
-        public ISmartScriptProjectItem Serialize(DatabaseTableSolutionItem item, bool forMostRecentlyUsed)
+        public ISmartScriptProjectItem? Serialize(DatabaseTableSolutionItem item, bool forMostRecentlyUsed)
         {
             var entries = JsonConvert.SerializeObject(item.Entries, new JsonSerializerSettings()
             {

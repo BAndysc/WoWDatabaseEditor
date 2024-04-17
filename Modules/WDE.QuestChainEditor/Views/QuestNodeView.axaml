@@ -2,70 +2,53 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="clr-namespace:AvaloniaGraph.Controls;assembly=AvaloniaGraph"
              xmlns:viewModels="clr-namespace:WDE.QuestChainEditor.ViewModels"
+             xmlns:nodify="https://miroiu.github.io/nodify"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:QuestViewModel"
              MaxWidth="145"
+             ClipToBounds="False"
              x:Class="WDE.QuestChainEditor.Views.QuestNodeView">
-    <UserControl.Styles>
-        <Style Selector="TextBlock">
-            <Setter Property="Foreground" Value="White" />
-        </Style>
+    <Border CornerRadius="4" Background="{DynamicResource CHAINS_QuestNodeBackgroundBrush}"
+            BorderThickness="2"
+            BorderBrush="{DynamicResource CHAINS_QuestNodeBorderBrush}"
+            >
+        <Panel>
 
-        <Style Selector="Border.selected">
-            <Setter Property="BorderBrush" Value="Yellow" />
-        </Style>
-    </UserControl.Styles>
+            <!-- ~1~ Margin="0,-9,0,0" @1@ -->
+            <!-- <nodify:NodeInput DockPanel.Dock="Top" -->
+            <!--                   Width="0" Header="0" -->
+            <!--                   HorizontalAlignment="Center" -->
+            <!--                   VerticalAlignment="Center" -->
+            <!--                   DataContext="{CompiledBinding RequiresConnector}" -->
+            <!--                   IsConnected="{CompiledBinding NonEmpty}" -->
+            <!--                   Anchor="{Binding Anchor, Mode=OneWayToSource}"> -->
+            <!-- </nodify:NodeInput> -->
+            <!-- -->
+            <!-- ~1~ Margin="0,0,0,-9" @1@ -->
+            <!-- <nodify:NodeOutput DockPanel.Dock="Top" -->
+            <!--                    Width="0" Header="0" -->
+            <!--                    HorizontalAlignment="Center" -->
+            <!--                    VerticalAlignment="Center" -->
+            <!--                    DataContext="{CompiledBinding IsRequiredByConnector}" -->
+            <!--                    IsConnected="{CompiledBinding NonEmpty}" -->
+            <!--                    Anchor="{Binding Anchor, Mode=OneWayToSource}"> -->
+            <!-- </nodify:NodeOutput> -->
 
-    <Border Classes.selected="{CompiledBinding IsSelected}"
-            BorderThickness="2" Padding="2" CornerRadius="4">
-        <Border CornerRadius="4" Background="#FF0F0F0F">
-            <DockPanel LastChildFill="True">
-                
-                <controls:ConnectorItem DockPanel.Dock="Top" DataContext="{CompiledBinding RequiresConnector}" AttachMode="Top" />
-                <controls:ConnectorItem DockPanel.Dock="Bottom" DataContext="{CompiledBinding IsRequiredByConnector}" AttachMode="Bottom" />
-                
-                
-                <controls:ConnectorItem DockPanel.Dock="Left" DataContext="{CompiledBinding LeftInputConnector}" AttachMode="Middle" />
-                <controls:ConnectorItem DockPanel.Dock="Right" DataContext="{CompiledBinding RightOutputConnector}" AttachMode="Middle" />
+            <Border Padding="5 2 2 2" BorderBrush="DodgerBlue" BorderThickness="0 0 0 0" CornerRadius="2 2 0 0">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="WrapWithOverflow" Text="{CompiledBinding Name}" />
+                    <TextBlock HorizontalAlignment="Center" TextAlignment="Center" Text="{CompiledBinding Entry}" Opacity="0.5" FontSize="9" />
 
-                
-                <Border Padding="5 2 2 2" BorderBrush="DodgerBlue" BorderThickness="0 0 0 0" CornerRadius="2 2 0 0">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock HorizontalAlignment="Center" TextWrapping="WrapWithOverflow" Text="{CompiledBinding Name}" />
-                        <TextBlock HorizontalAlignment="Center" Text="{CompiledBinding Entry}" Foreground="LightGray" FontSize="9" />
-                        
-                        <!-- races -->
-                        <ItemsPresenter HorizontalAlignment="Center" Items="{CompiledBinding Races}">
-                            <ItemsPresenter.ItemTemplate>
-                                <DataTemplate DataType="viewModels:MiniIconViewModel">
-                                    <WdeImage ToolTip.Tip="{CompiledBinding Name}" Image="{CompiledBinding Icon}" Width="16" Height="16" />
-                                </DataTemplate>
-                            </ItemsPresenter.ItemTemplate>
-                            <ItemsPresenter.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Spacing="2" Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ItemsPresenter.ItemsPanel>
-                        </ItemsPresenter>
-                        
-                        <!-- classes -->
-                        <ItemsPresenter HorizontalAlignment="Center" Items="{CompiledBinding Classes}">
-                            <ItemsPresenter.ItemTemplate>
-                                <DataTemplate DataType="viewModels:MiniIconViewModel">
-                                    <WdeImage ToolTip.Tip="{CompiledBinding Name}" Image="{CompiledBinding Icon}" Width="16" Height="16" />
-                                </DataTemplate>
-                            </ItemsPresenter.ItemTemplate>
-                            <ItemsPresenter.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Spacing="2" Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ItemsPresenter.ItemsPanel>
-                        </ItemsPresenter>
-                    </StackPanel>
-                </Border>
-            </DockPanel>
-        </Border>
+                    <!-- ~1~ DEBUG POSITION @1@ -->
+                    <!-- <TextBlock Text="{CompiledBinding PerfectY, StringFormat=Perfect Y: {0}}" /> -->
+                    <!-- <TextBlock Text="{CompiledBinding Y, StringFormat=Y: {0}}" /> -->
+
+                    <!-- races -->
+                    <GameRacesImage HorizontalAlignment="Center" MaxHeight="16" Races="{CompiledBinding Races}" />
+                    <GameClassesImage HorizontalAlignment="Center" MaxHeight="16" GameClasses="{CompiledBinding Classes}" />
+                </StackPanel>
+            </Border>
+        </Panel>
     </Border>
 </UserControl>

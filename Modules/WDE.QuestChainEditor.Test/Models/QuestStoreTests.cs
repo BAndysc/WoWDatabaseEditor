@@ -74,8 +74,8 @@ public class QuestStoreTests
         });
         
         store.LoadQuest(1);
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"1"}, store[2].Requirements.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"1"}, store[2].MustBeCompleted.Select(r => r.ToString()));
     }
     
     [Test]
@@ -88,8 +88,8 @@ public class QuestStoreTests
         });
         
         store.LoadQuest(2);
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"1"}, store[2].Requirements.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"1"}, store[2].MustBeCompleted.Select(r => r.ToString()));
     }
     
     [Test]
@@ -104,10 +104,10 @@ public class QuestStoreTests
         });
         
         store.LoadQuest(3);
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"1"}, store[2].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"2"}, store[3].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"3"}, store[4].Requirements.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"1"}, store[2].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"2"}, store[3].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"3"}, store[4].MustBeCompleted.Select(r => r.ToString()));
     }
     
     [Test]
@@ -123,11 +123,11 @@ public class QuestStoreTests
         });
         
         store.LoadQuest(3);
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[2].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[3].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"1|2|3"}, store[4].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"4"}, store[5].Requirements.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[2].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[3].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"1|2|3"}, store[4].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"4"}, store[5].MustBeCompleted.Select(r => r.ToString()));
     }
     
     [Test]
@@ -143,11 +143,11 @@ public class QuestStoreTests
         });
         
         store.LoadQuest(5);
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[2].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[3].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"1&2&3"}, store[4].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"4"}, store[5].Requirements.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[2].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[3].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"1&2&3"}, store[4].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"4"}, store[5].MustBeCompleted.Select(r => r.ToString()));
     }
     
     [Test]
@@ -163,11 +163,11 @@ public class QuestStoreTests
         });
         
         store.LoadQuest(5);
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[2].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"5"}, store[3].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"1&2", "3"}, store[4].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[5].Requirements.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[2].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"5"}, store[3].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"1&2", "3"}, store[4].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[5].MustBeCompleted.Select(r => r.ToString()));
     }
     
     [Test]
@@ -183,11 +183,11 @@ public class QuestStoreTests
         });
         
         store.LoadQuest(5);
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"1"}, store[2].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"1"}, store[3].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"+3"}, store[4].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"2&3"}, store[5].Requirements.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[1].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"1"}, store[2].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"1"}, store[3].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"+3"}, store[4].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"2&3"}, store[5].MustBeCompleted.Select(r => r.ToString()));
     }
     
     /*
@@ -214,13 +214,13 @@ public class QuestStoreTests
         
         store.LoadQuest(2);
         //CollectionAssert.AreEquivalent(Array.Empty<string>(), store[8].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[questA].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"1"}, store[questB].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[questC].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"3"}, store[questD].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[questE].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"5"}, store[questF].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"2&4&6"}, store[questG].Requirements.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[questA].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"1"}, store[questB].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[questC].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"3"}, store[questD].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[questE].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"5"}, store[questF].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"2&4&6"}, store[questG].MustBeCompleted.Select(r => r.ToString()));
     }
     
     /*
@@ -258,15 +258,15 @@ public class QuestStoreTests
         });
         
         store.LoadQuest(questG);
-        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[questA].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"1"}, store[questB].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"2"}, store[questC].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"3"}, store[questD].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"4"}, store[questE].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"2"}, store[questF].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"2"}, store[questG].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"2"}, store[questH].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"6&7&8"}, store[questI].Requirements.Select(r => r.ToString()));
-        CollectionAssert.AreEquivalent(new string[]{"5&9"}, store[questJ].Requirements.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(Array.Empty<string>(), store[questA].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"1"}, store[questB].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"2"}, store[questC].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"3"}, store[questD].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"4"}, store[questE].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"2"}, store[questF].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"2"}, store[questG].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"2"}, store[questH].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"6&7&8"}, store[questI].MustBeCompleted.Select(r => r.ToString()));
+        CollectionAssert.AreEquivalent(new string[]{"5&9"}, store[questJ].MustBeCompleted.Select(r => r.ToString()));
     }
 }

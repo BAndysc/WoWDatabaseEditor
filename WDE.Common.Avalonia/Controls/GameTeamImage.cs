@@ -115,9 +115,9 @@ public class GameTeamImage : Control
             isHorde = races == cachedHordeRaces;
         }
         else if (mode == GameTeamImageMode.MustContainAny)
-        {
-            isAlly = (races & cachedAllyRaces) != 0;
-            isHorde = (races & cachedHordeRaces) != 0;
+        { // independent from current core
+            isAlly = (races & CharacterRaces.AllAlliance) != 0;
+            isHorde = (races & CharacterRaces.AllHorde) != 0;
         }
         else
             throw new Exception("Unknown mode");

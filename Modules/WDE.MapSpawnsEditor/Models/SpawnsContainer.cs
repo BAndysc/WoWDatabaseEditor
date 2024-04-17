@@ -12,8 +12,8 @@ namespace WDE.MapSpawnsEditor.Models;
 public interface ISpawnsContainer
 {
     bool IsLoading { get; }
-    uint? LoadedMap { get; }
-    void LoadMap(uint mapId, ZoneAreaManager zoneAreaManager, DbcManager dbcManager);
+    int? LoadedMap { get; }
+    void LoadMap(int mapId, ZoneAreaManager zoneAreaManager, DbcManager dbcManager);
     PerChunkHolder<List<SpawnInstance>> SpawnsPerChunk { get; }
     FlatTreeList<SpawnGroup, SpawnInstance> Spawns { get; }
     void Clear();
@@ -31,7 +31,7 @@ public class SpawnsContainer : ISpawnsContainer
     private readonly IDatabaseProvider databaseProvider;
     private readonly Lazy<ISpawnSelectionService> selectionService;
     public bool IsLoading { get; private set; }
-    public uint? LoadedMap { get; private set; }
+    public int? LoadedMap { get; private set; }
 
     private HierarchicalContainer hierarchy = null!;
     private ObservableCollection<SpawnGroup> entries = new();
@@ -53,7 +53,7 @@ public class SpawnsContainer : ISpawnsContainer
         spawns = new FlatTreeList<SpawnGroup, SpawnInstance>(entries);
     }
     
-    public void LoadMap(uint mapId, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
+    public void LoadMap(int mapId, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
     {
         if (mapId == LoadedMap)
             return;
@@ -203,7 +203,7 @@ public class SpawnsContainer : ISpawnsContainer
         }
     }
 
-    private async Task LoadSpawns(uint mapId, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
+    private async Task LoadSpawns(int mapId, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
     {
         var creatureSpawns = await databaseProvider.GetCreaturesByMapAsync(mapId);
         var gameObjectSpawns = await databaseProvider.GetGameObjectsByMapAsync(mapId);
@@ -300,7 +300,7 @@ public class SpawnsContainer : ISpawnsContainer
         }
     }
     
-    private async Task LoadModelsTasks(uint mapId, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
+    private async Task LoadModelsTasks(int mapId, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
     {
         IsLoading = true;
         try

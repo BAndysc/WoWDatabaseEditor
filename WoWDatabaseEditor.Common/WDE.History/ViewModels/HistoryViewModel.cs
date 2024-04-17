@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using DynamicData.Binding;
 using Prism.Events;
 using Prism.Mvvm;
 using WDE.Common.Events;
@@ -54,7 +55,7 @@ namespace WDE.HistoryWindow.ViewModels
                 });
         }
 
-        public ObservableCollection<HistoryEvent> Items { get; set; } = new();
+        public ObservableCollectionExtended<HistoryEvent> Items { get; set; } = new();
 
         public string Title => "History";
 
@@ -73,6 +74,7 @@ namespace WDE.HistoryWindow.ViewModels
 
         private void HistoryCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            using var _ = Items.SuspendNotifications();
             Items.Clear();
             if (previousDocument?.History == null)
                 return;

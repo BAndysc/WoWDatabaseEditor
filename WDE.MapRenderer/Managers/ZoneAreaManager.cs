@@ -16,7 +16,7 @@ public class ZoneAreaManager
     private readonly IGameFiles gameFiles;
 
     private bool loaded;
-    private readonly Dictionary<uint, ChunkAreas?[,]> areaTables = new();
+    private readonly Dictionary<int, ChunkAreas?[,]> areaTables = new();
 
     private FileInfo CachePath => fileSystem.ResolvePhysicalPath($"~/cache/areas_{(int)gameFiles.WoWVersion}.bin");
     
@@ -45,7 +45,7 @@ public class ZoneAreaManager
         this.gameFiles = gameFiles;
     }
     
-    public uint? GetAreaId(uint map, Vector3 wowPosition)
+    public int? GetAreaId(int map, Vector3 wowPosition)
     {
         if (!areaTables.TryGetValue(map, out var areas))
             return null;
@@ -142,7 +142,7 @@ public class ZoneAreaManager
             }
             
             ChunkAreas?[,] areas = new ChunkAreas?[64, 64];
-            areaTables[(uint)map.Id] = areas;
+            areaTables[map.Id] = areas;
             
             var currentWdt = new FastWDTChunks(new MemoryBinaryReader(wdtBytes!));
 
@@ -230,7 +230,7 @@ public class ZoneAreaManager
         var fileLength = file.Length;
         while (file.Position < fileLength)
         {
-            var mapId = br.ReadUInt32();
+            var mapId = br.ReadInt32();
             var chunksCount = br.ReadUInt16();
 
             ChunkAreas?[,] mapAreaIds = new ChunkAreas?[64, 64];

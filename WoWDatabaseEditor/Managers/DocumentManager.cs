@@ -76,11 +76,7 @@ namespace WoWDatabaseEditorCore.Managers
             this.eventAggregator.GetEvent<DocumentClosedEvent>()
                 .Subscribe(document =>
                 {
-                    if (!documentToSolution.ContainsKey(document))
-                        return;
 
-                    documents.Remove(documentToSolution[document]);
-                    documentToSolution.Remove(document);
                 });
 
             this.eventAggregator.GetEvent<EventRequestOpenItem>()
@@ -89,6 +85,17 @@ namespace WoWDatabaseEditorCore.Managers
                         OpenDocument(item);
                     },
                     true);
+        }
+
+        private void RemoveDocument(IDocument document)
+        {
+            OpenedDocuments.Remove(document);
+
+            if (!documentToSolution.ContainsKey(document))
+                return;
+
+            documents.Remove(documentToSolution[document]);
+            documentToSolution.Remove(document);
         }
 
         public IReadOnlyList<ITool> AllTools => allTools;
@@ -121,7 +128,7 @@ namespace WoWDatabaseEditorCore.Managers
             }
         }
         
-        public async Task<bool> TryCloseAllDocuments()
+        public async Task<bool> TryCloseAllDocuments(bool closingEditor)
         {
             var modifiedDocuments = OpenedDocuments.Where(d => d.IsModified).ToList();
             if (modifiedDocuments.Count > 0)
@@ -169,12 +176,12 @@ namespace WoWDatabaseEditorCore.Managers
                                 editor.Save.Execute(null);
                         }
                         modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
-                        OpenedDocuments.Remove(editor);
+                        RemoveDocument(editor);
                     }
                     else if (result == MessageBoxButtonType.No)
                     {
                         modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
-                        OpenedDocuments.Remove(editor);
+                        RemoveDocument(editor);
                     }
                     else if (result == MessageBoxButtonType.CustomA)
                     {
@@ -202,10 +209,10 @@ namespace WoWDatabaseEditorCore.Managers
             }
 
             // when always restore is enabled, don't close documents so that the session can be saved
-            if (generalEditorSettingsProvider.RestoreOpenTabsMode != RestoreOpenTabsMode.AlwaysRestore)
+            if (!closingEditor || generalEditorSettingsProvider.RestoreOpenTabsMode != RestoreOpenTabsMode.AlwaysRestore)
             {
                 while (OpenedDocuments.Count > 0)
-                    OpenedDocuments.RemoveAt(OpenedDocuments.Count - 1);
+                    RemoveDocument(OpenedDocuments[OpenedDocuments.Count - 1]);
             }
             
             var modifiedTools = AllTools
@@ -362,8 +369,7 @@ namespace WoWDatabaseEditorCore.Managers
                     {
                         if (origCommand != null)
                             await origCommand.ExecuteAsync();
-                        OpenedDocuments.Remove(editor);
-                        eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);
+                        RemoveDocument(editor);
                         editor.CloseCommand = origCommand;
                     }
                 },

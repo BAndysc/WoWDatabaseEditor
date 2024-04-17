@@ -12,6 +12,7 @@ using WDE.Common.DBC;
 using WDE.Common.DBC.Structs;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
+using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.TableData;
@@ -71,6 +72,7 @@ namespace WDE.DbcStore
         private readonly ITabularDataPicker dataPicker;
         private readonly IWindowManager windowManager;
         private readonly IDatabaseRowsCountProvider databaseRowsCountProvider;
+        private readonly Lazy<IRaceProviderService> raceProviderService;
         private readonly NullSpellService nullSpellService;
         private readonly IParameterFactory parameterFactory;
         private readonly ITaskRunner taskRunner;
@@ -87,6 +89,7 @@ namespace WDE.DbcStore
             ITabularDataPicker dataPicker,
             IWindowManager windowManager,
             IDatabaseRowsCountProvider databaseRowsCountProvider,
+            Lazy<IRaceProviderService> raceProviderService,
             NullSpellService nullSpellService,
             DBCD.DBCD dbcd,
             IEnumerable<IDbcLoader> dbcLoaders,
@@ -101,6 +104,7 @@ namespace WDE.DbcStore
             this.dataPicker = dataPicker;
             this.windowManager = windowManager;
             this.databaseRowsCountProvider = databaseRowsCountProvider;
+            this.raceProviderService = raceProviderService;
             this.nullSpellService = nullSpellService;
             this.dbcd = dbcd;
             this.dbcLoaders = dbcLoaders;
@@ -179,7 +183,7 @@ namespace WDE.DbcStore
         
         internal void Load()
         {            
-            parameterFactory.Register("RaceMaskParameter", new RaceMaskParameter(currentCoreVersion.Current.GameVersionFeatures.AllRaces), QuickAccessMode.Limited);
+            parameterFactory.Register("RaceMaskParameter", new RaceMaskParameter(currentCoreVersion.Current.GameVersionFeatures.AllRaces, raceProviderService), QuickAccessMode.Limited);
 
             if (dbcSettingsProvider.GetSettings().SkipLoading ||
                 !Directory.Exists(dbcSettingsProvider.GetSettings().Path))
@@ -987,8 +991,9 @@ namespace WDE.DbcStore
         }
     }
 
-    public class RaceMaskParameter : FlagParameter
+    public class RaceMaskParameter : FlagParameter, ICustomPickerParameter<long>
     {
+        private readonly Lazy<IRaceProviderService> raceProvider;
         private CharacterRaces alliance;
         private CharacterRaces horde;
         private CharacterRaces all;
@@ -1009,8 +1014,9 @@ namespace WDE.DbcStore
             return (x != 0) && ((x & (x - 1)) == 0);
         }
     
-        public RaceMaskParameter(CharacterRaces allowableRaces)
+        public RaceMaskParameter(CharacterRaces allowableRaces, Lazy<IRaceProviderService> raceProvider)
         {
+            this.raceProvider = raceProvider;
             Items = new Dictionary<long, SelectOption>();
 
             alliance = allowableRaces & CharacterRaces.AllAlliance;
@@ -1030,6 +1036,11 @@ namespace WDE.DbcStore
                 }
             }
         }
+
+        public async Task<(long, bool)> PickValue(long value)
+        {
+            var race = await raceProvider.Value.PickRaces((CharacterRaces)value);
+            return ((long)(race ?? 0), race.HasValue);
+        }
     }
-    
 }

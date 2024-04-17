@@ -57,7 +57,7 @@ public class PerDatabaseTableLootSolutionItemProviders :
         return item.Type + " loot editor";
     }
 
-    public ISmartScriptProjectItem Serialize(PerDatabaseTableLootSolutionItem item, bool forMostRecentlyUsed)
+    public ISmartScriptProjectItem? Serialize(PerDatabaseTableLootSolutionItem item, bool forMostRecentlyUsed)
     {
         return new AbstractSmartScriptProjectItem()
         {

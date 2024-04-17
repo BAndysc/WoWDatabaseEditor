@@ -53,5 +53,9 @@ namespace WDE.CMMySqlDatabase.Models
         public ITable<FishingLootTemplate> FishingLootTemplate => this.GetTable<FishingLootTemplate>();
         public ITable<SkinningLootTemplate> SkinningLootTemplate => this.GetTable<SkinningLootTemplate>();
         public ITable<PickpocketingLootTemplate> PickpocketingLootTemplate => this.GetTable<PickpocketingLootTemplate>();
+        public ITable<CreatureQuestEnder> CreatureQuestEnders => this.GetTable<CreatureQuestEnder>();
+        public ITable<CreatureQuestStarter> CreatureQuestStarters => this.GetTable<CreatureQuestStarter>();
+        public ITable<GameObjectQuestEnder> GameObjectQuestEnders => this.GetTable<GameObjectQuestEnder>();
+        public ITable<GameObjectQuestStarter> GameObjectQuestStarters => this.GetTable<GameObjectQuestStarter>();
     }
 }

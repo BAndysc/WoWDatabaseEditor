@@ -131,7 +131,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                     return;
                 }
 
-                solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!);
+                solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!).ListenErrors(this.messageBoxService);
             }, () => (DocumentManager.ActiveSolutionItemDocument != null &&
                      (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase)) ||
                      (DocumentManager.ActiveDocument is {} doc && doc.Save.CanExecute(null)));
@@ -195,7 +195,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             documentManager.OpenedDocuments.ToCountChangedObservable().SubscribeAction(count =>
             {
                 if (count == 0 && !inCanClose)
-                    ShowStartPage();
+                    mainThread.Delay(ShowStartPage, TimeSpan.FromMilliseconds(1));
             });
             //LoadDefault();
 
@@ -351,7 +351,7 @@ namespace WoWDatabaseEditorCore.ViewModels
 
             try
             {
-                return await DocumentManager.TryCloseAllDocuments();
+                return await DocumentManager.TryCloseAllDocuments(true);
             }
             finally
             {

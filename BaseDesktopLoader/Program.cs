@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using AsyncAwaitBestPractices;
@@ -68,8 +69,20 @@ namespace BaseDesktopLoader
             if (ProgramBootstrap.TryLaunchUpdaterIfNeeded(args))
                 return false;
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-            SafeFireAndForgetExtensions.SetDefaultExceptionHandling(x => LOG.LogError(x));
-            TaskScheduler.UnobservedTaskException += (sender, eventArgs) => LOG.LogError(eventArgs.Exception);
+            SafeFireAndForgetExtensions.SetDefaultExceptionHandling(x =>
+            {
+                if (x is OperationCanceledException)
+                    return;
+                if (x is AggregateException a && a.InnerExceptions.All(e => e is OperationCanceledException))
+                    return;
+                LOG.LogError(x);
+            });
+            TaskScheduler.UnobservedTaskException += (sender, eventArgs) =>
+            {
+                if (eventArgs.Exception.InnerExceptions.All(e => e is OperationCanceledException))
+                    return;
+                LOG.LogError(eventArgs.Exception);
+            };
             GlobalApplication.Arguments.Init(args);
             
             if (GlobalApplication.Arguments.IsArgumentSet("console"))
@@ -104,6 +117,10 @@ namespace BaseDesktopLoader
             
             var configuration = AppBuilder.Configure<App>()
                 .UsePlatformDetect()
+                .With(new AvaloniaNativePlatformOptions()
+                {
+                    RenderingMode = new[] { /*AvaloniaNativeRenderingMode.Metal, */AvaloniaNativeRenderingMode.OpenGl, AvaloniaNativeRenderingMode.Software }
+                })
                 .UseReactiveUI()
                 .LogToTrace();
 

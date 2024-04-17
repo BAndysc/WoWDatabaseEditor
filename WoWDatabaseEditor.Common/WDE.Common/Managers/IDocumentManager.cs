@@ -24,7 +24,7 @@ namespace WDE.Common.Managers
         void OpenTool<T>() where T : ITool;
         T GetTool<T>() where T : ITool;
         void OpenTool(Type toolType);
-        Task<bool> TryCloseAllDocuments();
+        Task<bool> TryCloseAllDocuments(bool closingEditor);
         void ActivateDocumentInTheBackground(IDocument document);
         // Indicated whether active document should be brought to front (False) or not (True)
         bool BackgroundMode { get; }

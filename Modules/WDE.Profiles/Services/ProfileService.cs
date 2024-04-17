@@ -296,8 +296,11 @@ public class ProfileService : IProfileService
         if (item != null)
         {
             var projectItem = serializerRegistry.Serialize(item, true);
-            var serialized = serializer.Serialize(projectItem);
-            additionalArgs = "--open \"" + serialized.Replace("\"", "\"\"\"") +  "\"";
+            if (projectItem != null)
+            {
+                var serialized = serializer.Serialize(projectItem);
+                additionalArgs = "--open \"" + serialized.Replace("\"", "\"\"\"") +  "\"";
+            }
         }
 
         Process.Start(new ProcessStartInfo(exe, $"--profile {key} {additionalArgs}")
@@ -336,7 +339,8 @@ public class ProfileService : IProfileService
         if (foundProfile.HasValue)
         {
             var projectItem = serializerRegistry.Serialize(item, true);
-            interEditorCommunication.RequestOpen(foundProfile.Value, projectItem);
+            if (projectItem != null)
+                interEditorCommunication.RequestOpen(foundProfile.Value, projectItem);
             return true;
         }
         else

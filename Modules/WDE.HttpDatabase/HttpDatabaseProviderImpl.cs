@@ -648,7 +648,7 @@ public class HttpDatabaseProviderImpl : IAsyncDatabaseProvider
         }
     }
 
-    public async Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map)
+    public async Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(int map)
     {
         try
         {
@@ -662,7 +662,7 @@ public class HttpDatabaseProviderImpl : IAsyncDatabaseProvider
         }
     }
 
-    public async Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map)
+    public async Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(int map)
     {
         try
         {
@@ -1375,6 +1375,34 @@ public class HttpDatabaseProviderImpl : IAsyncDatabaseProvider
         {
             LOG.LogError(e);
             return null;
+        }
+    }
+
+    public async Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId)
+    {
+        try
+        {
+            var result = await client.GetStringAsync(Path.Join(URL, "GetQuestStarters", questId.ToString()));
+            return (IReadOnlyList<JsonQuestRelation>?)JsonConvert.DeserializeObject<List<JsonQuestRelation>>(result) ?? (IReadOnlyList<JsonQuestRelation>)Array.Empty<IQuestRelation>();
+        }
+        catch (Exception e)
+        {
+            LOG.LogError(e);
+            return Array.Empty<IQuestRelation>();
+        }
+    }
+
+    public async Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId)
+    {
+        try
+        {
+            var result = await client.GetStringAsync(Path.Join(URL, "GetQuestEnders", questId.ToString()));
+            return (IReadOnlyList<JsonQuestRelation>?)JsonConvert.DeserializeObject<List<JsonQuestRelation>>(result) ?? (IReadOnlyList<JsonQuestRelation>)Array.Empty<IQuestRelation>();
+        }
+        catch (Exception e)
+        {
+            LOG.LogError(e);
+            return Array.Empty<IQuestRelation>();
         }
     }
 

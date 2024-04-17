@@ -15,7 +15,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "id")]
         public uint Entry { get; set; }
         [Column(Name = "map")]
-        public uint Map { get; set; }
+        public int Map { get; set; }
 
         public SmallReadOnlyList<int>? PhaseId => null;
         
@@ -74,7 +74,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "id")]
         public uint Entry { get; set; }
         [Column(Name = "map")]
-        public uint Map { get; set; }
+        public int Map { get; set; }
 
         public uint? PhaseMask => null;
 

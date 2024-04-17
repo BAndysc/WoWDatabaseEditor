@@ -45,7 +45,7 @@ public partial class PathPreviewViewModel : ObservableBase, IWizard, IMapContext
             
             fetchingPathsToken?.Cancel();
             var token = fetchingPathsToken = new CancellationTokenSource();
-            var creatures = await databaseProvider.GetCreaturesByMapAsync((uint)selectedMap.Id);
+            var creatures = await databaseProvider.GetCreaturesByMapAsync(selectedMap.Id);
             var visibleRect = new Rect(TopLeft, BottomRight);
 
             List<PathViewModel> paths = new();
