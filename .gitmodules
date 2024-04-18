@@ -19,3 +19,6 @@
 [submodule "Modules/automatic-graph-layout"]
 	path = Modules/automatic-graph-layout
 	url = https://github.com/microsoft/automatic-graph-layout
+[submodule "Modules/GraphX"]
+	path = Modules/GraphX
+	url = https://github.com/panthernet/GraphX
