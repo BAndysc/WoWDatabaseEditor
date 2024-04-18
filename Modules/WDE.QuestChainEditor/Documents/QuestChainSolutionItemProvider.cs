@@ -4,9 +4,11 @@ using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Common.Solution;
 using WDE.Common.Types;
 using WDE.Module.Attributes;
+using WDE.QuestChainEditor.Services;
 using WDE.QuestChainEditor.ViewModels;
 
 namespace WDE.QuestChainEditor.Documents;
@@ -18,16 +20,20 @@ public class QuestChainSolutionItemProvider : ISolutionItemProvider,
     ISolutionItemIconProvider<QuestChainSolutionItem>,
     ISolutionNameProvider<QuestChainSolutionItem>,
     ISolutionItemDeserializer<QuestChainSolutionItem>,
-    ISolutionItemSerializer<QuestChainSolutionItem>
+    ISolutionItemSerializer<QuestChainSolutionItem>,
+    ISolutionItemRemoteCommandProvider<QuestChainSolutionItem>
 {
     private readonly IContainerProvider containerProvider;
     private readonly IQuestEntryProviderService questEntryProviderService;
+    private readonly IQuestChainEditorConfiguration configuration;
 
     public QuestChainSolutionItemProvider(IContainerProvider containerProvider,
-        IQuestEntryProviderService questEntryProviderService)
+        IQuestEntryProviderService questEntryProviderService,
+        IQuestChainEditorConfiguration configuration)
     {
         this.containerProvider = containerProvider;
         this.questEntryProviderService = questEntryProviderService;
+        this.configuration = configuration;
     }
 
     public string GetName() => "Quest chain";
@@ -84,5 +90,24 @@ public class QuestChainSolutionItemProvider : ISolutionItemProvider,
         {
             Type = 43
         };
+    }
+
+    public IRemoteCommand[] GenerateCommand(QuestChainSolutionItem item)
+    {
+        if (configuration.ShowMarkConditionSourceType.HasValue)
+        {
+            return new IRemoteCommand[]
+            {
+                new AnonymousRemoteCommand("reload quest_template"),
+                new AnonymousRemoteCommand("reload conditions " + configuration.ShowMarkConditionSourceType)
+            };
+        }
+        else
+        {
+            return new IRemoteCommand[]
+            {
+                new AnonymousRemoteCommand("reload quest_template")
+            };
+        }
     }
 }

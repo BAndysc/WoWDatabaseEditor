@@ -54,7 +54,7 @@
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">
                     <Color x:Key="GridLinesColor">#333337</Color>
-                    <SolidColorBrush x:Key="CHAINS_PickQuestBrush" Color="#5C6A98" />
+                    <SolidColorBrush x:Key="CHAINS_PickQuestBrush" Color="#434E71" />
                     <SolidColorBrush x:Key="CHAINS_QuestNodeBackgroundBrush" Color="#2C3C47" />
                     <SolidColorBrush x:Key="CHAINS_QuestNodeBorderBrush" Color="#005DA0" />
                     <SolidColorBrush x:Key="CHAINS_ExclusiveGroupBackgroundBrush" Color="#47FFFFFF" />
@@ -64,7 +64,7 @@
                     <SolidColorBrush x:Key="CHAINS_OneOfGroupBorderBrush" Color="#597E68"/>
                     <SolidColorBrush x:Key="CHAINS_AllGroupBackground" Color="#504B5B"/>
                     <SolidColorBrush x:Key="CHAINS_OneOfGroupBackground" Color="#5F6A64"/>
-                    <SolidColorBrush x:Key="CHAINS_QuestBackground" Color="#444850"/>
+                    <SolidColorBrush x:Key="CHAINS_QuestBackground" Color="#32353B"/>
 
                     <ControlTheme TargetType="Border" x:Key="Grip">
                         <Setter Property="Background">

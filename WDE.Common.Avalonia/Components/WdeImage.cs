@@ -60,9 +60,13 @@ namespace WDE.Common.Avalonia.Components
                     {
                         var bitmap = await LoadBitmapAsync(new ImageUri(image.ImageUri));
                         if (image.ImageUri == uri && bitmap != null)
+                        {
                             image.SetCurrentValue(SourceProperty, bitmap);
-                        else
+                        }
+                        else if (bitmap == null)
+                        {
                             image.ClearValue(SourceProperty);
+                        }
                     }
                 }
 
@@ -76,9 +80,13 @@ namespace WDE.Common.Avalonia.Components
                 {
                     var bitmap = await LoadBitmapAsync(image.Image);
                     if (bitmap != null && image.Image == img)
+                    {
                         image.SetCurrentValue(SourceProperty, bitmap);
-                    else
+                    }
+                    else if (bitmap == null)
+                    {
                         image.ClearValue(SourceProperty);
+                    }
                 }
 
                 Func().ListenErrors();

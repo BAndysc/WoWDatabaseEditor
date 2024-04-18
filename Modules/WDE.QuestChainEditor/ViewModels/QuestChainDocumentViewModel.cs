@@ -38,7 +38,7 @@ using WDE.SqlQueryGenerator;
 namespace WDE.QuestChainEditor.ViewModels;
 
 [AutoRegister]
-public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument, IProblemSourceDocument
+public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument, IProblemSourceDocument, IWindowViewModel
 {
     [Notify] private Point viewportLocation; // must be bound or else BringToView animation won't work
     [Notify] private bool isSearchBoxVisible;
@@ -189,20 +189,14 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
             ReLayoutGraph(Elements, Connections);
         };
 
-        QuestPicker.CloseCancel += () =>
+        QuestPicker.CloseCancel += OnCancelQuestPicker;
+        QuestPicker.CloseOk += OnOkQuestPicker;
+
+        AutoDispose(new ActionDisposable(() =>
         {
-            questPickingTask?.SetResult(null);
-            questPickingTask = null;
-            isPickingQuest = false;
-            RaisePropertyChanged(nameof(IsPickingQuest));
-        };
-        QuestPicker.CloseOk += () =>
-        {
-            questPickingTask?.SetResult(QuestPicker.SelectedQuest);
-            questPickingTask = null;
-            isPickingQuest = false;
-            RaisePropertyChanged(nameof(IsPickingQuest));
-        };
+            QuestPicker.CloseCancel -= OnCancelQuestPicker;
+            QuestPicker.CloseOk -= OnOkQuestPicker;
+        }));
 
         ToggleSearchBoxCommand = new DelegateCommand(() =>
         {
@@ -510,6 +504,28 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                 History.Clear();
             });
         }
+    }
+
+    private void OnOkQuestPicker()
+    {
+        if (!isPickingQuest)
+            return;
+
+        questPickingTask?.SetResult(QuestPicker.SelectedQuest);
+        questPickingTask = null;
+        isPickingQuest = false;
+        RaisePropertyChanged(nameof(IsPickingQuest));
+    }
+
+    private void OnCancelQuestPicker()
+    {
+        if (!isPickingQuest)
+            return;
+
+        questPickingTask?.SetResult(null);
+        questPickingTask = null;
+        isPickingQuest = false;
+        RaisePropertyChanged(nameof(IsPickingQuest));
     }
 
     public async Task<QuestViewModel> LoadQuestWithDependencies(uint quest, Point targetLocation)
@@ -1176,7 +1192,10 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
     public IHistoryManager History { get; }
     public ICachedDatabaseProvider DatabaseProvider { get; }
     public bool IsModified => !History.IsSaved;
+    public int DesiredWidth => 1024;
+    public int DesiredHeight => 720;
     public string Title => "Quest chain";
+    public bool Resizeable => true;
     public ICommand Copy { get; }
     public ICommand Cut => AlwaysDisabledCommand.Command;
     public ICommand Paste => AlwaysDisabledCommand.Command;

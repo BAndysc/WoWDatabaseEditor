@@ -21,6 +21,7 @@ internal class StandaloneTableEditorSettings : IStandaloneTableEditorSettings
 {
     private readonly IUserSettings userSettings;
     private Dictionary<DatabaseTable, WindowState> states;
+    private Dictionary<IAbstractWindowView, DatabaseTable> windowToTable = new();
 
     public StandaloneTableEditorSettings(IUserSettings userSettings)
     {
@@ -89,17 +90,28 @@ internal class StandaloneTableEditorSettings : IStandaloneTableEditorSettings
 
     public void SetupWindow(DatabaseTable table, IAbstractWindowView window)
     {
+        windowToTable[window] = table;
+
         if (GetWindowState(table, out var maximized, out var x, out var y, out var width, out var height) &&
             width > 0 && height > 0)
         {
             window.Reposition(x, y, maximized, width, height);
         }
-        window.OnClosing += () =>
+
+        window.OnClosing += OnWindowClosing;
+    }
+
+    private void OnWindowClosing(IAbstractWindowView window)
+    {
+        var position = window.Position;
+        var size = window.Size;
+        var maximized = window.IsMaximized;
+        if (windowToTable.TryGetValue(window, out var table))
         {
-            var position = window.Position;
-            var size = window.Size;
-            var maximized = window.IsMaximized;
             UpdateWindowState(table, maximized, position.x, position.y, size.x, size.y);
-        };
+            windowToTable.Remove(window);
+        }
+
+        window.OnClosing -= OnWindowClosing;
     }
 }

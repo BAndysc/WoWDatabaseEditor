@@ -52,7 +52,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 this.window = window;
                 if (window.TryGetTarget(out var target))
                 {
-                    target.Closing += (sender, args) => OnClosing?.Invoke();
+                    target.Closing += (sender, args) => OnClosing?.Invoke(this);
                 }
             }
 
@@ -72,7 +72,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             {
             }
 
-            public event Action? OnClosing;
+            public event Action<IAbstractWindowView>? OnClosing;
         }
 
         private class WindowWrapper : IAbstractWindowView
@@ -84,7 +84,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 this.window = window;
                 if (window.TryGetTarget(out var target))
                 {
-                    target.Closing += (sender, args) => OnClosing?.Invoke();
+                    target.Closing += (sender, args) => OnClosing?.Invoke(this);
                 }
             }
 
@@ -171,7 +171,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 }
             }
 
-            public event Action? OnClosing;
+            public event Action<IAbstractWindowView>? OnClosing;
         }
 
         private class PopupWrapper : IAbstractWindowView
@@ -183,7 +183,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 this.popup = popup;
                 if (popup.TryGetTarget(out var target))
                 {
-                    target.Closed += (sender, args) => OnClosing?.Invoke();
+                    target.Closed += (sender, args) => OnClosing?.Invoke(this);
                 }
             }
 
@@ -203,7 +203,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             {
             }
 
-            public event Action? OnClosing;
+            public event Action<IAbstractWindowView>? OnClosing;
         }
 
         public IAbstractWindowView ShowWindow(IWindowViewModel viewModel, out Task task)

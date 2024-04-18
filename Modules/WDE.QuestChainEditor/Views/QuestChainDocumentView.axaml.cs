@@ -100,13 +100,14 @@ public partial class QuestChainDocumentView : UserControl
             });
     }
 
-    protected override void OnKeyDown(KeyEventArgs e)
+    protected override void OnTextInput(TextInputEventArgs e)
     {
-        base.OnKeyDown(e);
+        base.OnTextInput(e);
+
         if (e.Handled)
             return;
 
-        if (e.Key == Key.Space)
+        if (e.Text == " ")
         {
             LoadQuest_MenuItemClick(default, default!);
         }
