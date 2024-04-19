@@ -120,7 +120,8 @@ namespace WDE.SmartScriptEditor.Data
         ConditionInParameter1 = 32,
         WaitAction = 64,
         NeedsAwait = 128,
-        MustBeLast = 256
+        MustBeLast = 256,
+        AwaitAction = 512
     }
     
     [Flags]

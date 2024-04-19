@@ -3,6 +3,7 @@
         "name": "Script",
         "group_members": [
             "SMART_ACTION_META_WAIT",
+            "SMART_ACTION_META_AWAIT",
             "SMART_ACTION_META_COMMENT",
             "SMART_ACTION_META_BEGIN_ACTIONLIST",
             "SMART_ACTION_META_AFTER",

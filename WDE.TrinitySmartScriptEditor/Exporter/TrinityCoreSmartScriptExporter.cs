@@ -154,8 +154,15 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     for (var index = 0; index < e.Actions.Count; ++index)
                     {
                         SmartEvent eventToSerialize = index == 0 ? e.ShallowCopy() : smartFactory.EventFactory(null, SmartConstants.EventUpdateInCombat);
-
                         SmartAction actualAction = e.Actions[index].Copy();
+
+                        // next is await
+                        if (index + 1 < e.Actions.Count && e.Actions[index + 1].Id == SmartConstants.ActionAwaitTimedList)
+                        {
+                            index++;
+                            eventToSerialize.Flags.Value |= SmartConstants.EventFlagActionListWaits;
+                        }
+
                         AdjustCoreCompatibleAction(actualAction);
                         
                         eventToSerialize.Parent = script;
@@ -298,7 +305,14 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                                     after.GetParameter(0).Value = afterTimeMin;
                                     after.GetParameter(1).Value = afterTimeMax;
                                     SmartAction actualAction = e.Actions[index].Copy();
-                                    
+
+                                    if (index + 1 < e.Actions.Count &&
+                                        e.Actions[index + 1].Id == SmartConstants.ActionAwaitTimedList)
+                                    {
+                                        index++;
+                                        after.Flags.Value |= SmartConstants.EventFlagActionListWaits;
+                                    }
+
                                     if (e.Actions[index].Id == SmartConstants.ActionRepeatTimedActionList)
                                     {
                                         actualAction = smartFactory.ActionFactory(SmartConstants.ActionCreateTimed, null, null);

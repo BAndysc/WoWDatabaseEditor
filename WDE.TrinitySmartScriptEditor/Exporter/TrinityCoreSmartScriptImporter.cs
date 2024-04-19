@@ -240,6 +240,16 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     }
                 }
 
+                if (source == SmartScriptType.TimedActionList &&
+                    (line.EventFlags & SmartConstants.EventFlagActionListWaits) ==
+                    SmartConstants.EventFlagActionListWaits)
+                {
+                    var awaitAction = smartFactory.ActionFactory(SmartConstants.ActionAwaitTimedList,
+                        smartFactory.SourceFactory(SmartConstants.SourceNone),
+                        smartFactory.TargetFactory(SmartConstants.TargetNone));
+                    currentEvent.AddAction(awaitAction);
+                }
+
                 if (line.Link != 0 && !doubleLinks.Contains(line.Link))
                 {
                     linkToSmartEventParent[line.Link] = currentEvent;

@@ -316,7 +316,8 @@
 			"1": {"name": "interrupt previous", "description": "Interrupt any spell casting"},
 			"2": {"name": "triggered", "description": "Triggered (this makes spell cost zero mana and have no cast time)"},
 			"32": {"name": "aura not present", "description": "only cast if target does not have aura from spell"},
-			"64": {"name": "combat move", "description": "Prevents combat movement if cast successful. Allows movement on range, OOM, LOS"}
+			"64": {"name": "combat move", "description": "Prevents combat movement if cast successful. Allows movement on range, OOM, LOS"},
+			"128": {"name": "wait for hit", "description": "When used in combination with `Await` action in timed action list, AI will wait for the spell to hit its target instead of just cast bar to finish"}
 		}
 	},
 	"ExtraFlagParameter": {
