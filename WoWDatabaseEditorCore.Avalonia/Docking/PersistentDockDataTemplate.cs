@@ -89,6 +89,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                 DocumentManager.OpenedDocuments.ToStream(false).Where(e => e.Type == CollectionEventType.Remove)
                     .SubscribeAction(item =>
                     {
+                        documents[item.Item].DataContext = null; // reset datacontext to prevent Avalonia leaks
                         //RemoveContextMenus(documents[item.Item]);
                         documents.Remove(item.Item);
                     });

@@ -150,19 +150,19 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             {
                 if (window.TryGetTarget(out var target))
                 {
-                    var point = new PixelPoint(x, y);
-                    var screen = target.Screens.ScreenFromPoint(point);
-                    if (screen == null)
-                        return;
-
-                    target.Position = point;
-
                     if (isMaximized)
                     {
                         target.WindowState = WindowState.Maximized;
                     }
                     else
                     {
+                        var point = new PixelPoint(x, y);
+                        var screen = target.Screens.ScreenFromPoint(point);
+                        if (screen == null)
+                            return;
+
+                        target.Position = point;
+
                         var tl = target.PointToClient(new PixelPoint(x, y));
                         var br = target.PointToClient(new PixelPoint(x + width, y + height));
                         target.Width = Math.Max(br.X - tl.X, 100);

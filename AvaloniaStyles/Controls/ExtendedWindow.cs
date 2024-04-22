@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Platform;
@@ -122,6 +123,18 @@ namespace AvaloniaStyles.Controls
             {
                 window.BindBackgroundBrush(e.NewValue as SolidColorBrush);
             });
+        }
+
+        protected override void OnLoaded(RoutedEventArgs e)
+        {
+            base.OnLoaded(e);
+            if (OperatingSystem.IsWindows())
+            {
+                PlatformImpl?.GetType()
+                    .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
+                    .FirstOrDefault(x => x.Name == "ShowWindow")?
+                    .Invoke(this.PlatformImpl!, new object?[] { this.WindowState, false });
+            }
         }
 
         private IDisposable? backgroundBrushBinding;
