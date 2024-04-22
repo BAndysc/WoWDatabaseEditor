@@ -108,6 +108,8 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         
         protected override void EndEditing(bool commit = true)
         {
+            if (partText != null)
+                partText.IsVisible = true;
             textBoxDisposable?.Dispose();
             textBoxDisposable = null;
             

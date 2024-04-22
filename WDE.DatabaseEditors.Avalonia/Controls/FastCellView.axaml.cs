@@ -52,6 +52,17 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             }
         }
 
+        protected override bool OpenForEditing()
+        {
+            var open = base.OpenForEditing();
+            if (open)
+            {
+                if (partText != null)
+                    partText.IsVisible = false;
+            }
+            return open;
+        }
+
         protected override Control CreateEditingControl()
         {
             textBox = new TextBox()
