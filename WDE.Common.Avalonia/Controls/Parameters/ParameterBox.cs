@@ -128,8 +128,9 @@ public class ParameterBox : BaseParameterBox
     {
         if (boolBox == null)
         {
-            boolBox = (CheckBox)BoolTemplate.Build()!;
-            panel!.Children.Add(boolBox);
+            boolBox = (CheckBox?)BoolTemplate?.Build();
+            if (boolBox != null)
+                panel!.Children.Add(boolBox);
         }
         else
             boolBox.IsVisible = true;
@@ -139,8 +140,9 @@ public class ParameterBox : BaseParameterBox
     {
         if (genericBox == null)
         {
-            genericBox = (GenericParameterBox)GenericTemplate.Build()!;
-            panel!.Children.Add(genericBox);
+            genericBox = (GenericParameterBox?)GenericTemplate?.Build();
+            if (genericBox != null)
+                panel!.Children.Add(genericBox);
         }
         else
             genericBox.IsVisible = true;
@@ -150,8 +152,9 @@ public class ParameterBox : BaseParameterBox
     {
         if (comboBox == null)
         {
-            comboBox = (CompletionComboParameterBox)ComboBoxTemplate.Build()!;
-            panel!.Children.Add(comboBox);
+            comboBox = (CompletionComboParameterBox?)ComboBoxTemplate?.Build();
+            if (comboBox != null)
+                panel!.Children.Add(comboBox);
         }
         else
             comboBox.IsVisible = true;
