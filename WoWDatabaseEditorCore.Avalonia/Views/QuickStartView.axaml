@@ -151,7 +151,7 @@
                 
                 <StackPanel Margin="30,0,0,0">
                     <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10">Quick load</TextBlock>
-                    <ItemsControl Margin="20,0,0,0" ItemsSource="{CompiledBinding FlatItemPrototypes, Mode=OneTime}">
+                    <ItemsControl x:Name="IconsControl" Margin="20,0,0,0" ItemsSource="{CompiledBinding FlatItemPrototypes, Mode=OneTime}">
                         <ItemsControl.Styles>
                             <Style Selector="ItemsControl > ContentPresenter">
                                 <Setter Property="(controls1:WrapPanelWithDivider.ForceNewLine)" Value="{Binding ForceNewLine}" />
@@ -165,7 +165,6 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Panel Background="Transparent"
-                                       views:QuickStartView.EnableAnimations="True"
                                        ToolTip.Tip="{CompiledBinding IsEnabled, Converter={StaticResource TipConverter}}">
                                     <Button Classes="FlattyButton" 
                                             Width="100"

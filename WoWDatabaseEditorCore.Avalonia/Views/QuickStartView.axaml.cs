@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Rendering.Composition;
 using Avalonia.Rendering.Composition.Animations;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
@@ -15,11 +16,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         public QuickStartView()
         {
             InitializeComponent();
-        }
-
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
         }
 
         private void EnsureImplicitAnimations()
@@ -48,23 +44,37 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             }
         }
 
-        public static void SetEnableAnimations(Panel panel, bool value)
+        private System.IDisposable? animationAttachTimer;
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
-            var page = panel.FindAncestorOfType<QuickStartView>();
-            if (page == null)
+            base.OnAttachedToVisualTree(e);
+            animationAttachTimer?.Dispose();
+            animationAttachTimer = DispatcherTimer.RunOnce(() =>
             {
-                panel.AttachedToVisualTree += delegate { SetEnableAnimations(panel, true); };
-                return;
-            }
+                EnsureImplicitAnimations();
+                foreach (var container in IconsControl.GetRealizedContainers())
+                {
+                    if (ElementComposition.GetElementVisual(container) is { } compositionVisual)
+                    {
+                        compositionVisual.ImplicitAnimations = _implicitAnimations;
+                    }
+                }
+                animationAttachTimer = null;
+            }, TimeSpan.FromMilliseconds(10));
+        }
 
-            if (ElementComposition.GetElementVisual(page) == null)
-                return;
-
-            page.EnsureImplicitAnimations();
-            if (panel.GetVisualParent() is Visual visualParent
-                && ElementComposition.GetElementVisual(visualParent) is CompositionVisual compositionVisual)
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            animationAttachTimer?.Dispose();
+            animationAttachTimer = null;
+            foreach (var container in IconsControl.GetRealizedContainers())
             {
-                compositionVisual.ImplicitAnimations = page._implicitAnimations;
+                if (ElementComposition.GetElementVisual(container) is {} compositionVisual)
+                {
+                    compositionVisual.ImplicitAnimations = null;
+                }
             }
         }
     }
