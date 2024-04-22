@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using System;
+using System.Linq;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Threading;
@@ -51,6 +52,10 @@ namespace WDE.Common.Avalonia.Utils
             if (visual == null)
                 return false;
 
+            var thisAsControl = visual as Control;
+            if (thisAsControl == null)
+                return false;
+
             if (visual.Focusable)
             {
                 visual.Focus(GetFocusFirstMethod((Control)visual));
@@ -62,12 +67,28 @@ namespace WDE.Common.Avalonia.Utils
             }
             else
             {
-                foreach (var item in ((Visual)visual).GetVisualChildren())
+                var navigationMethod = KeyboardNavigation.GetTabNavigation(thisAsControl);
+                if (navigationMethod == KeyboardNavigationMode.Local)
                 {
-                    if (item is IInputElement elem)
+                    foreach (var item in thisAsControl.GetVisualChildren().OrderBy(
+                                 child => KeyboardNavigation.GetTabIndex((IInputElement)child)))
                     {
-                        if (FocusFirstFocusableChild(elem))
-                            return true;
+                        if (item is IInputElement elem)
+                        {
+                            if (FocusFirstFocusableChild(elem))
+                                return true;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var item in thisAsControl.GetVisualChildren())
+                    {
+                        if (item is IInputElement elem)
+                        {
+                            if (FocusFirstFocusableChild(elem))
+                                return true;
+                        }
                     }
                 }
             }

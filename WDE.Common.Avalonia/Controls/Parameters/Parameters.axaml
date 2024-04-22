@@ -84,6 +84,7 @@
                   DockPanel.Dock="Right" />
           <ParameterTextBox VerticalContentAlignment="Center"
                             Focusable="True"
+                            TabIndex="1"
                             x:Name="PART_TextBox"
                             Tag="{TemplateBinding NumberToMultiply}"
                             SpecialCopying="{TemplateBinding IsFloatParameter}"
