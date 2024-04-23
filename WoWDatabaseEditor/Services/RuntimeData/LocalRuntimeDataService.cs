@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
@@ -42,7 +43,9 @@ public class LocalRuntimeDataService : IRuntimeDataService
         
         try
         {
-            return await Task.FromResult(Directory.GetFiles(directory, searchPattern, SearchOption.AllDirectories));
+            return await Task.FromResult(Directory.GetFiles(directory, searchPattern, SearchOption.AllDirectories)
+                .Select(x => x.Replace("\\", "/"))
+                .ToList());
         }
         catch (Exception e)
         {
