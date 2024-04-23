@@ -14,6 +14,7 @@ using Avalonia.Input;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WDE.Common;
 using WDE.Common.Avalonia.Components;
@@ -335,7 +336,23 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
 
                     async Task<bool> inner()
                     {
-                        var result = await view.ShowDialog<bool>(GetFocusedWindow());
+                        WeakReference<IInputElement>? focusedElement = null;
+                        var parentWindow = GetFocusedWindow();
+                        if (TopLevel.GetTopLevel(parentWindow)?.FocusManager?.GetFocusedElement() is
+                            { } focusedElement_)
+                        {
+                            focusedElement = new WeakReference<IInputElement>(focusedElement_);
+                        }
+
+                        var result = await view.ShowDialog<bool>(parentWindow);
+
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            if (focusedElement != null &&
+                                focusedElement.TryGetTarget(out var focusedElement__))
+                                focusedElement__.Focus();
+                        }, DispatcherPriority.Input);
+
                         view.DataContext = null;
                         return result;
                     }
