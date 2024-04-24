@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -9,6 +10,7 @@ using Newtonsoft.Json;
 using Serilog.Core;
 using Serilog.Events;
 using WDE.Common;
+using WDE.Common.Exceptions;
 using WDE.Common.Factories;
 using WDE.Common.Services;
 using WDE.Common.Utils;
@@ -70,6 +72,9 @@ public class ReportErrorsSink : ILogEventSink
 
     private async Task ReportError(HttpClient client, LogEvent logEvent)
     {
+        if (!ShouldReportException(logEvent.Exception))
+            return;
+
         try
         {
             sendingCounter++;
@@ -82,6 +87,22 @@ public class ReportErrorsSink : ILogEventSink
         {
             sendingCounter--;
         }
+    }
+
+    private bool ShouldReportException(Exception? exception)
+    {
+        if (exception == null)
+            return true;
+
+        bool IsExceptionOfType<T>()
+        {
+            return exception is T || exception is AggregateException a && a.InnerExceptions.All(e => e is T);
+        }
+        
+        return !IsExceptionOfType<OperationCanceledException>() &&
+               !IsExceptionOfType<UserException>() &&
+               !IsExceptionOfType<TimeoutException>() &&
+               !IsExceptionOfType<IOException>();
     }
 
     private HttpClient? TryGetClient()
