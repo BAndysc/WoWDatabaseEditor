@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -102,7 +103,8 @@ public class ReportErrorsSink : ILogEventSink
         return !IsExceptionOfType<OperationCanceledException>() &&
                !IsExceptionOfType<UserException>() &&
                !IsExceptionOfType<TimeoutException>() &&
-               !IsExceptionOfType<IOException>();
+               !IsExceptionOfType<IOException>() &&
+               !IsExceptionOfType<SocketException>();
     }
 
     private HttpClient? TryGetClient()
