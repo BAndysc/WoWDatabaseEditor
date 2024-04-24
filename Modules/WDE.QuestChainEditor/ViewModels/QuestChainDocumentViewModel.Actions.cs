@@ -615,6 +615,17 @@ public partial class QuestChainDocumentViewModel
 
         Traverse(startQuest);
 
+        List<ChainRawData> affectedExistingData = new();
+        List<(uint, IReadOnlyList<ICondition>)> affectedExistingConditions = new();
+
+        foreach (var node in nodes.OfType<QuestViewModel>())
+        {
+            if (existingData.TryGetValue(node.Entry, out var data))
+                affectedExistingData.Add(data);
+            if (existingConditions.TryGetValue(node.Entry, out var conditions))
+                affectedExistingConditions.Add((node.Entry, conditions));
+        }
+
         historyHandler.DoAction(new AnonymousHistoryAction("Unload chain", () =>
         {
             foreach (var node in nodes)
@@ -623,10 +634,23 @@ public partial class QuestChainDocumentViewModel
                 {
                     Elements.Insert(0, group);
                 }
-                else
+                else if (node is QuestViewModel quest)
                 {
                     Elements.Add(node);
+                    entryToQuest[quest.Entry] = quest;
                 }
+                else
+                    throw new NotSupportedException($"Unsupported node type {node.GetType()}");
+            }
+
+            foreach (var data in affectedExistingData)
+            {
+                existingData[data.Id] = data;
+            }
+
+            foreach (var (quest, data) in affectedExistingConditions)
+            {
+                existingConditions[quest] = data;
             }
 
             foreach (var conn in connectionsToRemove)
@@ -646,6 +670,12 @@ public partial class QuestChainDocumentViewModel
             foreach (var node in nodes)
             {
                 Elements.Remove(node);
+                if (node is QuestViewModel quest)
+                {
+                    entryToQuest.Remove(quest.Entry);
+                    existingData.Remove(quest.Entry);
+                    existingConditions.Remove(quest.Entry);
+                }
             }
         }));
     }

@@ -39,6 +39,7 @@ public partial class QuestPickerView : UserControl
         {
             if (@is)
             {
+                resultsList.SelectedItem = null;
                 DispatcherTimer.RunOnce(() =>
                 {
                     searchBox?.Focus();
