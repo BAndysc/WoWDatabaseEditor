@@ -9,12 +9,15 @@ using AvaloniaEdit.Editing;
 
 namespace WDE.Common.Avalonia.Types;
 
-public class CompletionData : ICompletionData
+public class CompletionData : DockPanel, ICompletionData
 {
     public CompletionData(string text, string? subText = null)
     {
         Text = text;
         SubText = subText;
+
+        Children.Add(new TextBlock() { Text = Text });
+        Children.Add(new TextBlock() { Text = SubText, Opacity = 0.5f, Margin = new Thickness(15, 0, 0, 0) });
     }
 
     public IImage? Image => null;
@@ -24,14 +27,7 @@ public class CompletionData : ICompletionData
     public string? SubText { get; }
 
     // Use this property if you want to show a fancy UIElement in the list.
-    public object Content => new DockPanel()
-    {
-        Children =
-        {
-            new TextBlock() { Text = Text },
-            new TextBlock() { Text = SubText, Opacity = 0.5f, Margin = new Thickness(15,0,0,0) },
-        }
-    };
+    public object? Content => null;
 
     public object? Description => null;
 
