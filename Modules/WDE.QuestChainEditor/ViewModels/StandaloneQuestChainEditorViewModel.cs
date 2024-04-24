@@ -35,11 +35,11 @@ public class StandaloneQuestChainEditorViewModel : ObservableBase, IDialog, IWin
         SaveCommand = new AsyncAutoCommand(async () =>
         {
             await ViewModel.Save.ExecuteAsync();
-        });
+        }).WrapMessageBox<Exception>(messageBoxService);
         GenerateQueryCommand = new AsyncAutoCommand(async () =>
         {
             windowManager.ShowStandaloneDocument(textDocumentService.CreateDocument("SQL Query", (await ViewModel.GenerateQuery()).QueryString, "sql", false), out _);
-        });
+        }).WrapMessageBox<Exception>(messageBoxService);
         Accept = new AsyncAutoCommand(async () =>
         {
             await ViewModel.Save.ExecuteAsync();
