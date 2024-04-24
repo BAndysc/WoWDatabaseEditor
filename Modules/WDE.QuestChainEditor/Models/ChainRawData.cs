@@ -7,7 +7,7 @@ namespace WDE.QuestChainEditor.Models;
 public class ChainRawData
 {
     [JsonConstructor]
-    public ChainRawData(uint id, CharacterClasses allowableClasses, CharacterRaces allowableRaces, int prevQuestId = 0, int nextQuestId = 0, int exclusiveGroup = 0, int breadcrumbQuestId = 0)
+    public ChainRawData(uint id, long allowableClasses, long allowableRaces, int prevQuestId = 0, int nextQuestId = 0, int exclusiveGroup = 0, int breadcrumbQuestId = 0)
     {
         Id = id;
         AllowableClasses = allowableClasses;
@@ -21,8 +21,8 @@ public class ChainRawData
     public ChainRawData(IQuestTemplate template)
     {
         Id = template.Entry;
-        AllowableClasses = template.AllowableClasses;
-        AllowableRaces = template.AllowableRaces;
+        AllowableClasses = (long)template.AllowableClasses;
+        AllowableRaces = (long)template.AllowableRaces;
         PrevQuestId = template.PrevQuestId;
         NextQuestId = template.NextQuestId;
         ExclusiveGroup = template.ExclusiveGroup;
@@ -30,8 +30,8 @@ public class ChainRawData
     }
 
     public uint Id { get; init; }
-    public CharacterClasses AllowableClasses { get; }
-    public CharacterRaces AllowableRaces { get; }
+    public long AllowableClasses { get; }
+    public long AllowableRaces { get; }
     public int PrevQuestId { get; set; }
     public int NextQuestId { get; set; }
     public int ExclusiveGroup { get; set; }
