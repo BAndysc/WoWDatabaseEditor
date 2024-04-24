@@ -670,8 +670,12 @@
             <nodify:NodifyEditor.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Load quest" Click="LoadQuest_MenuItemClick" />
+                    <Separator />
+                    <MenuItem Header="Select all" Command="{CompiledBinding SelectAllCommand}" />
+                    <MenuItem Header="Copy all entries" Command="{CompiledBinding CopyAllEntries}" />
+                    <Separator />
                     <MenuItem Header="Layout graph now" Command="{CompiledBinding DoLayoutGraphCommand}" />
-                    <MenuItem Header="Evaluate quest states"
+                    <MenuItem Header="Evaluate quests state"
                               IsVisible="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).RemoteCommandsSupported}"
                               Command="{CompiledBinding EvaluateQuestStatusCommand}" />
                     <Separator />

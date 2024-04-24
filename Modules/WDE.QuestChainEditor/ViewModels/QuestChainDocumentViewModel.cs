@@ -112,6 +112,8 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
     public DelegateCommand<QuestViewModel> OpenWowHeadCommand { get; }
     public DelegateCommand ToggleSearchBoxCommand { get; }
     public IAsyncCommand<QuestViewModel> UnloadThisChainCommand { get; }
+    public DelegateCommand SelectAllCommand { get; }
+    public DelegateCommand CopyAllEntries { get; }
 
     private bool TryGetQuest(uint entry, out QuestViewModel quest)
     {
@@ -266,7 +268,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
         {
             if (SelectedItems.Count > 0)
             {
-                clipboardService.SetText(string.Join(",", SelectedItems.Where(x => x is QuestViewModel)
+                clipboardService.SetText(string.Join(", ", SelectedItems.Where(x => x is QuestViewModel)
                     .Select(x => x.EntryOrExclusiveGroupId)));
             }
         });
@@ -538,6 +540,18 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
         }).WrapMessageBox<Exception, QuestViewModel>(messageBoxService);
 
         DoLayoutGraphCommand = new DelegateCommand(DoLayoutGraphNow);
+
+        SelectAllCommand = new DelegateCommand(() =>
+        {
+            using var _ = SelectedItems.SuspendNotifications();
+            SelectedConnections.Clear();
+            SelectedItems.AddRange(Elements);
+        });
+
+        CopyAllEntries = new DelegateCommand(() =>
+        {
+            clipboardService.SetText(string.Join(", ", Elements.OfType<QuestViewModel>().Select(x => x.Entry)));
+        });
 
         History.ToObservable(x => x.IsSaved).SubscribeAction(_ => RaisePropertyChanged((nameof(IsModified))));
         //LoadQuestWithDependencies(25134, default).ListenErrors();
