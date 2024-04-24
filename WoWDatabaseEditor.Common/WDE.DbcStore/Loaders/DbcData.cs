@@ -73,7 +73,7 @@ public class DbcData
     public List<CurrencyCategory> CurrencyCategories { get; } = new();
     public List<CurrencyType> CurrencyTypes { get; } = new();
     public List<GarrMission> Missions { get; } = new();
-    public List<AreaEntry> Areas { get; } = new();
+    public List<AreaEntry> Areas { get; } = new() { new AreaEntry() { Id = 0, Name = "(global)" } };
     public List<MapEntry> Maps { get; } = new();
     public List<FactionTemplate> FactionTemplates { get; } = new();
     public List<Faction> Factions { get; } = new();
