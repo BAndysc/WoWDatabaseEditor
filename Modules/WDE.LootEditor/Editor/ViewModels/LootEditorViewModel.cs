@@ -769,8 +769,12 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         System.IDisposable disposable = new EmptyDisposable();
         if (MultiSelection.MoreThanOne)
             disposable = HistoryHandler.WithinBulk("Bulk edit property");
-        foreach (var selected in MultiSelection.All())
+        foreach (var selected in MultiSelection.All().ToList())
         {
+            if (!selected.IsValid || selected.GroupIndex >= Loots.Count ||
+                selected.RowIndex >= Loots[selected.GroupIndex].Rows.Count)
+                continue;
+
             var cell = Loots[selected.GroupIndex].Rows[selected.RowIndex].CellsList[focusedCellIndex];
             if (cell is LootItemParameterCell<long> longCell)
                 await longCell.UpdateFromStringAsync(text);

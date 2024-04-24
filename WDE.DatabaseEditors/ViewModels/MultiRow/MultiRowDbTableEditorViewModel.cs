@@ -215,8 +215,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 if (focusedCellIndex == -1)
                     return;
                 using var _ = BulkEdit("Batch revert");
-                foreach (var selected in MultiSelection.All())
+                foreach (var selected in MultiSelection.All().ToList())
                 {
+                    if (!selected.IsValid || selected.GroupIndex >= Rows.Count ||
+                        selected.RowIndex >= Rows[selected.GroupIndex].Rows.Count)
+                        continue;
+
                     var row = Rows[selected.GroupIndex][selected.RowIndex];
                     var cell = row.Cells[focusedCellIndex];
                     await RevertCommand.ExecuteAsync(cell);
@@ -227,8 +231,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 if (focusedCellIndex == -1)
                     return;
                 using var _ = BulkEdit("Batch set to null");
-                foreach (var selected in MultiSelection.All())
+                foreach (var selected in MultiSelection.All().ToList())
                 {
+                    if (!selected.IsValid || selected.GroupIndex >= Rows.Count ||
+                        selected.RowIndex >= Rows[selected.GroupIndex].Rows.Count)
+                        continue;
+
                     var row = Rows[selected.GroupIndex][selected.RowIndex];
                     var cell = row.Cells[focusedCellIndex];
                     SetNullCommand.Execute(cell);
@@ -237,8 +245,14 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             DuplicateSelectedCommand = new DelegateCommand(() =>
             {
                 using var _ = BulkEdit("Batch duplicate");
-                foreach (var selected in MultiSelection.All().Reverse())
+                var sel = MultiSelection.All().ToList();
+                sel.Reverse();
+                foreach (var selected in sel)
                 {
+                    if (!selected.IsValid || selected.GroupIndex >= Rows.Count ||
+                        selected.RowIndex >= Rows[selected.GroupIndex].Rows.Count)
+                        continue;
+
                     var row = Rows[selected.GroupIndex][selected.RowIndex];
                     var duplicate = row.Entity.Clone();
                     ForceInsertEntity(duplicate, selected.RowIndex + 1);
@@ -247,8 +261,14 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             DeleteRowSelectedCommand = new AsyncAutoCommand(async () =>
             {
                 using var _ = BulkEdit("Batch delete");
-                foreach (var selected in MultiSelection.All().Reverse())
+                var sel = MultiSelection.All().ToList();
+                sel.Reverse();
+                foreach (var selected in sel)
                 {
+                    if (!selected.IsValid || selected.GroupIndex >= Rows.Count ||
+                        selected.RowIndex >= Rows[selected.GroupIndex].Rows.Count)
+                        continue;
+
                     var row = Rows[selected.GroupIndex][selected.RowIndex];
                     await RemoveEntity(row.Entity);
                 }
