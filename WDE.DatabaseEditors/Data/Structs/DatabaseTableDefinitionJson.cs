@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 using Generator.Equals;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -161,6 +162,16 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         // single row table type ignores solution item entries quality, because there is no keys
         [IgnoreEquality] [JsonIgnore] public bool IgnoreEquality => RecordMode == RecordMode.SingleRow;
+
+        [OnDeserialized]
+        internal void OnDeserializedMethod(StreamingContext context)
+        {
+            if (PrimaryKey == null || PrimaryKey.Count == 0)
+            {
+                if (!string.IsNullOrEmpty(TablePrimaryKeyColumnName))
+                    PrimaryKey = new List<string> {TablePrimaryKeyColumnName};
+            }
+        }
     }
 
     public enum OnlyConditionMode

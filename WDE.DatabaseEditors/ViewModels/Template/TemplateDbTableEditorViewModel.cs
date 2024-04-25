@@ -12,6 +12,7 @@ using Prism.Events;
 using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.Database;
+using WDE.Common.Exceptions;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
@@ -126,7 +127,13 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
 
             canOpenRevertTip = !teachingTipService.IsTipShown(TipYouCanRevertId);
-            
+
+            if (tableDefinition.PrimaryKey == null)
+                throw new UserException($"Table definition " + tableDefinition.Id + " doesn't have primary key defined");
+
+            if (tableDefinition.PrimaryKey.Count != 1)
+                throw new UserException($"Table definition " + tableDefinition.Id + " is a template type editor, therefore its primary key should be a single column.");
+
             Debug.Assert(tableDefinition.PrimaryKey.Count == 1);
             
             ScheduleLoading();
