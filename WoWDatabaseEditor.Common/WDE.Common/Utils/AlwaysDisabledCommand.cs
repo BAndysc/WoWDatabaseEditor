@@ -5,9 +5,25 @@ using AsyncAwaitBestPractices.MVVM;
 
 namespace WDE.Common.Utils
 {
+    public class NullCommand : ICommand
+    {
+        public static NullCommand Command { get; } = new();
+
+        public bool CanExecute(object? parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+        }
+
+        public event EventHandler? CanExecuteChanged;
+    }
+
     public class AlwaysDisabledCommand : ICommand
     {
-        public static AlwaysDisabledCommand Command => new();
+        public static AlwaysDisabledCommand Command { get; } = new();
 
         public bool CanExecute(object? parameter)
         {
@@ -23,7 +39,7 @@ namespace WDE.Common.Utils
     
     public class AlwaysDisabledAsyncCommand : IAsyncCommand
     {
-        public static AlwaysDisabledAsyncCommand Command => new();
+        public static AlwaysDisabledAsyncCommand Command { get; } = new();
 
         public bool CanExecute(object? parameter)
         {

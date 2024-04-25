@@ -27,11 +27,12 @@ public class StandaloneQuestChainEditorViewModel : ObservableBase, IDialog, IWin
         IContainerProvider containerProvider,
         IMessageBoxService messageBoxService,
         IWindowManager windowManager,
-        ITextDocumentService textDocumentService
+        ITextDocumentService textDocumentService,
+        QuestChainSolutionItem solutionItem
         )
     {
         this.messageBoxService = messageBoxService;
-        ViewModel = containerProvider.Resolve<QuestChainDocumentViewModel>(((typeof(QuestChainSolutionItem), new QuestChainSolutionItem())));
+        ViewModel = containerProvider.Resolve<QuestChainDocumentViewModel>((typeof(QuestChainSolutionItem), solutionItem));
         SaveCommand = new AsyncAutoCommand(async () =>
         {
             await ViewModel.Save.ExecuteAsync();
@@ -45,11 +46,7 @@ public class StandaloneQuestChainEditorViewModel : ObservableBase, IDialog, IWin
             await ViewModel.Save.ExecuteAsync();
             CloseOk?.Invoke();
         });
-        Cancel = new AsyncCommand(async () =>
-        {
-            await ViewModel.AskToSave();
-            CloseCancel?.Invoke();
-        });
+        Cancel = NullCommand.Command; // do nothing on Escape, becuase this is a standalone editor, not a dialog
     }
 
     private async Task<bool> AskToSave()

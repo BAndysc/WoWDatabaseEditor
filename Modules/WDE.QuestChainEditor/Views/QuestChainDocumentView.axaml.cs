@@ -284,6 +284,75 @@ public partial class QuestChainDocumentView : UserControl
         base.OnAttachedToVisualTree(e);
         timer?.Dispose();
         timer = DispatcherTimer.Run(RelayoutGraph, TimeSpan.FromMilliseconds(16));
+        BindToViewModel();
+    }
+
+    private QuestChainDocumentViewModel? boundViewModel;
+
+    private void UnBindFromViewModel()
+    {
+        if (boundViewModel != null)
+        {
+            boundViewModel.NavigateToQuest -= NavigateToQuest;
+            boundViewModel = null;
+        }
+    }
+
+    private void BindToViewModel()
+    {
+        UnBindFromViewModel();
+        if (DataContext is QuestChainDocumentViewModel vm)
+        {
+            boundViewModel = vm;
+            vm.NavigateToQuest += NavigateToQuest;
+        }
+    }
+
+    private CancellationTokenSource? lastNavigateToken;
+
+    private void NavigateToQuest(BaseQuestViewModel quest)
+    {
+        BaseQuestViewModel questToCompareTo = quest;
+        if (quest is QuestViewModel q && q.ExclusiveGroup != null)
+            questToCompareTo = q.ExclusiveGroup;
+
+        async Task NavigateToQuestAsync(CancellationToken token)
+        {
+            await Task.Delay(100, token);
+
+            token.ThrowIfCancellationRequested();
+
+            while (boundViewModel?.IsCalculatingGraphLayout ?? false)
+                await Task.Delay(16, token);
+
+            token.ThrowIfCancellationRequested();
+
+            await Task.Delay(100, token);
+
+            token.ThrowIfCancellationRequested();
+
+            do
+            {
+                Editor.BringIntoView(quest.Bounds.Center);
+                var diff = (questToCompareTo.Location - new Point(questToCompareTo.PerfectX, questToCompareTo.PerfectY));
+                var lengthSq = diff.X * diff.X + diff.Y * diff.Y;
+                if (lengthSq < 2)
+                    break;
+                await Task.Delay(16, token);
+
+                token.ThrowIfCancellationRequested();
+            } while (true);
+        }
+
+        lastNavigateToken?.Cancel();
+        lastNavigateToken = new();
+        NavigateToQuestAsync(lastNavigateToken.Token).ListenWarnings();
+    }
+
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        base.OnDataContextChanged(e);
+        BindToViewModel();
     }
 
     private bool RelayoutGraph()
@@ -307,6 +376,7 @@ public partial class QuestChainDocumentView : UserControl
         base.OnDetachedFromVisualTree(e);
         timer?.Dispose();
         timer = null;
+        UnBindFromViewModel();
     }
 
     private void DoScreenshot(object? sender, RoutedEventArgs e)

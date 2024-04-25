@@ -30,8 +30,16 @@ namespace WDE.Module
                 var instance = moduleScope.Resolve(register);
                 foreach (Type @interface in register.GetInterfaces().Union(new[] {register}))
                 {
-                    string name = register + @interface.ToString();
-                    parentContainer.RegisterInstance(@interface, instance, name);
+                    var isNonUnique = @interface.IsDefined(typeof(NonUniqueProviderAttribute), true);
+                    if (isNonUnique)
+                    {
+                        string name = register + @interface.ToString();
+                        parentContainer.RegisterInstance(@interface, instance, name);
+                    }
+                    else
+                    {
+                        parentContainer.RegisterInstance(@interface, instance);
+                    }
                 }
             }
         }

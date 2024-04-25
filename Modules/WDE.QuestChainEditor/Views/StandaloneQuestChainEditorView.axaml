@@ -4,11 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:WDE.QuestChainEditor.ViewModels"
              xmlns:views="clr-namespace:WDE.QuestChainEditor.Views"
+             xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:StandaloneQuestChainEditorViewModel"
              x:Class="WDE.QuestChainEditor.Views.StandaloneQuestChainEditorView">
   <views:QuestChainDocumentView DataContext="{CompiledBinding ViewModel}">
     <views:QuestChainDocumentView.KeyBindings>
+      <BetterKeyBinding Gesture="Escape" CustomCommand="{x:Static utils:NullCommand.Command}" />
       <BetterKeyBinding Gesture="Ctrl+S" CustomCommand="{CompiledBinding Save}" />
       <BetterKeyBinding Gesture="Cmd+S" CustomCommand="{CompiledBinding Save}" />
       <BetterKeyBinding Gesture="Ctrl+C" CustomCommand="{CompiledBinding Copy}" />

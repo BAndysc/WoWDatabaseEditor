@@ -42,7 +42,7 @@ public class QuestChainQueryGenerator : ISolutionItemSqlProvider<QuestChainSolut
     public async Task<IQuery> GenerateSql(QuestChainSolutionItem item)
     {
         var openedEditors = documentManager.Value.OpenedDocuments.Where(doc => doc is QuestChainDocumentViewModel)
-            .Concat(standaloneQuestChainEditorService.OpenedDocument is { } doc ? new[]{doc} : new ISolutionItemDocument[]{})
+            .Concat(standaloneQuestChainEditorService.OpenedDocuments)
             .OfType<QuestChainDocumentViewModel>()
             .ToList();
 

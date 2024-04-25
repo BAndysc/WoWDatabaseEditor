@@ -502,7 +502,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                 if (!quest.HasValue)
                     return;
 
-                var vm = await LoadQuestWithDependencies(quest.Value, PendingConnection.TargetLocation);
+                var vm = await LoadQuestWithDependencies(quest.Value, PendingConnection.TargetLocation, false);
                 AddConnection(PendingConnection.From!, vm);
             }
             else
@@ -580,7 +580,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
             taskRunner.ScheduleTask("Load quests", async () =>
             {
                 foreach (var quest in solutionItem.Entries)
-                    await LoadQuestWithDependencies(quest, default);
+                    await LoadQuestWithDependencies(quest, default, true);
                 LoadingStack--;
                 History.Clear();
             });
@@ -635,7 +635,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
         RaisePropertyChanged(nameof(IsPickingQuest));
     }
 
-    public async Task<QuestViewModel> LoadQuestWithDependencies(uint quest, Point targetLocation)
+    public async Task<QuestViewModel> LoadQuestWithDependencies(uint quest, Point targetLocation, bool navigateToQuest)
     {
         if (entryToQuest.TryGetValue(quest, out var existingQuestViewModel))
             return existingQuestViewModel;
@@ -861,6 +861,13 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                 }
             }));
 
+            if (navigateToQuest)
+            {
+                NavigateToQuest?.Invoke(mainQuest);
+                SelectedItems.Clear();
+                SelectedItems.Add(mainQuest);
+            }
+
             if (wasSavedBeforeLoad)
             {
                 History.MarkAsSaved();
@@ -873,6 +880,8 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
             LoadingStack--;
         }
     }
+
+    public event Action<BaseQuestViewModel>? NavigateToQuest;
 
     private void RefreshProblems()
     {
@@ -1372,6 +1381,11 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
     {
         var quest = await PickQuest();
         if (quest.HasValue)
-            await LoadQuestWithDependencies(quest.Value, editorMouseLocation);
+            await LoadQuestWithDependencies(quest.Value, editorMouseLocation, false);
+    }
+
+    public bool HasQuest(uint quest)
+    {
+        return entryToQuest.ContainsKey(quest);
     }
 }

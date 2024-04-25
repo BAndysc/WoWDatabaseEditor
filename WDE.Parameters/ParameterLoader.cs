@@ -561,9 +561,9 @@ namespace WDE.Parameters
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (ICreatureTemplate item in await database.GetCreatureTemplatesAsync())
-                Items.Add(item.Entry, new SelectOption(item.Name));
+                Items[item.Entry] = new SelectOption(item.Name);
             foreach (IGameObjectTemplate item in await database.GetGameObjectTemplatesAsync())
-                Items.Add(-item.Entry, new SelectOption(item.Name));
+                Items[-item.Entry] = new SelectOption(item.Name);
         }
     }
 
