@@ -110,6 +110,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
     public IAsyncCommand CompleteQuestForPlayerCommand { get; }
     public IAsyncCommand RewardQuestForPlayerCommand { get; }
     public DelegateCommand<QuestViewModel> OpenWowHeadCommand { get; }
+    public DelegateCommand<QuestViewModel> OpenShootCommand { get; }
     public DelegateCommand ToggleSearchBoxCommand { get; }
     public IAsyncCommand<QuestViewModel> UnloadThisChainCommand { get; }
     public DelegateCommand SelectAllCommand { get; }
@@ -530,6 +531,23 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                 _ => ""
             };
             var url = $"https://wowhead.com/{exp}quest={quest.Entry}";
+            windowManager.OpenUrl(url);
+        });
+
+        OpenShootCommand = new DelegateCommand<QuestViewModel>(quest =>
+        {
+            string exp = currentCoreVersion.Current.Version.Major switch
+            {
+                1 => "",
+                2 => "",
+                3 => "",
+                4 => "cata-",
+                5 => "mop-",
+                6 => "legion-",
+                7 => "legion-",
+                _ => ""
+            };
+            var url = $"https://{exp}shoot.tauri.hu/?quest={quest.Entry}";
             windowManager.OpenUrl(url);
         });
 

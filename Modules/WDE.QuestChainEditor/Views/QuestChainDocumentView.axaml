@@ -447,6 +447,11 @@
                                       CommandParameter="{CompiledBinding .}"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
 
+                            <MenuItem Header="Open Tauri Shoot"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).OpenShootCommand}"
+                                      CommandParameter="{CompiledBinding .}"
+                                      IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+
                             <Separator IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
 
                             <MenuItem Header="Unload this chain"
