@@ -26,6 +26,8 @@ namespace WDE.MPQ.ViewModels
             Save = new DelegateCommand(() =>
             {
                 mpqSettings.Path = woWPath;
+                mpqSettings.OpenType = mpqOpenType;
+                mpqSettings.Save();
                 IsModified = false;
                 RaisePropertyChanged(nameof(IsModified));
             });

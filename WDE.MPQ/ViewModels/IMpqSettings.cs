@@ -7,6 +7,7 @@ namespace WDE.MPQ.ViewModels
     {
         public string? Path { get; set; }
         public MpqOpenType OpenType { get; set; }
+        void Save();
     }
 
     public enum MpqOpenType

@@ -20,6 +20,8 @@ namespace WDE.MPQ.ViewModels
 
             if (verifier.VerifyFolder(saved.Path) != WoWFilesType.Invalid)
                 path = saved.Path;
+
+            openType = saved.OpenType;
         }
 
         private struct Data : ISettings
@@ -31,21 +33,18 @@ namespace WDE.MPQ.ViewModels
         public string? Path
         {
             get => path;
-            set
-            {
-                path = value;
-                userSettings.Update(new Data(){Path = value, OpenType = openType});
-            }
+            set => path = value;
         }
 
         public MpqOpenType OpenType
         {
             get => openType;
-            set
-            {
-                openType = value;
-                userSettings.Update(new Data(){Path = path, OpenType = value});
-            }
+            set => openType = value;
+        }
+
+        public void Save()
+        {
+            userSettings.Update(new Data(){Path = path, OpenType = openType});
         }
     }
 }

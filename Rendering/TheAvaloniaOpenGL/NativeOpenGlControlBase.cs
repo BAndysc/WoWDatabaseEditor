@@ -83,7 +83,7 @@ public class NativeOpenGlControlBase : NativeControlHost
             //Dispatcher.UIThread.RunJobs(DispatcherPriority.Input);
             Render();
             return true;
-        }, TimeSpan.FromMilliseconds(1));
+        }, TimeSpan.FromMilliseconds(10));
         
         return new PlatformHandle(window.Pointer, "HWND");        
         
