@@ -31,7 +31,7 @@
                             <ItemsPresenter Name="PART_ItemsPresenter">
                                 <ItemsPresenter.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <controls:ToolbarPanel ClipToBounds="{TemplateBinding ClipToBounds}" IsOverflow="{Binding IsOverflow, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWayToSource}" OutOfBoundsPanel="{Binding #OverflowPanel}" />
+                                        <controls:ToolbarPanel Background="Transparent" ClipToBounds="{TemplateBinding ClipToBounds}" IsOverflow="{Binding IsOverflow, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWayToSource}" OutOfBoundsPanel="{Binding #OverflowPanel}" />
                                     </ItemsPanelTemplate>
                                 </ItemsPresenter.ItemsPanel>
                             </ItemsPresenter>
