@@ -309,9 +309,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             PasteRowsCommand = new AsyncAutoCommand(async () =>
             {
                 IDisposable? bulk = null;
+                string? text = null;
                 try
                 {
-                    var text = await clipboardService.GetText();
+                    text = await clipboardService.GetText();
                     if (string.IsNullOrEmpty(text))
                         return;
 
@@ -329,15 +330,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                         ForceInsertEntity(entity, index++);
                     }
                 }
-                catch (JsonReaderException e)
+                catch (Exception)
                 {
-                    LOG.LogWarning(e, "Can't paste rows");
-                    statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failed to paste rows (see the debug log output)"));
-                }
-                catch (Exception e)
-                {
-                    LOG.LogError(e, "Can't paste rows");
-                    statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failed to paste rows (see the debug log output)"));
+                    if (text != null)
+                        UpdateSelectedCells(text);
                 }
                 finally
                 {
