@@ -7,23 +7,25 @@ namespace WDE.SqlWorkbench.Services.Downloaders.MariaDb;
 
 [AutoRegister]
 [SingleInstance]
-internal class MariaDumpDownloadService : IMariaDumpDownloadService
+internal class MariaDownloadService : IMariaDownloadService
 {
     private readonly IWindowManager windowManager;
     private readonly Func<MariaDownloadViewModel> creator;
 
-    public MariaDumpDownloadService(IWindowManager windowManager,
+    public MariaDownloadService(IWindowManager windowManager,
         Func<MariaDownloadViewModel> creator)
     {
         this.windowManager = windowManager;
         this.creator = creator;
     }
     
-    public async Task<string?> AskToDownloadMariaDumpAsync()
+    public async Task<(string dump, string mariadb)?> AskToDownloadMariaAsync()
     {
         using var vm = creator();
         if (await windowManager.ShowDialog(vm))
-            return vm.DownloadPath;
+            return vm.DumpDownloadPath != null &&
+                   vm.MariaDbDownloadPath != null ?
+                (vm.DumpDownloadPath, vm.MariaDbDownloadPath) : null;
         return null;
     }
 }

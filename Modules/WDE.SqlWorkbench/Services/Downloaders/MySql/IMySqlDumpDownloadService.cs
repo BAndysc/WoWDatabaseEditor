@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace WDE.SqlWorkbench.Services.Downloaders.MySql;
 
-internal interface IMySqlDumpDownloadService
+internal interface IMySqlDownloadService
 {
-    Task<string?> AskToDownloadMySqlDumpAsync();
+    Task<(string dump, string mysql)?> AskToDownloadMySqlAsync();
 }

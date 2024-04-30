@@ -29,7 +29,8 @@ namespace WDE.Common.Services.Processes
         Task<int> Run(CancellationToken token, string path, string arguments, string? workingDirectory,
             Action<string>? onOutput,
             Action<string>? onError,
-            Action<TextWriter>? onInput = null,
+            bool redirectInput,
+            out StreamWriter inputWriter,
             params (string, string)[] envVars);
     }
 }

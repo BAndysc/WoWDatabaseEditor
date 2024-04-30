@@ -25,7 +25,7 @@ namespace WDE.Common.Services.Processes
             {
                 sb.AppendLine(s);
                 any = true;
-            }, null);
+            }, null, false, out _);
             if (any)
                 return sb.ToString();
             return null;
@@ -43,7 +43,7 @@ namespace WDE.Common.Services.Processes
             {
                 sb.Append(s);
                 any = true;
-            });
+            }, false, out _);
             if (any)
                 return sb.ToString();
             return null;

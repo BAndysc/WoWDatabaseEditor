@@ -34,7 +34,8 @@ internal partial class MariaDownloadViewModel : ObservableBase, IDialog, ITaskPr
 
     public IAsyncCommand DownloadSelectedVersionCommand { get; }
     
-    public string? DownloadPath { get; private set; }
+    public string? DumpDownloadPath { get; private set; }
+    public string? MariaDbDownloadPath { get; private set; }
 
     private CancellationTokenSource? cts;
     
@@ -74,7 +75,9 @@ internal partial class MariaDownloadViewModel : ObservableBase, IDialog, ITaskPr
                 if (!path.Exists)
                     path.Create();
 
-                DownloadPath = await mariaDbDownloader.DownloadMariaDbDumpAsync(SelectedMariaDbVersion!.Value.Id, path.FullName, this, cts.Token);
+                var (dump, maria) = await mariaDbDownloader.DownloadMariaDbAsync(SelectedMariaDbVersion!.Value.Id, path.FullName, this, cts.Token);
+                DumpDownloadPath = dump;
+                MariaDbDownloadPath = maria;
 
                 IsDownloaded = true;
                 cts = null;

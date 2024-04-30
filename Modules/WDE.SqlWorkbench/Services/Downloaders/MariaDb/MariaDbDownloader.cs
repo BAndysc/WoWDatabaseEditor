@@ -75,7 +75,7 @@ internal class MariaDbDownloader : IMariaDbDownloader
         }
     }
 
-    public async Task<string> DownloadMariaDbDumpAsync(string version, string outputDirectory, ITaskProgress progress, CancellationToken token = default)
+    public async Task<(string dump, string mariadb)> DownloadMariaDbAsync(string version, string outputDirectory, ITaskProgress progress, CancellationToken token = default)
     {
         var tempDir = Path.GetTempFileName() + ".dir";
         Directory.CreateDirectory(tempDir);
@@ -87,18 +87,27 @@ internal class MariaDbDownloader : IMariaDbDownloader
 
             await using var stream = new FileStream(Path.Combine(tempDir, "mariadb.zip"), FileMode.Open);
             var zip = new ZipArchive(stream);
-            var entry = zip.Entries.FirstOrDefault(x => x.FullName.EndsWith("mariadb-dump.exe", StringComparison.OrdinalIgnoreCase));
-            
-            if (entry == null)
+            var entryDump = zip.Entries.FirstOrDefault(x => x.FullName.EndsWith("mariadb-dump.exe", StringComparison.OrdinalIgnoreCase));
+            var entryMariaDb = zip.Entries.FirstOrDefault(x => x.FullName.EndsWith("mariadb.exe", StringComparison.OrdinalIgnoreCase));
+
+            if (entryDump == null)
                 throw new Exception("Cannot find mariadb-dump.exe in downloaded archive");
 
-            var outFile = Path.Combine(outputDirectory, "mariadb-dump.exe");
-            entry.ExtractToFile(outFile, true);
-            
-            if (!File.Exists(outFile))
+            if (entryMariaDb == null)
+                throw new Exception("Cannot find mariadb.exe in downloaded archive");
+
+            var outFileDump = Path.Combine(outputDirectory, "mariadb-dump.exe");
+            var outFileMariaDb = Path.Combine(outputDirectory, "mariadb.exe");
+            entryDump.ExtractToFile(outFileDump, true);
+            entryMariaDb.ExtractToFile(outFileMariaDb, true);
+
+            if (!File.Exists(outFileDump))
                 throw new Exception("Cannot find mariadb-dump.exe in downloaded archive");
-            
-            return Path.GetFullPath(outFile);
+
+            if (!File.Exists(outFileMariaDb))
+                throw new Exception("Cannot find mariadb.exe in downloaded archive");
+
+            return (Path.GetFullPath(outFileDump), Path.GetFullPath(outFileMariaDb));
         }
         finally
         {

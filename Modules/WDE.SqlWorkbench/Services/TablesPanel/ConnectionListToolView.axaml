@@ -64,6 +64,7 @@
                                 <MenuItem Header="Procedure" Command="{CompiledBinding AddNewProcedureCommand}" />
                                 <MenuItem Header="Function" Command="{CompiledBinding AddNewFunctionCommand}" />
                             </MenuItem>
+                            <MenuItem Header="Import" Command="{CompiledBinding ImportDatabaseCommand}" IsVisible="{CompiledBinding IsDatabaseSelected}" />
                             <MenuItem Header="Dump Table" Command="{CompiledBinding DumpTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
                             <MenuItem Header="Dump Database" Command="{CompiledBinding DumpDatabaseCommand}" IsVisible="{CompiledBinding IsDatabaseSelected}" />
                             <Separator IsVisible="{CompiledBinding IsTableSelected}" />

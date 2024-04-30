@@ -35,7 +35,7 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
 {
     private readonly ISqlWorkbenchPreferences preferences;
     private readonly IConnectionsManager connectionsManager;
-    private readonly IMariaDumpDownloadService mariaDumpDownloadService;
+    private readonly IMariaDownloadService mariaDownloadService;
     [Notify] [AlsoNotify(nameof(IsModified))] private bool connectionsContainerIsModified;
     
     public ICommand Save { get; }
@@ -114,6 +114,34 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
         }
     }
 
+    [Notify] [AlsoNotify(nameof(HasCustomMariaImportPath))] private string? customMariaImportPath;
+
+    public bool HasCustomMariaImportPath
+    {
+        get => CustomMariaImportPath != null;
+        set
+        {
+            if (value)
+                CustomMariaImportPath = "";
+            else
+                CustomMariaImportPath = null;
+        }
+    }
+
+    [Notify] [AlsoNotify(nameof(HasCustomMySqlImportPath))] private string? customMySqlImportPath;
+
+    public bool HasCustomMySqlImportPath
+    {
+        get => CustomMySqlImportPath != null;
+        set
+        {
+            if (value)
+                CustomMySqlImportPath = "";
+            else
+                CustomMySqlImportPath = null;
+        }
+    }
+
     [Notify] private ConnectionConfigViewModel? selectedConnection;
 
     [Notify] [AlsoNotify(nameof(IsModified))] private ConnectionConfigViewModel? defaultConnection;
@@ -128,9 +156,13 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
     
     public IAsyncCommand PickCustomMariaDumpPath { get; }
 
+    public IAsyncCommand PickCustomMariaImportPath { get; }
+
     public IAsyncCommand DownloadAndPickCustomMariaDumpCommand { get; }
 
     public IAsyncCommand PickCustomMySqlDumpPath { get; }
+
+    public IAsyncCommand PickCustomMySqlImportPath { get; }
 
     public IAsyncCommand DownloadAndPickCustomMySqlDumpCommand { get; }
 
@@ -146,15 +178,15 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
         IWindowManager windowManager,
         IMySqlConnector mySqlConnector,
         IMessageBoxService messageBoxService,
-        IMariaDumpDownloadService mariaDumpDownloadService,
-        IMySqlDumpDownloadService mySqlDumpDownloadService,
+        IMariaDownloadService mariaDownloadService,
+        IMySqlDownloadService mySqlDownloadService,
         IWorldDatabaseSettingsProvider worldDatabaseSettingsProvider,
         IHotfixDatabaseSettingsProvider hotfixDatabaseSettingsProvider,
         IAuthDatabaseSettingsProvider authDatabaseSettingsProvider)
     {
         this.preferences = preferences;
         this.connectionsManager = connectionsManager;
-        this.mariaDumpDownloadService = mariaDumpDownloadService;
+        this.mariaDownloadService = mariaDownloadService;
         Connections.ToStream(true).SubscribeAction(e =>
         {
             if (e.Type == CollectionEventType.Add)
@@ -172,6 +204,8 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
             preferences.CustomSqlsPath = CustomSqlsPath;
             preferences.CustomMariaDumpPath = CustomMariaDumpPath;
             preferences.CustomMySqlDumpPath = CustomMySqlDumpPath;
+            preferences.CustomMariaImportPath = CustomMariaImportPath;
+            preferences.CustomMySqlImportPath = CustomMySqlImportPath;
             preferences.EachDatabaseHasSeparateConnection = EachDatabaseHasSeparateConnection;
             preferences.AskBeforeApplyingChanges = AskBeforeApplyingChanges;
             preferences.CloseNonModifiedTabsOnExecute = CloseNonModifiedTabsOnExecute;
@@ -242,12 +276,22 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
             if (path != null)
                 CustomMariaDumpPath = path;
         });
-        
+
+        PickCustomMariaImportPath = new AsyncAutoCommand(async () =>
+        {
+            var path = await windowManager.ShowOpenFileDialog(CustomMariaImportPath ?? Environment.CurrentDirectory);
+            if (path != null)
+                CustomMariaImportPath = path;
+        });
+
         DownloadAndPickCustomMariaDumpCommand = new AsyncAutoCommand(async () =>
         {
-            var path = await mariaDumpDownloadService.AskToDownloadMariaDumpAsync();
-            if (path != null)
-                CustomMariaDumpPath = path;
+            var paths = await mariaDownloadService.AskToDownloadMariaAsync();
+            if (paths != null)
+            {
+                CustomMariaDumpPath = paths.Value.dump;
+                CustomMariaImportPath = paths.Value.mariadb;
+            }
         });
 
         PickCustomMySqlDumpPath = new AsyncAutoCommand(async () =>
@@ -256,12 +300,22 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
             if (path != null)
                 CustomMySqlDumpPath = path;
         });
-        
+
+        PickCustomMySqlImportPath = new AsyncAutoCommand(async () =>
+        {
+            var path = await windowManager.ShowOpenFileDialog(CustomMySqlImportPath ?? Environment.CurrentDirectory);
+            if (path != null)
+                CustomMySqlImportPath = path;
+        });
+
         DownloadAndPickCustomMySqlDumpCommand = new AsyncAutoCommand(async () =>
         {
-            var path = await mySqlDumpDownloadService.AskToDownloadMySqlDumpAsync();
-            if (path != null)
-                CustomMySqlDumpPath = path;
+            var paths = await mySqlDownloadService.AskToDownloadMySqlAsync();
+            if (paths != null)
+            {
+                CustomMySqlDumpPath = paths.Value.dump;
+                CustomMySqlImportPath = paths.Value.mysql;
+            }
         });
 
         AddConnectionCommand = new DelegateCommand(() =>
@@ -323,6 +377,8 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
         CustomSqlsPath = originalCustomSqlsPath = preferences.CustomSqlsPath;
         CustomMariaDumpPath = originalCustomMariaDumpPath = preferences.CustomMariaDumpPath;
         CustomMySqlDumpPath = originalCustomMySqlDumpPath = preferences.CustomMySqlDumpPath;
+        CustomMariaImportPath = preferences.CustomMariaImportPath;
+        CustomMySqlImportPath = preferences.CustomMySqlImportPath;
         ConnectionsContainerIsModified = false;
     }
 

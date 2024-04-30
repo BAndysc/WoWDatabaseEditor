@@ -11,7 +11,7 @@ internal interface IMariaDbDownloader
     Task<IReadOnlyList<MariaDbRelease>> GetReleasesAsync(CancellationToken token = default);
     Task<string?> GetDownloadLinkAsync(string version, CancellationToken token = default);
     Task DownloadAsync(string version, string outputPath, ITaskProgress progress, CancellationToken token = default);
-    Task<string> DownloadMariaDbDumpAsync(string version, string outputDirectory, ITaskProgress progress, CancellationToken token = default);
+    Task<(string dump, string mariadb)> DownloadMariaDbAsync(string version, string outputDirectory, ITaskProgress progress, CancellationToken token = default);
 }
 
 internal struct MariaDbRelease

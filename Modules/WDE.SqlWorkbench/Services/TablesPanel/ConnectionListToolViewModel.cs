@@ -16,6 +16,7 @@ using WDE.MVVM;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Services.SqlDump;
+using WDE.SqlWorkbench.Services.SqlImport;
 using WDE.SqlWorkbench.Services.TableUtils;
 using WDE.SqlWorkbench.Services.UserQuestions;
 using WDE.SqlWorkbench.Settings;
@@ -86,6 +87,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     public AsyncAutoCommand CopyUpdateCommand { get; }
     public AsyncAutoCommand CopyDeleteCommand { get; }
     public AsyncAutoCommand CopyCreateCommand { get; }
+    public DelegateCommand ImportDatabaseCommand { get; }
     public DelegateCommand DumpDatabaseCommand { get; }
     public DelegateCommand DumpTableCommand { get; }
     public DelegateCommand DropTableCommand { get; }
@@ -102,6 +104,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
         IClipboardService clipboardService,
         IQueryGenerator queryGenerator,
         IDatabaseDumpService databaseDumpService,
+        IDatabaseImportService databaseImportService,
         IQueryDialogService queryDialogService,
         IConnection connection,
         IConnectionsManager connectionsManager,
@@ -167,7 +170,9 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
         {
             this.sqlEditorService.Value.NewDocumentWithQuery(SelectedConnection!, "delimiter //\nCREATE FUNCTION <NAME> (<PARAMS>)\nRETURNS <TYPE>\nBEGIN\n    ...\nEND //");
         }, () => Selected != null);
-        
+
+        ImportDatabaseCommand = new DelegateCommand(() => databaseImportService.ShowImportDatabaseWindowAsync(SelectedConnection!.ConnectionData.Credentials.WithSchemaName(SelectedSchemaName!)).ListenErrors(),
+            () => IsDatabaseSelected);
         DumpDatabaseCommand = new DelegateCommand(() => databaseDumpService.ShowDumpDatabaseWindowAsync(SelectedConnection!.ConnectionData.Credentials.WithSchemaName(SelectedSchemaName!)).ListenErrors(),
             () => IsDatabaseSelected);
         DumpTableCommand = new DelegateCommand(() => databaseDumpService.ShowDumpTableWindowAsync(SelectedConnection!.ConnectionData.Credentials.WithSchemaName(SelectedSchemaName!), SelectedTable!.TableName).ListenErrors(),

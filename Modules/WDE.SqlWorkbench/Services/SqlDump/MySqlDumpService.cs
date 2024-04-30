@@ -65,7 +65,7 @@ internal class MySqlDumpService : IMySqlDumpService
     
     public async Task DumpDatabaseAsync(DatabaseCredentials credentials, 
         MySqlDumpOptions options, 
-        MySqlDumpVersion version,
+        MySqlToolsVersion version,
         string[] allTables,
         string[] tables,
         string output, 
@@ -118,15 +118,15 @@ internal class MySqlDumpService : IMySqlDumpService
             f.Write(bytes);
             f.Write(NewLine);
             mainThread.Dispatch(() => bytesWrittenCallback(bytes.Length + NewLine.Length));
-        }, x => mainThread.Dispatch(() => errorCallback(x)));
+        }, x => mainThread.Dispatch(() => errorCallback(x)), false, out _);
         isClosed[0] = true;
         if (exitCode != 0 && !token.IsCancellationRequested)
             throw new Exception("mysqldump failed with exit code " + exitCode + ". See the log for more details.");
     }
 
-    private string LocateDumper(MySqlDumpVersion version)
+    private string LocateDumper(MySqlToolsVersion version)
     {
-        if (version == MySqlDumpVersion.MySql)
+        if (version == MySqlToolsVersion.MySql)
         {
             if (!string.IsNullOrEmpty(preferences.CustomMySqlDumpPath) &&
                 File.Exists(preferences.CustomMySqlDumpPath))

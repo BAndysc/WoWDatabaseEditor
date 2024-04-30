@@ -163,24 +163,28 @@ internal class MySqlDbDownloader : IMySqlDownloader
         }
     }
 
-    public async Task<string> DownloadMySqlDumpAsync(string version, string outputDirectory, ITaskProgress progress, CancellationToken token = default)
+    public async Task<(string dump, string mysql)> DownloadMySqlAsync(string version, string outputDirectory, ITaskProgress progress, CancellationToken token = default)
     {
         var tempDir = Path.GetTempFileName() + ".dir";
         Directory.CreateDirectory(tempDir);
-        var outMySql = Path.Combine(tempDir, "mysql.zip");
+        var outMySqlZip = Path.Combine(tempDir, "mysql.zip");
 
         try
         {
-            await DownloadAsync(version, outMySql, progress, token);
+            await DownloadAsync(version, outMySqlZip, progress, token);
 
             await using var stream = new FileStream(Path.Combine(tempDir, "mysql.zip"), FileMode.Open);
             var zip = new ZipArchive(stream);
             var mysqldump = zip.Entries.FirstOrDefault(x => x.FullName.EndsWith("mysqldump.exe", StringComparison.OrdinalIgnoreCase));
+            var mysql = zip.Entries.FirstOrDefault(x => x.FullName.EndsWith("mysql.exe", StringComparison.OrdinalIgnoreCase));
             var libcrypto = zip.Entries.FirstOrDefault(x => x.FullName.EndsWith("libcrypto-3-x64.dll", StringComparison.OrdinalIgnoreCase));
             var libssl = zip.Entries.FirstOrDefault(x => x.FullName.EndsWith("libssl-3-x64.dll", StringComparison.OrdinalIgnoreCase));
             
             if (mysqldump == null)
                 throw new Exception("Cannot find mysqldump.exe in downloaded archive");
+
+            if (mysql == null)
+                throw new Exception("Cannot find mysql.exe in downloaded archive");
 
             if (libcrypto == null)
                 throw new Exception("Cannot find libcrypto-3-x64.dll in downloaded archive");
@@ -189,22 +193,27 @@ internal class MySqlDbDownloader : IMySqlDownloader
                 throw new Exception("Cannot find libssl-3-x64.dll in downloaded archive");
             
             var outMySqlDump = Path.Combine(outputDirectory, "mysqldump.exe");
+            var outMySql = Path.Combine(outputDirectory, "mysql.exe");
             var outLibCrypto = Path.Combine(outputDirectory, "libcrypto-3-x64.dll");
             var outLibSsl = Path.Combine(outputDirectory, "libssl-3-x64.dll");
             
             mysqldump.ExtractToFile(outMySqlDump, true);
+            mysql.ExtractToFile(outMySql, true);
             libcrypto.ExtractToFile(outLibCrypto, true);
             libssl.ExtractToFile(outLibSsl, true);
             
             if (!File.Exists(outMySqlDump))
                 throw new Exception("Cannot find mysqldump.exe in downloaded archive");
-            
-            return Path.GetFullPath(outMySqlDump);
+
+            if (!File.Exists(outMySql))
+                throw new Exception("Cannot find mysql.exe in downloaded archive");
+
+            return (Path.GetFullPath(outMySqlDump), Path.GetFullPath(outMySql));
         }
         finally
         {
-            if (File.Exists(outMySql))
-                File.Delete(outMySql);
+            if (File.Exists(outMySqlZip))
+                File.Delete(outMySqlZip);
         }
     }
 }

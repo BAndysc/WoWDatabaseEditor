@@ -39,6 +39,22 @@
             <TextBox Text="{CompiledBinding CustomSqlsPath}" IsEnabled="{CompiledBinding HasCustomSqlsPath}" TabIndex="1" />
           </DockPanel>
         </SettingItem>
+        <SettingItem Header="Custom MariaDB path" Help="If you want to import MariaDB databases, you can provide mariadb tool path here.">
+          <DockPanel KeyboardNavigation.TabNavigation="Local">
+            <CheckBox IsChecked="{CompiledBinding HasCustomMariaImportPath}" TabIndex="0" />
+            <Button Margin="5,0,0,0" DockPanel.Dock="Right" TabIndex="3" Content="Download" Command="{CompiledBinding DownloadAndPickCustomMariaDumpCommand}" IsEnabled="{CompiledBinding HasCustomMariaImportPath}"/>
+            <Button Margin="5,0,0,0" DockPanel.Dock="Right" TabIndex="2" Content=" ... " Command="{CompiledBinding PickCustomMariaImportPath}" IsEnabled="{CompiledBinding HasCustomMariaImportPath}"/>
+            <TextBox Text="{CompiledBinding CustomMariaImportPath}" IsEnabled="{CompiledBinding HasCustomMariaImportPath}" TabIndex="1" />
+          </DockPanel>
+        </SettingItem>
+        <SettingItem Header="Custom mysql path" Help="If you want to import MySQL databases, you can provide mysql tool path here.">
+          <DockPanel KeyboardNavigation.TabNavigation="Local">
+            <CheckBox IsChecked="{CompiledBinding HasCustomMySqlImportPath}" TabIndex="0" />
+            <Button Margin="5,0,0,0" DockPanel.Dock="Right" TabIndex="3" Content="Download" Command="{CompiledBinding DownloadAndPickCustomMySqlDumpCommand}" IsEnabled="{CompiledBinding HasCustomMySqlImportPath}"/>
+            <Button Margin="5,0,0,0" DockPanel.Dock="Right" TabIndex="2" Content=" ... " Command="{CompiledBinding PickCustomMySqlImportPath}" IsEnabled="{CompiledBinding HasCustomMySqlImportPath}"/>
+            <TextBox Text="{CompiledBinding CustomMySqlImportPath}" IsEnabled="{CompiledBinding HasCustomMySqlImportPath}" TabIndex="1" />
+          </DockPanel>
+        </SettingItem>
         <SettingItem Header="Custom MariaDB-dump path" Help="If you want to dump MariaDB databases, you can provide mariadb-dump tool path here.">
           <DockPanel KeyboardNavigation.TabNavigation="Local">
             <CheckBox IsChecked="{CompiledBinding HasCustomMariaDumpPath}" TabIndex="0" />

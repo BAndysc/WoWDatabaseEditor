@@ -237,7 +237,7 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
             ConsoleOutput = "";
             await mySqlDumpService.DumpDatabaseAsync(credentials,
                 options,
-                DatabaseVersion.Contains("maria", StringComparison.OrdinalIgnoreCase) ? MySqlDumpVersion.MariaDb : MySqlDumpVersion.MySql,
+                DatabaseVersion.Contains("maria", StringComparison.OrdinalIgnoreCase) ? MySqlToolsVersion.MariaDb : MySqlToolsVersion.MySql,
                 Tables.Select(x => x.Name).ToArray(),
                 selectedTables, 
                 outFile,

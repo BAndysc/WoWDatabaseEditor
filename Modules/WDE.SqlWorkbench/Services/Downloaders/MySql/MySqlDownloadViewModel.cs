@@ -27,14 +27,15 @@ internal partial class MySqlDownloadViewModel : ObservableBase, IDialog, ITaskPr
     [Notify] private int downloadLength;
     [Notify] private bool isDownloading;
     [Notify] private bool isFetchingVersions;
-    [Notify] private MySqlRelease? selectedMariaDbVersion;
+    [Notify] private MySqlRelease? selectedMySqlDbVersion;
     [Notify] private string downloadText = "Download";
     [Notify] private bool isDownloaded;
-    public ObservableCollection<MySqlRelease> MariaDbVersions { get; } = new();
+    public ObservableCollection<MySqlRelease> MySqlVersions { get; } = new();
 
     public IAsyncCommand DownloadSelectedVersionCommand { get; }
     
-    public string? DownloadPath { get; private set; }
+    public string? DumpDownloadPath { get; private set; }
+    public string? MySqlDownloadPath { get; private set; }
 
     private CancellationTokenSource? cts;
     
@@ -54,7 +55,7 @@ internal partial class MySqlDownloadViewModel : ObservableBase, IDialog, ITaskPr
         var accept = new DelegateCommand(() =>
         {
             CloseOk?.Invoke();
-        }, () => !IsDownloading && !IsFetchingVersions && SelectedMariaDbVersion != null && IsDownloaded);
+        }, () => !IsDownloading && !IsFetchingVersions && SelectedMySqlDbVersion != null && IsDownloaded);
         Accept = accept;
         Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
         
@@ -74,7 +75,9 @@ internal partial class MySqlDownloadViewModel : ObservableBase, IDialog, ITaskPr
                 if (!path.Exists)
                     path.Create();
 
-                DownloadPath = await mySqlDbDownloader.DownloadMySqlDumpAsync(SelectedMariaDbVersion!.Value.Id, path.FullName, this, cts.Token);
+                var (dump, mysql) = await mySqlDbDownloader.DownloadMySqlAsync(SelectedMySqlDbVersion!.Value.Id, path.FullName, this, cts.Token);
+                DumpDownloadPath = dump;
+                MySqlDownloadPath = mysql;
 
                 IsDownloaded = true;
                 cts = null;
@@ -84,7 +87,7 @@ internal partial class MySqlDownloadViewModel : ObservableBase, IDialog, ITaskPr
                 IsDownloading = false;
                 DownloadText = "Download";
             }
-        }, _ => !IsDownloading && !IsFetchingVersions && SelectedMariaDbVersion != null)
+        }, _ => !IsDownloading && !IsFetchingVersions && SelectedMySqlDbVersion != null)
         .WrapMessageBox<Exception>(messageBoxService);
 
         PropertyChanged += (_, _) =>
@@ -102,12 +105,12 @@ internal partial class MySqlDownloadViewModel : ObservableBase, IDialog, ITaskPr
         {
             IsFetchingVersions = true;
             var releases = await mySqlDbDownloader.GetReleasesAsync();
-            MariaDbVersions.AddRange(releases);
-            SelectedMariaDbVersion = MariaDbVersions.Count == 0 ? null : MariaDbVersions[0];
+            MySqlVersions.AddRange(releases);
+            SelectedMySqlDbVersion = MySqlVersions.Count == 0 ? null : MySqlVersions[0];
         }
         catch (Exception e)
         {
-            await messageBoxService.SimpleDialog("Error", "Can't fetch maria db versions", e.Message);
+            await messageBoxService.SimpleDialog("Error", "Can't fetch MySql versions", e.Message);
         }
         finally
         {
@@ -117,7 +120,7 @@ internal partial class MySqlDownloadViewModel : ObservableBase, IDialog, ITaskPr
     
     public int DesiredWidth => 400;
     public int DesiredHeight => 300;
-    public string Title => "Maria DB Downloader";
+    public string Title => "MySql DB Downloader";
     public bool Resizeable => true;
     public ICommand Accept { get; }
     public ICommand Cancel { get; }

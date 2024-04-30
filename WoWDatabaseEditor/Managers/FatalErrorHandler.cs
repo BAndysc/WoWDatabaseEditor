@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using DynamicData;
 using WDE.Common;
 
 namespace WoWDatabaseEditorCore.Managers
@@ -44,7 +45,8 @@ namespace WoWDatabaseEditorCore.Managers
                     UseShellExecute = true
                 };
                 info.ArgumentList.Add("--crashed");
-                info.ArgumentList.AddRange(args);
+                foreach (var arg in args)
+                    info.ArgumentList.Add(arg);
                 Process.Start(info);
             }
         }

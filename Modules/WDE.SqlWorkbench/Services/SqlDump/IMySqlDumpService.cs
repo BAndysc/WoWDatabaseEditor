@@ -9,7 +9,7 @@ internal interface IMySqlDumpService
 {
     Task DumpDatabaseAsync(DatabaseCredentials credentials,
         MySqlDumpOptions options, 
-        MySqlDumpVersion version,
+        MySqlToolsVersion version,
         string[] allTables,
         string[] tables, 
         string outputFile,
@@ -18,7 +18,7 @@ internal interface IMySqlDumpService
         CancellationToken token);
 }
 
-internal enum MySqlDumpVersion
+internal enum MySqlToolsVersion
 {
     MySql,
     MariaDb

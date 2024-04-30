@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:views="clr-namespace:WDE.SqlWorkbench.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:ImportViewModel"
+             x:Class="WDE.SqlWorkbench.Views.ImportView">
+  <DockPanel KeyboardNavigation.TabNavigation="Local">
+    <OkCancelButtons TabIndex="10" DockPanel.Dock="Bottom" AcceptCommand="{CompiledBinding ImportCommand}"
+                     CancelCommand="{CompiledBinding CloseCommand}"
+                     AcceptText="Import" />
+
+    <ProgressBar IsVisible="{CompiledBinding ImportInProgress}"
+                 Value="{CompiledBinding ProgressValue}"
+                 Maximum="{CompiledBinding TotalSize}"
+                 Margin="0,5,0,5"
+                 DockPanel.Dock="Bottom" />
+
+    <DockPanel DockPanel.Dock="Bottom" IsVisible="{CompiledBinding !EachFileInNewSession}">
+      <Button DockPanel.Dock="Right" Command="{CompiledBinding OpenTempFile}">Open temp file</Button>
+      <StackPanel Orientation="Vertical">
+        <CheckBox IsChecked="{CompiledBinding SaveTempFile}" DockPanel.Dock="Bottom">Save a temporary file (to analyse if import fails)</CheckBox>
+        <CheckBox IsVisible="{CompiledBinding SaveTempFile}" IsChecked="{CompiledBinding AutoDeleteSaveTempFile}" DockPanel.Dock="Bottom">Delete the temporary file when import succeeds</CheckBox>
+      </StackPanel>
+    </DockPanel>
+
+    <CheckBox IsChecked="{CompiledBinding EachFileInNewSession}" DockPanel.Dock="Bottom">Apply each file in a new session (slower, but easier to debug when a file fails)</CheckBox>
+
+    <TextBox Text="{CompiledBinding ConsoleOutput}"
+             IsReadOnly="True"
+             DockPanel.Dock="Bottom"
+             FontFamily="{DynamicResource MonoFont}"
+             IsVisible="{CompiledBinding HasAnyConsoleOutput}" />
+
+    <Panel Margin="0,0,5,0">
+      <DockPanel IsEnabled="{CompiledBinding !IsLoading}">
+        <ToolbarPanel DockPanel.Dock="Top">
+          <Button Command="{CompiledBinding AddFileCommand}">Add file</Button>
+          <Button Command="{CompiledBinding AddFolderCommand}">Add folder</Button>
+          <Button Command="{CompiledBinding ClearAllCommand}">Clear</Button>
+        </ToolbarPanel>
+        <ListBox Name="FilesListBox" ItemsSource="{CompiledBinding Files}"
+                 SelectionMode="Multiple"
+                 KeyDown="TableItemKeyPressed">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <DockPanel>
+                <!-- TextBlock is not in the CheckBox's Content on purpose so that only the toggle box toggles the selection -->
+                <CheckBox IsChecked="{CompiledBinding IsChecked}" />
+                <TextBlock DockPanel.Dock="Right" Text="{CompiledBinding SizeMegaBytes, StringFormat={}{0:0.00} MB}" Margin="10,0,5,0" />
+                <WdeImage Width="16" Height="16" VerticalAlignment="Center" DockPanel.Dock="Right" Image="{CompiledBinding State, Converter={x:Static views:MySqlFileImportStateConverter.Instance}}" Margin="5,0,0,0"  />
+                <TextBlock Text="{CompiledBinding Name}" Margin="0,0,5,0" />
+              </DockPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+      <utils:LoadingSpinner IsVisible="{CompiledBinding IsLoading}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+    </Panel>
+  </DockPanel>
+</UserControl>

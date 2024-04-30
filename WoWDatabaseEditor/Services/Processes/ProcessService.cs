@@ -61,8 +61,8 @@ namespace WoWDatabaseEditorCore.Services.Processes
             return new ProcessData(process);
         }
         
-        public async Task<int> Run(CancellationToken token, string path, string arguments, string? workingDirectory, Action<string>? onOutput,
-            Action<string>? onError, Action<TextWriter>? onInput,
+        public Task<int> Run(CancellationToken token, string path, string arguments, string? workingDirectory, Action<string>? onOutput,
+            Action<string>? onError, bool redirectInput, out StreamWriter inputWriter,
             params (string, string)[] envVars)
         {
             var startInfo = new ProcessStartInfo(path, arguments);
@@ -71,7 +71,7 @@ namespace WoWDatabaseEditorCore.Services.Processes
                 startInfo.RedirectStandardOutput = true;
             if (onError != null)
                 startInfo.RedirectStandardError = true;
-            if (onInput != null)
+            if (redirectInput)
                 startInfo.RedirectStandardInput = true;
             startInfo.CreateNoWindow = true;
             
@@ -106,18 +106,26 @@ namespace WoWDatabaseEditorCore.Services.Processes
             if (onError != null)
                 process.BeginErrorReadLine();
 
-            //onInput?.Invoke(process.StandardInput);
+            if (redirectInput)
+                inputWriter = process.StandardInput;
+            else
+                inputWriter = null!;
 
-            try
+            async Task<int> Job()
             {
-                await process.WaitForExitAsync(token);
-            }
-            catch (TaskCanceledException)
-            {
-                process.Kill();
+                try
+                {
+                    await process.WaitForExitAsync(token);
+                }
+                catch (TaskCanceledException)
+                {
+                    process.Kill();
+                }
+
+                return process.HasExited ? process.ExitCode : -1;
             }
 
-            return process.HasExited ? process.ExitCode : -1;
+            return Job();
         }
     }
 }

@@ -39,7 +39,7 @@
       <StackPanel>
         <DockPanel Margin="0,0,0,10">
           <TextBlock DockPanel.Dock="Left" Text="Version:" Margin="0,0,10,0" />
-          <ComboBox HorizontalAlignment="Stretch" ItemsSource="{CompiledBinding MariaDbVersions}" SelectedItem="{CompiledBinding SelectedMariaDbVersion}">
+          <ComboBox HorizontalAlignment="Stretch" ItemsSource="{CompiledBinding MySqlVersions}" SelectedItem="{CompiledBinding SelectedMySqlDbVersion}">
             <ComboBox.ItemTemplate>
               <DataTemplate>
                 <DockPanel LastChildFill="False">

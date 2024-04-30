@@ -7,6 +7,7 @@ using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Services.SqlDump;
+using WDE.SqlWorkbench.Services.SqlImport;
 using WDE.SqlWorkbench.Services.TablesPanel;
 using WDE.SqlWorkbench.Services.TableUtils;
 using WDE.SqlWorkbench.Services.UserQuestions;
@@ -24,6 +25,7 @@ internal class ConnectionListToolViewModelTests
     protected IExtendedSqlEditorService extendedSqlEditorService = null!;
     protected MockSqlConnector connector = null!;
     protected IDatabaseDumpService databaseDumpService = null!;
+    protected IDatabaseImportService databaseImportService = null!;
     protected IQueryDialogService queryDialogService = null!;
     protected IMainThread mainThread = null!;
     protected IWorldDatabaseSettingsProvider worldDatabaseSettingsProvider = null!;
@@ -42,6 +44,7 @@ internal class ConnectionListToolViewModelTests
         extendedSqlEditorService = Substitute.For<IExtendedSqlEditorService>();
         connector = new MockSqlConnector(new QuerySafetyService(userQuestionsService));
         databaseDumpService = Substitute.For<IDatabaseDumpService>();
+        databaseImportService = Substitute.For<IDatabaseImportService>();
         queryDialogService = Substitute.For<IQueryDialogService>();
         mainThread = Substitute.For<IMainThread>();
         worldDatabaseSettingsProvider = Substitute.For<IWorldDatabaseSettingsProvider>();
@@ -70,6 +73,7 @@ internal class ConnectionListToolViewModelTests
             clipboard,
             new QueryGenerator(connector),
             databaseDumpService,
+            databaseImportService,
             queryDialogService,
             connection,
             connectionsManager,
