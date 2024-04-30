@@ -1,4 +1,5 @@
-﻿using WDE.Module.Attributes;
+﻿using System.Threading.Tasks;
+using WDE.Module.Attributes;
 
 namespace WDE.Common.Solution
 {
@@ -6,5 +7,6 @@ namespace WDE.Common.Solution
     public interface ISolutionItemNameRegistry
     {
         string GetName(ISolutionItem item);
+        Task<string> GetNameAsync(ISolutionItem item);
     }
 }

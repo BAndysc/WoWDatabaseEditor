@@ -98,6 +98,11 @@ namespace WDE.DatabaseEditors.ViewModels
             redoCommand = new DelegateCommand(History.Redo, CanRedo);
             Save = new AsyncAutoCommand(SaveSolutionItem);
             title = solutionItemName.GetName(solutionItem);
+            async Task GetTitleAsync()
+            {
+                Title = await solutionItemName.GetNameAsync(solutionItem);
+            }
+            GetTitleAsync().ListenErrors();
             Icon = iconRegistry.GetIcon(solutionItem);
             nameGeneratorParameter = parameterFactory.Factory("Parameter");
             
@@ -210,7 +215,7 @@ namespace WDE.DatabaseEditors.ViewModels
                     }
                     progress.ReportFinished();
                 });
-            Title = solutionItemName.GetName(SolutionItem);
+            Title = await solutionItemName.GetNameAsync(SolutionItem);
         }
 
         protected virtual Task AfterSave() => Task.CompletedTask;
@@ -220,7 +225,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         protected virtual async Task<DatabaseTableData?> LoadData()
         {
-            return await databaseTableDataProvider.Load(solutionItem.TableName, null, null, null, solutionItem.Entries.Select(e => e.Key).ToArray()) as DatabaseTableData; ;
+            return await databaseTableDataProvider.Load(solutionItem.TableName, null, null, null, solutionItem.Entries.Select(e => e.Key).ToArray()) as DatabaseTableData;
         }
         
         protected async Task<bool> InternalLoadData()
@@ -319,6 +324,15 @@ namespace WDE.DatabaseEditors.ViewModels
 
         protected string GenerateName(long entity)
         {
+            return nameGeneratorParameter.ToString(entity);
+        }
+
+        protected async Task<string> GenerateNameAsync(long entity)
+        {
+            if (nameGeneratorParameter is IAsyncParameter<long> lp)
+            {
+                return await lp.ToStringAsync(entity, default);
+            }
             return nameGeneratorParameter.ToString(entity);
         }
         

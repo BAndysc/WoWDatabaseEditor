@@ -54,6 +54,7 @@ public class RowPickerViewModel : ObservableBase, IDialog, IWindowViewModel, ICl
         this.messageBoxService = messageBoxService;
         this.noSaveMode = noSaveMode;
         Watch(baseViewModel, o => o.IsModified, nameof(Title));
+        Watch(baseViewModel, o => o.Title, nameof(Title));
         ExecuteChangedCommand = noSaveMode ? AlwaysDisabledAsyncCommand.Command : new AsyncAutoCommand(async () =>
         {
             await baseViewModel.Save.ExecuteAsync();

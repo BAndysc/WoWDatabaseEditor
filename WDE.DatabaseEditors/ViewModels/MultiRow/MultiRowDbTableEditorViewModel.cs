@@ -789,7 +789,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         {
             if (keys.Add(entity))
             {
-                byEntryGroups[entity] = new DatabaseEntitiesGroupViewModel(entity, GenerateName(entity[0]));
+                byEntryGroups[entity] = new DatabaseEntitiesGroupViewModel(entity, GenerateName(entity[0]), () => GenerateNameAsync(entity[0]));
                 Rows.Add(byEntryGroups[entity]);
                 entities.Add(new CustomObservableCollection<DatabaseEntity>());
             }

@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using AvaloniaStyles.Controls.FastTableView;
+using PropertyChanged.SourceGenerator;
 using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
@@ -12,7 +15,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
     {
         private bool isExpanded = true;
         public DatabaseKey Key { get; }
-        public string Name { get; }
+        [Notify] private string name;
         
         public bool IsExpanded
         {
@@ -25,10 +28,16 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             }
         }
 
-        public DatabaseEntitiesGroupViewModel(DatabaseKey key, string name)
+        public DatabaseEntitiesGroupViewModel(DatabaseKey key, string name, Func<Task<string>> nameLazyGetter)
         {
             Key = key;
-            Name = name;
+            this.name = name;
+            async Task SetName()
+            {
+                Name = await nameLazyGetter();
+            }
+
+            SetName().ListenErrors();
         }
 
         public override void OrderByIndices(List<int> indices)
