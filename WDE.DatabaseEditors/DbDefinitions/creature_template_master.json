@@ -1,0 +1,287 @@
+{
+  "compatibility": [
+    "TrinityMaster"
+  ],
+  "name": "Creature Template",
+  "single_solution_name": "{name} Template Editor",
+  "multi_solution_name": "Multiple Creatures Template Editor",
+  "description": "Main table for creature definitions",
+  "table_name": "creature_template",
+  "table_index_name": "entry",
+  "record_mode": "Template",
+  "group_name": "Templates",
+  "icon_path": "Icons/document_creature_template.png",
+  "reload_command": "reload creature_template",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "Entry & Name",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Female Name",
+          "db_column_name": "femaleName",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Subname",
+          "db_column_name": "subname",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Kill Credit 1",
+          "db_column_name": "KillCredit1",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Kill Credit 2",
+          "db_column_name": "KillCredit2",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Title Alt",
+          "db_column_name": "TitleAlt",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Icon Name",
+          "db_column_name": "IconName",
+          "can_be_null": true
+        },
+        {
+          "name": "Vignette ID",
+          "db_column_name": "VignetteID",
+          "value_type": "VignetteParameter"
+        },
+        {
+          "name": "Classification",
+          "db_column_name": "Classification",
+          "value_type": "NpcRankParameter"
+        },
+        {
+          "name": "Creature Immunities Id",
+          "db_column_name": "CreatureImmunitiesId",
+          "value_type": "int"
+        },
+        {
+          "name": "Edit difficulties",
+          "meta": "tableByKey:creature_template_difficulty;entry"
+        }
+      ]
+    },
+    {
+      "group_name": "General",
+      "fields": [
+        {
+          "name": "Required Expansion",
+          "db_column_name": "RequiredExpansion",
+          "value_type": "ExpansionParameter"
+        },
+        {
+          "name": "Faction",
+          "db_column_name": "faction",
+          "value_type": "FactionTemplateParameter"
+        },
+        {
+          "name": "Scale",
+          "db_column_name": "scale",
+          "value_type": "float",
+          "default": 1
+        },
+        {
+          "name": "Unit Class",
+          "db_column_name": "unit_class",
+          "value_type": "UnitClassParameter"
+        },
+        {
+          "name": "Family",
+          "db_column_name": "family",
+          "value_type": "CreatureFamilyParameter"
+        },
+        {
+          "name": "Trainer Class",
+          "db_column_name": "trainer_class",
+          "value_type": "Parameter"
+        },
+        {
+          "name": "Type",
+          "db_column_name": "type",
+          "value_type": "CreatureTypeParameter"
+        },
+        {
+          "name": "Experience Modifier",
+          "db_column_name": "ExperienceModifier",
+          "value_type": "float",
+          "default": 1
+        },
+        {
+          "name": "Racial Leader",
+          "db_column_name": "RacialLeader",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Flags",
+      "fields": [
+        {
+          "name": "Npc flag",
+          "db_column_name": "npcflag",
+          "value_type": "NpcFlagParameter"
+        },
+        {
+          "name": "Unit Flags",
+          "db_column_name": "unit_flags",
+          "value_type": "UnitFlagParameter"
+        },
+        {
+          "name": "Unit Flags 2",
+          "db_column_name": "unit_flags2",
+          "value_type": "UnitFlags2Parameter"
+        },
+        {
+          "name": "Unit Flags 3",
+          "db_column_name": "unit_flags3",
+          "value_type": "UnitFlags3Parameter"
+        },
+        {
+          "name": "Flags Extra",
+          "db_column_name": "flags_extra",
+          "value_type": "ExtraFlagParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Attack",
+      "fields": [
+        {
+          "name": "Regen Health",
+          "db_column_name": "RegenHealth",
+          "value_type": "BoolParameter",
+          "default": 1
+        },
+        {
+          "name": "Damage school",
+          "db_column_name": "dmgschool",
+          "value_type": "SpellSchoolParameter"
+        },
+        {
+          "name": "Base Attack Time",
+          "db_column_name": "BaseAttackTime",
+          "value_type": "uint",
+          "default": 2000
+        },
+        {
+          "name": "Range Attack Time",
+          "db_column_name": "RangeAttackTime",
+          "value_type": "uint",
+          "default": 2000
+        },
+        {
+          "name": "Range Variance",
+          "db_column_name": "RangeVariance",
+          "value_type": "float",
+          "default": 1
+        },
+        {
+          "name": "Base Variance",
+          "db_column_name": "BaseVariance",
+          "value_type": "float",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "group_name": "Movement",
+      "fields": [
+        {
+          "name": "Vehicle Id",
+          "db_column_name": "VehicleId",
+          "value_type": "VehicleIdParameter"
+        },
+        {
+          "name": "Speed Walk",
+          "db_column_name": "speed_walk",
+          "value_type": "float",
+          "default": 1
+        },
+        {
+          "name": "Speed Run",
+          "db_column_name": "speed_run",
+          "value_type": "float",
+          "default": 1.14286
+        },
+        {
+          "name": "Movement Id",
+          "db_column_name": "movementId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Movement Type",
+          "db_column_name": "MovementType",
+          "value_type": "DatabaseMovementTypeParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Widget",
+      "fields": [
+        {
+          "name": "Widget Set ID",
+          "db_column_name": "WidgetSetID",
+          "value_type": "int"
+        },
+        {
+          "name": "Widget Set Unit Condition ID",
+          "db_column_name": "WidgetSetUnitConditionID",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Script Data",
+      "fields": [
+        {
+          "name": "AIName",
+          "db_column_name": "AIName",
+          "value_type": "string",
+          "default": ""
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "default": ""
+        },
+        {
+          "name": "String Id",
+          "db_column_name": "StringId",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

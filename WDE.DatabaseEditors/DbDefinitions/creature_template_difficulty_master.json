@@ -1,0 +1,186 @@
+{
+  "compatibility": [
+    "TrinityMaster"
+  ],
+  "name": "Creature Difficulty",
+  "single_solution_name": "{name} Template Difficulty",
+  "multi_solution_name": "Multiple Creatures Template Difficulty Editor",
+  "table_name": "creature_template_difficulty",
+  "table_index_name": "Entry",
+  "record_mode": "MultiRecord",
+  "skip_quick_load": true,
+  "group_name": "Templates",
+  "icon_path": "Icons/document_creature_template.png",
+  "reload_command": "reload creature_template_difficulty",
+  "primary_key": [
+    "Entry",
+    "DifficultyID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "Entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Difficulty ID",
+          "db_column_name": "DifficultyID",
+          "value_type": "DifficultyParameter"
+        },
+        {
+          "name": "Level Scaling Delta Min",
+          "db_column_name": "LevelScalingDeltaMin",
+          "value_type": "int",
+          "preferred_width": 146.0
+        },
+        {
+          "name": "Level Scaling Delta Max",
+          "db_column_name": "LevelScalingDeltaMax",
+          "value_type": "int",
+          "preferred_width": 150.0
+        },
+        {
+          "name": "Content Tuning ID",
+          "db_column_name": "ContentTuningID",
+          "value_type": "int",
+          "preferred_width": 123.0
+        },
+        {
+          "name": "Health Scaling Expansion",
+          "db_column_name": "HealthScalingExpansion",
+          "value_type": "ExpansionParameter",
+          "preferred_width": 153.0
+        },
+        {
+          "name": "Health Mod",
+          "db_column_name": "HealthModifier",
+          "value_type": "float",
+          "default": 1,
+          "preferred_width": 82.0
+        },
+        {
+          "name": "Mana Mod",
+          "db_column_name": "ManaModifier",
+          "value_type": "float",
+          "default": 1,
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Armor Mod",
+          "db_column_name": "ArmorModifier",
+          "value_type": "float",
+          "default": 1,
+          "preferred_width": 81.0
+        },
+        {
+          "name": "Damage Mod",
+          "db_column_name": "DamageModifier",
+          "value_type": "float",
+          "default": 1,
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Creature Difficulty ID",
+          "db_column_name": "CreatureDifficultyID",
+          "value_type": "int",
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Type Flags",
+          "db_column_name": "TypeFlags",
+          "value_type": "uint"
+        },
+        {
+          "name": "Type Flags 2",
+          "db_column_name": "TypeFlags2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Loot ID",
+          "db_column_name": "LootID",
+          "value_type": "uint"
+        },
+        {
+          "name": "Pick Pocket Loot ID",
+          "db_column_name": "PickPocketLootID",
+          "value_type": "uint",
+          "preferred_width": 128.0
+        },
+        {
+          "name": "Skin Loot ID",
+          "db_column_name": "SkinLootID",
+          "value_type": "uint"
+        },
+        {
+          "name": "Gold Min",
+          "db_column_name": "GoldMin",
+          "value_type": "MoneyParameter",
+          "preferred_width": 69.0
+        },
+        {
+          "name": "Gold Max",
+          "db_column_name": "GoldMax",
+          "value_type": "MoneyParameter",
+          "preferred_width": 71.0
+        },
+        {
+          "name": "Static Flags 1",
+          "db_column_name": "StaticFlags1",
+          "value_type": "CreatureStaticFlags1Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags 2",
+          "db_column_name": "StaticFlags2",
+          "value_type": "CreatureStaticFlags2Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags 3",
+          "db_column_name": "StaticFlags3",
+          "value_type": "CreatureStaticFlags3Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags 4",
+          "db_column_name": "StaticFlags4",
+          "value_type": "CreatureStaticFlags4Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags 5",
+          "db_column_name": "StaticFlags5",
+          "value_type": "CreatureStaticFlags5Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags 6",
+          "db_column_name": "StaticFlags6",
+          "value_type": "CreatureStaticFlags6Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags 7",
+          "db_column_name": "StaticFlags7",
+          "value_type": "CreatureStaticFlags7Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags 8",
+          "db_column_name": "StaticFlags8",
+          "value_type": "CreatureStaticFlags8Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

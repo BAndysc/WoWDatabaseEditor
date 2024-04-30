@@ -1,0 +1,85 @@
+{
+  "compatibility": [
+    "TrinityMaster"
+  ],
+  "name": "Creature Static Flags Override",
+  "single_solution_name": "{name} Static Flags Override",
+  "multi_solution_name": "Multiple Creatures Static Flags Override",
+  "table_name": "creature_static_flags_override",
+  "table_index_name": "SpawnId",
+  "record_mode": "MultiRecord",
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_flags.png",
+  "picker": "CreatureGUIDParameter",
+  "primary_key": [
+    "SpawnId",
+    "DifficultyId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spawn Id (guid)",
+          "db_column_name": "SpawnId",
+          "value_type": "CreatureGUIDParameter",
+          "read_only": true,
+          "preferred_width": 179.0
+        },
+        {
+          "name": "Difficulty Id",
+          "db_column_name": "DifficultyId",
+          "value_type": "DifficultyParameter"
+        },
+        {
+          "name": "Static Flags 1",
+          "db_column_name": "StaticFlags1",
+          "value_type": "CreatureStaticFlags1Parameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Static Flags 2",
+          "db_column_name": "StaticFlags2",
+          "value_type": "CreatureStaticFlags2Parameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Static Flags 3",
+          "db_column_name": "StaticFlags3",
+          "value_type": "CreatureStaticFlags3Parameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Static Flags 4",
+          "db_column_name": "StaticFlags4",
+          "value_type": "CreatureStaticFlags4Parameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Static Flags 5",
+          "db_column_name": "StaticFlags5",
+          "value_type": "CreatureStaticFlags5Parameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Static Flags 6",
+          "db_column_name": "StaticFlags6",
+          "value_type": "CreatureStaticFlags6Parameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Static Flags 7",
+          "db_column_name": "StaticFlags7",
+          "value_type": "CreatureStaticFlags7Parameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Static Flags 8",
+          "db_column_name": "StaticFlags8",
+          "value_type": "CreatureStaticFlags8Parameter",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

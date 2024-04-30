@@ -1,0 +1,203 @@
+{
+  "compatibility": [
+    "TrinityMaster"
+  ],
+  "name": "Creature Spawns",
+  "single_solution_name": "Creature Table",
+  "multi_solution_name": "Creature Table",
+  "description": "Spawns",
+  "table_name": "creature",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_creatures.png",
+  "primary_key": [
+    "guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "db_column_name": "guid",
+          "value_type": "string",
+          "read_only": true,
+          "preferred_width": 68.0
+        },
+        {
+          "name": "Creature Id",
+          "db_column_name": "id",
+          "value_type": "CreatureParameter",
+          "preferred_width": 86.0
+        },
+        {
+          "name": "String Id",
+          "db_column_name": "StringId",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spawn Difficulties",
+          "db_column_name": "spawnDifficulties",
+          "value_type": "string",
+          "preferred_width": 124.0
+        },
+        {
+          "name": "Phase Use Flags",
+          "db_column_name": "phaseUseFlags",
+          "value_type": "BoolParameter",
+          "preferred_width": 116.0
+        },
+        {
+          "name": "Phase Id",
+          "db_column_name": "PhaseId",
+          "value_type": "PhaseParameter",
+          "can_be_null": true,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Phase Group",
+          "db_column_name": "PhaseGroup",
+          "value_type": "int",
+          "can_be_null": true,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Terrain Swap Map",
+          "db_column_name": "terrainSwapMap",
+          "value_type": "MapParameter",
+          "default": -1,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Movement Type",
+          "db_column_name": "MovementType",
+          "value_type": "DatabaseMovementTypeParameter"
+        },
+        {
+          "name": "Wander Distance",
+          "db_column_name": "wander_distance",
+          "value_type": "float",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags",
+          "meta": "tableByKey:creature_static_flags_override;guid"
+        },
+        {
+          "name": "Model",
+          "db_column_name": "modelid",
+          "value_type": "CreatureModelDataParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Equipment Id",
+          "db_column_name": "equipment_id",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spawn time secs",
+          "db_column_name": "spawntimesecs",
+          "value_type": "uint",
+          "default": 120
+        },
+        {
+          "name": "Current waypoint",
+          "db_column_name": "currentwaypoint",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Cur Health Pct",
+          "db_column_name": "curHealthPct",
+          "value_type": "uint",
+          "default": 100
+        },
+        {
+          "name": "Npc flag",
+          "db_column_name": "npcflag",
+          "value_type": "NpcFlagParameter",
+          "can_be_null": true,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Unit Flags",
+          "db_column_name": "unit_flags",
+          "value_type": "UnitFlagParameter",
+          "can_be_null": true,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Unit Flags 2",
+          "db_column_name": "unit_flags2",
+          "value_type": "UnitFlags2Parameter",
+          "can_be_null": true,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Unit Flags 3",
+          "db_column_name": "unit_flags3",
+          "value_type": "UnitFlags3Parameter",
+          "can_be_null": true,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "default": ""
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Position",
+      "fields": [
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter",
+          "preferred_width": 139.0
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Zone Id",
+          "db_column_name": "zoneId",
+          "value_type": "ZoneParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Area Id",
+          "db_column_name": "areaId",
+          "value_type": "ZoneAreaParameter",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}
