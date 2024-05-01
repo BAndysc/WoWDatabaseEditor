@@ -40,6 +40,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return impl.GetQuestTemplatesAsync();
         }
 
+        public Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesBySortIdAsync(int zoneSortId)
+        {
+            return impl.GetQuestTemplatesBySortIdAsync(zoneSortId);
+        }
+
         public Task<IReadOnlyList<INpcText>> GetNpcTextsAsync()
         {
             return impl.GetNpcTextsAsync();

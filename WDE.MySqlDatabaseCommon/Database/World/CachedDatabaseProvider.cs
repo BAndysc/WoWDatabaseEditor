@@ -213,6 +213,13 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return await nonCachedDatabase.GetQuestTemplatesAsync();
         }
 
+        public async Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesBySortIdAsync(int zoneSortId)
+        {
+            if (questTemplateCache != null)
+                return questTemplateCache.Where(q => q.QuestSortId == zoneSortId).ToList();
+            return await WaitForCache(nonCachedDatabase.GetQuestTemplatesBySortIdAsync(zoneSortId));
+        }
+
         public async Task<IReadOnlyList<INpcText>> GetNpcTextsAsync()
         {
             if (npcTextsCache != null)

@@ -154,6 +154,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesAsync() => Task.FromResult<IReadOnlyList<IQuestTemplate>>(new List<IQuestTemplate>());
 
+        public Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesBySortIdAsync(int zoneSortId) => Task.FromResult<IReadOnlyList<IQuestTemplate>>(new List<IQuestTemplate>());
+
         public Task<IReadOnlyList<IGossipMenu>> GetGossipMenusAsync() => Task.FromResult<IReadOnlyList<IGossipMenu>>(new List<IGossipMenu>());
 
         public Task<IGossipMenu?> GetGossipMenuAsync(uint menuId) => Task.FromResult<IGossipMenu?>(null);

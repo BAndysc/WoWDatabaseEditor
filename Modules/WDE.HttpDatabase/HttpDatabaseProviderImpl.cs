@@ -101,6 +101,20 @@ public class HttpDatabaseProviderImpl : IAsyncDatabaseProvider
         }
     }
 
+    public async Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesBySortIdAsync(int questSortId)
+    {
+        try
+        {
+            var result = await client.GetStringAsync(Path.Join(URL, "GetQuestTemplatesBySortIdAsync", questSortId.ToString()));
+            return JsonConvert.DeserializeObject<List<JsonQuestTemplate>>(result) ?? new List<JsonQuestTemplate>();
+        }
+        catch (Exception e)
+        {
+            LOG.LogError(e);
+            return new List<JsonQuestTemplate>();
+        }
+    }
+
     public async Task<IReadOnlyList<INpcText>> GetNpcTextsAsync()
     {
         try

@@ -239,7 +239,17 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
             orderby t.Entry
             select t.SetAddon(subaddon));
     }
-        
+
+    private IQueryable<MySqlMasterQuestTemplate> GetQuestsQueryByZoneSortId(TrinityMasterDatabase model, int zoneSortId)
+    {
+        return (from t in model.MasterQuestTemplate
+            where t.QuestSortId == zoneSortId
+            join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
+            from subaddon in adn.DefaultIfEmpty()
+            orderby t.Entry
+            select t.SetAddon(subaddon));
+    }
+
     public override IReadOnlyList<IQuestTemplate> GetQuestTemplates()
     {
         using var model = Database();
@@ -251,6 +261,12 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
     {
         await using var model = Database();
         return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
+    }
+
+    public override async Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesBySortIdAsync(int questSortId)
+    {
+        await using var model = Database();
+        return await GetQuestsQueryByZoneSortId(model, questSortId).ToListAsync<IQuestTemplate>();
     }
 
     public override async Task<IQuestTemplate?> GetQuestTemplate(uint entry)

@@ -254,10 +254,18 @@ namespace WDE.CMMySqlDatabase.Database
 
         public virtual async Task<IQuestTemplate?> GetQuestTemplate(uint entry)
         {
-            using var model = Database();
+            await using var model = Database();
             return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry);
         }
-        
+
+        public async Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesBySortIdAsync(int questSortId)
+        {
+            await using var model = Database();
+            return await model.QuestTemplate.Where(t => t.QuestSortId == questSortId)
+                .OrderBy(t => t.Entry)
+                .ToListAsync<IQuestTemplate>();
+        }
+
         protected abstract Task<ICreature?> GetCreatureByGuidAsync(T model, uint guid);
         protected abstract Task<IGameObject?> GetGameObjectByGuidAsync(T model, uint guid);
         protected abstract Task SetCreatureTemplateAI(T model, uint entry, string ainame, string scriptname);

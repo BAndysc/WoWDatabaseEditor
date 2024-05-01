@@ -295,6 +295,8 @@ namespace WDE.TrinityMySqlDatabase.Database
         
         public abstract Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesAsync();
 
+        public abstract Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesBySortIdAsync(int questSortId);
+
         public abstract Task<IQuestTemplate?> GetQuestTemplate(uint entry);
 
         public async Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry)

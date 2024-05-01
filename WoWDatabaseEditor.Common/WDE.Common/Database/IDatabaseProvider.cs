@@ -16,6 +16,7 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<IGameEvent>> GetGameEventsAsync();
         Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectTemplatesAsync();
         Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesAsync();
+        Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesBySortIdAsync(int questSortId);
         Task<IReadOnlyList<INpcText>> GetNpcTextsAsync();
         Task<IReadOnlyList<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync();
 
