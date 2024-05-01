@@ -53,13 +53,7 @@ public class QuestChainQueryGenerator : ISolutionItemSqlProvider<QuestChainSolut
             store.Merge(existingStore);
         }
 
-        foreach (var q in item.Entries)
-        {
-            if (store.HasQuest(q))
-                continue;
-
-            await questChainLoader.LoadChain(q, store);
-        }
+        await questChainLoader.LoadChain(item.Entries.ToArray(), store);
 
         var query = await chainGenerator.Generate(store, item.ExistingData);
         var conditions = store.Where(x => x.Conditions.Count > 0)

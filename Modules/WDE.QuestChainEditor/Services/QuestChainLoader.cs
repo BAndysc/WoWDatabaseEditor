@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using WDE.Common.Collections;
 using WDE.Common.Database;
@@ -26,11 +27,12 @@ public class QuestChainLoader : IQuestChainLoader
         this.databaseProvider = databaseProvider;
     }
 
-    public async Task LoadChain(uint entry, QuestStore quests, List<string>? nonFatalErrors = null)
+    public async Task LoadChain(uint[] entries, QuestStore quests, List<string>? nonFatalErrors = null, CancellationToken token = default)
     {
         HashSet<uint> loaded = new();
         Queue<uint> toLoad = new();
-        toLoad.Enqueue(entry);
+        foreach (var entry in entries)
+            toLoad.Enqueue(entry);
 
         MultiDictionary<uint, uint> mustBeCompleted = new(); // values are quests that must be completed before key
         MultiDictionary<uint, uint> mustBeActive = new(); // values are quests that must be active to get key
@@ -44,11 +46,12 @@ public class QuestChainLoader : IQuestChainLoader
 
         while (toLoad.Count > 0)
         {
-            entry = toLoad.Dequeue();
+            var entry = toLoad.Dequeue();
             if (!loaded.Add(entry))
                 continue;
 
             var questModel = await quests.GetOrCreate(entry, source.GetTemplate);
+            token.ThrowIfCancellationRequested();
             var template = questModel.Template;
 
             if (template.PrevQuestId != 0)
@@ -100,12 +103,14 @@ public class QuestChainLoader : IQuestChainLoader
             }
 
             var byPrevious = await source.GetByPreviousQuestId(entry);
+            token.ThrowIfCancellationRequested();
             foreach (var next in byPrevious)
             {
                 toLoad.Enqueue(next.Entry);
             }
 
             var byNext = await source.GetByNextQuestId(entry);
+            token.ThrowIfCancellationRequested();
             foreach (var next in byNext)
             {
                 toLoad.Enqueue(next.Entry);
@@ -114,6 +119,7 @@ public class QuestChainLoader : IQuestChainLoader
             if (template.ExclusiveGroup != 0)
             {
                 var byExclusiveGroup = await source.GetByExclusiveGroup(template.ExclusiveGroup);
+                token.ThrowIfCancellationRequested();
                 foreach (var next in byExclusiveGroup)
                 {
                     toLoad.Enqueue(next.Entry);
@@ -121,6 +127,7 @@ public class QuestChainLoader : IQuestChainLoader
             }
 
             var byBreadcrumb = await source.GetByBreadCrumbQuestId(entry);
+            token.ThrowIfCancellationRequested();
             foreach (var next in byBreadcrumb)
             {
                 toLoad.Enqueue(next.Entry);
@@ -251,5 +258,6 @@ public class QuestChainLoader : IQuestChainLoader
                 quests[(uint)questId].Conditions = condList.Select(c => new AbstractCondition(c)).ToList();
             }
         }
+        token.ThrowIfCancellationRequested();
     }
 }

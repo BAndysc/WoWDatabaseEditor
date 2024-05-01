@@ -115,6 +115,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
     public IAsyncCommand<QuestViewModel> UnloadThisChainCommand { get; }
     public DelegateCommand SelectAllCommand { get; }
     public DelegateCommand CopyAllEntries { get; }
+    public IAsyncCommand LoadQuestsBySortIdCommand { get; }
 
     private bool TryGetQuest(uint entry, out QuestViewModel quest)
     {
@@ -571,6 +572,23 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
             clipboardService.SetText(string.Join(", ", Elements.OfType<QuestViewModel>().Select(x => x.Entry)));
         });
 
+        LoadQuestsBySortIdCommand = new AsyncCommand(async () =>
+        {
+            var (zoneId, ok) = await parameterPickerService.PickParameter("ZoneOrQuestSortParameter");
+            if (!ok)
+                return;
+
+            var quests = await databaseProvider.GetQuestTemplatesBySortIdAsync((int)zoneId);
+
+            if (quests.Count == 0)
+            {
+                await messageBoxService.SimpleDialog("Info", "No quests found", "No quests found in the database for the selected zone or sort id");
+                return;
+            }
+
+            await ExecuteTask(token => LoadQuestWithDependencies(quests.Select(x => x.Entry).ToArray(), default, true, token));
+        });
+
         History.ToObservable(x => x.IsSaved).SubscribeAction(_ => RaisePropertyChanged((nameof(IsModified))));
         //LoadQuestWithDependencies(25134, default).ListenErrors();
 
@@ -640,19 +658,28 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
         if (entryToQuest.TryGetValue(quest, out var existingQuestViewModel))
             return existingQuestViewModel;
 
+        return await ExecuteTask(token => LoadQuestWithDependencies([quest], targetLocation, navigateToQuest, token));
+    }
+
+    public async Task<QuestViewModel> LoadQuestWithDependencies(uint[] quests, Point targetLocation, bool navigateToQuest, CancellationToken token)
+    {
+        Dictionary<uint, QuestViewModel> addedQuestsByEntry = new();
+        List<BaseQuestViewModel> addedQuests = new();
+        List<ConnectionViewModel> addedConnections = new();
+        List<ChainRawData> newExistingData = new();
+        List<(uint, IReadOnlyList<ICondition>)> newExistingConditions = new();
+        List<string> nonFatalErrors = new();
+        Dictionary<int, ExclusiveGroupViewModel> groups = new();
+
         LoadingStack++;
         try
         {
-            QuestViewModel? mainQuest = null;
-            Dictionary<int, ExclusiveGroupViewModel> groups = new();
+            List<QuestViewModel> mainQuests = new();
 
             var questStore = new QuestStore();
-            List<string> nonFatalErrors = new();
-            await questChainLoader.LoadChain(quest, questStore, nonFatalErrors);
+            await questChainLoader.LoadChain(quests.ToArray(), questStore, nonFatalErrors, token);
 
-            Dictionary<uint, QuestViewModel> addedQuestsByEntry = new();
-            List<BaseQuestViewModel> addedQuests = new();
-            List<ConnectionViewModel> addedConnections = new();
+            token.ThrowIfCancellationRequested();
 
             QuestViewModel GetOrCreate(IQuestTemplate template)
             {
@@ -679,8 +706,8 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
 
                 viewModel.Conditions = q.Conditions;
 
-                if (q.Entry == quest)
-                    mainQuest = viewModel;
+                if (quests.Contains(q.Entry))
+                    mainQuests.Add(viewModel);
 
                 void LoadGroups(QuestRequirementType type, IReadOnlyList<IQuestGroup> questGroups)
                 {
@@ -775,7 +802,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
             automaticGraphLayouter.DoLayoutNow(LayoutSettingsViewModel.CurrentAlgorithm!, addedQuests, addedConnections, false);
 
             //var maxRight = Elements.Select(x => x.Bounds.Right).DefaultIfEmpty().Max();
-            var offset = targetLocation - new Point(mainQuest!.PerfectX, mainQuest!.PerfectY);
+            var offset = targetLocation - new Point(mainQuests[^1]!.PerfectX, mainQuests[^1]!.PerfectY);
 
             foreach (var node in addedQuests)
             {
@@ -784,19 +811,28 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                 node.Location = new Point(node.PerfectX, node.PerfectY);
             }
 
-            if (nonFatalErrors.Count > 0)
-            {
-                await messageBoxService.SimpleDialog("Warning", "Incorrect database data", "Some data in the database is out of correct range: \n" + string.Join("\n", nonFatalErrors.Select(x => " - " + x)));
-            }
-
-            List<ChainRawData> newExistingData = new();
-            List<(uint, IReadOnlyList<ICondition>)> newExistingConditions = new();
             foreach (var q in questStore)
             {
                 if (!existingData.ContainsKey(q.Entry))
                     newExistingData.Add(new ChainRawData(q.Template));
                 if (!existingConditions.ContainsKey(q.Entry) && q.Conditions.Count > 0)
                     newExistingConditions.Add((q.Entry, q.Conditions));
+            }
+
+            if (nonFatalErrors.Count > 0 && !userPreferences.NeverShowIncorrectDatabaseDataWarning)
+            {
+                if (await messageBoxService.ShowDialog(
+                    new MessageBoxFactory<bool>()
+                        .SetTitle("Warning")
+                        .SetMainInstruction("Incorrect database data")
+                        .SetContent("Some data in the database is out of correct range: \n" +
+                                    string.Join("\n", nonFatalErrors.Select(x => " - " + x)))
+                        .WithOkButton(false)
+                        .WithButton("(never show again)", true)
+                        .Build()))
+                {
+                    userPreferences.NeverShowIncorrectDatabaseDataWarning = true;
+                }
             }
 
             var wasSavedBeforeLoad = History.IsSaved;
@@ -861,11 +897,11 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                 }
             }));
 
-            if (navigateToQuest)
+            if (navigateToQuest && mainQuests.Count > 0)
             {
-                NavigateToQuest?.Invoke(mainQuest);
+                NavigateToQuest?.Invoke(mainQuests[^1]);
                 SelectedItems.Clear();
-                SelectedItems.Add(mainQuest);
+                SelectedItems.AddRange(mainQuests);
             }
 
             if (wasSavedBeforeLoad)
@@ -873,7 +909,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                 History.MarkAsSaved();
             }
 
-            return mainQuest!;
+            return mainQuests[0];
         }
         finally
         {

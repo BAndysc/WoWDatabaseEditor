@@ -22,6 +22,16 @@ public class QuestChainEditorPreferences : IQuestChainEditorPreferences
         }
     }
 
+    public bool NeverShowIncorrectDatabaseDataWarning
+    {
+        get => data.NeverShowIncorrectDatabaseDataWarning;
+        set
+        {
+            data.NeverShowIncorrectDatabaseDataWarning = value;
+            Save();
+        }
+    }
+
     private void Save()
     {
         userSettings.Update(data);
@@ -40,5 +50,7 @@ public class QuestChainEditorPreferences : IQuestChainEditorPreferences
         [DefaultValue(true)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public bool AutoLayout { get; set; } = true;
+
+        public bool NeverShowIncorrectDatabaseDataWarning { get; set; }
     }
 }

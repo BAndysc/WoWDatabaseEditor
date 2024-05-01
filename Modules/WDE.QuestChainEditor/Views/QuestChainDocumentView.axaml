@@ -675,6 +675,7 @@
             <nodify:NodifyEditor.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Load quest" Click="LoadQuest_MenuItemClick" />
+                    <MenuItem Header="Load quests by Sort Id" Command="{CompiledBinding LoadQuestsBySortIdCommand}" />
                     <Separator />
                     <MenuItem Header="Select all" Command="{CompiledBinding SelectAllCommand}" />
                     <MenuItem Header="Copy all entries" Command="{CompiledBinding CopyAllEntries}" />

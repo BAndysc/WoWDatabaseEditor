@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Prism.Mvvm;
 using WDE.MVVM.Observable;
@@ -13,6 +16,7 @@ namespace WDE.MVVM
     public abstract class ObservableBase : BindableBase, IDisposable, INotifyPropertyValueChanged
     {
         private List<IDisposable>? disposables;
+        private List<CancellationTokenSource>? tasks;
 
         private ILogger? logger;
         protected ILogger LOG => logger ??= WDE.Common.LOG.Factory.CreateLogger(GetType());
@@ -187,6 +191,23 @@ namespace WDE.MVVM
                 }
             }
         }
+
+        protected async Task<T> ExecuteTask<T>(Func<CancellationToken, Task<T>> task)
+        {
+            tasks ??= new List<CancellationTokenSource>();
+            var cts = new CancellationTokenSource();
+            tasks.Add(cts);
+            var taskToExecute = task(cts.Token);
+            try
+            {
+                var result = await taskToExecute;
+                return result;
+            }
+            finally
+            {
+                tasks.Remove(cts);
+            }
+        }
         
         public virtual void Dispose()
         {
@@ -194,6 +215,16 @@ namespace WDE.MVVM
                 return;
             
             disposed = true;
+
+            if (tasks != null)
+            {
+                while (tasks.Count > 0)
+                {
+                    var token = tasks[^1];
+                    tasks.RemoveAt(tasks.Count - 1);
+                    token.Cancel();
+                }
+            }
 
             if (disposables != null)
             {

@@ -6,4 +6,5 @@ namespace WDE.QuestChainEditor.Services;
 public interface IQuestChainEditorPreferences
 {
     bool AutoLayout { get; set; }
+    bool NeverShowIncorrectDatabaseDataWarning { get; set; }
 }
