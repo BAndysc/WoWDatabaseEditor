@@ -26,6 +26,7 @@ public partial class ConnectionViewModel : ObservableBase
         To = to?.Connector; // RequiresConnector
         this.from = from?.Connector;
         this.to = to?.Connector;
+        //StackTraces.Add((new StackTrace(true), true));
     }
 
     public ConnectorViewModel? From
@@ -68,10 +69,10 @@ public partial class ConnectionViewModel : ObservableBase
     {
         From = null;
         To = null;
-        DetachStackTraces.Add(new StackTrace(true));
+        //StackTraces.Add((new StackTrace(true), false));
     }
 
-    public List<StackTrace> DetachStackTraces { get; } = new();
+    //public List<(StackTrace, bool creation)> StackTraces { get; } = new();
 
     public string Text => RequirementType switch
     {

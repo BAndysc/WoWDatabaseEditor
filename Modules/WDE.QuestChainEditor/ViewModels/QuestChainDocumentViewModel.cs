@@ -43,6 +43,8 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
 {
     [Notify] private Point viewportLocation; // must be bound or else BringToView animation won't work
     [Notify] private bool isSearchBoxVisible;
+    [Notify] private bool shiftAltConnectionMessageVisible;
+    [Notify] private bool shiftAltConnectionTeachingTipVisible;
 
     private readonly IQuestTemplateSource questTemplateSource;
     private readonly IChainGenerator chainGenerator;
@@ -95,6 +97,8 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
     public AsyncAutoCommand<QuestViewModel> PickQuestRacesCommand { get; }
     public AsyncCommand<QuestViewModel> EditShowQuestMarkConditions { get; }
     public DelegateCommand GroupSelectedQuestsCommand { get; }
+    public DelegateCommand MoveOutgoingConnectionsToGroupCommand { get; }
+    public DelegateCommand MoveIncomingConnectionsToGroupCommand { get; }
     public IAsyncCommand EditTemplateCommand { get; }
     public IAsyncCommand EditCreatureStartersCommand { get; }
     public IAsyncCommand EditCreatureQuestEndersCommand { get; }
@@ -474,6 +478,16 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
             CreateAndGroupSelectedQuests(null);
         });
 
+        MoveOutgoingConnectionsToGroupCommand = new DelegateCommand(() =>
+        {
+            MoveConnectionsToGroup(true, SelectedQuestsSnapshot());
+        });
+
+        MoveIncomingConnectionsToGroupCommand = new DelegateCommand(() =>
+        {
+            MoveConnectionsToGroup(false, SelectedQuestsSnapshot());
+        });
+
         StartConnectionCommand = new DelegateCommand(() =>
         {
             PendingConnection.IsVisible = true;
@@ -504,10 +518,10 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                     return;
 
                 var vm = await LoadQuestWithDependencies(quest.Value, PendingConnection.TargetLocation, false);
-                AddConnection(PendingConnection.From!, vm);
+                AddConnection(PendingConnection.From!, vm, PendingConnection.RequirementType);
             }
             else
-               AddConnection(PendingConnection.From!, PendingConnection.To!);
+               AddConnection(PendingConnection.From!, PendingConnection.To!, PendingConnection.RequirementType);
         }, () => PendingConnection.From != null && PendingConnection.From != PendingConnection.To);
 
         DeleteSelectedExclusiveGroupsCommand = new DelegateCommand(() =>
@@ -1423,5 +1437,10 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
     public bool HasQuest(uint quest)
     {
         return entryToQuest.ContainsKey(quest);
+    }
+
+    public void ShowShiftKeyTeachingTip()
+    {
+        ShiftAltConnectionTeachingTipVisible = teachingTipService.ShowTip("QUEST_CHAIN_CONNECTION_FROM_QUEST");
     }
 }

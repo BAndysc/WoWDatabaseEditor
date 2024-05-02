@@ -1,7 +1,10 @@
 using Avalonia;
 using Avalonia.Controls.Templates;
 using Avalonia.LogicalTree;
+using Avalonia.VisualTree;
 using Nodify;
+using Nodify.Compatibility;
+using WDE.QuestChainEditor.ViewModels;
 
 namespace WDE.QuestChainEditor.Views;
 
@@ -31,5 +34,25 @@ public class HeaderedStateNode : StateNode
       if (!(e.NewValue is ILogical newValue))
         return;
       this.LogicalChildren.Add(newValue);
+    }
+
+    public override void OnConnectorDragStarted(MouseButtonEventArgs e)
+    {
+      if (e.KeyModifiers == 0 &&
+          DataContext is QuestViewModel q && q.ExclusiveGroup != null && Editor is {} editor &&
+          editor.ContainerFromItem(q.ExclusiveGroup) is { } groupContainer &&
+          groupContainer.FindDescendantOfType<Connector>() is { } groupConnector)
+      {
+        if (editor.DataContext is QuestChainDocumentViewModel vm)
+          vm.ShowShiftKeyTeachingTip();
+        // a hack, very manual way to redirect connection from a different node
+        ReleaseMouseCapture();
+        PropagateMouseCapturedWithin(false);
+        e.Capture(groupConnector);
+        PropagateMouseCapturedWithin(true);
+        groupConnector.OnConnectorDragStarted(e);
+      }
+      else
+        base.OnConnectorDragStarted(e);
     }
 }

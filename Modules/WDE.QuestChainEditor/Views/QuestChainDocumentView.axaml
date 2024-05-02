@@ -97,6 +97,7 @@
                             </ControlTemplate>
                         </Setter>
                     </ControlTheme>
+                    <BoolToDoubleConverter x:Key="BoolToOpacityConverter" WhenFalse="0" WhenTrue="1" />
                     <converters:ConnectionTypeToBrushConverter x:Key="RequirementTypeToBrush"
                                                                          Completed="#5CA2C9"
                                                                          MustBeActive="#5DC796"
@@ -229,11 +230,13 @@
             <nodify:NodifyEditor.PendingConnectionTemplate>
                 <DataTemplate x:DataType="viewModels:PendingConnectionViewModel">
                     <nodify:PendingConnection IsVisible="{CompiledBinding IsVisible}"
-                                              Source="{CompiledBinding From, Mode=OneWayToSource}"
-                                              Target="{CompiledBinding To, Mode=OneWayToSource}"
-                                              TargetAnchor="{CompiledBinding TargetLocation, Mode=OneWayToSource}"
-                                              StartedCommand="{CompiledBinding ((viewModels:QuestChainDocumentViewModel)DataContext).StartConnectionCommand, RelativeSource={RelativeSource AncestorType={x:Type nodify:NodifyEditor}}}"
-                                              CompletedCommand="{CompiledBinding ((viewModels:QuestChainDocumentViewModel)DataContext).CreateConnectionCommand, RelativeSource={RelativeSource AncestorType={x:Type nodify:NodifyEditor}}}">
+                                            AllowOnlyConnectors="False"
+                                            Source="{CompiledBinding From, Mode=OneWayToSource}"
+                                            Target="{CompiledBinding To, Mode=OneWayToSource}"
+                                            Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                            TargetAnchor="{CompiledBinding TargetLocation, Mode=OneWayToSource}"
+                                            StartedCommand="{CompiledBinding ((viewModels:QuestChainDocumentViewModel)DataContext).StartConnectionCommand, RelativeSource={RelativeSource AncestorType={x:Type nodify:NodifyEditor}}}"
+                                            CompletedCommand="{CompiledBinding ((viewModels:QuestChainDocumentViewModel)DataContext).CreateConnectionCommand, RelativeSource={RelativeSource AncestorType={x:Type nodify:NodifyEditor}}}">
                         <nodify:PendingConnection.Template>
                             <ControlTemplate TargetType="nodify:PendingConnection" x:DataType="viewModels:PendingConnectionViewModel">
                                 <nodify:LineConnection Source="{TemplateBinding SourceAnchor}"
@@ -242,8 +245,16 @@
                                                        StrokeDashArray="{TemplateBinding StrokeDashArray}"
                                                        SourceOffset="{Binding From.Bounds.Size, Converter={x:Static converters:ConnectorOffsetConverter.Instance}}"
                                                        Spacing="0"
+                                                       Text="{CompiledBinding Text}"
                                                        SourceOffsetMode="Edge"
-                                                       TargetOffsetMode="Edge" />
+                                                       TargetOffsetMode="Edge">
+                                    <nodify:LineConnection.Styles>
+                                        <Style Selector="nodify|LineConnection">
+                                            <Setter Property="Stroke" Value="{CompiledBinding RequirementType, Converter={StaticResource RequirementTypeToBrush}}" x:DataType="viewModels:PendingConnectionViewModel" />
+                                            <Setter Property="Fill" Value="{CompiledBinding RequirementType, Converter={StaticResource RequirementTypeToBrush}}" x:DataType="viewModels:PendingConnectionViewModel" />
+                                        </Style>
+                                    </nodify:LineConnection.Styles>
+                                </nodify:LineConnection>
                             </ControlTemplate>
                         </nodify:PendingConnection.Template>
                     </nodify:PendingConnection>
@@ -272,11 +283,13 @@
                     <Setter Property="ContextMenu">
                         <ContextMenu Closed="NodeContextMenuClosed">
                             <MenuItem Header="Set ANY"
+                                      utils:MenuBind.Icon="Icons/icon_or.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).ToggleExclusiveGroupTypeCommand}"
                                       CommandParameter="{CompiledBinding .}"
                                       x:DataType="viewModels:ExclusiveGroupViewModel"
                                       IsVisible="{CompiledBinding IsAllGroupType, FallbackValue={x:False}}" />
                             <MenuItem Header="Set ALL"
+                                      utils:MenuBind.Icon="Icons/icon_and.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).ToggleExclusiveGroupTypeCommand}"
                                       CommandParameter="{CompiledBinding .}"
                                       x:DataType="viewModels:ExclusiveGroupViewModel"
@@ -284,43 +297,52 @@
                             <Separator IsVisible="{CompiledBinding ., Converter={x:Static converters:IsExclusiveGroupConverter.Instance}}" />
 
                             <MenuItem Header="Delete outgoing connections"
+                                      utils:MenuBind.Icon="Icons/icon_delete_outgoing.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).DeleteOutgoingConnectionsCommand}"
                                       />
 
                             <MenuItem Header="Delete incoming connections"
+                                      utils:MenuBind.Icon="Icons/icon_delete_incoming.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).DeleteIncomingConnectionsCommand}"
                                       />
 
                             <MenuItem Header="Delete exclusive group"
+                                      utils:MenuBind.Icon="Icons/icon_delete.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).DeleteSelectedExclusiveGroupsCommand}"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsExclusiveGroupConverter.Instance}}" />
 
                             <Separator IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
 
                             <MenuItem Header="Set any race"
+                                      utils:MenuBind.Icon="Icons/icon_ally_horde.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).SetQuestAnyTeamCommand}"
                                       CommandParameter="{CompiledBinding .}"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
                             <MenuItem Header="Set Horde only"
+                                      utils:MenuBind.Icon="Icons/icon_horde.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).SetQuestHordeOnlyCommand}"
                                       CommandParameter="{CompiledBinding .}"
                                       InputGesture="Ctrl+H"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
                             <MenuItem Header="Set Alliance only"
+                                      utils:MenuBind.Icon="Icons/icon_alliance.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).SetQuestAllianceOnlyCommand}"
                                       CommandParameter="{CompiledBinding .}"
                                       InputGesture="Ctrl+A"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
                             <MenuItem Header="Pick allowable classes"
+                                      utils:MenuBind.Icon="Icons/classes/warlock.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).PickQuestClassesCommand}"
                                       CommandParameter="{CompiledBinding .}"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
                             <MenuItem Header="Pick allowable races"
+                                      utils:MenuBind.Icon="Icons/races/orc.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).PickQuestRacesCommand}"
                                       CommandParameter="{CompiledBinding .}"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
 
                             <MenuItem Header="Edit Show Quest Conditions"
+                                      utils:MenuBind.Icon="Icons/document_conditions.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).EditShowQuestMarkConditions}"
                                       CommandParameter="{CompiledBinding .}"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
@@ -328,6 +350,7 @@
                             <Separator IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
 
                             <MenuItem Header="Edit"
+                                      utils:MenuBind.Icon="Icons/icon_edit.png"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" >
                                 <MenuItem Header="Edit template"
                                           Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).EditTemplateCommand}"
@@ -354,10 +377,35 @@
                             <Separator IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
 
                             <MenuItem Header="Group selected quests"
+                                      utils:MenuBind.Icon="Icons/icon_group.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).GroupSelectedQuestsCommand}"
                                       CommandParameter="{CompiledBinding .}"
                                       InputGesture="Ctrl+G"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
+
+                            <MenuItem Header="Move outgoing connections to group"
+                                      utils:MenuBind.Icon="Icons/icon_group_below.png"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).MoveOutgoingConnectionsToGroupCommand}"
+                                      CommandParameter="{CompiledBinding .}">
+                                <MenuItem.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <CompiledBinding Converter="{x:Static converters:IsQuestConverter.Instance}" />
+                                        <CompiledBinding x:DataType="viewModels:QuestViewModel" Path="ExclusiveGroup" FallbackValue="{x:False}" Converter="{x:Static NullConverter.IsNotNull}" />
+                                    </MultiBinding>
+                                </MenuItem.IsVisible>
+                            </MenuItem>
+
+                            <MenuItem Header="Move incoming connections to group"
+                                      utils:MenuBind.Icon="Icons/icon_group_above.png"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).MoveIncomingConnectionsToGroupCommand}"
+                                      CommandParameter="{CompiledBinding .}">
+                                <MenuItem.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <CompiledBinding Converter="{x:Static converters:IsQuestConverter.Instance}" />
+                                        <CompiledBinding x:DataType="viewModels:QuestViewModel" Path="ExclusiveGroup" FallbackValue="{x:False}" Converter="{x:Static NullConverter.IsNotNull}" />
+                                    </MultiBinding>
+                                </MenuItem.IsVisible>
+                            </MenuItem>
 
                             <Separator>
                                 <Separator.IsVisible>
@@ -369,6 +417,7 @@
                             </Separator>
 
                             <MenuItem Header="Add quest to player's log"
+                                      utils:MenuBind.Icon="Icons/icon_add.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).AddQuestToPlayerCommand}"
                                       CommandParameter="{CompiledBinding .}">
                                 <MenuItem.IsVisible>
@@ -380,6 +429,7 @@
                             </MenuItem>
 
                             <MenuItem Header="Remove quest from player's log"
+                                      utils:MenuBind.Icon="Icons/icon_minus_minus.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).RemoveQuestFromPlayerCommand}"
                                       CommandParameter="{CompiledBinding .}">
                                 <MenuItem.IsVisible>
@@ -391,6 +441,7 @@
                             </MenuItem>
 
                             <MenuItem Header="Complete quest for player"
+                                      utils:MenuBind.Icon="Icons/icon_quest_completed_2.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).CompleteQuestForPlayerCommand}"
                                       CommandParameter="{CompiledBinding .}">
                                 <MenuItem.IsVisible>
@@ -402,6 +453,7 @@
                             </MenuItem>
 
                             <MenuItem Header="Reward quest for player"
+                                      utils:MenuBind.Icon="Icons/icon_ok.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).RewardQuestForPlayerCommand}"
                                       CommandParameter="{CompiledBinding .}">
                                 <MenuItem.IsVisible>
@@ -413,6 +465,7 @@
                             </MenuItem>
 
                             <MenuItem Header="Teleport to quest starter"
+                                      utils:MenuBind.Icon="Icons/icon_run.png"
                                       CommandParameter="{CompiledBinding .}"
                                       x:Name="TeleportToQuestStarterMenu">
                                 <MenuItem.IsVisible>
@@ -425,6 +478,7 @@
                             </MenuItem>
 
                             <MenuItem Header="Teleport to quest ender"
+                                      utils:MenuBind.Icon="Icons/icon_run.png"
                                       CommandParameter="{CompiledBinding .}"
                                       x:Name="TeleportToQuestEnderMenu">
                                 <MenuItem.IsVisible>
@@ -439,15 +493,18 @@
                             <Separator />
 
                             <MenuItem Header="Copy entry"
+                                      utils:MenuBind.Icon="Icons/icon_duplicate.png"
                                       InputGesture="Ctrl+C"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).Copy}" />
 
                             <MenuItem Header="Open WowHead"
+                                      utils:MenuBind.Icon="Icons/icon_head_red.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).OpenWowHeadCommand}"
                                       CommandParameter="{CompiledBinding .}"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
 
                             <MenuItem Header="Open Tauri Shoot"
+                                      utils:MenuBind.Icon="Icons/icon_shoot.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).OpenShootCommand}"
                                       CommandParameter="{CompiledBinding .}"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
@@ -455,6 +512,7 @@
                             <Separator IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
 
                             <MenuItem Header="Unload this chain"
+                                      utils:MenuBind.Icon="Icons/icon_unload2.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).UnloadThisChainCommand}"
                                       CommandParameter="{CompiledBinding .}"
                                       IsVisible="{CompiledBinding ., Converter={x:Static converters:IsQuestConverter.Instance}}" />
@@ -694,6 +752,19 @@
         <Border Background="{DynamicResource SlightlyHighlightedBackground}" Opacity="0.5" IsVisible="{CompiledBinding IsLoading}">
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Loading...</TextBlock>
         </Border>
+
+        <TextBlock Text="Press and hold [SHIFT] to connect a quest, instead of a group." Background="{DynamicResource ContentBackground}" Padding="3" IsHitTestVisible="False" Opacity="{CompiledBinding ShiftAltConnectionMessageVisible, Converter={StaticResource BoolToOpacityConverter}}" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <TextBlock.Transitions>
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+                </Transitions>
+            </TextBlock.Transitions>
+        </TextBlock>
+
+        <TeachingTip IsOpened="{CompiledBinding ShiftAltConnectionTeachingTipVisible}" VerticalAlignment="Bottom" Margin="20"
+                     Header="If you want to connect a quest...">
+            You started a connection from a quest, but instead the editor automatically redirected the connection to a group. If you want to add a BREADCRUMB connection, press and hold [SHIFT] while starting a connection.
+        </TeachingTip>
 
         <Border Background="{DynamicResource SlightlyHighlightedBackground}" Opacity="0.5" IsHitTestVisible="False">
             <Border.IsVisible>

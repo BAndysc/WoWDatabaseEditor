@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Avalonia;
 using Microsoft.Extensions.Logging;
 using WDE.Common.Database;
@@ -142,7 +141,7 @@ public partial class QuestChainDocumentViewModel
         }));
     }
 
-    public void AddConnection(BaseQuestViewModel from, BaseQuestViewModel to)
+    public void AddConnection(BaseQuestViewModel from, BaseQuestViewModel to, QuestRequirementType requirementType)
     {
         if (from == to)
             return;
@@ -150,7 +149,7 @@ public partial class QuestChainDocumentViewModel
         var conflicting = GetConflictingConnections(from, to);
         var conflictingConnections = conflicting?.Select(x => (x.FromNode, x.ToNode, x))?.ToList();
 
-        var connection = new ConnectionViewModel(QuestRequirementType.Completed, from, to);
+        var connection = new ConnectionViewModel(requirementType, from, to);
 
         historyHandler.DoAction(new AnonymousHistoryAction("Connect nodes", () =>
         {
@@ -176,7 +175,6 @@ public partial class QuestChainDocumentViewModel
                 }
             }
 
-            connection.RequirementType = QuestRequirementType.Completed;
             connection.From = from.Connector;
             connection.To = to.Connector;
             Connections.Add(connection);
@@ -626,6 +624,8 @@ public partial class QuestChainDocumentViewModel
                 affectedExistingConditions.Add((node.Entry, conditions));
         }
 
+        var wasSavedBefore = History.IsSaved;
+
         historyHandler.DoAction(new AnonymousHistoryAction("Unload chain", () =>
         {
             foreach (var node in nodes)
@@ -676,6 +676,81 @@ public partial class QuestChainDocumentViewModel
                     existingData.Remove(quest.Entry);
                     existingConditions.Remove(quest.Entry);
                 }
+            }
+        }));
+
+        if (wasSavedBefore)
+            History.MarkAsSaved();
+    }
+
+    private void MoveConnectionsToGroup(bool onlyOutgoing, IReadOnlyList<QuestViewModel> quests)
+    {
+        List<(ConnectionViewModel, BaseQuestViewModel, BaseQuestViewModel)> connectionsToRemove = new();
+        List<(ConnectionViewModel, BaseQuestViewModel, BaseQuestViewModel)> connectionsToAdd = new();
+
+        bool ConnectionExists(BaseQuestViewModel from, BaseQuestViewModel to)
+        {
+            return from.RequirementFor.Any(tuple => tuple.requirementFor == to) ||
+                   connectionsToAdd.Any(tuple => tuple.Item2 == from && tuple.Item3 == to);
+        }
+
+        foreach (var quest in quests.Where(q => q.ExclusiveGroup != null))
+        {
+            if (onlyOutgoing)
+            {
+                foreach (var (requirementFor, requirementType, conn) in quest.RequirementFor)
+                {
+                    if (!ConnectionExists(quest.ExclusiveGroup!, requirementFor))
+                    {
+                        var newConnection = new ConnectionViewModel(requirementType,quest.ExclusiveGroup, requirementFor);
+                        connectionsToAdd.Add((newConnection, quest.ExclusiveGroup!, requirementFor));
+                    }
+                    connectionsToRemove.Add((conn, quest, requirementFor));
+                }
+            }
+            else
+            {
+                foreach (var (prerequisite, requirementType, conn) in quest.Prerequisites)
+                {
+                    if (!ConnectionExists(prerequisite, quest.ExclusiveGroup!))
+                    {
+                        var newConnection = new ConnectionViewModel(requirementType, prerequisite, quest.ExclusiveGroup);
+                        connectionsToAdd.Add((newConnection, prerequisite, quest.ExclusiveGroup!));
+                    }
+
+                    connectionsToRemove.Add((conn, prerequisite, quest));
+                }
+            }
+        }
+
+        if (connectionsToAdd.Count == 0 && connectionsToRemove.Count == 0)
+            return;
+
+        historyHandler.DoAction(new AnonymousHistoryAction("Move connections to group", () =>
+        {
+            foreach (var (conn, from, to) in connectionsToAdd)
+            {
+                conn.Detach();
+                Connections.Remove(conn);
+            }
+            foreach (var (conn, from, to) in connectionsToRemove)
+            {
+                conn.From = from.Connector;
+                conn.To = to.Connector;
+                Connections.Add(conn);
+            }
+        }, () =>
+        {
+            foreach (var (conn, from, to) in connectionsToRemove)
+            {
+                conn.Detach();
+                Connections.Remove(conn);
+            }
+            foreach (var (conn, from, to) in connectionsToAdd)
+            {
+                conn.From = from.Connector;
+                conn.To = to.Connector;
+                Connections.Add(conn);
             }
         }));
     }

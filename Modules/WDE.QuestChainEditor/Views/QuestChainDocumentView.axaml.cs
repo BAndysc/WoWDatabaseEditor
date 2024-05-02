@@ -10,6 +10,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Nodify;
 using Nodify.Compatibility;
 using WDE.Common;
@@ -17,6 +18,7 @@ using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Utils;
 using WDE.MVVM.Observable;
+using WDE.QuestChainEditor.Models;
 using WDE.QuestChainEditor.ViewModels;
 
 namespace WDE.QuestChainEditor.Views;
@@ -43,6 +45,9 @@ public partial class QuestChainDocumentView : UserControl
         Editor.AddHandler(ItemContainer.DragCompletedEvent, OnItemsDragCompleted, RoutingStrategies.Bubble);
         Editor.AddHandler(ItemContainer.SelectedEvent, OnSelectedItem, RoutingStrategies.Bubble);
         Editor.AddHandler(NodifyEditor.BeforeDraggingStartedEvent, OnBeforeDraggingStarted, RoutingStrategies.Bubble);
+        Editor.AddHandler(Connector.PendingConnectionStartedEvent, OnPendingConnectionStarted, RoutingStrategies.Bubble);
+        Editor.AddHandler(Connector.PendingConnectionCompletedEvent, OnPendingConnectionCompleted, RoutingStrategies.Bubble);
+        Editor.AddHandler(Connector.PendingConnectionConnectorOverrideEvent, OnEndConnectorOverride, RoutingStrategies.Bubble);
 
         SearchBox.GetObservable(IsVisibleProperty).SubscribeAction(@is =>
         {
@@ -98,6 +103,79 @@ public partial class QuestChainDocumentView : UserControl
                     TeleportToQuestEnderMenu.Items.Add(new MenuItem() { Header = "(loading)" });
                 }
             });
+    }
+
+    private void OnPendingConnectionCompleted(object? sender, PendingConnectionEventArgs e)
+    {
+        if (DataContext is not QuestChainDocumentViewModel rootViewModel)
+            return;
+
+        rootViewModel.ShiftAltConnectionMessageVisible = false;
+    }
+
+    private void OnPendingConnectionStarted(object? sender, PendingConnectionEventArgs e)
+    {
+        if (DataContext is not QuestChainDocumentViewModel rootViewModel)
+            return;
+
+        rootViewModel.ShiftAltConnectionMessageVisible = false;
+
+        rootViewModel.PendingConnection.RequirementType = e.KeyModifiers == 0 ? QuestRequirementType.Completed : QuestRequirementType.Breadcrumb;
+    }
+
+    private void OnEndConnectorOverride(object? sender, PendingConnectionConnectorOverrideEventArgs e)
+    {
+        if (DataContext is not QuestChainDocumentViewModel vm)
+            return;
+
+        // if pending connection is breadcrumb, then connection to group is not allowed, no matter if user holds shift or not
+        if (vm.PendingConnection.RequirementType == QuestRequirementType.Breadcrumb &&
+                 e.PotentialConnector != null &&
+                 e.PotentialConnector.DataContext is ExclusiveGroupViewModel)
+        {
+            vm.ShiftAltConnectionMessageVisible = false;
+            e.PotentialConnector = null;
+            return;
+        }
+
+        // if KeyModifiers != 0, then allow precise connection
+        if (e.KeyModifiers == 0 && Editor is {} editor && e.PotentialConnector != null)
+        {
+            // no connection to the same group
+            if (e.SourceConnector is ExclusiveGroupViewModel fromGroup &&
+                (e.PotentialConnector.DataContext is QuestViewModel qvm &&
+                qvm.ExclusiveGroup == fromGroup ||
+                e.PotentialConnector.DataContext is ExclusiveGroupViewModel toGroup &&
+                toGroup == fromGroup))
+            {
+                vm.ShiftAltConnectionMessageVisible = true;
+                e.PotentialConnector = null;
+                return;
+            }
+
+            // connection to quest in group goes to the group unless pending connection is breadcrumb
+            if (vm.PendingConnection.RequirementType != QuestRequirementType.Breadcrumb &&
+                e.PotentialConnector.DataContext is QuestViewModel qvm2 &&
+                qvm2.ExclusiveGroup != null &&
+                editor.ContainerFromItem(qvm2.ExclusiveGroup) is { } groupContainer &&
+                groupContainer.FindDescendantOfType<Connector>() is { } groupConnector)
+            {
+                vm.ShiftAltConnectionMessageVisible = true;
+                e.PotentialConnector = groupConnector;
+                return;
+            }
+        }
+
+        if (e.PotentialConnector != null &&
+            e.PotentialConnector is not Connector c &&
+            e.PotentialConnector.FindDescendantOfType<Connector>() is { } connector)
+        {
+            vm.ShiftAltConnectionMessageVisible = false; /* this is just a fixup when the potential connector is ItemContainer */
+            e.PotentialConnector = connector;
+            return;
+        }
+
+        vm.ShiftAltConnectionMessageVisible = false;
     }
 
     protected override void OnTextInput(TextInputEventArgs e)
