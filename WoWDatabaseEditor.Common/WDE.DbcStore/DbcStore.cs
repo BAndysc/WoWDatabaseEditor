@@ -515,6 +515,8 @@ namespace WDE.DbcStore
             Changed?.Invoke(this);
         }
 
+        public IDbcSpellService SpellService => spellServiceImpl;
+
         private IDbcSpellService spellServiceImpl;
         public bool Exists(uint spellId) => spellServiceImpl.Exists(spellId);
         public int SpellCount => spellServiceImpl.SpellCount;

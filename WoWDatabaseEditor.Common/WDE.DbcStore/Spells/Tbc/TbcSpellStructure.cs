@@ -3,7 +3,7 @@ using WDE.Common.Services;
 
 namespace WDE.DbcStore.Spells.Tbc
 {
-    public class SpellCastTime
+    public class TbcSpellCastTime
     {
         public uint Id;
         public uint BaseTimeMs;
@@ -11,7 +11,7 @@ namespace WDE.DbcStore.Spells.Tbc
         public uint MinimumMs;
     }
     
-    public struct SpellStructure
+    public struct TbcSpellStructure
     {
         public uint Id;
         public uint Category;
@@ -58,8 +58,8 @@ namespace WDE.DbcStore.Spells.Tbc
         public uint ModalNextSpell;
         public uint CumulativeAura;
         public FixedUintArray2 Totem;
-        //Reagent<32>[8]
-        //ReagentCount<32>[8]
+        public uint[] Reagent;
+        public uint[] ReagentCount;
         public uint EquippedItemClass;
         public uint EquippedItemSubclass;
         public uint EquippedItemInvTypes;
@@ -74,8 +74,8 @@ namespace WDE.DbcStore.Spells.Tbc
         public FixedUintArray3 ImplicitTargetB;
         public FixedUintArray3 EffectRadiusIndex;
         public FixedUintArray3 EffectAura;
-        public FixedUintArray3 EffectAuraPeriod;
-        public FixedFloatArray3 EffectAmplitude;
+        public FixedUintArray3 EffectAmplitude;
+        public FixedFloatArray3 EffectMultipleValue;
         public FixedUintArray3 EffectChainTargets;
         public FixedUintArray3 EffectItemType;
         public FixedUintArray3 EffectMiscValue;
@@ -119,6 +119,6 @@ namespace WDE.DbcStore.Spells.Tbc
         public uint Difficulty;
         
         public uint? SkillLine { get; set; }
-        public SpellCastTime? CastingTime { get; set; }
+        public TbcSpellCastTime? CastingTime { get; set; }
     }
 }

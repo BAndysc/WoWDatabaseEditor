@@ -9,8 +9,8 @@ namespace WDE.DbcStore.Spells.Tbc
 {
     public class TbcSpellService : IDbcSpellService, IDbcSpellLoader
     {
-        private Dictionary<uint, SpellCastTime> spellCastTimes = new();
-        private SpellStructure[] spells = null!;
+        private Dictionary<uint, TbcSpellCastTime> spellCastTimes = new();
+        private TbcSpellStructure[] spells = null!;
         private Dictionary<uint, int> spellIndices = new();
         private readonly DatabaseClientFileOpener opener;
 
@@ -28,7 +28,7 @@ namespace WDE.DbcStore.Spells.Tbc
                 var perLevelMs = row.GetUInt(2);
                 var minimumMs = row.GetUInt(3);
                 
-                spellCastTimes[id] = new SpellCastTime()
+                spellCastTimes[id] = new TbcSpellCastTime()
                 {
                     Id = id,
                     BaseTimeMs = baseTimeMs,
@@ -37,13 +37,13 @@ namespace WDE.DbcStore.Spells.Tbc
                 };
             }
             var dbc = opener.Open(Path.Join(path, "Spell.dbc"));
-            spells = new SpellStructure[dbc.RecordCount];
+            spells = new TbcSpellStructure[dbc.RecordCount];
             int j = 0;
             foreach (var row in dbc)
             {
                 int i = 0;
                 var id = row.GetUInt(0);
-                ref SpellStructure spell = ref spells[j];
+                ref TbcSpellStructure spell = ref spells[j];
                 spellIndices[id] = j;
                 j++;
                 
@@ -93,10 +93,12 @@ namespace WDE.DbcStore.Spells.Tbc
                 spell.CumulativeAura = row.GetUInt(i++);
                 spell.Totem[0] = row.GetUInt(i++);
                 spell.Totem[1] = row.GetUInt(i++);
-                // Reagent<32>[8]
-                i += 8;
-                //ReagentCount<32>[8]
-                i += 8;
+                spell.Reagent = new uint[8];
+                spell.ReagentCount = new uint[8];
+                for (int k = 0; k < 8; ++k)
+                    spell.Reagent[k] = row.GetUInt(i++);
+                for (int k = 0; k < 8; ++k)
+                    spell.ReagentCount[k] = row.GetUInt(i++);
                 spell.EquippedItemClass = row.GetUInt(i++);
                 spell.EquippedItemSubclass = row.GetUInt(i++);
                 spell.EquippedItemInvTypes = row.GetUInt(i++);
@@ -133,12 +135,12 @@ namespace WDE.DbcStore.Spells.Tbc
                 spell.EffectAura[0] = row.GetUInt(i++);
                 spell.EffectAura[1] = row.GetUInt(i++);
                 spell.EffectAura[2] = row.GetUInt(i++);
-                spell.EffectAuraPeriod[0] = row.GetUInt(i++);
-                spell.EffectAuraPeriod[1] = row.GetUInt(i++);
-                spell.EffectAuraPeriod[2] = row.GetUInt(i++);
-                spell.EffectAmplitude[0] = row.GetFloat(i++);
-                spell.EffectAmplitude[1] = row.GetFloat(i++);
-                spell.EffectAmplitude[2] = row.GetFloat(i++);
+                spell.EffectAmplitude[0] = row.GetUInt(i++);
+                spell.EffectAmplitude[1] = row.GetUInt(i++);
+                spell.EffectAmplitude[2] = row.GetUInt(i++);
+                spell.EffectMultipleValue[0] = row.GetFloat(i++);
+                spell.EffectMultipleValue[1] = row.GetFloat(i++);
+                spell.EffectMultipleValue[2] = row.GetFloat(i++);
                 spell.EffectChainTargets[0] = row.GetUInt(i++);
                 spell.EffectChainTargets[1] = row.GetUInt(i++);
                 spell.EffectChainTargets[2] = row.GetUInt(i++);
@@ -362,5 +364,12 @@ namespace WDE.DbcStore.Spells.Tbc
         }
 
         public DBCVersions Version => DBCVersions.TBC_8606;
+
+        public TbcSpellStructure GetSpell(uint spellId)
+        {
+            if (spellIndices.TryGetValue(spellId, out var spellIndex))
+                return spells[spellIndex];
+            return new TbcSpellStructure();
+        }
     }
 }
