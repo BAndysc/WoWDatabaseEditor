@@ -99,7 +99,7 @@ namespace WDE.DbcStore.Spells.Tbc
                     spell.Reagent[k] = row.GetUInt(i++);
                 for (int k = 0; k < 8; ++k)
                     spell.ReagentCount[k] = row.GetUInt(i++);
-                spell.EquippedItemClass = row.GetUInt(i++);
+                spell.EquippedItemClass = row.GetInt(i++);
                 spell.EquippedItemSubclass = row.GetUInt(i++);
                 spell.EquippedItemInvTypes = row.GetUInt(i++);
                 spell.Effect[0] = (SpellEffectType)row.GetUInt(i++);

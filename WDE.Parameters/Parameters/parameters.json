@@ -3127,26 +3127,26 @@
 		}
 	},
 
-	"ItemClassParameter": {
-		"isflag": false,
+	"ItemClassMaskParameter": {
+		"isflag": true,
 		"values": {
-			"0": { "name": "Consumable" },
-			"1": { "name": "Container" },
-			"2": { "name": "Weapon" },
-			"3": { "name": "Gem" },
-			"4": { "name": "Armor" },
-			"5": { "name": "Reagent" },
-			"6": { "name": "Projectile" },
-			"7": { "name": "Trade Goods" },
-			"8": { "name": "Generic(OBSOLETE)" },
-			"9": { "name": "Recipe" },
-			"10": { "name": "Money(OBSOLETE)" },
-			"11": { "name": "Quiver" },
-			"12": { "name": "Quest" },
-			"13": { "name": "Key" },
-			"14": { "name": "Permanent(OBSOLETE)" },
-			"15": { "name": "Miscellaneous" },
-			"16": { "name": "Glyph" }
+			"1": { "name": "Consumable" },
+			"2": { "name": "Container" },
+			"4": { "name": "Weapon" },
+			"8": { "name": "Gem" },
+			"16": { "name": "Armor" },
+			"32": { "name": "Reagent" },
+			"64": { "name": "Projectile" },
+			"128": { "name": "Trade Goods" },
+			"256": { "name": "Generic(OBSOLETE)" },
+			"512": { "name": "Recipe" },
+			"1024": { "name": "Money(OBSOLETE)" },
+			"2048": { "name": "Quiver" },
+			"4096": { "name": "Quest" },
+			"8192": { "name": "Key" },
+			"16384": { "name": "Permanent(OBSOLETE)" },
+			"32768": { "name": "Miscellaneous" },
+			"65536": { "name": "Glyph" }
 		}
 	},
 

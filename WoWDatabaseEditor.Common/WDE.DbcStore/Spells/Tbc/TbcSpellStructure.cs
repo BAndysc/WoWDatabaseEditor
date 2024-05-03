@@ -60,7 +60,7 @@ namespace WDE.DbcStore.Spells.Tbc
         public FixedUintArray2 Totem;
         public uint[] Reagent;
         public uint[] ReagentCount;
-        public uint EquippedItemClass;
+        public int EquippedItemClass;
         public uint EquippedItemSubclass;
         public uint EquippedItemInvTypes;
         public FixedEffectTypeArray3 Effect;
