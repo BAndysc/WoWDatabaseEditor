@@ -58,7 +58,7 @@ public class PhantomCompletionComboBox : BasePhantomCompletionComboBox
         {
             string? strValue = null;
             if (element.SelectedItem is BaseDatabaseCellViewModel.ParameterStringOption strOption)
-                strValue = strOption.Value;
+                strValue = strOption.Key;
             else if (!string.IsNullOrWhiteSpace(element.SearchText))
                 strValue = element.SearchText;
             
