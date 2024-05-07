@@ -75,6 +75,9 @@ namespace AvaloniaStyles
                                        // || EffectiveTheme == SystemThemeOptions.MacOsCatalinaDark ||
                                        // EffectiveTheme == SystemThemeOptions.MacOsBigSurDark;
 
+                //bug
+                EffectiveTheme = SystemThemeOptions.DarkWindows10;
+
                Application.Current!.RequestedThemeVariant = EffectiveThemeIsDark
                    ? ThemeVariant.Dark
                    : ThemeVariant.Light;
