@@ -29,20 +29,26 @@ namespace WDE.DatabaseEditors.QueryGenerators
         private readonly IConditionQueryGenerator conditionQueryGenerator;
         private readonly ICurrentCoreVersion currentCoreVersion;
 
-        private Dictionary<DatabaseTable, ICustomQueryGenerator> customQueryGenerators = new();
+        private Dictionary<DatabaseTable, ICustomQueryGeneratorAppend> customQueryAppenders = new();
+        private Dictionary<DatabaseTable, ICustomFullQueryGenerator> customQueryGenerators = new();
 
         public QueryGenerator(ICommentGeneratorService commentGeneratorService,
             IParameterFactory parameterFactory,
             IQueryGenerator<ConditionDeleteModel> conditionDeleteGenerator,
             IConditionQueryGenerator conditionQueryGenerator,
             ICurrentCoreVersion currentCoreVersion,
-            IEnumerable<ICustomQueryGenerator> customQueryGenerators)
+            IEnumerable<ICustomQueryGeneratorAppend> customQueryAppenders,
+            IEnumerable<ICustomFullQueryGenerator> customQueryGenerators)
         {
             this.commentGeneratorService = commentGeneratorService;
             this.parameterFactory = parameterFactory;
             this.conditionDeleteGenerator = conditionDeleteGenerator;
             this.conditionQueryGenerator = conditionQueryGenerator;
             this.currentCoreVersion = currentCoreVersion;
+            foreach (var gen in customQueryAppenders)
+            {
+                this.customQueryAppenders[gen.TableName] = gen;
+            }
             foreach (var gen in customQueryGenerators)
             {
                 this.customQueryGenerators[gen.TableName] = gen;
@@ -51,6 +57,11 @@ namespace WDE.DatabaseEditors.QueryGenerators
         
         public IQuery GenerateQuery(IReadOnlyList<DatabaseKey> keys, IReadOnlyList<DatabaseKey>? deletedKeys, IDatabaseTableData tableData)
         {
+            if (customQueryGenerators.TryGetValue(tableData.TableDefinition.Id, out var customQueryGenerator))
+            {
+                return customQueryGenerator.Generate(keys, deletedKeys, tableData);
+            }
+
             if (tableData.TableDefinition.IsOnlyConditionsTable is OnlyConditionMode.IgnoreTableCompletely or OnlyConditionMode.TableReadOnly)
                 return BuildConditions(keys, tableData);
             if (tableData.TableDefinition.RecordMode == RecordMode.MultiRecord)
@@ -77,9 +88,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     query.Add(GenerateUpdateQuery(tableData.TableDefinition, entity));
             }
 
-            if (customQueryGenerators.TryGetValue(tableData.TableDefinition.Id, out var customQueryGenerator))
+            if (customQueryAppenders.TryGetValue(tableData.TableDefinition.Id, out var appender))
             {
-                query.Add(customQueryGenerator.Generate(keys, deletedKeys, tableData));
+                query.Add(appender.Generate(keys, deletedKeys, tableData));
             }
             
             return query.Close();

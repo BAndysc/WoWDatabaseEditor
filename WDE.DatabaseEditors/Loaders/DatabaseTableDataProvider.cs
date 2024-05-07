@@ -25,18 +25,21 @@ namespace WDE.DatabaseEditors.Loaders
         private readonly IMessageBoxService messageBoxService;
         private readonly IDatabaseProvider databaseProvider;
         private readonly IDatabaseTableModelGenerator tableModelGenerator;
+        private readonly Dictionary<DatabaseTable, ICustomDatabaseTableSourcePostLoad> customPostLoadSources;
         
         public DatabaseTableDataProvider(ITableDefinitionProvider tableDefinitionProvider, 
             IDatabaseQueryExecutor sqlExecutor,
             IMessageBoxService messageBoxService,
             IDatabaseProvider databaseProvider,
-            IDatabaseTableModelGenerator tableModelGenerator)
+            IDatabaseTableModelGenerator tableModelGenerator,
+            IEnumerable<ICustomDatabaseTableSourcePostLoad> customPostLoadSources)
         {
             this.tableDefinitionProvider = tableDefinitionProvider;
             this.sqlExecutor = sqlExecutor;
             this.messageBoxService = messageBoxService;
             this.databaseProvider = databaseProvider;
             this.tableModelGenerator = tableModelGenerator;
+            this.customPostLoadSources = customPostLoadSources.ToDictionary(x => x.Table, x => x);
         }
         
         private string BuildSQLQueryForSingleRow(DatabaseTableDefinitionJson tableDefinitionJson, string? customWhere, long? offset, int? limit)
@@ -403,7 +406,12 @@ namespace WDE.DatabaseEditors.Loaders
             if (result == null)
                 result = new List<Dictionary<string, (Type, object)>>();
 
-            return tableModelGenerator.CreateDatabaseTable(definition, keys, result);
+            var databaseTable = tableModelGenerator.CreateDatabaseTable(definition, keys, result);
+
+            if (databaseTable != null && customPostLoadSources.TryGetValue(tableName, out var postProcessor))
+                await postProcessor.PostProcess(databaseTable, definition, keys);
+
+            return databaseTable;
         }
     }
 }

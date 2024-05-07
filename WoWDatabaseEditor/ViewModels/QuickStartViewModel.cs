@@ -16,6 +16,7 @@ using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Services.Statistics;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
@@ -96,6 +97,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             IWindowManager windowManager,
             IProgramNameService programNameService,
             IQuickLoadSettings quickLoadSettings,
+            IMessageBoxService messageBoxService,
             AboutViewModel aboutViewModel,
             IEnumerable<IQuickStartPanel> quickStartPanels)
         {
@@ -145,7 +147,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 var item = await prototype.CreateSolutionItem("");
                 if (item != null)
                     eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
-            });
+            }).WrapMessageBox<Exception, NewItemPrototypeInfo>(messageBoxService);
 
             OpenMostRecentlyUsedCommand = new AsyncAutoCommand<MostRecentlyUsedViewModel>(async item =>
             {
@@ -227,7 +229,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             }
         }
 
-        public AsyncAutoCommand<NewItemPrototypeInfo> LoadItemCommand { get; }
+        public IAsyncCommand<NewItemPrototypeInfo> LoadItemCommand { get; }
         public AsyncAutoCommand<IWizardProvider> LoadWizard { get; }
         public AsyncAutoCommand<MostRecentlyUsedViewModel> OpenMostRecentlyUsedCommand { get; }
         

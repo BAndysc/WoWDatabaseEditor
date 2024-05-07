@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using AsyncAwaitBestPractices.MVVM;
 using DynamicData;
 using Prism.Commands;
 using Prism.Events;
@@ -69,7 +70,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public override bool SupportsMultiSelect => false;
         public override IReadOnlyList<DatabaseEntity>? MultiSelectionEntities => null;
 
-        public AsyncAutoCommand AddNewCommand { get; }
+        public IAsyncCommand AddNewCommand { get; }
 
         private bool canOpenRevertTip;
         public bool YouCanRevertTipOpened { get; set; }
@@ -124,7 +125,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && vm.IsModified);
             EditConditionsCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(EditConditions);
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
-            AddNewCommand = new AsyncAutoCommand(AddNewEntity);
+            AddNewCommand = new AsyncAutoCommand(AddNewEntity).WrapMessageBox<Exception>(messageBoxService);
 
             canOpenRevertTip = !teachingTipService.IsTipShown(TipYouCanRevertId);
 
@@ -282,10 +283,10 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public async Task<bool> RemoveEntity(DatabaseEntity entity)
         {
             if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                .SetTitle("Delete entity")
-                .SetMainInstruction($"Do you want to delete entity with key {entity.Key} from the editor?")
+                .SetTitle("Unload entity")
+                .SetMainInstruction($"Do you want to unload entity with key {entity.Key} from the editor?")
                 .SetContent(
-                    "It will be removed only from the project editor, it will not be removed from the database.")
+                    "It will be unloaded only from the project editor, it will not be removed from the database.")
                 .WithYesButton(true)
                 .WithNoButton(false).Build()))
                 return false;

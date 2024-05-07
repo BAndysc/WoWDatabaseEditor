@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -25,7 +26,7 @@ namespace WDE.Solutions.Explorer.ViewModels
 {
     [AutoRegister]
     [SingleInstance]
-    public class SolutionExplorerViewModel : BindableBase, ITool, IDropTarget
+    public class SolutionExplorerViewModel : ObservableBase, ITool, IDropTarget
     {
         private readonly IEventAggregator ea;
         private readonly ISolutionItemNameRegistry itemNameRegistry;
@@ -134,17 +135,18 @@ namespace WDE.Solutions.Explorer.ViewModels
                     AddItems.Add(category);
                 }
                 
-                category.Items.Add(new SolutionItemMenuViewModel(item, insertItemCommand));
+                category.Items.Add(new SolutionItemMenuViewModel(item, messageBoxService, insertItemCommand));
             }
 
-            AddItem = new DelegateCommand(async () =>
+            AddItem = new AsyncCommand(async () =>
             {
                 ISolutionItem? item = await newItemService.GetNewSolutionItem();
                 if (item != null)
                     DoAddItem(item);
-            }, () => (SelectedItem == null || SelectedItem.IsContainer) && SelectedItems.Count <= 1)
-                .ObservesProperty(() => SelectedItem)
-                .ObservesProperty(() => SelectedItems.Count);
+            }, _ => (SelectedItem == null || SelectedItem.IsContainer) && SelectedItems.Count <= 1)
+            .WrapMessageBox<Exception>(messageBoxService);
+            On(() => SelectedItem, _ => AddItem.RaiseCanExecuteChanged());
+            SelectedItems.CollectionChanged += (sender, args) => AddItem.RaiseCanExecuteChanged();
 
             RemoveItem = new DelegateCommand<SolutionItemViewModel>(vm =>
             {
@@ -281,7 +283,7 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         public ObservableCollection<SolutionItemViewModel> Root { get; }
         public ObservableCollection<AddItemCategoryMenuViewModel> AddItems { get; } = new();
-        public DelegateCommand AddItem { get; }
+        public IAsyncCommand AddItem { get; }
         public DelegateCommand<SolutionItemViewModel> RemoveItem { get; }
         public AsyncAutoCommand<SolutionItemViewModel> RenameItem { get; }
         public DelegateCommand<SolutionItemViewModel> GenerateSQL { get; }

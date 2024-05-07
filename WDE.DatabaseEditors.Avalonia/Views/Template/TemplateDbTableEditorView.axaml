@@ -35,6 +35,7 @@
             <helpers:FieldValueTemplateSelector.FlagsTemplate>
                 <DataTemplate x:DataType="viewModels:DatabaseCellViewModel">
                     <controls:FastFlagCellView MinWidth="300" Margin="0,0,10,0"
+                                               ToolTip.Tip="{CompiledBinding OriginalValueTooltip}"
                                                Height="24"
                                                SelectedItem="{CompiledBinding OptionValue, Mode=TwoWay}"
                                                SelectedValue="{CompiledBinding AsLongValue, Mode=TwoWay}"
@@ -46,6 +47,7 @@
             <helpers:FieldValueTemplateSelector.ItemsTemplate>
                 <DataTemplate x:DataType="viewModels:DatabaseCellViewModel">
                     <controls:FastItemCellView MinWidth="300" Margin="0,0,10,0"
+                                               ToolTip.Tip="{CompiledBinding OriginalValueTooltip}"
                                                Height="24"
                                                SelectedItem="{CompiledBinding OptionValue, Mode=TwoWay}"
                                                Items="{CompiledBinding Items}"

@@ -134,7 +134,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             contextMenu = new ContextMenu();
             revertMenuItem = new MenuItem() {Header = "Revert value"};
             setNullMenuItem = new MenuItem() {Header = "Set to null"};
-            deleteMenuItem = new MenuItem() {Header = "Delete entity from the editor"};
+            deleteMenuItem = new MenuItem() {Header = "Unload entity from the editor"};
             duplicateMenuItem = new MenuItem() {Header = "Duplicate row"};
             contextMenu.ItemsSource = new Control[]
             {

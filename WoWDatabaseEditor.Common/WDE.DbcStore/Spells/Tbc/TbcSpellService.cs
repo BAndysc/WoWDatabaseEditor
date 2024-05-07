@@ -363,13 +363,15 @@ namespace WDE.DbcStore.Spells.Tbc
             return 0;
         }
 
+        private TbcSpellStructure empty = new TbcSpellStructure();
+
         public DBCVersions Version => DBCVersions.TBC_8606;
 
-        public TbcSpellStructure GetSpell(uint spellId)
+        public ref readonly TbcSpellStructure GetSpell(uint spellId)
         {
             if (spellIndices.TryGetValue(spellId, out var spellIndex))
-                return spells[spellIndex];
-            return new TbcSpellStructure();
+                return ref spells[spellIndex];
+            return ref empty;
         }
     }
 }

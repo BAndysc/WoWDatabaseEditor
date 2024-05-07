@@ -8,7 +8,7 @@ using WDE.SqlQueryGenerator;
 namespace WDE.DatabaseEditors.QueryGenerators;
 
 [NonUniqueProvider]
-public interface ICustomFullQueryGenerator
+public interface ICustomQueryGeneratorAppend
 {
     DatabaseTable TableName { get; }
     IQuery Generate(IReadOnlyList<DatabaseKey> keys, IReadOnlyList<DatabaseKey>? deletedKeys, IDatabaseTableData data);

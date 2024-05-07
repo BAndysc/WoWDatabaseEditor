@@ -144,20 +144,34 @@ namespace WoWDatabaseEditorCore.Providers
 
         private async Task AddNewItemWindow()
         {
-            ISolutionItem? item = await newItemService.GetNewSolutionItem();
-            if (item != null)
+            try
             {
-                solutionManager.Add(item);
-                if (item is not SolutionFolderItem)
-                    eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
+                ISolutionItem? item = await newItemService.GetNewSolutionItem();
+                if (item != null)
+                {
+                    solutionManager.Add(item);
+                    if (item is not SolutionFolderItem)
+                        eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
+                }
+            }
+            catch (Exception e)
+            {
+                await messageBoxService.Value.SimpleDialog("Error", "Error while creating new item", e.Message);
             }
         }
         
         private async Task OpenNewItemWindow()
         {
-            ISolutionItem? item = await newItemService.GetNewSolutionItem(false);
-            if (item != null)
-                eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
+            try
+            {
+                ISolutionItem? item = await newItemService.GetNewSolutionItem(false);
+                if (item != null)
+                    eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
+            }
+            catch (Exception e)
+            {
+                await messageBoxService.Value.SimpleDialog("Error", "Error while creating new item", e.Message);
+            }
         }
         private void OpenSettings() => settings.ShowSettings();
 

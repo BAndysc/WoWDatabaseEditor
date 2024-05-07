@@ -103,15 +103,23 @@ namespace WDE.DatabaseEditors.Models
 
         public void SetTypedCellOrThrow<T>(string column, T? value) where T : IComparable<T>
         {
+            SetTypedCellOrThrowUnsafe(EntityChangeFlags.ChangeCurrent, column, value);
+        }
+
+        public void SetTypedCellOrThrowUnsafe<T>(EntityChangeFlags flags, string column, T? value) where T : IComparable<T>
+        {
             var cell = GetCell(column);
             if (cell == null)
                 throw new Exception("No column named " + column);
             var typed = cell as DatabaseField<T>;
             if (typed == null)
                 throw new Exception("No column named " + column + " with type " + typeof(T));
-            typed.Current.Value = value;
+            if (flags.HasFlagFast(EntityChangeFlags.ChangeCurrent))
+                typed.Current.Value = value;
+            if (flags.HasFlagFast(EntityChangeFlags.ChangeOriginal))
+                typed.Original.Value = value;
         }
-        
+
         public T? GetTypedValueOrThrow<T>(string columnName) where T : IComparable<T>
         {
             var cell = GetCell(columnName);
@@ -156,5 +164,13 @@ namespace WDE.DatabaseEditors.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+    }
+
+    [Flags]
+    public enum EntityChangeFlags
+    {
+        ChangeCurrent = 1,
+        ChangeOriginal = 2,
+        ChangeAll = ChangeCurrent | ChangeOriginal
     }
 }

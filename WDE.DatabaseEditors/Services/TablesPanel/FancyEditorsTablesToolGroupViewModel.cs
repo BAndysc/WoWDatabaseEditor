@@ -8,6 +8,7 @@ using WDE.Common;
 using WDE.Common.Documents;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
@@ -24,6 +25,7 @@ public partial class FancyEditorsTablesToolGroupViewModel : ObservableBase, ITab
 {
     private readonly ITableOpenService tableOpenService;
     private readonly IEventAggregator eventAggregator;
+    private readonly IMessageBoxService messageBoxService;
     private List<TableItemViewModel> allTables = new();
     private string searchText = "";
     [Notify] private TableItemViewModel? selectedTable;
@@ -45,10 +47,12 @@ public partial class FancyEditorsTablesToolGroupViewModel : ObservableBase, ITab
     public FancyEditorsTablesToolGroupViewModel(ITableDefinitionProvider definitionProvider,
         ISolutionItemProvideService rawTableSolutionItemProviderService,
         ITableOpenService tableOpenService,
-        IEventAggregator eventAggregator) 
+        IEventAggregator eventAggregator,
+        IMessageBoxService messageBoxService)
     {
         this.tableOpenService = tableOpenService;
         this.eventAggregator = eventAggregator;
+        this.messageBoxService = messageBoxService;
         foreach (var defi in definitionProvider.Definitions)
         {
             allTables.Add(new TableItemViewModel(defi.TableName, defi));
@@ -93,19 +97,19 @@ public partial class FancyEditorsTablesToolGroupViewModel : ObservableBase, ITab
 
     public void OpenTable(TableItemViewModel item)
     {
-        DoOpenTable(item).ListenErrors();
+        DoOpenTable(item).ListenErrors(messageBoxService);
     }
 
     public bool OpenSelected()
     {
         if (selectedTable != null)
         {
-            DoOpenTable(selectedTable).ListenErrors();
+            DoOpenTable(selectedTable).ListenErrors(messageBoxService);
             return true;
         }
         else if (FilteredTables.Count == 1)
         {
-            DoOpenTable(FilteredTables[0]).ListenErrors();
+            DoOpenTable(FilteredTables[0]).ListenErrors(messageBoxService);
             return true;
         }
 

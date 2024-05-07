@@ -5,6 +5,8 @@ using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Mvvm;
 using WDE.Common;
+using WDE.Common.Services.MessageBox;
+using WDE.Common.Utils;
 
 namespace WDE.Solutions.Explorer.ViewModels
 {
@@ -24,7 +26,8 @@ namespace WDE.Solutions.Explorer.ViewModels
         public string Name { get; }
         public ICommand Command { get; }
         
-        public SolutionItemMenuViewModel(ISolutionItemProvider provider, 
+        public SolutionItemMenuViewModel(ISolutionItemProvider provider,
+            IMessageBoxService messageBoxService,
             Func<ISolutionItemProvider, Task> addCommand)
         {
             Name = provider.GetName();
@@ -32,7 +35,7 @@ namespace WDE.Solutions.Explorer.ViewModels
             Command = new AsyncCommand(async () =>
             {
                 await addCommand.Invoke(provider);
-            });
+            }).WrapMessageBox<Exception>(messageBoxService);
         }
     }
 }
