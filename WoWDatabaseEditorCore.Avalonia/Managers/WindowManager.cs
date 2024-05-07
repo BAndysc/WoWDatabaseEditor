@@ -16,6 +16,7 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using AvaloniaStyles.Controls;
 using WDE.Common;
 using WDE.Common.Avalonia.Components;
 using WDE.Common.Avalonia.Controls.Popups;
@@ -350,7 +351,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                         {
                             if (focusedElement != null &&
                                 focusedElement.TryGetTarget(out var focusedElement__))
-                                focusedElement__.Focus();
+                            {
+                                if (((Visual)focusedElement__).GetVisualRoot() == null)
+                                    (parentWindow.GetLogicalChildren().FirstOrDefault(x => x is not ToolBar) as Control)?.Focus();
+                                else
+                                    focusedElement__.Focus();
+                            }
                         }, DispatcherPriority.Input);
 
                         view.DataContext = null;
