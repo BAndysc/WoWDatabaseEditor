@@ -6,17 +6,35 @@ using WDE.MpqReader.Readers;
 
 namespace WDE.MpqReader.Structures
 {
+    public readonly struct WmoId : IEquatable<WmoId>
+    {
+        public bool Equals(WmoId other) => id == other.id;
+
+        public override bool Equals(object? obj) => obj is WmoId other && Equals(other);
+
+        public override int GetHashCode() => id;
+
+        public static bool operator ==(WmoId left, WmoId right) => left.Equals(right);
+
+        public static bool operator !=(WmoId left, WmoId right) => !left.Equals(right);
+
+        private readonly int id;
+
+        public WmoId(int id) => this.id = id;
+    }
+
     public readonly struct WorldMapObjectPlacementData
     {
         public readonly string WmoPath;
         public readonly Vector3 AbsolutePosition;
         public readonly Vector3 Rotation;
         public readonly CAaBox Bounds;
+        public readonly WmoId Id;
 
         public WorldMapObjectPlacementData(IBinaryReader reader, string[] names)
         {
             WmoPath = names[reader.ReadInt32()];
-            var uniqueId = reader.ReadInt32();
+            Id = new WmoId(reader.ReadInt32());
             AbsolutePosition = reader.ReadVector3();
             Rotation = reader.ReadVector3();
             Bounds = CAaBox.Read(reader);
@@ -34,7 +52,24 @@ namespace WDE.MpqReader.Structures
         mddf_entry_is_filedata_id = 0x40,     // Legion+ᵘ nameId is a file data id to directly load
         mddf_unk_100 = 0x100,                 // Legion+ᵘ
     }
-    
+
+    public readonly struct M2Id : IEquatable<M2Id>
+    {
+        public bool Equals(M2Id other) => id == other.id;
+
+        public override bool Equals(object? obj) => obj is M2Id other && Equals(other);
+
+        public override int GetHashCode() => id;
+
+        public static bool operator ==(M2Id left, M2Id right) => left.Equals(right);
+
+        public static bool operator !=(M2Id left, M2Id right) => !left.Equals(right);
+
+        private readonly int id;
+
+        public M2Id(int id) => this.id = id;
+    }
+
     public readonly struct M2PlacementData
     {
         public readonly FileId M2Path;
@@ -42,11 +77,12 @@ namespace WDE.MpqReader.Structures
         public readonly Vector3 Rotation;
         public readonly float Scale;
         public readonly MDDFFlags Flags;
+        public readonly M2Id Id;
 
         public M2PlacementData(IBinaryReader reader, string[] names)
         {
             var entry = reader.ReadUInt32();
-            var uniqueId = reader.ReadInt32();
+            Id = new M2Id(reader.ReadInt32());
             AbsolutePosition = reader.ReadVector3();
             Rotation = reader.ReadVector3();
             Scale = reader.ReadUInt16() / 1024.0f;
