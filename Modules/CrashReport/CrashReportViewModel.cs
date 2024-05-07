@@ -58,7 +58,7 @@ public class CrashReportViewModel : INotifyPropertyChanged
             var httpClient = clientFactory.Factory();
             try
             {
-                await httpClient.PostAsync(Path.Join(server, "Log", "Send"), new StringContent(JsonConvert.SerializeObject(new
+                await httpClient.PostAsync(server + "/Log/Send", new StringContent(JsonConvert.SerializeObject(new
                 {
                     log = CrashReport
                 }), new MediaTypeHeaderValue("application/json")));
