@@ -117,7 +117,7 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
             
             return (new AsyncAutoCommand(async () =>
             {
-                await command.Process(definition, new DatabaseTableData(viewModel.TableDefinition, viewModel.Entities), viewModel);
+                await command.Process(definition, new DatabaseTableData(viewModel.TableDefinition, viewModel.Entities), entity, viewModel);
             }, () => command.CanExecute(definition, entity, viewModel)), text);
         }
 

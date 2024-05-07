@@ -23,7 +23,7 @@ namespace WDE.DatabaseEditors.CustomCommands.Commands
             this.databaseProvider = databaseProvider;
         }
         
-        public async Task Process(DatabaseCommandDefinitionJson definition, IDatabaseTableData tableData, ITableContext addRow)
+        public async Task Process(DatabaseCommandDefinitionJson definition, IDatabaseTableData tableData, DatabaseEntity? entityParameter, ITableContext addRow)
         {
             if (definition.Parameters == null || definition.Parameters.Length != 2)
                 throw new Exception("Invalid command definition");

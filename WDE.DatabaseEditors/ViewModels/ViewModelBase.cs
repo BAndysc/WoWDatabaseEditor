@@ -274,7 +274,7 @@ namespace WDE.DatabaseEditors.ViewModels
                             WrapBulkEdit(
                                 () => WrapBlockingTask(
                                     () => cmdExecutor.Process(commandDefinition,
-                                        new DatabaseTableData(tableDefinition, Entities), this)
+                                        new DatabaseTableData(tableDefinition, Entities), null, this)
                                 ), cmdExecutor.Name));
                     }));
                 }
