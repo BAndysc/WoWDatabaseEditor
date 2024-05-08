@@ -103,7 +103,7 @@ public class ParameterBox : BaseParameterBox
             EnableCheckBox();
         else if (Parameter is FlagParameter)
             EnableFlagsBox();
-        else if (Parameter is IParameter<long> l && l.Items != null && l.Items.Count < 2000 && !l.NeverUseComboBoxPicker)
+        else if (Parameter is IParameter<long> l && l.Items != null && l.Items.Count < 2000 && !l.NeverUseComboBoxPicker && Parameter is not ICustomPickerParameter<long> && Parameter is not ICustomPickerContextualParameter<long>)
             EnableComboBox();
         else
             EnableGenericBox();
