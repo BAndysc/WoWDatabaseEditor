@@ -23,20 +23,16 @@ public class QuestChainSolutionItemProvider : ISolutionItemProvider,
     ISolutionItemIconProvider<QuestChainSolutionItem>,
     ISolutionNameProvider<QuestChainSolutionItem>,
     ISolutionItemDeserializer<QuestChainSolutionItem>,
-    ISolutionItemSerializer<QuestChainSolutionItem>,
-    ISolutionItemRemoteCommandProvider<QuestChainSolutionItem>
+    ISolutionItemSerializer<QuestChainSolutionItem>
 {
     private readonly IContainerProvider containerProvider;
     private readonly IQuestEntryProviderService questEntryProviderService;
-    private readonly IQuestChainEditorConfiguration configuration;
 
     public QuestChainSolutionItemProvider(IContainerProvider containerProvider,
-        IQuestEntryProviderService questEntryProviderService,
-        IQuestChainEditorConfiguration configuration)
+        IQuestEntryProviderService questEntryProviderService)
     {
         this.containerProvider = containerProvider;
         this.questEntryProviderService = questEntryProviderService;
-        this.configuration = configuration;
     }
 
     public string GetName() => "Quest chain";
@@ -122,24 +118,5 @@ public class QuestChainSolutionItemProvider : ISolutionItemProvider,
     private string? SerializeExistingDataAndConditions(QuestChainSolutionItem item)
     {
         return JsonConvert.SerializeObject(item);
-    }
-
-    public IRemoteCommand[] GenerateCommand(QuestChainSolutionItem item)
-    {
-        if (configuration.ShowMarkConditionSourceType.HasValue)
-        {
-            return new IRemoteCommand[]
-            {
-                new AnonymousRemoteCommand("reload quest_template"),
-                new AnonymousRemoteCommand("reload conditions " + configuration.ShowMarkConditionSourceType)
-            };
-        }
-        else
-        {
-            return new IRemoteCommand[]
-            {
-                new AnonymousRemoteCommand("reload quest_template")
-            };
-        }
     }
 }
