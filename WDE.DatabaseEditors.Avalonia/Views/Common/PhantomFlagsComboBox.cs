@@ -6,6 +6,7 @@ using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Avalonia.Controls;
 using WDE.Common.Parameters;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels;
 
@@ -15,9 +16,9 @@ public class PhantomFlagsComboBox : BasePhantomFlagsComboBox
 {
     private IParameterValue<long> parameter = null!;
     private ITableContext context = null!;
-    private string column = null!;
+    private ColumnFullName column;
 
-    public void Spawn(Visual parent, Rect position, string? initialText, IParameterValue<long> parameter, ITableContext context, string column)
+    public void Spawn(Visual parent, Rect position, string? initialText, IParameterValue<long> parameter, ITableContext context, ColumnFullName column)
     {
         this.parameter = parameter;
         this.context = context;
@@ -30,7 +31,7 @@ public class PhantomFlagsComboBox : BasePhantomFlagsComboBox
         base.Cleanup(element);
         parameter = null!;
         context = null!;
-        column = null!;
+        column = default;
     }
 
     protected override void Save(FlagComboBox element)

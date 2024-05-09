@@ -5,6 +5,7 @@ using System.Linq;
 using AvaloniaStyles.Controls.FastTableView;
 using Prism.Mvvm;
 using PropertyChanged.SourceGenerator;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.OneToOneForeignKey
@@ -38,9 +39,9 @@ namespace WDE.DatabaseEditors.ViewModels.OneToOneForeignKey
 
         public IReadOnlyList<ITableCell> CellsList => Groups.SelectMany(x => x.Cells).ToList();
         public event Action<ITableRow>? Changed;
-        public event Action<DatabaseEntityViewModel, SingleRecordDatabaseCellViewModel, string>? ChangedCell;
+        public event Action<DatabaseEntityViewModel, SingleRecordDatabaseCellViewModel, ColumnFullName>? ChangedCell;
 
-        public void RaiseChanged(SingleRecordDatabaseCellViewModel cell, string column)
+        public void RaiseChanged(SingleRecordDatabaseCellViewModel cell, ColumnFullName column)
         {
             ChangedCell?.Invoke(this, cell, column);
             Changed?.Invoke(this);

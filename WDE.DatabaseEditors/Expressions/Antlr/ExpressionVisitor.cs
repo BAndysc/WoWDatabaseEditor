@@ -116,8 +116,11 @@ namespace WDE.DatabaseEditors.Expressions.Antlr
 
         public override object VisitEFieldStringValue(DatabaseEditorExpressionParser.EFieldStringValueContext context)
         {
-            var name = context.ID().GetText();
-            if (name == null || !definition.TableColumns.TryGetValue(name, out var column))
+            if (context.ID().GetText() is not { } columnName)
+                return "(unknown)";
+
+            var name = new ColumnFullName(null, columnName);
+            if (!definition.TableColumns.TryGetValue(name, out var column))
                 return "(unknown)";
             
             var cell = entity?.GetCell(name);
@@ -141,7 +144,9 @@ namespace WDE.DatabaseEditors.Expressions.Antlr
         public override object VisitEFieldValue(DatabaseEditorExpressionParser.EFieldValueContext context)
         {
             var name = context.ID().GetText();
-            var cell = entity?.GetCell(name);
+            if (name == null)
+                throw new Exception();
+            var cell = entity?.GetCell(new ColumnFullName(null, name));
             if (cell is DatabaseField<long> lField)
                 return lField.Current.Value;
             if (cell is DatabaseField<float> fField)

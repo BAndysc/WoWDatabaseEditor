@@ -5,7 +5,7 @@ namespace WDE.DatabaseEditors.Factories
 {
     public interface IDatabaseFieldFactory
     {
-        IDatabaseField CreateField(string columnName, IValueHolder valueHolder);
+        IDatabaseField CreateField(ColumnFullName columnName, IValueHolder valueHolder);
         IDatabaseField CreateField(DatabaseColumnJson column, object? value);
     }
 }

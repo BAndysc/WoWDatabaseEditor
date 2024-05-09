@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -47,28 +48,35 @@ namespace WDE.MySqlDatabaseCommon.Database
         {
             var tables = await ExecuteSelectSql("SHOW TABLES");
 
-            return tables.SelectMany(row => row.Values).Select(c => (string)c.Item2).ToList();
+            return tables.Select(row => tables.Value<string>(row, 0)!).ToList();
         }
 
         public async Task<IList<MySqlDatabaseColumn>> GetTableColumns(string table)
         {
             var columns = await ExecuteSelectSql($"SELECT COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, COLUMN_TYPE, COLUMN_KEY FROM information_schema.columns WHERE table_name = '{table}' AND table_schema = '{databaseName}' ORDER BY ordinal_position;");
 
+            var columnNameIndex = columns.ColumnIndex("COLUMN_NAME");
+            var dataTypeIndex = columns.ColumnIndex("DATA_TYPE");
+            var columnTypeIndex = columns.ColumnIndex("COLUMN_TYPE");
+            var columnDefaultIndex = columns.ColumnIndex("COLUMN_DEFAULT");
+            var isNullableIndex = columns.ColumnIndex("IS_NULLABLE");
+            var columnKeyIndex = columns.ColumnIndex("COLUMN_KEY");
+
             var list = new List<MySqlDatabaseColumn>();
-            foreach (var column in columns)
+            foreach (var rowIndex in columns)
             {
                 var c = new MySqlDatabaseColumn()
                 {
-                    ColumnName = (string)column["COLUMN_NAME"].Item2
+                    ColumnName = columns.Value<string>(rowIndex, columnNameIndex)!
                 };
 
-                c.Nullable = (string) column["IS_NULLABLE"].Item2 == "YES";
-                c.PrimaryKey = (string) column["COLUMN_KEY"].Item2 == "PRI";
+                c.Nullable = columns.Value<string>(rowIndex, isNullableIndex)! == "YES";
+                c.PrimaryKey = columns.Value<string>(rowIndex, columnKeyIndex)! == "PRI";
 
-                bool unsigned = ((string) column["COLUMN_TYPE"].Item2).Contains("unsigned");
-                string dataType = (string) column["DATA_TYPE"].Item2;
+                bool unsigned = (columns.Value<string>(rowIndex, columnTypeIndex)!).Contains("unsigned");
+                string dataType = columns.Value<string>(rowIndex, dataTypeIndex)!;
                 string? defaultValue = null;
-                if (column["COLUMN_DEFAULT"].Item2 is string str)
+                if (columns.Value<string>(rowIndex, columnDefaultIndex) is string str)
                     defaultValue = str;
 
                 c.DatabaseType = dataType;
@@ -209,10 +217,60 @@ namespace WDE.MySqlDatabaseCommon.Database
             }
         }
 
-        public async Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query)
+        private class DatabaseSelectResult : IDatabaseSelectResult
+        {
+            private readonly string[] columns;
+            private readonly Type[] types;
+            private readonly List<object?[]> rows;
+
+            public DatabaseSelectResult(string[] columns, Type[] types, List<object?[]> rows)
+            {
+                this.columns = columns;
+                this.types = types;
+                this.rows = rows;
+            }
+
+            public int Columns => columns.Length;
+
+            public int Rows => rows.Count;
+
+            public string ColumnName(int index) => columns[index];
+
+            public Type ColumnType(int index) => types[index];
+
+            public object? Value(int row, int column) => rows[row][column];
+
+            public T? Value<T>(int row, int column)
+            {
+                if (rows[row][column] == null)
+                    return default;
+                return (T) rows[row][column]!;
+            }
+
+            public bool IsNull(int row, int column) => rows[row][column] == null;
+
+            public int ColumnIndex(string columnName)
+            {
+                for (int i = 0; i < columns.Length; ++i)
+                    if (columns[i] == columnName)
+                        return i;
+
+                throw new Exception($"Column {columnName} not found. Have columns: " + string.Join(", ", columns));
+            }
+
+            public IEnumerator<int> GetEnumerator()
+            {
+                for (int i = 0; i < Rows; ++i)
+                    yield return i;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+        public async Task<IDatabaseSelectResult> ExecuteSelectSql(string query)
         {
             if (string.IsNullOrEmpty(query) || !IsConnected)
-                return new List<Dictionary<string, (Type, object)>>();
+                return new EmptyDatabaseSelectResult();
 
             databaseLogger.Log(query, null, TraceLevel.Info, QueryType.ReadQuery);
             using var writeLock = await DatabaseLock.WriteLock();
@@ -244,19 +302,27 @@ namespace WDE.MySqlDatabaseCommon.Database
                 throw new IMySqlExecutor.QueryFailedDatabaseException(ex);
             }
 
-            List<Dictionary<string, (Type, object)>> result = new();
+            string[] columns = new string[reader.FieldCount];
+            Type[] types = new Type[reader.FieldCount];
+            List<object?[]> rows = new List<object?[]>();
+            for (int i = 0; i < reader.FieldCount; ++i)
+            {
+                columns[i] = reader.GetName(i);
+                types[i] = reader.GetFieldType(i);
+            }
             while (reader.Read())
             {
-                var fields = new Dictionary<string, (Type, object)>(reader.FieldCount);
+                object?[] row = new object?[reader.FieldCount];
                 for (int i = 0; i < reader.FieldCount; ++i)
-                    fields.Add(reader.GetName(i), (reader.GetFieldType(i), reader.GetValue(i)));
-                
-                result.Add(fields);
+                {
+                    row[i] = reader.IsDBNull(i) ? null : reader.GetValue(i);
+                }
+                rows.Add(row);
             }
 
             await reader.CloseAsync();
             await conn.CloseAsync();
-            return result;
+            return new DatabaseSelectResult(columns, types, rows);
         }
     }
 }

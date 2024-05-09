@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using AvaloniaStyles.Controls.FastTableView;
 using Prism.Mvvm;
 using WDE.Common.Services;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
@@ -40,7 +41,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         public event Action<ITableRow>? Changed;
 
-        public void RaiseChanged(DatabaseCellViewModel cell, string? fieldName)
+        public void RaiseChanged(DatabaseCellViewModel cell, ColumnFullName? fieldName)
         {
             Changed?.Invoke(this);
         }

@@ -58,6 +58,7 @@ internal static class SqlParseUtils
             "redundant" => RowFormat.Redundant,
             "compact" => RowFormat.Compact,
             "paged" => RowFormat.Paged,
+            "page" => RowFormat.Page,
             _ => throw new ArgumentOutOfRangeException($"Row format {rowFormat} is not known.")
         };
     }

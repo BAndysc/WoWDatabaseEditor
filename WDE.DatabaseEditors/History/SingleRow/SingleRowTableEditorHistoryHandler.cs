@@ -4,6 +4,7 @@ using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Services;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
@@ -16,12 +17,14 @@ public class SingleRowTableEditorHistoryHandler : HistoryHandler, IDisposable
     private readonly SingleRowDbTableEditorViewModel viewModel;
     private IDisposable? disposable;
 
-    private HashSet<string> keys;
+    private HashSet<ColumnFullName> keys;
 
     public SingleRowTableEditorHistoryHandler(SingleRowDbTableEditorViewModel viewModel)
     {
         this.viewModel = viewModel;
-        keys = new HashSet<string>(viewModel.TableDefinition.GroupByKeys);
+        keys = new HashSet<ColumnFullName>();
+        foreach (var key in viewModel.TableDefinition.GroupByKeys)
+            keys.Add(new ColumnFullName(null, key));
         BindTableData();
     }
 
@@ -51,10 +54,10 @@ public class SingleRowTableEditorHistoryHandler : HistoryHandler, IDisposable
         });
     }
 
-    private void FieldValueChanged(DatabaseEntity entity, string columnName, Action<IValueHolder> undo, Action<IValueHolder> redo)
+    private void FieldValueChanged(DatabaseEntity entity, ColumnFullName columnName, Action<IValueHolder> undo, Action<IValueHolder> redo)
     {
         var index = viewModel.Entities.IndexOf(entity);
-        if (entity.Phantom || !viewModel.TableDefinition.GroupByKeys.Contains(columnName))
+        if (entity.Phantom || !(columnName.ForeignTable == null && viewModel.TableDefinition.GroupByKeys.Contains(columnName.ColumnName)))
             PushAction(new SingleRowFieldCellValueChangedAction(viewModel, index, columnName, undo, redo));
     }
 
@@ -86,11 +89,11 @@ public class SingleRowFieldCellValueChangedAction : IHistoryAction
 {
     private readonly SingleRowDbTableEditorViewModel viewModel;
     private readonly int index;
-    private readonly string columnName;
+    private readonly ColumnFullName columnName;
     private readonly Action<IValueHolder> undo;
     private readonly Action<IValueHolder> redo;
 
-    public SingleRowFieldCellValueChangedAction(SingleRowDbTableEditorViewModel viewModel, int index, string columnName, Action<IValueHolder> undo, Action<IValueHolder> redo)
+    public SingleRowFieldCellValueChangedAction(SingleRowDbTableEditorViewModel viewModel, int index, ColumnFullName columnName, Action<IValueHolder> undo, Action<IValueHolder> redo)
     {
         this.viewModel = viewModel;
         this.index = index;

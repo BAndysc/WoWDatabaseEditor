@@ -64,7 +64,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private HashSet<DatabaseKey> removedKeys = new HashSet<DatabaseKey>();
         private HashSet<DatabaseKey> forceInsertKeys = new HashSet<DatabaseKey>();
         private HashSet<DatabaseKey> forceDeleteKeys = new HashSet<DatabaseKey>();
-        private HashSet<(DatabaseKey key, string columnName)> forceUpdateCells = new HashSet<(DatabaseKey, string)>();
+        private HashSet<(DatabaseKey key, ColumnFullName columnName)> forceUpdateCells = new HashSet<(DatabaseKey, ColumnFullName)>();
         private List<IDisposable> rowsDisposable = new();
         public ObservableCollection<DatabaseEntityViewModel> Rows { get; } = new();
         public IReadOnlyList<ITableRowGroup> OnlyGroup { get; }
@@ -432,7 +432,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 var nextGuid = await personalGuidRangeService.GetNextGuidOrShowError(TableDefinition.AutoKeyValue.Value, statusBar);
                 if (nextGuid.HasValue)
-                    entity.SetTypedCellOrThrow(TableDefinition.PrimaryKey[0], (long)nextGuid.Value);
+                    entity.SetTypedCellOrThrow(new ColumnFullName(null, TableDefinition.PrimaryKey[0]), (long)nextGuid.Value);
             }
         }
 
@@ -445,7 +445,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 for (int i = 0; i < DefaultPartialKey.Value.Count; ++i)
                 {
-                    freshEntity.SetTypedCellOrThrow(TableDefinition.PrimaryKey[i], DefaultPartialKey.Value[i]);
+                    freshEntity.SetTypedCellOrThrow(new ColumnFullName(null, TableDefinition.PrimaryKey[i]), DefaultPartialKey.Value[i]);
                 }
             }
             await SetupPersonalGuidValue(freshEntity);
@@ -481,11 +481,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             var key = new IDatabaseProvider.ConditionKey(tableDefinition.Condition.SourceType);
             if (tableDefinition.Condition.SourceGroupColumn is {} sourceGroup)
-                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceGroup.Name)));
+                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceGroup.Name))));
             if (tableDefinition.Condition.SourceEntryColumn is { } sourceEntry)
-                key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceEntry));
+                key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceEntry)));
             if (tableDefinition.Condition.SourceIdColumn is { } sourceId)
-                key = key.WithId((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceId));
+                key = key.WithId((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceId)));
 
             var newConditions = await conditionEditService.EditConditions(key, conditionList);
             if (newConditions == null)
@@ -494,7 +494,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             view.ParentEntity.Conditions = newConditions.ToList();
             if (tableDefinition.Condition.SetColumn != null)
             {
-                var hasColumn = view.ParentEntity.GetCell(tableDefinition.Condition.SetColumn);
+                var hasColumn = view.ParentEntity.GetCell(tableDefinition.Condition.SetColumn.Value);
                 if (hasColumn is DatabaseField<long> lf)
                     lf.Current.Value = view.ParentEntity.Conditions.Count > 0 ? 1 : 0;
             }
@@ -739,7 +739,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 }
                 else
                 {
-                    var cell = entity.GetCell(column.DbColumnName);
+                    var cell = entity.GetCell(column.DbColumnFullName);
                     if (cell == null)
                         throw new Exception("this should never happen");
 
@@ -778,9 +778,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return true;
         }
 
-        private void OnRowChangedCell(DatabaseEntityViewModel entity, SingleRecordDatabaseCellViewModel cell, string columnName)
+        private void OnRowChangedCell(DatabaseEntityViewModel entity, SingleRecordDatabaseCellViewModel cell, ColumnFullName columnName)
         {
-            if (tableDefinition.GroupByKeys.Contains(columnName) && !entity.IsPhantomEntity)
+            if (columnName.ForeignTable == null && tableDefinition.GroupByKeys.Contains(columnName.ColumnName) && !entity.IsPhantomEntity)
                 ReKey(entity).ListenErrors();
             else
             {
@@ -798,7 +798,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             Debug.Assert(!entity.IsPhantomEntity);
             DatabaseKey BuildKey(DatabaseEntity e)
             {
-                return new DatabaseKey(tableDefinition.GroupByKeys.Select(e.GetTypedValueOrThrow<long>));
+                return new DatabaseKey(tableDefinition.GroupByKeys.Select(key => e.GetTypedValueOrThrow<long>(new ColumnFullName(null, key))));
             }
 
             var newRealKey = BuildKey(entity.Entity);
@@ -818,7 +818,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 ForceInsertEntity(original, indexOfRow);
                 int i = 0;
                 foreach (var column in tableDefinition.GroupByKeys)
-                    original.SetTypedCellOrThrow(column, oldKey[i++]);
+                    original.SetTypedCellOrThrow(new ColumnFullName(null, column), oldKey[i++]);
                 Debug.Assert(!oldKey.IsPhantomKey);
                 forceInsertKeys.Add(oldKey);
             }, () =>
@@ -829,7 +829,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 ForceInsertEntity(clone, indexOfRow);
                 int i = 0;
                 foreach (var column in tableDefinition.GroupByKeys)
-                    clone.SetTypedCellOrThrow(column, newRealKey[i++]);
+                    clone.SetTypedCellOrThrow(new ColumnFullName(null, column), newRealKey[i++]);
             }));
         }
 
@@ -1035,8 +1035,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             var result = await mySqlExecutor.ExecuteSelectSql(tableDefinition, query.QueryString);
             
-            var count = result.Count == 0 ? (typeof(long), 0L) :  result[0]["C"];
-            var offset = Convert.ToInt64(count.Item2);
+            var count = result.Rows == 0 ? 0L : result.Value(0, result.ColumnIndex("C"));
+            var offset = Convert.ToInt64(count);
             var modifiedOffset = (ulong)Math.Max(0, offset - LimitQuery / 2 + 1);
             OffsetQuery = modifiedOffset;
             await ScheduleLoading();

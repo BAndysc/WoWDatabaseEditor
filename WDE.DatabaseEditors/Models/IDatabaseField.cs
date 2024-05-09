@@ -2,12 +2,13 @@
 using System;
 using System.ComponentModel;
 using WDE.Common.History;
+using WDE.DatabaseEditors.Data.Structs;
 
 namespace WDE.DatabaseEditors.Models
 {
     public interface IDatabaseField : INotifyPropertyChanged, IComparable<IDatabaseField>
     {
-        string FieldName { get; }
+        ColumnFullName FieldName { get; }
         bool IsModified { get; }
         object? OriginalValue { get; set; }
         event Action<IHistoryAction> OnChanged;
@@ -15,6 +16,6 @@ namespace WDE.DatabaseEditors.Models
         IValueHolder CurrentValue { get; }
         IDatabaseField Clone();
         object? Object { get; }
-        event Action<string, Action<IValueHolder>, Action<IValueHolder>> ValueChanged;
+        event Action<ColumnFullName, Action<IValueHolder>, Action<IValueHolder>> ValueChanged;
     }
 }

@@ -51,7 +51,7 @@ public class TextEntitySerializer : ITextEntitySerializer
         List<DatabaseEntity> entities = new();
         foreach (var row in data)
         {
-            Dictionary<string, IDatabaseField> fields = new Dictionary<string, IDatabaseField>();
+            Dictionary<ColumnFullName, IDatabaseField> fields = new Dictionary<ColumnFullName, IDatabaseField>();
             IReadOnlyList<ICondition>? conditions = (row.contitions?.Count ?? 0) == 0 ? null : row.contitions;
 
             foreach (var column in definition.TableColumns)
@@ -68,9 +68,9 @@ public class TextEntitySerializer : ITextEntitySerializer
             DatabaseKey key;
             
             if (definition.RecordMode == RecordMode.SingleRow)
-                key = new DatabaseKey(definition.PrimaryKey.Select(keyColumn => (long)fields[keyColumn].Object!));
+                key = new DatabaseKey(definition.PrimaryKey.Select(keyColumn => (long)fields[new ColumnFullName(null, keyColumn)].Object!));
             else 
-                key = new DatabaseKey((long)fields[definition.PrimaryKey[0]].Object!); // this is what DatabaseEntity expects to have as the key, not the best solution I must say
+                key = new DatabaseKey((long)fields[new ColumnFullName(null, definition.PrimaryKey[0])].Object!); // this is what DatabaseEntity expects to have as the key, not the best solution I must say
 
             if (forceKey.HasValue)
                 key = forceKey.Value;
@@ -84,7 +84,7 @@ public class TextEntitySerializer : ITextEntitySerializer
 
     private class JsonFormat
     {
-        public Dictionary<string, object?> values = new Dictionary<string, object?>();
+        public Dictionary<ColumnFullName, object?> values = new Dictionary<ColumnFullName, object?>();
         public List<AbstractCondition> contitions = new List<AbstractCondition>();
     }
 }

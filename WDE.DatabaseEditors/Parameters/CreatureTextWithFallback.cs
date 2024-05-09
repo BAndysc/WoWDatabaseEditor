@@ -4,6 +4,7 @@ using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.DatabaseEditors.Data;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Parameters;
@@ -24,7 +25,7 @@ public class CreatureTextWithFallback : StringParameter, IAsyncContextualParamet
         if (!string.IsNullOrWhiteSpace(value))
             return value;
         
-        var broadcastTextId = context.GetTypedValueOrThrow<long>("broadcasttextid");
+        var broadcastTextId = context.GetTypedValueOrThrow<long>(new ColumnFullName(null, "broadcasttextid"));
         if (broadcastTextId == 0)
             return "";
 
@@ -37,7 +38,7 @@ public class CreatureTextWithFallback : StringParameter, IAsyncContextualParamet
         if (!string.IsNullOrWhiteSpace(value))
             return value;
 
-        var broadcastTextId = context.GetTypedValueOrThrow<long>("broadcasttextid");
+        var broadcastTextId = context.GetTypedValueOrThrow<long>(new ColumnFullName(null, "broadcasttextid"));
         if (broadcastTextId != 0)
             return $"BroadcastText {broadcastTextId} (fetching)";
         return "";
@@ -54,7 +55,7 @@ public class CreatureTextWithFallback : StringParameter, IAsyncContextualParamet
         return ("", false);
     }
 
-    public string AffectedByColumn => "broadcasttextid";
+    public ColumnFullName AffectedByColumn => new ColumnFullName(null, "broadcasttextid");
 
     public string ToString(string value, object context)
     {

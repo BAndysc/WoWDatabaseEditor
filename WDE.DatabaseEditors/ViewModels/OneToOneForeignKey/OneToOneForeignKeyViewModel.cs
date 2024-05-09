@@ -57,7 +57,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     [Notify] private bool presentInDatabase;
     private DatabaseEntityViewModel row;
     
-    private HashSet<string> forceUpdateCells = new HashSet<string>();
+    private HashSet<ColumnFullName> forceUpdateCells = new HashSet<ColumnFullName>();
 
     public DatabaseEntityViewModel Row
     {
@@ -331,7 +331,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         return multi.Close();
     }
     
-    private void OnRowChangedCell(DatabaseEntityViewModel entity, SingleRecordDatabaseCellViewModel cell, string columnName)
+    private void OnRowChangedCell(DatabaseEntityViewModel entity, SingleRecordDatabaseCellViewModel cell, ColumnFullName columnName)
     {
         if (!cell.IsModified && entity.Entity.ExistInDatabase)
         {
@@ -389,7 +389,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
                 }
                 else
                 {
-                    var cell = entity.GetCell(column.DbColumnName);
+                    var cell = entity.GetCell(column.DbColumnFullName);
                     if (cell == null)
                         throw new Exception("this should never happen");
 

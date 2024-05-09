@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace WDE.DatabaseEditors.Loaders
             this.customPostLoadSources = customPostLoadSources.ToDictionary(x => x.Table, x => x);
         }
         
-        private string BuildSQLQueryForSingleRow(DatabaseTableDefinitionJson tableDefinitionJson, string? customWhere, long? offset, int? limit)
+        private (string query, List<ColumnFullName> selectedColumns) BuildSQLQueryForSingleRow(DatabaseTableDefinitionJson tableDefinitionJson, string? customWhere, long? offset, int? limit)
         {
             var tableName = tableDefinitionJson.TableName;
             var columns = tableDefinitionJson.Groups
@@ -53,10 +54,11 @@ namespace WDE.DatabaseEditors.Loaders
                     var column =  $"`{x.ForeignTable ?? tableName}`.`{x.DbColumnName}`";
                     if (x.IsUnixTimestamp)
                         column = $"UNIX_TIMESTAMP({column}) AS `{x.DbColumnName}`";
-                    return column;
+                    return (column, x.DbColumnFullName);
                 })
-                .Distinct();
-            var names = string.Join(",", columns);
+                .Distinct()
+                .ToList();
+            var names = string.Join(",", columns.Select(x => x.column));
             var joins = "";
 
             if (tableDefinitionJson.ForeignTable != null)
@@ -70,10 +72,11 @@ namespace WDE.DatabaseEditors.Loaders
             }
             
             var where = string.IsNullOrEmpty(customWhere) ? "" : $"WHERE ({customWhere})";
-            return $"SELECT {names} FROM `{tableDefinitionJson.TableName}` {joins} {where} ORDER BY {string.Join(", ", tableDefinitionJson.PrimaryKey.Select(x => $"`{x}`"))} ASC LIMIT {limit ?? 300} OFFSET {offset ?? 0}";
+            var query = $"SELECT {names} FROM `{tableDefinitionJson.TableName}` {joins} {where} ORDER BY {string.Join(", ", tableDefinitionJson.PrimaryKey.Select(x => $"`{x}`"))} ASC LIMIT {limit ?? 300} OFFSET {offset ?? 0}";
+            return (query, columns.Select(c => c.DbColumnFullName).ToList());
         }
         
-        private string BuildSQLQueryFromTableDefinition(DatabaseTableDefinitionJson tableDefinitionJson, DatabaseKey[] entries)
+        private (string query, List<ColumnFullName> selectedColumns) BuildSQLQueryFromTableDefinition(DatabaseTableDefinitionJson tableDefinitionJson, DatabaseKey[] entries)
         {
             var tableName = tableDefinitionJson.TableName;
             var tablePrimaryKey = tableDefinitionJson.TablePrimaryKeyColumnName;
@@ -85,10 +88,11 @@ namespace WDE.DatabaseEditors.Loaders
                     var column =  $"`{x.ForeignTable ?? tableName}`.`{x.DbColumnName}`";
                     if (x.IsUnixTimestamp)
                         column = $"UNIX_TIMESTAMP({column}) AS `{x.DbColumnName}`";
-                    return column;
+                    return (column, x.DbColumnFullName);
                 })
-                .Distinct();
-            var names = string.Join(",", columns);
+                .Distinct()
+                .ToList();
+            var names = string.Join(",", columns.Select(x => x.column));
             var joins = "";
 
             if (tableDefinitionJson.ForeignTable != null)
@@ -101,8 +105,8 @@ namespace WDE.DatabaseEditors.Loaders
                 }));
             }
             
-            return
-                $"SELECT {names} FROM {tableDefinitionJson.TableName} {joins} WHERE `{tableName}`.`{tablePrimaryKey}` IN ({string.Join(", ", entries)});";
+            var query = $"SELECT {names} FROM {tableDefinitionJson.TableName} {joins} WHERE `{tableName}`.`{tablePrimaryKey}` IN ({string.Join(", ", entries)});";
+            return (query, columns.Select(c => c.DbColumnFullName).ToList());
         }
         
         public async Task<long> GetCount(DatabaseTable tableName, string? customWhere, IEnumerable<DatabaseKey>? keys)
@@ -125,10 +129,11 @@ namespace WDE.DatabaseEditors.Loaders
             try
             {
                 var result = await sqlExecutor.ExecuteSelectSql(definition, sql);
-                if (result.Count == 0)
+                if (result.Rows == 0)
                     return 0;
-                return Convert.ToInt64(result[0]["num"].Item2);
+                return Convert.ToInt64(result.Value(0, 0));
             }
+
             catch (IMySqlExecutor.CannotConnectToDatabaseException)
             {
                 return 0;
@@ -170,9 +175,11 @@ namespace WDE.DatabaseEditors.Loaders
             var definition = tableDefinitionProvider.GetDefinitionByTableName(tableName);
             if (definition == null)
                 return null;
-            
-            IList<Dictionary<string, (Type, object)>>? result = null;
+
+            IReadOnlyList<ColumnFullName> columns = Array.Empty<ColumnFullName>();
+            IDatabaseSelectResult? result = null;
             IDatabaseProvider.ConditionKeyMask keyMask = IDatabaseProvider.ConditionKeyMask.None;
+            IList<IConditionLine>[]? conditionsPerRowIndex = null;
             if (definition.Condition != null)
             {
                 if (definition.Condition.SourceEntryColumn != null)
@@ -193,35 +200,38 @@ namespace WDE.DatabaseEditors.Loaders
                     else
                         customWhere = "(" + customWhere + ") AND " + whereKeys;
                 }
-                var sqlStatement = BuildSQLQueryForSingleRow(definition, customWhere, offset, Math.Min(limit ?? 300, 3000));
+                var (sqlStatement, selectedColumns) = BuildSQLQueryForSingleRow(definition, customWhere, offset, Math.Min(limit ?? 300, 3000));
+                columns = selectedColumns;
                 try
                 {
                     result = await sqlExecutor.ExecuteSelectSql(definition, sqlStatement);
 
                     if (definition.Condition != null)
                     {
-                        List<(Dictionary<string, (Type, object)>, int? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
+                        conditionsPerRowIndex = new IList<IConditionLine>[result.Rows];
+
+                        List<(int rowIndex, int? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
+                        var sourceGroupColumnIndex = definition.Condition.SourceGroupColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceGroupColumn.Name);
+                        var sourceEntryColumnIndex = definition.Condition.SourceEntryColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceEntryColumn);
+                        var sourceIdColumnIndex = definition.Condition.SourceIdColumn == null ? null : (int?) result.ColumnIndex(definition.Condition.SourceIdColumn);
                         foreach (var row in result)
                         {
                             int? sourceGroup = null, sourceEntry = null, sourceId = null;
 
-                            if (definition.Condition.SourceGroupColumn != null &&
-                                row.TryGetValue(definition.Condition.SourceGroupColumn.Name, out var groupData) &&
-                                int.TryParse(groupData.Item2.ToString(), out var groupInt))
-                                sourceGroup = definition.Condition.SourceGroupColumn.Calculate(groupInt);
+                            if (sourceGroupColumnIndex.HasValue &&
+                                int.TryParse(result.Value(row, sourceGroupColumnIndex.Value)!.ToString(), out var groupInt))
+                                sourceGroup = definition.Condition.SourceGroupColumn!.Calculate(groupInt);
 
-                            if (definition.Condition.SourceEntryColumn != null &&
-                                row.TryGetValue(definition.Condition.SourceEntryColumn, out var entryData) &&
-                                int.TryParse(entryData.Item2.ToString(), out var entryInt))
+                            if (sourceEntryColumnIndex.HasValue &&
+                                int.TryParse(result.Value(row, sourceEntryColumnIndex.Value)!.ToString(), out var entryInt))
                                 sourceEntry = entryInt;
 
-                            if (definition.Condition.SourceIdColumn != null &&
-                                row.TryGetValue(definition.Condition.SourceIdColumn, out var idData) &&
-                                int.TryParse(idData.Item2.ToString(), out var idInt))
+                            if (sourceIdColumnIndex.HasValue &&
+                                int.TryParse(result.Value(row, sourceIdColumnIndex.Value)!.ToString(), out var idInt))
                                 sourceId = idInt;
 
                             conditionsToLoad.Add((row, sourceGroup, sourceEntry, sourceId));
-                            row.Add("conditions", (typeof(IList<IConditionLine>), new List<IConditionLine>()));
+                            conditionsPerRowIndex[row] = new List<IConditionLine>();
                         }
                         
                         var allConditions = await databaseProvider.GetConditionsForAsync(keyMask, conditionsToLoad.Select(c => 
@@ -232,10 +242,12 @@ namespace WDE.DatabaseEditors.Loaders
                             keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId) ? (int?)line.SourceId : null))
                             .ToDictionary(key => key.Key, values => values.ToList());
                         
-                        foreach (var (row, sourceGroup, sourceEntry, sourceId) in conditionsToLoad)
+                        foreach (var (rowIndex, sourceGroup, sourceEntry, sourceId) in conditionsToLoad)
                         {
                             if (groupedConditions.TryGetValue((sourceGroup, sourceEntry, sourceId), out var conditionList))
-                                row["conditions"] = (typeof(IList<IConditionLine>), conditionList);
+                            {
+                                conditionsPerRowIndex[rowIndex] = conditionList;
+                            }
                         }
                     }
                 }
@@ -273,8 +285,9 @@ namespace WDE.DatabaseEditors.Loaders
                 {
                     if (definition.Condition == null)
                         throw new Exception("only_conditions + no conditions make no sense");
-                    
-                    result = new List<Dictionary<string, (Type, object)>>();
+
+                    var conditionsResult = new ConditionsOnlyDatabaseSource(definition.Condition.SourceGroupColumn?.Name, definition.Condition.SourceEntryColumn, definition.Condition.SourceIdColumn);
+                    result = conditionsResult;
                     
                     foreach (var key in keys)
                     {
@@ -309,65 +322,50 @@ namespace WDE.DatabaseEditors.Loaders
                             foreach (var distinct in conditionList
                                 .Select(line => (line.SourceEntry, line.SourceGroup, line.SourceId)).Distinct())
                             {
-                                var row = new Dictionary<string, (Type, object)>();
                                 var conditions = conditionList.Where(l =>
                                     l.SourceEntry == distinct.SourceEntry && l.SourceId == distinct.SourceId &&
                                                     l.SourceGroup == distinct.SourceGroup).ToList();
-                                
-                                foreach (var column in definition.TableColumns.Values)
-                                {
-                                    if (column.IsConditionColumn)
-                                        continue;
-                                    if (definition.Condition.SourceGroupColumn != null &&
-                                        column.DbColumnName == definition.Condition.SourceGroupColumn.Name)
-                                        row.Add(column.DbColumnName, (typeof(int), distinct.SourceGroup));
 
-                                    if (definition.Condition.SourceEntryColumn != null &&
-                                        column.DbColumnName == definition.Condition.SourceEntryColumn)
-                                        row.Add(column.DbColumnName, (typeof(int), distinct.SourceEntry));
-
-                                    if (definition.Condition.SourceIdColumn != null &&
-                                        column.DbColumnName == definition.Condition.SourceIdColumn)
-                                        row.Add(column.DbColumnName, (typeof(int), distinct.SourceId));
-                                }
-                                row.Add("conditions", (typeof(IList<IConditionLine>), conditions));
-                                result.Add(row);
-                            } 
+                                conditionsResult.Add(distinct.SourceGroup, distinct.SourceEntry, distinct.SourceId, conditions);
+                            }
                         }
                     }
+                    conditionsPerRowIndex = conditionsResult.Conditions;
                 }
                 else
                 {
                     Debug.Assert(customWhere == null, "Custom where with non single record mode is not supported");
-                    var sqlStatement = BuildSQLQueryFromTableDefinition(definition, keys);
+                    var (sqlStatement, selectedColumns) = BuildSQLQueryFromTableDefinition(definition, keys);
+                    columns = selectedColumns;
                     try
                     {
                         result = await sqlExecutor.ExecuteSelectSql(definition, sqlStatement);
 
                         if (definition.Condition != null)
                         {
-                            List<(Dictionary<string, (Type, object)>, int? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
-                            foreach (var row in result)
+                            conditionsPerRowIndex = new IList<IConditionLine>[result.Rows];
+                            List<(int rowIndex, int? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
+                            var sourceGroupColumnIndex = definition.Condition.SourceGroupColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceGroupColumn.Name);
+                            var sourceEntryColumnIndex = definition.Condition.SourceEntryColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceEntryColumn);
+                            var sourceIdColumnIndex = definition.Condition.SourceIdColumn == null ? null : (int?) result.ColumnIndex(definition.Condition.SourceIdColumn);
+                            foreach (var rowIndex in result)
                             {
                                 int? sourceGroup = null, sourceEntry = null, sourceId = null;
 
-                                if (definition.Condition.SourceGroupColumn != null &&
-                                    row.TryGetValue(definition.Condition.SourceGroupColumn.Name, out var groupData) &&
-                                    int.TryParse(groupData.Item2.ToString(), out var groupInt))
-                                    sourceGroup = definition.Condition.SourceGroupColumn.Calculate(groupInt);
+                                if (sourceGroupColumnIndex.HasValue &&
+                                    int.TryParse(result.Value(rowIndex, sourceGroupColumnIndex.Value)!.ToString(), out var groupInt))
+                                    sourceGroup = definition.Condition.SourceGroupColumn!.Calculate(groupInt);
 
-                                if (definition.Condition.SourceEntryColumn != null &&
-                                    row.TryGetValue(definition.Condition.SourceEntryColumn, out var entryData) &&
-                                    int.TryParse(entryData.Item2.ToString(), out var entryInt))
+                                if (sourceEntryColumnIndex.HasValue &&
+                                    int.TryParse(result.Value(rowIndex, sourceEntryColumnIndex.Value)!.ToString(), out var entryInt))
                                     sourceEntry = entryInt;
 
-                                if (definition.Condition.SourceIdColumn != null &&
-                                    row.TryGetValue(definition.Condition.SourceIdColumn, out var idData) &&
-                                    int.TryParse(idData.Item2.ToString(), out var idInt))
+                                if (sourceIdColumnIndex.HasValue &&
+                                    int.TryParse(result.Value(rowIndex, sourceIdColumnIndex.Value)!.ToString(), out var idInt))
                                     sourceId = idInt;
 
-                                conditionsToLoad.Add((row, sourceGroup, sourceEntry, sourceId));
-                                row.Add("conditions", (typeof(IList<IConditionLine>), new List<IConditionLine>()));
+                                conditionsToLoad.Add((rowIndex, sourceGroup, sourceEntry, sourceId));
+                                conditionsPerRowIndex[rowIndex] = new List<IConditionLine>();
                             }
                             
                             var allConditions = await databaseProvider.GetConditionsForAsync(keyMask, conditionsToLoad.Select(c => 
@@ -378,10 +376,10 @@ namespace WDE.DatabaseEditors.Loaders
                                     keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId) ? (int?)line.SourceId : null))
                                 .ToDictionary(key => key.Key, values => values.ToList());
                         
-                            foreach (var (row, sourceGroup, sourceEntry, sourceId) in conditionsToLoad)
+                            foreach (var (rowIndex, sourceGroup, sourceEntry, sourceId) in conditionsToLoad)
                             {
                                 if (groupedConditions.TryGetValue((sourceGroup, sourceEntry, sourceId), out var conditionList))
-                                    row["conditions"] = (typeof(IList<IConditionLine>), conditionList);
+                                    conditionsPerRowIndex[rowIndex] = conditionList;
                             }
                         }
                     }
@@ -404,14 +402,93 @@ namespace WDE.DatabaseEditors.Loaders
             }
 
             if (result == null)
-                result = new List<Dictionary<string, (Type, object)>>();
+                result = new EmptyDatabaseSelectResult();
 
-            var databaseTable = tableModelGenerator.CreateDatabaseTable(definition, keys, result);
+            var databaseTable = tableModelGenerator.CreateDatabaseTable(definition, keys, result, columns, conditionsPerRowIndex);
 
             if (databaseTable != null && customPostLoadSources.TryGetValue(tableName, out var postProcessor))
                 await postProcessor.PostProcess(databaseTable, definition, keys);
 
             return databaseTable;
+        }
+
+        private class ConditionsOnlyDatabaseSource : IDatabaseSelectResult
+        {
+            private readonly string? group;
+            private readonly string? entry;
+            private readonly string? id;
+            private readonly List<string> columns;
+            private List<(int col1, int col2, int col3)> rows = new();
+            private List<IList<IConditionLine>> conditions = new();
+
+            public ConditionsOnlyDatabaseSource(string? group, string? entry, string? id)
+            {
+                this.group = group;
+                this.entry = entry;
+                this.id = id;
+                columns = new List<string>();
+                if (group != null)
+                    columns.Add(group);
+                if (entry != null)
+                    columns.Add(entry);
+                if (id != null)
+                    columns.Add(id);
+            }
+
+            public IEnumerator<int> GetEnumerator()
+            {
+                for (int i = 0; i < rows.Count; ++i)
+                    yield return i;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            public int Columns => columns.Count;
+
+            public int Rows => rows.Count;
+
+            public string ColumnName(int index) => columns[index];
+
+            public Type ColumnType(int index) => typeof(int);
+
+            public object? Value(int row, int column) => Value<int>(row, column);
+
+            public T? Value<T>(int row, int column)
+            {
+                if (typeof(T) == typeof(int))
+                {
+                    if (column == 0)
+                        return (T)(object)rows[row].col1;
+                    if (column == 1)
+                        return (T)(object)rows[row].col2;
+                    if (column == 2)
+                        return (T)(object)rows[row].col3;
+                }
+                return default;
+            }
+
+            public bool IsNull(int row, int column) => false;
+
+            public int ColumnIndex(string columnName) => columns.IndexOf(columnName);
+
+            public void Add(int sourceGroup, int sourceEntry, int sourceId, List<IConditionLine> conditions)
+            {
+                Span<int> columns = stackalloc int[3];
+                this.conditions.Add(conditions);
+                int i = 0;
+                if (group != null)
+                    columns[i++] = sourceGroup;
+                if (entry != null)
+                    columns[i++] = sourceEntry;
+                if (id != null)
+                    columns[i++] = sourceId;
+                rows.Add((columns[0], columns[1], columns[2]));
+            }
+
+            public IList<IConditionLine>[] Conditions => conditions.ToArray();
         }
     }
 }

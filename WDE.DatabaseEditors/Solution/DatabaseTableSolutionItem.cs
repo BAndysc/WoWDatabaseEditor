@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Services;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Solution
@@ -197,11 +198,11 @@ namespace WDE.DatabaseEditors.Solution
             OriginalValue = copy.OriginalValue;
         }
 
-        [JsonProperty("c")] public string ColumnName { get; set; } = "";
+        [JsonProperty("c")] [JsonConverter(typeof(ColumnFullNameConverter))] public ColumnFullName ColumnName { get; set; }
         [JsonProperty("v")] public object? OriginalValue { get; set; }
         
         // legacy names, now using one byte property names for space saving
-        [JsonProperty("ColumnName")] private string _ColumnName { set => ColumnName = value; }
+        [JsonProperty("ColumnName")] [JsonConverter(typeof(ColumnFullNameConverter))] private ColumnFullName _ColumnName { set => ColumnName = value; }
         [JsonProperty("OriginalValue")] private object? _OriginalValue { set => OriginalValue = value; }
     }
 }

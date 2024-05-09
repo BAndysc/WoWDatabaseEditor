@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -83,8 +84,11 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                 {
                     if (parameterNames.IndexOf(column.ValueType) != -1)
                     {
-                        if (group.ShowIf is {} showIf)
-                            where = where.OrWhere(row => row.Column<long>(column.DbColumnName) == parameterValue && row.Column<long>(showIf.ColumnName) == showIf.Value);
+                        if (group.ShowIf is { } showIf)
+                        {
+                            Debug.Assert(showIf.ColumnName.ForeignTable == null);
+                            where = where.OrWhere(row => row.Column<long>(column.DbColumnName) == parameterValue && row.Column<long>(showIf.ColumnName.ColumnName) == showIf.Value);
+                        }
                         else
                             where = where.OrWhere(row => row.Column<long>(column.DbColumnName) == parameterValue);
                     }
@@ -101,8 +105,9 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                                 {
                                     foreach (var value in values)
                                     {
+                                        Debug.Assert(dependantParameter.DependantColumn.ForeignTable == null);
                                         where = where.OrWhere(row =>
-                                            row.Column<long>(dependantParameter.DependantColumn) == value &&
+                                            row.Column<long>(dependantParameter.DependantColumn.ColumnName) == value &&
                                             row.Column<long>(column.DbColumnName) == parameterValue);
                                     }
                                 }
@@ -117,9 +122,9 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                 var select = where.Select();
                 var result = await executor.ExecuteSelectSql(definition, select.QueryString);
 
-                if (result.Count > 0)
+                if (result.Rows > 0)
                 {
-                    foreach (var row in result)
+                    foreach (var rowIndex in result)
                     {
                         ISolutionItem? item = null;
                         ICommand? commad = null;
@@ -127,7 +132,7 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                         DatabaseKey key;
                         if (definition.RecordMode == RecordMode.SingleRow)
                         {
-                            key = new DatabaseKey(definition.PrimaryKey.Select(k => Convert.ToInt64(row[k].Item2)));
+                            key = new DatabaseKey(definition.PrimaryKey.Select(k => Convert.ToInt64(result.Value(rowIndex, result.ColumnIndex(k)))));
                             commad = new DelegateCommand(() =>
                             {
                                 var solutionItem = new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality);
@@ -166,7 +171,7 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                                         {
                                             editor!.FilterViewModel.SelectedColumn = editor!.FilterViewModel.Columns.FirstOrDefault(c => c.ColumnName == definition.GroupByKey);
                                             editor!.FilterViewModel.SelectedOperator = editor!.FilterViewModel.Operators.First(o => o.Operator == "=");
-                                            editor!.FilterViewModel.FilterText = row[definition.GroupByKey].Item2?.ToString() ?? "";
+                                            editor!.FilterViewModel.FilterText = result.Value(rowIndex, result.ColumnIndex(definition.GroupByKey))?.ToString() ?? "";
                                             await editor.FilterViewModel.ApplyFilter.ExecuteAsync();
                                         }
                                         await editor!.TryFind(key);
@@ -178,20 +183,20 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                         else
                         {
                             if (tableName == definition.Id)
-                                key = new DatabaseKey(Convert.ToInt64(row[definition.TablePrimaryKeyColumnName].Item2));
+                                key = new DatabaseKey(Convert.ToInt64(result.Value(rowIndex, result.ColumnIndex(definition.TablePrimaryKeyColumnName))));
                             else
-                                key = new DatabaseKey(Convert.ToInt64(row[definition.ForeignTableByName![tableName.Table].ForeignKeys[0]].Item2));
+                                key = new DatabaseKey(Convert.ToInt64(result.Value(rowIndex, result.ColumnIndex(definition.ForeignTableByName![tableName.Table].ForeignKeys[0]))));
 
                             if (!added.Add(key))
                                 continue;
                             item = new DatabaseTableSolutionItem(key, true, false, definition.Id, definition.IgnoreEquality);
                         }
-                        
+
                         resultContext.AddResult(new FindAnywhereResult(
                             new ImageUri(definition.IconPath!),
                             key[0],
                             tableName.Table,
-                            string.Join(", ", row.Select(pair => pair.Key + ": " + pair.Value.Item2)),
+                            string.Join(", ", Enumerable.Range(0, result.Columns).Select(c => result.ColumnName(c) + ": " + result.Value(rowIndex, c))),
                             item,
                             commad
                             ));

@@ -326,7 +326,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     foreach (var entity in deserialized)
                     {
                         if (key.HasValue)
-                            entity.SetTypedCellOrThrow(tableDefinition.GroupByKeys[0], key.Value[0]);
+                            entity.SetTypedCellOrThrow(new ColumnFullName(null, tableDefinition.GroupByKeys[0]), key.Value[0]);
                         ForceInsertEntity(entity, index++);
                     }
                 }
@@ -381,12 +381,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 if (byEntryGroups[key].Count > 0)
                     max = 1 + byEntryGroups[key].Max(t =>
                     {
-                        if (t.Entity.GetCell(autoIncrementColumn.DbColumnName) is DatabaseField<long> lField)
+                        if (t.Entity.GetCell(autoIncrementColumn.DbColumnFullName) is DatabaseField<long> lField)
                             return lField.Current.Value;
                         return 0L;
                     });
                 
-                if (freshEntity.GetCell(autoIncrementColumn.DbColumnName) is DatabaseField<long> lField)
+                if (freshEntity.GetCell(autoIncrementColumn.DbColumnFullName) is DatabaseField<long> lField)
                     lField.Current.Value = max;
             }
 
@@ -472,11 +472,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
             var key = new IDatabaseProvider.ConditionKey(tableDefinition.Condition.SourceType);
             if (tableDefinition.Condition.SourceGroupColumn is {} sourceGroup)
-                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceGroup.Name)));
+                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceGroup.Name))));
             if (tableDefinition.Condition.SourceEntryColumn is { } sourceEntry)
-                key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceEntry));
+                key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceEntry)));
             if (tableDefinition.Condition.SourceIdColumn is { } sourceId)
-                key = key.WithId((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceId));
+                key = key.WithId((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceId)));
 
             var newConditions = await conditionEditService.EditConditions(key, conditionList);
             if (newConditions == null)
@@ -485,7 +485,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             view.ParentEntity.Conditions = newConditions.ToList();
             if (tableDefinition.Condition.SetColumn != null)
             {
-                var hasColumn = view.ParentEntity.GetCell(tableDefinition.Condition.SetColumn);
+                var hasColumn = view.ParentEntity.GetCell(tableDefinition.Condition.SetColumn.Value);
                 if (hasColumn is DatabaseField<long> lf)
                     lf.Current.Value = view.ParentEntity.Conditions.Count > 0 ? 1 : 0;
             }
@@ -704,7 +704,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 }
                 else
                 {
-                    var cell = entity.GetCell(column.DbColumnName);
+                    var cell = entity.GetCell(column.DbColumnFullName);
                     if (cell == null)
                         throw new Exception("this should never happen");
 
@@ -717,7 +717,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     {
                         if (column.AutogenerateComment != null)
                         {
-                            var autoGenComment = commentGeneratorService.GenerateAutoCommentOnly(entity, TableDefinition, column.DbColumnName);
+                            var autoGenComment = commentGeneratorService.GenerateAutoCommentOnly(entity, TableDefinition, column.DbColumnFullName);
                             
                             stringParam.Current.Value = stringParam.Current.Value.GetCommentUnlessDefault(autoGenComment, column.CanBeNull);
                             stringParam.Original.Value = stringParam.Original.Value.GetCommentUnlessDefault(autoGenComment, column.CanBeNull);

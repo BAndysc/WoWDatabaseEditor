@@ -23,7 +23,7 @@ public partial class ColumnGroupViewModel : ObservableBase
         hasShowIf = group.ShowIf.HasValue;
         if (group.ShowIf.HasValue)
         {
-            showIfColumnName = group.ShowIf.Value.ColumnName;
+            showIfColumnName = group.ShowIf.Value.ColumnName.ColumnName;
             showIfColumnValue = group.ShowIf.Value.Value;
         }
     }

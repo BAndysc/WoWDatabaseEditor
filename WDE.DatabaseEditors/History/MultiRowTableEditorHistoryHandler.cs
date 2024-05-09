@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Services;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 using WDE.MVVM.Observable;
@@ -65,7 +66,7 @@ namespace WDE.DatabaseEditors.History
             viewModel.OnDeletedQuery += ViewModelOnDeletedQuery;
         }
 
-        private void FieldValueChanged(DatabaseEntity entity, string columnName, Action<IValueHolder> undo, Action<IValueHolder> redo)
+        private void FieldValueChanged(DatabaseEntity entity, ColumnFullName columnName, Action<IValueHolder> undo, Action<IValueHolder> redo)
         {
             var index = viewModel.Entities.GetIndex(entity);
             PushAction(new AnonymousHistoryAction($"{columnName} changed", () =>

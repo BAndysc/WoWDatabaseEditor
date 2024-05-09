@@ -208,7 +208,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
                 foreach (var sortBy in sortByList)
                 {
-                    var comparisonResult = x.GetCell(sortBy)?.CompareTo(y.GetCell(sortBy)) ?? 0;
+                    var comparisonResult = x.GetCell(new ColumnFullName(null, sortBy))?.CompareTo(y.GetCell(new ColumnFullName(null, sortBy))) ?? 0;
                     if (comparisonResult != 0) 
                         return comparisonResult;
                 }
@@ -254,9 +254,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     bool isMainTable = table.Key == tableData.TableDefinition.Id;
                     var cells = table.Value.ToDictionary(c => c.DbColumnName, c =>
                     {
-                        var cell = entity.GetCell(c.DbColumnName)!;
+                        var cell = entity.GetCell(c.DbColumnFullName)!;
                         if (c.AutogenerateComment != null)
-                            return commentGeneratorService.GenerateFinalComment(entity, tableData.TableDefinition, c.DbColumnName);
+                            return commentGeneratorService.GenerateFinalComment(entity, tableData.TableDefinition, c.DbColumnFullName);
 
                         var columnDefinition = tableData.TableDefinition.TableColumns[cell.FieldName];
                         if (!columnDefinition.CanBeNull && cell.Object is null)
@@ -283,7 +283,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         var foreignTableDefinition = tableData.TableDefinition.ForeignTableByName![table.Key.Table];
                         var foreignKeys = foreignTableDefinition.ForeignKeys;
                         for (int i = 0; i < foreignKeys.Length; ++i)
-                            newCells[foreignKeys[i]] = entity.GetTypedValueOrThrow<long>(tableData.TableDefinition.PrimaryKey![i]);
+                            newCells[foreignKeys[i]] = entity.GetTypedValueOrThrow<long>(new ColumnFullName(null, tableData.TableDefinition.PrimaryKey![i]));
                         foreach (var old in cells)
                             newCells[old.Key] = old.Value;
                         if (foreignTableDefinition.AutofillBuildColumn is { } autofillBuildColumn)
@@ -351,17 +351,17 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 int sourceId = 0;
 
                 if (tableData.TableDefinition.Condition.SourceEntryColumn != null &&
-                    entity.GetCell(tableData.TableDefinition.Condition.SourceEntryColumn) is DatabaseField<long>
+                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceEntryColumn)) is DatabaseField<long>
                         entryCell)
                     sourceEntry = (int) entryCell.Current.Value;
 
                 if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
-                    entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn.Name) is DatabaseField<long>
+                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceGroupColumn.Name)) is DatabaseField<long>
                         groupCell)
                     sourceGroup = tableData.TableDefinition.Condition.SourceGroupColumn.Calculate((int)groupCell.Current.Value);
 
                 if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
-                    entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn) is DatabaseField<long>
+                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceIdColumn)) is DatabaseField<long>
                         idCell)
                     sourceId = (int) idCell.Current.Value;
 
@@ -390,17 +390,17 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 int sourceId = 0;
 
                 if (tableData.TableDefinition.Condition.SourceEntryColumn != null &&
-                    entity.GetCell(tableData.TableDefinition.Condition.SourceEntryColumn) is DatabaseField<long>
+                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceEntryColumn)) is DatabaseField<long>
                         entryCell)
                     sourceEntry = (int)entryCell.Current.Value;
 
                 if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
-                    entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn.Name) is DatabaseField<long>
+                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceGroupColumn.Name)) is DatabaseField<long>
                         groupCell)
                     sourceGroup = tableData.TableDefinition.Condition.SourceGroupColumn.Calculate((int)groupCell.Current.Value);
 
                 if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
-                    entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn) is DatabaseField<long>
+                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceIdColumn)) is DatabaseField<long>
                         idCell)
                     sourceId = (int)idCell.Current.Value;
 
@@ -465,7 +465,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             var q = Queries.Table(tableId);
             var where = GenerateConditionsForSingleRow(q, table, tableId, entity);
             return where
-                .Set(field.FieldName, FixUnixTimestampAndNullability(column, field.Object))
+                .Set(field.FieldName.ColumnName, FixUnixTimestampAndNullability(column, field.Object))
                 .Update();
         }
 
@@ -504,8 +504,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 {
                     for (var index = foreign.ForeignKeys.Length - 1; index >= 0; index--)
                     {
-                        var foreignKey = foreign.ForeignKeys[index];
-                        var thisKey = definition.PrimaryKey![index];
+                        var foreignKey = new ColumnFullName(foreign.TableName, foreign.ForeignKeys[index]);
+                        var thisKey = new ColumnFullName(null, definition.PrimaryKey![index]);
                         
                         fieldsByTable[new DatabaseTable(definition.DataDatabaseType, foreign.TableName)].Insert(0,
                             new DatabaseField<long>(foreignKey, new ValueHolder<long>(entity.GetTypedValueOrThrow<long>(thisKey), false)));
@@ -534,8 +534,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         query.Table(table.Key)
                             .InsertIgnore(
                                 definition.ForeignTableByName[table.Key.Table].ForeignKeys
-                                    .Zip(definition.PrimaryKey!)
-                                    .ToDictionary<(string, string), string, object?>(
+                                    .Zip(definition.PrimaryKey.Select(x => new ColumnFullName(null, x)))
+                                    .ToDictionary<(string, ColumnFullName), string, object?>(
                                     key => key.Item1,
                                     key => entity.GetTypedValueOrThrow<long>(key.Item2))
                                 );
@@ -543,9 +543,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
                     var where = GenerateWherePrimaryKey(groupByKeys, query.Table(table.Key), entity.Key);
                     IUpdateQuery update = where
-                        .Set(updates[0].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[0].FieldName], updates[0].Object));
+                        .Set(updates[0].FieldName.ColumnName, FixUnixTimestampAndNullability(definition.TableColumns[updates[0].FieldName], updates[0].Object));
                     for (int i = 1; i < updates.Count; ++i)
-                        update = update.Set(updates[i].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
+                        update = update.Set(updates[i].FieldName.ColumnName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
 
                     if (autoFillBuildColumn != null)
                         update = update.Set(autoFillBuildColumn, currentCoreVersion.Current.Version.Build);
@@ -569,7 +569,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 {
                     if (table.Key == definition.Id)
                     {
-                        var cells = table.Value.ToDictionary(t => t.FieldName, t => t.Object);
+                        var cells = table.Value.ToDictionary(t => t.FieldName.ColumnName, t => t.Object);
                         if (definition.AutofillBuildColumn is {} autofillBuildColumn)
                             cells[autofillBuildColumn] = currentCoreVersion.Current.Version.Build;
                         query.Table(table.Key)
@@ -588,16 +588,16 @@ namespace WDE.DatabaseEditors.QueryGenerators
                             query.Table(table.Key)
                                 .InsertIgnore(
                                     definition.ForeignTableByName[table.Key.Table].ForeignKeys
-                                        .Zip(definition.PrimaryKey!)
-                                        .ToDictionary<(string, string), string, object?>(
+                                        .Zip(definition.PrimaryKey.Select(k => new ColumnFullName(null, k)))
+                                        .ToDictionary<(string, ColumnFullName), string, object?>(
                                             key => key.Item1,
                                             key => entity.GetTypedValueOrThrow<long>(key.Item2))
                                 );
                             var where = GenerateWherePrimaryKey(primaryKeyColumn, query.Table(table.Key), entity.GenerateKey(definition));
                             IUpdateQuery update = where
-                                .Set(updates[0].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[0].FieldName], updates[0].Object));
+                                .Set(updates[0].FieldName.ColumnName, FixUnixTimestampAndNullability(definition.TableColumns[updates[0].FieldName], updates[0].Object));
                             for (int i = 1; i < updates.Count; ++i)
-                                update = update.Set(updates[i].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
+                                update = update.Set(updates[i].FieldName.ColumnName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
 
                             if (foreignTableDefinition.AutofillBuildColumn is { } autofillBuildColumn)
                                 update = update.Set(autofillBuildColumn, currentCoreVersion.Current.Version.Build);
@@ -638,12 +638,12 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 var where = table
                     .Where(row =>
                         row.Column<uint>(foreignKeys[0]) ==
-                        (uint)entity.GetTypedValueOrThrow<long>(definition.PrimaryKey![0]));
+                        (uint)entity.GetTypedValueOrThrow<long>(new ColumnFullName(null, definition.PrimaryKey![0])));
                             
                 for (int i = 1; i < foreignKeys.Length; ++i)
                 {
                     var foreignKey = foreignKeys[i];
-                    var thisKey = definition.PrimaryKey![i];
+                    var thisKey = new ColumnFullName(null, definition.PrimaryKey![i]);
                     where = where.Where(row =>
                         row.Column<uint>(foreignKey) == (uint)entity.GetTypedValueOrThrow<long>(thisKey));
                 }

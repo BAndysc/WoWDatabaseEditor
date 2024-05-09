@@ -237,16 +237,17 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
                     originals = item.Entries[0].OriginalValues ??= new();
                     context.ProduceItem(item);
                 }
+                var tableName = query.TableName.Table == defi.TableName ? null : query.TableName.Table;
                 foreach (var upd in query.Updates)
                 {
-                    var cell = old.Entities[0].GetCell(upd.ColumnName);
+                    var cell = old.Entities[0].GetCell(new ColumnFullName(tableName, upd.ColumnName));
                     if (cell == null)
                         continue;
-                    if (originals.Any(o => o.ColumnName == upd.ColumnName))
+                    if (originals.Any(o => o.ColumnName == new ColumnFullName(tableName, upd.ColumnName)))
                         continue;
                     var original = new EntityOrigianlField()
                     {
-                        ColumnName = upd.ColumnName,
+                        ColumnName = new ColumnFullName(tableName, upd.ColumnName),
                         OriginalValue = cell.OriginalValue
                     };
                     originals.Add(original);

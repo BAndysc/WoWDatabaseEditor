@@ -108,10 +108,10 @@ public class DatabaseContextualParameter : BaseContextualParameter<long, Databas
     protected readonly IParameterPickerService pickerService;
     protected Dictionary<long, IParameter<long>> parameters = new();
     protected Dictionary<IParameter<long>, List<long>> reverseParameters = new();
-    protected string column;
+    protected ColumnFullName column;
     protected IParameter<long> defaultParameter;
 
-    public string DependantColumn => column;
+    public ColumnFullName DependantColumn => column;
 
     public IReadOnlyList<long>? DependantColumnValuesForParameter(IParameter<long> param)
     {
@@ -124,7 +124,7 @@ public class DatabaseContextualParameter : BaseContextualParameter<long, Databas
         IParameterPickerService pickerService,
         ContextualParameterSimpleSwitchJson simpleSwitch)
     {
-        column = simpleSwitch.Column;
+        column = new ColumnFullName(null, simpleSwitch.Column);
         defaultParameter = simpleSwitch.Default == null ? Parameter.Instance : factory.Factory(simpleSwitch.Default);
         this.pickerService = pickerService;
         foreach (var param in simpleSwitch.Values)
@@ -168,7 +168,7 @@ public class DatabaseContextualParameter : BaseContextualParameter<long, Databas
         return parameter.ToString(value);
     }
 
-    public string AffectedByColumn => column;
+    public ColumnFullName AffectedByColumn => column;
 }
 
 public class AsyncDatabaseContextualParameter : DatabaseContextualParameter, IAsyncContextualParameter<long, DatabaseEntity>
@@ -203,7 +203,7 @@ public class AsyncDatabaseContextualParameter : DatabaseContextualParameter, IAs
 
 public interface ITableAffectedByParameter
 {
-    public string AffectedByColumn { get; }
+    public ColumnFullName AffectedByColumn { get; }
     public bool AffectedByConditions => false;
 }
 
@@ -213,13 +213,13 @@ public class DatabaseStringContextualParameter : BaseContextualParameter<string,
     private Dictionary<string, IParameter<long>> longParameters = new();
     private Dictionary<string, IParameter<string>> stringParameters = new();
     private IParameter<long> defaultParameter;
-    public string AffectedByColumn { get; }
+    public ColumnFullName AffectedByColumn { get; }
 
     public DatabaseStringContextualParameter(IParameterFactory factory, 
         IParameterPickerService pickerService,
         ContextualParameterSimpleStringSwitchJson simpleSwitch)
     {
-        AffectedByColumn = simpleSwitch.Column;
+        AffectedByColumn = new ColumnFullName(null, simpleSwitch.Column);
         defaultParameter = simpleSwitch.Default == null ? Parameter.Instance : factory.Factory(simpleSwitch.Default);
         this.pickerService = pickerService;
         foreach (var param in simpleSwitch.Values)

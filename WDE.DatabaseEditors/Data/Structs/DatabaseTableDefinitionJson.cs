@@ -142,7 +142,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [IgnoreEquality]
         [JsonIgnore] 
-        public IDictionary<string, DatabaseColumnJson> TableColumns { get; set; } = null!;
+        public IDictionary<ColumnFullName, DatabaseColumnJson> TableColumns { get; set; } = null!;
         
         [IgnoreEquality]
         [JsonIgnore] 
@@ -235,8 +235,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         public string? SourceIdColumn { get; set; }
         
         [DefaultEquality]
+        [JsonConverter(typeof(ColumnFullNameConverter))]
         [JsonProperty(PropertyName = "set_column")]
-        public string? SetColumn { get; set; }
+        public ColumnFullName? SetColumn { get; set; }
         
         [OrderedEquality]
         [JsonProperty(PropertyName = "targets")]

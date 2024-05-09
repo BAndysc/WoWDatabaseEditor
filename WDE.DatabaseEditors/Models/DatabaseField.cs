@@ -6,15 +6,16 @@ using System.Runtime.CompilerServices;
 using WDE.Common.Annotations;
 using WDE.Common.History;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.History;
 
 namespace WDE.DatabaseEditors.Models
 {
     public class DatabaseField<T> : IDatabaseField where T : IComparable<T>
     {
-        private readonly string columnName;
+        private readonly ColumnFullName columnName;
 
-        public DatabaseField(string columnName, ValueHolder<T> current, ValueHolder<T>? original = null)
+        public DatabaseField(ColumnFullName columnName, ValueHolder<T> current, ValueHolder<T>? original = null)
         {
             this.columnName = columnName;
             Current = current;
@@ -88,7 +89,7 @@ namespace WDE.DatabaseEditors.Models
                 }
             }
         }
-        public string FieldName => columnName;
+        public ColumnFullName FieldName => columnName;
         public bool IsModified => Current.IsNull != Original.IsNull || Comparer<T>.Default.Compare(Current.Value, Original.Value) != 0;
         public event Action<IHistoryAction>? OnChanged;
         public string ToQueryString()
@@ -118,7 +119,7 @@ namespace WDE.DatabaseEditors.Models
 
         public object? Object => Current.IsNull ? null : Current.Value;
         // <ColumnName, <Undo>, <Redo>
-        public event Action<string, Action<IValueHolder>, Action<IValueHolder>>? ValueChanged;
+        public event Action<ColumnFullName, Action<IValueHolder>, Action<IValueHolder>>? ValueChanged;
 
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 

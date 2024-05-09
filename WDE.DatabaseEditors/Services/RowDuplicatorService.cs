@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Services;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
@@ -40,7 +41,7 @@ public class TableEntityDuplicatorService : ITableEntityDuplicatorService
         var newEntity = data.Entities[0].Clone(newKey, false);
         int i = 0;
         foreach (var column in data.TableDefinition.GroupByKeys)
-            newEntity.SetTypedCellOrThrow(column, newKey[i++]);
+            newEntity.SetTypedCellOrThrow(new ColumnFullName(null, column), newKey[i++]);
         IQuery insert = queryGenerator.GenerateQuery(new[] { newKey }, null, new DatabaseTableData(data.TableDefinition, new[] { newEntity }));
         return insert;
     }

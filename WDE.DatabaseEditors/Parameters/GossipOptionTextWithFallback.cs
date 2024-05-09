@@ -4,6 +4,7 @@ using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.DatabaseEditors.Data;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Parameters;
@@ -24,7 +25,7 @@ public class GossipOptionTextWithFallback : StringParameter, IAsyncContextualPar
         if (!string.IsNullOrWhiteSpace(value))
             return value;
         
-        var broadcastTextId = context.GetTypedValueOrThrow<long>("broadcasttext_option_text");
+        var broadcastTextId = context.GetTypedValueOrThrow<long>(new ColumnFullName(null, "broadcasttext_option_text"));
         if (broadcastTextId == 0)
             return "";
 
@@ -37,7 +38,7 @@ public class GossipOptionTextWithFallback : StringParameter, IAsyncContextualPar
         if (!string.IsNullOrWhiteSpace(value))
             return value;
 
-        var broadcastTextId = context.GetTypedValueOrThrow<long>("broadcasttext_option_text");
+        var broadcastTextId = context.GetTypedValueOrThrow<long>(new ColumnFullName(null, "broadcasttext_option_text"));
         if (broadcastTextId != 0)
             return $"BroadcastText {broadcastTextId} (fetching)";
         return "";
@@ -54,7 +55,7 @@ public class GossipOptionTextWithFallback : StringParameter, IAsyncContextualPar
         return ("", false);
     }
 
-    public string AffectedByColumn => "broadcasttext_option_text";
+    public ColumnFullName AffectedByColumn => new ColumnFullName(null, "broadcasttext_option_text");
 
     public string ToString(string value, object context)
     {

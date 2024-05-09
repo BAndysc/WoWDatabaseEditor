@@ -1,13 +1,14 @@
 ﻿using System;
 using WDE.Common.History;
 using WDE.Common.Services;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.History
 {
     public interface IDatabaseFieldHistoryAction : IHistoryAction
     {
-        public string Property { get; }
+        public ColumnFullName Property { get; }
     }
     
     public interface IDatabaseFieldWithKeyHistoryAction : IDatabaseFieldHistoryAction
@@ -41,7 +42,7 @@ namespace WDE.DatabaseEditors.History
             return impl.GetDescription();
         }
 
-        public string Property => impl.Property;
+        public ColumnFullName Property => impl.Property;
 
         public DatabaseKey Key => key;
     }
@@ -49,13 +50,13 @@ namespace WDE.DatabaseEditors.History
     public class DatabaseFieldHistoryAction<T> : IDatabaseFieldHistoryAction where T : IComparable<T>
     {
         private readonly DatabaseField<T> tableField;
-        private readonly string property;
+        private readonly ColumnFullName property;
         private readonly T? oldValue;
         private readonly T? newValue;
         private readonly bool wasNull;
         private readonly bool isNull;
 
-        public DatabaseFieldHistoryAction(DatabaseField<T> tableField, string property, T? oldValue, T? newValue, bool wasNull, bool isNull)
+        public DatabaseFieldHistoryAction(DatabaseField<T> tableField, ColumnFullName property, T? oldValue, T? newValue, bool wasNull, bool isNull)
         {
             this.tableField = tableField;
             this.property = property;
@@ -87,6 +88,6 @@ namespace WDE.DatabaseEditors.History
             return $"Changed value of {property} to {value}";
         }
 
-        public string Property => property;
+        public ColumnFullName Property => property;
     }
 }

@@ -94,7 +94,7 @@ public class DefinitionExporterService : IDefinitionExporterService
             SourceType = vm.SourceType,
             SourceEntryColumn = vm.SourceEntryColumn,
             SourceIdColumn = vm.SourceIdColumn,
-            SetColumn = vm.SetColumn,
+            SetColumn = vm.SetColumn == null ? null : new ColumnFullName(null, vm.SetColumn),
             SourceGroupColumn = vm.SourceGroupColumn == null ? null :
                 new DatabaseConditionColumn(){IsAbs = vm.SourceGroupColumnAbs, Name = vm.SourceGroupColumn},
             Targets = vm.Targets.Select(t => new DatabaseConditionTargetJson()
@@ -112,7 +112,11 @@ public class DefinitionExporterService : IDefinitionExporterService
         {
             Name = vm.GroupName,
             Fields = columns,
-            ShowIf = vm.HasShowIf ? new DatabaseColumnsGroupJson.ShowIfCondition(){ColumnName = vm.ShowIfColumnName, Value = vm.ShowIfColumnValue} : null
+            ShowIf = vm.HasShowIf ? new DatabaseColumnsGroupJson.ShowIfCondition()
+            {
+                ColumnName = new ColumnFullName(null, vm.ShowIfColumnName),
+                Value = vm.ShowIfColumnValue
+            } : null
         };
     }
     

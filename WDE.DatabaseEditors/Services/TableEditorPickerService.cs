@@ -100,9 +100,9 @@ public class TableEditorPickerService : ITableEditorPickerService
                         {
                             var group = multiRow.Rows[groupIndex];
                             var rowIndex = group.IndexIf(r =>
-                                (r.Entity.GetCell(column) is DatabaseField<long> longField &&
+                                (r.Entity.GetCell(new ColumnFullName(null, column)) is DatabaseField<long> longField &&
                                  longField.Current.Value == initialValue) ||
-                                (backupColumn != null && r.Entity.GetCell(backupColumn) is DatabaseField<long> longField2 &&
+                                (backupColumn != null && r.Entity.GetCell(new ColumnFullName(null, backupColumn)) is DatabaseField<long> longField2 &&
                                  longField2.Current.Value == initialValue));
                             if (rowIndex != -1)
                             {
@@ -162,12 +162,12 @@ public class TableEditorPickerService : ITableEditorPickerService
             windowsSettings.SetupWindow(table, window);
         if (await task)
         {
-            var col = viewModel.SelectedRow?.GetCell(column);
+            var col = viewModel.SelectedRow?.GetCell(new ColumnFullName(null, column));
             if (col is DatabaseField<long> longColumn)
                 return longColumn.Current.Value;
             else if (backupColumn != null)
             {
-                col = viewModel.SelectedRow?.GetCell(backupColumn);
+                col = viewModel.SelectedRow?.GetCell(new ColumnFullName(null, backupColumn));
                 if (col is DatabaseField<long> longColumn2)
                     return longColumn2.Current.Value;
             }

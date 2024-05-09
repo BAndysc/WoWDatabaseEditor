@@ -23,7 +23,7 @@ public class CommentGeneratorService : ICommentGeneratorService
         this.parameterFactory = parameterFactory;
     }
     
-    public string GenerateFinalComment(DatabaseEntity entity, DatabaseTableDefinitionJson tableDefinition, string columnName)
+    public string GenerateFinalComment(DatabaseEntity entity, DatabaseTableDefinitionJson tableDefinition, ColumnFullName columnName)
     {
         string? field = entity.GetTypedValueOrThrow<string>(columnName);
         var columnDefinition = tableDefinition.TableColumns[columnName];
@@ -32,7 +32,7 @@ public class CommentGeneratorService : ICommentGeneratorService
         return autoGen.AddComment(field);
     }
 
-    public string GenerateAutoCommentOnly(DatabaseEntity entity, DatabaseTableDefinitionJson tableDefinition, string columnName)
+    public string GenerateAutoCommentOnly(DatabaseEntity entity, DatabaseTableDefinitionJson tableDefinition, ColumnFullName columnName)
     {
         var columnDefinition = tableDefinition.TableColumns[columnName];
 

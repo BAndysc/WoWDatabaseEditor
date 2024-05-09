@@ -36,7 +36,7 @@ public partial class ConditionReferenceViewModel : ObservableBase, IDropTarget
         sourceGroupColumnAbs = json.SourceGroupColumn?.IsAbs ?? false;
         sourceEntryColumn = json.SourceEntryColumn;
         sourceIdColumn = json.SourceIdColumn;
-        setColumn = json.SetColumn;
+        setColumn = json.SetColumn?.ColumnName;
         if (json.Targets != null)
         {
             foreach (var target in json.Targets)

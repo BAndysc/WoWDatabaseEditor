@@ -7,6 +7,6 @@ namespace WDE.DatabaseEditors.Services;
 [UniqueProvider]
 public interface ICommentGeneratorService
 {
-    string GenerateFinalComment(DatabaseEntity entity, DatabaseTableDefinitionJson tableDefinition, string columnName);
-    string GenerateAutoCommentOnly(DatabaseEntity entity, DatabaseTableDefinitionJson tableDefinition, string columnName);
+    string GenerateFinalComment(DatabaseEntity entity, DatabaseTableDefinitionJson tableDefinition, ColumnFullName columnName);
+    string GenerateAutoCommentOnly(DatabaseEntity entity, DatabaseTableDefinitionJson tableDefinition, ColumnFullName columnName);
 }

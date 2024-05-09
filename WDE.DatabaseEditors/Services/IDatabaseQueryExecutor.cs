@@ -13,7 +13,7 @@ namespace WDE.DatabaseEditors.Services;
 [UniqueProvider]
 public interface IDatabaseQueryExecutor
 {
-    Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(DatabaseTableDefinitionJson definition, string query);
+    Task<IDatabaseSelectResult> ExecuteSelectSql(DatabaseTableDefinitionJson definition, string query);
     Task ExecuteSql(DatabaseTableDefinitionJson definition, IQuery query, bool rollback = false);
     Task ExecuteSql(DatabaseTableDefinitionJson definition, string query, bool rollback = false);
     Task<IList<DatabaseTable>> GetTables(DataDatabaseType type);
@@ -35,7 +35,7 @@ internal class DatabaseQueryExecutor : IDatabaseQueryExecutor
         this.hotfixExecutor = hotfixExecutor;
     }
     
-    public Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(DatabaseTableDefinitionJson definition, string query)
+    public Task<IDatabaseSelectResult> ExecuteSelectSql(DatabaseTableDefinitionJson definition, string query)
     {
         if (definition.DataDatabaseType == DataDatabaseType.World)
             return worldExecutor.ExecuteSelectSql(query);

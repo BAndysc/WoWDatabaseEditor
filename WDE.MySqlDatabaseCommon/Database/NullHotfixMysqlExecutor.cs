@@ -18,9 +18,9 @@ public class NullHotfixMysqlExecutor : IMySqlHotfixExecutor
     {
     }
 
-    public async Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query)
+    public async Task<IDatabaseSelectResult> ExecuteSelectSql(string query)
     {
-        return new List<Dictionary<string, (Type, object)>>();
+        return EmptyDatabaseSelectResult.Instance;
     }
 
     public async Task<IList<string>> GetTables()

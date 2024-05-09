@@ -75,12 +75,12 @@ namespace WDE.DatabaseEditors.Data
                     if (string.IsNullOrEmpty(definition.IconPath))
                         definition.IconPath = "Icons/document_table.png";
 
-                    definition.TableColumns = new Dictionary<string, DatabaseColumnJson>();
+                    definition.TableColumns = new Dictionary<ColumnFullName, DatabaseColumnJson>();
                     foreach (var group in definition.Groups)
                     {
                         foreach (var column in group.Fields)
                         {
-                            definition.TableColumns[column.DbColumnName] = column;
+                            definition.TableColumns[column.DbColumnFullName] = column;
                         }
                     }
 

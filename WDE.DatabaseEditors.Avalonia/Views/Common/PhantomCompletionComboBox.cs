@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using AvaloniaStyles.Controls;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.ViewModels;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.Common;
@@ -12,10 +13,10 @@ namespace WDE.DatabaseEditors.Avalonia.Views.Common;
 public class PhantomCompletionComboBox : BasePhantomCompletionComboBox
 {
     private BaseDatabaseCellViewModel cellModel = null!;
-    private string column = null!;
+    private ColumnFullName column;
     private ITableContext context = null!;
 
-    public void Spawn(Visual parent, Rect position, string? initialText, BaseDatabaseCellViewModel cellModel, ITableContext context, string column)
+    public void Spawn(Visual parent, Rect position, string? initialText, BaseDatabaseCellViewModel cellModel, ITableContext context, ColumnFullName column)
     {
         this.cellModel = cellModel;
         this.column = column;
@@ -27,7 +28,7 @@ public class PhantomCompletionComboBox : BasePhantomCompletionComboBox
     {
         base.Cleanup(element);
         cellModel = null!;
-        column = null!;
+        column = default;
         context = null!;
     }
 

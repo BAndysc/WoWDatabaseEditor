@@ -55,7 +55,7 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
                 () =>
                 {
                     var newCondition = entity.FillTemplate(condition);
-                    tableEditorPickerService.ShowTable(table, newCondition, keyParts.Length == 0 ? null : new DatabaseKey(keyParts.Select(entity.GetTypedValueOrThrow<long>))).ListenErrors();
+                    tableEditorPickerService.ShowTable(table, newCondition, keyParts.Length == 0 ? null : new DatabaseKey(keyParts.Select(key => entity.GetTypedValueOrThrow<long>(new ColumnFullName(null, key))))).ListenErrors();
                 }), "Open");
         }
         if (metaColumn.StartsWith("tableByKey:"))
@@ -64,7 +64,7 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
             var key = metaColumn.Substring(metaColumn.IndexOf(";") + 1);
             return (new DelegateCommand(() =>
             {
-                tableEditorPickerService.ShowTable(table, null, new DatabaseKey(entity.GetTypedValueOrThrow<long>(key))).ListenErrors();
+                tableEditorPickerService.ShowTable(table, null, new DatabaseKey(entity.GetTypedValueOrThrow<long>(new ColumnFullName(null, key)))).ListenErrors();
             }), "Open");
         }
         if (metaColumn.StartsWith("one2one:"))

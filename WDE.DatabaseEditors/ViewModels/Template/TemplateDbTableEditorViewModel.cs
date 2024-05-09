@@ -26,6 +26,7 @@ using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.CustomCommands;
 using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Expressions;
 using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.History;
@@ -57,7 +58,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> FilteredRows { get; }
         public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
         public SourceList<DatabaseRowViewModel> Rows { get; } = new();
-        private HashSet<(DatabaseKey key, string columnName)> forceUpdateCells = new HashSet<(DatabaseKey, string)>();
+        private HashSet<(DatabaseKey key, ColumnFullName columnName)> forceUpdateCells = new HashSet<(DatabaseKey, ColumnFullName)>();
 
         [Notify] private bool allowMultipleKeys = true;
         
@@ -152,11 +153,11 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
             var key = new IDatabaseProvider.ConditionKey(tableDefinition.Condition.SourceType);
             if (tableDefinition.Condition.SourceGroupColumn is {} sourceGroup)
-                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceGroup.Name)));
+                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceGroup.Name))));
             if (tableDefinition.Condition.SourceEntryColumn is { } sourceEntry)
-                key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceEntry));
+                key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceEntry)));
             if (tableDefinition.Condition.SourceIdColumn is { } sourceId)
-                key = key.WithId((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceId));
+                key = key.WithId((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceId)));
 
             var newConditions = await conditionEditService.EditConditions(key, conditionList);
             if (newConditions == null)
@@ -165,7 +166,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             view.ParentEntity.Conditions = newConditions.ToList();
             if (tableDefinition.Condition.SetColumn != null)
             {
-                var hasColumn = view.ParentEntity.GetCell(tableDefinition.Condition.SetColumn);
+                var hasColumn = view.ParentEntity.GetCell(tableDefinition.Condition.SetColumn.Value);
                 if (hasColumn is DatabaseField<long> lf)
                     lf.Current.Value = view.ParentEntity.Conditions.Count > 0 ? 1 : 0;
             }
@@ -356,7 +357,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 }
                 else
                 {
-                    var cell = entity.GetCell(column.DbColumnName);
+                    var cell = entity.GetCell(column.DbColumnFullName);
                     if (cell == null)
                         throw new Exception("this should never happen");
                             
@@ -415,7 +416,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                          .Where(column => column != null)
                          .Distinct())
             {
-                var typeCell = entity.GetCell(column!);
+                var typeCell = entity.GetCell(column!.Value);
                 if (typeCell != null)
                     typeCell.PropertyChanged += (_, _) => ReEvalVisibility();
             }

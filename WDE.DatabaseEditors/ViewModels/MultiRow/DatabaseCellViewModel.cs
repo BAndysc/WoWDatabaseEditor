@@ -29,7 +29,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public string ActionLabel { get; set; } = "";
         
         public string ColumnName { get; }
-        public string? DbColumnName { get; }
+        public ColumnFullName? DbColumnName { get; }
 
         public DatabaseCellViewModel(int columnIndex, DatabaseColumnJson columnDefinition, DatabaseEntityViewModel parent, DatabaseEntity parentEntity, IDatabaseField? tableField, IParameterValue parameterValue) : base(parentEntity)
         {
@@ -37,7 +37,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             CanBeNull = columnDefinition.CanBeNull;
             IsReadOnly = columnDefinition.IsReadOnly;
             ColumnName = columnDefinition.Name;
-            DbColumnName = columnDefinition.DbColumnName;
+            DbColumnName = columnDefinition.DbColumnFullName;
             Parent = parent;
             TableField = tableField;
             ParameterValue = parameterValue;

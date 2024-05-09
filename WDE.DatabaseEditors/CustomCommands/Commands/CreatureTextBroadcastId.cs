@@ -27,9 +27,9 @@ namespace WDE.DatabaseEditors.CustomCommands.Commands
         {
             if (definition.Parameters == null || definition.Parameters.Length != 2)
                 throw new Exception("Invalid command definition");
-            
-            var textColumn = definition.Parameters[0];
-            var broadcastTextColumn = definition.Parameters[1];
+
+            var textColumn = new ColumnFullName(null, definition.Parameters[0]);
+            var broadcastTextColumn = new ColumnFullName(null, definition.Parameters[1]);
             foreach (var entity in tableData.Entities)
             {
                 var broadcastTextIdField = entity.GetCell(broadcastTextColumn) as DatabaseField<long>;

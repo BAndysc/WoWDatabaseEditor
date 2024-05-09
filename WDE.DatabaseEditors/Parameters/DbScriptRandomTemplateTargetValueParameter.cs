@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Parameters;
@@ -25,7 +26,7 @@ public class DbScriptRandomTemplateTargetValueParameter : BaseAsyncContextualPar
         IParameter<long> parameter = Parameter.Instance;
         if (context is DatabaseEntity entity)
         {
-            var cell = entity.GetTypedValueOrThrow<long>("type");
+            var cell = entity.GetTypedValueOrThrow<long>(new ColumnFullName(null, "type"));
             if (cell == (int)IMangosDatabaseProvider.RandomTemplateType.Text && broadcastTextsParameter != null)
             {
                 parameter = broadcastTextsParameter;
@@ -47,7 +48,7 @@ public class DbScriptRandomTemplateTargetValueParameter : BaseAsyncContextualPar
 
     public override Task<string> ToStringAsync(long value, CancellationToken token, DatabaseEntity entity)
     {
-        var cell = entity.GetTypedValueOrThrow<long>("type");
+        var cell = entity.GetTypedValueOrThrow<long>(new ColumnFullName(null, "type"));
         if (cell == (int)IMangosDatabaseProvider.RandomTemplateType.Text && broadcastTextsParameter != null)
             return broadcastTextsParameter.ToStringAsync(value, token);
         return Task.FromResult(value.ToString());

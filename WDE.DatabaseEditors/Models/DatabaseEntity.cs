@@ -18,7 +18,7 @@ namespace WDE.DatabaseEditors.Models
     {
         private DatabaseKey key;
         
-        public Dictionary<string, IDatabaseField> Cells { get; }
+        public Dictionary<ColumnFullName, IDatabaseField> Cells { get; }
 
         private IReadOnlyList<ICondition>? conditions;
         
@@ -40,7 +40,7 @@ namespace WDE.DatabaseEditors.Models
         public IEnumerable<IDatabaseField> Fields => Cells.Values;
 
         public event System.Action<IHistoryAction>? OnAction;
-        public event Action<DatabaseEntity, string, Action<IValueHolder>, Action<IValueHolder>>? FieldValueChanged;
+        public event Action<DatabaseEntity, ColumnFullName, Action<IValueHolder>, Action<IValueHolder>>? FieldValueChanged;
         
         public event System.Action<DatabaseEntity, IReadOnlyList<ICondition>?, IReadOnlyList<ICondition>?>? OnConditionsChanged;
         
@@ -53,7 +53,7 @@ namespace WDE.DatabaseEditors.Models
         
         public DatabaseKey ForceGenerateKey(DatabaseTableDefinitionJson definition)
         {
-            return new DatabaseKey(definition.PrimaryKey.Select(GetLongMapping));
+            return new DatabaseKey(definition.PrimaryKey.Select(column => GetLongMapping(new ColumnFullName(null, column))));
         }
         
         public DatabaseKey Key
@@ -70,7 +70,7 @@ namespace WDE.DatabaseEditors.Models
         
         public DatabaseEntity(bool existInDatabase, 
             DatabaseKey key,
-            Dictionary<string, IDatabaseField> cells,
+            Dictionary<ColumnFullName, IDatabaseField> cells,
             IReadOnlyList<ICondition>? conditions)
         {
             Debug.Assert(!(existInDatabase && key.IsPhantomKey)); // phantom keys can never exist in the database!!
@@ -94,19 +94,32 @@ namespace WDE.DatabaseEditors.Models
             }
         }
 
-        public IDatabaseField? GetCell(string columnName)
+        // public IDatabaseField? GetCell(string columnName)
+        // {
+        //     return Cells.GetValueOrDefault(new ColumnFullName(null, columnName));
+        // }
+
+        public IDatabaseField? GetCell(string foreignTableName, string columnName)
         {
-            if (Cells.TryGetValue(columnName, out var cell))
-                return cell;
-            return null;
+            return Cells.GetValueOrDefault(new ColumnFullName(foreignTableName, columnName));
         }
 
-        public void SetTypedCellOrThrow<T>(string column, T? value) where T : IComparable<T>
+        public IDatabaseField? GetCell(ColumnFullName columnName)
+        {
+            return Cells.GetValueOrDefault(columnName);
+        }
+
+        public void SetTypedCellOrThrow<T>(ColumnFullName column, T? value) where T : IComparable<T>
         {
             SetTypedCellOrThrowUnsafe(EntityChangeFlags.ChangeCurrent, column, value);
         }
 
-        public void SetTypedCellOrThrowUnsafe<T>(EntityChangeFlags flags, string column, T? value) where T : IComparable<T>
+        public void SetTypedCellOrThrow<T>(string column, T? value) where T : IComparable<T>
+        {
+            SetTypedCellOrThrowUnsafe(EntityChangeFlags.ChangeCurrent, ColumnFullName.Parse(column), value);
+        }
+
+        public void SetTypedCellOrThrowUnsafe<T>(EntityChangeFlags flags, ColumnFullName column, T? value) where T : IComparable<T>
         {
             var cell = GetCell(column);
             if (cell == null)
@@ -120,7 +133,9 @@ namespace WDE.DatabaseEditors.Models
                 typed.Original.Value = value;
         }
 
-        public T? GetTypedValueOrThrow<T>(string columnName) where T : IComparable<T>
+        public T? GetTypedValueOrThrow<T>(string columnName) where T : IComparable<T> => GetTypedValueOrThrow<T>(ColumnFullName.Parse(columnName));
+
+        public T? GetTypedValueOrThrow<T>(ColumnFullName columnName) where T : IComparable<T>
         {
             var cell = GetCell(columnName);
             if (cell == null)
@@ -131,7 +146,7 @@ namespace WDE.DatabaseEditors.Models
             return typed.Current.Value;
         }
 
-        public long GetLongMapping(string columnName)
+        public long GetLongMapping(ColumnFullName columnName)
         {
             var cell = GetCell(columnName);
             if (cell == null)
@@ -145,7 +160,7 @@ namespace WDE.DatabaseEditors.Models
 
         public DatabaseEntity Clone(DatabaseKey? newKey = null, bool? existInDatabase = null)
         {
-            var fields = new Dictionary<string, IDatabaseField>(StringComparer.InvariantCultureIgnoreCase);
+            var fields = new Dictionary<ColumnFullName, IDatabaseField>(ColumnFullNameIgnoreCaseComparer.Instance);
             foreach (var field in Cells)
                 fields[field.Key] = field.Value.Clone();
             

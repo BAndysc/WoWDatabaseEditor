@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using AvaloniaStyles.Controls.FastTableView;
 using Prism.Mvvm;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.SingleRow
@@ -21,9 +22,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         public IReadOnlyList<ITableCell> CellsList => Cells;
         public event Action<ITableRow>? Changed;
-        public event Action<DatabaseEntityViewModel, SingleRecordDatabaseCellViewModel, string>? ChangedCell;
+        public event Action<DatabaseEntityViewModel, SingleRecordDatabaseCellViewModel, ColumnFullName>? ChangedCell;
 
-        public void RaiseChanged(SingleRecordDatabaseCellViewModel cell, string column)
+        public void RaiseChanged(SingleRecordDatabaseCellViewModel cell, ColumnFullName column)
         {
             ChangedCell?.Invoke(this, cell, column);
             Changed?.Invoke(this);

@@ -5,6 +5,7 @@ using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Parameters;
@@ -50,7 +51,7 @@ public class VehicleSeatIdParameter : ICustomPickerContextualParameter<long>
             return (0, false);
         }
 
-        var vehicleId = entity.GetTypedValueOrThrow<long>("vehicleId");
+        var vehicleId = entity.GetTypedValueOrThrow<long>(new ColumnFullName(null, "vehicleId"));
         if (vehicleStore.GetVehicleById((uint)vehicleId) is { } vehicle)
         {
             Dictionary<long, SelectOption> options = vehicle

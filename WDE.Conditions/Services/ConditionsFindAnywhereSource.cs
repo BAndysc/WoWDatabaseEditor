@@ -112,12 +112,13 @@ public class ConditionsFindAnywhereSource : IFindAnywhereSource
         }
 
         var result = await mySqlExecutor.ExecuteSelectSql(where.Select().QueryString);
-        foreach (var row in result)
+        var commentIndex = result.ColumnIndex("Comment");
+        foreach (var rowIndex in result)
         {
             resultContext.AddResult(new FindAnywhereResult(new ImageUri("Icons/document_conditions.png"),
                 null,
-                "Condition " + row["Comment"].Item2,
-                 string.Join(", ", row.Select(pair => pair.Key + ": " + pair.Value.Item2)),
+                "Condition " + result.Value(rowIndex, commentIndex),
+                 string.Join(", ", Enumerable.Range(0, result.Columns).Select(columnIndex => result.ColumnName(columnIndex) + ": " + result.Value(rowIndex, columnIndex))),
                 null,
                 command));
         }

@@ -11,6 +11,7 @@ using WDE.Common.Avalonia.Services;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Parameters;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 
@@ -114,11 +115,11 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
             rect = rect.Deflate(new Thickness(20, 0, 0, 0));
         }
 
-        if (cell.DbColumnName == "text" || cell.DbColumnName == "option_text")
+        if (cell.DbColumnName?.ColumnName == "text" || cell.DbColumnName?.ColumnName == "option_text")
         {
-            var broadcastTextId = cell.Parent.Entity.GetCell("broadcasttextid") as DatabaseField<long>;
+            var broadcastTextId = cell.Parent.Entity.GetCell(new ColumnFullName(null, "broadcasttextid")) as DatabaseField<long>;
             if (broadcastTextId == null)
-                broadcastTextId = cell.Parent.Entity.GetCell("broadcasttext_option_text") as DatabaseField<long>;
+                broadcastTextId = cell.Parent.Entity.GetCell(new ColumnFullName(null, "broadcasttext_option_text")) as DatabaseField<long>;
             if (broadcastTextId != null && cell.TableField is DatabaseField<string> textField && string.IsNullOrWhiteSpace(textField.Current.Value))
             {
                 rect = rect.Deflate(new Thickness(10, 0, 0, 0));

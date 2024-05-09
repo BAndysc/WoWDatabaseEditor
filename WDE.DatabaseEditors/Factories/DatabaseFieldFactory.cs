@@ -17,7 +17,7 @@ namespace WDE.DatabaseEditors.Factories
             this.parameterFactory = parameterFactory;
         }
         
-        public IDatabaseField CreateField(string columnName, IValueHolder valueHolder)
+        public IDatabaseField CreateField(ColumnFullName columnName, IValueHolder valueHolder)
         {
             return valueHolder switch
             {
@@ -50,8 +50,8 @@ namespace WDE.DatabaseEditors.Factories
             }
             else
                 valueHolder = new ValueHolder<string>(value is string f ? f : "", column.CanBeNull && value == null);
-                
-            return CreateField(column.DbColumnName, valueHolder);
+
+            return CreateField(column.DbColumnFullName, valueHolder);
         }
     }
 }

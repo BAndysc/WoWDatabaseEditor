@@ -49,9 +49,9 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
         if (!providers.TryGetValue(table, out var provider))
         {
             var definition = definitionProvider.GetDefinition(DatabaseTable.WorldTable("creature"));
-            if (definition == null || (!definition.TableColumns.ContainsKey("id") && !definition.TableColumns.ContainsKey("entry")))
+            if (definition == null || (!definition.TableColumns.ContainsKey(new ColumnFullName(null, "id")) && !definition.TableColumns.ContainsKey(new ColumnFullName(null, "entry"))))
                 return 0;
-            var columnToGroupBy = definition.TableColumns.ContainsKey("entry") ? "entry" : "id";
+            var columnToGroupBy = definition.TableColumns.ContainsKey(new ColumnFullName(null, "entry")) ? "entry" : "id";
             provider = new BulkAsyncTableRowProvider(executor, definition, columnToGroupBy);
             providers[table] = provider;
         }
@@ -65,9 +65,9 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
         if (!providers.TryGetValue(table, out var provider))
         {
             var definition = definitionProvider.GetDefinition(DatabaseTable.WorldTable("gameobject"));
-            if (definition == null || (!definition.TableColumns.ContainsKey("id") && !definition.TableColumns.ContainsKey("entry")))
+            if (definition == null || (!definition.TableColumns.ContainsKey(new ColumnFullName(null, "id")) && !definition.TableColumns.ContainsKey(new ColumnFullName(null, "entry"))))
                 return 0;
-            var columnToGroupBy = definition.TableColumns.ContainsKey("entry") ? "entry" : "id";
+            var columnToGroupBy = definition.TableColumns.ContainsKey(new ColumnFullName(null, "entry")) ? "entry" : "id";
             provider = new BulkAsyncTableRowProvider(executor, definition, columnToGroupBy);
             providers[table] = provider;
         }
@@ -123,10 +123,12 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
                 .SelectGroupBy(new[]{groupByColumn}, $"`{groupByColumn}`", "COUNT(*) AS c");
             
             var result = await executor.ExecuteSelectSql(query.QueryString);
-            foreach (var row in result)
+            var groupByColumnIndex = result.ColumnIndex(groupByColumn);
+            var cColumnIndex = result.ColumnIndex("c");
+            foreach (var rowIndex in result)
             {
-                var primaryKey = Convert.ToInt64(row[groupByColumn].Item2);
-                var count = Convert.ToInt32(row["c"].Item2);
+                var primaryKey = Convert.ToInt64(result.Value(rowIndex, groupByColumnIndex));
+                var count = Convert.ToInt32(result.Value(rowIndex, cColumnIndex));
                 done.Add(primaryKey);
                 
                 if (tasks.TryGetValue(primaryKey, out var task))

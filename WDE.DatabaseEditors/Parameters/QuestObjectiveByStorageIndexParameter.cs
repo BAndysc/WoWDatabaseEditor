@@ -4,6 +4,7 @@ using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.TableData;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.Parameters.Parameters;
 
@@ -12,14 +13,14 @@ namespace WDE.DatabaseEditors.Parameters;
 public class QuestObjectiveByStorageIndexParameter : BaseQuestObjectiveParameter,
     IAsyncContextualParameter<long, DatabaseEntity>
 {
-    private readonly string questIdColumnName;
+    private readonly ColumnFullName questIdColumnName;
 
     public QuestObjectiveByStorageIndexParameter(ICachedDatabaseProvider databaseProvider, 
         IItemFromListProvider itemFromListProvider,
         ITabularDataPicker tabularDataPicker,
         IParameterPickerService parameterPickerService,
         IParameterFactory parameterFactory,
-        string questIdColumnName) : base (databaseProvider, itemFromListProvider, tabularDataPicker, parameterPickerService, parameterFactory, true)
+        ColumnFullName questIdColumnName) : base (databaseProvider, itemFromListProvider, tabularDataPicker, parameterPickerService, parameterFactory, true)
     {
         this.questIdColumnName = questIdColumnName;
     }

@@ -6,6 +6,115 @@ using Newtonsoft.Json;
 
 namespace WDE.DatabaseEditors.Data.Structs
 {
+    public readonly struct ColumnFullName : IEquatable<ColumnFullName>
+    {
+        public bool Equals(ColumnFullName other)
+        {
+            return ForeignTable == other.ForeignTable && ColumnName == other.ColumnName;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ColumnFullName other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ForeignTable, ColumnName);
+        }
+
+        public static bool operator ==(ColumnFullName left, ColumnFullName right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ColumnFullName left, ColumnFullName right)
+        {
+            return !left.Equals(right);
+        }
+
+        public readonly string? ForeignTable;
+        public readonly string ColumnName;
+
+        public ColumnFullName(string? foreignTable, string columnName)
+        {
+            ForeignTable = foreignTable;
+            ColumnName = columnName;
+        }
+
+        public static ColumnFullName Parse(string column)
+        {
+            var parts = column.Split('.');
+            if (parts.Length == 1)
+                return new ColumnFullName(null, parts[0]);
+            return new ColumnFullName(parts[0], parts[1]);
+        }
+    }
+
+    public class ColumnFullNameConverter : JsonConverter
+    {
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+        {
+            if (value is null)
+            {
+                writer.WriteNull();
+            }
+            else if (value is ColumnFullName columnFullName)
+            {
+                if (columnFullName.ForeignTable == null)
+                    writer.WriteValue(columnFullName.ColumnName);
+                else
+                    writer.WriteValue(columnFullName.ForeignTable + "." + columnFullName.ColumnName);
+            }
+            else
+                throw new Exception("Expected ColumnFullName object value.");
+        }
+
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+        {
+            if (reader.Value is null)
+                return null;
+
+            if (reader.Value is string s)
+            {
+                var parts = s.Split('.');
+                if (parts.Length == 1)
+                    return new ColumnFullName(null, parts[0]);
+                return new ColumnFullName(parts[0], parts[1]);
+            }
+            throw new Exception("Expected string value.");
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(ColumnFullName) || objectType == typeof(ColumnFullName?);
+        }
+    }
+
+    public class ColumnFullNameIgnoreCaseComparer :
+        IComparer<ColumnFullName>,
+        IEqualityComparer<ColumnFullName>
+    {
+        public static ColumnFullNameIgnoreCaseComparer Instance { get; } = new();
+
+        public int Compare(ColumnFullName x, ColumnFullName y)
+        {
+            if (x.ForeignTable != y.ForeignTable)
+                return StringComparer.OrdinalIgnoreCase.Compare(x.ForeignTable, y.ForeignTable);
+            return StringComparer.OrdinalIgnoreCase.Compare(x.ColumnName, y.ColumnName);
+        }
+
+        public bool Equals(ColumnFullName x, ColumnFullName y)
+        {
+            return Compare(x, y) == 0;
+        }
+
+        public int GetHashCode(ColumnFullName obj)
+        {
+            return HashCode.Combine(obj.ForeignTable, obj.ColumnName);
+        }
+    }
+
     [Equatable]
     public partial class DatabaseColumnJson
     {
@@ -29,7 +138,10 @@ namespace WDE.DatabaseEditors.Data.Structs
         [DefaultEquality]
         [JsonProperty(PropertyName = "foreign_table")]
         public string? ForeignTable { get; set; }
-        
+
+        [JsonIgnore]
+        public ColumnFullName DbColumnFullName => new(ForeignTable, DbColumnName);
+
         [DefaultEquality]
         [JsonProperty(PropertyName = "value_type")]
         [DefaultValue("")]

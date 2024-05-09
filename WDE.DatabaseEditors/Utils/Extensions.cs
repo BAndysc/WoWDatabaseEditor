@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using WDE.Common.Services;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Solution;
 
@@ -29,7 +30,7 @@ public static class Extensions
         while (indexOf != -1)
         {
             var columnName = template.Substring(indexOf + 1, template.IndexOf("}", indexOf, StringComparison.Ordinal) - indexOf - 1);
-            template = template.Replace("{" + columnName + "}", entity.GetCell(columnName)!.ToString());
+            template = template.Replace("{" + columnName + "}", entity.GetCell(new ColumnFullName(null, columnName))!.ToString());
             indexOf = template.IndexOf("{", indexOf + 1, StringComparison.Ordinal);
         }
         return template;

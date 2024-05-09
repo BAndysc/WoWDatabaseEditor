@@ -25,8 +25,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         public partial struct ShowIfCondition
         {
             [DefaultEquality]
+            [JsonConverter(typeof(ColumnFullNameConverter))]
             [JsonProperty(PropertyName = "db_column_name")]
-            public string ColumnName { get; set; }
+            public ColumnFullName ColumnName { get; set; }
             
             [DefaultEquality]
             [JsonProperty(PropertyName = "value", DefaultValueHandling = DefaultValueHandling.Include)]
