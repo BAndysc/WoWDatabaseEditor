@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Net.WebSockets;
 using WDE.Common;
 using WDE.Common.Database;
@@ -102,7 +103,7 @@ public class HttpMySqlExecutor : IMySqlExecutor
         }
     }
 
-    public async Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query)
+    public async Task<IDatabaseSelectResult> ExecuteSelectSql(string query)
     {
         try
         {
@@ -119,12 +120,12 @@ public class HttpMySqlExecutor : IMySqlExecutor
                 rows.Add(entity);
             }
 
-            return rows;
+            return new DatabaseSelectResults(rows);
         }
         catch (Exception e)
         {
             LOG.LogError(e);
-            return new List<Dictionary<string, (Type, object)>>();
+            return new EmptyDatabaseSelectResult();
         }
     }
 
@@ -136,5 +137,55 @@ public class HttpMySqlExecutor : IMySqlExecutor
     public async Task<IList<MySqlDatabaseColumn>> GetTableColumns(string table)
     {
         return new List<MySqlDatabaseColumn>();
+    }
+
+    private class DatabaseSelectResults : IDatabaseSelectResult
+    {
+        private List<Dictionary<string, (Type, object)>> data;
+        private List<string> columns;
+        private List<Type> types;
+
+        public DatabaseSelectResults(List<Dictionary<string, (Type, object)>> data)
+        {
+            this.data = data;
+
+            if (data.Count > 0)
+            {
+                columns = data[0].Keys.ToList();
+                types = data[0].Values.Select(v => v.Item1).ToList();
+            }
+            else
+            {
+                columns = new List<string>();
+                types = new List<Type>();
+            }
+        }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            for (int i = 0; i < data.Count; ++i)
+                yield return i;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public int Columns => columns.Count;
+
+        public int Rows => data.Count;
+
+        public string ColumnName(int index) => data[0].Keys.ElementAt(index);
+
+        public Type ColumnType(int index) => types[index];
+
+        public object? Value(int row, int column) => data[row][columns[column]].Item2;
+
+        public T? Value<T>(int row, int column) => (T?)Value(row, column);
+
+        public bool IsNull(int row, int column) => Value(row, column) == null;
+
+        public int ColumnIndex(string columnName) => columns.IndexOf(columnName);
     }
 }

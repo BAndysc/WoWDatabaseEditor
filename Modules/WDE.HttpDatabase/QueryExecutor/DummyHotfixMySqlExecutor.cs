@@ -16,7 +16,7 @@ public class DummyHotfixMySqlExecutor : IMySqlHotfixExecutor
         throw new NotImplementedException();
     }
 
-    public async Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query)
+    public async Task<IDatabaseSelectResult> ExecuteSelectSql(string query)
     {
         throw new NotImplementedException();
     }

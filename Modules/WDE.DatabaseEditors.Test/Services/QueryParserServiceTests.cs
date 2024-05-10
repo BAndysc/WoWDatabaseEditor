@@ -69,7 +69,7 @@ public class QueryParserServiceTests
             .ReturnsForAnyArgs(
                 Task.FromResult<IDatabaseTableData?>(new DatabaseTableData(definition, new List<DatabaseEntity>()
                 {
-                    new DatabaseEntity(true, new DatabaseKey(0, 18675), new Dictionary<string, IDatabaseField>(), null)
+                    new DatabaseEntity(true, new DatabaseKey(0, 18675), new Dictionary<ColumnFullName, IDatabaseField>(), null)
                 })));
 
         tableDefinitionProvider

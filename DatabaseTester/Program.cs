@@ -262,7 +262,7 @@ public class Program
         foreach (var tableName in tester.Tables().Where(x => x != null))
         {
             var result = await executor.ExecuteSelectSql($"SHOW TABLES LIKE '{tableName}'");
-            if (result.Count == 0)
+            if (result.Rows == 0)
                 continue;
             await executor.ExecuteSql($"ALTER TABLE `{tableName}` ROW_FORMAT = DEFAULT");
             await executor.ExecuteSql($"ALTER TABLE `{tableName}` ENGINE = InnoDB");
