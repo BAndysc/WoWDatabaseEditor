@@ -121,7 +121,9 @@ namespace WDE.SmartScriptEditor.Data
         WaitAction = 64,
         NeedsAwait = 128,
         MustBeLast = 256,
-        AwaitAction = 512
+        AwaitAction = 512,
+        SynchronizeParam12 = 1024,
+        SynchronizeParam34 = 2048,
     }
     
     [Flags]

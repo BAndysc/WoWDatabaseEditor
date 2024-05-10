@@ -495,7 +495,24 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     (long? val, bool ok) = await parameterPickerService.PickParameter(param.Parameter.Parameter, param.Parameter.Value, param.Context);
                     if (ok)
                     {
+                        System.IDisposable? bulk = null;
+                        if (param.Context is SmartAction action)
+                        {
+                            if (action.ActionFlags.HasFlagFast(ActionFlags.SynchronizeParam12) &&
+                                param.ParameterIndex == 0)
+                            {
+                                bulk = action.BulkEdit("Edit parameter");
+                                action.GetParameter(1).Value = val.Value;
+                            } else if (action.ActionFlags.HasFlagFast(ActionFlags.SynchronizeParam34) &&
+                                       param.ParameterIndex == 2)
+                            {
+                                bulk = action.BulkEdit("Edit parameter");
+                                action.GetParameter(3).Value = val.Value;
+                            }
+                        }
                         param.Parameter.Value = val.Value;
+                        bulk?.Dispose();
+
                         if (param.Parameter.Parameter is ICustomPickerContextualParameter<long>) // custom pickers can save to database, which makes a delay when the value will be ready
                         {
                             param.Parameter.ForceRefresh();
