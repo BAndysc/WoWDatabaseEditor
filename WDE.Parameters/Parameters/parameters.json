@@ -3500,5 +3500,12 @@
 			"0x00000020": { "name": "USE_2D_CHASING_CALCULATION" },
 			"0x00000040": { "name": "USE_FAST_CLASSIC_HEARTBEAT" }
 		}
+	},
+	"ChrSpecializationRoleParameter": {
+		"values": {
+			"0": "tank",
+			"1": "healer",
+			"2": "damage"
+		}
 	}
 }

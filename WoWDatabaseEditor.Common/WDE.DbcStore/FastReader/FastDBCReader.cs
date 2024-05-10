@@ -76,6 +76,22 @@ namespace WDE.DbcStore.FastReader
             
             public ushort GetUShort(int field, int index) => throw new Exception("DBC doesn't have arrays");
 
+            public ulong GetULong(int field) => GetUInt(field);
+
+            public ulong GetULong(int field, int arrayIndex) => throw new Exception("DBC doesn't have arrays");
+
+            public long GetLong(int field) => GetInt(field);
+
+            public long GetLong(int field, int arrayIndex) => throw new Exception("DBC doesn't have arrays");
+
+            public sbyte GetSbyte(int field) => (sbyte)GetInt(field);
+
+            public sbyte GetSbyte(int field, int arrayIndex) => throw new Exception("DBC doesn't have arrays");
+
+            public byte GetByte(int field) => (byte)GetUInt(field);
+
+            public byte GetByte(int field, int arrayIndex) => throw new Exception("DBC doesn't have arrays");
+
             public ushort GetUShort(int field) => (ushort)GetUInt(field);
 
             public string GetString(int field, int arrayIndex) => throw new Exception("DBC doesn't have arrays");

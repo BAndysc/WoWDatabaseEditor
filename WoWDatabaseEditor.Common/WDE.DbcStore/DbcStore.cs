@@ -20,6 +20,7 @@ using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DbcStore.FastReader;
 using WDE.DbcStore.Loaders;
+using WDE.DbcStore.Parameters;
 using WDE.DbcStore.Providers;
 using WDE.DbcStore.Spells;
 using WDE.DbcStore.Spells.Cataclysm;
@@ -63,7 +64,8 @@ namespace WDE.DbcStore
 
     [AutoRegister]
     [SingleInstance]
-    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore, IGarrMissionStore, IItemStore, IConversationLineStore, IVehicleStore
+    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore, IGarrMissionStore,
+        IItemStore, IConversationLineStore, IVehicleStore, IPlayerConditionStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -180,7 +182,11 @@ namespace WDE.DbcStore
         public ICurrencyType? GetCurrencyTypeById(uint id) => CurrencyTypeById.TryGetValue(id, out var currency) ? currency : null;
         
         public IReadOnlyList<ICharShipment> CharShipments { get; set; } = Array.Empty<ICharShipment>();
-        
+
+        public IReadOnlyList<IPlayerCondition> PlayerConditions { get; internal set; } = Array.Empty<IPlayerCondition>();
+        public Dictionary<int, IPlayerCondition> PlayerConditionsById { get; internal set; } = new();
+        public IPlayerCondition? GetPlayerConditionById(int id) => PlayerConditionsById.GetValueOrDefault(id);
+
         internal void Load()
         {            
             parameterFactory.Register("RaceMaskParameter", new RaceMaskParameter(currentCoreVersion.Current.GameVersionFeatures.AllRaces, raceProviderService), QuickAccessMode.Limited);
@@ -285,6 +291,9 @@ namespace WDE.DbcStore
                 store.CurrencyTypes = data.CurrencyTypes;
                 store.CurrencyTypeById = data.CurrencyTypes.ToDictionary(a => a.Id, a => a);
 
+                store.PlayerConditions = data.PlayerConditions;
+                store.PlayerConditionsById = data.PlayerConditions.ToDictionary(a => a.Id, a => a);
+
                 var currencyCategoryById = data.CurrencyCategories.ToDictionary(x => x.Id, x => x);
                 foreach (var curr in data.CurrencyTypes)
                 {
@@ -388,6 +397,24 @@ namespace WDE.DbcStore
                 parameterFactory.Register("ItemVisualParameter", new ItemVisualParameter(store));
                 parameterFactory.Register("ScenarioEventParameter", Parameter.Instance);
                 parameterFactory.Register("VehicleIdParameter", new DbcParameter(data.Vehicles.ToDictionary(x => (long)x.Id, x => new SelectOption("", "Seats: " + string.Join(", ", x.Seats.Where(x => x != 0))))));
+                parameterFactory.RegisterCombined("PlayerConditionParameter",
+                    new[] {"PowerTypeParameter",
+                    "ChrSpecializationRoleParameter",
+                    "SkillParameter",
+                    "LanguageParameter",
+                    "FactionParameter",
+                    "ReputationRankParameter",
+                    "QuestParameter",
+                    "SpellParameter",
+                    "ItemParameter",
+                    "CurrencyTypeParameter",
+                    "ZoneAreaParameter",
+                    "AchievementParameter",
+                    "PhaseParameter",
+                    "CreatureParameter"
+                    },
+                    p =>
+                        new PlayerConditionParameter(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12], p[13], data.PlayerConditions));
 
                 parameterFactory.RegisterCombined("CharShipmentParameter", "SpellParameter", "CreatureParameter", "ItemParameter",
                     (spells, creatures, items) => new CharShipmentParameter(dataPicker, store.CharShipments, spells, creatures, items), QuickAccessMode.Limited);

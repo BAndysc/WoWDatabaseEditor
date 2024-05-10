@@ -675,7 +675,7 @@ namespace WDE.Parameters
         public void Reload() => LateLoad().ListenErrors();
     }
     
-    public class QuestParameter : LateAsyncLoadParameter, ICustomPickerParameter<long>
+    public class QuestParameter : LateAsyncLoadParameter, ICustomPickerParameter<long>, IDynamicParameter<long>
     {
         private readonly IDatabaseProvider database;
         private readonly IQuestEntryProviderService questEntryProvider;
@@ -691,6 +691,7 @@ namespace WDE.Parameters
             Items = new Dictionary<long, SelectOption>();
             foreach (IQuestTemplate item in await database.GetQuestTemplatesAsync())
                 Items[item.Entry] = new SelectOption(item.Name ?? "Quest " + item.Entry);
+            ItemsChanged?.Invoke(this);
         }
 
         public async Task<(long, bool)> PickValue(long value)
@@ -698,6 +699,8 @@ namespace WDE.Parameters
             var result = await questEntryProvider.GetEntryFromService((uint)value);
             return (result ?? 0, result.HasValue);
         }
+
+        public event Action<IParameter<long>>? ItemsChanged;
     }
     
     public class PrevQuestParameter : LateAsyncLoadParameter

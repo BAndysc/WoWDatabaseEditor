@@ -87,4 +87,5 @@ public class DbcData
     public List<ItemModifiedAppearanceEntry> ItemModifiedAppearances { get; } = new();
     public List<ConversationLine> ConversationLines { get; } = new();
     public List<Vehicle> Vehicles { get; } = new();
+    public List<IPlayerCondition> PlayerConditions { get; } = new();
 }

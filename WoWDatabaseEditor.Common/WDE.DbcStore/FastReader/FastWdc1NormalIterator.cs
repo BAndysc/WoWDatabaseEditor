@@ -71,7 +71,7 @@ public partial class FastWdc1Reader
             }
         }
 
-        private unsafe ulong GetULong(int field)
+        public unsafe ulong GetULong(int field)
         {
             if (parent.header.Flags.HasFlagFast(Wdc1Header.HeaderFlags.IndexMap))
             {
@@ -113,8 +113,19 @@ public partial class FastWdc1Reader
             return value;
         }
 
+        public long GetLong(int field) => (long)GetULong(field);
 
-        private unsafe ulong GetULong(int field, int index)
+        public long GetLong(int field, int arrayIndex) => (long)GetULong(field, arrayIndex);
+
+        public sbyte GetSbyte(int field) => (sbyte)GetInt(field);
+
+        public sbyte GetSbyte(int field, int arrayIndex) => (sbyte)GetInt(field, arrayIndex);
+
+        public byte GetByte(int field) => (byte)GetUInt(field);
+
+        public byte GetByte(int field, int arrayIndex) => (byte)GetUInt(field, arrayIndex);
+
+        public unsafe ulong GetULong(int field, int index)
         {
             if (parent.header.Flags.HasFlagFast(Wdc1Header.HeaderFlags.IndexMap))
                 field--;
@@ -148,9 +159,9 @@ public partial class FastWdc1Reader
             return value;
         }
 
-        public int GetInt(int field) => (int)GetULong(field);
+        public int GetInt(int field) => (int)GetLong(field);
         
-        public int GetInt(int field, int arrayIndex) => (int)GetULong(field, arrayIndex);
+        public int GetInt(int field, int arrayIndex) => (int)GetLong(field, arrayIndex);
 
         public uint GetUInt(int field) => (uint)GetULong(field);
 

@@ -87,7 +87,7 @@ public partial class FastWdc1Reader
             }
         }
 
-        private ulong GetULong(int field)
+        public ulong GetULong(int field)
         {
             if (parent.header.Flags.HasFlagFast(Wdc1Header.HeaderFlags.IndexMap))
             {
@@ -99,6 +99,41 @@ public partial class FastWdc1Reader
             if (parent.fieldStorageInfo[field].StorageType >= FieldCompression.FieldCompressionCommonData)
                 throw new Exception("not implemented");
             return ReadBits(GetRowMemory(), GetFieldBitOffset(field), parent.fieldStorageInfo[field].FieldSizeBits);
+        }
+
+        public ulong GetULong(int field, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long GetLong(int field)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long GetLong(int field, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public sbyte GetSbyte(int field)
+        {
+            throw new NotImplementedException();
+        }
+
+        public sbyte GetSbyte(int field, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte GetByte(int field)
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte GetByte(int field, int arrayIndex)
+        {
+            throw new NotImplementedException();
         }
 
         public int GetInt(int field) => (int)GetULong(field);

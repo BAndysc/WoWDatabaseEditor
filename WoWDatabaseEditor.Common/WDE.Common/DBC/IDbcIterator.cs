@@ -9,6 +9,14 @@ namespace WDE.Common.DBC
         public uint GetUInt(int field, int arrayIndex);
         public ushort GetUShort(int field);
         public ushort GetUShort(int field, int arrayIndex);
+        public ulong GetULong(int field);
+        public ulong GetULong(int field, int arrayIndex);
+        public long GetLong(int field);
+        public long GetLong(int field, int arrayIndex);
+        public sbyte GetSbyte(int field);
+        public sbyte GetSbyte(int field, int arrayIndex);
+        public byte GetByte(int field);
+        public byte GetByte(int field, int arrayIndex);
         public string GetString(int field);
         public string GetString(int field, int arrayIndex);
         public float GetFloat(int field);

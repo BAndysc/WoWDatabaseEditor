@@ -949,7 +949,7 @@
 		"help": "Condition is met if target has a player condition met",
 		"parameters": [
 			{
-				"type": "Parameter",
+				"type": "PlayerConditionParameter",
 				"name": "Condition id"
 			}
 		],

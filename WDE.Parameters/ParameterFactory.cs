@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using WDE.Common.Database;
+using WDE.Common.Disposables;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Utils;
@@ -231,6 +233,62 @@ namespace WDE.Parameters
                 {
                     Register(name, creator(pair.First, pair.Second, pair.Third, pair.Fourth, pair.Fifth), quickAccessMode);
                 });
+        }
+
+        public void RegisterCombined(string name, string[] dependencies, Func<IParameter<long>[], IParameter<long>> creator,
+            QuickAccessMode quickAccessMode = QuickAccessMode.None)
+        {
+            new CombineLatest<IParameter<long>>(
+                    dependencies.Select(OnRegisterLong).ToArray())
+                .SubscribeOnce(prams => Register(name, creator(prams), quickAccessMode));
+        }
+
+        public class CombineLatest<T> : IObservable<T[]>
+        {
+            private readonly IObservable<T>[] sources;
+
+            public CombineLatest(IObservable<T>[] sources)
+            {
+                this.sources = sources;
+            }
+
+            private class Sub : IDisposable
+            {
+                private readonly IObserver<T[]> observer;
+                private readonly T[] values;
+                private BitArray hasValue;
+                private List<System.IDisposable> subs;
+
+                public Sub(IObservable<T>[] sources, IObserver<T[]> observer)
+                {
+                    this.observer = observer;
+                    values = new T[sources.Length];
+                    hasValue = new BitArray(sources.Length);
+                    subs = sources.Select((s, index) => s.SubscribeAction(x =>
+                    {
+                        values[index] = x;
+                        if (hasValue[index])
+                            return;
+                        hasValue[index] = true;
+                        if (hasValue.HasAllSet())
+                            this.observer.OnNext(values);
+                    })).ToList();
+                }
+
+                public void Dispose()
+                {
+                    foreach (var x in subs)
+                    {
+                        x.Dispose();
+                    }
+                    subs.Clear();
+                }
+            }
+
+            public IDisposable Subscribe(IObserver<T[]> observer)
+            {
+                return new Sub(sources, observer);
+            }
         }
 
         public void RegisterDepending(string name, string dependsOn, Func<IParameter<long>, IParameter<long>> creator, QuickAccessMode quickAccessMode = QuickAccessMode.None)
