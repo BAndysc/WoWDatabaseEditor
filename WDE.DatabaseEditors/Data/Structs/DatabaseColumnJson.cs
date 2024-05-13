@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using Generator.Equals;
 using Newtonsoft.Json;
 
 namespace WDE.DatabaseEditors.Data.Structs
 {
+    [JsonConverter(typeof(ColumnFullNameConverter))]
+    [TypeConverter(typeof(ColumnFullNameTypeConverter))]
     public readonly struct ColumnFullName : IEquatable<ColumnFullName>
     {
         public bool Equals(ColumnFullName other)
@@ -48,6 +51,55 @@ namespace WDE.DatabaseEditors.Data.Structs
             if (parts.Length == 1)
                 return new ColumnFullName(null, parts[0]);
             return new ColumnFullName(parts[0], parts[1]);
+        }
+    }
+
+    public class ColumnFullNameTypeConverter : TypeConverter
+    {
+        public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
+        {
+            if (value is string s)
+                return ColumnFullName.Parse(s);
+            if (value is ColumnFullName columnFullName)
+                return columnFullName;
+            return null;
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
+        {
+            return sourceType == typeof(string) || sourceType == typeof(ColumnFullName) || sourceType == typeof(ColumnFullName?);
+        }
+
+        public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
+        {
+            if (destinationType == typeof(string))
+            {
+                if (value is ColumnFullName columnFullName)
+                {
+                    if (columnFullName.ForeignTable == null)
+                        return columnFullName.ColumnName;
+                    return columnFullName.ForeignTable + "." + columnFullName.ColumnName;
+                }
+                else if (value is string s)
+                    return s;
+                return null;
+            }
+            else if (destinationType == typeof(ColumnFullName))
+            {
+                if (value is ColumnFullName columnFullName)
+                    return columnFullName;
+                if (value is string s)
+                    return ColumnFullName.Parse(s);
+                if (value is null)
+                    return null;
+            }
+
+            return null;
+        }
+
+        public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType)
+        {
+            return destinationType == typeof(string) || destinationType == typeof(ColumnFullName) || destinationType == typeof(ColumnFullName?);
         }
     }
 
