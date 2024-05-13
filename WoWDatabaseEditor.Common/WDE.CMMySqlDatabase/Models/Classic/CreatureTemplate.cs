@@ -58,16 +58,16 @@ public class CreatureTemplateClassic : ICreatureTemplate
     [Column("NpcFlags")]
     public GameDefines.NpcFlags NpcFlags { get; set; }
 
-    [Column("ModelId1")] 
+    [Column("DisplayId1")]
     public uint ModelId1               { get; set; }
 
-    [Column("ModelId2")]
+    [Column("DisplayId2")]
     public uint ModelId2               { get; set; }
     
-    [Column("ModelId3")] 
+    [Column("DisplayId3")]
     public uint ModelId3               { get; set; }
     
-    [Column("ModelId4")]
+    [Column("DisplayId4")]
     public uint ModelId4               { get; set; }
 
     [Column("EquipmentTemplateId")]
