@@ -101,7 +101,7 @@
 				"description": "Faction ID to test"
 			},
 			{
-				"type": "ReputationRankParameter",
+				"type": "ReputationRankMaskParameter",
 				"name": "Minimum rank"
 			}
 		],
