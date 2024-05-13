@@ -101,8 +101,8 @@
 				"description": "Faction ID to test"
 			},
 			{
-				"type": "ReputationRankParameter",
-				"name": "Minimum rank"
+				"type": "ReputationRankMaskParameter",
+				"name": "Rank"
 			}
 		],
 		"description": "{target} {negate:has at least|has no more than} reputation {pram2} to faction {pram1}"

@@ -1847,7 +1847,7 @@
 		}	
 	},	
 	"ReputationRankParameter": {	
-		"name": "Reputation rank",	
+		"name": "Reputation rank",
 		"values": {	
 			"0": {"name": "Hated"},	
 			"1": {"name": "Hostile"},	
