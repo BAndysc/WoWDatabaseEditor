@@ -1847,16 +1847,17 @@
 		}	
 	},	
 	"ReputationRankParameter": {	
-		"name": "Reputation rank",	
+		"name": "Reputation rank",
+		"isflag": true,	
 		"values": {	
-			"0": {"name": "Hated"},	
-			"1": {"name": "Hostile"},	
-			"2": {"name": "Unfriendly"},	
-			"3": {"name": "Neutral"},	
-			"4": {"name": "Friendly"},	
-			"5": {"name": "Honored"},	
-			"6": {"name": "Revered"},	
-			"7": {"name": "Exalted"}	
+			"1": {"name": "Hated"},	
+			"2": {"name": "Hostile"},	
+			"4": {"name": "Unfriendly"},	
+			"8": {"name": "Neutral"},	
+			"16": {"name": "Friendly"},	
+			"32": {"name": "Honored"},	
+			"64": {"name": "Revered"},	
+			"128": {"name": "Exalted"}	
 		}	
 	},	
 	"ReputationRankMaskParameter": {	
