@@ -6,16 +6,19 @@ namespace WDE.PacketViewer.Solutions
 {
     public class PacketDocumentSolutionItem : ISolutionItem
     {
-        public PacketDocumentSolutionItem(string file, int? version = null)
+        public PacketDocumentSolutionItem(string? file, int? version = null, bool liveStream = false)
         {
             File = file;
             CustomVersion = version;
+            LiveStream = liveStream;
         }
 
-        public string File { get; set; }
+        public string? File { get; set; }
         
         public int? CustomVersion { get; set; }
-        
+
+        public bool LiveStream { get; set; }
+
         [JsonIgnore]
         public bool IsContainer => false;
 

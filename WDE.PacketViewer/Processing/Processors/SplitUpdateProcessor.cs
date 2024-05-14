@@ -10,9 +10,10 @@ namespace WDE.PacketViewer.Processing.Processors
     {
         private readonly GuidExtractorProcessor guidExtractorProcessor;
 
-        public SplitUpdateProcessor(GuidExtractorProcessor guidExtractorProcessor)
+        public SplitUpdateProcessor(GuidExtractorProcessor guidExtractorProcessor, int baseNumber)
         {
             this.guidExtractorProcessor = guidExtractorProcessor;
+            NextNumber = baseNumber;
         }
 
         public override void Initialize(ulong gameBuild)

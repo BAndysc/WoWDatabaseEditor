@@ -9,7 +9,27 @@ using WowPacketParser.Proto;
 
 namespace WDE.PacketViewer.ViewModels;
 
-public class PacketViewModelStore : IDisposable
+public interface IPacketViewModelStore : IDisposable
+{
+    bool Load(DumpFormatType dumpFormatType);
+    Task<string> GetTextAsync(PacketViewModel packet);
+    string GetText(PacketViewModel packet);
+}
+
+public class NullPacketViewModelStore : IPacketViewModelStore
+{
+    public bool Load(DumpFormatType dumpFormatType) => true;
+
+    public Task<string> GetTextAsync(PacketViewModel packet) => Task.FromResult(GetText(packet));
+
+    public string GetText(PacketViewModel packet) => packet.Packet.BaseData.StringData;
+
+    public void Dispose()
+    {
+    }
+}
+
+public class PacketViewModelStore : IPacketViewModelStore
 {
     private AsyncMonitor asyncMonitor = new();
     private FileStream? textFileStream;

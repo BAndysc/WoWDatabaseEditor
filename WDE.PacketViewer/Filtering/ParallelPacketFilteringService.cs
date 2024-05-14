@@ -16,7 +16,7 @@ namespace WDE.PacketViewer.Filtering
     [SingleInstance]
     public class ParallelPacketFilteringService : IPacketFilteringService
     {
-        private bool AcceptFilterData(PacketViewModelStore store, PacketViewModel packet, IReadOnlyFilterData filterData)
+        private bool AcceptFilterData(IPacketViewModelStore store, PacketViewModel packet, IReadOnlyFilterData filterData)
         {
             if (filterData.ForceIncludePacketNumbers != null)
             {
@@ -106,9 +106,42 @@ namespace WDE.PacketViewer.Filtering
 
             return true;
         }
-        
+
+        public bool IsMatched(PacketViewModel packet, IPacketViewModelStore store, string filter, IReadOnlyFilterData? filterData)
+        {
+            if (string.IsNullOrEmpty(filter))
+            {
+                if (filterData == null)
+                {
+                    return true;
+                }
+                else
+                {
+                    return AcceptFilterData(store, packet, filterData);
+                }
+            }
+            else
+            {
+                var playerGuid = new UniversalGuid(); // playerLogin?.PlayerGuid ?? new UniversalGuid()
+                var evaluator = new DatabaseExpressionEvaluator(filter, playerGuid, store);
+                if (filterData == null || AcceptFilterData(store, packet, filterData))
+                {
+                    try
+                    {
+                        return evaluator.Evaluate(packet) is true;
+                    }
+                    catch (Exception)
+                    {
+                        return true; // i.e. when the fitler is invalid
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public async Task<ObservableCollection<PacketViewModel>?> Filter(IList<PacketViewModel> all, 
-            PacketViewModelStore store,
+            IPacketViewModelStore store,
             string filter, 
             IReadOnlyFilterData? filterData,
             CancellationToken cancellationToken,

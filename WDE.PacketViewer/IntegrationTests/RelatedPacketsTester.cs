@@ -77,7 +77,7 @@ namespace WDE.PacketViewer.IntegrationTests
             var sniffPath = Path.Combine(basePath, testCaseGroup.SniffFilePath);
             var sniff = await sniffLoader.LoadSniff(sniffPath, null, CancellationToken.None, true, new Progress<float>());
             var store = new PacketViewModelStore(sniffPath);
-            var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor());
+            var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor(), 0);
             List<PacketViewModel> split = new();
             foreach (var packet in sniff.Packets_)
             {

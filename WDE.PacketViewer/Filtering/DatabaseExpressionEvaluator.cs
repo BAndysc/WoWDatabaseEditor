@@ -7,13 +7,13 @@ namespace WDE.PacketViewer.Filtering
 {
     public class DatabaseExpressionEvaluator
     {
-        private readonly PacketViewModelStore store;
+        private readonly IPacketViewModelStore store;
         private SyntaxLexer lexer;
         private CommonTokenStream tokens;
         private SyntaxParser parser;
         private ExpressionVisitor visitor;
         
-        public DatabaseExpressionEvaluator(string expression, UniversalGuid playerGuid, PacketViewModelStore store)
+        public DatabaseExpressionEvaluator(string expression, UniversalGuid playerGuid, IPacketViewModelStore store)
         {
             this.store = store;
             lexer = new SyntaxLexer(new AntlrInputStream(expression));

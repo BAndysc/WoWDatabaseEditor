@@ -4,12 +4,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Services.Processes;
 using WDE.Module.Attributes;
+using WDE.PacketViewer.Services;
 
 namespace WDE.PacketViewer.PacketParserIntegration
 {
@@ -18,6 +21,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
     public class PacketParserService : IPacketParserService
     {
         private readonly IPacketParserLocator locator;
+        private readonly IProcessService processService;
         private readonly IUserSettings userSettings;
         private readonly IMessageBoxService messageBoxService;
         private bool acceptedLicence;
@@ -26,12 +30,14 @@ namespace WDE.PacketViewer.PacketParserIntegration
         
         private Dictionary<string, (string key, string defaults, ParserConfigurationGetterType getter)> propertiesToConfig = new();
 
-        public PacketParserService(IPacketParserLocator locator, 
+        public PacketParserService(IPacketParserLocator locator,
+            IProcessService processService,
             IUserSettings userSettings,
             IMessageBoxService messageBoxService,
             IApplicationReleaseConfiguration applicationReleaseConfiguration)
         {
             this.locator = locator;
+            this.processService = processService;
             this.userSettings = userSettings;
             this.messageBoxService = messageBoxService;
             acceptedLicence = userSettings.Get<Data>().AcceptedLicense || applicationReleaseConfiguration.GetBool("PARSER_LICENCE") is true;
@@ -46,24 +52,28 @@ namespace WDE.PacketViewer.PacketParserIntegration
                 propertiesToConfig[prop.Name] = (attribute.SettingName, attribute.DefaultValue, getter);
             }
         }
-        
-        public async Task RunParser(string input, ParserConfiguration config, DumpFormatType dumpType, int? customVersion, CancellationToken token, IProgress<float> progress)
+
+        private string GetPacketParserPathOrThrow()
         {
             var path = locator.GetPacketParserPath();
             if (path == null)
                 throw new ParserNotFoundException();
+            return path;
+        }
 
+        private async Task AcceptLicenseOrThrow()
+        {
             if (!acceptedLicence)
             {
                 if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                    .SetIcon(MessageBoxIcon.Information)
-                    .SetTitle("Terms of use")
-                    .SetMainInstruction("Terms of Wow Packet Parser use")
-                    .SetContent(
-                        "WDE uses TrinityCore's Wow Packet Parser. To use the parser, you have to agree to WPP GPL3 licence.\nhttps://github.com/TrinityCore/WowPacketParser/blob/master/COPYING\n\nDo you accept the terms of use?")
-                    .WithYesButton(true)
-                    .WithNoButton(false)
-                    .Build()))
+                        .SetIcon(MessageBoxIcon.Information)
+                        .SetTitle("Terms of use")
+                        .SetMainInstruction("Terms of Wow Packet Parser use")
+                        .SetContent(
+                            "WDE uses TrinityCore's Wow Packet Parser. To use the parser, you have to agree to WPP GPL3 licence.\nhttps://github.com/TrinityCore/WowPacketParser/blob/master/COPYING\n\nDo you accept the terms of use?")
+                        .WithYesButton(true)
+                        .WithNoButton(false)
+                        .Build()))
                 {
                     acceptedLicence = true;
                     userSettings.Update(new Data(){AcceptedLicense = true});
@@ -73,7 +83,10 @@ namespace WDE.PacketViewer.PacketParserIntegration
                     throw new NoAgreementForParserLicence();
                 }
             }
+        }
 
+        private string GetConfigurationString(ParserConfiguration config, DumpFormatType dumpType, int? customVersion)
+        {
             var configuration = string.Join(" ", propertiesToConfig
                 .Values
                 .Select(tuple => (tuple.getter(ref config), tuple.defaults, tuple.key))
@@ -82,8 +95,73 @@ namespace WDE.PacketViewer.PacketParserIntegration
 
             if (customVersion.HasValue)
                 configuration += $" --ClientBuild {customVersion.Value}";
-                    
-            var args = $"{configuration} --DumpFormat {(int) dumpType} \"{input}\"";
+
+            var args = $"{configuration} --DumpFormat {(int) dumpType}";
+            return args;
+        }
+
+        private class LivePacketParser : ILivePacketParser
+        {
+            private BinaryWriter writer = null!;
+
+            public void SendRawPacket(ParserRawPacket packet)
+            {
+                writer.Write(Encoding.ASCII.GetBytes(packet.IsSmsg ? "SMSG" : "CMSG"));
+                writer.Write((uint)packet.SessionId);
+                writer.Write((ulong)packet.TickCount);
+                writer.Write((uint)0);
+                writer.Write((uint)packet.Data.Length + 4);
+                writer.Write((uint)packet.Opcode);
+                writer.Write(packet.Data);
+            }
+
+            public event Action<string>? OnPacketParsed;
+
+            public void SetInputStream(Stream stream)
+            {
+                this.writer = new BinaryWriter(stream);
+            }
+
+            public void ReceivedParsedPacket(string packet)
+            {
+                OnPacketParsed?.Invoke(packet);
+            }
+        }
+
+        public async Task<ILivePacketParser> RunStreamParser(ParserConfiguration config, DumpFormatType dumpType, CancellationToken token)
+        {
+            var path = GetPacketParserPathOrThrow();
+            await AcceptLicenseOrThrow();
+            var args = GetConfigurationString(config, dumpType, null);
+            var executable = path;
+            args += " --stdin true --stdout true";
+            if (Path.GetExtension(executable) == ".dll")
+            {
+                executable = "dotnet";
+                args = path + " " + args;
+            }
+
+            var parser = new LivePacketParser();
+            var task = processService.Run(token, executable, args, null, onOut =>
+            {
+                if (!onOut.StartsWith("PKT"))
+                    return;
+
+                var base64 = onOut.Substring(3);
+                parser.ReceivedParsedPacket(base64);
+            }, null, true, out var input);
+
+            parser.SetInputStream(input.BaseStream);
+
+            return parser;
+        }
+        
+        public async Task RunParser(string input, ParserConfiguration config, DumpFormatType dumpType, int? customVersion, CancellationToken token, IProgress<float> progress)
+        {
+            var path = GetPacketParserPathOrThrow();
+            await AcceptLicenseOrThrow();
+
+            var args = GetConfigurationString(config, dumpType, customVersion) + $" \"{input}\"";
 
             var executable = path;
             if (Path.GetExtension(executable) == ".dll")

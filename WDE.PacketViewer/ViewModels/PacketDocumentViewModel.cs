@@ -56,6 +56,8 @@ namespace WDE.PacketViewer.ViewModels
         private readonly IActionReactionProcessorCreator actionReactionProcessorCreator;
         private readonly IRelatedPacketsFinder relatedPacketsFinder;
         private readonly ISniffLoader sniffLoader;
+        private readonly IStreamSniffParser streamSniffParser;
+        private readonly ISnifferProxy snifferProxy;
         private readonly PrettyFlagParameter prettyFlagParameter;
         private readonly PacketViewModelFactory packetViewModelCreator;
 
@@ -79,8 +81,10 @@ namespace WDE.PacketViewer.ViewModels
             ITeachingTipService teachingTipService,
             PacketDocumentSolutionNameProvider solutionNameProvider,
             ISniffLoader sniffLoader,
+            IStreamSniffParser streamSniffParser,
             ISpellStore spellStore,
             IParsingSettings parsingSettings,
+            ISnifferProxy snifferProxy,
             PrettyFlagParameter prettyFlagParameter,
             Func<IUpdateFieldsHistory> historyCreator)
         {
@@ -93,6 +97,8 @@ namespace WDE.PacketViewer.ViewModels
             this.actionReactionProcessorCreator = actionReactionProcessorCreator;
             this.relatedPacketsFinder = relatedPacketsFinder;
             this.sniffLoader = sniffLoader;
+            this.streamSniffParser = streamSniffParser;
+            this.snifferProxy = snifferProxy;
             this.prettyFlagParameter = prettyFlagParameter;
             ParsingSettings = parsingSettings;
             History = history;
@@ -104,7 +110,7 @@ namespace WDE.PacketViewer.ViewModels
             FilterText = nativeTextDocumentCreator();
             SelectedPacketPreview = nativeTextDocumentCreator();
             SelectedPacketPreview.DisableUndo();
-            packetStore = AutoDispose(new PacketViewModelStore(solutionItem.File));
+            packetStore = AutoDispose<IPacketViewModelStore>(solutionItem.File == null ? new NullPacketViewModelStore() : new PacketViewModelStore(solutionItem.File));
             Watch(this, t => t.FilteringProgress, nameof(ProgressUnknown));
 
             AutoDispose(history.AddHandler(new SelectedPacketHistory(this)));
@@ -551,9 +557,90 @@ namespace WDE.PacketViewer.ViewModels
 
             UpdateHistoryViewModel = AutoDispose(new UpdateHistoryViewModel(historyCreator,  prettyFlagParameter, JumpToPacketCommand, this.ToObservable(p => p.SelectedPacket)));
 
-            LoadSniff().ListenErrors();
+            if (solutionItem.File != null)
+                LoadSniff().ListenErrors();
+            else
+            {
+                Listen();
+            }
 
             AutoDispose(new ActionDisposable(() => currentActionToken?.Cancel()));
+            AutoDispose(new ActionDisposable(() => liveStreamToken?.Cancel()));
+        }
+
+        private CancellationTokenSource? liveStreamToken;
+
+        private void Listen()
+        {
+            liveStreamToken = new CancellationTokenSource();
+            streamSniffParser.OnPacketArrived += packets =>
+            {
+                var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor(), AllPacketsSplit?.Count ?? 0);
+                sniffGameBuild = packets.GameVersion;
+                prettyFlagParameter.InitializeBuild(sniffGameBuild);
+                splitter.Initialize(sniffGameBuild);
+                if (splitUpdate)
+                    AllPacketsSplit ??= new();
+                using (AllPackets.SuspendNotifications())
+                {
+                    foreach (var packet in packets.Packets_)
+                    {
+                        var packetViewModel = packetViewModelCreator.Process(packet, packet.BaseData.Number)!;
+                        packetViewModel.Diff = AllPackets.Count == 0 ? 0 : (int)packet.BaseData.Time.ToDateTime().Subtract(AllPackets[^1].Time).TotalMilliseconds;
+                        AllPackets.Add(packetViewModel);
+
+                        if (splitUpdate)
+                        {
+                            var splitted = splitter.Process(packet);
+                            if (splitted == null)
+                            {
+                                AllPacketsSplit!.Add(packetViewModel);
+                                if (filteringService.IsMatched(packetViewModel, packetStore, DisableFilters ? "" : FilterText.ToString(), DisableFilters ? null : FilterData))
+                                    FilteredPackets.Add(packetViewModel);
+                            }
+                            else
+                            {
+                                foreach (var split in splitted)
+                                {
+                                    var splitPacketViewModel = packetViewModelCreator.Process(split.Item1, split.Item1.BaseData.Number)!;
+                                    splitPacketViewModel.Diff = AllPacketsSplit!.Count == 0 ? 0 : (int)split.Item1.BaseData.Time.ToDateTime().Subtract(AllPacketsSplit[^1].Time).TotalMilliseconds;
+                                    AllPacketsSplit!.Add(splitPacketViewModel);
+                                    if (filteringService.IsMatched(splitPacketViewModel, packetStore, DisableFilters ? "" : FilterText.ToString(), DisableFilters ? null : FilterData))
+                                        FilteredPackets.Add(splitPacketViewModel);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (filteringService.IsMatched(packetViewModel, packetStore, DisableFilters ? "" : FilterText.ToString(), DisableFilters ? null : FilterData))
+                                FilteredPackets.Add(packetViewModel);
+                        }
+                    }
+                }
+
+                if (splitUpdate)
+                {
+                    var finalized = splitter.Finalize();
+                    if (finalized != null)
+                    {
+                        foreach (var split in finalized)
+                        {
+                            var splitPacketViewModel = packetViewModelCreator.Process(split.Item1, split.Item2)!;
+                            splitPacketViewModel.Diff = AllPacketsSplit!.Count == 0 ? 0 : (int)split.Item1.BaseData.Time.ToDateTime().Subtract(AllPacketsSplit[^1].Time).TotalMilliseconds;
+                            AllPacketsSplit!.Add(splitPacketViewModel);
+                            if (filteringService.IsMatched(splitPacketViewModel, packetStore, DisableFilters ? "" : FilterText.ToString(), DisableFilters ? null : FilterData))
+                                FilteredPackets.Add(splitPacketViewModel);
+                        }
+                    }
+                }
+
+            };
+            streamSniffParser.Start(liveStreamToken.Token);
+            snifferProxy.Listen(liveStreamToken.Token);
+            snifferProxy.OnSnifferPacketArrived += raw =>
+            {
+                streamSniffParser.Send(raw);
+            };
         }
 
         private async Task<bool> EnsureSplitOrDismiss()
@@ -591,7 +678,7 @@ namespace WDE.PacketViewer.ViewModels
             return Task.Run(() =>
             {
                 AllPacketsSplit = new();
-                var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor());
+                var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor(), 0);
                 splitter.Initialize(sniffGameBuild);
                 foreach (var packet in AllPackets)
                 {
@@ -867,7 +954,7 @@ namespace WDE.PacketViewer.ViewModels
             
             try
             {
-                var packets = await sniffLoader.LoadSniff(solutionItem.File, solutionItem.CustomVersion, currentActionToken.Token, true, this);
+                var packets = await sniffLoader.LoadSniff(solutionItem.File!, solutionItem.CustomVersion, currentActionToken.Token, true, this);
                 
                 if (!packetStore.Load((DumpFormatType)packets.DumpType))
                     await messageBoxService.SimpleDialog("Error", "Failed to load packet text output", "Failed to load _parsed.txt output file. Without this file, text output will be missing in the packets.");
@@ -1042,7 +1129,7 @@ namespace WDE.PacketViewer.ViewModels
 
         private ActionReactionProcessor? actionReactionProcessor;
 
-        private PacketViewModelStore packetStore;
+        private IPacketViewModelStore packetStore;
         
         private ObservableCollection<PacketViewModel> filteredPackets;
         public ObservableCollection<PacketViewModel> FilteredPackets

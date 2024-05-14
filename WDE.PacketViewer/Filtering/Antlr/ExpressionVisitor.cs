@@ -9,10 +9,10 @@ namespace WDE.PacketViewer.Filtering.Antlr
         private PacketViewModel? packet;
         private static IsPacketPlayerProcessor isPlayerProcessor = new();
         private IsPacketSpecificPlayerProcessor isPacketSpecificPlayerProcessor;
-        private readonly PacketViewModelStore store;
+        private readonly IPacketViewModelStore store;
 
         public ExpressionVisitor(IsPacketSpecificPlayerProcessor isPacketSpecificPlayerProcessor,
-            PacketViewModelStore store)
+            IPacketViewModelStore store)
         {
             this.isPacketSpecificPlayerProcessor = isPacketSpecificPlayerProcessor;
             this.store = store;

@@ -201,7 +201,7 @@ namespace WoWDatabaseEditorCore.Avalonia
                 .Where(a =>
                 {
                     var name = a.GetName().Name!;
-                    return (name.Contains("WDE") && !name.Contains("Test") && !name.Contains("WDE.Common.Avalonia")) || (name.Contains("LoaderAvalonia.Web"));
+                    return (name.Contains("WDE") && !name.Contains("Test") && !name.Contains("WDE.Common.Avalonia")) || (name.Contains("LoaderAvalonia"));
                 })
                 .ToList();
 

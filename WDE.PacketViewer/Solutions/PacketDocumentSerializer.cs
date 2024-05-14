@@ -12,6 +12,9 @@ namespace WDE.PacketViewer.Solutions
     {
         public ISmartScriptProjectItem? Serialize(PacketDocumentSolutionItem item, bool forMostRecentlyUsed)
         {
+            if (item.LiveStream)
+                return null;
+
             return new AbstractSmartScriptProjectItem()
             {
                 Type = 25,
