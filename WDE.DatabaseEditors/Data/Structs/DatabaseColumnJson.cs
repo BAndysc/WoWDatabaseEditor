@@ -52,6 +52,13 @@ namespace WDE.DatabaseEditors.Data.Structs
                 return new ColumnFullName(null, parts[0]);
             return new ColumnFullName(parts[0], parts[1]);
         }
+
+        public override string ToString()
+        {
+            if (ForeignTable == null)
+                return ColumnName;
+            return ForeignTable + "." + ColumnName;
+        }
     }
 
     public class ColumnFullNameTypeConverter : TypeConverter

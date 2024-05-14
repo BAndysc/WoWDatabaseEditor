@@ -71,13 +71,31 @@ namespace WDE.History
         {
             handler.ActionPush -= HandlerOnActionPush;
             handler.ActionDone -= HandlerOnActionDone;
+            handler.ActionDoneWithoutHistory -= HandlerOnActionDoneWithoutHistory;
         }
 
         public T AddHandler<T>(T handler) where T : HistoryHandler
         {
             handler.ActionPush += HandlerOnActionPush;
             handler.ActionDone += HandlerOnActionDone;
+            handler.ActionDoneWithoutHistory += HandlerOnActionDoneWithoutHistory;
             return handler;
+        }
+
+        private void HandlerOnActionDoneWithoutHistory(object? sender, IHistoryAction action)
+        {
+            if (!acceptNew)
+                throw new Exception("Cannot do history action when not accepting new actions");
+
+            try
+            {
+                acceptNew = false;
+                action.Redo();
+            }
+            finally
+            {
+                acceptNew = true;
+            }
         }
 
         private void HandlerOnActionDone(object? sender, IHistoryAction action)

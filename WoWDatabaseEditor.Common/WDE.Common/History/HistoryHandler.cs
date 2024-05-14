@@ -7,11 +7,11 @@ namespace WDE.Common.History
     public class HistoryHandler
     {
         private readonly List<IHistoryAction> bulkEditing = new();
-        private readonly List<IHistoryAction> bulkEditingDoneActions = new();
         private int inBulkEditingNestLevel;
         private bool inPause;
         public event EventHandler<IHistoryAction> ActionPush = delegate { };
         public event EventHandler<IHistoryAction> ActionDone = delegate { };
+        public event EventHandler<IHistoryAction> ActionDoneWithoutHistory = delegate { };
 
         public IDisposable WithinBulk(string name)
         {
@@ -24,7 +24,6 @@ namespace WDE.Common.History
             if (inBulkEditingNestLevel++ == 0)
             {
                 bulkEditing.Clear();
-                bulkEditingDoneActions.Clear();
             }
         }
 
@@ -32,13 +31,9 @@ namespace WDE.Common.History
         {
             if (--inBulkEditingNestLevel == 0)
             {
-                // todo: this should be one history action
                 if (bulkEditing.Count > 0)
                     PushAction(new CompoundHistoryAction(name, bulkEditing.ToArray()));
-                if (bulkEditingDoneActions.Count > 0)
-                    DoAction(new CompoundHistoryAction(name, bulkEditingDoneActions.ToArray()));
                 bulkEditing.Clear();
-                bulkEditingDoneActions.Clear();
             }
         }
 
@@ -78,7 +73,10 @@ namespace WDE.Common.History
                 return;
 
             if (inBulkEditingNestLevel > 0)
-                bulkEditingDoneActions.Add(action);
+            {
+                ActionDoneWithoutHistory(this, action);
+                bulkEditing.Add(action);
+            }
             else
                 ActionDone(this, action);
         }

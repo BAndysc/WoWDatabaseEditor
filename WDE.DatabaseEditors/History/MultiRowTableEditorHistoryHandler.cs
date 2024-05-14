@@ -61,9 +61,6 @@ namespace WDE.DatabaseEditors.History
                     }
                 }
             });
-            viewModel.OnKeyDeleted += ViewModelOnDeleteQuery;
-            viewModel.OnKeyAdded += ViewModelOnKeyAdded;
-            viewModel.OnDeletedQuery += ViewModelOnDeletedQuery;
         }
 
         private void FieldValueChanged(DatabaseEntity entity, ColumnFullName columnName, Action<IValueHolder> undo, Action<IValueHolder> redo)
@@ -84,27 +81,9 @@ namespace WDE.DatabaseEditors.History
         {
             PushAction(new DatabaseEntityConditionsChangedHistoryAction(entity, old, @new, viewModel));
         }
-        
-        private void ViewModelOnDeletedQuery(DatabaseEntity obj)
-        {
-            PushAction(new DatabaseExecuteDeleteHistoryAction(viewModel, obj));
-        }
-
-        private void ViewModelOnKeyAdded(DatabaseKey key)
-        {
-            PushAction(new DatabaseKeyAddedHistoryAction(viewModel, key));
-        }
-
-        private void ViewModelOnDeleteQuery(DatabaseEntity obj)
-        {
-            PushAction(new DatabaseKeyRemovedHistoryAction(viewModel, obj.GenerateKey(viewModel.TableDefinition)));
-        }
 
         private void UnbindTableData()
         {
-            viewModel.OnDeletedQuery -= ViewModelOnDeletedQuery;
-            viewModel.OnKeyAdded -= ViewModelOnKeyAdded;
-            viewModel.OnKeyDeleted -= ViewModelOnDeleteQuery;
             disposable?.Dispose();
             disposable = null;
         }

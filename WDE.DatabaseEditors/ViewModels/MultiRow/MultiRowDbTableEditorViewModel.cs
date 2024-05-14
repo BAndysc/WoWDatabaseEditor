@@ -123,8 +123,6 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public ObservableCollection<DatabaseColumnHeaderViewModel> Columns { get; } = new();
         private DatabaseColumnJson? autoIncrementColumn;
 
-        private HashSet<DatabaseKey> keys = new();
-
         public bool AllowMultipleKeys
         {
             get => allowMultipleKeys;
@@ -137,6 +135,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> DuplicateCommand { get; }
         public DelegateCommand<DatabaseEntitiesGroupViewModel> AddRowCommand { get; }
+        public AsyncAutoCommand<DatabaseEntitiesGroupViewModel> UnloadGroupCommand { get; }
         public DelegateCommand<DatabaseEntitiesGroupViewModel> CollapseExpandCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
         public AsyncAutoCommand RevertSelectedCommand { get; }
@@ -146,11 +145,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public DelegateCommand InsertRowBelowCommand { get; }
         public DelegateCommand CopySelectedRowsCommand { get; }
         public DelegateCommand SelectAllCommand { get; }
-        public AsyncAutoCommand PasteRowsCommand { get; } 
-
-        public event Action<DatabaseEntity>? OnDeletedQuery;
-        public event Action<DatabaseEntity>? OnKeyDeleted;
-        public event Action<DatabaseKey>? OnKeyAdded;
+        public AsyncAutoCommand PasteRowsCommand { get; }
 
         public MultiRowDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
@@ -195,6 +190,40 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             DuplicateCommand = new DelegateCommand<DatabaseCellViewModel?>(Duplicate, vm => vm != null);
             EditConditionsCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(EditConditions);
             AddRowCommand = new DelegateCommand<DatabaseEntitiesGroupViewModel>(AddRowByGroup);
+            UnloadGroupCommand = new AsyncAutoCommand<DatabaseEntitiesGroupViewModel>(async group =>
+            {
+                await AskToSave();
+                var indexOfGroup = Rows.IndexOf(group);
+
+                if (indexOfGroup == -1)
+                    throw new Exception("Couldn't find group in entities, report to the developer with a repro.");
+
+                var entitiesCopy = entities[indexOfGroup].ToList();
+                var viewModelsCopy = byEntryGroups[group.Key].ToList();
+
+                bool wasSaved = history.IsSaved;
+                DoAction(new AnonymousHistoryAction("Unload group", () =>
+                {
+                    byEntryGroups[group.Key] = group;
+                    entities.Insert(indexOfGroup, new CustomObservableCollection<DatabaseEntity>());
+                    Rows.Insert(indexOfGroup, group);
+
+                    entities[indexOfGroup].AddRange(entitiesCopy);
+                    byEntryGroups[group.Key].AddRange(viewModelsCopy);
+                }, () =>
+                {
+                    entities[indexOfGroup].RemoveAll();
+                    byEntryGroups[group.Key].RemoveAll();
+                    if (SelectedRow != null && viewModelsCopy.Contains(SelectedRow))
+                        FocusedRowIndex = VerticalCursor.None;
+
+                    Rows.RemoveAt(indexOfGroup);
+                    entities.RemoveAt(indexOfGroup);
+                    byEntryGroups.Remove(group.Key);
+                }));
+                if (wasSaved)
+                    history.MarkAsSaved(); // because group unload is not a real change
+            });
             CollapseExpandCommand = new DelegateCommand<DatabaseEntitiesGroupViewModel>(group => group.IsExpanded = !group.IsExpanded);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
             InsertRowBelowCommand = new DelegateCommand(() =>
@@ -438,8 +467,20 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 if (data == null) 
                     continue;
 
-                OnKeyAdded?.Invoke(key);
-                EnsureKey(key);
+                var group = new DatabaseEntitiesGroupViewModel(key, GenerateName(key[0]), () => GenerateNameAsync(key[0]));
+                var index = Rows.Count;
+                var collection = new CustomObservableCollection<DatabaseEntity>();
+                DoAction(new AnonymousHistoryAction("Load key", () =>
+                {
+                    byEntryGroups.Remove(key);
+                    Rows.RemoveAt(index);
+                    entities.RemoveAt(index);
+                }, () =>
+                {
+                    byEntryGroups[key] = group;
+                    Rows.Insert(index, group);
+                    entities.Insert(index, collection);
+                }));
                 AddEntities(data.Entities);   
             }
         }
@@ -514,7 +555,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             return Task.CompletedTask;
         }
 
-        protected override IReadOnlyList<DatabaseKey> GenerateKeys() => keys.ToList();
+        protected override IReadOnlyList<DatabaseKey> GenerateKeys() => byEntryGroups.Keys.ToList();
         protected override IReadOnlyList<DatabaseKey>? GenerateDeletedKeys() => null;
 
         protected override async Task InternalLoadData(DatabaseTableData data)
@@ -542,9 +583,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                         tablePersonalSettings.UpdateWidth(TableDefinition.Id, col.ColumnIdForUi, col.PreferredWidth ?? 100,  ((int)(width) / 5) * 5);
                     }));   
             }
-            
+
             foreach (var entity in solutionItem.Entries)
-                EnsureKey(entity.Key);
+            {
+                byEntryGroups[entity.Key] = new DatabaseEntitiesGroupViewModel(entity.Key, GenerateName(entity.Key[0]), () => GenerateNameAsync(entity.Key[0]));
+                Rows.Add(byEntryGroups[entity.Key]);
+                entities.Add(new CustomObservableCollection<DatabaseEntity>());
+            }
 
             AddEntities(data.Entities);
             historyHandler = History.AddHandler(AutoDispose(new MultiRowTableEditorHistoryHandler(this)));
@@ -557,50 +602,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         protected override void UpdateSolutionItem()
         {
-            solutionItem.Entries = keys.Select(e =>
+            solutionItem.Entries = byEntryGroups.Keys.Select(e =>
                 new SolutionItemDatabaseEntity(e, false, false)).ToList();
         }
 
         public async Task<bool> RemoveEntity(DatabaseEntity entity)
         {
-            var itemsWithSameKey = Entities.Count(e => e.Key == entity.Key);
-
-            var removed = ForceRemoveEntity(entity);
-            
-            if (itemsWithSameKey == 1)
-            {
-                if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                    .SetTitle("Removing entity")
-                    .SetMainInstruction($"Do you want to delete the key {entity.Key} from solution?")
-                    .SetContent(
-                        $"This entity is the last row with key {entity.Key}. You have to choose if you want to delete the key from the solution as well.\n\nIf you delete it from the solution, DELETE FROM... will no longer be generated for this key.")
-                    .WithYesButton(true)
-                    .WithNoButton(false)
-                    .SetIcon(MessageBoxIcon.Information)
-                    .Build()))
-                {
-                    if (mySqlExecutor.IsConnected(tableDefinition))
-                    {
-                        if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                            .SetTitle("Execute DELETE query?")
-                            .SetMainInstruction("Do you want to execute DELETE query now?")
-                            .SetContent(
-                                "You have decided to remove the item from solution, therefore DELETE FROM query will not be generated for this key anymore, you we can execute DELETE with that key for that last time.")
-                            .WithYesButton(true)
-                            .WithNoButton(false)
-                            .Build()))
-                        {
-                            OnDeletedQuery?.Invoke(entity);
-                            await mySqlExecutor.ExecuteSql(tableDefinition, queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
-                            History.MarkNoSave();
-                        }
-                    }
-                    RemoveKey(entity.Key);
-                    OnKeyDeleted?.Invoke(entity);
-                }
-            }
-            
-            return removed;
+            return ForceRemoveEntity(entity);
         }
         
         public void RedoExecuteDelete(DatabaseEntity entity)
@@ -611,17 +619,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 History.MarkNoSave();
             }
         }
-        
-        public void DoAddKey(DatabaseKey entity)
-        {
-            EnsureKey(entity);
-        }
 
-        public void UndoAddKey(DatabaseKey entity)
-        {
-            RemoveKey(entity);
-        }
-        
         public override bool ForceRemoveEntity(DatabaseEntity entity)
         {
             var indexOfEntity = Entities.GetIndex(entity);
@@ -748,7 +746,6 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 entities[groupIndex].RemoveAt(index);
             }, () =>
             {
-                EnsureKey(entity.Key);
                 var group = byEntryGroups[entity.Key];
                 var groupIndex = Rows.IndexOf(group);
                 entities[groupIndex].Insert(index, entity);
@@ -765,30 +762,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             return true;
         }
 
-        private void RemoveKey(DatabaseKey entity)
-        {
-            if (keys.Remove(entity))
-            {
-                var index = Rows.IndexOf(byEntryGroups[entity]);
-                Rows.RemoveAt(index);
-                entities.RemoveAt(index);
-                byEntryGroups.Remove(entity);
-            }
-        }
-
         private bool ContainsKey(DatabaseKey key)
         {
-            return keys.Contains(key);
-        }
-        
-        private void EnsureKey(DatabaseKey entity)
-        {
-            if (keys.Add(entity))
-            {
-                byEntryGroups[entity] = new DatabaseEntitiesGroupViewModel(entity, GenerateName(entity[0]), () => GenerateNameAsync(entity[0]));
-                Rows.Add(byEntryGroups[entity]);
-                entities.Add(new CustomObservableCollection<DatabaseEntity>());
-            }
+            return byEntryGroups.ContainsKey(key);
         }
 
         private void AddEntities(IReadOnlyList<DatabaseEntity> tableDataEntities)
@@ -879,6 +855,25 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 }
             });
             DoAction(action);
+        }
+
+        protected async Task AskToSave()
+        {
+            if (IsModified)
+            {
+                var result = await messageBoxService.ShowDialog(new MessageBoxFactory<int>()
+                    .SetTitle("Save changes")
+                    .SetMainInstruction("You have unsaved changes. Do you want to save them?")
+                    .SetContent("Changing the rows you see will discard unsaved changes.")
+                    .WithYesButton(0)
+                    .WithNoButton(1)
+                    .WithCancelButton(2)
+                    .Build());
+                if (result == 2)
+                    throw new OperationCanceledException();
+                if (result == 0)
+                    await Save.ExecuteAsync();
+            }
         }
 
         // we're gonna check for duplicate keys before saving the data to prevent data loss
