@@ -120,6 +120,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         }
 
         private IList<DatabaseColumnJson> columns = new List<DatabaseColumnJson>();
+        public ObservableCollection<int> HiddenColumns { get; } = new();
         public ObservableCollection<DatabaseColumnHeaderViewModel> Columns { get; } = new();
         private DatabaseColumnJson? autoIncrementColumn;
 
@@ -573,8 +574,29 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 {
                     var column = new DatabaseColumnHeaderViewModel(c);
                     column.Width = tablePersonalSettings.GetColumnWidth(TableDefinition.Id, column.ColumnIdForUi, c.PreferredWidth ?? 120);
+                    column.IsVisible = tablePersonalSettings.IsColumnVisible(TableDefinition.Id, column.ColumnIdForUi);
                     return AutoDispose(column);
                 }));
+                Columns.Each((col, i) => AutoDispose(col.ToObservable(x => x.IsVisible)
+                    .Subscribe(@is =>
+                    {
+                        if (@is)
+                        {
+                            if (HiddenColumns.Contains(i))
+                            {
+                                HiddenColumns.Remove(i);
+                                tablePersonalSettings.UpdateVisibility(TableDefinition.Id, col.ColumnIdForUi, @is);
+                            }
+                        }
+                        else
+                        {
+                            if (!HiddenColumns.Contains(i))
+                            {
+                                HiddenColumns.Add(i);
+                                tablePersonalSettings.UpdateVisibility(TableDefinition.Id, col.ColumnIdForUi, @is);
+                            }
+                        }
+                    })));
                 Columns.Each(col => col.ToObservable(c => c.Width)
                     .Skip(1)
                     .Throttle(TimeSpan.FromMilliseconds(300))
