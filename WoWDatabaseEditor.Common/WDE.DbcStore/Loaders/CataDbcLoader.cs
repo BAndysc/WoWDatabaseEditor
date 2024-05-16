@@ -99,7 +99,19 @@ internal class CataDbcLoader : BaseDbcLoader
             data.EmoteStore.Add(row.GetUInt(0), row.GetString(1));
         });
         Load("EmotesText.dbc", 0, 1, data.TextEmoteStore);
-        Load("item-sparse.db2", 0, 99, data.ItemStore);
+        Load("item-sparse.db2", row =>
+        {
+            var item = new ItemSparse()
+            {
+                Id = row.GetInt(0),
+                Name = row.GetString(96),
+                RandomSelect = row.GetUShort(108),
+                ItemRandomSuffixGroupId = row.GetUShort(109),
+            };
+            data.ItemSparses.Add(item);
+        });
+        Load("ItemRandomProperties.dbc", 0, 7, data.ItemRandomPropertiesStore);
+        Load("ItemRandomSuffix.dbc", 0, 1, data.ItemRandomSuffixStore);
         Load("Phase.dbc", 0, 1, data.PhaseStore);
         Load("SoundEntries.dbc", 0, 2, data.SoundStore);
         Load("SpellFocusObject.dbc", 0, 1, data.SpellFocusObjectStore);

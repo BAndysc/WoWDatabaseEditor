@@ -25,7 +25,6 @@ public class DbcData
     public Dictionary<long, string> EmoteStateStore { get; } = new();
     public Dictionary<long, string> TextEmoteStore { get; } = new();
     public Dictionary<long, string> AchievementStore { get; } = new();
-    public Dictionary<long, string> ItemStore { get; } = new();
     public Dictionary<long, string> SpellFocusObjectStore { get; } = new();
     public Dictionary<long, string> QuestInfoStore { get; } = new();
     public Dictionary<long, string> CharTitleStore { get; } = new();
@@ -66,6 +65,8 @@ public class DbcData
     public Dictionary<long, string> AdventureJournalStore { get; internal set; } = new();
     public Dictionary<long, string> WorldMapAreaStore { get; internal set; } = new();
     public Dictionary<long, string> ConversationLineStore { get; internal set; } = new();
+    public Dictionary<long, string> ItemRandomPropertiesStore { get; internal set; } = new();
+    public Dictionary<long, string> ItemRandomSuffixStore { get; internal set; } = new();
 
     public List<(string parameter, Dictionary<long, SelectOption> options)> parametersToRegister = new();
     public List<UiTextureKit> UiTextureKits { get; } = new();
@@ -75,6 +76,7 @@ public class DbcData
     public List<GarrMission> Missions { get; } = new();
     public List<AreaEntry> Areas { get; } = new() { new AreaEntry() { Id = 0, Name = "(global)" } };
     public List<MapEntry> Maps { get; } = new();
+    public List<ItemSparse> ItemSparses { get; } = new();
     public List<FactionTemplate> FactionTemplates { get; } = new();
     public List<Faction> Factions { get; } = new();
     public Dictionary<long, string> CharShipmentContainerStore { get; } = new();

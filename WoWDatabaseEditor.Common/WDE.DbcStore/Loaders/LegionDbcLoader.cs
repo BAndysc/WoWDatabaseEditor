@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using WDE.Common.DBC;
 using WDE.Common.DBC.Structs;
@@ -68,7 +69,19 @@ internal class LegionDbcLoader : BaseDbcLoader
         Load("CurrencyTypes.db2", 0, 1, data.CurrencyTypeStore);
         Load("DungeonEncounter.db2", 6, 0, data.DungeonEncounterStore);
         Load("Difficulty.db2", 0, 1, data.DifficultyStore);
-        Load("ItemSparse.db2", 0, 2, data.ItemStore);
+        Dictionary<int, string> temporaryItemNames = new();
+        Load("ItemSparse.db2", row =>
+        {
+            var item = new ItemSparse()
+            {
+                Id = row.GetInt(0),
+                Name = row.GetString(2),
+                RandomSelect = row.GetUShort(34),
+                ItemRandomSuffixGroupId = row.GetUShort(35),
+            };
+            temporaryItemNames[item.Id] = item.Name;
+            data.ItemSparses.Add(item);
+        });
         Load("ItemExtendedCost.db2", row =>
         {
             var id = row.GetUInt(0);
@@ -77,7 +90,7 @@ internal class LegionDbcLoader : BaseDbcLoader
             {
                 var count = row.GetUInt(2, i);
                 var currency = row.GetUInt(5, i);
-                var item = row.GetUInt(1, i);
+                var item = row.GetInt(1, i);
                 var itemsCount = row.GetUShort(3, i);
 
                 if (currency != 0 && count != 0)
@@ -89,7 +102,7 @@ internal class LegionDbcLoader : BaseDbcLoader
                 }
                 if (itemsCount != 0 && item != 0)
                 {
-                    if (!data.ItemStore.TryGetValue(item, out var itemName))
+                    if (!temporaryItemNames.TryGetValue(item, out var itemName))
                         itemName = "item " + item;
 
                     if (itemsCount == 1)
@@ -105,6 +118,8 @@ internal class LegionDbcLoader : BaseDbcLoader
             }
             data.ExtendedCostStore.Add(id, desc.ToString());
         });
+        Load("ItemRandomProperties.db2", 0, 1, data.ItemRandomPropertiesStore);
+        Load("ItemRandomSuffix.db2", 0, 1, data.ItemRandomSuffixStore);
         Load("ItemSet.db2", 0, 1, data.ItemSetStore);
         Load("LFGDungeons.db2", 0, 1, data.LFGDungeonStore);
         Load("chrRaces.db2", 30, 2, data.RaceStore);

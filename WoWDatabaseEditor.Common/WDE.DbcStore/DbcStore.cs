@@ -118,7 +118,6 @@ namespace WDE.DbcStore
         
         public bool IsConfigured { get; private set; }
         public Dictionary<long, string> CurrencyTypeStore { get; internal set;} = new();
-        public Dictionary<long, string> ItemStore { get; set; } = new();
         public Dictionary<long, string> AreaTriggerStore { get; internal set; } = new();
         public Dictionary<long, string> PhaseStore { get; internal set; } = new();
         public Dictionary<long, string> MapStore { get; internal set; } = new();
@@ -186,6 +185,10 @@ namespace WDE.DbcStore
         public IReadOnlyList<IPlayerCondition> PlayerConditions { get; internal set; } = Array.Empty<IPlayerCondition>();
         public Dictionary<int, IPlayerCondition> PlayerConditionsById { get; internal set; } = new();
         public IPlayerCondition? GetPlayerConditionById(int id) => PlayerConditionsById.GetValueOrDefault(id);
+
+        public IReadOnlyList<IItemSparse> ItemSparses { get; internal set; } = Array.Empty<IItemSparse>();
+        public Dictionary<int, ItemSparse> ItemSparsById { get; internal set; } = new();
+        public IItemSparse? GetItemSparseById(int id) => ItemSparsById.GetValueOrDefault(id);
 
         internal void Load()
         {            
@@ -264,7 +267,6 @@ namespace WDE.DbcStore
                     .Where(pair => pair.seatId != 0)
                     .ToDictionary(x => x.seatId, x => (IVehicle)x.veh);
                 store.Maps = data.Maps;
-                store.ItemStore = data.ItemStore;
                 store.MapById = data.Maps.ToDictionary(a => a.Id, a => (IMap)a);
                 store.FactionTemplates = data.FactionTemplates;
                 store.FactionTemplateById = data.FactionTemplates.ToDictionary(a => a.TemplateId, a => (FactionTemplate)a);
@@ -293,6 +295,9 @@ namespace WDE.DbcStore
 
                 store.PlayerConditions = data.PlayerConditions;
                 store.PlayerConditionsById = data.PlayerConditions.ToDictionary(a => a.Id, a => a);
+
+                store.ItemSparses = data.ItemSparses;
+                store.ItemSparsById = data.ItemSparses.ToDictionary(a => a.Id, a => a);
 
                 var currencyCategoryById = data.CurrencyCategories.ToDictionary(x => x.Id, x => x);
                 foreach (var curr in data.CurrencyTypes)
@@ -341,7 +346,8 @@ namespace WDE.DbcStore
                 parameterFactory.Register("FactionTemplateParameter", new FactionTemplateParameter(data.FactionStore, data.FactionTemplateStore), QuickAccessMode.Limited);
                 parameterFactory.Register("DbcSpellParameter", new DbcParameter(data.SpellStore));
                 parameterFactory.Register("CurrencyTypeParameter", new DbcParameter(data.CurrencyTypeStore));
-                parameterFactory.Register("ItemDbcParameter", new DbcParameter(data.ItemStore));
+                parameterFactory.Register("ItemDbcParameter", new ItemSparseParameter(data.ItemSparses));
+                parameterFactory.Register("ItemRandomPropByItemParameter", new ItemRandomSelectParameter(data.ItemSparses));
                 parameterFactory.Register("EmoteParameter", new DbcParameter(data.EmoteStore), QuickAccessMode.Full);
                 parameterFactory.Register("EmoteOneShotParameter", new DbcParameter(data.EmoteOneShotStore));
                 parameterFactory.Register("EmoteStateParameter", new DbcParameter(data.EmoteStateStore));
@@ -369,6 +375,9 @@ namespace WDE.DbcStore
                 parameterFactory.Register("MailTemplateParameter", new DbcParameter(data.MailTemplateStore));
                 parameterFactory.Register("LFGDungeonParameter", new DbcParameter(data.LFGDungeonStore));
                 parameterFactory.Register("ItemSetParameter", new DbcParameter(data.ItemSetStore));
+                parameterFactory.Register("ItemRandomSuffixParameter", new DbcParameter(data.ItemRandomSuffixStore));
+                parameterFactory.Register("ItemRandomPropertyParameter", new DbcParameter(data.ItemRandomPropertiesStore));
+                parameterFactory.Register("ItemRandomPropertySuffixParameter", new ItemRandomPropertySuffixParameter(data.ItemRandomPropertiesStore, data.ItemRandomSuffixStore));
                 parameterFactory.Register("DungeonEncounterParameter", new DbcParameter(data.DungeonEncounterStore));
                 parameterFactory.Register("HolidaysParameter", new DbcParameter(data.HolidaysStore));
                 parameterFactory.Register("WorldSafeLocParameter", new DbcParameter(data.WorldSafeLocsStore));
@@ -1070,6 +1079,67 @@ namespace WDE.DbcStore
         {
             var race = await raceProvider.Value.PickRaces((CharacterRaces)value);
             return ((long)(race ?? 0), race.HasValue);
+        }
+    }
+
+    public class ItemSparseParameter : ParameterNumbered
+    {
+        public ItemSparseParameter(IReadOnlyList<IItemSparse> items)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (var item in items)
+                Items.Add(item.Id, new SelectOption(item.Name));
+        }
+    }
+
+    public class ItemRandomSelectParameter : ParameterNumbered
+    {
+        public ItemRandomSelectParameter(IReadOnlyList<IItemSparse> items)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            Dictionary<ushort, List<IItemSparse>> randomSelect = new();
+            Dictionary<ushort, List<IItemSparse>> randomSuffix = new();
+
+            foreach (var item in items)
+            {
+                if (item.RandomSelect != 0)
+                {
+                    if (!randomSelect.TryGetValue(item.RandomSelect, out var list))
+                    {
+                        list = new List<IItemSparse>();
+                        randomSelect.Add(item.RandomSelect, list);
+                    }
+                    list.Add(item);
+                }
+
+                if (item.ItemRandomSuffixGroupId != 0)
+                {
+                    if (!randomSuffix.TryGetValue(item.ItemRandomSuffixGroupId, out var list))
+                    {
+                        list = new List<IItemSparse>();
+                        randomSuffix.Add(item.ItemRandomSuffixGroupId, list);
+                    }
+                    list.Add(item);
+                }
+            }
+
+            foreach (var (key, value) in randomSuffix.Select(pair => (-(int)pair.Key, pair.Value)).Concat(randomSelect.Select(pair => ((int)pair.Key, pair.Value))))
+            {
+                var name = "Used by " +  string.Join(", ", value.Take(5).Select(x => x.Name)) + (value.Count > 5 ? $" and {value.Count - 5} more items" : "");
+                Items.Add(key, new SelectOption(name));
+            }
+        }
+    }
+
+    public class ItemRandomPropertySuffixParameter : ParameterNumbered
+    {
+        public ItemRandomPropertySuffixParameter(Dictionary<long, string> property, Dictionary<long, string> suffix)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (var (key, value) in property)
+                Items.Add(key, new SelectOption(value));
+            foreach (var (key, value) in suffix)
+                Items.Add(-key, new SelectOption(value));
         }
     }
 }
