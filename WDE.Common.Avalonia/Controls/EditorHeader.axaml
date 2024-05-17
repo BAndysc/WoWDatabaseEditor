@@ -15,14 +15,16 @@
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel Spacing="5">
-          <DockPanel LastChildFill="False">
+          <EditorHeaderPanel>
             <TextBlock Foreground="{TemplateBinding Success, Converter={StaticResource BoolToBrushConverter}}"
                        x:Name="PART_IdTextBlock"
                        FontSize="12"
                        VerticalAlignment="Center"
                        Margin="0,0,5,0" Text="{TemplateBinding Entry, Converter={x:Static ToStringConverter.Instance}}"/>
+
             <TextBlock Foreground="{TemplateBinding Success, Converter={StaticResource BoolToBrushConverter}}"
                        x:Name="PART_DisplayNameTextBlock"
+                       TextTrimming="CharacterEllipsis"
                        FontSize="16"
                        FontWeight="Bold"
                        VerticalAlignment="Center"
@@ -31,7 +33,7 @@
             <ContentControl ClipToBounds="{TemplateBinding ClipToBounds}" Content="{TemplateBinding ToolBarContent}" />
 
             <ContentControl Content="{TemplateBinding RightContent}" DockPanel.Dock="Right"></ContentControl>
-          </DockPanel>
+          </EditorHeaderPanel>
           <ContentControl Content="{TemplateBinding BottomContent}" />
         </StackPanel>
       </ControlTemplate>
