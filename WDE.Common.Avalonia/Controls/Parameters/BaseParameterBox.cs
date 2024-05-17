@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -102,6 +103,8 @@ public abstract class BaseParameterBox : TemplatedControl
         else if (change.Property == ContextProperty)
         {
             UpdateString();
+            UnbindFromContext();
+            BindToContext();
         }
     }
 
@@ -208,5 +211,43 @@ public abstract class BaseParameterBox : TemplatedControl
                 UpdateFloat(refreshStringInProgress.Token).ListenErrors();
             }
         }
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        UnbindFromContext();
+        BindToContext();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        UnbindFromContext();
+    }
+
+    private INotifyPropertyChanged? boundContext;
+
+    private void BindToContext()
+    {
+        if (Context is INotifyPropertyChanged)
+        {
+            boundContext = (INotifyPropertyChanged)Context;
+            boundContext.PropertyChanged += ContextOnPropertyChanged;
+        }
+    }
+
+    private void UnbindFromContext()
+    {
+        if (boundContext != null)
+        {
+            boundContext.PropertyChanged -= ContextOnPropertyChanged;
+            boundContext = null;
+        }
+    }
+
+    private void ContextOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        UpdateString();
     }
 }
