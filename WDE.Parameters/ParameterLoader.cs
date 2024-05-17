@@ -985,9 +985,9 @@ namespace WDE.Parameters
                 if (actors.TryGetValue(conversation.Id, out var actorList))
                 {
                     sb.Append("Actors<");
+                    bool needsComma = false;
                     for (var index = 0; index < actorList.Count; index++)
                     {
-                        var isLast = index == actorList.Count - 1;
                         var actor = actorList[index];
 
                         actorTemplates.TryGetValue(actor.ConversationActorId, out var creatures);
@@ -1000,13 +1000,15 @@ namespace WDE.Parameters
                         if (creatureId == 0)
                             continue;
 
+                        if (needsComma)
+                            sb.Append(", ");
+
                         var creatureName = databaseProvider.GetCachedCreatureTemplate(creatureId)?.Name ?? "(unknown)";
                         sb.Append(creatureName);
                         sb.Append(" (");
                         sb.Append(actor.ConversationActorId);
                         sb.Append(")");
-                        if (!isLast)
-                            sb.Append(", ");
+                        needsComma = true;
                     }
                     sb.Append("> ");
                 }
@@ -1020,6 +1022,23 @@ namespace WDE.Parameters
 
                 Items.Add(conversation.Id, new SelectOption(sb.ToString()));
             }
+        }
+
+        public override string ToString(long key, ToStringOptions options)
+        {
+            if (options.withNumber)
+                return ToString(key);
+
+            if (Items != null && Items.TryGetValue(key, out var option))
+                return option.Name;
+            return key.ToString();
+        }
+
+        public override string ToString(long key)
+        {
+            if (Items != null && Items.TryGetValue(key, out var option))
+                return $"({key}) {option.Name}";
+            return key.ToString();
         }
     }
 }
