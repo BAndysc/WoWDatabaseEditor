@@ -876,7 +876,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     group.OrderByIndices(oldGroupIndices[index]);
                 }
             });
+            var wasSaved = History.IsSaved;
             DoAction(action);
+            if (wasSaved)
+                History.MarkAsSaved();
         }
 
         protected async Task AskToSave()
