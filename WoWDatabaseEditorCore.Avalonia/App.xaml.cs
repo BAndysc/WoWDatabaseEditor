@@ -62,6 +62,7 @@ namespace WoWDatabaseEditorCore.Avalonia
         private ILoggerFactory loggerFactory;
         private ILogDataStore logDataStore;
         private ReportErrorsSink reportErrorsSink;
+        private RestoreFocusAfterEnableChange? restoreFocusAfterEnableChange;
 
         public App()
         {
@@ -317,6 +318,7 @@ namespace WoWDatabaseEditorCore.Avalonia
         
         protected async Task OnInitializedAsync()
         {
+            restoreFocusAfterEnableChange = new RestoreFocusAfterEnableChange();
             this.InitializeModules();
 
             var loadedModules = Container.Resolve<IEnumerable<ModuleBase>>();
