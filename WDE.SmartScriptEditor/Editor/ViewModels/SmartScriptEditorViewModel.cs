@@ -205,7 +205,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             title = "";
             Icon = iconRegistry.GetIcon(item);
             scale = preferences.DefaultScale;
-            
+
+            SupportsNonBreakableLinks = editorFeatures.NonBreakableLinkFlag.HasValue;
+
             On(() => SelectedHighlighter, v =>
             {
                 if (script == null)
@@ -1278,6 +1280,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             NewEventBelowCommand = new AsyncCommand(() => NewEvent(true));
             NewGroupAboveCommand = new AsyncCommand(() => NewGroup(false));
             NewGroupBelowCommand = new AsyncCommand(() => NewGroup(true));
+            ToggleBreakableLinkCommand = new AsyncCommand(async () =>
+            {
+                if (editorFeatures.NonBreakableLinkFlag is { } flag)
+                {
+                    foreach (var e in Events.Where(e => e.IsSelected && e.IsEvent))
+                    {
+                        if ((e.Flags.Value & flag) != 0)
+                            e.Flags.Value &= ~flag;
+                        else
+                            e.Flags.Value |= (long)flag;
+                    }
+                }
+            });
 
             GroupSelectedEventsCommand = new AsyncAutoCommand(async () =>
             {
@@ -1611,6 +1626,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public AsyncCommand NewCommentAboveCommand { get; set; }
         public AsyncCommand NewCommentBelowCommand { get; set; }
+        public AsyncCommand ToggleBreakableLinkCommand { get; set; }
         public AsyncCommand NewActionAboveCommand { get; set; }
         public AsyncCommand NewActionBelowCommand { get; set; }
         public AsyncCommand NewEventAboveCommand { get; set; }
@@ -1627,6 +1643,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand SelectionLeft { get; set; }
         public DelegateCommand SelectAll { get; set; }
 
+        public bool SupportsNonBreakableLinks { get; }
         public bool AnyEventOrActionSelected => AnyEventSelected || AnyActionSelected;
         public bool AnySelected => AnyGroupSelected || AnyEventSelected || AnyActionSelected;
         private bool AnyGlobalVariableSelected => script.GlobalVariables.Any(e => e.IsSelected);

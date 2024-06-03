@@ -24,6 +24,7 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public IParameter<long> ConditionTargetParameter { get; }
         public IParameter<long> EventFlagsParameter => SmartEventFlagParameter.Instance;
         public int TargetConditionId => -1;
+        public int? NonBreakableLinkFlag => null;
 
         public TrinityEditorFeatures(ICurrentCoreVersion coreVersion)
         {
@@ -50,6 +51,7 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public IParameter<long> ConditionTargetParameter { get; }
         public IParameter<long> EventFlagsParameter => SmartEventFlagParameter.Instance;
         public int TargetConditionId => -1;
+        public int? NonBreakableLinkFlag => null;
 
         public AzerothEditorFeatures(ICurrentCoreVersion coreVersion)
         {
@@ -85,5 +87,6 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public IParameter<long> ConditionTargetParameter => current.ConditionTargetParameter;
         public IParameter<long> EventFlagsParameter => current.EventFlagsParameter;
         public int TargetConditionId => current.TargetConditionId;
+        public int? NonBreakableLinkFlag => null;
     }
 }

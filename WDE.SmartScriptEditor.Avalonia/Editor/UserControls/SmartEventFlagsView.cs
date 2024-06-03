@@ -38,6 +38,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         public long ConditionFailedTime { get; }
         public long ConditionFailedOnce { get; }
         public long UpdateTimer { get; }
+        public long NonBreakableLink { get; }
         
         public bool HasValues { get; }
         
@@ -62,6 +63,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             ConditionFailedTime = GetValue(param.Items.FirstOrDefault(x => x.Value.Name.Contains("condition")&& x.Value.Name.Contains("time")));
             ConditionFailedOnce = GetValue(param.Items.FirstOrDefault(x => x.Value.Name.Contains("Condition")&& x.Value.Name.Contains("once")));
             UpdateTimer = GetValue(param.Items.FirstOrDefault(x => x.Value.Name.Contains("timer")));
+            NonBreakableLink = GetValue(param.Items.FirstOrDefault(x => x.Value.Name.Contains("breakable")));
         }
 
         private long GetValue(KeyValuePair<long,SelectOption> pair)
@@ -319,6 +321,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 return "💥";
             if (flag == flagsMapping.UpdateTimer)
                 return "⏱️";
+            if (flag == flagsMapping.NonBreakableLink)
+                return "🔗";
             return "?";
         }
 
