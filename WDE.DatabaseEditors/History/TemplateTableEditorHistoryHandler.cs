@@ -34,11 +34,11 @@ namespace WDE.DatabaseEditors.History
                 {
                     e.Item.OnAction += PushAction;
                     e.Item.OnConditionsChanged += OnConditionsChanged;
-                    PushAction(new DatabaseEntityAddedHistoryAction(e.Item, e.Index, viewModel));
+                    PushAction(new TemplateDatabaseEntityAddedHistoryAction(e.Item, e.Index, viewModel));
                 }
                 else if (e.Type == CollectionEventType.Remove)
                 {
-                    PushAction(new DatabaseEntityRemovedHistoryAction(e.Item, e.Index, viewModel));
+                    PushAction(new TemplateDatabaseEntityRemovedHistoryAction(e.Item, e.Index, viewModel));
                     e.Item.OnAction -= PushAction;
                     e.Item.OnConditionsChanged -= OnConditionsChanged;
                 }

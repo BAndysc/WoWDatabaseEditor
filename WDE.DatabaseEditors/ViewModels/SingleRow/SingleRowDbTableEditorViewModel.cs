@@ -162,7 +162,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public DelegateCommand<SingleRecordDatabaseCellViewModel?> RevertCommand { get; }
         public AsyncAutoCommand<SingleRecordDatabaseCellViewModel?> EditConditionsCommand { get; }
         public DelegateCommand<SingleRecordDatabaseCellViewModel?> SetNullCommand { get; }
-        public DelegateCommand<SingleRecordDatabaseCellViewModel?> DuplicateCommand { get; }
+        public AsyncAutoCommand<SingleRecordDatabaseCellViewModel?> DuplicateCommand { get; }
         public AsyncAutoCommand<SingleRecordDatabaseCellViewModel> OpenParameterWindow { get; }
         
         public AsyncAutoCommand DeleteRowSelectedCommand { get; }
@@ -219,7 +219,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 cell!.ParameterValue!.Revert();
             }, cell => cell != null && cell.CanBeReverted && (cell?.TableField?.IsModified ?? false));
             SetNullCommand = new DelegateCommand<SingleRecordDatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
-            DuplicateCommand = new DelegateCommand<SingleRecordDatabaseCellViewModel?>(Duplicate, vm => vm != null);
+            DuplicateCommand = new AsyncAutoCommand<SingleRecordDatabaseCellViewModel?>(async cell => await Duplicate(cell!.ParentEntity), vm => vm != null);
             EditConditionsCommand = new AsyncAutoCommand<SingleRecordDatabaseCellViewModel?>(EditConditions);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
 
@@ -255,12 +255,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }, () => FocusedRow != null);
             AutoDispose(this.ToObservable(() => FocusedRow).Subscribe(_ => DeleteRowSelectedCommand.RaiseCanExecuteChanged()));
             
-            DuplicateSelectedCommand = new AsyncAutoCommand(async () =>
-            {
-                var duplicate = FocusedRow!.Entity.Clone(DatabaseKey.PhantomKey, false);
-                await SetupPersonalGuidValue(duplicate);
-                ForceInsertEntity(duplicate, FocusedRowIndex.RowIndex + 1);
-            }, () => FocusedRow != null);
+            DuplicateSelectedCommand = new AsyncAutoCommand(async () => await Duplicate(FocusedRow!.Entity), () => FocusedRow != null);
             AutoDispose(this.ToObservable(() => FocusedRow).Subscribe(_ => DuplicateSelectedCommand.RaiseCanExecuteChanged()));
 
             GenerateInsertQueryForSelectedCommand = new DelegateCommand(() =>
@@ -356,6 +351,14 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             ScheduleLoading();
         }
 
+        private void DoUndoableAction(string actionName, Action undo, Action redo)
+        {
+            if (historyHandler == null)
+                redo();
+            else
+                historyHandler.DoAction(new AnonymousHistoryAction(actionName, undo, redo));
+        }
+
         private class FakeGroup : ITableRowGroup
         {
             public event Action<ITableRowGroup, ITableRow>? RowChanged;
@@ -405,7 +408,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public override DatabaseEntity AddRow(DatabaseKey key, int? index = null)
         {
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key, true);
-            ForceInsertEntity(freshEntity, index ?? Entities.Count);
+            index ??= Entities.Count;
+            DoUndoableAction("Add row", () => ForceRemoveEntity(freshEntity), () => ForceInsertEntity(freshEntity, index.Value));
             return freshEntity;
         }
         
@@ -449,7 +453,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 }
             }
             await SetupPersonalGuidValue(freshEntity);
-            ForceInsertEntity(freshEntity, index);
+            DoUndoableAction("Add new row", () =>
+            {
+                ForceRemoveEntity(freshEntity);
+            }, () =>
+            {
+                ForceInsertEntity(freshEntity, index);
+            });
             MultiSelection.Clear();
             MultiSelection.Add(FocusedRowIndex);
         }
@@ -460,13 +470,18 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 view.ParameterValue?.SetNull();
         }
 
-        private void Duplicate(SingleRecordDatabaseCellViewModel? view)
+        private async Task Duplicate(DatabaseEntity entity)
         {
-            if (view != null)
+            var duplicate = entity.Clone(DatabaseKey.PhantomKey, false);
+            await SetupPersonalGuidValue(duplicate);
+            var index = Entities.IndexOf(entity);
+            DoUndoableAction("Duplicate row", () =>
             {
-                var duplicate = view.Parent.Entity.Clone();
-                ForceInsertEntity(duplicate, 0);
-            }
+                ForceRemoveEntity(duplicate);
+            }, () =>
+            {
+                ForceInsertEntity(duplicate, index);
+            });
         }
 
         private async Task EditConditions(SingleRecordDatabaseCellViewModel? view)
@@ -536,7 +551,10 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 if (result == 2)
                     return false;
                 if (result == 0)
-                    await SaveDataNow();
+                {
+                    if (!await SaveDataNow())
+                        return false;
+                }
             }
             beforeLoadSelectedRow = FocusedRow?.Entity?.GenerateKey(TableDefinition);
             // save existing changes
@@ -553,14 +571,17 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return true;
         }
 
-        private async Task SaveDataNow()
+        private async Task<bool> SaveDataNow()
         {
+            if (await ShallSavePreventClosing())
+                return false;
             UpdateSolutionItem();
             solutionManager.Refresh(SolutionItem);
             await mySqlExecutor.ExecuteSql(tableDefinition, await GenerateQuery());
             await sessionService.UpdateQuery(this);
             MaterializePhantomEntities();
             History.MarkAsSaved();
+            return true;
         }
         
         protected override async Task InternalLoadData(DatabaseTableData data)
@@ -612,7 +633,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     }));
             }
 
-            await AsyncAddEntities(data.Entities);
+            AddEntitiesAndFocus(data.Entities);
 
             FocusedRowIndex = new VerticalCursor(0,
                 beforeLoadSelectedRow.HasValue
@@ -681,11 +702,6 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             Rows.RemoveAt(indexOfEntity);
 
             return true;
-        }
-        
-        public async Task<bool> AddEntity(DatabaseEntity entity)
-        {
-            return ForceInsertEntity(entity, Entities.Count);
         }
 
         public override bool ForceInsertEntity(DatabaseEntity entity, int index, bool undoing = false)
@@ -780,6 +796,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         private void OnRowChangedCell(DatabaseEntityViewModel entity, SingleRecordDatabaseCellViewModel cell, ColumnFullName columnName)
         {
+            if (History.IsUndoing)
+                return;
+
             if (columnName.ForeignTable == null && tableDefinition.GroupByKeys.Contains(columnName.ColumnName) && !entity.IsPhantomEntity)
                 ReKey(entity).ListenErrors();
             else
@@ -852,15 +871,16 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             if (Rows.Select((row, index) => (row, index)).Any(pair => pair.row.Entity.GenerateKey(TableDefinition) == key && pair.index != excludeIndex))
                 return true;
 
+            if (removedKeys.Contains(key))
+                return false;
+
             return await databaseTableDataProvider.GetCount(tableDefinition.Id, null, new [] { key }) > 0;
         }
         
-        private async Task AsyncAddEntities(IReadOnlyList<DatabaseEntity> tableDataEntities)
+        private void AddEntitiesAndFocus(IReadOnlyList<DatabaseEntity> tableDataEntities)
         {
             foreach (var entity in tableDataEntities)
-            {
-                await AddEntity(entity);
-            }
+                ForceInsertEntity(entity, Entities.Count);
             focusedRowIndex = VerticalCursor.None;
             if (Rows.Count > 0)
                 FocusedRowIndex = new VerticalCursor(0, 0);

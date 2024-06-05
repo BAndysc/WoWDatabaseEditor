@@ -43,11 +43,9 @@ public class SingleRowTableEditorHistoryHandler : HistoryHandler, IDisposable
             {
                 e.Item.FieldValueChanged += FieldValueChanged;
                 e.Item.OnConditionsChanged += OnConditionsChanged;
-                PushAction(new DatabaseEntityAddedByIndexHistoryAction(e.Item, e.Index, viewModel));
             }
             else if (e.Type == CollectionEventType.Remove)
             {
-                PushAction(new DatabaseEntityRemovedByIndexHistoryAction(e.Item, e.Index, viewModel));
                 e.Item.FieldValueChanged -= FieldValueChanged;
                 e.Item.OnConditionsChanged -= OnConditionsChanged;
             }
@@ -75,7 +73,7 @@ public class SingleRowTableEditorHistoryHandler : HistoryHandler, IDisposable
         }
         PushAction(action);
     }
-        
+
     private void UnbindTableData()
     {
         foreach (var e in viewModel.Entities)
@@ -115,69 +113,5 @@ public class SingleRowFieldCellValueChangedAction : IHistoryAction
     public string GetDescription()
     {
         return "Changed " + columnName;
-    }
-}
-
-
-public class DatabaseEntityAddedByIndexHistoryAction : IHistoryAction
-{
-    private readonly DatabaseEntity entity;
-    private readonly int index;
-    private readonly ViewModelBase viewModel;
-    private readonly DatabaseKey actualKey;
-
-    public DatabaseEntityAddedByIndexHistoryAction(DatabaseEntity entity, int index,
-        ViewModelBase viewModel)
-    {
-        this.entity = entity;
-        this.index = index;
-        this.viewModel = viewModel;
-        actualKey = entity.GenerateKey(viewModel.TableDefinition);
-    }
-        
-    public void Undo()
-    {
-        viewModel.ForceRemoveEntity(viewModel.Entities[index]);
-    }
-
-    public void Redo()
-    {
-        viewModel.ForceInsertEntity(entity, index);
-    }
-
-    public string GetDescription()
-    {
-        return $"Entity {actualKey} added";
-    }
-}
-    
-public class DatabaseEntityRemovedByIndexHistoryAction : IHistoryAction
-{
-    private readonly DatabaseEntity entity;
-    private readonly int index;
-    private readonly ViewModelBase viewModel;
-    private readonly DatabaseKey actualKey;
-
-    public DatabaseEntityRemovedByIndexHistoryAction(DatabaseEntity entity, int index, ViewModelBase viewModel)
-    {
-        this.entity = entity;
-        this.index = index;
-        this.viewModel = viewModel;
-        actualKey = entity.GenerateKey(viewModel.TableDefinition);
-    }
-        
-    public void Undo()
-    {
-        viewModel.ForceInsertEntity(entity, index, true);
-    }
-
-    public void Redo()
-    {
-        viewModel.ForceRemoveEntity(viewModel.Entities[index]);
-    }
-
-    public string GetDescription()
-    {
-        return $"Entity {actualKey} removed";
     }
 }
