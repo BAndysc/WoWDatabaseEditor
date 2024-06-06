@@ -45,6 +45,7 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly ICachedDatabaseProvider databaseProvider;
         private readonly IDbcStore dbcStore;
         private readonly ISpellStore spellStore;
+        private readonly IMapAreaStore mapAreaStore;
         private readonly IWaypointProcessor waypointProcessor;
         private readonly IChatEmoteSoundProcessor chatProcessor;
         private readonly IRandomMovementDetector randomMovementDetector;
@@ -65,10 +66,20 @@ namespace WDE.PacketViewer.Processing.Processors
         private HashSet<uint> activePhases = new();
 
         public bool RequiresSplitUpdateObject => true;
-        
+
+        private struct LastWorldState
+        {
+            public DateTime time;
+            public int zoneId;
+            public int areaId;
+        }
+
+        private LastWorldState? lastWorldState;
+
         public StoryTellerDumper(ICachedDatabaseProvider databaseProvider, 
             IDbcStore dbcStore,
             ISpellStore spellStore,
+            IMapAreaStore mapAreaStore,
             IParameterFactory parameterFactory,
             IWaypointProcessor waypointProcessor,
             IChatEmoteSoundProcessor chatProcessor,
@@ -87,6 +98,7 @@ namespace WDE.PacketViewer.Processing.Processors
             this.databaseProvider = databaseProvider;
             this.dbcStore = dbcStore;
             this.spellStore = spellStore;
+            this.mapAreaStore = mapAreaStore;
             this.waypointProcessor = waypointProcessor;
             this.chatProcessor = chatProcessor;
             this.randomMovementDetector = randomMovementDetector;
@@ -578,6 +590,17 @@ namespace WDE.PacketViewer.Processing.Processors
             return base.Process(basePacket, packet);
         }
 
+        protected override bool Process(PacketBase basePacket, PacketInitWorldStates packet)
+        {
+            lastWorldState = new LastWorldState()
+            {
+                time = basePacket.Time.ToDateTime(),
+                zoneId = packet.ZoneId,
+                areaId = packet.AreaId
+            };
+            return base.Process(basePacket, packet);
+        }
+
         protected override bool Process(PacketBase basePacket, PacketPhaseShift packet)
         {
             StringBuilder sb = new StringBuilder();
@@ -640,8 +663,12 @@ namespace WDE.PacketViewer.Processing.Processors
 
             if (removedPhases.Count > 0)
             {
-                sb.AppendLine();
-                sb.Append("     Removed Phases:      " + removedPhases[0]);
+                if (sb.Length > 0)
+                {
+                    sb.AppendLine();
+                    sb.Append("     ");
+                }
+                sb.Append("Removed Phases:      " + removedPhases[0]);
             }
 
             if (removedPhases.Count > 1)
@@ -651,6 +678,14 @@ namespace WDE.PacketViewer.Processing.Processors
                 sb.Append("                          " + removedPhases[i]);
                 if (i < removedPhases.Count - 1)
                     sb.AppendLine();
+            }
+
+            if (lastWorldState.HasValue)
+            {
+                var zoneName = mapAreaStore.GetAreaById((uint)lastWorldState.Value.zoneId)?.Name;
+                var areaName = mapAreaStore.GetAreaById((uint)lastWorldState.Value.areaId)?.Name;
+                var diff = basePacket.Time.ToDateTime() - lastWorldState.Value.time;
+                sb.Append($"           Last zone: {zoneName} ({lastWorldState.Value.zoneId}) Last area: {areaName} ({lastWorldState.Value.areaId}) ({diff.ToHumanFriendlyString()} ago)");
             }
 
             AppendLine(basePacket, null, sb.ToString());
