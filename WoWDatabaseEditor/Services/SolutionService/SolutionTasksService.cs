@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AsyncAwaitBestPractices.MVVM;
 using WDE.Common;
@@ -122,8 +123,14 @@ namespace WoWDatabaseEditor.Services.SolutionService
                             var command = reduced[i].GenerateCommand();
                             progress.Report(i, reduced.Count, command);
                             var result = await remoteConnectorService.ExecuteCommand(reduced[i]);
-                            if (result.Contains("ERROR") && result.Contains("SQL"))
-                                messageBoxService.SimpleDialog("Error", "Error while executing command: " + command, result).ListenErrors();
+                            if (result.Contains("ERROR:SQL(p)"))
+                            {
+                                var lines = result.Split('\n');
+                                var filteredLines = lines.Where(l => l.StartsWith("ERROR:SQL(p)"))
+                                    .Select(l => l.Substring("ERROR:SQL(p)".Length));
+                                var message = string.Join("\n", filteredLines);
+                                messageBoxService.SimpleDialog("Error", "Error while executing command: " + command, message).ListenErrors();
+                            }
                         }
                     }
                     catch (CouldNotConnectToRemoteServer)
