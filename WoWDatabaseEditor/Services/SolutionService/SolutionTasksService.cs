@@ -122,7 +122,7 @@ namespace WoWDatabaseEditor.Services.SolutionService
                             var command = reduced[i].GenerateCommand();
                             progress.Report(i, reduced.Count, command);
                             var result = await remoteConnectorService.ExecuteCommand(reduced[i]);
-                            if (result.Contains("ERRORS:"))
+                            if (result.Contains("ERROR") && result.Contains("SQL"))
                                 messageBoxService.SimpleDialog("Error", "Error while executing command: " + command, result).ListenErrors();
                         }
                     }
