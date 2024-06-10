@@ -106,7 +106,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             }
         }
         
-        protected override void EndEditing(bool commit = true)
+        protected override void EndEditing(bool commit = true, bool focus = true)
         {
             if (partText != null)
                 partText.IsVisible = true;
@@ -126,8 +126,9 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             adornerLayer = null;
             opened = false;
             editingControl = null;
-            
-            Focus(NavigationMethod.Tab);
+
+            if (focus)
+                Focus(NavigationMethod.Tab);
         }
 
         protected abstract void EndEditingInternal(bool commit);

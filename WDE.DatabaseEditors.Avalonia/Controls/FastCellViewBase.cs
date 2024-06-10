@@ -180,7 +180,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
 
         private bool MoveDown(Key key, KeyModifiers modifiers)
         {
-            return key == Key.Down;
+            return key == Key.Down || key == Key.Tab;
         }
         
         private bool MoveUp(Key key, KeyModifiers modifiers)
@@ -188,7 +188,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             return key == Key.Up;
         }
         
-        protected virtual void EndEditing(bool commit = true) {}
+        protected virtual void EndEditing(bool commit = true, bool focus = true) {}
         
         protected void HandleMoveLeftRightUpBottom(KeyEventArgs args, bool leftRight)
         {
@@ -247,7 +247,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 if (newCell == null)
                     return;
 
-                this.EndEditing();
+                this.EndEditing(focus: false);
                 newCell.Focus(NavigationMethod.Tab);
                 args.Handled = true;
             }
