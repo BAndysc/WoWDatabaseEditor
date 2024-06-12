@@ -171,7 +171,7 @@ namespace WDE.SmartScriptEditor.Models
                             source = "[s=8]" + Source.Readable + "[/s]",
                             targetcoords = "[p]" + Target.GetCoords() + "[/p]",
                             hascoords = Target.X != 0 || Target.Y != 0 || Target.Z != 0 || Target.O != 0,
-                            target_position = "[s=6]" + Target.GetPosition() + "[/s]",
+                            target_position = "[s=9]" + Target.GetPosition() + "[/s]",
                             targetid = Target.Id,
                             sourceid = Source.Id,
                             pram2_m1 = "[p=1]" + (this.GetValueOrDefault(1) - 1) + "[/p]",
