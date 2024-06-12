@@ -21,10 +21,10 @@ namespace WDE.CMMySqlDatabase.Models.Wrath
         [Column("DifficultyEntry1"                            )] public uint    DifficultyEntry1       { get; set; } // mediumint(8) unsigned
         [Column("DifficultyEntry2"                            )] public uint    DifficultyEntry2       { get; set; } // mediumint(8) unsigned
         [Column("DifficultyEntry3"                            )] public uint    DifficultyEntry3       { get; set; } // mediumint(8) unsigned
-        [Column("ModelId1")] public uint    ModelId1               { get; set; } // mediumint(8) unsigned
-        [Column("ModelId2")] public uint    ModelId2               { get; set; } // mediumint(8) unsigned
-        [Column("ModelId3")] public uint    ModelId3               { get; set; } // mediumint(8) unsigned
-        [Column("ModelId4")] public uint    ModelId4               { get; set; } // mediumint(8) unsigned
+        [Column("ModelId1"                                    )] public uint    ModelId1               { get; set; } // mediumint(8) unsigned
+        [Column("ModelId2"                                    )] public uint    ModelId2               { get; set; } // mediumint(8) unsigned
+        [Column("ModelId3"                                    )] public uint    ModelId3               { get; set; } // mediumint(8) unsigned
+        [Column("ModelId4"                                    )] public uint    ModelId4               { get; set; } // mediumint(8) unsigned
         [Column("Faction"                                     )] public ushort  Faction                { get; set; } // smallint(5) unsigned
         [Column("Scale"                                       )] public float   Scale                  { get; set; } // float
         [Column("Family"                                      )] public int   Family                  { get; set; } // tinyint(4)
