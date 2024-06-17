@@ -211,9 +211,9 @@ namespace WDE.DatabaseEditors.Loaders
                         conditionsPerRowIndex = new IList<IConditionLine>[result.Rows];
 
                         List<(int rowIndex, int? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
-                        var sourceGroupColumnIndex = definition.Condition.SourceGroupColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceGroupColumn.Name);
-                        var sourceEntryColumnIndex = definition.Condition.SourceEntryColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceEntryColumn);
-                        var sourceIdColumnIndex = definition.Condition.SourceIdColumn == null ? null : (int?) result.ColumnIndex(definition.Condition.SourceIdColumn);
+                        var sourceGroupColumnIndex = definition.Condition.SourceGroupColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceGroupColumn.Name.ColumnName);
+                        var sourceEntryColumnIndex = definition.Condition.SourceEntryColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceEntryColumn.Value.ColumnName);
+                        var sourceIdColumnIndex = definition.Condition.SourceIdColumn == null ? null : (int?) result.ColumnIndex(definition.Condition.SourceIdColumn.Value.ColumnName);
                         foreach (var row in result)
                         {
                             int? sourceGroup = null, sourceEntry = null, sourceId = null;
@@ -286,7 +286,7 @@ namespace WDE.DatabaseEditors.Loaders
                     if (definition.Condition == null)
                         throw new Exception("only_conditions + no conditions make no sense");
 
-                    var conditionsResult = new ConditionsOnlyDatabaseSource(definition.Condition.SourceGroupColumn?.Name, definition.Condition.SourceEntryColumn, definition.Condition.SourceIdColumn);
+                    var conditionsResult = new ConditionsOnlyDatabaseSource(definition.Condition.SourceGroupColumn?.Name.ColumnName, definition.Condition.SourceEntryColumn?.ColumnName, definition.Condition.SourceIdColumn?.ColumnName);
                     result = conditionsResult;
                     
                     foreach (var key in keys)
@@ -345,9 +345,9 @@ namespace WDE.DatabaseEditors.Loaders
                         {
                             conditionsPerRowIndex = new IList<IConditionLine>[result.Rows];
                             List<(int rowIndex, int? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
-                            var sourceGroupColumnIndex = definition.Condition.SourceGroupColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceGroupColumn.Name);
-                            var sourceEntryColumnIndex = definition.Condition.SourceEntryColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceEntryColumn);
-                            var sourceIdColumnIndex = definition.Condition.SourceIdColumn == null ? null : (int?) result.ColumnIndex(definition.Condition.SourceIdColumn);
+                            var sourceGroupColumnIndex = definition.Condition.SourceGroupColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceGroupColumn.Name.ColumnName);
+                            var sourceEntryColumnIndex = definition.Condition.SourceEntryColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceEntryColumn.Value.ColumnName);
+                            var sourceIdColumnIndex = definition.Condition.SourceIdColumn == null ? null : (int?) result.ColumnIndex(definition.Condition.SourceIdColumn.Value.ColumnName);
                             foreach (var rowIndex in result)
                             {
                                 int? sourceGroup = null, sourceEntry = null, sourceId = null;

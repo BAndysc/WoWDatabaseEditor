@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,10 +24,10 @@ namespace WDE.Common.Services.Processes
     [UniqueProvider]
     public interface IProcessService
     {
-        IProcess RunAndForget(string path, string arguments, string? workingDirectory, bool noWindow,
+        IProcess RunAndForget(string path, IReadOnlyList<string> arguments, string? workingDirectory, bool noWindow,
             params (string, string)[] envVars);
         
-        Task<int> Run(CancellationToken token, string path, string arguments, string? workingDirectory,
+        Task<int> Run(CancellationToken token, string path, IReadOnlyList<string> arguments, string? workingDirectory,
             Action<string>? onOutput,
             Action<string>? onError,
             bool redirectInput,

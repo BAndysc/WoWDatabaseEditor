@@ -77,7 +77,7 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
 
                 if (tableName == definition.Id && definition.Picker != null && parameterNames.IndexOf(definition.Picker) != -1)
                 {
-                    where = where.OrWhere(row => row.Column<long>(definition.TablePrimaryKeyColumnName) == parameterValue);
+                    where = where.OrWhere(row => row.Column<long>(definition.TablePrimaryKeyColumnName!.Value.ColumnName) == parameterValue);
                 }
                 
                 foreach (var (group, column) in tableGroup)
@@ -132,7 +132,7 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                         DatabaseKey key;
                         if (definition.RecordMode == RecordMode.SingleRow)
                         {
-                            key = new DatabaseKey(definition.PrimaryKey.Select(k => Convert.ToInt64(result.Value(rowIndex, result.ColumnIndex(k)))));
+                            key = new DatabaseKey(definition.PrimaryKey.Select(k => Convert.ToInt64(result.Value(rowIndex, result.ColumnIndex(k.ColumnName)))));
                             commad = new DelegateCommand(() =>
                             {
                                 var solutionItem = new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality);
@@ -183,9 +183,9 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                         else
                         {
                             if (tableName == definition.Id)
-                                key = new DatabaseKey(Convert.ToInt64(result.Value(rowIndex, result.ColumnIndex(definition.TablePrimaryKeyColumnName))));
+                                key = new DatabaseKey(Convert.ToInt64(result.Value(rowIndex, result.ColumnIndex(definition.TablePrimaryKeyColumnName!.Value.ColumnName))));
                             else
-                                key = new DatabaseKey(Convert.ToInt64(result.Value(rowIndex, result.ColumnIndex(definition.ForeignTableByName![tableName.Table].ForeignKeys[0]))));
+                                key = new DatabaseKey(Convert.ToInt64(result.Value(rowIndex, result.ColumnIndex(definition.ForeignTableByName![tableName.Table].ForeignKeys[0].ColumnName))));
 
                             if (!added.Add(key))
                                 continue;

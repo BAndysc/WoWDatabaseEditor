@@ -93,6 +93,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             ICurrentCoreVersion currentCoreVersion,
             IUpdateViewModel updateViewModel,
             IVisualStudioManagerViewModel visualStudioManagerViewModel,
+            IEnumerable<IVersionedFilesViewModel> versionedFilesViewModel,
             Func<IFindAnywhereDialogViewModel> findAnywhereCreator)
         {
             DocumentManager = documentManager;
@@ -101,6 +102,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             SessionRestoreService = sessionRestoreService;
             ConnectionsViewModel = connectionsViewModel;
             VisualStudioManagerViewModel = visualStudioManagerViewModel;
+            VersionedFilesViewModel = versionedFilesViewModel.FirstOrDefault();
             this.statusBar = statusBar;
             this.messageBoxService = messageBoxService;
             this.aboutViewModelCreator = aboutViewModelCreator;
@@ -289,6 +291,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         public ICommand OpenSqlDocumentCommand { get; }
 
         public ICommand DownloadUpdateCommand => updateViewModel.InstallPendingCommandUpdate;
+
+        public IVersionedFilesViewModel? VersionedFilesViewModel { get; }
 
         public bool ShowTablesList
         {

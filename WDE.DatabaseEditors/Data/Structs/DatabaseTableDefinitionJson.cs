@@ -28,7 +28,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [SetEquality]
         [JsonProperty(PropertyName = "compatibility")] 
-        public IList<string> Compatibility { get; set; } = System.Array.Empty<string>();
+        public List<string> Compatibility { get; set; } = new List<string>();
         
         [DefaultEquality]
         [JsonProperty(PropertyName = "name")] 
@@ -53,7 +53,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [DefaultEquality]
         [JsonProperty(PropertyName = "table_index_name")]
-        public string TablePrimaryKeyColumnName { get; set; } = "";
+        public ColumnFullName? TablePrimaryKeyColumnName { get; set; }
         
         [DefaultEquality]
         [JsonProperty(PropertyName = "record_mode", DefaultValueHandling = DefaultValueHandling.Include)]
@@ -88,7 +88,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [OrderedEquality]
         [JsonProperty(PropertyName = "sort_by")]
-        public string[]? SortBy { get; set; }
+        public ColumnFullName[]? SortBy { get; set; }
         
         [DefaultEquality]
         [JsonProperty(PropertyName = "picker")]
@@ -98,10 +98,10 @@ namespace WDE.DatabaseEditors.Data.Structs
         [DefaultEquality]
         [JsonProperty(PropertyName = "table_name_source_field")]
         public string? TableNameSource { get; set; }
-        
+
         [OrderedEquality]
         [JsonProperty(PropertyName = "primary_key")]
-        public IList<string> PrimaryKey { get; set; } = null!;
+        public IList<ColumnFullName> PrimaryKey { get; set; } = null!;
 
         [OrderedEquality]
         [JsonProperty(PropertyName = "commands")]
@@ -150,13 +150,13 @@ namespace WDE.DatabaseEditors.Data.Structs
 
         [IgnoreEquality]
         [JsonIgnore]
-        public IList<string> GroupByKeys
+        public IList<ColumnFullName> GroupByKeys
         {
             get
             {
                 if (RecordMode == RecordMode.SingleRow)
                     return PrimaryKey!;
-                return new List<string>(){!string.IsNullOrWhiteSpace(TablePrimaryKeyColumnName) ? TablePrimaryKeyColumnName : PrimaryKey[0]};
+                return new List<ColumnFullName>(){TablePrimaryKeyColumnName.HasValue && !string.IsNullOrWhiteSpace(TablePrimaryKeyColumnName.Value.ColumnName) ? TablePrimaryKeyColumnName.Value : PrimaryKey[0]};
             }
         }
         
@@ -168,8 +168,8 @@ namespace WDE.DatabaseEditors.Data.Structs
         {
             if (PrimaryKey == null || PrimaryKey.Count == 0)
             {
-                if (!string.IsNullOrEmpty(TablePrimaryKeyColumnName))
-                    PrimaryKey = new List<string> {TablePrimaryKeyColumnName};
+                if (TablePrimaryKeyColumnName.HasValue && !string.IsNullOrEmpty(TablePrimaryKeyColumnName.Value.ColumnName))
+                    PrimaryKey = new List<ColumnFullName> {TablePrimaryKeyColumnName.Value};
             }
         }
     }
@@ -228,11 +228,11 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [DefaultEquality]
         [JsonProperty(PropertyName = "source_entry")]
-        public string? SourceEntryColumn { get; set; }
+        public ColumnFullName? SourceEntryColumn { get; set; }
         
         [DefaultEquality]
         [JsonProperty(PropertyName = "source_id")]
-        public string? SourceIdColumn { get; set; }
+        public ColumnFullName? SourceIdColumn { get; set; }
         
         [DefaultEquality]
         [JsonConverter(typeof(ColumnFullNameConverter))]
@@ -248,7 +248,7 @@ namespace WDE.DatabaseEditors.Data.Structs
     public sealed partial class DatabaseConditionColumn
     {
         [DefaultEquality]
-        public string Name { get; set; } = "";
+        public ColumnFullName Name { get; set; } = ColumnFullName.Parse("");
         
         [DefaultEquality]
         public bool IsAbs { get; set; }

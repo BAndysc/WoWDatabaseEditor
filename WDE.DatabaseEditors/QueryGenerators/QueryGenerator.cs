@@ -96,19 +96,19 @@ namespace WDE.DatabaseEditors.QueryGenerators
             return query.Close();
         }
 
-        private static IWhere GenerateWherePrimaryKey(IList<string> keys, ITable table, DatabaseKey key)
+        private static IWhere GenerateWherePrimaryKey(IList<ColumnFullName> keys, ITable table, DatabaseKey key)
         {
             Debug.Assert(keys.Count == key.Count);
 
             if (key.Count == 1)
-                return table.Where(r => r.Column<long>(keys[0]) == key[0]);
+                return table.Where(r => r.Column<long>(keys[0].ColumnName) == key[0]);
             else
             {
-                var where = table.Where(r => r.Column<long>(keys[0]) == key[0]);
+                var where = table.Where(r => r.Column<long>(keys[0].ColumnName) == key[0]);
                 for (int i = 1; i < keys.Count; i++)
                 {
                     int index = i;
-                    where = where.Where(r => r.Column<long>(keys[index]) == key[index]);
+                    where = where.Where(r => r.Column<long>(keys[index].ColumnName) == key[index]);
                 }
 
                 return where;
@@ -136,7 +136,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     if (keys.Count > 1 && keys[0].Count == 1)
                     {
                         foreach (var chunk in keys.Select(k => k[0]).Chunk(128))
-                            table.WhereIn(foreign.ForeignKeys[0], chunk).Delete();
+                            table.WhereIn(foreign.ForeignKeys[0].ColumnName, chunk).Delete();
                     }
                     else
                     {
@@ -150,7 +150,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             if (keys.Count > 1 && keys[0].Count == 1)
             {
                 foreach (var chunk in keys.Select(k => k[0]).Chunk(128))
-                    table.WhereIn(definition.TablePrimaryKeyColumnName, chunk).Delete();
+                    table.WhereIn(definition.TablePrimaryKeyColumnName!.Value.ColumnName, chunk).Delete();
             }
             else
             {
@@ -208,7 +208,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
                 foreach (var sortBy in sortByList)
                 {
-                    var comparisonResult = x.GetCell(new ColumnFullName(null, sortBy))?.CompareTo(y.GetCell(new ColumnFullName(null, sortBy))) ?? 0;
+                    var comparisonResult = x.GetCell(sortBy)?.CompareTo(y.GetCell(sortBy)) ?? 0;
                     if (comparisonResult != 0) 
                         return comparisonResult;
                 }
@@ -283,7 +283,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         var foreignTableDefinition = tableData.TableDefinition.ForeignTableByName![table.Key.Table];
                         var foreignKeys = foreignTableDefinition.ForeignKeys;
                         for (int i = 0; i < foreignKeys.Length; ++i)
-                            newCells[foreignKeys[i]] = entity.GetTypedValueOrThrow<long>(new ColumnFullName(null, tableData.TableDefinition.PrimaryKey![i]));
+                            newCells[foreignKeys[i].ColumnName] = entity.GetTypedValueOrThrow<long>(tableData.TableDefinition.PrimaryKey![i]);
                         foreach (var old in cells)
                             newCells[old.Key] = old.Value;
                         if (foreignTableDefinition.AutofillBuildColumn is { } autofillBuildColumn)
@@ -351,17 +351,17 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 int sourceId = 0;
 
                 if (tableData.TableDefinition.Condition.SourceEntryColumn != null &&
-                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceEntryColumn)) is DatabaseField<long>
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceEntryColumn.Value) is DatabaseField<long>
                         entryCell)
                     sourceEntry = (int) entryCell.Current.Value;
 
                 if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
-                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceGroupColumn.Name)) is DatabaseField<long>
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn.Name) is DatabaseField<long>
                         groupCell)
                     sourceGroup = tableData.TableDefinition.Condition.SourceGroupColumn.Calculate((int)groupCell.Current.Value);
 
                 if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
-                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceIdColumn)) is DatabaseField<long>
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn.Value) is DatabaseField<long>
                         idCell)
                     sourceId = (int) idCell.Current.Value;
 
@@ -390,17 +390,17 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 int sourceId = 0;
 
                 if (tableData.TableDefinition.Condition.SourceEntryColumn != null &&
-                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceEntryColumn)) is DatabaseField<long>
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceEntryColumn.Value) is DatabaseField<long>
                         entryCell)
                     sourceEntry = (int)entryCell.Current.Value;
 
                 if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
-                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceGroupColumn.Name)) is DatabaseField<long>
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn.Name) is DatabaseField<long>
                         groupCell)
                     sourceGroup = tableData.TableDefinition.Condition.SourceGroupColumn.Calculate((int)groupCell.Current.Value);
 
                 if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
-                    entity.GetCell(new ColumnFullName(null, tableData.TableDefinition.Condition.SourceIdColumn)) is DatabaseField<long>
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn.Value) is DatabaseField<long>
                         idCell)
                     sourceId = (int)idCell.Current.Value;
 
@@ -504,8 +504,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 {
                     for (var index = foreign.ForeignKeys.Length - 1; index >= 0; index--)
                     {
-                        var foreignKey = new ColumnFullName(foreign.TableName, foreign.ForeignKeys[index]);
-                        var thisKey = new ColumnFullName(null, definition.PrimaryKey![index]);
+                        var foreignKey = new ColumnFullName(foreign.TableName, foreign.ForeignKeys[index].ColumnName);
+                        var thisKey = definition.PrimaryKey![index];
                         
                         fieldsByTable[new DatabaseTable(definition.DataDatabaseType, foreign.TableName)].Insert(0,
                             new DatabaseField<long>(foreignKey, new ValueHolder<long>(entity.GetTypedValueOrThrow<long>(thisKey), false)));
@@ -524,7 +524,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         .Where(f => f.IsModified)
                         .ToList();
                     
-                    IList<string> groupByKeys = definition.GroupByKeys;
+                    IList<ColumnFullName> groupByKeys = definition.GroupByKeys;
                     string? autoFillBuildColumn = definition.AutofillBuildColumn;
                     if (table.Key != definition.Id)
                     {
@@ -534,9 +534,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         query.Table(table.Key)
                             .InsertIgnore(
                                 definition.ForeignTableByName[table.Key.Table].ForeignKeys
-                                    .Zip(definition.PrimaryKey.Select(x => new ColumnFullName(null, x)))
-                                    .ToDictionary<(string, ColumnFullName), string, object?>(
-                                    key => key.Item1,
+                                    .Zip(definition.PrimaryKey.Select(x => new ColumnFullName(null, x.ColumnName)))
+                                    .ToDictionary<(ColumnFullName, ColumnFullName), string, object?>(
+                                    key => key.Item1.ColumnName,
                                     key => entity.GetTypedValueOrThrow<long>(key.Item2))
                                 );
                     }
@@ -588,9 +588,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
                             query.Table(table.Key)
                                 .InsertIgnore(
                                     definition.ForeignTableByName[table.Key.Table].ForeignKeys
-                                        .Zip(definition.PrimaryKey.Select(k => new ColumnFullName(null, k)))
-                                        .ToDictionary<(string, ColumnFullName), string, object?>(
-                                            key => key.Item1,
+                                        .Zip(definition.PrimaryKey.Select(k => new ColumnFullName(null, k.ColumnName)))
+                                        .ToDictionary<(ColumnFullName, ColumnFullName), string, object?>(
+                                            key => key.Item1.ColumnName,
                                             key => entity.GetTypedValueOrThrow<long>(key.Item2))
                                 );
                             var where = GenerateWherePrimaryKey(primaryKeyColumn, query.Table(table.Key), entity.GenerateKey(definition));
@@ -637,15 +637,15 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
                 var where = table
                     .Where(row =>
-                        row.Column<uint>(foreignKeys[0]) ==
-                        (uint)entity.GetTypedValueOrThrow<long>(new ColumnFullName(null, definition.PrimaryKey![0])));
+                        row.Column<uint>(foreignKeys[0].ColumnName) ==
+                        (uint)entity.GetTypedValueOrThrow<long>(definition.PrimaryKey![0]));
                             
                 for (int i = 1; i < foreignKeys.Length; ++i)
                 {
                     var foreignKey = foreignKeys[i];
-                    var thisKey = new ColumnFullName(null, definition.PrimaryKey![i]);
+                    var thisKey = definition.PrimaryKey![i];
                     where = where.Where(row =>
-                        row.Column<uint>(foreignKey) == (uint)entity.GetTypedValueOrThrow<long>(thisKey));
+                        row.Column<uint>(foreignKey.ColumnName) == (uint)entity.GetTypedValueOrThrow<long>(thisKey));
                 }
 
                 return where;

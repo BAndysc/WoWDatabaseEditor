@@ -46,5 +46,9 @@ namespace WDE.Common.Services.CommandLine
         {
             return GetEnumerator();
         }
+
+        public int Count => arguments.Length;
+
+        public string this[int index] => arguments[index];
     }
 }

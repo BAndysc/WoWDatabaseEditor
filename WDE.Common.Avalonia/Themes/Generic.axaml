@@ -16,6 +16,7 @@
     <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/EditorHeader.axaml"></StyleInclude>
     <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/Parameters/Parameters.axaml" />
     <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/CodeCompletionTextEditor/CodeCompletionTextEditor.axaml" />
+    <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/CoreVersionPicker.axaml" />
     <Style Selector="controls|ParameterValueHolderView">
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
@@ -146,7 +147,7 @@
             <ControlTemplate>
                 <StackPanel Spacing="15" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button IsDefault="True" Classes="primary" MinWidth="90" MinHeight="30" Command="{TemplateBinding AcceptCommand}" Content="{TemplateBinding AcceptText}"></Button>
-                    <Button IsCancel="True" MinWidth="90" MinHeight="30" Command="{TemplateBinding CancelCommand}">Cancel</Button>
+                    <Button IsCancel="True" IsVisible="{TemplateBinding DisplayCancelButton}" MinWidth="90" MinHeight="30" Command="{TemplateBinding CancelCommand}">Cancel</Button>
                 </StackPanel>
             </ControlTemplate>
         </Setter>

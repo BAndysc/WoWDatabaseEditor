@@ -71,12 +71,12 @@ public class DefinitionGeneratorService : IDefinitionGeneratorService
         tableDefinition.Description = $"Here insert short description what is {tableName} for";
         tableDefinition.IconPath = "Icons/document_.png";
         tableDefinition.ReloadCommand = $"reload {tableName}";
-        tableDefinition.TablePrimaryKeyColumnName = primaryKeys.Count > 0
+        tableDefinition.TablePrimaryKeyColumnName = new ColumnFullName(null, primaryKeys.Count > 0
             ? primaryKeys[0].ColumnName
-            : (columns.Count > 0 ? columns[0].ColumnName : "");
+            : (columns.Count > 0 ? columns[0].ColumnName : ""));
         if (tableDefinition.RecordMode != RecordMode.SingleRow)
             tableDefinition.Picker = "Parameter";
-        tableDefinition.PrimaryKey = primaryKeys.Select(c => c.ColumnName).ToList();
+        tableDefinition.PrimaryKey = primaryKeys.Select(c => new ColumnFullName(null, c.ColumnName)).ToList();
         tableDefinition.Groups = new List<DatabaseColumnsGroupJson>()
         {
             new()

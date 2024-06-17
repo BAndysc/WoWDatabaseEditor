@@ -12,7 +12,7 @@ public class DatabaseConditionColumnConverter : JsonConverter
         if (cond.IsAbs)
             writer.WriteValue("abs(" + cond.Name + ")");
         else
-            writer.WriteValue(cond.Name);
+            writer.WriteValue(cond.Name.ToString());
     }
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
@@ -27,12 +27,12 @@ public class DatabaseConditionColumnConverter : JsonConverter
             return new DatabaseConditionColumn()
             {
                 IsAbs = true,
-                Name = value.Substring(4, value.Length - 5)
+                Name = ColumnFullName.Parse(value.Substring(4, value.Length - 5))
             };
 
         return new DatabaseConditionColumn()
         {
-            Name = value
+            Name = ColumnFullName.Parse(value)
         };
     }
 

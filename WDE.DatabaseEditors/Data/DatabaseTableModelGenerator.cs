@@ -55,7 +55,7 @@ namespace WDE.DatabaseEditors.Data
                 int keyIndex = 0;
                 foreach (var name in definition.GroupByKeys)
                 {
-                    if (columns[new ColumnFullName(null, name)] is not DatabaseField<long> field)
+                    if (columns[name] is not DatabaseField<long> field)
                         throw new Exception("Only long keys are supported now");
                     field.Current.Value = key[keyIndex++];
                 }   
@@ -147,7 +147,7 @@ namespace WDE.DatabaseEditors.Data
 
                 key = new DatabaseKey(tableDefinition.GroupByKeys.Select(key =>
                 {
-                    if (columns[new ColumnFullName(null, key)] is DatabaseField<long> field)
+                    if (columns[key] is DatabaseField<long> field)
                         return field.Current.Value;
                     throw new Exception("");
                 }));

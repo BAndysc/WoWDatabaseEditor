@@ -10,6 +10,7 @@ namespace WDE.Common.Managers
         string Title { get; }
         bool Resizeable { get; }
         bool AutoSize => false;
+        void OnWindowOpened() { }
     }
     
     public interface IDialog : IDialogWindowBase

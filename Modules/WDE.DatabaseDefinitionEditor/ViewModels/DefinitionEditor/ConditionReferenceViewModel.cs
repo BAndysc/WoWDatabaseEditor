@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Windows.Input;
 using DynamicData.Binding;
@@ -32,10 +33,17 @@ public partial class ConditionReferenceViewModel : ObservableBase, IDropTarget
     {
         Parent = parent;
         sourceType = json.SourceType;
-        sourceGroupColumn = json.SourceGroupColumn?.Name;
+        if (json.SourceGroupColumn?.Name.ForeignTable != null)
+            throw new Exception("Foreign Table in SourceGroupColumn is not supported (But could be)");
+        if (json.SourceEntryColumn?.ForeignTable != null)
+            throw new Exception("Foreign Table in SourceEntryColumn is not supported (But could be)");
+        if (json.SourceIdColumn?.ForeignTable != null)
+            throw new Exception("Foreign Table in SourceIdColumn is not supported (But could be)");
+
+        sourceGroupColumn = json.SourceGroupColumn?.Name.ColumnName;
         sourceGroupColumnAbs = json.SourceGroupColumn?.IsAbs ?? false;
-        sourceEntryColumn = json.SourceEntryColumn;
-        sourceIdColumn = json.SourceIdColumn;
+        sourceEntryColumn = json.SourceEntryColumn?.ColumnName;
+        sourceIdColumn = json.SourceIdColumn?.ColumnName;
         setColumn = json.SetColumn?.ColumnName;
         if (json.Targets != null)
         {

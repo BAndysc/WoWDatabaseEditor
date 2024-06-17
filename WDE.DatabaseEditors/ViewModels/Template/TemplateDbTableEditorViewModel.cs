@@ -153,11 +153,11 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
             var key = new IDatabaseProvider.ConditionKey(tableDefinition.Condition.SourceType);
             if (tableDefinition.Condition.SourceGroupColumn is {} sourceGroup)
-                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceGroup.Name))));
+                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceGroup.Name)));
             if (tableDefinition.Condition.SourceEntryColumn is { } sourceEntry)
-                key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceEntry)));
+                key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceEntry));
             if (tableDefinition.Condition.SourceIdColumn is { } sourceId)
-                key = key.WithId((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceId)));
+                key = key.WithId((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceId));
 
             var newConditions = await conditionEditService.EditConditions(key, conditionList);
             if (newConditions == null)

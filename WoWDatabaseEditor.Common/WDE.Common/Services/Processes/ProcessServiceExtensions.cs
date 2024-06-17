@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -6,7 +7,7 @@ namespace WDE.Common.Services.Processes
 {
     public static class ProcessServiceExtensions
     {
-        public static async Task<T?> RunAndGetJson<T>(this IProcessService service, string path, string arguments,
+        public static async Task<T?> RunAndGetJson<T>(this IProcessService service, string path, IReadOnlyList<string> arguments,
             string? workingDirectory)
         {
             var output = await service.RunAndGetOutput(path, arguments, workingDirectory);
@@ -17,7 +18,7 @@ namespace WDE.Common.Services.Processes
             return t;
         }
         
-        public static async Task<string?> RunAndGetOutput(this IProcessService service, string path, string arguments, string? workingDirectory)
+        public static async Task<string?> RunAndGetOutput(this IProcessService service, string path, IReadOnlyList<string> arguments, string? workingDirectory)
         {
             StringBuilder sb = new();
             bool any = false;
@@ -31,7 +32,7 @@ namespace WDE.Common.Services.Processes
             return null;
         }
         
-        public static async Task<string?> RunAndGetOutputAndError(this IProcessService service, string path, string arguments, string? workingDirectory)
+        public static async Task<string?> RunAndGetOutputAndError(this IProcessService service, string path, IReadOnlyList<string> arguments, string? workingDirectory)
         {
             StringBuilder sb = new();
             bool any = false;

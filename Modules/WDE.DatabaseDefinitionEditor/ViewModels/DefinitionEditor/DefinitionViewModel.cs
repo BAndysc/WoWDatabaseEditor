@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,10 +25,10 @@ namespace WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor;
 public partial class DefinitionViewModel : ObservableBase, IDropTarget
 {
     private readonly DefinitionEditorViewModel parent;
+    private readonly IVersionedFilesService versionedFilesService;
     public DefinitionStubViewModel DefinitionStub { get; }
 
-    //[Notify] private IList<string> compatibility = System.Array.Empty<string>();
-    public List<CoreVersionViewModel> Compatibility { get; }
+    [Notify] private IReadOnlyList<string> compatibility = System.Array.Empty<string>();
     [Notify] private string name = "";
     [Notify] private string singleSolutionName = "";
     [Notify] private string multiSolutionName = "";
@@ -48,7 +49,7 @@ public partial class DefinitionViewModel : ObservableBase, IDropTarget
     [Notify] private string? autofillBuildColumn = null;
     [Notify] private GuidType? autoKeyValue;
     
-    public string SourceFile { get; }
+    public FileHandle SourceFile { get; }
     
     public ObservableCollectionExtended<ForeignTableViewModel> ForeignTables { get; } = new ObservableCollectionExtended<ForeignTableViewModel>();
     [Notify] private ForeignTableViewModel? selectedForeignTable;
@@ -77,8 +78,6 @@ public partial class DefinitionViewModel : ObservableBase, IDropTarget
     
     [Notify] private string? iconPath;
 
-    public string CompatibilityString => string.Join(", ", Compatibility.Where(x => x.IsChecked).Select(x => x.Tag));
-    
     public ObservableCollectionExtended<DatabaseSourceColumnViewModel> DatabaseSourceColumns { get; } = new();
 
     public ObservableCollectionExtended<ColumnValueTypeViewModel> AllParameters { get; }
@@ -105,28 +104,25 @@ public partial class DefinitionViewModel : ObservableBase, IDropTarget
     
     public event Action? OnDataChanged;
     
-    public DefinitionViewModel(DefinitionEditorViewModel parent,
+    public DefinitionViewModel(IVersionedFilesService versionedFilesService,
+        DefinitionEditorViewModel parent,
         DatabaseTableDefinitionJson model,
         DefinitionStubViewModel stub)
     {
         this.parent = parent;
+        this.versionedFilesService = versionedFilesService;
         DefinitionStub = stub;
-        SourceFile = model.AbsoluteFileName;
+        SourceFile = versionedFilesService.OpenFile(new FileInfo(model.AbsoluteFileName));
         AllParameters = parent.AllParameters;
-        Compatibility = parent.AllCoreVersions.Select(x => new CoreVersionViewModel(x)).ToList();
-        foreach (var core in Compatibility)
-        {
-            if (model.Compatibility.Contains(core.Tag))
-                core.IsChecked = true;
-            core.ToObservable(x => x.IsChecked)
-                .SubscribeAction(_ => RaisePropertyChanged(nameof(CompatibilityString)));
-        }
+        Compatibility = model.Compatibility;
         name = model.Name;
         singleSolutionName = model.SingleSolutionName;
         multiSolutionName = model.MultiSolutionName;
         description = model.Description;
         tableName = model.TableName;
-        tablePrimaryKeyColumnName = model.TablePrimaryKeyColumnName;
+        if (model.TablePrimaryKeyColumnName.HasValue && model.TablePrimaryKeyColumnName.Value.ForeignTable != null)
+            throw new Exception("Error: TablePrimaryKeyColumnName cannot have ForeignTable set!");
+        tablePrimaryKeyColumnName = model.TablePrimaryKeyColumnName?.ColumnName ?? "";
         recordMode = model.RecordMode;
         dataDatabaseType = model.DataDatabaseType;
         isOnlyConditionsTable = model.IsOnlyConditionsTable;
@@ -135,7 +131,14 @@ public partial class DefinitionViewModel : ObservableBase, IDropTarget
         iconPath = model.IconPath;
         reloadCommand = model.ReloadCommand;
         if (model.SortBy != null)
-            SortBy.AddRange(model.SortBy.Select(col => new SortByViewModel(this, col)));
+        {
+            SortBy.AddRange(model.SortBy.Select(col =>
+            {
+                if (col.ForeignTable != null)
+                    throw new Exception("Non null foreign table in SortBy column! This could be supported if there is a need for it.");
+                return new SortByViewModel(this, col.ColumnName);
+            }));
+        }
         picker = string.IsNullOrEmpty(model.Picker)
             ? null
             : AllParameters.FirstOrDefault(x => x.ParameterName == model.Picker) ?? ColumnValueTypeViewModel.FromValueType(model.Picker, true);
@@ -156,9 +159,14 @@ public partial class DefinitionViewModel : ObservableBase, IDropTarget
         
         autofillBuildColumn = model.AutofillBuildColumn;
         autoKeyValue = model.AutoKeyValue;
-        
+
         if (model.PrimaryKey != null)
-           CustomPrimaryKey.AddRange(model.PrimaryKey.Select(x => new CustomPrimaryKeyViewModel(this, x)));
+           CustomPrimaryKey.AddRange(model.PrimaryKey.Select(x =>
+           {
+               if (x.ForeignTable != null)
+                   throw new Exception("Error: CustomPrimaryKey cannot have ForeignTable set!");
+               return new CustomPrimaryKeyViewModel(this, x.ColumnName);
+           }));
         
         On(() => TablePrimaryKeyColumnName, _ => RebuildColumnPreview());
         On(() => RecordMode, _ => RebuildColumnPreview());
@@ -417,7 +425,7 @@ public partial class DefinitionViewModel : ObservableBase, IDropTarget
                 }
             }
 
-            vm.IsPrimaryKey = tableDefinition?.PrimaryKey?.Contains(definition.DbColumnName) ?? false;
+            vm.IsPrimaryKey = tableDefinition?.PrimaryKey?.Contains(definition.DbColumnFullName) ?? false;
         }
         // that will cause the very fast tree view to be refresehed
         vm.ToObservable().SubscribeAction(_ => OnDataChanged?.Invoke());

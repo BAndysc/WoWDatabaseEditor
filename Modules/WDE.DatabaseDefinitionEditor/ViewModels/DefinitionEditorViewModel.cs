@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -18,6 +19,7 @@ using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Types;
 using WDE.Common.Utils;
@@ -41,6 +43,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
     public readonly IParameterFactory ParameterFactory;
     private readonly IDefinitionExporterService exporterService;
     private readonly IMessageBoxService messageBoxService;
+    private readonly IVersionedFilesService versionedFilesService;
     private readonly List<DefinitionStubViewModel> allDefinitions = new();
 
     public ObservableCollectionExtended<DefinitionStubViewModel> Definitions { get; } = new();
@@ -166,6 +169,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
         IDefinitionEditorSettings settings,
         IDefinitionGeneratorService generatorService,
         IMetaColumnViewModelFactory metaColumnFactory,
+        IVersionedFilesService versionedFilesService,
         IWindowManager windowManager)
     {
         RawDefinitionDocument = rawDefinitionDocument;
@@ -176,6 +180,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
         this.ParameterFactory = parameterFactory;
         this.exporterService = exporterService;
         this.messageBoxService = messageBoxService;
+        this.versionedFilesService = versionedFilesService;
         ShowIntroTip = !settings.IntroShown;
         settings.IntroShown = true;
         
@@ -253,6 +258,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
             definition.FileName = Path.GetRelativePath(Environment.CurrentDirectory, resultFile);
             
             File.WriteAllText(resultFile, Serialize(definition));
+            File.WriteAllText(resultFile + ".old", "");
 
             var definitionVm = new DefinitionStubViewModel(definition);
             JustAddedSource.Definitions.Add(definitionVm);
@@ -285,6 +291,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
             emptyDefinition.FileName = Path.GetRelativePath(Environment.CurrentDirectory, resultFile);
             
             File.WriteAllText(resultFile, Serialize(emptyDefinition));
+            File.WriteAllText(resultFile + ".old", "");
 
             var definitionVm = new DefinitionStubViewModel(emptyDefinition);
             JustAddedSource.Definitions.Add(definitionVm);
@@ -313,7 +320,8 @@ public partial class DefinitionEditorViewModel : ObservableBase
     public void Save(DefinitionViewModel definition)
     {
         var exported = exporterService.Export(definition);
-        File.WriteAllText(definition.SourceFile, Serialize(exported));
+        versionedFilesService.WriteAllText(definition.SourceFile, Serialize(exported));
+        versionedFilesService.MarkModified(definition.SourceFile);
         definition.DefinitionStub.Definition = exported;
     }
     
@@ -384,7 +392,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
             return false;
         }
 
-        var tableVm = new DefinitionViewModel(this, json, definition);
+        var tableVm = new DefinitionViewModel(versionedFilesService, this, json, definition);
         await tableVm.LoadDatabaseColumns();
 
         if (cancel.IsCancellationRequested)
@@ -422,7 +430,18 @@ public partial class DefinitionEditorViewModel : ObservableBase
                         var of = og.Fields[j];
                         if (tf != of)
                         {
-                            LOG.LogWarning("At index " + i + "/" + j + " there is a diff");
+                            LOG.LogWarning(new StringBuilder().Append("At index ")
+                                .Append(i)
+                                .Append($" ({exported.Groups[i].Name})")
+                                .Append("/")
+                                .Append(j)
+                                .Append($" ({tf.DbColumnName})")
+                                .Append(" there is a diff (")
+                                .Append(Path.GetRelativePath(Environment.CurrentDirectory, json.AbsoluteFileName))
+                                .AppendLine(")")
+                                .AppendLine("Original: " + JsonConvert.SerializeObject(of))
+                                .Append("Exported: " + JsonConvert.SerializeObject(tf))
+                                .ToString());
                         }
                     }                    
                 }
@@ -432,7 +451,9 @@ public partial class DefinitionEditorViewModel : ObservableBase
         }
         else
         {
-            File.WriteAllText(definition.Definition.AbsoluteFileName, Serialize(exported));
+            var fh = versionedFilesService.OpenFile(new FileInfo(definition.Definition.AbsoluteFileName));
+            versionedFilesService.WriteAllText(fh, Serialize(exported));
+            // versionedFilesService.StageFile(fh); <-- don't stage here, stage only if the user explicitly saves
             ItemsDemo.Add(new DemoItemGroup(tableVm));
             SelectedTable = tableVm;
             UpdateRawDefinition();

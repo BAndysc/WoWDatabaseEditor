@@ -86,9 +86,9 @@ namespace WDE.DatabaseDefinitionEditor.ViewModels
 
                     if (column.ForeignTable == null)
                     {
-                        if (dbDefinition.PrimaryKey && !(value.PrimaryKey?.Contains(column.DbColumnName) ?? false))
+                        if (dbDefinition.PrimaryKey && !(value.PrimaryKey?.Contains(column.DbColumnFullName) ?? false))
                             raport.AppendLine($" [ WARN  ] Column {table.Key}.{column.DbColumnName} should be marked as primary key!");
-                        else if (!dbDefinition.PrimaryKey && (value.PrimaryKey?.Contains(column.DbColumnName) ?? false))
+                        else if (!dbDefinition.PrimaryKey && (value.PrimaryKey?.Contains(column.DbColumnFullName) ?? false))
                             raport.AppendLine($" [ WARN  ] Column {table.Key}.{column.DbColumnName} marked as primary key, but is not!");   
                     }
                 }

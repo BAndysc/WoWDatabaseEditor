@@ -12,7 +12,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonProperty(PropertyName = "foreign_key")]
         [OrderedEquality]
-        public string[] ForeignKeys { get; set; }
+        public ColumnFullName[] ForeignKeys { get; set; }
 
         [DefaultEquality]
         [JsonProperty(PropertyName = "autofill_build_column")]

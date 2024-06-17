@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -41,7 +42,7 @@ namespace WoWDatabaseEditorCore.Services.Processes
             public event Action<int>? OnExit;
         }
         
-        public IProcess RunAndForget(string path, string arguments, string? workingDirectory, bool noWindow,
+        public IProcess RunAndForget(string path, IReadOnlyList<string> arguments, string? workingDirectory, bool noWindow,
             params (string, string)[] envVars)
         {
             var startInfo = new ProcessStartInfo(path, arguments);
@@ -61,7 +62,7 @@ namespace WoWDatabaseEditorCore.Services.Processes
             return new ProcessData(process);
         }
         
-        public Task<int> Run(CancellationToken token, string path, string arguments, string? workingDirectory, Action<string>? onOutput,
+        public Task<int> Run(CancellationToken token, string path, IReadOnlyList<string> arguments, string? workingDirectory, Action<string>? onOutput,
             Action<string>? onError, bool redirectInput, out StreamWriter inputWriter,
             params (string, string)[] envVars)
         {

@@ -73,7 +73,7 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
         List<long>? values = null;
         foreach (var groupBy in (foreign?.ForeignKeys ?? definition.GroupByKeys))
         {
-            int index = condition.Columns.IndexIf(x => x.Equals(groupBy, StringComparison.InvariantCultureIgnoreCase));
+            int index = condition.Columns.IndexIf(x => x.Equals(groupBy.ColumnName, StringComparison.InvariantCultureIgnoreCase));
             if (index == -1)
                 return false;
             var value = condition.Values[index];
@@ -141,7 +141,7 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
         if (defi == null)
             return false;
 
-        var keyIndices = defi.GroupByKeys.Select(key => query.Columns.IndexOf(key)).ToList();
+        var keyIndices = defi.GroupByKeys.Select(key => query.Columns.IndexOf(key.ColumnName)).ToList();
         if (keyIndices.Count != defi.GroupByKeys.Count)
             return false;
 

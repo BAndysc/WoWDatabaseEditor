@@ -85,19 +85,24 @@ namespace WDE.PacketViewer.PacketParserIntegration
             }
         }
 
-        private string GetConfigurationString(ParserConfiguration config, DumpFormatType dumpType, int? customVersion)
+        private List<string> GetConfigurationString(ParserConfiguration config, DumpFormatType dumpType, int? customVersion)
         {
-            var configuration = string.Join(" ", propertiesToConfig
+            var configuration = propertiesToConfig
                 .Values
                 .Select(tuple => (tuple.getter(ref config), tuple.defaults, tuple.key))
                 .Where(tuple => tuple.defaults != tuple.Item1)
-                .Select(tuple => $"--{tuple.key} \"{tuple.Item1}\""));
+                .SelectMany(tuple => new[] { $"--{tuple.key}", tuple.Item1 })
+                .ToList();
 
             if (customVersion.HasValue)
-                configuration += $" --ClientBuild {customVersion.Value}";
+            {
+                configuration.Add("--ClientBuild");
+                configuration.Add(customVersion.Value.ToString());
+            }
 
-            var args = $"{configuration} --DumpFormat {(int) dumpType}";
-            return args;
+            configuration.Add("--DumpFormat");
+            configuration.Add(((int) dumpType).ToString());
+            return configuration;
         }
 
         private class LivePacketParser : ILivePacketParser
@@ -134,11 +139,14 @@ namespace WDE.PacketViewer.PacketParserIntegration
             await AcceptLicenseOrThrow();
             var args = GetConfigurationString(config, dumpType, null);
             var executable = path;
-            args += " --stdin true --stdout true";
+            args.Add("--stdin");
+            args.Add("true");
+            args.Add("--stdout");
+            args.Add("true");
             if (Path.GetExtension(executable) == ".dll")
             {
                 executable = "dotnet";
-                args = path + " " + args;
+                args.Insert(0, path);
             }
 
             var parser = new LivePacketParser();

@@ -24,7 +24,7 @@ public class SingleRowTableEditorHistoryHandler : HistoryHandler, IDisposable
         this.viewModel = viewModel;
         keys = new HashSet<ColumnFullName>();
         foreach (var key in viewModel.TableDefinition.GroupByKeys)
-            keys.Add(new ColumnFullName(null, key));
+            keys.Add(key);
         BindTableData();
     }
 
@@ -55,7 +55,7 @@ public class SingleRowTableEditorHistoryHandler : HistoryHandler, IDisposable
     private void FieldValueChanged(DatabaseEntity entity, ColumnFullName columnName, Action<IValueHolder> undo, Action<IValueHolder> redo)
     {
         var index = viewModel.Entities.IndexOf(entity);
-        if (entity.Phantom || !(columnName.ForeignTable == null && viewModel.TableDefinition.GroupByKeys.Contains(columnName.ColumnName)))
+        if (entity.Phantom || !(columnName.ForeignTable == null && viewModel.TableDefinition.GroupByKeys.Contains(columnName)))
             PushAction(new SingleRowFieldCellValueChangedAction(viewModel, index, columnName, undo, redo));
     }
 

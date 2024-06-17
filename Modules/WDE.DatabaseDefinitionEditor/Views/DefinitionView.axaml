@@ -19,23 +19,7 @@
         <controls:DatabaseTableCompletionBox Database="{CompiledBinding DataDatabaseType}" TableName="{CompiledBinding TableName}" /> 
 
         <TextBlock ToolTip.Tip="This table is compatible with following cores">Compatibility:</TextBlock>
-        <CompletionComboBox Items="{CompiledBinding Compatibility}">
-            <CompletionComboBox.ItemTemplate>
-                <DataTemplate DataType="definitionEditor:CoreVersionViewModel">
-                    <CheckBox IsChecked="{CompiledBinding IsChecked}">
-                        <DockPanel>
-                            <WdeImage Image="{CompiledBinding  Icon}" Width="16" Height="16" Margin="0,0,5,0" />
-                            <TextBlock Text="{CompiledBinding  Tag}" />
-                        </DockPanel>
-                    </CheckBox>
-                </DataTemplate>
-            </CompletionComboBox.ItemTemplate>
-            <CompletionComboBox.ButtonItemTemplate>
-                <DataTemplate DataType="definitionEditor:CoreVersionViewModel">
-                    <TextBlock Text="{CompiledBinding #Root.((definitionEditor:DefinitionViewModel)DataContext).CompatibilityString}" />
-                </DataTemplate>
-            </CompletionComboBox.ButtonItemTemplate>
-        </CompletionComboBox>
+        <CoreVersionPicker Cores="{CompiledBinding Compatibility}" />
 
         <TextBlock xml:space="preserve" ToolTip.Tip="The display mode of this editor. Template is a vertical view and can be used for tables with single column primary key, i.e. creature_template.
 
