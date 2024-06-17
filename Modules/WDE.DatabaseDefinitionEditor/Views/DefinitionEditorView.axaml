@@ -9,6 +9,7 @@
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
              xmlns:controls="clr-namespace:WDE.DatabaseDefinitionEditor.Views.Controls"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditorView"
              Background="{DynamicResource SlightlyHighlightedBackground}"
@@ -38,12 +39,12 @@
                                 <controls:DatabaseTableCompletionBox
                                     Database="{CompiledBinding ImportTableDatabaseType}"
                                     TableName="{CompiledBinding ImportTableName}"/>
-                                <Button Command="{CompiledBinding ImportTableCommand}">Import</Button>
+                                <Button Content="Import" Click="OnButtonImportClick" />
                             </StackPanel>
                         </Flyout>
                     </ButtonImage.Flyout>
                 </ButtonImage>
-                <ButtonImage ToolTip.Tip="Create an empty table" Image="Icons/icon_new.png" Command="{CompiledBinding CreateEmptyTableCommand}" />
+                <ButtonImage ToolTip.Tip="Create an empty table" Image="Icons/icon_new.png" Click="OnButtonCreateEmptyClick" />
             </ToolbarPanel>
             <controls:OnReleaseListBox ItemsSource="{CompiledBinding Definitions}"
                               Margin="5,0,5,5"

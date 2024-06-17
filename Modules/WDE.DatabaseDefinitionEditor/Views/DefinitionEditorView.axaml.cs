@@ -2,6 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
@@ -71,6 +74,35 @@ public partial class DefinitionEditorView : UserControl
             ignoreNextSelectionEvent = 2;
             TabControl.SelectedItem = RawJsonTab;
             noUpdateJson = false;
+        }
+    }
+
+    // for some reason, on Windows, opening a save dialog from a flyout causes a hang. This firstly closes a popup thus preventing the hang
+    private void OnButtonImportClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button b)
+        {
+            var popup = b.FindLogicalAncestorOfType<Popup>();
+            if (popup != null)
+                popup.IsOpen = false;
+            if (DataContext is DefinitionEditorViewModel vm)
+            {
+                Dispatcher.UIThread.Post(() => vm.ImportTableCommand.Execute(null));
+            }
+        }
+    }
+
+    private void OnButtonCreateEmptyClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button b)
+        {
+            var popup = b.FindLogicalAncestorOfType<Popup>();
+            if (popup != null)
+                popup.IsOpen = false;
+            if (DataContext is DefinitionEditorViewModel vm)
+            {
+                Dispatcher.UIThread.Post(() => vm.CreateEmptyTableCommand.Execute(null));
+            }
         }
     }
 }
