@@ -55,6 +55,7 @@ namespace Updater
             if (FindOldFiles())
             {
                 PrintError(null, "There are some .old files in the editor directory. It means you have some custom changes to the editor files. Commit them or delete manually and run the update.exe again");
+                Console.ReadKey();
                 return;
             }
 
