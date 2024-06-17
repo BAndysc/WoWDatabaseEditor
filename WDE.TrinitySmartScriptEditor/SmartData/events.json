@@ -1608,8 +1608,7 @@
         "parameters": [
             {
                 "name": "Minimum heal",
-                "type": "Parameter",
-                "required": true
+                "type": "Parameter"
             },
             {
                 "name": "Maximum heal",
