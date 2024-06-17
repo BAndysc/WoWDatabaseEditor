@@ -16,6 +16,7 @@ using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Factories;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Services;
@@ -221,7 +222,7 @@ public class Program
                         (definition.ForeignTable == null ||
                          definition.ForeignTable.FirstOrDefault(f => f.TableName == table.Key) is { } x &&
                          !(x.ForeignKeys?.Contains(
-                             column) ?? false)))
+                             new ColumnFullName(null, column)) ?? false)))
                     {
 
                         var top = FuzzySharp.Process.ExtractTop(column,
