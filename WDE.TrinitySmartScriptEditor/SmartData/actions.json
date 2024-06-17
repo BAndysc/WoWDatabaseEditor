@@ -233,13 +233,13 @@
         "description": "{source}: Cast spell [spell={pram1value}] {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
         "target_types": "Unit",
         "implicit_source": "SMART_TARGET_SELF",
+        "flags": "Async",
         "description_rules": [
             {
                 "description": "{source}: Cast spell [spell={pram1value}] {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram3value:choose(0):| with {pram3} trigger flags}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
                 "condition": "(action.param(2) & 2) == 2"
             }
-        ],
-        "flags": "Async"
+        ]
     },
     {
         "id": 12,
@@ -1278,8 +1278,8 @@
         "do_not_propose_target": true,
         "target_types": "Player",
         "implicit_source": "SMART_TARGET_SELF",
-        "usable_with_script_types": "Creature,TimedActionList",
-        "flags": "Async"
+        "flags": "Async",
+        "usable_with_script_types": "Creature,TimedActionList"
     },
     {
         "id": 53,
@@ -1738,8 +1738,8 @@
         "target_types": "GameObject,Unit,Position",
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true,
-        "usable_with_script_types": "Creature,TimedActionList",
-        "flags": "Async"
+        "flags": "Async",
+        "usable_with_script_types": "Creature,TimedActionList"
     },
     {
         "id": 70,
@@ -2062,13 +2062,13 @@
         "description": "{pram4value:choose(0):|Random {pram4} }{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on self",
         "target_types": "Unit",
         "target_is_source": true,
+        "flags": "Async",
         "description_rules": [
             {
                 "description": "{pram4value:choose(0):|Random {pram4} }{source}: Cast spell [spell={pram1value}] {pram1}{pram2value:choose(0):| with flags {pram2}} on self{pram3value:choose(0):| with {pram3} trigger flags}",
                 "condition": "(action.param(2) & 2) == 2"
             }
-        ],
-        "flags": "Async"
+        ]
     },
     {
         "id": 86,
@@ -2361,7 +2361,6 @@
     {
         "id": 97,
         "name": "SMART_ACTION_JUMP_TO_POS",
-        "tags": ["TrinityWrath", "TrinityCata", "Azeroth"],
         "name_readable": "Jump to pos",
         "parameters": [
             {
@@ -2374,6 +2373,11 @@
             }
         ],
         "description": "{source}: Jump to pos {targetcoords} with speed XY {pram1} and speed Z {pram2}",
+        "tags": [
+            "TrinityWrath",
+            "TrinityCata",
+            "Azeroth"
+        ],
         "target_types": "Creature",
         "uses_target_position": true,
         "target_is_source": true
@@ -2381,7 +2385,6 @@
     {
         "id": 97,
         "name": "SMART_ACTION_JUMP_TO_POS_MASTER",
-        "tags": ["TrinityMaster"],
         "name_readable": "Jump to pos",
         "parameters": [
             {
@@ -2411,10 +2414,12 @@
             }
         ],
         "description": "{source}: Jump to pos {target_position} with speed XY {pram1}, speed Z {pram2}{pram4value:choose(0):| and gravity {pram3}}",
+        "tags": [
+            "TrinityMaster"
+        ],
         "target_types": "Creature",
-        "uses_target_position": true,
-        "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true,
         "flags": "Async"
     },
     {
@@ -3174,13 +3179,13 @@
         ],
         "target_types": "Unit",
         "implicit_source": "SMART_TARGET_ACTION_INVOKER",
+        "flags": "Async",
         "description_rules": [
             {
                 "description": "{source}: Cast spell [spell={pram1value}] {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram3value:choose(0):| with {pram3} trigger flags}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
                 "condition": "(action.param(2) & 2) == 2"
             }
-        ],
-        "flags": "Async"
+        ]
     },
     {
         "id": 135,
@@ -4006,9 +4011,11 @@
         "name": "SMART_ACTION_META_AWAIT",
         "name_readable": "Wait for previous",
         "description": "       Wait for previous",
+        "tags": [
+            "TrinityMaster"
+        ],
         "implicit_source": "SMART_TARGET_NONE",
         "flags": "Await",
-        "tags": ["TrinityMaster"],
         "usable_with_script_types": "TimedActionList"
     },
     {
