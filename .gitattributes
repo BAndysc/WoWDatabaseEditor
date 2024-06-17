@@ -3,6 +3,9 @@
 ###############################################################################
 * text=auto
 
+# Jsons should always be normalized to LF
+*.json text eol=lf
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
