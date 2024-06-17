@@ -167,7 +167,7 @@ namespace Updater
 
         private static bool FindOldFiles()
         {
-            foreach (var fileName in Directory.EnumerateFiles(Environment.CurrentDirectory, "*.old"))
+            foreach (var fileName in Directory.EnumerateFiles(Environment.CurrentDirectory, "*.old", SearchOption.AllDirectories))
             {
                 var regularFileName = fileName.Substring(0, fileName.Length - 4);
                 if (!File.Exists(regularFileName))
