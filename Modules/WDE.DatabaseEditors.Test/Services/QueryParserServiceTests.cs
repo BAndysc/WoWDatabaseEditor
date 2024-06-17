@@ -33,7 +33,7 @@ public class QueryParserServiceTests
             DataDatabaseType = DataDatabaseType.Hotfix,
             TableName = "table",
             RecordMode = RecordMode.SingleRow,
-            PrimaryKey = new List<string>() { "spawnId", "spawnType" },
+            PrimaryKey = new List<ColumnFullName>() { new ColumnFullName(null,  "spawnId"), new ColumnFullName(null, "spawnType") },
             Groups = new List<DatabaseColumnsGroupJson>()
             {
                 new DatabaseColumnsGroupJson()
