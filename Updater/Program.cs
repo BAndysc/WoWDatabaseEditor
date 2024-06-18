@@ -56,6 +56,7 @@ namespace Updater
             {
                 PrintError(null, "There are some .old files in the editor directory. It means you have some custom changes to the editor files. Commit them or delete manually and run the update.exe again");
                 Console.ReadKey();
+                LaunchWowDatabaseEditor(executable, args.Concat(new[]{"--skip-update"}).ToArray());
                 return;
             }
 

@@ -66,8 +66,9 @@ namespace BaseDesktopLoader
         public static bool BeforeBuildApp(string[] args)
         {
             FixCurrentDirectory();
-            if (ProgramBootstrap.TryLaunchUpdaterIfNeeded(args))
-                return false;
+            if (!args.Contains("--skip-update"))
+                if (ProgramBootstrap.TryLaunchUpdaterIfNeeded(args))
+                    return false;
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             SafeFireAndForgetExtensions.SetDefaultExceptionHandling(x =>
             {
