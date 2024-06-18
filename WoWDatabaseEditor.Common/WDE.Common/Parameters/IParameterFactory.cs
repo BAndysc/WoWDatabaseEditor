@@ -20,7 +20,7 @@ namespace WDE.Common.Parameters
         bool IsRegisteredLong(string? type);
         bool IsRegisteredString(string? type);
         bool IsRegisteredFloat(string? type);
-        T Register<T>(string key, T parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None) where T : IParameter<long>;
+        T Register<T>(string key, T parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None, bool overrideExisting = false) where T : IParameter<long>;
         void Register(string key, IParameter<string> parameter);
         void Updated(IParameter parameter);
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
@@ -20,15 +21,41 @@ namespace WDE.SmartScriptEditor.Data
 
         private readonly ISmartDataJsonProviderAsync jsonProvider;
         private readonly ISmartDataSerializationProvider serializationProvider;
+        private readonly IMainThread mainThread;
         private readonly IMessageBoxService messageBoxService;
+
+        public event Action? DefinitionsChanged;
 
         public SmartRawDataProviderAsync(ISmartDataJsonProviderAsync jsonProvider,
             ISmartDataSerializationProvider serializationProvider,
+            IMainThread mainThread,
             IMessageBoxService messageBoxService)
         {
             this.jsonProvider = jsonProvider;
             this.serializationProvider = serializationProvider;
+            this.mainThread = mainThread;
             this.messageBoxService = messageBoxService;
+            jsonProvider.SourceFilesChanged += OnSourceFilesChanged;
+        }
+
+        private IDisposable? pendingRefreh;
+
+        private void OnSourceFilesChanged()
+        {
+            void RefreshJsons()
+            {
+                actions = null;
+                events = null;
+                targets = null;
+                eventsGroups = null;
+                actionsGroups = null;
+                targetsGroups = null;
+                pendingRefreh = null;
+                DefinitionsChanged?.Invoke();
+            }
+
+            pendingRefreh?.Dispose();
+            pendingRefreh = mainThread.Delay(RefreshJsons, TimeSpan.FromSeconds(0.5));
         }
 
         public async Task<IReadOnlyList<SmartGenericJsonData>> GetEvents()
@@ -72,7 +99,7 @@ namespace WDE.SmartScriptEditor.Data
                 targetsGroups = DeserializeGroups(await jsonProvider.GetTargetsGroupsJson(), "targets_groups.json");
             return targetsGroups;
         }
-        
+
         private List<SmartGenericJsonData> DeserializeData(string json, string fileName)
         {
             try

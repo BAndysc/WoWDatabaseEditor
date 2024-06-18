@@ -12,6 +12,7 @@ namespace WDE.SmartScriptEditor.Data
         Task<string> GetEventsGroupsJson();
         Task<string> GetActionsGroupsJson();
         Task<string> GetTargetsGroupsJson();
+        event Action? SourceFilesChanged;
     }
 
     public interface ISmartRawDataProviderAsync
@@ -22,6 +23,7 @@ namespace WDE.SmartScriptEditor.Data
         Task<IReadOnlyList<SmartGroupsJsonData>> GetEventsGroups();
         Task<IReadOnlyList<SmartGroupsJsonData>> GetActionsGroups();
         Task<IReadOnlyList<SmartGroupsJsonData>> GetTargetsGroups();
+        event Action? DefinitionsChanged;
     }
  
     public interface ISmartDataProviderAsync
@@ -32,6 +34,7 @@ namespace WDE.SmartScriptEditor.Data
         Task<IReadOnlyList<SmartGroupsJsonData>> GetEventsGroups();
         Task<IReadOnlyList<SmartGroupsJsonData>> GetActionsGroups();
         Task<IReadOnlyList<SmartGroupsJsonData>> GetTargetsGroups();
+        event Action? DefinitionsChanged;
     }
 
     public interface ISmartTypeListProvider

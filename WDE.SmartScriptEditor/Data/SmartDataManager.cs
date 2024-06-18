@@ -4,8 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using WDE.Common.Database;
+using WDE.Common.Managers;
 using WDE.Common.Modules;
 using WDE.Common.Parameters;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Editor;
@@ -59,7 +61,8 @@ namespace WDE.SmartScriptEditor.Data
 
         public SmartDataManager(ISmartDataProviderAsync provider, 
             IEditorFeatures editorFeatures,
-            IParameterFactory parameterFactory)
+            IParameterFactory parameterFactory,
+            IStatusBar statusBar)
         {
             this.provider = provider;
             this.editorFeatures = editorFeatures;
@@ -68,13 +71,25 @@ namespace WDE.SmartScriptEditor.Data
             allData[SmartType.SmartAction] = new ReactiveProperty<IReadOnlyList<SmartGenericJsonData>>(new List<SmartGenericJsonData>());
             allData[SmartType.SmartEvent] = new ReactiveProperty<IReadOnlyList<SmartGenericJsonData>>(new List<SmartGenericJsonData>());
             allData[SmartType.SmartTarget] = allData[SmartType.SmartSource] = new ReactiveProperty<IReadOnlyList<SmartGenericJsonData>>(new List<SmartGenericJsonData>());
+
+            provider.DefinitionsChanged += () =>
+            {
+                statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Smart script definitions reloaded"));
+                Initialize().ListenErrors();
+            };
         }
 
         public async Task Initialize()
         {
-            Load(SmartType.SmartEvent, await provider.GetEvents());
-            Load(SmartType.SmartAction, await provider.GetActions());
-            Load(SmartType.SmartTarget, await provider.GetTargets());
+            var events = await provider.GetEvents();
+            var actions = await provider.GetActions();
+            var targets = await provider.GetTargets();
+            smartIdData.Clear();
+            smartNameData.Clear();
+            defaults.Clear();
+            Load(SmartType.SmartEvent, events);
+            Load(SmartType.SmartAction, actions);
+            Load(SmartType.SmartTarget, targets);
             foreach (var (key, value) in smartIdData)
                 RegisterDynamicParameters(key, value.Values);
         }
@@ -96,11 +111,10 @@ namespace WDE.SmartScriptEditor.Data
                         continue; // SmartTarget will register its parameters, so SmartSource doesn't have to do it again
 
                     string key = $"{editorFeatures.Name}_{type}_{data.Name}_{index}";
-                    if (!parameterFactory.IsRegisteredLong(key))
-                        parameterFactory.Register(key,
-                            param.Type == "FlagParameter"
-                                ? new FlagParameter() {Items = param.Values}
-                                : new Parameter() {Items = param.Values});
+                    parameterFactory.Register(key,
+                        param.Type == "FlagParameter"
+                            ? new FlagParameter() {Items = param.Values}
+                            : new Parameter() {Items = param.Values}, overrideExisting: true);
 
                     param.Type = key;
                     data.Parameters[index] = param;
@@ -181,6 +195,13 @@ namespace WDE.SmartScriptEditor.Data
 
         private void Load(SmartType type, IEnumerable<SmartGenericJsonData> data)
         {
+            if (type == SmartType.SmartEvent)
+                maxIdEvent = 0;
+            else if (type == SmartType.SmartAction)
+                maxIdAction = 0;
+            else if (type == SmartType.SmartTarget)
+                maxIdTarget = 0;
+
             List<SmartGenericJsonData> list = new List<SmartGenericJsonData>();
             foreach (SmartGenericJsonData d in data)
             {

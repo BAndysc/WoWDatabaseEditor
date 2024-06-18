@@ -101,9 +101,13 @@ namespace WDE.Parameters
             return type == "FloatParameterFloat";
         }
 
-        public T Register<T>(string key, T parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None) where T : IParameter<long>
+        public T Register<T>(string key, T parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None, bool overrideExisting = false) where T : IParameter<long>
         {
-            parameters.Add(key, parameter);
+            if (overrideExisting)
+                parameters[key] = parameter;
+            else
+                parameters.Add(key, parameter);
+
             if (pendingObservables.TryGetValue(key, out var pending))
                 pending.Publish(parameter);
             if (pendingLongObservables.TryGetValue(key, out var pending2))

@@ -17,4 +17,10 @@ public interface IItemStore
     ICurrencyType? GetCurrencyTypeById(uint id);
 
     IItemSparse? GetItemSparseById(int id);
+    //
+    // IReadOnlyList<IItemRandomProperty> RandomProperties { get; }
+    // IItemRandomProperty? GetRandomPropertyById(uint id);
+    //
+    // IReadOnlyList<IItemRandomSuffix> RandomSuffixes { get; }
+    // IItemRandomSuffix? GetRandomSuffixById(uint id);
 }

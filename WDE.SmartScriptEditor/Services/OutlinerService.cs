@@ -117,22 +117,25 @@ public class OutlinerService : IOutlinerService
         this.iconRegistry = iconRegistry;
         this.nameRegistry = nameRegistry;
         this.eventAggregator = eventAggregator;
-        eventInspectors = new SmartScriptType?[dataManager.MaxId(SmartType.SmartEvent)+1, editorFeatures.EventParametersCount.IntCount];
-        actionInspectors = new SmartScriptType?[dataManager.MaxId(SmartType.SmartAction)+1, editorFeatures.ActionParametersCount.IntCount];
-        targetInspectors = new SmartScriptType?[dataManager.MaxId(SmartType.SmartTarget)+1, editorFeatures.TargetParametersCount.IntCount];
+        eventInspectors = new SmartScriptType?[0, editorFeatures.EventParametersCount.IntCount];
+        actionInspectors = new SmartScriptType?[0, editorFeatures.ActionParametersCount.IntCount];
+        targetInspectors = new SmartScriptType?[0, editorFeatures.TargetParametersCount.IntCount];
 
         dataManager.GetAllData(SmartType.SmartEvent)
-            .SubscribeAction(x => ProcessData(x, eventInspectors));
+            .SubscribeAction(x => ProcessData(x, dataManager.MaxId(SmartType.SmartEvent)+1, ref eventInspectors));
         
         dataManager.GetAllData(SmartType.SmartAction)
-            .SubscribeAction(x => ProcessData(x, actionInspectors));
+            .SubscribeAction(x => ProcessData(x, dataManager.MaxId(SmartType.SmartAction)+1, ref actionInspectors));
         
         dataManager.GetAllData(SmartType.SmartTarget)
-            .SubscribeAction(x => ProcessData(x, targetInspectors));
+            .SubscribeAction(x => ProcessData(x, dataManager.MaxId(SmartType.SmartTarget)+1, ref targetInspectors));
         
-        void ProcessData(IReadOnlyList<SmartGenericJsonData> list, SmartScriptType?[,] dest)
+        void ProcessData(IReadOnlyList<SmartGenericJsonData> list, int maxId, ref SmartScriptType?[,] dest)
         {
-            Array.Clear(dest);
+            if (dest.GetLength(0) < maxId)
+                dest = new SmartScriptType?[maxId, dest.GetLength(1)];
+            else
+                Array.Clear(dest);
             foreach (var data in list)
             {
                 if (data.Parameters == null)

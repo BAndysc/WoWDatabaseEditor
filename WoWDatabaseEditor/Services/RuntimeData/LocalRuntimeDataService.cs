@@ -12,6 +12,32 @@ namespace WoWDatabaseEditorCore.Services.RuntimeData;
 [SingleInstance]
 public class LocalRuntimeDataService : IRuntimeDataService
 {
+    private class DirectoryWatcher : IDirectoryWatcher
+    {
+        private FileSystemWatcher watcher;
+
+        public DirectoryWatcher(string path)
+        {
+            watcher = new FileSystemWatcher(path);
+            watcher.Changed += (sender, args) => OnChanged?.Invoke(args.ChangeType, args.FullPath);
+            watcher.EnableRaisingEvents = true;
+            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+        }
+
+        public void Dispose()
+        {
+            watcher.EnableRaisingEvents = false;
+            watcher.Dispose();
+        }
+
+        public event Action<WatcherChangeTypes, string>? OnChanged;
+    }
+
+    public IDirectoryWatcher WatchDirectory(string path)
+    {
+        return new DirectoryWatcher(path);
+    }
+
     public async Task<string> ReadAllText(string path)
     {
         try

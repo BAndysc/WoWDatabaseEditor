@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using WDE.Module.Attributes;
 
@@ -12,6 +13,12 @@ public interface IRuntimeDataService
     Task<byte[]> ReadAllBytes(string path);
     Task<IReadOnlyList<string>> GetAllFiles(string directory, string searchPattern);
     Task<bool> Exists(string path);
+    IDirectoryWatcher WatchDirectory(string path);
+}
+
+public interface IDirectoryWatcher : System.IDisposable
+{
+    event Action<WatcherChangeTypes, string>? OnChanged;
 }
 
 public class DataMissingException : Exception
