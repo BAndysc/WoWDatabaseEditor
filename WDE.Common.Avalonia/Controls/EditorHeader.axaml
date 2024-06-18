@@ -20,7 +20,8 @@
                        x:Name="PART_IdTextBlock"
                        FontSize="12"
                        VerticalAlignment="Center"
-                       Margin="0,0,5,0" Text="{TemplateBinding Entry, Converter={x:Static ToStringConverter.Instance}}"/>
+                       Background="Transparent"
+                       Padding="0,0,5,0" Text="{TemplateBinding Entry, Converter={x:Static ToStringConverter.Instance}}"/>
 
             <TextBlock Foreground="{TemplateBinding Success, Converter={StaticResource BoolToBrushConverter}}"
                        x:Name="PART_DisplayNameTextBlock"
@@ -28,7 +29,8 @@
                        FontSize="16"
                        FontWeight="Bold"
                        VerticalAlignment="Center"
-                       Margin="0,0,10,0" Text="{TemplateBinding DisplayName}"/>
+                       Background="Transparent"
+                       Padding="0,0,10,0" Text="{TemplateBinding DisplayName}"/>
 
             <ContentControl ClipToBounds="{TemplateBinding ClipToBounds}" Content="{TemplateBinding ToolBarContent}" />
 
