@@ -15,7 +15,7 @@
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
         <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
     </UserControl.Resources>
-    <TabControl>
+    <TabControl SelectedIndex="{CompiledBinding SelectedTabIndex}">
         <TabItem Header="Definition generator">
             <Grid ColumnDefinitions="200,10,*" RowDefinitions="*,10,Auto" DataContext="{CompiledBinding Definitions}">
                 <DockPanel LastChildFill="True">
@@ -29,7 +29,7 @@
                 <GridSplitter Grid.Column="1" Classes="vertical" />
                 <avaloniaEdit:TextEditor Grid.Column="2"
                                          IsEnabled="{CompiledBinding IsLoading, Converter={StaticResource InverseBoolConverter}}"
-                                         SyntaxHighlighting="Json" 
+                                         AvalonEditExtra.SyntaxExtension="json"
                                          Document="{CompiledBinding Definition, Converter={StaticResource DocumentConverter}}" 
                                          BorderThickness="0"
                                          ShowLineNumbers="True"

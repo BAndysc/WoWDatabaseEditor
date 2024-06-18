@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using Prism.Commands;
 using Prism.Events;
 using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.Documents;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Types;
 using WDE.Common.Utils;
@@ -26,6 +29,7 @@ public partial class FancyEditorsTablesToolGroupViewModel : ObservableBase, ITab
     private readonly ITableOpenService tableOpenService;
     private readonly IEventAggregator eventAggregator;
     private readonly IMessageBoxService messageBoxService;
+    private readonly ITableDefinitionEditorService definitionEditorService;
     private List<TableItemViewModel> allTables = new();
     private string searchText = "";
     [Notify] private TableItemViewModel? selectedTable;
@@ -44,15 +48,19 @@ public partial class FancyEditorsTablesToolGroupViewModel : ObservableBase, ITab
 
     public ObservableCollection<TableItemViewModel> FilteredTables { get; } = new();
 
+    public ICommand EditDefinitionCommand { get; }
+
     public FancyEditorsTablesToolGroupViewModel(ITableDefinitionProvider definitionProvider,
         ISolutionItemProvideService rawTableSolutionItemProviderService,
         ITableOpenService tableOpenService,
         IEventAggregator eventAggregator,
-        IMessageBoxService messageBoxService)
+        IMessageBoxService messageBoxService,
+        ITableDefinitionEditorService definitionEditorService)
     {
         this.tableOpenService = tableOpenService;
         this.eventAggregator = eventAggregator;
         this.messageBoxService = messageBoxService;
+        this.definitionEditorService = definitionEditorService;
         foreach (var defi in definitionProvider.Definitions)
         {
             allTables.Add(new TableItemViewModel(defi.TableName, defi));
@@ -73,7 +81,13 @@ public partial class FancyEditorsTablesToolGroupViewModel : ObservableBase, ITab
             }
         }
         allTables.Sort((a, b) => String.Compare(a.TableName, b.TableName, StringComparison.Ordinal));
-        
+
+        EditDefinitionCommand = new DelegateCommand<TableItemViewModel>(item =>
+        {
+            if (item.Definition != null)
+                definitionEditorService.EditDefinition(item.Definition.AbsoluteFileName);
+        }, item => item != null && item.Definition != null);
+
         On(() => SearchText, search =>
         {
             FilteredTables.Clear();
