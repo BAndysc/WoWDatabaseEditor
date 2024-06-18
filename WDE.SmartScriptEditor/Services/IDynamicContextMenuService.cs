@@ -121,12 +121,30 @@ public class DynamicContextMenuService : IDynamicContextMenuService
                 {
                     command = GenerateOpenScriptCommand(menuItem);
                 }
+                else if (menuItem.Command == SmartContextMenuCommand.NegateValue)
+                {
+                    command = GenerateNegateValueCommand(menuItem);
+                }
                 else
                     command = new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon), _ => {}, _ => false);
                 
                 menus.Add(new Entry(command, shouldShow));
             }
         }
+    }
+
+    private NamedDelegateCommand<SmartScriptEditorViewModel> GenerateNegateValueCommand(SmartContextMenuData menuItem)
+    {
+        return new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon), vm =>
+        {
+            var selectedActionIndex = vm.FirstSelectedActionIndex;
+            if (selectedActionIndex.eventIndex == -1 || selectedActionIndex.actionIndex == -1)
+                return;
+
+            var selectedAction = vm.Events[selectedActionIndex.eventIndex].Actions[selectedActionIndex.actionIndex];
+            var value = selectedAction.GetParameter(menuItem.EntryFromParameter).Value;
+            selectedAction.GetParameter(menuItem.EntryFromParameter).Value = value == 0 ? 1 : 0;
+        });
     }
 
     private NamedDelegateCommand<SmartScriptEditorViewModel> GenerateOpenScriptCommand(SmartContextMenuData menuItem)

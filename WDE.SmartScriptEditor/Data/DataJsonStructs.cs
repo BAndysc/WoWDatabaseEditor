@@ -174,7 +174,8 @@ namespace WDE.SmartScriptEditor.Data
         /// </summary>
         AddEventIfAura,
         OpenScript,
-        AddAction
+        AddAction,
+        NegateValue
     }
 
     [Equatable]
