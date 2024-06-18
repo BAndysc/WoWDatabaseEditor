@@ -175,7 +175,7 @@ namespace WDE.SmartScriptEditor.Data
         AddEventIfAura,
         OpenScript,
         AddAction,
-        NegateValue
+        InvertBoolParameter
     }
 
     [Equatable]
@@ -192,6 +192,19 @@ namespace WDE.SmartScriptEditor.Data
         [DefaultEquality]
         [JsonProperty(PropertyName = "to", DefaultValueHandling = DefaultValueHandling.Include)]
         public int To { get; set; }
+
+        [DefaultEquality]
+        [JsonProperty(PropertyName = "negate_value")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public SmartContextMenuCopyParameterFlags Flags { get; set; }
+    }
+
+    [Flags]
+    public enum SmartContextMenuCopyParameterFlags
+    {
+        None = 0,
+        InvertBool = 1,
+        NegateValue = 2,
     }
 
     [Equatable]

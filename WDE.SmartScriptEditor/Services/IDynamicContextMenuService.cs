@@ -121,9 +121,9 @@ public class DynamicContextMenuService : IDynamicContextMenuService
                 {
                     command = GenerateOpenScriptCommand(menuItem);
                 }
-                else if (menuItem.Command == SmartContextMenuCommand.NegateValue)
+                else if (menuItem.Command == SmartContextMenuCommand.InvertBoolParameter)
                 {
-                    command = GenerateNegateValueCommand(menuItem);
+                    command = GenerateInvertBoolParameterCommand(menuItem);
                 }
                 else
                     command = new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon), _ => {}, _ => false);
@@ -133,7 +133,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
         }
     }
 
-    private NamedDelegateCommand<SmartScriptEditorViewModel> GenerateNegateValueCommand(SmartContextMenuData menuItem)
+    private NamedDelegateCommand<SmartScriptEditorViewModel> GenerateInvertBoolParameterCommand(SmartContextMenuData menuItem)
     {
         return new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, menuItem.Icon == null ? null : new ImageUri(menuItem.Icon), vm =>
         {
@@ -185,6 +185,10 @@ public class DynamicContextMenuService : IDynamicContextMenuService
                     
                     var destParam = newAction.GetParameter(param.To);
                     destParam.Value = param.Const ?? selectedAction.GetParameter(param.From!.Value).Value;
+                    if (param.Flags.HasFlagFast(SmartContextMenuCopyParameterFlags.NegateValue))
+                        destParam.Value = -destParam.Value;
+                    if (param.Flags.HasFlagFast(SmartContextMenuCopyParameterFlags.InvertBool))
+                        destParam.Value = destParam.Value == 0 ? 1 : 0;
                 }
             }
             vm.Events[selectedActionIndex.eventIndex].Actions.Insert(selectedActionIndex.actionIndex + 1, newAction); // +1 to add below
@@ -215,6 +219,10 @@ public class DynamicContextMenuService : IDynamicContextMenuService
                     
                     var destParam = @event.GetParameter(param.To);
                     destParam.Value = param.Const ?? selectedAction.GetParameter(param.From!.Value).Value;
+                    if (param.Flags.HasFlagFast(SmartContextMenuCopyParameterFlags.NegateValue))
+                        destParam.Value = -destParam.Value;
+                    if (param.Flags.HasFlagFast(SmartContextMenuCopyParameterFlags.InvertBool))
+                        destParam.Value = destParam.Value == 0 ? 1 : 0;
                 }
             }
             vm.Events.Insert(selectedActionIndex.eventIndex + 1, @event); // +1 to add below
