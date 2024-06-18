@@ -256,9 +256,9 @@ public partial class DefinitionEditorViewModel : ObservableBase
             
             definition.AbsoluteFileName = resultFile;
             definition.FileName = Path.GetRelativePath(Environment.CurrentDirectory, resultFile);
-            
-            File.WriteAllText(resultFile, Serialize(definition));
-            File.WriteAllText(resultFile + ".old", "");
+
+            var handle = versionedFilesService.OpenFile(new FileInfo(resultFile));
+            versionedFilesService.WriteAllText(handle, Serialize(definition));
 
             var definitionVm = new DefinitionStubViewModel(definition);
             JustAddedSource.Definitions.Add(definitionVm);
@@ -289,9 +289,9 @@ public partial class DefinitionEditorViewModel : ObservableBase
             emptyDefinition.TableName = Path.GetFileNameWithoutExtension(resultFile);
             emptyDefinition.AbsoluteFileName = resultFile;
             emptyDefinition.FileName = Path.GetRelativePath(Environment.CurrentDirectory, resultFile);
-            
-            File.WriteAllText(resultFile, Serialize(emptyDefinition));
-            File.WriteAllText(resultFile + ".old", "");
+
+            var handle = versionedFilesService.OpenFile(new FileInfo(resultFile));
+            versionedFilesService.WriteAllText(handle, Serialize(emptyDefinition));
 
             var definitionVm = new DefinitionStubViewModel(emptyDefinition);
             JustAddedSource.Definitions.Add(definitionVm);
