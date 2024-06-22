@@ -169,15 +169,16 @@ namespace WDE.PacketViewer.PacketParserIntegration
             var path = GetPacketParserPathOrThrow();
             await AcceptLicenseOrThrow();
 
-            var args = GetConfigurationString(config, dumpType, customVersion) + $" \"{input}\"";
+            var args = GetConfigurationString(config, dumpType, customVersion);
+            args.Add(input);
 
             var executable = path;
             if (Path.GetExtension(executable) == ".dll")
             {
                 executable = "dotnet";
-                args = path + " " + args;
+                args.Insert(0, path);
             }
-            LOG.LogInformation("Running {@executable} {@args}", executable, args);
+            LOG.LogInformation("Running {@executable} {@args}", executable, string.Join(" ", args));
             var processStartInfo = new ProcessStartInfo(executable, args);
             processStartInfo.WorkingDirectory = Path.GetDirectoryName(path)!;
             processStartInfo.UseShellExecute = false;
