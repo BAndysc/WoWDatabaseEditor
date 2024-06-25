@@ -22,8 +22,8 @@ public class StandaloneDefinitionEditorViewModel : ObservableBase, IWindowViewMo
     
     public ICommand CloseWindow { get; }
     
-    public int DesiredWidth => 1024;
-    public int DesiredHeight => 768;
+    public int DesiredWidth => 1280;
+    public int DesiredHeight => 1000;
     public string Title => "Table definitions editor";
     public bool Resizeable => true;
     public ImageUri? Icon => new ImageUri("Icons/icon_edit.png");

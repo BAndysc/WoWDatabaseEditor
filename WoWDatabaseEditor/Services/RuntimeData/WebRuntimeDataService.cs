@@ -46,7 +46,7 @@ public class WebRuntimeDataService : IRuntimeDataService
         return response.IsSuccessStatusCode;
     }
 
-    public IDirectoryWatcher WatchDirectory(string path)
+    public IDirectoryWatcher WatchDirectory(string path, bool recursive)
     {
         return NullDirectoryWatcher.Instance;
     }

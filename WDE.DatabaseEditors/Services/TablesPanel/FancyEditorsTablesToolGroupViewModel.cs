@@ -26,6 +26,8 @@ namespace WDE.DatabaseEditors.Services.TablesPanel;
 [SingleInstance]
 public partial class FancyEditorsTablesToolGroupViewModel : ObservableBase, ITablesToolGroup
 {
+    private readonly ITableDefinitionProvider definitionProvider;
+    private readonly ISolutionItemProvideService rawTableSolutionItemProviderService;
     private readonly ITableOpenService tableOpenService;
     private readonly IEventAggregator eventAggregator;
     private readonly IMessageBoxService messageBoxService;
@@ -57,10 +59,48 @@ public partial class FancyEditorsTablesToolGroupViewModel : ObservableBase, ITab
         IMessageBoxService messageBoxService,
         ITableDefinitionEditorService definitionEditorService)
     {
+        this.definitionProvider = definitionProvider;
+        this.rawTableSolutionItemProviderService = rawTableSolutionItemProviderService;
         this.tableOpenService = tableOpenService;
         this.eventAggregator = eventAggregator;
         this.messageBoxService = messageBoxService;
         this.definitionEditorService = definitionEditorService;
+        definitionProvider.DefinitionsChanged += UpdateDefinitions;
+        UpdateDefinitions();
+
+        EditDefinitionCommand = new DelegateCommand<TableItemViewModel>(item =>
+        {
+            if (item.Definition != null)
+                definitionEditorService.EditDefinition(item.Definition.AbsoluteFileName);
+        }, item => item != null && item.Definition != null);
+
+        On(() => SearchText, FilterTables);
+    }
+
+    private void FilterTables(string search)
+    {
+        FilteredTables.Clear();
+        if (string.IsNullOrEmpty(search))
+        {
+            FilteredTables.AddRange(allTables);
+        }
+        else
+        {
+            search = search.ToLower();
+            foreach (var table in allTables)
+            {
+                if (table.TableName.Contains(search, StringComparison.Ordinal))
+                {
+                    FilteredTables.Add(table);
+                }
+            }
+        }
+    }
+
+    private void UpdateDefinitions()
+    {
+        allTables.Clear();
+
         foreach (var defi in definitionProvider.Definitions)
         {
             allTables.Add(new TableItemViewModel(defi.TableName, defi));
@@ -69,7 +109,7 @@ public partial class FancyEditorsTablesToolGroupViewModel : ObservableBase, ITab
                 foreach (var foreign in defi.ForeignTable)
                 {
                     allTables.Add(new TableItemViewModel(foreign.TableName, defi));
-                }   
+                }
             }
         }
 
@@ -80,33 +120,10 @@ public partial class FancyEditorsTablesToolGroupViewModel : ObservableBase, ITab
                 allTables.Add(new TableItemViewModel(rawTable.TableName, provider));
             }
         }
+
         allTables.Sort((a, b) => String.Compare(a.TableName, b.TableName, StringComparison.Ordinal));
 
-        EditDefinitionCommand = new DelegateCommand<TableItemViewModel>(item =>
-        {
-            if (item.Definition != null)
-                definitionEditorService.EditDefinition(item.Definition.AbsoluteFileName);
-        }, item => item != null && item.Definition != null);
-
-        On(() => SearchText, search =>
-        {
-            FilteredTables.Clear();
-            if (string.IsNullOrEmpty(search))
-            {
-                FilteredTables.AddRange(allTables);
-            }
-            else
-            {
-                search = search.ToLower();
-                foreach (var table in allTables)
-                {
-                    if (table.TableName.Contains(search, StringComparison.Ordinal))
-                    {
-                        FilteredTables.Add(table);
-                    }
-                }
-            }
-        });
+        FilterTables(searchText);
     }
 
     public void OpenTable(TableItemViewModel item)

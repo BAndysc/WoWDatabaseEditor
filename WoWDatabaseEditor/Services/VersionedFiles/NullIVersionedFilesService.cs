@@ -53,9 +53,13 @@ public class NullIVersionedFilesService : IVersionedFilesService
 
     public async Task<string> ReadAllTextAsync(FileHandle handle) => await File.ReadAllTextAsync(handleToFile[handle].File.FullName);
 
-    public void WriteOriginalText(FileHandle handle, string text) { }
+    public void WriteOriginalText(FileHandle handle, string? text) { }
+
+    public void WriteOriginalBytes(FileHandle handle, byte[]? bytes) { }
 
     public void WriteAllText(FileHandle handle, string text) => File.WriteAllText(handleToFile[handle].File.FullName, text);
+
+    public void WriteAllBytes(FileHandle handle, byte[] bytes) => File.WriteAllBytes(handleToFile[handle].File.FullName, bytes);
 
     public FileStream OpenStream(FileHandle handle, FileMode mode, FileAccess access) => File.Open(handleToFile[handle].File.FullName, mode, access);
 
@@ -68,4 +72,6 @@ public class NullIVersionedFilesService : IVersionedFilesService
     public void RestoreOriginal(FileHandle fileHandle) { }
 
     public void MarkCurrentAsOriginal(FileHandle fileHandle) { }
+
+    public void Copy(FileInfo sourceFile, FileHandle destinationHandle) => File.Copy(sourceFile.FullName, handleToFile[destinationHandle].File.FullName);
 }

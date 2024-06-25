@@ -223,6 +223,14 @@
             <ControlTemplate>
                 <DockPanel>
                     <CheckBox IsChecked="{TemplateBinding IsNonNullIcon, Mode=TwoWay}" />
+                    <ButtonImage DockPanel.Dock="Right"
+                                 IsEnabled="{TemplateBinding IsNonNullIcon}"
+                                 Image="Icons/icon_web_mono.png"
+                                 Width="32"
+                                 Height="32"
+                                 Padding="5"
+                                 x:Name="DownloadMoreIconsButton"
+                                 ToolTip.Tip="Download new icons" />
                     <CompletionComboBox SelectedItem="{TemplateBinding IconPath, Mode=TwoWay}"
                                         IsEnabled="{TemplateBinding IsNonNullIcon}"
                                         Items="{x:Static DefinitionEditorStatic.Icons}"

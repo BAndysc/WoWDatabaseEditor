@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.CoreVersion;
@@ -29,6 +30,8 @@ namespace WDE.DatabaseEditors.Data
         private readonly Dictionary<DatabaseTable, DatabaseTableDefinitionJson> definitionsByTableName = new();
         private readonly Dictionary<DatabaseTable, DatabaseTableDefinitionJson> definitionsByForeignTableName = new();
 
+        private CancellationTokenSource? cancellationTokenSource;
+
         public TableDefinitionProvider(ITableDefinitionDeserializer serializationProvider,
             Lazy<ITableDefinitionJsonProvider> jsonProvider,
             ICurrentCoreVersion currentCoreVersion,
@@ -40,10 +43,22 @@ namespace WDE.DatabaseEditors.Data
             this.messageBoxService = messageBoxService;
         }
 
-        public async Task Initialize()
+        private async Task LoadDefinitions(bool invokeEvent, CancellationToken token)
         {
+            var references = await jsonProvider.Value.GetDefinitionReferences();
+            var definitionSources = await jsonProvider.Value.GetDefinitionSources();
+
+            if (token.IsCancellationRequested)
+                return;
+
+            incompatibleDefinitionList.Clear();
+            incompatibleDefinitions.Clear();
+            definitions.Clear();
+            definitionsByTableName.Clear();
+            definitionsByForeignTableName.Clear();
+
             Dictionary<string, List<DatabaseTableReferenceJson>> fileToExtraCompatibility = new();
-            foreach (var source in await jsonProvider.Value.GetDefinitionReferences())
+            foreach (var source in references)
             {
                 try
                 {
@@ -58,11 +73,14 @@ namespace WDE.DatabaseEditors.Data
                     ShowLoadingError(source.file, e);
                 }
             }
-            
-            foreach (var source in await jsonProvider.Value.GetDefinitionSources())
+
+            foreach (var source in definitionSources)
             {
                 try
                 {
+                    if (string.IsNullOrEmpty(source.content))
+                        continue;
+
                     var definition =
                         serializationProvider.DeserializeTableDefinition<DatabaseTableDefinitionJson>(source.content);
 
@@ -118,9 +136,24 @@ namespace WDE.DatabaseEditors.Data
                 {
                     ShowLoadingError(source.file, e);
                 }
-            }    
+            }
+            if (invokeEvent)
+                DefinitionsChanged?.Invoke();
         }
-        
+
+        public async Task Initialize()
+        {
+            await LoadDefinitions(false, default);
+            jsonProvider.Value.FilesChanged += OnSourceFileChanged;
+        }
+
+        private void OnSourceFileChanged()
+        {
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource = new();
+            LoadDefinitions(true, cancellationTokenSource.Token).ListenErrors();
+        }
+
         private void ShowLoadingError(string sourceFile, Exception e)
         {
             LOG.LogError(e);
@@ -166,5 +199,6 @@ namespace WDE.DatabaseEditors.Data
         public IEnumerable<DatabaseTableDefinitionJson> AllDefinitions =>
             definitions.Values.Concat(incompatibleDefinitionList);
         public IEnumerable<DatabaseTableDefinitionJson> Definitions => definitions.Values;
+        public event Action? DefinitionsChanged;
     }
 }

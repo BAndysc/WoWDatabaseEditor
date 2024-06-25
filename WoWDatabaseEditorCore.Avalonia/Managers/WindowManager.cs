@@ -419,7 +419,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                     .Where((x, i) => i % 2 == 0)
                     .Select(x => new FilePickerFileType(x.First)
                     {
-                        Patterns = x.Second.Split(",").ToList()
+                        Patterns = x.Second.Split(",").Select(ext => ext.StartsWith("*") ? ext : $"*.{ext}").ToList()
                     }).ToList()
             });
 

@@ -19,15 +19,23 @@ public struct MD5Hash
     public override bool Equals(object? obj)
     {
         if (obj is MD5Hash other)
-        {
-            for (int i = 0; i < 16; ++i)
-            {
-                if (array[i] != other.array[i])
-                    return false;
-            }
-            return true;
-        }
+            return this == other;
         return false;
+    }
+
+    public static bool operator ==(MD5Hash a, MD5Hash b)
+    {
+        for (int i = 0; i < 16; ++i)
+        {
+            if (a.array[i] != b.array[i])
+                return false;
+        }
+        return true;
+    }
+
+    public static bool operator !=(MD5Hash a, MD5Hash b)
+    {
+        return !(a == b);
     }
 
     public ReadOnlySpan<byte> AsSpan() => MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<FixedByteArray16, byte>(ref Unsafe.AsRef(in array)), 16);

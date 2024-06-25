@@ -1,6 +1,7 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
@@ -28,6 +29,9 @@ public class OnReleaseListBox : ListBox
         base.OnPointerReleased(e);
         if (e.Source is Visual source)
         {
+            if (source.FindAncestorOfType<ScrollBar>() != null)
+                return;
+
             var point = e.GetCurrentPoint(source);
 
             if (point.Properties.PointerUpdateKind is PointerUpdateKind.LeftButtonReleased or PointerUpdateKind.RightButtonReleased)

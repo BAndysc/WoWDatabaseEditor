@@ -132,7 +132,6 @@ namespace WDE.SmartScriptEditor.Data
     {
         None = 0,
         Creature = 1,
-        Gameobject = 2, // alias
         GameObject = 2,
         Player = 4,
         AreaTrigger = 8,

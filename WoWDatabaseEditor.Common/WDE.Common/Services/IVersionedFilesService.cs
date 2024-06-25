@@ -29,9 +29,13 @@ public interface IVersionedFilesService
 
     Task<string> ReadAllTextAsync(FileHandle handle);
 
-    void WriteOriginalText(FileHandle handle, string text);
+    void WriteOriginalText(FileHandle handle, string? text);
+
+    void WriteOriginalBytes(FileHandle handle, byte[]? bytes);
 
     void WriteAllText(FileHandle handle, string text);
+
+    void WriteAllBytes(FileHandle handle, byte[] bytes);
 
     FileStream OpenStream(FileHandle handle, FileMode mode, FileAccess access);
 
@@ -44,6 +48,8 @@ public interface IVersionedFilesService
     void RestoreOriginal(FileHandle fileHandle);
 
     void MarkCurrentAsOriginal(FileHandle fileHandle);
+
+    void Copy(FileInfo sourceFile, FileHandle destinationHandle);
 }
 
 [NonUniqueProvider]

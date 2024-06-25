@@ -13,7 +13,7 @@ public interface IRuntimeDataService
     Task<byte[]> ReadAllBytes(string path);
     Task<IReadOnlyList<string>> GetAllFiles(string directory, string searchPattern);
     Task<bool> Exists(string path);
-    IDirectoryWatcher WatchDirectory(string path);
+    IDirectoryWatcher WatchDirectory(string path, bool recursive);
 }
 
 public interface IDirectoryWatcher : System.IDisposable

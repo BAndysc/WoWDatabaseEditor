@@ -30,6 +30,8 @@ namespace WDE.Common.Avalonia.Components
         private static IRuntimeDataService dataAccess;
         private static TaskCompletionSource? loadingFilesListing;
         private static HashSet<string>? existingFiles;
+        private static IDirectoryWatcher? watcher;
+        private static Action<ImageUri?>? imagesChanged;
 
         public static readonly AttachedProperty<object?> MenuIconProperty = AvaloniaProperty.RegisterAttached<AvaloniaObject, object?>("MenuIcon", typeof(WdeImage));
 
@@ -46,6 +48,17 @@ namespace WDE.Common.Avalonia.Components
             }
 
             dataAccess = ViewBind.ResolveViewModel<IRuntimeDataService>();
+            watcher = dataAccess.WatchDirectory("Icons", true);
+            watcher.OnChanged += (type, path) =>
+            {
+                existingFiles = null;
+                var relativePath = Path.GetRelativePath(Environment.CurrentDirectory, path);
+                Dispatcher.UIThread.Post(() =>
+                {
+                    cache.Remove(new ImageUri(relativePath));
+                    imagesChanged?.Invoke(new ImageUri(relativePath));
+                });
+            };
 
             ImageUriProperty.Changed.AddClassHandler<WdeImage>((image, e) =>
             {
@@ -108,6 +121,31 @@ namespace WDE.Common.Avalonia.Components
         }
         public static readonly AvaloniaProperty<string?> ImageUriProperty = 
             AvaloniaProperty.Register<WdeImage, string?>(nameof(ImageUri));
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            imagesChanged += ImageChanged;
+        }
+
+        private void ImageChanged(ImageUri? triggering)
+        {
+            if (ImageUri != null)
+            {
+                if (Source == null || !triggering.HasValue || ImageUri == triggering?.Uri)
+                {
+                    var uri = ImageUri;
+                    SetCurrentValue(ImageUriProperty, null);
+                    SetCurrentValue(ImageUriProperty, uri);  // trigger reload
+                }
+            }
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            imagesChanged -= ImageChanged;
+        }
 
         private static async Task<bool> FileExists(string? uri)
         {

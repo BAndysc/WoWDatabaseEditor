@@ -15,17 +15,28 @@ public class LocalRuntimeDataService : IRuntimeDataService
     private class DirectoryWatcher : IDirectoryWatcher
     {
         private FileSystemWatcher watcher;
+        private bool disposed;
 
-        public DirectoryWatcher(string path)
+        public DirectoryWatcher(string path, bool recursive)
         {
             watcher = new FileSystemWatcher(path);
             watcher.Changed += (sender, args) => OnChanged?.Invoke(args.ChangeType, args.FullPath);
-            watcher.EnableRaisingEvents = true;
+            watcher.IncludeSubdirectories = recursive;
             watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            watcher.EnableRaisingEvents = true;
+        }
+
+        ~DirectoryWatcher()
+        {
+            if (!disposed)
+            {
+                Console.WriteLine("FileSystemWatcher removed without Dispose. Don't do it");
+            }
         }
 
         public void Dispose()
         {
+            disposed = true;
             watcher.EnableRaisingEvents = false;
             watcher.Dispose();
         }
@@ -33,9 +44,9 @@ public class LocalRuntimeDataService : IRuntimeDataService
         public event Action<WatcherChangeTypes, string>? OnChanged;
     }
 
-    public IDirectoryWatcher WatchDirectory(string path)
+    public IDirectoryWatcher WatchDirectory(string path, bool recursive)
     {
-        return new DirectoryWatcher(path);
+        return new DirectoryWatcher(path, recursive);
     }
 
     public async Task<string> ReadAllText(string path)

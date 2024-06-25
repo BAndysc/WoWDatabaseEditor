@@ -60,6 +60,7 @@ public class DefinitionGeneratorService : IDefinitionGeneratorService
         tableDefinition.Name = tableName.Table.ToTitleCase();
         tableDefinition.TableName = tableName.Table;
         tableDefinition.GroupName = "CATEGORY";
+        tableDefinition.SkipQuickLoad = true;
         tableDefinition.RecordMode = RecordMode.SingleRow;//primaryKeys.Count != 1 ? RecordMode.MultiRecord : RecordMode.SingleRow;
         if (tableDefinition.RecordMode == RecordMode.SingleRow)
             tableDefinition.SingleSolutionName = tableDefinition.MultiSolutionName = $"{tableName.Table.ToTitleCase()} Table";
@@ -70,7 +71,7 @@ public class DefinitionGeneratorService : IDefinitionGeneratorService
         }
         tableDefinition.Description = $"Here insert short description what is {tableName} for";
         tableDefinition.IconPath = "Icons/document_.png";
-        tableDefinition.ReloadCommand = $"reload {tableName}";
+        tableDefinition.ReloadCommand = $"reload {tableName.Table}";
         tableDefinition.TablePrimaryKeyColumnName = new ColumnFullName(null, primaryKeys.Count > 0
             ? primaryKeys[0].ColumnName
             : (columns.Count > 0 ? columns[0].ColumnName : ""));

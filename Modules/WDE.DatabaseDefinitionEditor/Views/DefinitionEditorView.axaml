@@ -51,10 +51,13 @@
                               SelectedItem="{CompiledBinding SelectedDefinition, Mode=TwoWay}">
                 <controls:OnReleaseListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{CompiledBinding TableName, Mode=OneTime}" FontWeight="Bold" />
-                            <TextBlock Text="{CompiledBinding RelativePath, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
-                        </StackPanel>
+                        <DockPanel>
+                            <WdeImage ImageUri="{CompiledBinding Icon}" VerticalAlignment="Center" Margin="0,0,5,0" Width="24" Height="24" />
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="{CompiledBinding TableName, Mode=OneTime}" FontWeight="Bold" />
+                                <TextBlock Text="{CompiledBinding RelativePath, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
+                            </StackPanel>
+                        </DockPanel>
                     </DataTemplate>
                 </controls:OnReleaseListBox.ItemTemplate>
             </controls:OnReleaseListBox>
@@ -64,12 +67,15 @@
         <Grid Grid.RowDefinitions="*,5,Auto" Grid.Column="2" IsEnabled="{CompiledBinding SelectedTable, Converter={x:Static NullConverter.IsNotNull}}">
             <TabControl SelectionChanged="SelectingItemsControl_OnSelectionChanged" x:Name="TabControl">
                 <TabItem Header="Table">
-                    <ScrollViewer>
+                    <ScrollViewer AllowAutoHide="False">
                         <views:DefinitionView DataContext="{CompiledBinding SelectedTable}" />
                     </ScrollViewer>
                 </TabItem>
+                <TabItem Header="Columns">
+                    <views:ColumnsView  DataContext="{CompiledBinding SelectedTable}" />
+                </TabItem>
                 <TabItem Header="Conditions">
-                    <ScrollViewer>
+                    <ScrollViewer AllowAutoHide="False">
                         <views:ConditionsView DataContext="{CompiledBinding SelectedTable}" />
                     </ScrollViewer>
                 </TabItem>
@@ -78,9 +84,6 @@
                 </TabItem>
                 <TabItem Header="Commands">
                     <views:CommandsView DataContext="{CompiledBinding SelectedTable}" />
-                </TabItem>
-                <TabItem Header="Columns">
-                    <views:ColumnsView  DataContext="{CompiledBinding SelectedTable}" />
                 </TabItem>
                 <TabItem Header="Raw json" x:Name="RawJsonTab">
                     <avaloniaEdit:TextEditor AvalonEditExtra.SyntaxExtension="json"

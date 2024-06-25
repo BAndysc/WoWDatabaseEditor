@@ -6,6 +6,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using AvaloniaStyles.Controls;
+using WDE.Common.Avalonia.Utils;
+using WDE.Common.Services;
 using WDE.Common.Types;
 
 namespace WDE.Common.Avalonia.Components;
@@ -67,6 +69,17 @@ public class WdeIconPicker : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
+        var downloadMoreIconsButton = e.NameScope.Get<Button>("DownloadMoreIconsButton");
+        var service = ViewBind.ResolveViewModel<IIconFinderService>();
+        downloadMoreIconsButton.IsVisible = service.Enabled;
+        downloadMoreIconsButton.Click += async (sender, args) =>
+        {
+            var image = await service.PickIconAsync();
+            if (image.HasValue)
+            {
+                SetCurrentValue(IconPathProperty, image.Value.Uri);
+            }
+        };
     }
 }
 
