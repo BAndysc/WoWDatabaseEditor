@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -9,12 +10,15 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles;
 using AvaloniaStyles.Controls;
 using Dock.Avalonia.Controls;
 using Newtonsoft.Json;
+using Prism.Events;
+using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
@@ -34,6 +38,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         private static string DockSettingsFile = "~/dock.ava.layout";
         private readonly IFileSystem fileSystem;
         private readonly IUserSettings userSettings;
+        private readonly IEventAggregator eventAggregator;
+        private readonly IParserViewerSolutionItemService parserViewerSolutionItemService;
         private AvaloniaDockAdapter avaloniaDockAdapter;
 
         public static readonly AttachedProperty<bool> OnEnterPressedProperty = 
@@ -44,6 +50,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             fileSystem = null!;
             userSettings = null!;
             avaloniaDockAdapter = null!;
+            eventAggregator = null!;
+            parserViewerSolutionItemService = null!;
         }
         
         public static bool GetOnEnterPressed(AvaloniaObject obj)
@@ -85,10 +93,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             ILayoutViewModelResolver layoutViewModelResolver,
             IFileSystem fileSystem,
             IUserSettings userSettings,
+            IEventAggregator eventAggregator,
+            IParserViewerSolutionItemService parserViewerSolutionItemService,
             TempToolbarButtonStyleService tempToolbarButtonStyleService)
         {
             this.fileSystem = fileSystem;
             this.userSettings = userSettings;
+            this.eventAggregator = eventAggregator;
+            this.parserViewerSolutionItemService = parserViewerSolutionItemService;
             avaloniaDockAdapter = new AvaloniaDockAdapter(documentManager, layoutViewModelResolver);
             
             // we have to do it before InitializeComponent!
@@ -120,6 +132,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                     Application.Current!.Resources["DisplayButtonImageIcon"] = style is ToolBarButtonStyle.Icon or ToolBarButtonStyle.IconAndText;
                     Application.Current!.Resources["DisplayButtonImageText"] = style is ToolBarButtonStyle.Text or ToolBarButtonStyle.IconAndText;
                 });
+
+            DragDrop.SetAllowDrop(this, true);
+            AddHandler(DragDrop.DragEnterEvent, DragEnter);
+            AddHandler(DragDrop.DragOverEvent, DragOver);
+            AddHandler(DragDrop.DropEvent, Drop);
         }
 
         public static ImageUri DocumentIcon => new ImageUri("Icons/document.png");
@@ -295,6 +312,36 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 realClosing = true;
                 Close();
             }
+        }
+
+        private void Drop(object? sender, DragEventArgs e)
+        {
+            if (!e.Data.Contains(DataFormats.Files) || !parserViewerSolutionItemService.Enabled)
+                return;
+
+            var files = e.Data.GetFiles();
+            if (files == null)
+                return;
+
+            foreach (var file in files.Select(x => x.TryGetLocalPath())
+                         .Where(x => x != null))
+            {
+                if (File.Exists(file))
+                {
+                    eventAggregator.GetEvent<EventRequestOpenItem>()
+                        .Publish(parserViewerSolutionItemService.CreateSolutionItem(file));
+                }
+            }
+        }
+
+        private void DragOver(object? sender, DragEventArgs e)
+        {
+            e.DragEffects = e.Data.Contains(DataFormats.Files) && parserViewerSolutionItemService.Enabled ? DragDropEffects.Copy : DragDropEffects.None;
+        }
+
+        private void DragEnter(object? sender, DragEventArgs e)
+        {
+            e.DragEffects = e.Data.Contains(DataFormats.Files) && parserViewerSolutionItemService.Enabled ? DragDropEffects.Copy : DragDropEffects.None;
         }
 
         public struct WindowLastSize : ISettings

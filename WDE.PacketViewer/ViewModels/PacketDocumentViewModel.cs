@@ -566,6 +566,13 @@ namespace WDE.PacketViewer.ViewModels
 
             AutoDispose(new ActionDisposable(() => currentActionToken?.Cancel()));
             AutoDispose(new ActionDisposable(() => liveStreamToken?.Cancel()));
+            AutoDispose(() =>
+            {
+                AllPackets.Clear();
+                AllPacketsSplit?.Clear();
+                FilteredPackets.Clear();
+                VisiblePackets.Clear();
+            });
         }
 
         private CancellationTokenSource? liveStreamToken;

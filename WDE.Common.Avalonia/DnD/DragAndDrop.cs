@@ -248,6 +248,9 @@ namespace WDE.Common.Avalonia.DnD
 
         private static void OnListDragOver(object? sender, DragEventArgs e)
         {
+            if (e.Data.Contains(DataFormats.Files))
+                return;
+
             var listBox = sender as ListBox;
             var dropElement = FindVisualParent<ListBoxItem>(e.Source as Visual);
             var dragInfo = e.Data.Get("") as DragInfo?;
@@ -286,6 +289,7 @@ namespace WDE.Common.Avalonia.DnD
                 IsCopy = IsCopyKey(e)
             };
             dropHandler.DragOver(dropInfo);
+            e.Handled = true;
 
             {
                 double mousePosY = e.GetPosition(listBox).Y;
@@ -304,6 +308,9 @@ namespace WDE.Common.Avalonia.DnD
 
         private static void OnListDrop(object? sender, DragEventArgs e)
         {
+            if (e.Data.Contains(DataFormats.Files))
+                return;
+
             var listBox = sender as ListBox;
             var dropElement = FindVisualParent<ListBoxItem>(e.Source as Visual);
             var dragInfo = e.Data.Get("") as DragInfo?;
@@ -336,7 +343,8 @@ namespace WDE.Common.Avalonia.DnD
                     InsertIndex = indexOfDrop,
                     TargetItem = listBox.Items,
                     IsCopy = IsCopyKey(e)
-                });                
+                });
+                e.Handled = true;
             });
         }
         
@@ -346,6 +354,9 @@ namespace WDE.Common.Avalonia.DnD
         // Grid View
         private static void OnGridViewDragOver(object? sender, DragEventArgs e)
         {
+            if (e.Data.Contains(DataFormats.Files))
+                return;
+
             var listBox = sender as GridView;
             var dropElement = FindVisualParent<ListBoxItem>(e.Source as Visual);
             var dragInfo = e.Data.Get("") as DragInfo?;
@@ -384,6 +395,7 @@ namespace WDE.Common.Avalonia.DnD
                 IsCopy = IsCopyKey(e)
             };
             dropHandler.DragOver(dropInfo);
+            e.Handled = true;
 
             {
                 double mousePosY = e.GetPosition(listBox).Y;
@@ -402,6 +414,9 @@ namespace WDE.Common.Avalonia.DnD
         
         private static void OnGridViewDrop(object? sender, DragEventArgs e)
         {
+            if (e.Data.Contains(DataFormats.Files))
+                return;
+
             var listBox = sender as GridView;
             var dropElement = FindVisualParent<ListBoxItem>(e.Source as Visual);
             var dragInfo = e.Data.Get("") as DragInfo?;
@@ -437,6 +452,7 @@ namespace WDE.Common.Avalonia.DnD
                     TargetItem = listBox.Items,
                     IsCopy = IsCopyKey(e)
                 });
+                e.Handled = true;
             });
         }
         
@@ -446,6 +462,9 @@ namespace WDE.Common.Avalonia.DnD
 
         private static void OnTreeViewDragOver(object? sender, DragEventArgs e)
         {
+            if (e.Data.Contains(DataFormats.Files))
+                return;
+
             var treeView = sender as TreeView;
             var dropElement = FindVisualParent<TreeViewItem>(e.Source as Visual);
             var dragInfo = e.Data.Get("") as DragInfo?;
@@ -507,6 +526,7 @@ namespace WDE.Common.Avalonia.DnD
                 IsCopy = IsCopyKey(e)
             };
             dropHandler.DragOver(dropInfo);
+            e.Handled = true;
 
             /*{
                 double mousePosY = e.GetPosition(listBox).Y;
@@ -531,6 +551,9 @@ namespace WDE.Common.Avalonia.DnD
 
         private static void OnTreeViewDrop(object? sender, DragEventArgs e)
         {
+            if (e.Data.Contains(DataFormats.Files))
+                return;
+
             var treeView = sender as TreeView;
             var dropElement = FindVisualParent<TreeViewItem>(e.Source as Visual);
             var dragInfo = e.Data.Get("") as DragInfo?;
@@ -558,6 +581,7 @@ namespace WDE.Common.Avalonia.DnD
                 if (previousOffset.HasValue)
                     scrollViewer!.Offset = previousOffset.Value;
             }, DispatcherPriority.Render);
+            e.Handled = true;
         }
 
         private static void WrapTryCatch(Action x)
