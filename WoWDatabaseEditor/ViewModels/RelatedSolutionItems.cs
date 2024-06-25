@@ -86,7 +86,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 related.Value.Type == RelatedSolutionItem.RelatedType.GameobjectEntry ||
                 related.Value.Type == RelatedSolutionItem.RelatedType.QuestEntry)
             {
-                List.Add(new RelatedSolutionItemViewModel("Open wowhead in a browser", new ImageUri("icons/icon_head_red.png"), new AsyncAutoCommand(async () =>
+                List.Add(new RelatedSolutionItemViewModel("Open wowhead in a browser", new ImageUri("Icons/icon_head_red.png"), new AsyncAutoCommand(async () =>
                 {
                     var type = related.Value.Type == RelatedSolutionItem.RelatedType.CreatureEntry ? "npc" : "object";
                     if (related.Value.Type == RelatedSolutionItem.RelatedType.QuestEntry)
