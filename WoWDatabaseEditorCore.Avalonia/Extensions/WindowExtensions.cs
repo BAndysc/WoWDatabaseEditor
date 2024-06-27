@@ -30,12 +30,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Extensions
         
         [DllImport("dwmapi.dll", PreserveSig = true)]
         public static extern int DwmSetWindowAttribute(IntPtr hwnd, DWMWINDOWATTRIBUTE attr, ref int attrValue, int attrSize);
+
+        private static bool UseWorkaround = false;
         
         public static void ActivateWorkaround(this Window window)
         {
             if (ReferenceEquals(window, null)) throw new ArgumentNullException(nameof(window));
 
-            if (IsWin32Nt)
+            if (IsWin32Nt && UseWorkaround)
             {
                 
                 if (!window.IsActive)
