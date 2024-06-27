@@ -22,7 +22,7 @@ public class NullPacketViewModelStore : IPacketViewModelStore
 
     public Task<string> GetTextAsync(PacketViewModel packet) => Task.FromResult(GetText(packet));
 
-    public string GetText(PacketViewModel packet) => packet.Packet.BaseData.StringData;
+    public string GetText(PacketViewModel packet) => packet.Packet.BaseData.StringData.ToString() ?? "";
 
     public void Dispose()
     {
@@ -115,23 +115,23 @@ public class PacketViewModelStore : IPacketViewModelStore
         int? len = null;
         if (update.Created.Count == 1)
         {
-            start = update.Created[0].TextStartOffset;
-            len = update.Created[0].TextLength;
+            start = update.Created[0].TextStartOffset.Value;
+            len = update.Created[0].TextLength.Value;
         }
         else if (update.Destroyed.Count == 1)
         {
-            start = update.Destroyed[0].TextStartOffset;
-            len = update.Destroyed[0].TextLength;
+            start = update.Destroyed[0].TextStartOffset.Value;
+            len = update.Destroyed[0].TextLength.Value;
         }
         else if (update.Updated.Count == 1)
         {
-            start = update.Updated[0].TextStartOffset;
-            len = update.Updated[0].TextLength;
+            start = update.Updated[0].TextStartOffset.Value;
+            len = update.Updated[0].TextLength.Value;
         }
         else if (update.OutOfRange.Count == 1)
         {
-            start = update.OutOfRange[0].TextStartOffset;
-            len = update.OutOfRange[0].TextLength;
+            start = update.OutOfRange[0].TextStartOffset.Value;
+            len = update.OutOfRange[0].TextLength.Value;
         }
         if (start.HasValue && len.HasValue && start.Value + len.Value < text.Length)
         {
@@ -140,18 +140,18 @@ public class PacketViewModelStore : IPacketViewModelStore
         return " - file error - . Have you edited the _parsed.txt file?";
     }
     
-    private string GetText(PacketBase baseData)
+    private unsafe string GetText(PacketBase baseData)
     {
-        if (!baseData.TextStartOffset.HasValue)
+        if (baseData.TextStartOffset == null)
         {
-            return baseData.StringData;
+            return baseData.StringData.ToString() ?? "";
         }
-        else if (textFileStream != null && baseData.TextLength.HasValue &&
-                 baseData.TextStartOffset.Value + baseData.TextLength < length)
+        else if (textFileStream != null && baseData.TextLength != null &&
+                 baseData.TextStartOffset->Value + baseData.TextLength->Value < length)
         {
             using var _ = asyncMonitor.Enter();
-            textFileStream.Seek(baseData.TextStartOffset.Value, SeekOrigin.Begin);
-            var len = (int)(baseData.TextLength.Value);
+            textFileStream.Seek(baseData.TextStartOffset->Value, SeekOrigin.Begin);
+            var len = (int)(baseData.TextLength->Value);
             byte[] buffer = ArrayPool<byte>.Shared.Rent(len);
             textFileStream.Read(buffer, 0, len);
             var text = Encoding.UTF8.GetString(buffer.AsSpan(0, len));
@@ -163,18 +163,21 @@ public class PacketViewModelStore : IPacketViewModelStore
     }
 
     
-    private async Task<string> GetTextAsync(PacketBase baseData)
+    private Task<string> GetTextAsync(PacketBase baseData)
     {
-        if (!baseData.TextStartOffset.HasValue)
+        unsafe
         {
-            return baseData.StringData;
+            if (baseData.TextStartOffset == null)
+            {
+                return Task.FromResult(baseData.StringData.ToString() ?? "");
+            }
         }
-        else if (textFileStream != null && baseData.TextLength.HasValue &&
-                 baseData.TextStartOffset.Value + baseData.TextLength < length)
+
+        async Task<string> AsyncWork(long start, int length)
         {
             using var _ = await asyncMonitor.EnterAsync();
-            textFileStream.Seek(baseData.TextStartOffset.Value, SeekOrigin.Begin);
-            var len = (int)(baseData.TextLength.Value);
+            textFileStream.Seek(start, SeekOrigin.Begin);
+            var len = (int)(length);
             byte[] buffer = ArrayPool<byte>.Shared.Rent(len);
             await textFileStream.ReadAsync(buffer, 0, len);
             var text = Encoding.UTF8.GetString(buffer.AsSpan(0, len));
@@ -182,7 +185,15 @@ public class PacketViewModelStore : IPacketViewModelStore
             return text;
         }
 
-        return "";
+        unsafe
+        {
+            if (textFileStream != null && baseData.TextLength != null && baseData.TextStartOffset->Value + baseData.TextLength->Value < length)
+            {
+                return AsyncWork(baseData.TextStartOffset->Value, baseData.TextLength->Value);
+            }
+        }
+
+        return Task.FromResult("");
     }
 
     public void Dispose()

@@ -48,7 +48,7 @@ public static class SpellCastExtensions
 }
 
 [AutoRegister]
-public class SpellCastProcessor : PacketProcessor<bool>, ISpellCastProcessor
+public unsafe class SpellCastProcessor : PacketProcessor<bool>, ISpellCastProcessor
 {
     private class SpellData
     {
@@ -65,61 +65,61 @@ public class SpellCastProcessor : PacketProcessor<bool>, ISpellCastProcessor
         if (guid == null)
             return SpellData.Fake;
 
-        if (datas.TryGetValue(guid, out var d))
+        if (datas.TryGetValue(guid.Value, out var d))
             return d;
         
-        return datas[guid] = new();
+        return datas[guid.Value] = new();
     }
     
-    protected override bool Process(PacketBase basePacket, PacketSpellStart packet)
+    protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellStart packet)
     {
-        var castId = packet.Data.CastGuid;
+        var castId = packet.Data != null && packet.Data->IdKindCase == PacketSpellData.IdKindOneofCase.CastGuid ? packet.Data->CastGuid : (UniversalGuid?)null;
         var data = GetData(castId);
         data.SpellStart = basePacket.Time.ToDateTime();
-        return base.Process(basePacket, packet);
+        return base.Process(in basePacket, in packet);
     }
 
-    protected override bool Process(PacketBase basePacket, PacketSpellGo packet)
+    protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellGo packet)
     {
-        var castId = packet.Data.CastGuid;
+        var castId = packet.Data != null && packet.Data->IdKindCase == PacketSpellData.IdKindOneofCase.CastGuid ? packet.Data->CastGuid : (UniversalGuid?)null;
         var data = GetData(castId);
         data.SpellGo = basePacket.Time.ToDateTime();
-        return base.Process(basePacket, packet);
+        return base.Process(in basePacket, in packet);
     }
 
-    protected override bool Process(PacketBase basePacket, PacketSpellFailure packet)
+    protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellFailure packet)
     {
-        var castId = packet.CastGuid;
+        var castId = Unpack(packet.CastGuid);
         var data = GetData(castId);
         data.SpellFail = basePacket.Time.ToDateTime();
-        return base.Process(basePacket, packet);
+        return base.Process(in basePacket, in packet);
     }
 
-    protected override bool Process(PacketBase basePacket, PacketSpellCastFailed packet)
+    protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellCastFailed packet)
     {
-        var castId = packet.CastGuid;
+        var castId = Unpack(packet.CastGuid);
         var data = GetData(castId);
         data.SpellFail = basePacket.Time.ToDateTime();
-        return base.Process(basePacket, packet);
+        return base.Process(in basePacket, in packet);
     }
 
     public DateTime? GetSpellStartTime(UniversalGuid? castId)
     {
-        if (castId == null || !datas.TryGetValue(castId, out var data))
+        if (castId == null || !datas.TryGetValue(castId.Value, out var data))
             return null;
         return data.SpellStart;
     }
 
     public DateTime? GetSpellGoTime(UniversalGuid? castId)
     {
-        if (castId == null || !datas.TryGetValue(castId, out var data))
+        if (castId == null || !datas.TryGetValue(castId.Value, out var data))
             return null;
         return data.SpellGo;
     }
 
     public DateTime? GetSpellFailTime(UniversalGuid? castId)
     {
-        if (castId == null || !datas.TryGetValue(castId, out var data))
+        if (castId == null || !datas.TryGetValue(castId.Value, out var data))
             return null;
         return data.SpellFail;
     }

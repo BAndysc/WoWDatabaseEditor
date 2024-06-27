@@ -5,7 +5,7 @@ namespace WDE.PacketViewer.Processing.Processors
 {
     public class CreatureTemplateProcessor : PacketProcessor<bool>
     {
-        protected override bool Process(PacketBase basePacket, PacketQueryCreatureResponse packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQueryCreatureResponse packet)
         {
             
             return false;

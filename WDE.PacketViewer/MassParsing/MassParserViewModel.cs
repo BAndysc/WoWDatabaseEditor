@@ -23,6 +23,7 @@ using WDE.MVVM;
 using WDE.PacketViewer.PacketParserIntegration;
 using WDE.PacketViewer.Processing;
 using WDE.PacketViewer.Processing.ProcessorProviders;
+using WDE.PacketViewer.Utils;
 using WDE.PacketViewer.ViewModels;
 
 namespace WDE.PacketViewer.MassParsing;
@@ -177,9 +178,10 @@ public partial class MassParserViewModel : ObservableBase, IDocument
                 var i = 0;
                 foreach (var file in FileItems.ToList())
                 {
+                    using var allocator = new RefCountedArena();
                     i++;
                     subTaskSetter(file + " (" + i + "/" + total + ")");
-                    var packets = await sniffLoader.LoadSniff(file, null, token, false, new Progress<float>());
+                    var packets = await sniffLoader.LoadSniff(allocator, file, null, token, false, new Progress<float>());
                     
                     if (perFileStateProcessor != null)
                         perFileStateProcessor.ClearAllState();
@@ -189,26 +191,35 @@ public partial class MassParserViewModel : ObservableBase, IDocument
 
                     if (twoStep != null)
                     {
-                        foreach (var packet in packets.Packets_)
+                        void SynchronousPreprocess()
                         {
-                            twoStep.PreProcess(packet);
+                            foreach (ref var packet in packets.Packets_.AsSpan())
+                            {
+                                twoStep.PreProcess(ref packet);
+                            }
                         }
+                        SynchronousPreprocess();
 
                         await twoStep.PostProcessFirstStep();
                     }
 
-                    foreach (var packet in packets.Packets_)
+
+                    void SynchronousProcess()
                     {
-                        try
+                        foreach (ref var packet in packets.Packets_.AsSpan())
                         {
-                            textProcessor?.Process(packet);
-                            documentDumper?.Process(packet);
-                        }
-                        catch (Exception e)
-                        {
-                            LOG.LogError(e, "Error while processing packet");
+                            try
+                            {
+                                textProcessor?.Process(in packet);
+                                documentDumper?.Process(in packet);
+                            }
+                            catch (Exception e)
+                            {
+                                LOG.LogError(e, "Error while processing packet");
+                            }
                         }
                     }
+                    SynchronousProcess();
                 }
 
                 if (textProcessor != null)

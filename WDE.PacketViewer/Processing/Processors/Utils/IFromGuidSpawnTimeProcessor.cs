@@ -18,7 +18,7 @@ public class FromGuidSpawnTimeProcessor : IFromGuidSpawnTimeProcessor
     private bool hasServerTimeDiffFromSpawnTime;
     private TimeSpan serverTimeDiff;
     
-    public bool Process(PacketHolder packet)
+    public bool Process(ref readonly PacketHolder packet)
     {
         if (!hasServerTimeDiff)
         {
@@ -33,7 +33,7 @@ public class FromGuidSpawnTimeProcessor : IFromGuidSpawnTimeProcessor
         {
             if (packet.KindCase == PacketHolder.KindOneofCase.UpdateObject)
             {
-                foreach (var create in packet.UpdateObject.Created)
+                foreach (ref readonly var create in packet.UpdateObject.Created.AsSpan())
                 {
                     if (create.CreateType == CreateObjectType.Spawn &&
                         create.Guid.Type is UniversalHighGuid.Creature or UniversalHighGuid.Vehicle or UniversalHighGuid.Pet or UniversalHighGuid.GameObject &&
@@ -57,15 +57,15 @@ public class FromGuidSpawnTimeProcessor : IFromGuidSpawnTimeProcessor
     public TimeSpan? TryGetSpawnTime(UniversalGuid? guid, DateTime currentTime)
     {
         if (guid == null ||
-            (guid.Type is not UniversalHighGuid.Creature && guid.Type is not UniversalHighGuid.Pet &&
-             guid.Type is not UniversalHighGuid.Vehicle && guid.Type is not UniversalHighGuid.GameObject) ||
-            guid.KindCase != UniversalGuid.KindOneofCase.Guid128)
+            (guid.Value.Type is not UniversalHighGuid.Creature && guid.Value.Type is not UniversalHighGuid.Pet &&
+             guid.Value.Type is not UniversalHighGuid.Vehicle && guid.Value.Type is not UniversalHighGuid.GameObject) ||
+            guid.Value.KindCase != UniversalGuid.KindOneofCase.Guid128)
             return null;
 
         if (!hasServerTimeDiff)
             return null;
         
-        var timeStamp = (long)(guid.Guid128.Low & ((1 << 23) - 1));
+        var timeStamp = (long)(guid.Value.Guid128.Low & ((1 << 23) - 1));
         var timeQuotient = (new DateTimeOffset(currentTime).ToUnixTimeSeconds() & ~((1 << 23) - 1));
         return (currentTime - serverTimeDiff) - DateTimeOffset.FromUnixTimeSeconds(timeQuotient + timeStamp);
     }

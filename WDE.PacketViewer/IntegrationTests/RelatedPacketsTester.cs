@@ -75,25 +75,49 @@ namespace WDE.PacketViewer.IntegrationTests
         public async Task RunSingleTestCase(string basePath, RelatedPacketsTestCaseGroup testCaseGroup)
         {
             var sniffPath = Path.Combine(basePath, testCaseGroup.SniffFilePath);
-            var sniff = await sniffLoader.LoadSniff(sniffPath, null, CancellationToken.None, true, new Progress<float>());
+            using var allocator = new RefCountedArena();
+            var sniff = await sniffLoader.LoadSniff(allocator, sniffPath, null, CancellationToken.None, true, new Progress<float>());
             var store = new PacketViewModelStore(sniffPath);
-            var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor(), 0);
             List<PacketViewModel> split = new();
-            foreach (var packet in sniff.Packets_)
-            {
-                var output = splitter.Process(packet);
-                if (output != null)
-                    foreach (var p in output)
-                        if (viewModelFactory.Process(p.Item1, p.Item2) is PacketViewModel pvm)
-                            split.Add(pvm);
-            }
 
-            var finalized = splitter.Finalize();
-            if (finalized != null)
-                foreach (var p in finalized)
-                    if (viewModelFactory.Process(p.Item1, p.Item2) is PacketViewModel pvm)
-                        split.Add(pvm);
-            
+            unsafe void SynchronousWork()
+            {
+                var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor(), 0, allocator);
+                foreach (ref var packet in sniff.Packets_.AsSpan())
+                {
+                    IEnumerable<(Pointer<PacketHolder>, int)>? output;
+                    fixed (PacketHolder* ptr = &packet) // safe, because sniff.Packets_ is allocated from RefCountedAllocator
+                    {
+                        output = splitter.Process(ptr);
+                    }
+
+                    if (output != null)
+                    {
+                        foreach (var p in output)
+                        {
+                            if (viewModelFactory.Process(p.Item1, p.Item2) is PacketViewModel pvm)
+                            {
+                                split.Add(pvm);
+                            }
+                        }
+                    }
+                }
+
+                var finalized = splitter.Finalize();
+                if (finalized != null)
+                {
+                    foreach (var p in finalized)
+                    {
+                        if (viewModelFactory.Process(p.Item1, p.Item2) is PacketViewModel pvm)
+                        {
+                            split.Add(pvm);
+                        }
+                    }
+                }
+
+            }
+            SynchronousWork();
+
             foreach (var group in testCaseGroup.TestCases)
             {   
                 try

@@ -124,13 +124,13 @@ namespace WDE.PacketViewer.Processing.Processors
             public GossipMenuOption(GossipMessageOption option)
             {
                 Index = option.OptionIndex;
-                Text = option.Text;
+                Text = option.Text.ToString() ?? "";
                 Icon = (GossipOptionIcon)option.OptionNpc;
                 OptionType = GossipOption.Gossip;
                 NpcFlags = GameDefines.NpcFlags.Gossip;
                 BoxCoded = option.BoxCoded;
                 BoxMoney = option.BoxCost;
-                BoxText = string.IsNullOrEmpty(option.BoxText) ? null : option.BoxText;
+                BoxText = option.BoxText.BytesLength == 0 ? null : option.BoxText.ToString();
                 IsFromSniff = true;
                 switch (Icon)
                 {
@@ -199,15 +199,15 @@ namespace WDE.PacketViewer.Processing.Processors
             }
         }
 
-        protected override bool Process(PacketBase basePacket, PacketGossipHello packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGossipHello packet)
         {
             lastGossiper = packet.GossipSource;
             currentGossipMenu = null;
             lastChosenOption = null;
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketGossipMessage packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGossipMessage packet)
         {
             if (!packet.GossipSource.Equals(lastGossiper))
                 return false;
@@ -234,7 +234,7 @@ namespace WDE.PacketViewer.Processing.Processors
             currentGossipMenu = menu;
             menu.AddTextId(packet.TextId);
 
-            foreach (var option in packet.Options)
+            foreach (ref readonly var option in packet.Options.AsSpan())
             {
                 if (!menu.TryGetOption(option.OptionIndex, out var gossipMenuOption))
                 {
@@ -242,28 +242,33 @@ namespace WDE.PacketViewer.Processing.Processors
                     menu.AddOption(gossipMenuOption);
                 }
                 
-                if (gossipMenuOption.Text != option.Text || (int)gossipMenuOption.Icon != option.OptionNpc)
+                if (gossipMenuOption.Text != option.Text.ToString() || (int)gossipMenuOption.Icon != option.OptionNpc)
                     throw new Exception($"Same menu id, same option index different options :( menuId: {menu.MenuId} option index: {option.OptionIndex}");
             }
             
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketGossipClose packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGossipClose packet)
         {
             lastGossiper = null;
             currentGossipMenu = null;
             lastChosenOption = null;
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketNpcText packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketNpcText packet)
         {
-            npcTexts.Add((packet.Entry, packet.Texts.Select(t => (t.BroadcastTextId, t.Probability)).ToList()));
-            return base.Process(basePacket, packet);
+            List<(uint broadcastText, float probability)> texts = new();
+            foreach (ref readonly var text in packet.Texts.AsSpan())
+            {
+                texts.Add((text.BroadcastTextId, text.Probability));
+            }
+            npcTexts.Add((packet.Entry, texts));
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketGossipPoi packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGossipPoi packet)
         {
             if (lastChosenOption.HasValue)
             {
@@ -275,10 +280,10 @@ namespace WDE.PacketViewer.Processing.Processors
                     }
                 }
             }
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketDbReply packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketDbReply packet)
         {
             if (packet.KindCase != PacketDbReply.KindOneofCase.BroadcastText)
                 return false;
@@ -288,8 +293,8 @@ namespace WDE.PacketViewer.Processing.Processors
             { 
                 Id = b.Id,
                 Language = (uint)b.Language,
-                Text = b.Text0,
-                Text1 = b.Text1,
+                Text = b.Text0.ToString(),
+                Text1 = b.Text1.ToString(),
                 EmoteId1 = b.Emotes[0].EmoteId,
                 EmoteId2 = b.Emotes[1].EmoteId,
                 EmoteId3 = b.Emotes[2].EmoteId,
@@ -300,13 +305,13 @@ namespace WDE.PacketViewer.Processing.Processors
                 EmotesId = b.EmotesId,
                 Flags = b.Flags
             };
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketGossipSelect packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGossipSelect packet)
         {
             lastChosenOption = (packet.MenuId, packet.OptionId);
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
         private async Task<IBroadcastText?> GetBroadcastText(uint entry)
@@ -548,12 +553,12 @@ namespace WDE.PacketViewer.Processing.Processors
                 multiQuery.Add(poiGenerator.BulkInsert(poiToAdd.Select(option => new AbstractPointOfInterest
                 {
                     Id = id++,
-                    PositionX = option.ActionPoi!.Coordinates.X,
-                    PositionY = option.ActionPoi.Coordinates.Y,
-                    Icon = option.ActionPoi.Icon,
-                    Flags = option.ActionPoi.Flags,
-                    Importance = option.ActionPoi.Importance,
-                    Name = option.ActionPoi.Name,
+                    PositionX = option.ActionPoi!.Value.Coordinates.X,
+                    PositionY = option.ActionPoi.Value.Coordinates.Y,
+                    Icon = option.ActionPoi.Value.Icon,
+                    Flags = option.ActionPoi.Value.Flags,
+                    Importance = option.ActionPoi.Value.Importance,
+                    Name = option.ActionPoi.Value.Name.ToString() ?? "",
                     VerifiedBuild  = 0,
                 }).ToList()));
 
@@ -725,11 +730,11 @@ namespace WDE.PacketViewer.Processing.Processors
                         continue;
 
                     var close = dbPoi.FirstOrDefault(
-                        poi => poi.Icon == option.ActionPoi.Icon &&
-                               poi.Flags == option.ActionPoi.Flags &&
-                               Math.Abs(poi.PositionX - option.ActionPoi.Coordinates.X) < 1 &&
-                               Math.Abs(poi.PositionY - option.ActionPoi.Coordinates.Y) < 1 &&
-                               poi.Name == option.ActionPoi.Name);
+                        poi => poi.Icon == option.ActionPoi.Value.Icon &&
+                               poi.Flags == option.ActionPoi.Value.Flags &&
+                               Math.Abs(poi.PositionX - option.ActionPoi.Value.Coordinates.X) < 1 &&
+                               Math.Abs(poi.PositionY - option.ActionPoi.Value.Coordinates.Y) < 1 &&
+                               poi.Name == option.ActionPoi.Value.Name.ToString());
                     if (close != null)
                     {
                         option.ActionPoiId = close.Id;

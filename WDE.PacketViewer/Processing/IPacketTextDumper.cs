@@ -35,18 +35,18 @@ namespace WDE.PacketViewer.Processing
     
     public interface ITwoStepPacketProcessor<T>
     {
-        T? PreProcess(PacketHolder packet);
+        T? PreProcess(ref readonly PacketHolder packet);
         Task PostProcessFirstStep() => Task.CompletedTask;
     }
 
     public interface IUnfilteredTwoStepPacketProcessor<T>
     {
-        T? UnfilteredPreProcess(PacketHolder packet);
+        T? UnfilteredPreProcess(ref readonly PacketHolder packet);
     }
 
     public interface IUnfilteredPacketProcessor
     {
-        void ProcessUnfiltered(PacketHolder unfiltered);
+        void ProcessUnfiltered(ref PacketHolder unfiltered);
     }
 
     public interface INeedToPostProcess

@@ -2,9 +2,11 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
+using ProtoZeroSharp;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Services;
+using WDE.PacketViewer.Utils;
 using WowPacketParser.Proto;
 
 namespace WDE.PacketViewer.PacketParserIntegration;
@@ -23,16 +25,26 @@ public class StreamSniffParser : IStreamSniffParser
         this.mainThread = mainThread;
     }
 
-    public async Task Start(CancellationToken token)
+    public async Task Start(RefCountedArena memory, CancellationToken token)
     {
         parser = await parserService.RunStreamParser(default, DumpFormatType.UniversalProtoWithText, token);
         parser.OnPacketParsed += packetString =>
         {
-            var proto = Packets.Parser.ParseFrom(ByteString.FromBase64(packetString));
-            mainThread.Dispatch(() =>
+            unsafe
             {
-                OnPacketArrived?.Invoke(proto);
-            });
+                using var @ref = memory.Increment();
+                var bytes = Convert.FromBase64String(packetString);
+                var packets = new Packets();
+                fixed (byte* ptr = bytes)
+                {
+                    var reader = new ProtoReader(ptr, bytes.Length);
+                    packets.Read(ref reader, ref @ref.Array);
+                }
+                mainThread.Dispatch(() =>
+                {
+                    OnPacketArrived?.Invoke(packets);
+                });
+            }
         };
     }
 

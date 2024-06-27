@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
              xmlns:converters="clr-namespace:WDE.PacketViewer.Avalonia.Views.Converters"
-             xmlns:proto="clr-namespace:WowPacketParser.Proto;assembly=WowPacketParser.Proto"
+             xmlns:proto="clr-namespace:WowPacketParser.Proto;assembly=WDE.PacketViewer"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="Root"
              x:DataType="viewModels:UpdateHistoryViewModel"

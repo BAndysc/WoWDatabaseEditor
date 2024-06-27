@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Avalonia.Threading;
-using DynamicData;
 using DynamicData.Binding;
 using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using WDE.Common;
+using WDE.Common.Collections;
 using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Disposables;
@@ -39,7 +39,9 @@ using WDE.PacketViewer.Processing.Processors.Utils;
 using WDE.PacketViewer.Services;
 using WDE.PacketViewer.Settings;
 using WDE.PacketViewer.Solutions;
+using WDE.PacketViewer.Utils;
 using WDE.SqlQueryGenerator;
+using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.ViewModels
@@ -88,6 +90,7 @@ namespace WDE.PacketViewer.ViewModels
             PrettyFlagParameter prettyFlagParameter,
             Func<IUpdateFieldsHistory> historyCreator)
         {
+            this.memoryAllocator = AutoDispose(new RefCountedArena());
             this.solutionItem = solutionItem;
             this.mainThread = mainThread;
             this.messageBoxService = messageBoxService;
@@ -115,9 +118,11 @@ namespace WDE.PacketViewer.ViewModels
 
             AutoDispose(history.AddHandler(new SelectedPacketHistory(this)));
             
-            filteredPackets = visiblePackets = AllPackets;
+            //filteredPackets = visiblePackets = AllPackets;
             ApplyFilterCommand = new AsyncCommand(async () =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 if (inApplyFilterCommand)
                     return;
 
@@ -141,6 +146,8 @@ namespace WDE.PacketViewer.ViewModels
 
             SaveToFileCommand = new AsyncCommand(async () =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 var path = await windowManager.ShowSaveFileDialog("Text file|txt");
                 if (path == null)
                     return;
@@ -155,7 +162,7 @@ namespace WDE.PacketViewer.ViewModels
                     foreach (var packet in FilteredPackets)
                     {
                         await writer.WriteLineAsync(await packetStore.GetTextAsync(packet));
-                        if ((i % 100) == 0)
+                        if ((i % 10000) == 0)
                             Report(i * 1.0f / count);
                     }
                 }
@@ -202,6 +209,8 @@ namespace WDE.PacketViewer.ViewModels
 
             QuickRunProcessor = new AsyncAutoCommand<ProcessorViewModel>(async (processor) =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 LoadingInProgress = true;
                 FilteringInProgress = true;
                 try
@@ -231,6 +240,8 @@ namespace WDE.PacketViewer.ViewModels
             
             RunProcessors = new AsyncAutoCommand(async () =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 var processors = Processors.Where(s => s.IsChecked).ToList();
                 if (processors.Count == 0)
                     return;
@@ -297,6 +308,8 @@ namespace WDE.PacketViewer.ViewModels
             
             async Task Find(string searchText, int start, int direction)
             {
+                using var _ = memoryAllocator.Increment();
+
                 var count = VisiblePackets.Count;
                 var searchToLower = searchText.ToLower();
                 foreach (var i in GetFindEnumerator(start, count, direction, true))
@@ -332,6 +345,8 @@ namespace WDE.PacketViewer.ViewModels
 
             FindRelatedPacketsCommands = new AsyncAutoCommand(async () =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 if (selectedPacket == null)
                     return;
 
@@ -383,6 +398,8 @@ namespace WDE.PacketViewer.ViewModels
 
             ExcludeEntryCommand = new AsyncAutoCommand<PacketViewModel?>(async vm =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 if (vm == null || vm.Entry == 0)
                     return;
                 
@@ -392,6 +409,8 @@ namespace WDE.PacketViewer.ViewModels
 
             IncludeEntryCommand = new AsyncAutoCommand<PacketViewModel?>(async vm =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 if (vm == null || vm.Entry == 0)
                     return;
                 
@@ -401,24 +420,30 @@ namespace WDE.PacketViewer.ViewModels
             
             ExcludeGuidCommand = new AsyncAutoCommand<PacketViewModel?>(async vm =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 if (vm == null || vm.MainActor == null)
                     return;
                 
-                FilterData.ExcludeGuid(vm.MainActor);
+                FilterData.ExcludeGuid(vm.MainActor.Value);
                 await ApplyFilterCommand.ExecuteAsync();
             }, vm => vm is { } pvm && pvm.MainActor != null);
             
             IncludeGuidCommand = new AsyncAutoCommand<PacketViewModel?>(async vm =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 if (vm == null || vm.MainActor == null)
                     return;
                 
-                FilterData.IncludeGuid(vm.MainActor);
+                FilterData.IncludeGuid(vm.MainActor.Value);
                 await ApplyFilterCommand.ExecuteAsync();
             }, vm => vm is { } pvm && pvm.MainActor != null);
             
             ExcludeOpcodeCommand = new AsyncAutoCommand<PacketViewModel?>(async vm =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 if (vm == null)
                     return;
                 
@@ -428,6 +453,8 @@ namespace WDE.PacketViewer.ViewModels
             
             IncludeOpcodeCommand = new AsyncAutoCommand<PacketViewModel?>(async vm =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 if (vm == null)
                     return;
                 
@@ -447,6 +474,8 @@ namespace WDE.PacketViewer.ViewModels
 
             ExplainSelectedPacketCommand = new AsyncAutoCommand(async () =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 if (!reasonPanelVisibility || actionReactionProcessor == null)
                     return;
                 if (selectedPacket == null)
@@ -499,6 +528,8 @@ namespace WDE.PacketViewer.ViewModels
             
             OpenFilterDialogCommand = new AsyncAutoCommand(async () =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 var newData = await filterDialogService.OpenFilterDialog(FilterData);
                 if (newData != null)
                 {
@@ -518,6 +549,8 @@ namespace WDE.PacketViewer.ViewModels
             
             GoToPacketCommand = new AsyncAutoCommand(async () =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 var min = filteredPackets[0].Id;
                 var max = filteredPackets[^1].Id;
                 var jumpTo = await inputBoxService.GetUInt("Go to packet number", $"Specify the packet id to jump to ({min}-{max})");
@@ -577,12 +610,14 @@ namespace WDE.PacketViewer.ViewModels
 
         private CancellationTokenSource? liveStreamToken;
 
-        private void Listen()
+        private unsafe void Listen()
         {
             liveStreamToken = new CancellationTokenSource();
             streamSniffParser.OnPacketArrived += packets =>
             {
-                var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor(), AllPacketsSplit?.Count ?? 0);
+                using var _ = memoryAllocator.Increment(); // better safe than sorry
+
+                var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor(), AllPacketsSplit?.Count ?? 0, memoryAllocator);
                 sniffGameBuild = packets.GameVersion;
                 prettyFlagParameter.InitializeBuild(sniffGameBuild);
                 splitter.Initialize(sniffGameBuild);
@@ -590,15 +625,20 @@ namespace WDE.PacketViewer.ViewModels
                     AllPacketsSplit ??= new();
                 using (AllPackets.SuspendNotifications())
                 {
-                    foreach (var packet in packets.Packets_)
+                    foreach (ref var packet in packets.Packets_.AsSpan())
                     {
-                        var packetViewModel = packetViewModelCreator.Process(packet, packet.BaseData.Number)!;
+                        PacketViewModel packetViewModel;
+                        fixed (PacketHolder* ptr = &packet) // safe, because the Packets array is allocated with Marshal.AllocHGlobal
+                            packetViewModel = packetViewModelCreator.Process(ptr, packet.BaseData.Number)!;
+
                         packetViewModel.Diff = AllPackets.Count == 0 ? 0 : (int)packet.BaseData.Time.ToDateTime().Subtract(AllPackets[^1].Time).TotalMilliseconds;
                         AllPackets.Add(packetViewModel);
 
                         if (splitUpdate)
                         {
-                            var splitted = splitter.Process(packet);
+                            IEnumerable<(Pointer<PacketHolder>, int)>? splitted;
+                            fixed (PacketHolder* ptr = &packet)
+                                splitted = splitter.Process(ptr);
                             if (splitted == null)
                             {
                                 AllPacketsSplit!.Add(packetViewModel);
@@ -609,8 +649,8 @@ namespace WDE.PacketViewer.ViewModels
                             {
                                 foreach (var split in splitted)
                                 {
-                                    var splitPacketViewModel = packetViewModelCreator.Process(split.Item1, split.Item1.BaseData.Number)!;
-                                    splitPacketViewModel.Diff = AllPacketsSplit!.Count == 0 ? 0 : (int)split.Item1.BaseData.Time.ToDateTime().Subtract(AllPacketsSplit[^1].Time).TotalMilliseconds;
+                                    var splitPacketViewModel = packetViewModelCreator.Process(split.Item1, split.Item1.Value.BaseData.Number)!;
+                                    splitPacketViewModel.Diff = AllPacketsSplit!.Count == 0 ? 0 : (int)split.Item1.Value.BaseData.Time.ToDateTime().Subtract(AllPacketsSplit[^1].Time).TotalMilliseconds;
                                     AllPacketsSplit!.Add(splitPacketViewModel);
                                     if (filteringService.IsMatched(splitPacketViewModel, packetStore, DisableFilters ? "" : FilterText.ToString(), DisableFilters ? null : FilterData))
                                         FilteredPackets.Add(splitPacketViewModel);
@@ -633,7 +673,7 @@ namespace WDE.PacketViewer.ViewModels
                         foreach (var split in finalized)
                         {
                             var splitPacketViewModel = packetViewModelCreator.Process(split.Item1, split.Item2)!;
-                            splitPacketViewModel.Diff = AllPacketsSplit!.Count == 0 ? 0 : (int)split.Item1.BaseData.Time.ToDateTime().Subtract(AllPacketsSplit[^1].Time).TotalMilliseconds;
+                            splitPacketViewModel.Diff = AllPacketsSplit!.Count == 0 ? 0 : (int)split.Item1.Value.BaseData.Time.ToDateTime().Subtract(AllPacketsSplit[^1].Time).TotalMilliseconds;
                             AllPacketsSplit!.Add(splitPacketViewModel);
                             if (filteringService.IsMatched(splitPacketViewModel, packetStore, DisableFilters ? "" : FilterText.ToString(), DisableFilters ? null : FilterData))
                                 FilteredPackets.Add(splitPacketViewModel);
@@ -642,7 +682,7 @@ namespace WDE.PacketViewer.ViewModels
                 }
 
             };
-            streamSniffParser.Start(liveStreamToken.Token);
+            streamSniffParser.Start(memoryAllocator, liveStreamToken.Token);
             snifferProxy.Listen(liveStreamToken.Token);
             snifferProxy.OnSnifferPacketArrived += raw =>
             {
@@ -652,6 +692,8 @@ namespace WDE.PacketViewer.ViewModels
 
         private async Task<bool> EnsureSplitOrDismiss()
         {
+            using var _ = memoryAllocator.Increment();
+
             if (!splitUpdate)
             {
                 if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
@@ -674,8 +716,10 @@ namespace WDE.PacketViewer.ViewModels
         private int? Min(int? a, int? b) => a.HasValue ? (b.HasValue ? Math.Min(a.Value, b.Value) : a) : b;
         private int? Max(int? a, int? b) => a.HasValue ? (b.HasValue ? Math.Max(a.Value, b.Value) : a) : b;
 
-        private Task SplitPacketsIfNeededAsync()
+        private unsafe Task SplitPacketsIfNeededAsync()
         {
+            using var _ = memoryAllocator.Increment();
+
             if (!splitUpdate)
                 return Task.CompletedTask;
             
@@ -684,25 +728,31 @@ namespace WDE.PacketViewer.ViewModels
 
             return Task.Run(() =>
             {
+                using var _ = memoryAllocator.Increment();
+
                 AllPacketsSplit = new();
-                var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor(), 0);
+                var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor(), 0, memoryAllocator);
                 splitter.Initialize(sniffGameBuild);
                 foreach (var packet in AllPackets)
                 {
-                    var splitted = splitter.Process(packet.Packet);
+                    var splitted = splitter.Process(packet.PacketPtr);
                     if (splitted == null)
                         AllPacketsSplit.Add(packet);
                     else
                     {
                         foreach (var split in splitted)
+                        {
                             AllPacketsSplit.Add(packetViewModelCreator.Process(split.Item1, split.Item2)!);
+                        }
                     }
                 }
 
                 var finalized = splitter.Finalize();
                 if (finalized != null)
                     foreach (var split in finalized)
+                    {
                         AllPacketsSplit.Add(packetViewModelCreator.Process(split.Item1, split.Item2)!);
+                    }
 
                 UpdateHistoryViewModel.Invalidate(AllPacketsSplit);
             });
@@ -710,6 +760,8 @@ namespace WDE.PacketViewer.ViewModels
 
         private async Task RunProcessorsAndOpenResults(IReadOnlyList<ProcessorViewModel> processors, CancellationToken token)
         {
+            using var _ = memoryAllocator.Increment();
+
             string? textOutput;
             try
             {
@@ -762,6 +814,8 @@ namespace WDE.PacketViewer.ViewModels
 
         public async Task<string?> RunProcessorsThreaded(IReadOnlyList<ProcessorViewModel> processors, CancellationToken cancellationToken)
         {
+            using var _ = memoryAllocator.Increment();
+
             List<(ProcessorViewModel viewModel, IPacketTextDumper dumper)> textDumpers = new();
             foreach (var processor in processors)
             {
@@ -808,6 +862,8 @@ namespace WDE.PacketViewer.ViewModels
 
         public async Task<List<IDocument>?> RunDocumentProcessorsThreaded(IReadOnlyList<ProcessorViewModel> processors, CancellationToken cancellationToken)
         {
+            using var _ = memoryAllocator.Increment();
+
             List<IDocument> documents = new();
             List<(ProcessorViewModel viewModel, IPacketDocumentDumper dumper)> documentsDumpers = new();
             foreach (var processor in processors)
@@ -858,6 +914,8 @@ namespace WDE.PacketViewer.ViewModels
 
         private async Task RunProcessor(CancellationToken cancellationToken, IPacketProcessor<bool> dumper, IProgress<float> progress)
         {
+            using var _ = memoryAllocator.Increment();
+
             var packetsCount = (long)FilteredPackets.Count;
             long processed = 0;
             // ReSharper disable once SuspiciousTypeConversion.Global
@@ -867,8 +925,8 @@ namespace WDE.PacketViewer.ViewModels
                 foreach (var packet in FilteredPackets)
                 {
                     processed++;
-                    preprocessor.PreProcess(packet.Packet);
-                    if ((processed % 100) == 0)
+                    preprocessor.PreProcess(ref packet.Packet);
+                    if ((processed % 10000) == 0)
                     {
                         if (cancellationToken.IsCancellationRequested)
                             break;
@@ -888,13 +946,13 @@ namespace WDE.PacketViewer.ViewModels
                 {
                     var packet = all[index];
                     processed++;
-                    if (!unfilteredPreprocessor.UnfilteredPreProcess(packet.Packet))
+                    if (!unfilteredPreprocessor.UnfilteredPreProcess(ref packet.Packet))
                     {
                         processed += all.Count - index;
                         break;
                     }
 
-                    if ((processed % 100) == 0)
+                    if ((processed % 10000) == 0)
                     {
                         if (cancellationToken.IsCancellationRequested)
                             break;
@@ -915,13 +973,13 @@ namespace WDE.PacketViewer.ViewModels
 
                     while (j < all.Count && all[j].Id < packet.Id)
                     {
-                        unfilteredPacketProcessor.ProcessUnfiltered(all[j++].Packet);
+                        unfilteredPacketProcessor.ProcessUnfiltered(ref all[j++].Packet);
                     }
 
                     processed++;
                     j++;
-                    dumper.Process(packet.Packet);
-                    if ((processed % 100) == 0)
+                    dumper.Process(ref packet.Packet);
+                    if ((processed % 10000) == 0)
                     {
                         if (cancellationToken.IsCancellationRequested)
                             break;
@@ -935,8 +993,8 @@ namespace WDE.PacketViewer.ViewModels
                 foreach (var packet in FilteredPackets)
                 {
                     processed++;
-                    dumper.Process(packet.Packet);
-                    if ((processed % 100) == 0)
+                    dumper.Process(ref packet.Packet);
+                    if ((processed % 10000) == 0)
                     {
                         if (cancellationToken.IsCancellationRequested)
                             break;
@@ -953,6 +1011,8 @@ namespace WDE.PacketViewer.ViewModels
         
         private async Task LoadSniff()
         {
+            using var _ = memoryAllocator.Increment();
+
             LoadingInProgress = true;
             FilteringInProgress = true;
 
@@ -961,12 +1021,11 @@ namespace WDE.PacketViewer.ViewModels
             
             try
             {
-                var packets = await sniffLoader.LoadSniff(solutionItem.File!, solutionItem.CustomVersion, currentActionToken.Token, true, this);
+                var packets = await sniffLoader.LoadSniff(memoryAllocator, solutionItem.File!, solutionItem.CustomVersion, currentActionToken.Token, true, this);
                 
                 if (!packetStore.Load((DumpFormatType)packets.DumpType))
                     await messageBoxService.SimpleDialog("Error", "Failed to load packet text output", "Failed to load _parsed.txt output file. Without this file, text output will be missing in the packets.");
-                
-                
+
                 if (currentActionToken.IsCancellationRequested)
                 {
                     LoadingInProgress = false;
@@ -978,8 +1037,13 @@ namespace WDE.PacketViewer.ViewModels
                 prettyFlagParameter.InitializeBuild(sniffGameBuild);
                 using (AllPackets.SuspendNotifications())
                 {
-                    foreach (var packet in packets.Packets_)
-                        AllPackets.Add(packetViewModelCreator.Process(packet, packet.BaseData.Number)!);
+                    for (var index = 0; index < packets.Packets_.Count; index++)
+                    {
+                        unsafe
+                        {
+                            AllPackets.Add(packetViewModelCreator.Process(packets.Packets_.GetPointer(index), packets.Packets_[index].BaseData.Number)!);
+                        }
+                    }
                 }
             }
             catch (ParserException e)
@@ -1018,6 +1082,8 @@ namespace WDE.PacketViewer.ViewModels
         
         private async Task<IFilterData?> GetRelatedFilters(int start, CancellationToken token)
         {
+            using var _ = memoryAllocator.Increment();
+
             try
             {
                 var all = splitUpdate ? AllPacketsSplit! : AllPackets;
@@ -1043,6 +1109,8 @@ namespace WDE.PacketViewer.ViewModels
         
         private async Task FilterPackets(string filter)
         {
+            using var _ = memoryAllocator.Increment();
+
             FilteringInProgress = true;
             var tokenSource = new CancellationTokenSource();
             filteringToken = tokenSource;    
@@ -1055,10 +1123,15 @@ namespace WDE.PacketViewer.ViewModels
                 var result = await filteringService.Filter(splitUpdate && AllPacketsSplit != null ? AllPacketsSplit : AllPackets, packetStore, DisableFilters ? "" : filter, DisableFilters ? null : FilterData, tokenSource.Token, this);
                 if (result != null)
                 {
-                    FilteredPackets = result;
-                    VisiblePackets = HidePlayerMove
-                        ? new ObservableCollection<PacketViewModel>(result.Where(r => !IsPlayerMovePacket(r)))
-                        : result;
+                    using var __ = FilteredPackets.SuspendNotifications();
+                    using var ___ = VisiblePackets.SuspendNotifications();
+                    FilteredPackets.Clear();
+                    FilteredPackets.AddRange(result);
+                    VisiblePackets.Clear();
+                    if (hidePlayerMove)
+                        VisiblePackets.AddRange(result.Where(r => !IsPlayerMovePacket(r)));
+                    else
+                        VisiblePackets.AddRange(result);
                     SelectedPacket = previouslySelected;
                     if (VisiblePackets.Count > 0)
                     {
@@ -1075,9 +1148,9 @@ namespace WDE.PacketViewer.ViewModels
                         actionReactionProcessor = actionReactionProcessorCreator.Create();
                         actionReactionProcessor.Initialize(sniffGameBuild);
                         foreach (var f in filteredPackets)
-                            actionReactionProcessor.PreProcess(f.Packet);
+                            actionReactionProcessor.PreProcess(ref f.Packet);
                         foreach (var f in filteredPackets)
-                            actionReactionProcessor.Process(f.Packet);
+                            actionReactionProcessor.Process(ref f.Packet);
                     }
                     else
                         actionReactionProcessor = null;
@@ -1138,15 +1211,15 @@ namespace WDE.PacketViewer.ViewModels
 
         private IPacketViewModelStore packetStore;
         
-        private ObservableCollection<PacketViewModel> filteredPackets;
-        public ObservableCollection<PacketViewModel> FilteredPackets
+        private FastObservableCollection<PacketViewModel> filteredPackets = new();
+        public FastObservableCollection<PacketViewModel> FilteredPackets
         {
             get => filteredPackets;
             set => SetProperty(ref filteredPackets, value);
         }
 
-        private ObservableCollection<PacketViewModel> visiblePackets;
-        public ObservableCollection<PacketViewModel> VisiblePackets
+        private FastObservableCollection<PacketViewModel> visiblePackets = new();
+        public FastObservableCollection<PacketViewModel> VisiblePackets
         {
             get => visiblePackets;
             set => SetProperty(ref visiblePackets, value);
@@ -1238,8 +1311,9 @@ namespace WDE.PacketViewer.ViewModels
         public AsyncAutoCommand RunProcessors { get; }
         public AsyncAutoCommand<ProcessorViewModel> QuickRunProcessor { get; }
         public ObservableCollection<ProcessorViewModel> Processors { get; } = new();
-        private ObservableCollectionExtended<PacketViewModel> AllPackets { get; } = new ();
-        private ObservableCollectionExtended<PacketViewModel>? AllPacketsSplit { get; set; }
+        private RefCountedArena memoryAllocator;
+        private FastObservableCollection<PacketViewModel> AllPackets { get; } = new ();
+        private FastObservableCollection<PacketViewModel>? AllPacketsSplit { get; set; }
         public ReadOnlyObservableCollection<string> MostRecentlySearched { get; }
         public ObservableCollection<ActionReasonPredictionViewModel> Predictions { get; } = new();
         public ObservableCollection<PossibleActionViewModel> PossibleActions { get; } = new();

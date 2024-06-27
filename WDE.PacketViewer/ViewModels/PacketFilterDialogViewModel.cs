@@ -145,13 +145,13 @@ namespace WDE.PacketViewer.ViewModels
             DeleteIncludedGuid = new DelegateCommand<UniversalGuid?>(guid =>
             {
                 if (guid != null)
-                    IncludedGuids.Remove(guid);
+                    IncludedGuids.Remove(guid.Value);
             });
             
             DeleteExcludedGuid = new DelegateCommand<UniversalGuid?>(guid =>
             {
                 if (guid != null)
-                    ExcludedGuids.Remove(guid);
+                    ExcludedGuids.Remove(guid.Value);
             });
 
             AutoDispose(this.ToObservable(o => o.ExcludedEntries).SubscribeAction(_ => RaisePropertyChanged(nameof(EntriesHeader))));

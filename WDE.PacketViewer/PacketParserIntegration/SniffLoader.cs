@@ -2,9 +2,11 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using ProtoZeroSharp;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Settings;
+using WDE.PacketViewer.Utils;
 using WowPacketParser.PacketStructures;
 using WowPacketParser.Proto;
 
@@ -28,9 +30,8 @@ namespace WDE.PacketViewer.PacketParserIntegration
             this.viewerSettings = viewerSettings;
         }
         
-        public async Task<Packets> LoadSniff(string path, int? customVersion, CancellationToken token, bool withText, IProgress<float> progress)
+        public async Task<Packets> LoadSniff(RefCountedArena allocator, string path, int? customVersion, CancellationToken token, bool withText, IProgress<float> progress)
         {
-            Packets packets = null!;
             var extension = Path.GetExtension(path);
 
             if (extension != ".pkt" && extension != ".bin" && extension != ".dat")
@@ -91,7 +92,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
             }
 
             if (token.IsCancellationRequested)
-                return packets;
+                return default;
 
             if (!File.Exists(path))
             {
@@ -100,19 +101,25 @@ namespace WDE.PacketViewer.PacketParserIntegration
             }
             
             progress.Report(-1);
-            await Task.Run(async () =>
+            var packets = await Task.Run(() =>
             {
-                await using var input = File.OpenRead(path);
-                try
+                using var @ref = allocator.Increment();
+                unsafe
                 {
-                    packets = Packets.Parser.ParseFrom(input);
-                }
-                catch (Google.Protobuf.InvalidProtocolBufferException)
-                {
-                    throw new ParserException("Sniff file is broken. Possible reason: you are trying to open _parsed.dat file generated with an older editor version. Select .pkt file and reparse again.");
+                    var input = File.ReadAllBytes(path);
+                    Packets packets = new Packets();
+                    fixed (byte* ptr = input)
+                    {
+                        var protoReader = new ProtoReader(ptr, input.Length);
+                        packets.Read(ref protoReader, ref @ref.Array);
+                    }
+                    return packets;
                 }
             }, token).ConfigureAwait(true);
             progress.Report(1);
+
+            if (token.IsCancellationRequested)
+                return default;
 
             return packets;
         }
@@ -134,19 +141,35 @@ namespace WDE.PacketViewer.PacketParserIntegration
             return false;
         }
 
-        public async Task<(ulong, DumpFormatType)?> GetVersionAndDump(string path)
+        public unsafe Task<(ulong, DumpFormatType)?> GetVersionAndDump(string path)
         {
-            await using var input = File.OpenRead(path);
-            try
+            using var input = File.OpenRead(path);
+            var firstBytes = new byte[100]; // enough for the header
+            input.Read(firstBytes);
+
+            ulong? version = 0;
+            DumpFormatType? formatType = 0;
+
+            fixed (byte* ptr = firstBytes)
             {
-                var version = PacketsVersion.Parser.ParseFrom(input);
-                input.Close();
-                return (version.Version, (DumpFormatType)version.DumpType);
+                var protoReader = new ProtoReader(ptr, firstBytes.Length);
+                while (protoReader.Next())
+                {
+                    if (protoReader.Tag == PacketsVersion.FieldIds.Version)
+                        version = protoReader.ReadVarInt();
+                    else if (protoReader.Tag == PacketsVersion.FieldIds.DumpType)
+                        formatType = (DumpFormatType)protoReader.ReadVarInt();
+                    else if (protoReader.Tag == PacketsVersion.FieldIds.GameVersion)
+                        protoReader.ReadVarInt();
+                    else
+                        break;
+                }
             }
-            catch (Exception)
-            {
-                return null;
-            }
+
+            if (!version.HasValue || !formatType.HasValue)
+                return Task.FromResult<(ulong, DumpFormatType)?>(null);
+
+            return Task.FromResult<(ulong, DumpFormatType)?>((version.Value, formatType.Value));
         }
     }
 }

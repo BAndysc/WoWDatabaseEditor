@@ -1,4 +1,5 @@
 using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using WDE.PacketViewer.Filtering.Antlr;
 using WDE.PacketViewer.ViewModels;
 using WowPacketParser.Proto;
@@ -12,6 +13,7 @@ namespace WDE.PacketViewer.Filtering
         private CommonTokenStream tokens;
         private SyntaxParser parser;
         private ExpressionVisitor visitor;
+        private ExpressionTree.ITreeNode root;
         
         public DatabaseExpressionEvaluator(string expression, UniversalGuid playerGuid, IPacketViewModelStore store)
         {
@@ -23,15 +25,13 @@ namespace WDE.PacketViewer.Filtering
             parser.RemoveErrorListeners();
 
             visitor = new ExpressionVisitor(new IsPacketSpecificPlayerProcessor(playerGuid), store);
+            root = new ExpressionTree.TreeBuilder().Visit(parser.expr());
         }
 
-        public object? Evaluate(PacketViewModel entity)
+        public FilterOutput Evaluate(PacketViewModel entity)
         {
-            lexer.Reset();
-            tokens.Reset();
-            parser.Reset();
             visitor.SetContext(entity);
-            return visitor.Visit(parser.expr());
+            return visitor.Visit(root);
         }
     }
 }

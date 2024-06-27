@@ -30,35 +30,36 @@ namespace WDE.PacketViewer.ViewModels
             this.spellStore = spellStore;
         }
         
-        public PacketViewModel? Process(PacketHolder packet, int originalId)
+        public unsafe PacketViewModel? Process(PacketHolder* packetPtr, int originalId)
         {
+            ref PacketHolder packet = ref *packetPtr;
             if (packet.KindCase == PacketHolder.KindOneofCase.PlayerLogin)
                 playerGuid = packet.PlayerLogin.PlayerGuid;
             else if (playerGuid == null && packet.KindCase == PacketHolder.KindOneofCase.ClientMove)
                 playerGuid = packet.ClientMove.Mover;
             
             if (packet.KindCase == PacketHolder.KindOneofCase.QueryGameObjectResponse)
-                gameobjectNames[packet.QueryGameObjectResponse.Entry] = packet.QueryGameObjectResponse.Name;
+                gameobjectNames[packet.QueryGameObjectResponse.Entry] = packet.QueryGameObjectResponse.Name.ToString() ?? "";
             
             if (packet.KindCase == PacketHolder.KindOneofCase.QueryCreatureResponse)
-                creatureNames[packet.QueryCreatureResponse.Entry] = packet.QueryCreatureResponse.Name;
+                creatureNames[packet.QueryCreatureResponse.Entry] = packet.QueryCreatureResponse.Name.ToString() ?? "";
 
             if (packet.KindCase == PacketHolder.KindOneofCase.QueryPlayerNameResponse)
             {
-                foreach (var pair in packet.QueryPlayerNameResponse.Responses)
-                    if (pair.PlayerGuid != null)
-                        playerNames[pair.PlayerGuid] = pair.PlayerName;
+                foreach (var pair in packet.QueryPlayerNameResponse.Responses.AsSpan())
+                    if (pair.PlayerGuid != default)
+                        playerNames[pair.PlayerGuid] = pair.PlayerName.ToString() ?? "";
             }
  
-            var guid = guidExtractorProcessor.Process(packet);
-            var entry = entryExtractorProcessor.Process(packet);
+            var guid = guidExtractorProcessor.Process(in packet);
+            var entry = entryExtractorProcessor.Process(in packet);
 
             string? name = null;
             if (guid != null)
             {
-                if (guid.Type == UniversalHighGuid.Creature ||
-                    guid.Type == UniversalHighGuid.Pet ||
-                    guid.Type == UniversalHighGuid.Vehicle)
+                if (guid.Value.Type == UniversalHighGuid.Creature ||
+                    guid.Value.Type == UniversalHighGuid.Pet ||
+                    guid.Value.Type == UniversalHighGuid.Vehicle)
                 {
                     if (!creatureNames.TryGetValue(entry, out name))
                     {
@@ -67,9 +68,9 @@ namespace WDE.PacketViewer.ViewModels
                             name = creatureNames[entry] = template.Name;
                     }
                 }
-                else if (guid.Type == UniversalHighGuid.GameObject ||
-                         guid.Type == UniversalHighGuid.WorldTransaction ||
-                         guid.Type == UniversalHighGuid.Transport)
+                else if (guid.Value.Type == UniversalHighGuid.GameObject ||
+                         guid.Value.Type == UniversalHighGuid.WorldTransaction ||
+                         guid.Value.Type == UniversalHighGuid.Transport)
                 {
                     if (!gameobjectNames.TryGetValue(entry, out name))
                     {
@@ -78,9 +79,9 @@ namespace WDE.PacketViewer.ViewModels
                             name = gameobjectNames[entry] = template.Name;
                     }
                 }
-                else if (guid.Type == UniversalHighGuid.Player)
+                else if (guid.Value.Type == UniversalHighGuid.Player)
                 {
-                    if (playerNames.TryGetValue(guid, out var playerName))
+                    if (playerNames.TryGetValue(guid.Value, out var playerName))
                         name = "Player: " + playerName;
                 }
             }
@@ -112,9 +113,9 @@ namespace WDE.PacketViewer.ViewModels
             if (packet.KindCase == PacketHolder.KindOneofCase.SpellGo
                 || packet.KindCase == PacketHolder.KindOneofCase.SpellStart)
             {
-                if (packet.SpellGo != null && packet.SpellGo.Data == null || packet.SpellStart != null && packet.SpellStart.Data == null)
+                if (packet.KindCase == PacketHolder.KindOneofCase.SpellGo && packet.SpellGo.Data == null || packet.KindCase == PacketHolder.KindOneofCase.SpellStart && packet.SpellStart.Data == null)
                     return null;
-                var spellId = packet.SpellGo?.Data.Spell ?? packet.SpellStart!.Data.Spell;
+                var spellId = packet.KindCase == PacketHolder.KindOneofCase.SpellGo ? packet.SpellGo.Data->Spell : packet.SpellStart.Data->Spell;
                 var spellName = spellStore.HasSpell(spellId) ? spellStore.GetName(spellId) : null;
                 if (spellName != null)
                 {
@@ -125,7 +126,7 @@ namespace WDE.PacketViewer.ViewModels
                 }
             }
             
-            return new PacketViewModel(packet, originalId, entry, guid, name);
+            return new PacketViewModel(packetPtr, originalId, entry, guid, name);
         }
     }
 }

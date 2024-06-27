@@ -17,9 +17,9 @@ namespace WDE.PacketViewer.Processing
             nothingProcessor.Initialize(gameBuild);
         }
 
-        public bool Process(PacketHolder packet)
+        public bool Process(ref readonly PacketHolder packet)
         {
-            nothingProcessor.Process(packet);
+            nothingProcessor.Process(in packet);
             return true;
         }
     }

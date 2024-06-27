@@ -20,7 +20,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Description => "Generate all creature texts with emotes and sounds";
         public string Extension => "sql";
         public bool CanProcessMultipleFiles => true;
-        public ImageUri? Image { get; } = new ImageUri("icons/chat_big.png");
+        public ImageUri? Image { get; } = new ImageUri("Icons/chat_big.png");
         public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings) =>
             Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<CreatureTextDumper>((typeof(bool), false), (typeof(IParsingSettings), settings)));
     }
@@ -38,7 +38,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Description => "Generate all creature texts with emotes and sounds, as a diff with current texts in the database";
         public string Extension => "sql";
         public bool CanProcessMultipleFiles => true;
-        public ImageUri? Image { get; } = new ImageUri("icons/chat_diff_big.png");
+        public ImageUri? Image { get; } = new ImageUri("Icons/chat_diff_big.png");
         public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings) =>
             Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<CreatureTextDumper>((typeof(bool), true), (typeof(IParsingSettings), settings)));
     }

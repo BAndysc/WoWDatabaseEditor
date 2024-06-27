@@ -18,9 +18,9 @@ namespace WDE.PacketViewer.Processing.Runners
             r1.Initialize(gameBuild);
         }
 
-        public bool PreProcess(PacketHolder packet)
+        public bool PreProcess(ref readonly PacketHolder packet)
         {
-            r1.Process(packet);
+            r1.Process(in packet);
             return true;
         }
 
@@ -48,10 +48,10 @@ namespace WDE.PacketViewer.Processing.Runners
             r2.Initialize(gameBuild);
         }
 
-        public bool PreProcess(PacketHolder packet)
+        public bool PreProcess(ref readonly PacketHolder packet)
         {
-            r1.Process(packet);
-            r2.Process(packet);
+            r1.Process(in packet);
+            r2.Process(in packet);
             return true;
         }
 
@@ -85,11 +85,11 @@ namespace WDE.PacketViewer.Processing.Runners
             r3.Initialize(gameBuild);
         }
 
-        public bool PreProcess(PacketHolder packet)
+        public bool PreProcess(ref readonly PacketHolder packet)
         {
-            r1.Process(packet);
-            r2.Process(packet);
-            r3.Process(packet);
+            r1.Process(in packet);
+            r2.Process(in packet);
+            r3.Process(in packet);
             return true;
         }
 
@@ -130,12 +130,12 @@ namespace WDE.PacketViewer.Processing.Runners
             r4.Initialize(gameBuild);
         }
 
-        public bool PreProcess(PacketHolder packet)
+        public bool PreProcess(ref readonly PacketHolder packet)
         {
-            r1.Process(packet);
-            r2.Process(packet);
-            r3.Process(packet);
-            r4.Process(packet);
+            r1.Process(in packet);
+            r2.Process(in packet);
+            r3.Process(in packet);
+            r4.Process(in packet);
             return true;
         }
 
@@ -182,13 +182,13 @@ namespace WDE.PacketViewer.Processing.Runners
             r5.Initialize(gameBuild);
         }
         
-        public bool PreProcess(PacketHolder packet)
+        public bool PreProcess(ref readonly PacketHolder packet)
         {
-            r1.Process(packet);
-            r2.Process(packet);
-            r3.Process(packet);
-            r4.Process(packet);
-            r5.Process(packet);
+            r1.Process(in packet);
+            r2.Process(in packet);
+            r3.Process(in packet);
+            r4.Process(in packet);
+            r5.Process(in packet);
             return true;
         }
 
@@ -241,14 +241,14 @@ namespace WDE.PacketViewer.Processing.Runners
             r6.Initialize(gameBuild);
         }
 
-        public bool PreProcess(PacketHolder packet)
+        public bool PreProcess(ref readonly PacketHolder packet)
         {
-            r1.Process(packet);
-            r2.Process(packet);
-            r3.Process(packet);
-            r4.Process(packet);
-            r5.Process(packet);
-            r6.Process(packet);
+            r1.Process(in packet);
+            r2.Process(in packet);
+            r3.Process(in packet);
+            r4.Process(in packet);
+            r5.Process(in packet);
+            r6.Process(in packet);
             return true;
         }
 

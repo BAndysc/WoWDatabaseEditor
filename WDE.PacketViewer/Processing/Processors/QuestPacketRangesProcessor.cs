@@ -39,26 +39,26 @@ namespace WDE.PacketViewer.Processing.Processors
             this.databaseProvider = databaseProvider;
         }
         
-        protected override bool Process(PacketBase basePacket, PacketQuestComplete packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestComplete packet)
         {
             Get(packet.QuestId).Completed = basePacket.Number;
             return true;
         }
         
-        protected override bool Process(PacketBase basePacket, PacketQuestFailed packet) 
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestFailed packet) 
         {
             Get(packet.QuestId).Failed = basePacket.Number;
             return true;
         }
 
-        protected override bool Process(PacketBase basePacket, PacketQuestGiverQuestComplete packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestGiverQuestComplete packet)
         {
             Get(packet.QuestId).Rewarded = basePacket.Number;
             Get(packet.QuestId).RewardedTime = basePacket.Time.ToDateTime();
             return true;
         }
 
-        protected override bool Process(PacketBase basePacket, PacketQuestGiverAcceptQuest packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestGiverAcceptQuest packet)
         {
             Get(packet.QuestId).Accepted = basePacket.Number;
             Get(packet.QuestId).AcceptedTime = basePacket.Time.ToDateTime();

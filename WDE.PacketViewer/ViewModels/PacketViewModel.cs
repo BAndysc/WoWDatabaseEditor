@@ -5,13 +5,15 @@ using WowPacketParser.Proto;
 
 namespace WDE.PacketViewer.ViewModels
 {
-    public class PacketViewModel : INotifyPropertyChanged
+    public unsafe class PacketViewModel //: INotifyPropertyChanged
     {
         private int diff;
         public int OriginalId { get; }
         public int Id => Packet.BaseData.Number;
-        public string Opcode => Packet.BaseData.Opcode;
-        public PacketHolder Packet { get; }
+        private string? cachedOpcode;
+        public string Opcode => cachedOpcode ??= Packet.BaseData.Opcode.ToString() ?? "";
+        private PacketHolder* packet;
+        public ref PacketHolder Packet => ref *packet;
         public DateTime Time => Packet.BaseData.Time.ToDateTime();
 
         public int Diff
@@ -27,21 +29,22 @@ namespace WDE.PacketViewer.ViewModels
         public uint Entry { get; }
         public UniversalGuid? MainActor { get; }
         public string? ObjectName { get; }
-        
-        public PacketViewModel(PacketHolder packet, int originalId, uint entry, UniversalGuid? mainActor, string? objectName)
+        public PacketHolder* PacketPtr => packet;
+
+        public PacketViewModel(PacketHolder* packet, int originalId, uint entry, UniversalGuid? mainActor, string? objectName)
         {
             OriginalId = originalId;
-            Packet = packet;
+            this.packet = packet;
             Entry = entry;
             MainActor = mainActor;
             ObjectName = objectName;
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+//        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+  //          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
