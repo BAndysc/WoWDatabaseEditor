@@ -475,7 +475,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
 
         public void Activate()
         {
-            mainWindowHolder.RootWindow?.ActivateWorkaround();
+            if (mainWindowHolder.RootWindow is { } window)
+            {
+                if (window.WindowState == WindowState.Minimized)
+                    window.WindowState = WindowState.Normal;
+                window.Activate();
+            }
         }
 
         public async Task OpenPopupMenu<T>(T menuViewModel, object? control) where T : IPopupMenuViewModel
