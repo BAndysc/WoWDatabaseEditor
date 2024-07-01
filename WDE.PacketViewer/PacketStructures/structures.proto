@@ -28,8 +28,11 @@ message PacketBase {
   string opcode = 2;
   google.protobuf.Timestamp time = 3;
   string stringData = 4;
-  optional google.protobuf.Int64Value textStartOffset = 5;
-  optional google.protobuf.Int32Value textLength = 6;
+  optional int64 textStartOffset = 5;
+  int32 textLength = 6;
+  optional int64 headerTextStartOffset = 900;
+  int32 headerTextLength = 901;
+  bool isFirstPacketWithThisHeader = 902;
 }
 
 message PacketHolder {
@@ -705,23 +708,23 @@ message CreateObject {
   optional StationaryPositionData stationary = 6;
   optional VehicleCreate vehicle = 7;
   optional Quat rotation = 8;
-  google.protobuf.Int32Value textStartOffset = 9;
-  google.protobuf.Int32Value textLength = 10;
+  optional int32 textStartOffset = 9;
+  optional int32 textLength = 10;
   optional string text = 11;
 }
 
 message UpdateObject {
   UniversalGuid guid = 1;
   UpdateValues values = 2;
-  google.protobuf.Int32Value textStartOffset = 3;
-  google.protobuf.Int32Value textLength = 4;
+  optional int32 textStartOffset = 3;
+  optional int32 textLength = 4;
   optional string text = 5;
 }
 
 message DestroyedObject {
   UniversalGuid guid = 1;
-  google.protobuf.Int32Value textStartOffset = 2;
-  google.protobuf.Int32Value textLength = 3;
+  optional int32 textStartOffset = 2;
+  optional int32 textLength = 3;
   optional string text = 4;
 }
 

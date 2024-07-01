@@ -137,7 +137,7 @@ namespace WDE.PacketViewer.Processing.Processors
         
         private IEnumerable<(Pointer<PacketHolder>, int)>? InnerSplit(Pointer<PacketHolder> packet)
         {
-            if (packet.Value.KindCase == PacketHolder.KindOneofCase.UpdateObject)
+            if (packet.Value.KindCase == PacketHolder.KindOneofCase.UpdateObject && !packet.Value.BaseData.Opcode.Equals("SMSG_DESTROY_OBJECT"u8))
             {
                 var iterator = Process(ref packet.Value.BaseData, ref packet.Value.UpdateObject);
                 if (iterator != null)
@@ -154,11 +154,13 @@ namespace WDE.PacketViewer.Processing.Processors
             }
         }
 
-        protected IEnumerable<(Pointer<PacketHolder>, int)>? Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
+        protected unsafe IEnumerable<(Pointer<PacketHolder>, int)>? Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
         {
             using var @ref = allocator.Increment();
 
             List<(Pointer<PacketHolder>, int)> output = new();
+
+            int? headerLength = null;
 
             foreach (ref readonly var destroyed in packet.Destroyed.AsSpan())
             {
@@ -166,7 +168,11 @@ namespace WDE.PacketViewer.Processing.Processors
                 fake.Destroyed = UnmanagedArray<DestroyedObject>.AllocArray(1, ref @ref.Array);
                 fake.Destroyed[0] = destroyed;
                 var newBaseData = basePacket; // struct so this is a copy
-                newBaseData.StringData = Utf8String.CreateFromString(GenerateText(basePacket, destroyed.Text?.ToString()), ref @ref.Array);
+                newBaseData.TextStartOffset = basePacket.TextStartOffset + destroyed.TextStartOffset;
+                newBaseData.TextLength = destroyed.TextLength ?? 0;
+                newBaseData.IsFirstPacketWithThisHeader = !headerLength.HasValue;
+                newBaseData.HeaderTextStartOffset = basePacket.TextStartOffset;
+                newBaseData.HeaderTextLength = (headerLength ??= destroyed.TextStartOffset!.Value);
 
                 var newPacketHolder = @ref.Array.Alloc<PacketHolder>();
                 newPacketHolder.Value.BaseData = newBaseData;
@@ -182,7 +188,11 @@ namespace WDE.PacketViewer.Processing.Processors
                 fake.OutOfRange = UnmanagedArray<DestroyedObject>.AllocArray(1, ref @ref.Array);
                 fake.OutOfRange[0] = outOfRange;
                 var newBaseData = basePacket; // struct so this is a copy
-                newBaseData.StringData = Utf8String.CreateFromString(GenerateText(basePacket, outOfRange.Text?.ToString()), ref @ref.Array);
+                newBaseData.TextStartOffset = basePacket.TextStartOffset + outOfRange.TextStartOffset;
+                newBaseData.TextLength = outOfRange.TextLength ?? 0;
+                newBaseData.IsFirstPacketWithThisHeader = !headerLength.HasValue;
+                newBaseData.HeaderTextStartOffset = basePacket.TextStartOffset;
+                newBaseData.HeaderTextLength = (headerLength ??= outOfRange.TextStartOffset!.Value);
 
                 var newPacketHolder = @ref.Array.Alloc<PacketHolder>();
                 newPacketHolder.Value.BaseData = newBaseData;
@@ -198,7 +208,11 @@ namespace WDE.PacketViewer.Processing.Processors
                 fake.Created = UnmanagedArray<CreateObject>.AllocArray(1, ref @ref.Array);
                 fake.Created[0] = created;
                 var newBaseData = basePacket; // struct so this is a copy
-                newBaseData.StringData = Utf8String.CreateFromString(GenerateText(basePacket, created.Text?.ToString()), ref @ref.Array);
+                newBaseData.TextStartOffset = basePacket.TextStartOffset + created.TextStartOffset;
+                newBaseData.TextLength = created.TextLength ?? 0;
+                newBaseData.IsFirstPacketWithThisHeader = !headerLength.HasValue;
+                newBaseData.HeaderTextStartOffset = basePacket.TextStartOffset;
+                newBaseData.HeaderTextLength = (headerLength ??= created.TextStartOffset!.Value);
 
                 var newPacketHolder = @ref.Array.Alloc<PacketHolder>();
                 newPacketHolder.Value.BaseData = newBaseData;
@@ -214,7 +228,11 @@ namespace WDE.PacketViewer.Processing.Processors
                 fake.Updated = UnmanagedArray<UpdateObject>.AllocArray(1, ref @ref.Array);
                 fake.Updated[0] = updated;
                 var newBaseData = basePacket; // struct so this is a copy
-                newBaseData.StringData = Utf8String.CreateFromString(GenerateText(basePacket, updated.Text?.ToString()), ref @ref.Array);
+                newBaseData.TextStartOffset = basePacket.TextStartOffset + updated.TextStartOffset;
+                newBaseData.TextLength = updated.TextLength ?? 0;
+                newBaseData.IsFirstPacketWithThisHeader = !headerLength.HasValue;
+                newBaseData.HeaderTextStartOffset = basePacket.TextStartOffset;
+                newBaseData.HeaderTextLength = (headerLength ??= updated.TextStartOffset!.Value);
 
                 var newPacketHolder = @ref.Array.Alloc<PacketHolder>();
                 newPacketHolder.Value.BaseData = newBaseData;

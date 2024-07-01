@@ -51,7 +51,7 @@ internal class SourceCodeFindAnywhereSource : IFindAnywhereSource
     class TemporaryData
     {
         public readonly byte[] Buffer = new byte[1024 * 10];
-        public readonly List<(long, long, string)> Results = new();
+        public readonly List<FastByteSearcher.Result> Results = new();
     }
 
     public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType searchType, IReadOnlyList<string> parameterNames,
@@ -60,9 +60,7 @@ internal class SourceCodeFindAnywhereSource : IFindAnywhereSource
         if (parameterValue < 10)
             return; // this would yield too many false positives
 
-        var valueString = parameterValue.ToString();
-        var valueBytes = Encoding.UTF8.GetBytes(valueString);
-        var valueLength = valueBytes.Length;
+        var searcher = new FastByteSearcher(parameterValue.ToString(), false, true);
         foreach (var path in sourceCodePathService.SourceCodePaths)
         {
             var files = Enumerable.Concat(Directory.GetFiles(path, "*.h", SearchOption.AllDirectories),
@@ -79,13 +77,13 @@ internal class SourceCodeFindAnywhereSource : IFindAnywhereSource
                 Parallel.ForEach(files, options, () => new TemporaryData(), (f, loop, data) =>
                 {
                     data.Results.Clear();
-                    FastByteSearcher.IndexOfWholeWorldForAll(f, valueBytes, data.Buffer, data.Results);
+                    searcher.Search(f, false, data.Buffer, data.Results);
 
-                    foreach (var (lineNumber, offset, line) in data.Results)
+                    foreach (var result in data.Results)
                     {
                         mainThread.Dispatch(() =>
                         {
-                            resultContext.AddResult(new SourceCodeFindResult(OpenCommand, new FileInfo(f), (int)lineNumber + 1, line));
+                            resultContext.AddResult(new SourceCodeFindResult(OpenCommand, new FileInfo(f), (int)result.lineNumber + 1, result.line));
                         });
                     }
 
