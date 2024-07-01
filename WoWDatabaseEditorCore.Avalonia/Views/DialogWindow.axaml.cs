@@ -8,6 +8,7 @@ using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
 using AvaloniaStyles.Controls;
+using WDE.Common.Avalonia.Utils;
 using WDE.Common.Managers;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
@@ -23,8 +24,28 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         {
             InitializeComponent();
             this.AttachDevTools();
+            Activated += OnActivated;
+            Deactivated += OnDeactivated;
         }
-        
+
+        private void OnDeactivated(object? sender, EventArgs e)
+        {
+            foreach (var logicalChild in LogicalChildren)
+            {
+                if (logicalChild is IDialogWindowActivatedListener listener)
+                    listener.OnDeactivated();
+            }
+        }
+
+        private void OnActivated(object? sender, EventArgs e)
+        {
+            foreach (var logicalChild in LogicalChildren)
+            {
+                if (logicalChild is IDialogWindowActivatedListener listener)
+                    listener.OnActivated();
+            }
+        }
+
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
