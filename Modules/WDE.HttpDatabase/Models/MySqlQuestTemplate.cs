@@ -12,7 +12,9 @@ namespace WDE.HttpDatabase.Models
         public int MinLevel { get; set; }
         
         public int QuestSortId { get; set; }
-        
+
+        public QuestFlags Flags { get; set; }
+
         public CharacterClasses AllowableClasses { get; set; }
 
         public CharacterRaces AllowableRaces { get; set; }
@@ -37,18 +39,16 @@ namespace WDE.HttpDatabase.Models
     {
         private JsonCataQuestTemplateAddon? addon;
 
-        
         public uint Entry { get; set; }
-
         
         public string Name { get; set; } = "";
 
-        
         public int MinLevel { get; set; }
 
-        
         public int QuestSortId { get; set; }
-        
+
+        public QuestFlags Flags { get; set; }
+
         public CharacterClasses AllowableClasses => addon == null ? CharacterClasses.None : (CharacterClasses)addon.AllowableClasses;
 
         public CharacterRaces AllowableRaces => addon?.AllowableRaces ?? CharacterRaces.All;
@@ -90,9 +90,10 @@ namespace WDE.HttpDatabase.Models
         //
         public int MinLevel { get; set; }
 
-        
         public int QuestSortId { get; set; }
-        
+
+        public QuestFlags Flags { get; set; }
+
         public CharacterClasses AllowableClasses => addon == null ? CharacterClasses.None : (CharacterClasses)addon.AllowableClasses;
 
         public int BreadcrumbForQuestId => addon?.BreadcrumbForQuest ?? 0;

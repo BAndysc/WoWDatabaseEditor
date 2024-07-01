@@ -35,6 +35,8 @@ namespace WDE.CMMySqlDatabase.Models
 
         [Column("RequiredClasses"                            )] public CharacterClasses AllowableClasses { get; set; } // smallint(5) unsigned
 
+        [Column(Name = "QuestFlags")] public QuestFlags Flags { get; set; }
+
         //         [Column(Name = "RewardNextQuest")]
         //         public uint NextQuestInChain { get; set; }
 
