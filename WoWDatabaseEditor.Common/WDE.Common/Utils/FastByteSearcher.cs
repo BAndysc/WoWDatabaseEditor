@@ -143,7 +143,7 @@ public class FastByteSearcher
     public struct OpenedFileSearcher : System.IDisposable
     {
         private readonly FastByteSearcher data;
-        private MemoryMappedFile mmapFile;
+        private MemoryMappedFile? mmapFile;
         public readonly long FileLength;
 
         public OpenedFileSearcher(FastByteSearcher data, string mmapFilePath)
@@ -154,11 +154,14 @@ public class FastByteSearcher
 
             FileLength = new FileInfo(mmapFilePath).Length;
 
-            mmapFile = MemoryMappedFile.CreateFromFile(mmapFilePath, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
+            if (FileLength > 0)
+                mmapFile = MemoryMappedFile.CreateFromFile(mmapFilePath, FileMode.Open, null, FileLength, MemoryMappedFileAccess.Read);
         }
 
         public Result? FindOne(long byteOffset, int? maxLength, bool reversed)
         {
+            if (mmapFile == null)
+                return null;
             var temporaryBuffer = ArrayPool<byte>.Shared.Rent(1024 * 1000);
 
             try
@@ -175,6 +178,9 @@ public class FastByteSearcher
 
         public void Search(bool reversed, byte[]? temporaryBuffer, List<Result> results)
         {
+            if (mmapFile == null)
+                return;
+
             bool pooledBuffer = false;
             if (temporaryBuffer == null)
             {
