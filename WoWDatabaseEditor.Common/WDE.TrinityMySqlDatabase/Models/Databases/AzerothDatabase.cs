@@ -5,7 +5,8 @@ namespace WDE.TrinityMySqlDatabase.Models;
 
 public class AzerothDatabase : BaseTrinityDatabase
 {
-    public ITable<MySqlCreatureTemplateWrath> CreatureTemplate => this.GetTable<MySqlCreatureTemplateWrath>();
+    public ITable<MySqlCreatureTemplateAC> CreatureTemplate => this.GetTable<MySqlCreatureTemplateAC>();
+    public ITable<CreatureTemplateModel> CreatureTemplateModel => this.GetTable<CreatureTemplateModel>();
     public ITable<MySqlCreatureAzeroth> Creature => this.GetTable<MySqlCreatureAzeroth>();
     public ITable<MySqlBroadcastTextAzeroth> BroadcastTexts => this.GetTable<MySqlBroadcastTextAzeroth>();
     public ITable<ACoreString> Strings => this.GetTable<ACoreString>();

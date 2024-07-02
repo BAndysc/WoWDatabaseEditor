@@ -16,7 +16,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "LogTitle")]
         public string Name { get; set; } = "";
 
-        [Column(Name = "QuestFlags")]
+        [Column(Name = "Flags")]
         public QuestFlags Flags { get; set; }
 
         [Column(Name = "MinLevel")]
@@ -67,7 +67,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "MinLevel")]
         public int MinLevel { get; set; }
 
-        [Column(Name = "QuestFlags")]
+        [Column(Name = "Flags")]
         public QuestFlags Flags { get; set; }
 
         [Column(Name = "QuestSortID")]
@@ -111,7 +111,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "LogTitle")]
         public string Name { get; set; } = "";
 
-        [Column(Name = "QuestFlags")]
+        [Column(Name = "Flags")]
         public QuestFlags Flags { get; set; }
 
         // master no longer has min level

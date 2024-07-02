@@ -56,6 +56,10 @@ for index in ${!URLs[*]}; do
                 "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < "${i}"
             done
         else
+            cat data/sql/base/db_world/updates.sql | awk '/INSERT INTO `updates`/ {flag=1; next}/;/ {flag=0}flag {print $1}' | tr -d \'\' | tr -d \(\, | xargs -I {} rm "data/sql/updates/db_world/{}" || true
+
+            rm -rf data/sql/updates/db_world/2024_03_04_00.sql || true
+
             for i in data/sql/base/db_world/*.sql
             do
                 "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < "${i}"

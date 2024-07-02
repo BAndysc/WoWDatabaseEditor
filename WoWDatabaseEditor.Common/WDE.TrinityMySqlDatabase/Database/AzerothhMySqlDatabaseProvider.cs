@@ -29,19 +29,54 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
     public override async Task<ICreatureTemplate?> GetCreatureTemplate(uint entry)
     {
         await using var model = Database();
-        return await model.CreatureTemplate.FirstOrDefaultAsync(ct => ct.Entry == entry);
+        var template = await model.CreatureTemplate.FirstOrDefaultAsync(ct => ct.Entry == entry);
+        if (template == null)
+            return null;
+        var models = await model.CreatureTemplateModel.Where(x => x.CreatureId == entry).ToListAsync();
+        return template.WithModels(models);
     }
 
     public override IReadOnlyList<ICreatureTemplate> GetCreatureTemplates()
     {
         using var model = Database();
-        return model.CreatureTemplate.OrderBy(t => t.Entry).ToList<ICreatureTemplate>();
+        var templates = model.CreatureTemplate.OrderBy(t => t.Entry).ToList();
+        var models = model.CreatureTemplateModel.OrderBy(t => t.CreatureId).ThenBy(x => x.Index).ToList();
+        MergeCreatureTemplateModels(templates, models);
+        return templates;
     }
     
+    /// <summary>
+    /// Given a sorted lists of templates and models (sorted by Creature Entry), it merges models into templates
+    /// </summary>
+    /// <param name="templates"></param>
+    /// <param name="models"></param>
+    private void MergeCreatureTemplateModels(List<MySqlCreatureTemplateAC> templates, List<CreatureTemplateModel> models)
+    {
+        int j = 0;
+        for (int i = 0; i < templates.Count; ++i)
+        {
+            if (j >= models.Count)
+                break;
+
+            while (j < models.Count && models[j].CreatureId < templates[i].Entry)
+                j++;
+
+            var count = 0;
+            while (j + count < models.Count && models[j + count].CreatureId == templates[i].Entry)
+                count++;
+
+            templates[i].WithModels(models.Skip(j).Take(count).ToList());
+            j += count;
+        }
+    }
+
     public override async Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync()
     {
         await using var model = Database();
-        return await model.CreatureTemplate.OrderBy(t => t.Entry).ToListAsync<ICreatureTemplate>();
+        var templates = await model.CreatureTemplate.OrderBy(t => t.Entry).ToListAsync();
+        var models = await model.CreatureTemplateModel.OrderBy(t => t.CreatureId).ThenBy(x => x.Index).ToListAsync();
+        MergeCreatureTemplateModels(templates, models);
+        return templates;
     }
 
     public override async Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry)
