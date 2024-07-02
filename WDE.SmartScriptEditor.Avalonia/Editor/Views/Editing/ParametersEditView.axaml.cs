@@ -41,6 +41,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing
             base.OnGotFocus(e);
             DispatcherTimer.RunOnce(() =>
             {
+                if (!this.FindAncestorOfType<Window>()?.IsActive ?? true)
+                    return;
                 var currentFocus = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement();
                 if (currentFocus == null || ReferenceEquals(currentFocus, this) || forceFocusFirstOnNextGotFocus)
                 {
