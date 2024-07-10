@@ -9,6 +9,7 @@
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
              xmlns:controls="clr-namespace:WDE.DatabaseDefinitionEditor.Views.Controls"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditorView"
              Background="{DynamicResource SlightlyHighlightedBackground}"
@@ -38,22 +39,25 @@
                                 <controls:DatabaseTableCompletionBox
                                     Database="{CompiledBinding ImportTableDatabaseType}"
                                     TableName="{CompiledBinding ImportTableName}"/>
-                                <Button Command="{CompiledBinding ImportTableCommand}">Import</Button>
+                                <Button Content="Import" Click="OnButtonImportClick" />
                             </StackPanel>
                         </Flyout>
                     </ButtonImage.Flyout>
                 </ButtonImage>
-                <ButtonImage ToolTip.Tip="Create an empty table" Image="Icons/icon_new.png" Command="{CompiledBinding CreateEmptyTableCommand}" />
+                <ButtonImage ToolTip.Tip="Create an empty table" Image="Icons/icon_new.png" Click="OnButtonCreateEmptyClick" />
             </ToolbarPanel>
             <controls:OnReleaseListBox ItemsSource="{CompiledBinding Definitions}"
                               Margin="5,0,5,5"
                               SelectedItem="{CompiledBinding SelectedDefinition, Mode=TwoWay}">
                 <controls:OnReleaseListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{CompiledBinding TableName, Mode=OneTime}" FontWeight="Bold" />
-                            <TextBlock Text="{CompiledBinding RelativePath, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
-                        </StackPanel>
+                        <DockPanel>
+                            <WdeImage ImageUri="{CompiledBinding Icon}" VerticalAlignment="Center" Margin="0,0,5,0" Width="24" Height="24" />
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="{CompiledBinding TableName, Mode=OneTime}" FontWeight="Bold" />
+                                <TextBlock Text="{CompiledBinding RelativePath, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
+                            </StackPanel>
+                        </DockPanel>
                     </DataTemplate>
                 </controls:OnReleaseListBox.ItemTemplate>
             </controls:OnReleaseListBox>
@@ -63,12 +67,15 @@
         <Grid Grid.RowDefinitions="*,5,Auto" Grid.Column="2" IsEnabled="{CompiledBinding SelectedTable, Converter={x:Static NullConverter.IsNotNull}}">
             <TabControl SelectionChanged="SelectingItemsControl_OnSelectionChanged" x:Name="TabControl">
                 <TabItem Header="Table">
-                    <ScrollViewer>
+                    <ScrollViewer AllowAutoHide="False">
                         <views:DefinitionView DataContext="{CompiledBinding SelectedTable}" />
                     </ScrollViewer>
                 </TabItem>
+                <TabItem Header="Columns">
+                    <views:ColumnsView  DataContext="{CompiledBinding SelectedTable}" />
+                </TabItem>
                 <TabItem Header="Conditions">
-                    <ScrollViewer>
+                    <ScrollViewer AllowAutoHide="False">
                         <views:ConditionsView DataContext="{CompiledBinding SelectedTable}" />
                     </ScrollViewer>
                 </TabItem>
@@ -78,11 +85,8 @@
                 <TabItem Header="Commands">
                     <views:CommandsView DataContext="{CompiledBinding SelectedTable}" />
                 </TabItem>
-                <TabItem Header="Columns">
-                    <views:ColumnsView  DataContext="{CompiledBinding SelectedTable}" />
-                </TabItem>
                 <TabItem Header="Raw json" x:Name="RawJsonTab">
-                    <avaloniaEdit:TextEditor SyntaxHighlighting="Json" 
+                    <avaloniaEdit:TextEditor AvalonEditExtra.SyntaxExtension="json"
                                              Document="{CompiledBinding RawDefinitionDocument, Converter={x:Static NativeTextDocumentConverter.Instance}}" 
                                              BorderThickness="0"
                                              ShowLineNumbers="True"

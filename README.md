@@ -7,8 +7,8 @@ This project is a continuation of [Visual SAI Studio](https://github.com/Bandysc
 
 # Supported server versions
 
- * Supported database: TC 3.3.5, TC 4.3.4 ("preservation project"), TC master (9.0.x), AzerothCore (3.3.5)
- * Supported DBC: 3.3.5, 4.3.4, 9.0.1 - 9.1.5
+ * Supported database: TC 3.3.5, TC 4.3.4 ("preservation project"), TC master (10.0.x), AzerothCore (3.3.5)
+ * Supported DBC: 3.3.5, 4.3.4, 10.x
 
 # Sponsors
 
@@ -22,7 +22,7 @@ Application has a built-in auto updater, so you do **not** have to redownload a 
 
 ## Mac OS / Linux / Windows version
 
-**To run the editor, you need [.NET 6 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0) for your OS**.
+**To run the editor, you need [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0) for your OS**.
 
 WoW Database Editor is compatibile with both MacOS, Linux and Windows.
 
@@ -36,7 +36,7 @@ That's a fantastic news! There is still a lot to do in the IDE, if you do not kn
 
 # How to build
 
-**In order to build WoW Database Editor you need to install [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)** (it is installed automatically with Visual Studio 2022)
+**In order to build WoW Database Editor you need to install [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)** (it is installed automatically with Visual Studio 2022)
 
 **If you want to use Visual Studio, you need Visual Studio 2022**. That's because older Visual Studio version **doesn't** support .NET 6.0!
 
@@ -69,6 +69,7 @@ dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseedi
  * TrinityCore, Cmangos and everyone who contributes to WoW Core!
  * [Avalonia](https://avaloniaui.net/) - WoW Database Editor is built upon Avalonia UI framework
  * [Thenarden](https://github.com/Thenarden/nmpq) - for Nmpq - A Fully-Managed C# MPQ Parser
+ * [Icons8](https://icons8.com/) - for icons, [license](https://icons8.com/license)
 
 ![screenshot16](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot16.png)
 ![screenshot8](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot8.png)

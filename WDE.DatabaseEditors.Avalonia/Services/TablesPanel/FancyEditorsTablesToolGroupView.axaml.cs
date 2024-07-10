@@ -46,11 +46,15 @@ public partial class FancyEditorsTablesToolGroupView : UserControl
 
     private void InputElement_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (sender is ListBox itemsBox && e.Source is Visual visual)
+        if (e.InitialPressMouseButton == MouseButton.Left)
         {
-            if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
+            if (sender is ListBox itemsBox && e.Source is Visual visual)
             {
-                (DataContext as FancyEditorsTablesToolGroupViewModel)!.OpenTable((item.DataContext as TableItemViewModel)!);
+                if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
+                {
+                    (DataContext as FancyEditorsTablesToolGroupViewModel)!.OpenTable((item.DataContext as TableItemViewModel)!);
+                    e.Handled = true;
+                }
             }
         }
     }

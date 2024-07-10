@@ -1,27 +1,33 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using ProtoZeroSharp;
 using WowPacketParser.Proto;
 
 namespace WDE.PacketViewer.Utils
 {
     public static class GuidExtensions
     {
-        public static bool IsEmpty(this UniversalGuid? guid)
+        public static bool IsEmpty(this ref readonly UniversalGuid guid)
         {
-            if (guid == null)
-                return true;
-            
             if (guid.KindCase == UniversalGuid.KindOneofCase.Guid64)
                 return guid.Guid64.Low == 0 && guid.Guid64.High == 0;
-            
+
             if (guid.KindCase == UniversalGuid.KindOneofCase.Guid128)
                 return guid.Guid128.Low == 0 && guid.Guid128.High == 0;
-            
+
             return true;
         }
+
+        public static bool IsEmpty(this ref readonly Optional<UniversalGuid> guid)
+        {
+            if (!guid.HasValue)
+                return true;
+
+            return guid.Value.IsEmpty();
+        }
         
-        public static string ToHexString(this UniversalGuid guid)
+        public static string ToHexString(this ref readonly UniversalGuid guid)
         {
             if (guid.KindCase == UniversalGuid.KindOneofCase.Guid64)
                 return $"0x" + guid.Guid64.High.ToString("X8") + guid.Guid64.Low.ToString("X8");
@@ -32,7 +38,7 @@ namespace WDE.PacketViewer.Utils
             return "0x0";
         }
 
-        public static string ToHexWithTypeString(this UniversalGuid guid)
+        public static string ToHexWithTypeString(this ref readonly UniversalGuid guid)
         {
             return $"{guid.ToHexString()}/{guid.Entry}/{guid.Type}";
         }
@@ -98,11 +104,11 @@ namespace WDE.PacketViewer.Utils
                 if (!parts[0].TryParseGuid(entry, type, out var guid))
                     continue;
                 
-                yield return guid!;
+                yield return guid!.Value;
             }
         }
 
-        public static uint GetLow(this UniversalGuid guid)
+        public static uint GetLow(this ref readonly UniversalGuid guid)
         {
             if (guid.KindCase == UniversalGuid.KindOneofCase.Guid128)
                 return (uint)(guid.Guid128.Low & 0xFFFFFFFFFF);
@@ -130,20 +136,20 @@ namespace WDE.PacketViewer.Utils
             return 0;
         }
 
-        public static uint GetEntry(this UniversalGuid128 guid)
+        public static uint GetEntry(this ref readonly UniversalGuid128 guid)
         {
             return (uint)((guid.High >> 6) & 0x7FFFFF);
         }
 
-        public static byte GetSubType(this UniversalGuid128 guid) => (byte)(guid.High & 0x3F);
+        public static byte GetSubType(this ref readonly UniversalGuid128 guid) => (byte)(guid.High & 0x3F);
 
-        public static ushort GetRealmId(this UniversalGuid128 guid) => (ushort)((guid.High >> 42) & 0x1FFF);
+        public static ushort GetRealmId(this ref readonly UniversalGuid128 guid) => (ushort)((guid.High >> 42) & 0x1FFF);
 
-        public static uint GetServerId(this UniversalGuid128 guid) => (uint)((guid.Low >> 40) & 0xFFFFFF);
+        public static uint GetServerId(this ref readonly UniversalGuid128 guid) => (uint)((guid.Low >> 40) & 0xFFFFFF);
 
-        public static ushort GetMapId(this UniversalGuid128 guid) => (ushort)((guid.High >> 29) & 0x1FFF);
+        public static ushort GetMapId(this ref readonly UniversalGuid128 guid) => (ushort)((guid.High >> 29) & 0x1FFF);
 
-        public static bool HasEntry(this UniversalGuid guid)
+        public static bool HasEntry(this ref readonly UniversalGuid guid)
         {
             switch (guid.Type)
             {
@@ -158,10 +164,8 @@ namespace WDE.PacketViewer.Utils
             }
         }
 
-        public static string ToWowParserString(this UniversalGuid? guid)
+        public static string ToWowParserString(this in UniversalGuid guid)
         {
-            if (guid == null)
-                return "0x0 (null)";
             if (guid.KindCase == UniversalGuid.KindOneofCase.Guid128 && (guid.Guid128.High != 0 || guid.Guid128.Low != 0))
             {
                 if (guid.HasEntry())
@@ -171,7 +175,7 @@ namespace WDE.PacketViewer.Utils
                         guid.Type, guid.Guid128.GetSubType(), guid.Guid128.GetRealmId(), guid.Guid128.GetServerId(), guid.Guid128.GetMapId(),
                         guid.Entry, guid.GetLow());
                 }
-                
+
                 // ReSharper disable once UseStringInterpolation
                 return string.Format("Full: 0x{0:X16}{1:X16} {2}/{3} R{4}/S{5} Map: {6} Low: {7}", guid.Guid128.High, guid.Guid128.Low,
                     guid.Type, guid.Guid128.GetSubType(), guid.Guid128.GetRealmId(), guid.Guid128.GetServerId(), guid.Guid128.GetMapId(),
@@ -185,20 +189,38 @@ namespace WDE.PacketViewer.Utils
                 }
                 return string.Format("Full: 0x{0:X8} Type: {1} Low: {0}", guid.GetLow(), guid.Type);
             }
-            
+
             return "Full: 0x0";
         }
 
-        public static ushort GetMapId(this UniversalGuid guid)
+        public static string ToWowParserString(this ref readonly Optional<UniversalGuid> guid)
         {
-            if (guid.Guid128 != null)
+            if (!guid.HasValue)
+                return "0x0 (null)";
+
+            return guid.Value.ToWowParserString();
+        }
+
+        public static string ToWowParserString(this UniversalGuid? guid)
+        {
+            if (!guid.HasValue)
+                return "0x0 (null)";
+
+            var copy = guid.Value;
+
+            return copy.ToWowParserString();
+        }
+
+        public static ushort GetMapId(this ref readonly UniversalGuid guid)
+        {
+            if (guid.KindCase == UniversalGuid.KindOneofCase.Guid128)
                 return guid.Guid128.GetMapId();
             throw new Exception("Can't get Map from guid " + guid.ToWowParserString() + " because it's not a 128bit guid");
         }
 
-        public static ushort TryGetMapId(this UniversalGuid guid, ushort defaultValue)
+        public static ushort TryGetMapId(this ref readonly UniversalGuid guid, ushort defaultValue)
         {
-            if (guid.Guid128 != null)
+            if (guid.KindCase == UniversalGuid.KindOneofCase.Guid128)
                 return guid.Guid128.GetMapId();
             return defaultValue;
         }

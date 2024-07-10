@@ -459,6 +459,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public async Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text)
         {
+            if (string.IsNullOrEmpty(text))
+                return null;
             await WaitForCache();
             if (broadcastTextsCache == null)
                 return await nonCachedDatabase.GetBroadcastTextByTextAsync(text);

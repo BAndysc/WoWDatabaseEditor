@@ -15,16 +15,16 @@ public class DefinitionExporterService : IDefinitionExporterService
     public DatabaseTableDefinitionJson Export(DefinitionViewModel vm)
     {
         var groups = vm.Groups.Select(Export).ToList();
-        List<string>? primaryKey;
+        List<ColumnFullName>? primaryKey;
         
         if (vm.HasCustomPrimaryKeyOrder)
-            primaryKey = vm.CustomPrimaryKey.Select(c => c.ColumnName).ToList();
+            primaryKey = vm.CustomPrimaryKey.Select(c => new ColumnFullName(null, c.ColumnName)).ToList();
         else
         {
-            primaryKey = new List<string>();
+            primaryKey = new List<ColumnFullName>();
             foreach (var candidate in vm.Groups.SelectMany(g => g.Columns)
                          .Where(c => c.IsPrimaryKey && c.DatabaseColumnName != null && !c.DatabaseColumnName.IsForeignTable)
-                         .Select(c => c.DatabaseColumnName!.ColumnName))
+                         .Select(c => new ColumnFullName(null, c.DatabaseColumnName!.ColumnName)))
             {
                 if (!primaryKey.Contains(candidate))
                     primaryKey.Add(candidate);
@@ -38,20 +38,20 @@ public class DefinitionExporterService : IDefinitionExporterService
         {
             TableName = f.TableName,
             AutofillBuildColumn = f.AutofillBuildColumn.NullIfEmpty(),
-            ForeignKeys = f.ForeignKeys.Select(k => k.ColumnName).ToArray()
+            ForeignKeys = f.ForeignKeys.Select(k => new ColumnFullName(null, k.ColumnName)).ToArray()
         }).ToList();
         if (foreignKeys.Count == 0)
             foreignKeys = null;
         
         return new DatabaseTableDefinitionJson()
         {
-            Compatibility = vm.Compatibility.Where(c => c.IsChecked).Select(core => core.Tag).ToList(),
+            Compatibility = vm.Compatibility.ToList(),
             Name = vm.Name,
             SingleSolutionName = vm.SingleSolutionName,
             MultiSolutionName = vm.MultiSolutionName,
             Description = vm.Description,
             TableName = vm.TableName,
-            TablePrimaryKeyColumnName = vm.TablePrimaryKeyColumnName,
+            TablePrimaryKeyColumnName = new ColumnFullName(null, vm.TablePrimaryKeyColumnName),
             RecordMode = vm.RecordMode,
             DataDatabaseType = vm.DataDatabaseType,
             IsOnlyConditionsTable = vm.IsOnlyConditionsTable,
@@ -59,7 +59,7 @@ public class DefinitionExporterService : IDefinitionExporterService
             GroupName = vm.GroupName,
             IconPath = vm.IconPath,
             ReloadCommand = vm.ReloadCommand,
-            SortBy = vm.SortBy.Count == 0 ? null : vm.SortBy.Select(s => s.ColumnName).ToArray(),
+            SortBy = vm.SortBy.Count == 0 ? null : vm.SortBy.Select(s => new ColumnFullName(null, s.ColumnName)).ToArray(),
             Picker = vm.Picker?.ParameterName ?? "",
             TableNameSource = vm.TableNameSource.NullIfEmpty(),
             PrimaryKey = primaryKey!,
@@ -92,11 +92,11 @@ public class DefinitionExporterService : IDefinitionExporterService
         return new DatabaseConditionReferenceJson()
         {
             SourceType = vm.SourceType,
-            SourceEntryColumn = vm.SourceEntryColumn,
-            SourceIdColumn = vm.SourceIdColumn,
+            SourceEntryColumn = vm.SourceEntryColumn != null ? new ColumnFullName(null, vm.SourceEntryColumn) : null,
+            SourceIdColumn = vm.SourceIdColumn != null ? new ColumnFullName(null, vm.SourceIdColumn) : null,
             SetColumn = vm.SetColumn == null ? null : new ColumnFullName(null, vm.SetColumn),
             SourceGroupColumn = vm.SourceGroupColumn == null ? null :
-                new DatabaseConditionColumn(){IsAbs = vm.SourceGroupColumnAbs, Name = vm.SourceGroupColumn},
+                new DatabaseConditionColumn(){IsAbs = vm.SourceGroupColumnAbs, Name = new ColumnFullName(null, vm.SourceGroupColumn)},
             Targets = vm.Targets.Select(t => new DatabaseConditionTargetJson()
             {
                 Id = t.Id,

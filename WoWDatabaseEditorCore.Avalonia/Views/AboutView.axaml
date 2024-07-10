@@ -30,6 +30,8 @@
                 <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
                     <TextBlock  TextWrapping="WrapWithOverflow" Text="Database is not required, but in that case features are limited. It is database editor by design." />
                 </WrapPanel>
+                <Border Height="32" />
+                <HyperlinkButton NavigateUri="https://icons8.com/">Icons by Icons8</HyperlinkButton>
             </StackPanel>
         </DockPanel>
     </ScrollViewer>

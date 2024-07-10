@@ -38,8 +38,20 @@ internal class ShadowlandsDbcLoader : BaseDbcLoader
                 data.EmoteStateStore.Add(row.ID, name);
             data.EmoteStore.Add(row.ID, name);
         });
+        LoadDB2("ItemSparse.db2", row =>
+        {
+            var item = new ItemSparse()
+            {
+                Id = row.FieldAs<int>("ID"),
+                Name = row.FieldAs<string>("Display_lang"),
+                RandomSelect = row.FieldAs<ushort>("RandomSelect"),
+                ItemRandomSuffixGroupId = row.FieldAs<ushort>("ItemRandomSuffixGroupID"),
+            };
+            data.ItemSparses.Add(item);
+        });
+        Load("ItemRandomProperties.db2", "Name_lang", data.ItemRandomPropertiesStore);
+        Load("ItemRandomSuffix.db2", "Name_lang", data.ItemRandomSuffixStore);
         Load("EmotesText.db2", "Name", data.TextEmoteStore);
-        Load("ItemSparse.db2", "Display_lang", data.ItemStore);
         Load("Languages.db2", "Name_lang", data.LanguageStore);
         Load("Map.db2", "Directory", data.MapDirectoryStore);
         Load("Map.db2", "MapName_lang", data.MapStore);

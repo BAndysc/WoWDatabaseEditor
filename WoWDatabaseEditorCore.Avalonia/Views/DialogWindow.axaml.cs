@@ -28,6 +28,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
+            if (DataContext is IDialogWindowBase windowBase)
+                windowBase.OnWindowOpened();
             //(Content as IInputElement)?.Focus();
         }
 

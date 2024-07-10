@@ -23,9 +23,9 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         {
         }
 
-        public override bool Process(PacketHolder packet)
+        public override bool Process(ref readonly PacketHolder packet)
         {
-            base.Process(packet);
+            base.Process(in packet);
             var action = GetAction(packet.BaseData);
             if (!action.HasValue)
                 return false;
@@ -33,10 +33,14 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             var eventAction = GetPossibleEventsForAction(packet.BaseData);
             
             //(act: {r.Item2*100:0}%, time: {r.Item3*100:0}%, dist: {r.Item4*100:0}%)
-            sb.AppendLine($"[{action.Value.PacketNumber}] {action.Value.Description} [{action.Value.MainActor?.ToHexString()}] because:");
+            var mainActor = action.Value.MainActor ?? default;
+            var mainActorString = action.Value.MainActor != null ? mainActor.ToHexString() : "0x0";
+            sb.AppendLine($"[{action.Value.PacketNumber}] {action.Value.Description} [{mainActorString}] because:");
             foreach (var e in eventAction)
             {
-                sb.AppendLine($"  - {e.Item1.Value * 100:0}% ({e.Item1.Explain}): [{e.Item2.PacketNumber}] {e.Item2.Description} [{e.Item2.MainActor?.ToHexString()}]");
+                var extraActor = e.Item2.MainActor ?? default;
+                var extraActorString = e.Item2.MainActor != null ? extraActor.ToHexString() : "0x0";
+                sb.AppendLine($"  - {e.Item1.Value * 100:0}% ({e.Item1.Explain}): [{e.Item2.PacketNumber}] {e.Item2.Description} [{extraActorString}]");
             }
             sb.AppendLine();
             

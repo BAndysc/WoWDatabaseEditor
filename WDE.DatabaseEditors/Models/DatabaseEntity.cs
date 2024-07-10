@@ -53,7 +53,7 @@ namespace WDE.DatabaseEditors.Models
         
         public DatabaseKey ForceGenerateKey(DatabaseTableDefinitionJson definition)
         {
-            return new DatabaseKey(definition.PrimaryKey.Select(column => GetLongMapping(new ColumnFullName(null, column))));
+            return new DatabaseKey(definition.PrimaryKey.Select(GetLongMapping));
         }
         
         public DatabaseKey Key

@@ -121,15 +121,15 @@ public class UpdateFieldsHistory : PacketProcessor<Unit>, IUpdateFieldsHistory
         }
     }
 
-    public override Unit Process(PacketHolder packet)
+    public override Unit Process(ref readonly PacketHolder packet)
     {
         lastPacketNumber = packet.BaseData.Number;
-        return base.Process(packet);
+        return base.Process(in packet);
     }
 
-    protected override Unit Process(PacketBase basePacket, PacketUpdateObject packet)
+    protected override Unit Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
     {
-        foreach (var create in packet.Created)
+        foreach (ref readonly var create in packet.Created.AsSpan())
         {
             if (SkipGuid(create.Guid))
                 continue;
@@ -151,7 +151,7 @@ public class UpdateFieldsHistory : PacketProcessor<Unit>, IUpdateFieldsHistory
             }
         }
 
-        foreach (var update in packet.Updated)
+        foreach (ref readonly var update in packet.Updated.AsSpan())
         {
             if (SkipGuid(update.Guid))
                 continue;
@@ -170,7 +170,7 @@ public class UpdateFieldsHistory : PacketProcessor<Unit>, IUpdateFieldsHistory
             }
         }
 
-        foreach (var delete in packet.Destroyed)
+        foreach (ref readonly var delete in packet.Destroyed.AsSpan())
         {
             if (SkipGuid(delete.Guid))
                 continue;
@@ -181,7 +181,7 @@ public class UpdateFieldsHistory : PacketProcessor<Unit>, IUpdateFieldsHistory
             state.FinalizeAllPending(basePacket.Number);
         }
         
-        foreach (var delete in packet.OutOfRange)
+        foreach (ref readonly var delete in packet.OutOfRange.AsSpan())
         {
             if (SkipGuid(delete.Guid))
                 continue;
@@ -191,7 +191,7 @@ public class UpdateFieldsHistory : PacketProcessor<Unit>, IUpdateFieldsHistory
             state.pendingState = (SniffObjectState.OutOfRange, basePacket.Number);
             state.FinalizeAllPending(basePacket.Number);
         }
-        return base.Process(basePacket, packet);
+        return base.Process(in basePacket, in packet);
     }
 
     private bool SkipGuid(UniversalGuid guid)

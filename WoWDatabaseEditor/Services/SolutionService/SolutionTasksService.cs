@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AsyncAwaitBestPractices.MVVM;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.SqlQueryGenerator;
@@ -27,6 +30,7 @@ namespace WoWDatabaseEditor.Services.SolutionService
         private readonly IDatabaseProvider databaseProvider;
         private readonly IStatusBar statusBar;
         private readonly ISessionService sessionService;
+        private readonly IMessageBoxService messageBoxService;
 
         public SolutionTasksService(ITaskRunner taskRunner,
             ISolutionItemSqlGeneratorRegistry sqlGenerator,
@@ -36,7 +40,8 @@ namespace WoWDatabaseEditor.Services.SolutionService
             IRemoteConnectorService remoteConnectorService,
             IDatabaseProvider databaseProvider,
             IStatusBar statusBar,
-            ISessionService sessionService)
+            ISessionService sessionService,
+            IMessageBoxService messageBoxService)
         {
             this.taskRunner = taskRunner;
             this.sqlGenerator = sqlGenerator;
@@ -47,6 +52,7 @@ namespace WoWDatabaseEditor.Services.SolutionService
             this.databaseProvider = databaseProvider;
             this.statusBar = statusBar;
             this.sessionService = sessionService;
+            this.messageBoxService = messageBoxService;
             this.remoteConnectorService.EditorConnected += RemoteConnectorStateChanged;
             this.remoteConnectorService.EditorDisconnected += RemoteConnectorStateChanged;
         }
@@ -114,8 +120,17 @@ namespace WoWDatabaseEditor.Services.SolutionService
                     {
                         for (int i = 0; i < reduced.Count; ++i)
                         {
-                            progress.Report(i, reduced.Count, reduced[i].GenerateCommand());
-                            await remoteConnectorService.ExecuteCommand(reduced[i]);
+                            var command = reduced[i].GenerateCommand();
+                            progress.Report(i, reduced.Count, command);
+                            var result = await remoteConnectorService.ExecuteCommand(reduced[i]);
+                            if (result.Contains("ERROR:SQL(p)"))
+                            {
+                                var lines = result.Split('\n');
+                                var filteredLines = lines.Where(l => l.StartsWith("ERROR:SQL(p)"))
+                                    .Select(l => l.Substring("ERROR:SQL(p)".Length));
+                                var message = string.Join("\n", filteredLines);
+                                messageBoxService.SimpleDialog("Error", "Error while executing command: " + command, message).ListenErrors();
+                            }
                         }
                     }
                     catch (CouldNotConnectToRemoteServer)

@@ -131,7 +131,7 @@ namespace WDE.PacketViewer.Processing.Processors
             return perEntryState[guid.Entry] = new();
         }
         
-        protected override bool Process(PacketBase basePacket, PacketChat packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketChat packet)
         {
             if (packet.Sender.Type != UniversalHighGuid.Creature &&
                 packet.Sender.Type != UniversalHighGuid.Vehicle &&

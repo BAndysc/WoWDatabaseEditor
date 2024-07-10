@@ -16,14 +16,14 @@ namespace WDE.PacketViewer.Processing.Processors
     {
         private Dictionary<UniversalGuid, (DateTime spawnTime, int packetNumber)> lastCreateTime = new();
         private Dictionary<(UniversalGuid, int), TimeSpan> spawnLength = new();
-        protected override bool Process(PacketBase basePacket, PacketUpdateObject packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
         {
-            foreach (var create in packet.Created)
+            foreach (ref readonly var create in packet.Created.AsSpan())
             {
                 lastCreateTime[create.Guid] = (basePacket.Time.ToDateTime(), basePacket.Number);
             }
 
-            foreach (var destroyed in packet.Destroyed)
+            foreach (ref readonly var destroyed in packet.Destroyed.AsSpan())
             {
                 if (lastCreateTime.TryGetValue(destroyed.Guid, out var spawn))
                 {
@@ -33,7 +33,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     lastCreateTime.Remove(destroyed.Guid);
                 }
             }
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
         public TimeSpan? GetSpawnLength(UniversalGuid guid, int packetNumberSpawn)

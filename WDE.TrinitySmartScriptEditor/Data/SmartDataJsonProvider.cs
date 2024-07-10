@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using WDE.Common.CoreVersion;
 using WDE.Common.Services;
@@ -29,5 +30,6 @@ namespace WDE.TrinitySmartScriptEditor.Data
         public Task<string> GetEventsGroupsJson() => runtimeDataService.ReadAllText(smartScriptFeatures.EventGroupPath ??"SmartData/events_groups.json");
         public Task<string> GetActionsGroupsJson() => runtimeDataService.ReadAllText(smartScriptFeatures.ActionGroupPath ??"SmartData/actions_groups.json");
         public Task<string> GetTargetsGroupsJson() => runtimeDataService.ReadAllText(smartScriptFeatures.TargetGroupPath ??"SmartData/targets_groups.json");
+        public event Action? SourceFilesChanged;
     }
 }

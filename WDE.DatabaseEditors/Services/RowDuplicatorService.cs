@@ -41,7 +41,7 @@ public class TableEntityDuplicatorService : ITableEntityDuplicatorService
         var newEntity = data.Entities[0].Clone(newKey, false);
         int i = 0;
         foreach (var column in data.TableDefinition.GroupByKeys)
-            newEntity.SetTypedCellOrThrow(new ColumnFullName(null, column), newKey[i++]);
+            newEntity.SetTypedCellOrThrow(column, newKey[i++]);
         IQuery insert = queryGenerator.GenerateQuery(new[] { newKey }, null, new DatabaseTableData(data.TableDefinition, new[] { newEntity }));
         return insert;
     }

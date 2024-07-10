@@ -24,21 +24,21 @@ public class QuestRequestItemsProcessor : PacketProcessor<bool>, IPacketTextDump
         this.databaseProvider = databaseProvider;
     }
     
-    protected override bool Process(PacketBase basePacket, PacketQuestGiverRequestItems packet)
+    protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestGiverRequestItems packet)
     {
-        completionTexts[packet.QuestId] = packet.CompletionText;
+        completionTexts[packet.QuestId] = packet.CompletionText.ToString() ?? "";
         bool isComplete = packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.KillCreditComplete) &&
                           packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.CollectableComplete) &&
                           packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.QuestStatusUnk8) &&
                           packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.QuestStatusUnk16) &&
                           packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.QuestStatusUnk64) &&
                           packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.QuestStatusUnk128);
-        titles[packet.QuestId] = packet.QuestTitle;
+        titles[packet.QuestId] = packet.QuestTitle.ToString() ?? "";
         if (isComplete)
             emotesCompleted[packet.QuestId] = packet.EmoteType;
         else
             emotesNonCompleted[packet.QuestId] = packet.EmoteType;
-        return base.Process(basePacket, packet);
+        return base.Process(in basePacket, in packet);
     }
 
     public async Task<string> Generate()

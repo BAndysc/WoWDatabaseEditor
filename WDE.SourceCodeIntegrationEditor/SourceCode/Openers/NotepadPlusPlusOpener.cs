@@ -29,7 +29,7 @@ public class NotepadPlusPlusOpener : IFileOpener
         if (exe == null || !File.Exists(exe))
             return false;
 
-        var process = processService.RunAndForget(exe, $"\"{path.FullName}\" -n{lineNumber}", null, false);
+        var process = processService.RunAndForget(exe, new[]{path.FullName, $"-n{lineNumber}"}, null, false);
         return process.IsRunning;
     }
 }

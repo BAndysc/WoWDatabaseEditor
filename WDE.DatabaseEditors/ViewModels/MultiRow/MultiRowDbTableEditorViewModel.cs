@@ -120,6 +120,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         }
 
         private IList<DatabaseColumnJson> columns = new List<DatabaseColumnJson>();
+        public ObservableCollection<int> HiddenColumns { get; } = new();
         public ObservableCollection<DatabaseColumnHeaderViewModel> Columns { get; } = new();
         private DatabaseColumnJson? autoIncrementColumn;
 
@@ -355,7 +356,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     foreach (var entity in deserialized)
                     {
                         if (key.HasValue)
-                            entity.SetTypedCellOrThrow(new ColumnFullName(null, tableDefinition.GroupByKeys[0]), key.Value[0]);
+                            entity.SetTypedCellOrThrow(tableDefinition.GroupByKeys[0], key.Value[0]);
                         ForceInsertEntity(entity, index++);
                     }
                 }
@@ -513,11 +514,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
             var key = new IDatabaseProvider.ConditionKey(tableDefinition.Condition.SourceType);
             if (tableDefinition.Condition.SourceGroupColumn is {} sourceGroup)
-                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceGroup.Name))));
+                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceGroup.Name)));
             if (tableDefinition.Condition.SourceEntryColumn is { } sourceEntry)
-                key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceEntry)));
+                key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceEntry));
             if (tableDefinition.Condition.SourceIdColumn is { } sourceId)
-                key = key.WithId((int)view.ParentEntity.GetTypedValueOrThrow<long>(new ColumnFullName(null, sourceId)));
+                key = key.WithId((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceId));
 
             var newConditions = await conditionEditService.EditConditions(key, conditionList);
             if (newConditions == null)
@@ -562,7 +563,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         {
             Rows.RemoveAll();
             columns = tableDefinition.Groups.SelectMany(g => g.Fields)
-                .Where(c => c.DbColumnName != data.TableDefinition.TablePrimaryKeyColumnName)
+                .Where(c => new ColumnFullName(c.ForeignTable, c.DbColumnName) != data.TableDefinition.TablePrimaryKeyColumnName)
                 .ToList();
             if (mode == DocumentMode.PickRow)
                 columns.Insert(0, new DatabaseColumnJson(){Name="Pick", Meta = "picker", PreferredWidth = 30});
@@ -573,8 +574,29 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 {
                     var column = new DatabaseColumnHeaderViewModel(c);
                     column.Width = tablePersonalSettings.GetColumnWidth(TableDefinition.Id, column.ColumnIdForUi, c.PreferredWidth ?? 120);
+                    column.IsVisible = tablePersonalSettings.IsColumnVisible(TableDefinition.Id, column.ColumnIdForUi);
                     return AutoDispose(column);
                 }));
+                Columns.Each((col, i) => AutoDispose(col.ToObservable(x => x.IsVisible)
+                    .Subscribe(@is =>
+                    {
+                        if (@is)
+                        {
+                            if (HiddenColumns.Contains(i))
+                            {
+                                HiddenColumns.Remove(i);
+                                tablePersonalSettings.UpdateVisibility(TableDefinition.Id, col.ColumnIdForUi, @is);
+                            }
+                        }
+                        else
+                        {
+                            if (!HiddenColumns.Contains(i))
+                            {
+                                HiddenColumns.Add(i);
+                                tablePersonalSettings.UpdateVisibility(TableDefinition.Id, col.ColumnIdForUi, @is);
+                            }
+                        }
+                    })));
                 Columns.Each(col => col.ToObservable(c => c.Width)
                     .Skip(1)
                     .Throttle(TimeSpan.FromMilliseconds(300))
@@ -805,8 +827,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 // in MultiRow editor `entry` is hidden, because entries are grouped by it, so we want to check if
                 // the second primary key column is the one we sort by, because in this case, we want to sort by the third column as well
                 if (TableDefinition.PrimaryKey[0] == TableDefinition.TablePrimaryKeyColumnName &&
-                    TableDefinition.PrimaryKey[1] == column.DatabaseName)
-                    secondarColumnIndex = Columns.IndexIf(c => c.DatabaseName == TableDefinition.PrimaryKey[2]);
+                    TableDefinition.PrimaryKey[1] == new ColumnFullName(null, column.DatabaseName))
+                    secondarColumnIndex = Columns.IndexIf(c => c.DatabaseName == TableDefinition.PrimaryKey[2].ColumnName);
             }
 
             foreach (var group in Rows)
@@ -854,7 +876,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     group.OrderByIndices(oldGroupIndices[index]);
                 }
             });
+            var wasSaved = History.IsSaved;
             DoAction(action);
+            if (wasSaved)
+                History.MarkAsSaved();
         }
 
         protected async Task AskToSave()

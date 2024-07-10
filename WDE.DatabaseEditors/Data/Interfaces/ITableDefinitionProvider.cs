@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using WDE.Common.Database;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.Module.Attributes;
@@ -16,5 +17,7 @@ namespace WDE.DatabaseEditors.Data.Interfaces
         IEnumerable<DatabaseTableDefinitionJson> IncompatibleDefinitions { get; }
         
         IEnumerable<DatabaseTableDefinitionJson> AllDefinitions { get; }
+        
+        event Action? DefinitionsChanged;
     }
 }

@@ -30,10 +30,10 @@ namespace WDE.PacketViewer.ViewModels
         {
             ActionKind = actionHappened.Kind.ToString();
             Description = actionHappened.Description;
-            MainActor = actionHappened.MainActor?.ToWowParserString();
+            MainActor = actionHappened.MainActor.ToWowParserString();
             AdditionalActors = actionHappened.AdditionalActors?.Select(s => s.ToWowParserString()).ToList();
             if (actionHappened.EventLocation != null)
-                Location = $"X: {actionHappened.EventLocation.X} Y: {actionHappened.EventLocation.Y} Z: {actionHappened.EventLocation.Z}";
+                Location = $"X: {actionHappened.EventLocation.Value.X} Y: {actionHappened.EventLocation.Value.Y} Z: {actionHappened.EventLocation.Value.Z}";
         }
 
         public string ActionKind { get; }
@@ -50,10 +50,10 @@ namespace WDE.PacketViewer.ViewModels
         {
             EventKind = eventHappened.Kind.ToString();
             Description = eventHappened.Description;
-            MainActor = eventHappened.MainActor?.ToWowParserString();
+            MainActor = eventHappened.MainActor.ToWowParserString();
             AdditionalActors = eventHappened.AdditionalActors?.Select(s => s.ToWowParserString()).ToList();
             if (eventHappened.EventLocation != null)
-                Location = $"X: {eventHappened.EventLocation.X} Y: {eventHappened.EventLocation.Y} Z: {eventHappened.EventLocation.Z}";
+                Location = $"X: {eventHappened.EventLocation.Value.X} Y: {eventHappened.EventLocation.Value.Y} Z: {eventHappened.EventLocation.Value.Z}";
         }
 
         public string EventKind { get; }

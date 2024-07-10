@@ -11,6 +11,7 @@
         <EnablePreviewFeatures>true</EnablePreviewFeatures>
         <GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute>
         <Antlr4UseCSharpGenerator>True</Antlr4UseCSharpGenerator>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
@@ -28,16 +29,14 @@
             <Version>12.8.0</Version>
         </PackageReference>
         <PackageReference Include="DynamicData" Version="8.3.27" />
-        <PackageReference Include="Google.Protobuf" Version="3.26.0" />
-        <PackageReference Include="Grpc.Tools" Version="2.50.0">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
+        <ProjectReference Include="..\Libraries\ProtoZeroGenerator\ProtoZeroGenerator.csproj"
+                          OutputItemType="Analyzer"
+                          ReferenceOutputAssembly="false"/>
+        <ProjectReference Include="..\Libraries\ProtoZeroSharp\ProtoZeroSharp.csproj" />
         <ProjectReference Include="..\Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj" />
         <ProjectReference Include="..\Rendering\TheMaths\TheMaths.csproj" />
         <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
-        <ProjectReference Include="..\WoWPacketParser\WowPacketParser.Proto\WowPacketParser.Proto.csproj" />
     </ItemGroup>
     <ItemGroup>
         <Antlr4 Include="Filtering\Antlr\Syntax.g4">
@@ -49,7 +48,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="PacketStructures\structures.proto" />
+        <AdditionalFiles Include="PacketStructures\structures.proto" />
     </ItemGroup>
 
     <ItemGroup>

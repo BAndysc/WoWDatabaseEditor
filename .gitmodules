@@ -19,3 +19,6 @@
 [submodule "Modules/automatic-graph-layout"]
 	path = Libraries/automatic-graph-layout
 	url = https://github.com/microsoft/automatic-graph-layout
+[submodule "Libraries/DiffPlex.Avalonia"]
+	path = Libraries/DiffPlex.Avalonia
+	url = https://github.com/BAndysc/DiffPlex.Avalonia.git

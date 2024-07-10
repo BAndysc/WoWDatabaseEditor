@@ -13,7 +13,8 @@ namespace WDE.DatabaseEditors.Data.Structs
     {
         public bool Equals(ColumnFullName other)
         {
-            return ForeignTable == other.ForeignTable && ColumnName == other.ColumnName;
+            return string.Equals(ForeignTable, other.ForeignTable, StringComparison.OrdinalIgnoreCase) &&
+                   string.Equals(ColumnName, other.ColumnName, StringComparison.OrdinalIgnoreCase);
         }
 
         public override bool Equals(object? obj)
@@ -23,7 +24,7 @@ namespace WDE.DatabaseEditors.Data.Structs
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(ForeignTable, ColumnName);
+            return HashCode.Combine(ForeignTable?.ToLowerInvariant(), ColumnName.ToLowerInvariant());
         }
 
         public static bool operator ==(ColumnFullName left, ColumnFullName right)
@@ -185,7 +186,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "help")] 
         public string? Help { get; set; } = null;
         
-        [CustomEquality(typeof(StringComparer), nameof(StringComparer.OrdinalIgnoreCase))] 
+        [StringEquality(StringComparison.OrdinalIgnoreCase)]
         [JsonProperty(PropertyName = "db_column_name")]
         [DefaultValue("")]
         public string DbColumnName { get; set; } = "";

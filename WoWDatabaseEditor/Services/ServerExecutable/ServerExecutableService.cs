@@ -55,7 +55,7 @@ public partial class ServerExecutableService : ObservableBase, IServerExecutable
             {
                 worldProcess = processService.RunAndForget(
                     configuration.WorldServerPath,
-                    "", Directory.GetParent(configuration.WorldServerPath)?.FullName, true);
+                    Array.Empty<string>(), Directory.GetParent(configuration.WorldServerPath)?.FullName, true);
                 worldProcess.OnExit += WorldProcessOnOnExit;
                 IsWorldServerRunning = true;
             }
@@ -80,7 +80,7 @@ public partial class ServerExecutableService : ObservableBase, IServerExecutable
             {
                 authProcess = processService.RunAndForget(
                     configuration.AuthServerPath,
-                    "", Directory.GetParent(configuration.AuthServerPath)?.FullName, true);
+                    Array.Empty<string>(), Directory.GetParent(configuration.AuthServerPath)?.FullName, true);
                 authProcess.OnExit += AuthProcessOnOnExit;
                 IsAuthServerRunning = true;
             }

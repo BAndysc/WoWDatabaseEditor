@@ -3,7 +3,7 @@ using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Filtering
 {
-    public class IsPacketSpecificPlayerProcessor : PacketProcessor<bool>
+    public unsafe class IsPacketSpecificPlayerProcessor : PacketProcessor<bool>
     {
         private readonly UniversalGuid playerGuid;
 
@@ -12,52 +12,52 @@ namespace WDE.PacketViewer.Filtering
             this.playerGuid = playerGuid;
         }
         
-        protected override bool Process(PacketBase basePacket, PacketAuraUpdate packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketAuraUpdate packet)
         {
             return packet.Unit.Equals(playerGuid);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketSpellGo packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellGo packet)
         {
-            return packet.Data.Caster.Equals(playerGuid);
+            return Unpack(packet.Data, x => x->Caster).Equals(playerGuid);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketSpellStart packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellStart packet)
         {
-            return packet.Data.Caster.Equals(playerGuid);
+            return Unpack(packet.Data, x => x->Caster).Equals(playerGuid);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketPlayObjectSound packet)
-        {
-            return packet.Source.Equals(playerGuid);
-        }
-
-        protected override bool Process(PacketBase basePacket, PacketPlaySound packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketPlayObjectSound packet)
         {
             return packet.Source.Equals(playerGuid);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketEmote packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketPlaySound packet)
+        {
+            return packet.Source.Equals(playerGuid);
+        }
+
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketEmote packet)
         {
             return packet.Sender.Equals(playerGuid);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketChat packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketChat packet)
         {
             return packet.Sender.Equals(playerGuid);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketMonsterMove packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketMonsterMove packet)
         {
             return packet.Mover.Equals(playerGuid);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketOneShotAnimKit packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketOneShotAnimKit packet)
         {
             return packet.Unit.Equals(playerGuid);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketPlaySpellVisualKit packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketPlaySpellVisualKit packet)
         {
             return packet.Unit.Equals(playerGuid);
         }

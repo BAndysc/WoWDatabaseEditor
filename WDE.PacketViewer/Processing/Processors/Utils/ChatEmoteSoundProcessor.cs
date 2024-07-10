@@ -87,12 +87,12 @@ namespace WDE.PacketViewer.Processing.Processors
             if (a == null || b == null)
                 return false;
             
-            var timeA = a.Time.ToDateTime();
-            var timeB = b.Time.ToDateTime();
+            var timeA = a.Value.Time.ToDateTime();
+            var timeB = b.Value.Time.ToDateTime();
             return Math.Abs((timeB - timeA).TotalMilliseconds) < 200;
         }
         
-        protected override bool Process(PacketBase basePacket, PacketChat packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketChat packet)
         {
             var state = Get(packet.Sender);
             state.LastChat = (basePacket, packet);
@@ -113,7 +113,7 @@ namespace WDE.PacketViewer.Processing.Processors
             return true;
         }
 
-        protected override bool Process(PacketBase basePacket, PacketPlayObjectSound packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketPlayObjectSound packet)
         {
             var state = Get(packet.Source);
             if (state.LastChat.HasValue &&
@@ -129,7 +129,7 @@ namespace WDE.PacketViewer.Processing.Processors
             return true;
         }
 
-        protected override bool Process(PacketBase basePacket, PacketPlaySound packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketPlaySound packet)
         {
             var state = Get(packet.Source);
             if (state.LastChat.HasValue &&
@@ -145,7 +145,7 @@ namespace WDE.PacketViewer.Processing.Processors
             return true;
         }
 
-        protected override bool Process(PacketBase basePacket, PacketEmote packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketEmote packet)
         {
             var state = Get(packet.Sender);
             if (state.LastChat.HasValue &&
@@ -203,7 +203,7 @@ namespace WDE.PacketViewer.Processing.Processors
             
             foreach (var pair in numberToChat)
             {
-                var locale = await databaseProvider.GetBroadcastTextLocaleByTextAsync(pair.Value.Text);
+                var locale = await databaseProvider.GetBroadcastTextLocaleByTextAsync(pair.Value.Text.ToString() ?? "");
                 if (locale == null)
                     continue;
 
@@ -212,7 +212,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (broadcastText == null)
                     continue;
 
-                var text = pair.Value.Text == locale.Text ? broadcastText.Text : broadcastText.Text1;
+                var text = pair.Value.Text.ToString() == locale.Text ? broadcastText.Text : broadcastText.Text1;
 
                 if (text == null)
                     continue;
@@ -228,7 +228,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 return englishText;
             
             if (numberToChat.TryGetValue(chat.Number, out var chatPacket))
-                return chatPacket.Text;
+                return chatPacket.Text.ToString() ?? "";
 
             return "";
         }

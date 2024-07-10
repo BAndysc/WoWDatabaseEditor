@@ -214,8 +214,8 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
         }
         else
         {
-            if (ParentVm.DbcStore.ItemStore.TryGetValue(ItemOrCurrencyId.Value, out var name))
-                return name;
+            if (ParentVm.ItemStore.GetItemSparseById((int)ItemOrCurrencyId.Value) is { } itemSparse)
+                return itemSparse.Name;
             
             if (ParentVm.ItemParameter.Items != null &&
                 ParentVm.ItemParameter.Items.TryGetValue((int)ItemOrCurrencyId.Value, out var item))

@@ -15,7 +15,7 @@ namespace WDE.PacketViewer.Processing.Processors
     }
 
     [AutoRegister]
-    public class UnitPositionFollower : PacketProcessor<bool>, IUnitPositionFollower
+    public unsafe class UnitPositionFollower : PacketProcessor<bool>, IUnitPositionFollower
     {
         private Dictionary<UniversalGuid, State> states = new();
 
@@ -40,7 +40,7 @@ namespace WDE.PacketViewer.Processing.Processors
             if (guid == null)
                 return null;
             
-            if (!states.TryGetValue(guid, out var state) || state.IsDestroyed)
+            if (!states.TryGetValue(guid.Value, out var state) || state.IsDestroyed)
                 return null;
 
             if (!state.StartMoveTime.HasValue)
@@ -56,14 +56,14 @@ namespace WDE.PacketViewer.Processing.Processors
             return lerp;
         }
 
-        protected override bool Process(PacketBase basePacket, PacketClientMove packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketClientMove packet)
         {
             var state = GetState(packet.Mover);
             state.CurrentPosition = new Vec3() { X = packet.Position.X, Y = packet.Position.Y, Z = packet.Position.Z };
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketMonsterMove packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketMonsterMove packet)
         {
             var state = GetState(packet.Mover);
             state.CurrentPosition = packet.Position;
@@ -76,12 +76,12 @@ namespace WDE.PacketViewer.Processing.Processors
             else
                 state.StartMoveTime = null;
             
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
         private List<UniversalGuid> toDestroy = new();
 
-        protected override bool Process(PacketBase basePacket, PacketUpdateObject packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
         {
             if (toDestroy.Count > 0)
             {
@@ -94,31 +94,25 @@ namespace WDE.PacketViewer.Processing.Processors
                 toDestroy.Clear();
             }
             
-            if (packet.Created != null)
+            foreach (ref readonly var create in packet.Created.AsSpan())
             {
-                foreach (var create in packet.Created)
-                {
-                    if (create.Movement?.Position == null && create.Stationary?.Position == null)
-                        continue;
-                    
-                    var state = GetState(create.Guid);
-                    state.IsDestroyed = false;
-                    state.CurrentPosition = (create.Movement?.Position ?? create.Stationary?.Position)!;
-                }
+                if (create.Movement == null && create.Stationary == null)
+                    continue;
+
+                var state = GetState(create.Guid);
+                state.IsDestroyed = false;
+                state.CurrentPosition = create.Movement != null ? create.Movement->Position : create.Stationary->Position;
             }
             
-            if (packet.Destroyed != null)
+            foreach (ref readonly var destroyed in packet.Destroyed.AsSpan())
             {
-                toDestroy.AddRange(packet.Destroyed.Select(s => s.Guid));
+                toDestroy.Add(destroyed.Guid);
             }
 
-            if (packet.OutOfRange != null)
+            foreach (ref readonly var oorange in packet.OutOfRange.AsSpan())
             {
-                foreach (var oorange in packet.OutOfRange)
-                {
-                    var state = GetState(oorange.Guid);
-                    state.IsDestroyed = true;
-                }
+                var state = GetState(oorange.Guid);
+                state.IsDestroyed = true;
             }
 
             return true;

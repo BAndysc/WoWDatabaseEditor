@@ -1,46 +1,52 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ProtoZeroSharp;
+using WDE.PacketViewer.Utils;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Processors
 {
-    public class SplitUpdateProcessor : PacketProcessor<IEnumerable<(PacketHolder, int)>?>
+    public class SplitUpdateProcessor
     {
         private readonly GuidExtractorProcessor guidExtractorProcessor;
 
-        public SplitUpdateProcessor(GuidExtractorProcessor guidExtractorProcessor, int baseNumber)
+        public SplitUpdateProcessor(GuidExtractorProcessor guidExtractorProcessor, int baseNumber, RefCountedArena allocator)
         {
             this.guidExtractorProcessor = guidExtractorProcessor;
             NextNumber = baseNumber;
+            this.allocator = allocator;
         }
 
-        public override void Initialize(ulong gameBuild)
+        public void Initialize(ulong gameBuild)
         {
             guidExtractorProcessor.Initialize(gameBuild);
         }
 
-        private string GenerateText(PacketBase basePacket, string text)
+        private string GenerateText(PacketBase basePacket, string? text)
         {
-            int indexOfFirstLine = basePacket.StringData.IndexOf("\n", StringComparison.Ordinal);
+            text ??= "";
+            var unicodeStringData = basePacket.StringData.ToString() ?? "";
+            int indexOfFirstLine = unicodeStringData.IndexOf("\n", StringComparison.Ordinal);
             if (indexOfFirstLine == -1)
                 return text;
-            int indexOfSecondLine = basePacket.StringData.IndexOf("\n", indexOfFirstLine + 1, StringComparison.Ordinal);
+            int indexOfSecondLine = unicodeStringData.IndexOf("\n", indexOfFirstLine + 1, StringComparison.Ordinal);
             if (indexOfSecondLine == -1)
                 return text;
-            int indexOfThirdLine = basePacket.StringData.IndexOf("\n", indexOfSecondLine + 1, StringComparison.Ordinal);
+            int indexOfThirdLine = unicodeStringData.IndexOf("\n", indexOfSecondLine + 1, StringComparison.Ordinal);
             if (indexOfThirdLine == -1)
                 return text;
-            return basePacket.StringData.Substring(0, indexOfThirdLine + 1) +
+            return unicodeStringData.Substring(0, indexOfThirdLine + 1) +
                    text;
         }
 
         private int NextNumber = 0;
+        private readonly RefCountedArena allocator;
         private DateTime? LastPacketTime;
-        private List<PacketHolder> pending = new();
+        private List<Pointer<PacketHolder>> pending = new();
 
-        private int GetPriority(PacketHolder holder)
+        private int GetPriority(ref PacketHolder holder)
         {
             var kind = holder.KindCase;
             if (kind == PacketHolder.KindOneofCase.SpellStart)
@@ -56,10 +62,12 @@ namespace WDE.PacketViewer.Processing.Processors
             return 5;
         }
 
-        private List<(PacketHolder, int)> afterSplit = new();
-        public IEnumerable<(PacketHolder, int)>? Finalize()
+        private List<(Pointer<PacketHolder>, int)> afterSplit = new();
+        public IEnumerable<(Pointer<PacketHolder>, int)>? Finalize()
         {
-            pending.Sort(Comparer<PacketHolder>.Create((a, b) => GetPriority(a).CompareTo(GetPriority(b))));
+            using var @ref = allocator.Increment();
+
+            pending.Sort(Comparer<Pointer<PacketHolder>>.Create((a, b) => GetPriority(ref a.Value).CompareTo(GetPriority(ref b.Value))));
 
             afterSplit.Clear();
             foreach (var p in pending)
@@ -70,24 +78,24 @@ namespace WDE.PacketViewer.Processing.Processors
             }
             pending.Clear();
 
-            var created = new List<(PacketHolder, int)>();
-            var moveToFirst = new List<(PacketHolder, int)>();
+            var created = new List<(Pointer<PacketHolder>, int)>();
+            var moveToFirst = new List<(Pointer<PacketHolder>, int)>();
             foreach (var a in afterSplit)
             {
-                if (a.Item1.KindCase == PacketHolder.KindOneofCase.UpdateObject && a.Item1.UpdateObject.Created.Count == 1)
+                if (a.Item1.Value.KindCase == PacketHolder.KindOneofCase.UpdateObject && a.Item1.Value.UpdateObject.Created.Count == 1)
                     created.Add(a);
             }
 
             foreach (var a in afterSplit)
             {
-                if (a.Item1.KindCase != PacketHolder.KindOneofCase.UpdateObject)
+                if (a.Item1.Value.KindCase != PacketHolder.KindOneofCase.UpdateObject)
                 {
-                    var guid = guidExtractorProcessor.Process(a.Item1);
+                    var guid = guidExtractorProcessor.Process(ref a.Item1.Value);
                     if (guid == null)
                         continue;
                     foreach (var create in created)
                     {
-                        if (create.Item1.UpdateObject.Created[0].Guid.Equals(guid))
+                        if (create.Item1.Value.UpdateObject.Created[0].Guid.Equals(guid))
                         {
                             moveToFirst.Add(create);
                             created.Remove(create);
@@ -102,34 +110,36 @@ namespace WDE.PacketViewer.Processing.Processors
             
             foreach (var p in moveToFirst.Concat(afterSplit))
             {
-                yield return (new PacketHolder(p.Item1)
-                {
-                    BaseData = new PacketBase(p.Item1.BaseData) { Number = NextNumber++ },
-                }, p.Item2);
+                var newPacketHolder = @ref.Array.Alloc<PacketHolder>();
+                newPacketHolder.Value = p.Item1.Value; // it is a struct, so this is a shallow copy, perfect
+                newPacketHolder.Value.BaseData.Number = NextNumber++;
+                yield return (newPacketHolder, p.Item2);
             }
         }
         
-        public override IEnumerable<(PacketHolder, int)>? Process(PacketHolder packet)
+        public unsafe IEnumerable<(Pointer<PacketHolder>, int)>? Process(PacketHolder* packet)
         {
-            var packetTime = packet.BaseData.Time.ToDateTime();
+            List<(Pointer<PacketHolder>, int)> output = new();
+            var packetTime = packet->BaseData.Time.ToDateTime();
             if (!LastPacketTime.HasValue || (packetTime - LastPacketTime.Value).TotalMilliseconds > 0)
             {
                 var enumerable = Finalize();
                 if (enumerable != null)
                 {
                     foreach (var p in enumerable)
-                        yield return p;   
+                        output.Add(p);
                 }
                 LastPacketTime = packetTime;
             }
             pending.Add(packet);
+            return output;
         }
         
-        private IEnumerable<(PacketHolder, int)>? InnerSplit(PacketHolder packet)
+        private IEnumerable<(Pointer<PacketHolder>, int)>? InnerSplit(Pointer<PacketHolder> packet)
         {
-            if (packet.KindCase == PacketHolder.KindOneofCase.UpdateObject)
+            if (packet.Value.KindCase == PacketHolder.KindOneofCase.UpdateObject)
             {
-                var iterator = Process(packet.BaseData, packet.UpdateObject);
+                var iterator = Process(ref packet.Value.BaseData, ref packet.Value.UpdateObject);
                 if (iterator != null)
                 {
                     foreach (var up in iterator)
@@ -140,55 +150,81 @@ namespace WDE.PacketViewer.Processing.Processors
             }
             else
             {
-                yield return (packet, packet.BaseData.Number);
+                yield return (packet, packet.Value.BaseData.Number);
             }
         }
 
-        protected override IEnumerable<(PacketHolder, int)>? Process(PacketBase basePacket, PacketUpdateObject packet)
+        protected IEnumerable<(Pointer<PacketHolder>, int)>? Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
         {
-            foreach (var destroyed in packet.Destroyed)
+            using var @ref = allocator.Increment();
+
+            List<(Pointer<PacketHolder>, int)> output = new();
+
+            foreach (ref readonly var destroyed in packet.Destroyed.AsSpan())
             {
                 var fake = new PacketUpdateObject();
-                fake.Destroyed.Add(destroyed);
-                yield return (new PacketHolder()
-                {
-                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, destroyed.Text), TextStartOffset = basePacket.TextStartOffset, TextLength = basePacket.TextLength},
-                    UpdateObject = fake
-                }, basePacket.Number);
+                fake.Destroyed = UnmanagedArray<DestroyedObject>.AllocArray(1, ref @ref.Array);
+                fake.Destroyed[0] = destroyed;
+                var newBaseData = basePacket; // struct so this is a copy
+                newBaseData.StringData = Utf8String.CreateFromString(GenerateText(basePacket, destroyed.Text?.ToString()), ref @ref.Array);
+
+                var newPacketHolder = @ref.Array.Alloc<PacketHolder>();
+                newPacketHolder.Value.BaseData = newBaseData;
+                newPacketHolder.Value.AllocKind<PacketUpdateObject>(ref @ref.Array) = fake;
+                newPacketHolder.Value.KindCase = PacketHolder.KindOneofCase.UpdateObject;
+
+                output.Add((newPacketHolder, basePacket.Number));
             }
             
-            foreach (var outOfRange in packet.OutOfRange)
+            foreach (ref readonly var outOfRange in packet.OutOfRange.AsSpan())
             {
                 var fake = new PacketUpdateObject();
-                fake.OutOfRange.Add(outOfRange);
-                yield return (new PacketHolder()
-                {
-                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, outOfRange.Text), TextStartOffset = basePacket.TextStartOffset, TextLength = basePacket.TextLength},
-                    UpdateObject = fake
-                }, basePacket.Number);
+                fake.OutOfRange = UnmanagedArray<DestroyedObject>.AllocArray(1, ref @ref.Array);
+                fake.OutOfRange[0] = outOfRange;
+                var newBaseData = basePacket; // struct so this is a copy
+                newBaseData.StringData = Utf8String.CreateFromString(GenerateText(basePacket, outOfRange.Text?.ToString()), ref @ref.Array);
+
+                var newPacketHolder = @ref.Array.Alloc<PacketHolder>();
+                newPacketHolder.Value.BaseData = newBaseData;
+                newPacketHolder.Value.AllocKind<PacketUpdateObject>(ref @ref.Array) = fake;
+                newPacketHolder.Value.KindCase = PacketHolder.KindOneofCase.UpdateObject;
+
+                output.Add((newPacketHolder, basePacket.Number));
             }
             
-            foreach (var created in packet.Created)
+            foreach (ref readonly var created in packet.Created.AsSpan())
             {
                 var fake = new PacketUpdateObject();
-                fake.Created.Add(created);
-                yield return (new PacketHolder()
-                {
-                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, created.Text), TextStartOffset = basePacket.TextStartOffset, TextLength = basePacket.TextLength},
-                    UpdateObject = fake
-                }, basePacket.Number);
+                fake.Created = UnmanagedArray<CreateObject>.AllocArray(1, ref @ref.Array);
+                fake.Created[0] = created;
+                var newBaseData = basePacket; // struct so this is a copy
+                newBaseData.StringData = Utf8String.CreateFromString(GenerateText(basePacket, created.Text?.ToString()), ref @ref.Array);
+
+                var newPacketHolder = @ref.Array.Alloc<PacketHolder>();
+                newPacketHolder.Value.BaseData = newBaseData;
+                newPacketHolder.Value.AllocKind<PacketUpdateObject>(ref @ref.Array) = fake;
+                newPacketHolder.Value.KindCase = PacketHolder.KindOneofCase.UpdateObject;
+
+                output.Add((newPacketHolder, basePacket.Number));
             }
             
-            foreach (var updated in packet.Updated)
+            foreach (ref readonly var updated in packet.Updated.AsSpan())
             {
                 var fake = new PacketUpdateObject();
-                fake.Updated.Add(updated);
-                yield return (new PacketHolder()
-                {
-                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, updated.Text), TextStartOffset = basePacket.TextStartOffset, TextLength = basePacket.TextLength},
-                    UpdateObject = fake
-                }, basePacket.Number);
+                fake.Updated = UnmanagedArray<UpdateObject>.AllocArray(1, ref @ref.Array);
+                fake.Updated[0] = updated;
+                var newBaseData = basePacket; // struct so this is a copy
+                newBaseData.StringData = Utf8String.CreateFromString(GenerateText(basePacket, updated.Text?.ToString()), ref @ref.Array);
+
+                var newPacketHolder = @ref.Array.Alloc<PacketHolder>();
+                newPacketHolder.Value.BaseData = newBaseData;
+                newPacketHolder.Value.AllocKind<PacketUpdateObject>(ref @ref.Array) = fake;
+                newPacketHolder.Value.KindCase = PacketHolder.KindOneofCase.UpdateObject;
+
+                output.Add((newPacketHolder, basePacket.Number));
             }
+
+            return output;
         }
     }
 }

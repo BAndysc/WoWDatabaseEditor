@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 
 namespace Updater
@@ -12,7 +13,8 @@ namespace Updater
     {
         private static void PrintError(Exception? e, string message)
         {
-            Console.WriteLine(e?.Message);
+            if (e != null)
+                Console.WriteLine(e.Message);
             Console.WriteLine("@@@@@@@@@@@@@@@@@");
             Console.WriteLine("@");
             Console.WriteLine("@");
@@ -47,6 +49,15 @@ namespace Updater
             if (!updateFile.Exists)
             {
                 LaunchWowDatabaseEditor(executable, args);
+                return;
+            }
+
+            if (FindOldFiles())
+            {
+                PrintError(null, "There are some .old files in the editor directory. It means you have some custom changes to the editor files. Commit them or delete manually and run the update.exe again");
+                Thread.Sleep(3000);
+                LaunchWowDatabaseEditor(executable, args.Concat(new[]{"--skip-update"}).ToArray());
+                Console.ReadKey();
                 return;
             }
 
@@ -148,6 +159,31 @@ namespace Updater
         private static void LaunchWowDatabaseEditor(string executable, string[] args)
         {
             Process.Start(executable, args);
+        }
+
+        private static byte[] CalculateFileMd5(string filename)
+        {
+            using var md5 = MD5.Create();
+            using var stream = File.OpenRead(filename);
+            return md5.ComputeHash(stream);
+        }
+
+        private static bool FindOldFiles()
+        {
+            foreach (var fileName in Directory.EnumerateFiles(Environment.CurrentDirectory, "*.old", SearchOption.AllDirectories))
+            {
+                var regularFileName = fileName.Substring(0, fileName.Length - 4);
+                if (!File.Exists(regularFileName))
+                    continue;
+
+                var @new = CalculateFileMd5(regularFileName);
+                var old = CalculateFileMd5(fileName);
+
+                if (!@new.SequenceEqual(old))
+                    return true;
+            }
+
+            return false;
         }
     }
 }

@@ -25,7 +25,7 @@ public class VisualStudioCodeOpener : IFileOpener
         if (exe == null || !File.Exists(exe))
             return false;
 
-        var process = processService.RunAndForget(exe, $"--goto \"{path.FullName}:{lineNumber}\"", null, false);
+        var process = processService.RunAndForget(exe, new[]{"--goto", $"{path.FullName}:{lineNumber}"}, null, false);
         return process.IsRunning;
     }
 }

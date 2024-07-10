@@ -23,6 +23,7 @@ namespace WDE.SmartScriptEditor.Editor
         IParameter<long> ConditionTargetParameter { get; }
         IParameter<long> EventFlagsParameter { get; }
         int TargetConditionId { get; }
+        int? NonBreakableLinkFlag { get; }
     }
 
     public readonly struct ParametersCount

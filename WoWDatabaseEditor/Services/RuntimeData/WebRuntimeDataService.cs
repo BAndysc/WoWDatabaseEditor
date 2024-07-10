@@ -46,6 +46,11 @@ public class WebRuntimeDataService : IRuntimeDataService
         return response.IsSuccessStatusCode;
     }
 
+    public IDirectoryWatcher WatchDirectory(string path, bool recursive)
+    {
+        return NullDirectoryWatcher.Instance;
+    }
+
     public async Task<byte[]> ReadAllBytes(string path)
     {
         try
@@ -87,5 +92,16 @@ public class WebRuntimeDataService : IRuntimeDataService
         if (anySuffix)
             return file.StartsWith(searchPattern.Substring(0, searchPattern.Length - 1));
         return file == searchPattern;
+    }
+
+    private class NullDirectoryWatcher : IDirectoryWatcher
+    {
+        public static NullDirectoryWatcher Instance = new NullDirectoryWatcher();
+
+        public void Dispose()
+        {
+        }
+
+        public event Action<WatcherChangeTypes, string>? OnChanged;
     }
 }

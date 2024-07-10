@@ -43,7 +43,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             
             foreach (var f in packets)
             {
-                processor.PreProcess(f.Packet);
+                processor.PreProcess(ref f.Packet);
                 if (token.IsCancellationRequested)
                     throw new TaskCanceledException();
             }
@@ -55,11 +55,11 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 var packet = packets[index];
 
                 while (j < unfilteredPackets.Count && unfilteredPackets[j].Id < packet.Id)
-                    processor.ProcessUnfiltered(unfilteredPackets[j++].Packet);
+                    processor.ProcessUnfiltered(ref unfilteredPackets[j++].Packet);
 
                 i++;
                 j++;
-                processor.Process(packet.Packet);
+                processor.Process(ref packet.Packet);
                 if (token.IsCancellationRequested)
                     throw new TaskCanceledException();
             }
@@ -112,7 +112,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             List<int> relatedPacketsWithoutActors = new();
             HashSet<UniversalGuid> relatedActors = new HashSet<UniversalGuid>();
             if (happenReason.Value.MainActor != null)
-                relatedActors.Add(happenReason.Value.MainActor);
+                relatedActors.Add(happenReason.Value.MainActor.Value);
             
             if (idToPacket.TryGetValue(happenReason.Value.PacketNumber, out var pvm) && 
                 (pvm.MainActor == null || !pvm.MainActor.Equals(happenReason.Value.MainActor)))
@@ -141,7 +141,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     reasons.Enqueue(action.packetId);
                     if (actionHappened!.Value.MainActor != null)
                     {
-                        if (relatedActors.Add(actionHappened.Value.MainActor))
+                        if (relatedActors.Add(actionHappened.Value.MainActor.Value))
                         {
                             LOG.LogInformation("Taking {@actor} from packet {@packet} linked by {@reason}", actionHappened.Value.MainActor.ToWowParserString(), action.packetId, reason);
                         }

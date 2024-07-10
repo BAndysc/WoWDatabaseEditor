@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using WDE.Common.Services.CommandLine;
+using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Services
@@ -21,6 +23,39 @@ namespace WDE.Common.Services
             this.fileSystem = fileSystem;
 
             ReadConfig("app.ini");
+
+            ReadConfigFromCommandLine(GlobalApplication.Arguments);
+        }
+
+        private void ReadConfigFromCommandLine(ICommandLineArgs arguments)
+        {
+            for (int index = 0; index < arguments.Count; ++index)
+            {
+                var arg = arguments[index];
+                if (arg.StartsWith("-D"))
+                {
+                    var equalsSign = arg.IndexOf("=", StringComparison.Ordinal);
+                    if (equalsSign != -1)
+                    {
+                        var key = arg.Substring(2, equalsSign - 2);
+                        var value = arg.Substring(equalsSign + 1);
+                        config[key] = value;
+                    }
+                    else
+                    {
+                        var key = arg.Substring(2);
+                        if (index + 1 < arguments.Count && !arguments[index + 1].StartsWith("-"))
+                        {
+                            config[key] = arguments[index + 1];
+                            index++;
+                        }
+                        else
+                        {
+                            config[key] = "true";
+                        }
+                    }
+                }
+            }
         }
 
         private void ReadConfig(string configurationPath)

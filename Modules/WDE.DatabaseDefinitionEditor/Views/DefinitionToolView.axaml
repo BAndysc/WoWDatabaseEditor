@@ -15,7 +15,7 @@
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
         <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
     </UserControl.Resources>
-    <TabControl>
+    <TabControl SelectedIndex="{CompiledBinding SelectedTabIndex}">
         <TabItem Header="Definition generator">
             <Grid ColumnDefinitions="200,10,*" RowDefinitions="*,10,Auto" DataContext="{CompiledBinding Definitions}">
                 <DockPanel LastChildFill="True">
@@ -29,7 +29,7 @@
                 <GridSplitter Grid.Column="1" Classes="vertical" />
                 <avaloniaEdit:TextEditor Grid.Column="2"
                                          IsEnabled="{CompiledBinding IsLoading, Converter={StaticResource InverseBoolConverter}}"
-                                         SyntaxHighlighting="Json" 
+                                         AvalonEditExtra.SyntaxExtension="json"
                                          Document="{CompiledBinding Definition, Converter={StaticResource DocumentConverter}}" 
                                          BorderThickness="0"
                                          ShowLineNumbers="True"
@@ -47,11 +47,14 @@
                              SelectedItem="{CompiledBinding SelectedDefinition, Mode=TwoWay}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Vertical">
-                                    <TextBlock Text="{CompiledBinding Name, Mode=OneTime}" FontWeight="Bold" />
-                                    <TextBlock Text="{CompiledBinding FileName, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
-                                    <TextBlock Text="{CompiledBinding Description, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
-                                </StackPanel>
+                                <DockPanel>
+                                    <WdeImage ImageUri="{CompiledBinding IconPath}" VerticalAlignment="Center" Margin="0,0,5,0" Width="24" Height="24" />
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock Text="{CompiledBinding Name, Mode=OneTime}" FontWeight="Bold" />
+                                        <TextBlock Text="{CompiledBinding FileName, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
+                                        <TextBlock Text="{CompiledBinding Description, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
+                                    </StackPanel>
+                                </DockPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>                    

@@ -60,6 +60,10 @@
         <GeometryGroup x:Key="Open3DIcon">
             <PathGeometry>M15,3L6.36,0.802L1,3L1,13L9,15L10,14.999L15,13L15,3ZM2,4.221L2,12.19L9,13.95L9,5.981L2,4.221ZM10,5.997L10,13.915L14,12.239L14,4.321L10,5.997ZM2.78,3.386L9.198,5L9.791,5L13.2,3.572L6.41,1.865L2.78,3.386Z</PathGeometry>
         </GeometryGroup>
+        <GeometryGroup x:Key="CloudUpload">
+            <PathGeometry>M 4.5 11.667 C 2.568 11.667 1 10.098 1 8.167 C 1 6.235 2.568 4.667 4.5 4.667 C 4.63 4.667 4.758 4.674 4.884 4.687 C 5.535 3.297 6.948 2.333 8.583 2.333 C 10.657 2.333 12.371 3.882 12.632 5.885 C 13.98 6.142 15 7.328 15 8.75 C 15 10.16 13.997 11.338 12.667 11.608 L 12.455 11.61</PathGeometry>
+            <PathGeometry>M 8 14 L 8 7 L 6 8.75 L 8 7 L 10 8.75</PathGeometry>
+        </GeometryGroup>
     </controls:ExtendedWindow.Resources>
 
     <ExtendedWindow.Styles>
@@ -182,6 +186,10 @@
                         <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource DownloadUpdateIcon}" />
                     </Button>
 
+                    <Button x:Name="CloudUpload" IsVisible="{CompiledBinding VersionedFilesViewModel.AnyPendingFiles, FallbackValue={x:False}}" ToolTip.Tip="{CompiledBinding VersionedFilesViewModel.StagedFilesCount, StringFormat={}{0} Pending Files (click to see them)}" Command="{CompiledBinding VersionedFilesViewModel.OpenUploadWindow}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
+                        <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource CloudUpload}" />
+                    </Button>
+
                     <Button x:Name="OpenSQLDocument" ToolTip.Tip="New SQL document" Command="{CompiledBinding OpenSqlDocumentCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
                         <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource ToSqlIcon}" />
                     </Button>
@@ -254,12 +262,16 @@
             <docking:PersistentDockDataTemplate />
         </idc:DockControl.DataTemplates>
         <idc:DockControl.Styles>
+            <Style Selector="idc|DocumentTabStripItem">
+                <Setter Property="MaxWidth" Value="300" />
+                <Setter Property="(ToolTip.Tip)" Value="{CompiledBinding Title}" x:DataType="docking:AvaloniaDocumentDockWrapper" />
+            </Style>
             <Style Selector="idc|DocumentControl">
                 <Setter Property="HeaderTemplate">
                     <DataTemplate DataType="docking:AvaloniaDocumentDockWrapper">
-                        <StackPanel Orientation="Horizontal">
+                        <DockPanel>
                             <components:WdeImage Image="{CompiledBinding ViewModel.Icon, FallbackValue={x:Static views:MainWindowWithDocking.DocumentIcon}, TargetNullValue={x:Static views:MainWindowWithDocking.DocumentIcon}}" Width="16" Height="16"/>
-                            <TextBlock Text="{CompiledBinding Title}" Padding="2">
+                            <TextBlock TextTrimming="CharacterEllipsis" Text="{CompiledBinding Title}" Padding="2">
                                 <Interaction.Behaviors>
                                     <DataTriggerBehavior Binding="{CompiledBinding ViewModel.IsModified}" ComparisonCondition="Equal" Value="False">
                                         <ChangePropertyAction TargetObject="{Binding #TextBlock}"
@@ -273,7 +285,7 @@
                                     </DataTriggerBehavior>
                                 </Interaction.Behaviors>
                             </TextBlock>
-                        </StackPanel>
+                        </DockPanel>
                     </DataTemplate>
                 </Setter>
             </Style>

@@ -86,12 +86,12 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
 
         public BulkAsyncTableRowProvider(IMySqlExecutor executor, DatabaseTableDefinitionJson tableDefinition, string? customGroupByColumn = null)
         {
-            if (string.IsNullOrWhiteSpace(tableDefinition.TablePrimaryKeyColumnName))
+            if (!tableDefinition.TablePrimaryKeyColumnName.HasValue || string.IsNullOrWhiteSpace(tableDefinition.TablePrimaryKeyColumnName.Value.ColumnName))
                 throw new Exception($"Table {this.tableDefinition} primary key column name is not defined");
             
             this.executor = executor;
             this.tableDefinition = tableDefinition;
-            groupByColumn = customGroupByColumn ?? tableDefinition.TablePrimaryKeyColumnName;
+            groupByColumn = customGroupByColumn ?? tableDefinition.TablePrimaryKeyColumnName.Value.ColumnName;
             valuePublisher.Throttle(TimeSpan.FromSeconds((1)))
                 .SubscribeAction(_ =>
                 {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -151,7 +152,7 @@ internal class MySqlImportService : IMySqlImportService
 
         async Task DoJob(FileInfo[] files, bool reportState)
         {
-            var mysqlTask = processService.Run(token, mysqlPath, string.Join(" ", arguments), null, x =>
+            var mysqlTask = processService.Run(token, mysqlPath, arguments.ToList(), null, x =>
             {
             }, x => mainThread.Dispatch(() => errorCallback(x, files.Length > 1 ? null : files[0])),true, out var writer);
 

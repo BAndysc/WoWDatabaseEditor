@@ -40,20 +40,20 @@ namespace WDE.PacketViewer.Processing.Processors
             return null;
         }
 
-        private void ProcessUpdate(PacketBase basePacket, PacketUpdateObject packet)
+        private void ProcessUpdate(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
         {
-            foreach (var destroy in packet.Destroyed)
+            foreach (ref readonly var destroy in packet.Destroyed.AsSpan())
                 states.Remove(destroy.Guid);
             
-            foreach (var destroy in packet.OutOfRange)
+            foreach (ref readonly var destroy in packet.OutOfRange.AsSpan())
                 states.Remove(destroy.Guid);
         }
 
-        private void ProcessAuraUpdate(PacketBase basePacket, PacketAuraUpdate packet)
+        private void ProcessAuraUpdate(ref readonly PacketBase basePacket, ref readonly PacketAuraUpdate packet)
         {
             var state = Get(packet.Unit);
             lastAuraGuid = packet.Unit;
-            foreach (var update in packet.Updates)
+            foreach (ref readonly var update in packet.Updates.AsSpan())
             {
                 if (update.Remove)
                 {
@@ -66,11 +66,11 @@ namespace WDE.PacketViewer.Processing.Processors
             }
         }
         
-        public bool Process(PacketHolder packet)
+        public bool Process(ref readonly PacketHolder packet)
         {
             if (pendingRemoveSlots.Count > 0)
             {
-                if (lastAuraGuid != null && states.TryGetValue(lastAuraGuid, out var state))
+                if (lastAuraGuid != null && states.TryGetValue(lastAuraGuid.Value, out var state))
                 {
                     foreach (var slot in pendingRemoveSlots)
                         state.SlotToSpell.Remove(slot);
@@ -80,11 +80,11 @@ namespace WDE.PacketViewer.Processing.Processors
             
             if (packet.KindCase == PacketHolder.KindOneofCase.AuraUpdate)
             {
-                ProcessAuraUpdate(packet.BaseData, packet.AuraUpdate);
+                ProcessAuraUpdate(in packet.BaseData, in packet.AuraUpdate);
             }
             else if (packet.KindCase == PacketHolder.KindOneofCase.UpdateObject)
             {
-                ProcessUpdate(packet.BaseData, packet.UpdateObject);
+                ProcessUpdate(in packet.BaseData, in packet.UpdateObject);
             }
 
             return true;

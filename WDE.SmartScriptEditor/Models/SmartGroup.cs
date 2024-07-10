@@ -76,4 +76,5 @@ public class SmartGroupFakeEditorFeatures : IEditorFeatures
     public IParameter<long> ConditionTargetParameter => Parameter.Instance;
     public IParameter<long> EventFlagsParameter => Parameter.Instance;
     public int TargetConditionId => -1;
+    public int? NonBreakableLinkFlag => null;
 }

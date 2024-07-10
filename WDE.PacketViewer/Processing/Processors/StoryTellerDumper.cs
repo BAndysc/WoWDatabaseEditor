@@ -19,7 +19,7 @@ using DynamicData;
 namespace WDE.PacketViewer.Processing.Processors
 {
     [AutoRegister]
-    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector, ISpellCastProcessor, IAuraSlotTracker>,
+    public unsafe class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector, ISpellCastProcessor, IAuraSlotTracker>,
         IPacketTextDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor, IUnfilteredTwoStepPacketBoolProcessor
     {
         private class WriterBuilder
@@ -45,6 +45,7 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly ICachedDatabaseProvider databaseProvider;
         private readonly IDbcStore dbcStore;
         private readonly ISpellStore spellStore;
+        private readonly IMapAreaStore mapAreaStore;
         private readonly IWaypointProcessor waypointProcessor;
         private readonly IChatEmoteSoundProcessor chatProcessor;
         private readonly IRandomMovementDetector randomMovementDetector;
@@ -65,10 +66,20 @@ namespace WDE.PacketViewer.Processing.Processors
         private HashSet<uint> activePhases = new();
 
         public bool RequiresSplitUpdateObject => true;
-        
+
+        private struct LastWorldState
+        {
+            public DateTime time;
+            public int zoneId;
+            public int areaId;
+        }
+
+        private LastWorldState? lastWorldState;
+
         public StoryTellerDumper(ICachedDatabaseProvider databaseProvider, 
             IDbcStore dbcStore,
             ISpellStore spellStore,
+            IMapAreaStore mapAreaStore,
             IParameterFactory parameterFactory,
             IWaypointProcessor waypointProcessor,
             IChatEmoteSoundProcessor chatProcessor,
@@ -87,6 +98,7 @@ namespace WDE.PacketViewer.Processing.Processors
             this.databaseProvider = databaseProvider;
             this.dbcStore = dbcStore;
             this.spellStore = spellStore;
+            this.mapAreaStore = mapAreaStore;
             this.waypointProcessor = waypointProcessor;
             this.chatProcessor = chatProcessor;
             this.randomMovementDetector = randomMovementDetector;
@@ -132,9 +144,9 @@ namespace WDE.PacketViewer.Processing.Processors
                 return writer!;
             if (guid == null)
                 return WriterBuilder.Null;
-            if (perGuidWriter.TryGetValue(guid, out var wr))
+            if (perGuidWriter.TryGetValue(guid.Value, out var wr))
                 return wr;
-            var writerBuilder = perGuidWriter[guid] = new();
+            var writerBuilder = perGuidWriter[guid.Value] = new();
             return writerBuilder;
         }
         
@@ -192,10 +204,11 @@ namespace WDE.PacketViewer.Processing.Processors
             return null;
         }
         
-        private string NiceGuid(UniversalGuid? guid, bool withFull = false)
+        private string NiceGuid(UniversalGuid? nullableGuid, bool withFull = false)
         {
-            if (guid == null)
+            if (nullableGuid == null)
                 return "(null guid)";
+            var guid = nullableGuid.Value;
             int shortGuid = currentShortGuid;
             if (guids.ContainsKey(guid))
                 shortGuid = guids[guid];
@@ -211,15 +224,15 @@ namespace WDE.PacketViewer.Processing.Processors
             if (guid.Type == UniversalHighGuid.Creature || guid.Type == UniversalHighGuid.Vehicle || guid.Type == UniversalHighGuid.Pet)
             {
                 var pretty = GetPrettyFormat(guid.Type, guid.Entry, shortGuid);
-                return pretty ?? "Creature " + guid.Entry + (shortGuid > 0 ? " (GUID " + shortGuid + ")" : "") + (withFull?" "+(guid.Guid64?.Low ?? guid.Guid128.Low).ToString("X8"):"");
+                return pretty ?? "Creature " + guid.Entry + (shortGuid > 0 ? " (GUID " + shortGuid + ")" : "") + (withFull?" "+(guid.KindCase == UniversalGuid.KindOneofCase.Guid64 ? guid.Guid64.Low : guid.Guid128.Low).ToString("X8"):"");
             }
             if (guid.Type == UniversalHighGuid.GameObject || guid.Type == UniversalHighGuid.Transport)
             {
                 var pretty = GetPrettyFormat(guid.Type, guid.Entry, shortGuid);
-                return pretty ?? "GameObject " + guid.Entry + (shortGuid > 0 ? " (GUID " + shortGuid + ")" : "") + (withFull ? " " + (guid.Guid64?.Low ?? guid.Guid128.Low).ToString("X8") : "");
+                return pretty ?? "GameObject " + guid.Entry + (shortGuid > 0 ? " (GUID " + shortGuid + ")" : "") + (withFull ? " " + (guid.KindCase == UniversalGuid.KindOneofCase.Guid64 ? guid.Guid64.Low : guid.Guid128.Low).ToString("X8") : "");
             }
 
-            return guid.ToString();
+            return guid.ToString()!;
         }
 
         private string GetStringFromDbc(Dictionary<long, string> dbc, int id)
@@ -229,7 +242,7 @@ namespace WDE.PacketViewer.Processing.Processors
             return id.ToString();
         }
         
-        protected override bool Process(PacketBase basePacket, PacketChat packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketChat packet)
         {
             var emote = chatProcessor.GetEmoteForChat(basePacket);
             var sound = chatProcessor.GetSoundForChat(basePacket);
@@ -237,40 +250,40 @@ namespace WDE.PacketViewer.Processing.Processors
             AppendLine(basePacket,  packet.Sender, NiceGuid(packet.Sender) + " says: `" + text + "`"
                                    + (emote.HasValue ? " with emote " + GetStringFromDbc(dbcStore.EmoteStore, emote.Value) : "")
                                    + (sound.HasValue ? " with sound " + GetStringFromDbc(dbcStore.SoundStore, (int)sound.Value) : ""));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketEmote packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketEmote packet)
         {
             if (chatProcessor.IsEmoteForChat(basePacket))
                 return false;
             AppendLine(basePacket, packet.Sender, NiceGuid(packet.Sender) + " plays emote: " + GetStringFromDbc(dbcStore.EmoteStore, packet.Emote));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketPlaySound packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketPlaySound packet)
         {
             if (chatProcessor.IsSoundForChat(basePacket))
                 return false;
             AppendLine(basePacket, packet.Source, NiceGuid(packet.Source) + " plays sound: " + GetStringFromDbc(dbcStore.SoundStore, (int)packet.Sound));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketPlayMusic packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketPlayMusic packet)
         {
             AppendLine(basePacket, packet.Target, $"music: {packet.Music} plays");
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketPlayObjectSound packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketPlayObjectSound packet)
         {
             if (chatProcessor.IsSoundForChat(basePacket))
                 return false;
             AppendLine(basePacket, packet.Source, $"{NiceGuid(packet.Source)} plays object sound: {GetStringFromDbc(dbcStore.SoundStore, (int)packet.Sound)} to {NiceGuid(packet.Target)}");
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketAuraUpdate packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketAuraUpdate packet)
         {
             if (packet.Updates.Count == 1)
             {
@@ -287,7 +300,7 @@ namespace WDE.PacketViewer.Processing.Processors
             else
             {
                 SetAppendOnNext(NiceGuid(packet.Unit) + " auras update:");
-                foreach (var update in packet.Updates)
+                foreach (ref readonly var update in packet.Updates.AsSpan())
                 {
                     if (update.Remove)
                     {               
@@ -303,36 +316,44 @@ namespace WDE.PacketViewer.Processing.Processors
                 }
                 SetAppendOnNext(null);   
             }
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketSpellStart packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellStart packet)
         {
-            if (!spellService.Exists(packet.Data.Spell))
+            if (packet.Data == null)
                 return false;
 
-            if (spellCastProcessor.HasFinishedCastingAt(packet.Data.CastGuid, basePacket))
+            if (!spellService.Exists(packet.Data->Spell))
+                return false;
+
+            UniversalGuid? castGuid = packet.Data->IdKindCase == PacketSpellData.IdKindOneofCase.CastGuid ? packet.Data->CastGuid : null;
+
+            if (spellCastProcessor.HasFinishedCastingAt(castGuid, basePacket))
                 return false;
             
             string verb = " starts casting: ";
-            if (spellCastProcessor.HasFailedCastingAt(packet.Data.CastGuid, basePacket))
+            if (spellCastProcessor.HasFailedCastingAt(castGuid, basePacket))
                 verb = " tries to cast and fails: ";
 
-            AppendLine(basePacket, packet.Data.Caster, NiceGuid(packet.Data.Caster) + verb + GetSpellName(packet.Data.Spell));
+            AppendLine(basePacket, packet.Data->Caster, NiceGuid(packet.Data->Caster) + verb + GetSpellName(packet.Data->Spell));
             return true;
         }
         
-        protected override bool Process(PacketBase basePacket, PacketSpellGo packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellGo packet)
         {
-            if (!spellService.Exists(packet.Data.Spell))
+            if (packet.Data == null)
+                return false;
+
+            if (!spellService.Exists(packet.Data->Spell))
                 return false;
             
             string targetLine = "";
-            int targetCount = packet.Data.HitTargets.Count;
+            int targetCount = packet.Data->HitTargets.Count;
 
             if (targetCount == 1)
             {
-                targetLine = "at target: " + NiceGuid(packet.Data.HitTargets[0]);
+                targetLine = "at target: " + NiceGuid(packet.Data->HitTargets[0]);
             }
             else if (targetCount > 0)
             {
@@ -340,65 +361,66 @@ namespace WDE.PacketViewer.Processing.Processors
 
                 int index = 0;
                 targetLine += "\n       Spell Targets: {";
-                foreach (var guid in packet.Data.HitTargets)
+                foreach (ref readonly var guid in packet.Data->HitTargets.AsSpan())
                 {
                     targetLine += "\n            [" + (index++) + "] " + NiceGuid(guid);
                 }
                 targetLine += "\n       }";
             }
+            UniversalGuid? castGuid = packet.Data->IdKindCase == PacketSpellData.IdKindOneofCase.CastGuid ? packet.Data->CastGuid : null;
 
             string verb = "finishes casting";
-            if (spellCastProcessor.HasStartedCastingAt(packet.Data.CastGuid, basePacket))
+            if (spellCastProcessor.HasStartedCastingAt(castGuid, basePacket))
                 verb = "starts and finishes casting";
             
-            AppendLine(basePacket, packet.Data.Caster, NiceGuid(packet.Data.Caster) + $" {verb}: " + GetSpellName(packet.Data.Spell) + " " + targetLine);
-            return base.Process(basePacket, packet);
+            AppendLine(basePacket, packet.Data->Caster, NiceGuid(packet.Data->Caster) + $" {verb}: " + GetSpellName(packet.Data->Spell) + " " + targetLine);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketSpellFailure packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellFailure packet)
         {
             if (!spellService.Exists(packet.Spell))
                 return false;
 
-            if (spellCastProcessor.HasStartedCastingAt(packet.CastGuid, basePacket))
+            if (spellCastProcessor.HasStartedCastingAt(Unpack(packet.CastGuid), basePacket))
                 return false;
             
             AppendLine(basePacket, packet.Caster, NiceGuid(packet.Caster) + $" failed casting spell " + GetSpellName(packet.Spell));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketSpellCastFailed packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellCastFailed packet)
         {
             if (!spellService.Exists(packet.Spell))
                 return false;
 
-            if (spellCastProcessor.HasStartedCastingAt(packet.CastGuid, basePacket))
+            if (spellCastProcessor.HasStartedCastingAt(Unpack(packet.CastGuid), basePacket))
                 return false;
 
             AppendLine(basePacket, null, $"Casting spell " + GetSpellName(packet.Spell) + " failed");
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketGossipMessage packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGossipMessage packet)
         {
             gossips[packet.MenuId] = new Dictionary<uint, string>();
 
             for (int i = 0; i < packet.Options.Count; ++i) 
-                gossips[packet.MenuId].Add(packet.Options[i].OptionIndex, packet.Options[i].Text);
-            return base.Process(basePacket, packet);
+                gossips[packet.MenuId].Add(packet.Options[i].OptionIndex, packet.Options[i].Text.ToString() ?? "");
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketGossipSelect packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGossipSelect packet)
         {
             if (gossips.ContainsKey(packet.MenuId) && gossips[packet.MenuId].ContainsKey(packet.OptionId))
                 AppendLine(basePacket, packet.GossipUnit, "Player choose option: " + gossips[packet.MenuId][packet.OptionId]);
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketGossipHello packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGossipHello packet)
         {
             AppendLine(basePacket, packet.GossipSource, "Player talks to: " + NiceGuid(packet.GossipSource));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
         private string GetSpellName(uint spellId)
@@ -412,49 +434,49 @@ namespace WDE.PacketViewer.Processing.Processors
             return (template == null ? questId.ToString() : $"{template.Name} ({questId})");
         }
 
-        protected override bool Process(PacketBase basePacket, PacketClientUseGameObject packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketClientUseGameObject packet)
         {
             AppendLine(basePacket, packet.GameObject, "Player uses gameobject: " + NiceGuid(packet.GameObject));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketQuestGiverAcceptQuest packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestGiverAcceptQuest packet)
         {
             AppendLine(basePacket, packet.QuestGiver, "Player accepts quest: " + GetQuestName(packet.QuestId));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketQuestGiverQuestComplete packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestGiverQuestComplete packet)
         {
             AppendLine(basePacket, null, "Player rewards quest: " + GetQuestName(packet.QuestId));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketQuestComplete packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestComplete packet)
         {
             AppendLine(basePacket, null, "Quest completed: " + GetQuestName(packet.QuestId));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketQuestAddKillCredit packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestAddKillCredit packet)
         {
-            AppendLine(basePacket, packet.Victim, $"Added kill credit {packet.KillCredit} for quest " + GetQuestName(packet.QuestId) + $" ({packet.Count}/{packet.RequiredCount})");
-            return base.Process(basePacket, packet);
+            AppendLine(basePacket, Unpack(packet.Victim), $"Added kill credit {packet.KillCredit} for quest " + GetQuestName(packet.QuestId) + $" ({packet.Count}/{packet.RequiredCount})");
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketQuestFailed packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestFailed packet)
         {
             AppendLine(basePacket, null, "Quest failed: " + GetQuestName(packet.QuestId));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
         
-        protected override bool Process(PacketBase basePacket, PacketSpellClick packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellClick packet)
         {
             AppendLine(basePacket, packet.Target, "Player spell click on: " + NiceGuid(packet.Target));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketMonsterMove packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketMonsterMove packet)
         {
             if (randomMovementDetector.RandomMovementPacketRatio(packet.Mover) > 0.65f)
                 return false;
@@ -471,7 +493,7 @@ namespace WDE.PacketViewer.Processing.Processors
                      packet.Jump != null)
             {
                 var dest = packet.Points[0];
-                sb.Append($"jumps to ({dest.X}, {dest.Y}, {dest.Z}) with gravity {packet.Jump.Gravity}");
+                sb.Append($"jumps to ({dest.X}, {dest.Y}, {dest.Z}) with gravity {packet.Jump->Gravity}");
             }
             else if (packet.Flags.HasFlagFast(UniversalSplineFlag.TransportExit))
                 sb.Append("exits vehicle/transport");
@@ -480,7 +502,8 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (!waypointProcessor.State.TryGetValue(packet.Mover, out var state))
                     return true;
 
-                var path = state.Paths.FirstOrDefault(p => p.FirstPacketNumber == basePacket.Number);
+                var basePacketNumber = basePacket.Number;
+                var path = state.Paths.FirstOrDefault(p => p.FirstPacketNumber == basePacketNumber);
 
                 if (path == null)
                     return true;
@@ -551,7 +574,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     if (sb.Length > 0)
                         sb.Append("\n    then ");
                 
-                    sb.Append($"after [special time] jump with gravity {packet.Jump.Gravity}");
+                    sb.Append($"after [special time] jump with gravity {packet.Jump->Gravity}");
                     sb.Append("\n    (explanation: this packet is both a path and a jump. Check the packet text view manually, because story teller doesn't support it fully)");
                 }
             }
@@ -575,10 +598,21 @@ namespace WDE.PacketViewer.Processing.Processors
 
             var randomRatio = randomMovementDetector.RandomMovementPacketRatio(packet.Mover);
             AppendLine(basePacket, packet.Mover, NiceGuid(packet.Mover) + $" [random movement chance: {randomRatio*100:0}%] " + sb);
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketPhaseShift packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketInitWorldStates packet)
+        {
+            lastWorldState = new LastWorldState()
+            {
+                time = basePacket.Time.ToDateTime(),
+                zoneId = packet.ZoneId,
+                areaId = packet.AreaId
+            };
+            return base.Process(in basePacket, in packet);
+        }
+
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketPhaseShift packet)
         {
             StringBuilder sb = new StringBuilder();
             List<string> phases = new List<string>();
@@ -586,7 +620,7 @@ namespace WDE.PacketViewer.Processing.Processors
             List<string> removedPhases = new List<string>();
             List<string> continuedPhases = new List<string>();
 
-            foreach (uint phase in packet.Phases)
+            foreach (uint phase in packet.Phases.AsSpan())
             {
                 phases.Add(GetStringFromDbc(dbcStore.PhaseStore, (int)phase));
                 bool wasadded = activePhases.Add(phase);
@@ -598,7 +632,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
             foreach (uint phase in activePhases.ToList())
             {
-                bool isRemoved = !packet.Phases.Contains(phase);
+                bool isRemoved = !packet.Phases.AsSpan().Contains(phase);
                 if (isRemoved)
                 {
                     activePhases.Remove(phase);
@@ -640,8 +674,12 @@ namespace WDE.PacketViewer.Processing.Processors
 
             if (removedPhases.Count > 0)
             {
-                sb.AppendLine();
-                sb.Append("     Removed Phases:      " + removedPhases[0]);
+                if (sb.Length > 0)
+                {
+                    sb.AppendLine();
+                    sb.Append("     ");
+                }
+                sb.Append("Removed Phases:      " + removedPhases[0]);
             }
 
             if (removedPhases.Count > 1)
@@ -653,71 +691,80 @@ namespace WDE.PacketViewer.Processing.Processors
                     sb.AppendLine();
             }
 
+            if (lastWorldState.HasValue)
+            {
+                var zoneName = mapAreaStore.GetAreaById((uint)lastWorldState.Value.zoneId)?.Name;
+                var areaName = mapAreaStore.GetAreaById((uint)lastWorldState.Value.areaId)?.Name;
+                var diff = basePacket.Time.ToDateTime() - lastWorldState.Value.time;
+                sb.Append($"           Last zone: {zoneName} ({lastWorldState.Value.zoneId}) Last area: {areaName} ({lastWorldState.Value.areaId}) ({diff.ToHumanFriendlyString()} ago)");
+            }
+
             AppendLine(basePacket, null, sb.ToString());
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketClientUseItem packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketClientUseItem packet)
         {
             AppendLine(basePacket, null, "Player uses item in backpack and cast spell " + GetSpellName(packet.SpellId));
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketOneShotAnimKit packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketOneShotAnimKit packet)
         {
             AppendLine(basePacket, packet.Unit, NiceGuid(packet.Unit) + " plays one shot anim kit " + packet.AnimKit);
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketGameObjectCustomAnim packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGameObjectCustomAnim packet)
         {
             AppendLine(basePacket, packet.GameObject, NiceGuid(packet.GameObject) + " plays custom anim " + packet.Anim);
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketClientAreaTrigger packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketClientAreaTrigger packet)
         {
             AppendLine(basePacket, null, "Player " + (packet.Enter ? "enters" : "leaves") + " clientside area trigger " + packet.AreaTrigger);
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketSetAnimKit packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSetAnimKit packet)
         {
             AppendLine(basePacket, packet.Unit, NiceGuid(packet.Unit) + " sets anim kit " + packet.AnimKit);
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketUpdateObject packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
         {
-            foreach (var destroyed in packet.Destroyed)
+            foreach (ref readonly var destroyed in packet.Destroyed.AsSpan())
             {
                 if (destroyed.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
                 AppendLine(basePacket, destroyed.Guid, "Destroyed " + NiceGuid(destroyed.Guid));
             }
 
-            foreach (var destroyed in packet.OutOfRange)
+            foreach (ref readonly var destroyed in packet.OutOfRange.AsSpan())
             {
                 if (destroyed.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
                 AppendLine(basePacket, destroyed.Guid, "Out of range: " + NiceGuid(destroyed.Guid));
             }
 
-            foreach (var created in packet.Created)
+            foreach (ref readonly var created in packet.Created.AsSpan())
             {
                 if (created.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
                 var spawnTime = despawnDetector.GetSpawnLength(created.Guid, basePacket.Number);
                 var createType = created.CreateType == CreateObjectType.InRange ? "In range " : "Spawned ";
                 var spawnedAgo = fromGuidSpawnTimeProcessor.TryGetSpawnTime(created.Guid, basePacket.Time.ToDateTime());
-                SetAppendOnNext(createType + NiceGuid(created.Guid) + " at " + VecToString(created.Movement?.Position ?? created.Stationary?.Position, created.Movement?.Orientation ?? created.Stationary?.Orientation) +
+                SetAppendOnNext(createType + NiceGuid(created.Guid) + " at " + VecToString(created.Movement != null ? created.Movement->Position : created.Stationary != null ? created.Stationary->Position : null,
+                                    created.Movement != null ? created.Movement->Orientation : created.Stationary != null ? created.Stationary->Orientation : null) +
                                 (spawnTime == null ? "" : $" (will be destroyed in {spawnTime.Value.ToNiceString()})") +
                                 (spawnedAgo.HasValue && (spawnedAgo.Value.TotalMilliseconds > 1000 || created.CreateType == CreateObjectType.InRange) ? $" (spawned {spawnedAgo.Value.ToNiceString()} ago)" : ""));
                 PrintValues(basePacket, created.Guid, created.Values, false);
                 SetAppendOnNext(null);
             }
             
-            foreach (var updated in packet.Updated)
+            foreach (ref readonly var updated in packet.Updated.AsSpan())
             {
                 if (updated.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
@@ -747,7 +794,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 PrintValues(basePacket, updated.Guid, updated.Values, true);
                 SetAppendOnNext(null);
             }
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
         private string VecToString(Vec3? pos, float? orientation)
@@ -755,9 +802,9 @@ namespace WDE.PacketViewer.Processing.Processors
             if (pos == null)
                 return "(unknown)";
             if (orientation.HasValue)
-                return $"({pos.X}, {pos.Y}, {pos.Z}, {orientation})";
+                return $"({pos.Value.X}, {pos.Value.Y}, {pos.Value.Z}, {orientation})";
             else
-                return $"({pos.X}, {pos.Y}, {pos.Z})";
+                return $"({pos.Value.X}, {pos.Value.Y}, {pos.Value.Z})";
         }
 
         private string? TryGenerateFlagsDiff(IParameter<long>? param, string key, long old, long nnew)
@@ -894,7 +941,8 @@ namespace WDE.PacketViewer.Processing.Processors
                 return writer!.builder.ToString();
             foreach (var guid in perGuidWriter)
             {
-                totalBuilder.AppendLine(guid.Key.ToWowParserString());
+                var universalGuid = guid.Key;
+                totalBuilder.AppendLine(universalGuid.ToWowParserString());
                 totalBuilder.AppendLine(NiceGuid(guid.Key));
                 totalBuilder.AppendLine(guid.Value.builder.ToString());
                 totalBuilder.AppendLine("\n\n\n\n");
@@ -902,23 +950,23 @@ namespace WDE.PacketViewer.Processing.Processors
             return totalBuilder.ToString();
         }
 
-        public override bool Process(PacketHolder packet)
+        public override bool Process(ref readonly PacketHolder packet)
         {
-            playerGuidFollower.Process(packet);
-            var ret = base.Process(packet);
-            updateObjectFollower.Process(packet);
+            playerGuidFollower.Process(in packet);
+            var ret = base.Process(in packet);
+            updateObjectFollower.Process(in packet);
             return ret;
         }
 
-        public void ProcessUnfiltered(PacketHolder unfiltered)
+        public void ProcessUnfiltered(ref PacketHolder unfiltered)
         {
             if (unfiltered.KindCase == PacketHolder.KindOneofCase.UpdateObject)
-                updateObjectFollower.Process(unfiltered);
+                updateObjectFollower.Process(ref unfiltered);
         }
 
-        public bool UnfilteredPreProcess(PacketHolder packet)
+        public bool UnfilteredPreProcess(ref readonly PacketHolder packet)
         {
-            return fromGuidSpawnTimeProcessor.Process(packet);
+            return fromGuidSpawnTimeProcessor.Process(in packet);
         }
     }
 }

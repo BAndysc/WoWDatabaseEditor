@@ -9,7 +9,7 @@ using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Processors;
 
-public abstract class BaseSpellStatsDumper : PacketProcessor<bool>
+public abstract unsafe class BaseSpellStatsDumper : PacketProcessor<bool>
 {
     protected readonly ISpellStore spellStore;
     protected readonly ICachedDatabaseProvider databaseProvider;
@@ -57,19 +57,19 @@ public abstract class BaseSpellStatsDumper : PacketProcessor<bool>
 
     private CreatureState? GetState(UniversalGuid? guid)
     {
-        if (guid == null || guid.Type != UniversalHighGuid.Creature &&
-            guid.Type != UniversalHighGuid.Vehicle)
+        if (guid == null || guid.Value.Type != UniversalHighGuid.Creature &&
+            guid.Value.Type != UniversalHighGuid.Vehicle)
             return null;
 
-        if (states.TryGetValue(guid, out var s))
+        if (states.TryGetValue(guid.Value, out var s))
             return s;
 
-        return states[guid] = new();
+        return states[guid.Value] = new();
     }
 
-    protected override bool Process(PacketBase basePacket, PacketUpdateObject packet)
+    protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
     {
-        foreach (var obj in packet.Created)
+        foreach (ref readonly var obj in packet.Created.AsSpan())
         {
             var state = GetState(obj.Guid);
             if (state == null)
@@ -87,7 +87,7 @@ public abstract class BaseSpellStatsDumper : PacketProcessor<bool>
                 state.InCombat = false;
         }
 
-        foreach (var obj in packet.Updated)
+        foreach (ref readonly var obj in packet.Updated.AsSpan())
         {
             var state = GetState(obj.Guid);
             if (state == null)
@@ -114,25 +114,27 @@ public abstract class BaseSpellStatsDumper : PacketProcessor<bool>
             }
         }
 
-        return base.Process(basePacket, packet);
+        return base.Process(in basePacket, in packet);
     }
 
-    protected override bool Process(PacketBase basePacket, PacketSpellStart packet)
+    protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellStart packet)
     {
-        var state = GetState(packet.Data.Caster);
+        if (packet.Data == null)
+            return false;
+        var state = GetState(packet.Data->Caster);
         if (state == null)
             return false;
 
         if (!state.InCombat)
             return false;
 
-        if (!state.SpellHistory.TryGetValue(packet.Data.Spell, out var history))
-            history = state.SpellHistory[packet.Data.Spell] =
+        if (!state.SpellHistory.TryGetValue(packet.Data->Spell, out var history))
+            history = state.SpellHistory[packet.Data->Spell] =
                 new() { new() { CombatEnterTime = state.LastCombatEnterTime, SeenEnterCombat = state.SeenEnterCombat} };
 
         history[^1].CastTimes.Add(basePacket.Time.ToDateTime());
 
-        return base.Process(basePacket, packet);
+        return base.Process(in basePacket, in packet);
     }
 
     public string CreatureName(uint entry)

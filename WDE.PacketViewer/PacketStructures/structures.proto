@@ -1,7 +1,918 @@
 syntax = "proto3";
 package wpp;
-option csharp_namespace = "WoWPacketParser.Proto2";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+option csharp_namespace = "WowPacketParser.Proto";
 
-message FakeMessageSoThatCompilationWorks {
-  uint32 field = 1;
+/*
+  PacketsVersion::version field denotes version of the structure. Current version is in the file StructureVersion.cs.
+     If you change this file (and change the structure), please increment the version by one. This way user could
+     know if there is need to reparse the sniff.
+ */
+
+message PacketsVersion {
+  uint64 version = 1;
+  uint64 gameVersion = 2;
+  uint32 dumpType = 3;
+}
+
+message Packets {
+  uint64 version = 1;
+  uint64 gameVersion = 2;
+  uint32 dumpType = 3;
+  repeated PacketHolder packets = 4;
+}
+
+message PacketBase {
+  int32 number = 1;
+  string opcode = 2;
+  google.protobuf.Timestamp time = 3;
+  string stringData = 4;
+  optional google.protobuf.Int64Value textStartOffset = 5;
+  optional google.protobuf.Int32Value textLength = 6;
+}
+
+message PacketHolder {
+  PacketBase baseData = 1;
+  oneof kind {
+    PacketChat chat = 2;
+    PacketQueryCreatureResponse queryCreatureResponse = 3;
+    PacketEmote emote = 4;
+    PacketPlaySound playSound = 5;
+    PacketPlayMusic playMusic = 6;
+    PacketPlayObjectSound playObjectSound = 7;
+    PacketGossipHello gossipHello = 8;
+    PacketGossipMessage gossipMessage = 9;
+    PacketGossipSelect gossipSelect = 10;
+    PacketGossipClose gossipClose = 11;
+    PacketSpellStart spellStart = 12;
+    PacketSpellGo spellGo = 13;
+    PacketAuraUpdate auraUpdate = 14;
+    PacketMonsterMove monsterMove = 15;
+    PacketPhaseShift phaseShift = 16;
+    PacketSpellClick spellClick = 17;
+    PacketPlayerLogin playerLogin = 18;
+    PacketOneShotAnimKit oneShotAnimKit = 19;
+    PacketSetAnimKit setAnimKit = 20;
+    PacketPlaySpellVisualKit playSpellVisualKit = 21;
+    PacketQuestGiverAcceptQuest questGiverAcceptQuest = 22;
+    PacketQuestGiverCompleteQuestRequest questGiverCompleteQuestRequest = 23;
+    PacketQuestGiverQuestComplete questGiverQuestComplete = 24;
+    PacketQuestGiverRequestItems questGiverRequestItems = 25;
+    PacketNpcText npcText = 26;
+    PacketNpcTextOld npcTextOld = 27;
+    PacketDbReply dbReply = 28;
+    PacketUpdateObject updateObject = 29;
+    PacketQueryGameObjectResponse queryGameObjectResponse = 30;
+    PacketClientAreaTrigger clientAreaTrigger = 31;
+    PacketQueryPlayerNameResponseWrapper queryPlayerNameResponse = 32;
+    PacketQuestComplete questComplete = 33;
+    PacketQuestFailed questFailed = 34;
+    PacketQuestAddKillCredit questAddKillCredit = 35;
+    PacketClientUseItem clientUseItem = 36;
+    PacketClientQuestGiverChooseReward clientQuestGiverChooseReward = 37;
+    PacketClientMove clientMove = 38;
+    PacketClientUseGameObject clientUseGameObject = 39;
+    PacketGossipPoi gossipPoi = 40;
+    PacketGameObjectCustomAnim gameObjectCustomAnim = 41;
+    PacketSpellCastFailed spellCastFailed = 42;
+    PacketSpellFailure spellFailure = 43;
+    PacketLoginSetTimeSpeed loginSetTimeSpeed = 44;
+    PacketAuraUpdateAll auraUpdateAll = 45;
+    PacketAIReaction aiReaction = 46;
+    PacketInitWorldStates initWorldStates = 47;
+    PacketUpdateWorldState updateWorldState = 48;
+  }
+}
+
+enum UniversalHighGuid {
+  Null = 0;
+  Uniq = 1;
+  Player = 2;
+  Item = 3;
+  WorldTransaction = 4;
+  StaticDoor = 5;
+  Transport = 6;
+  Conversation = 7;
+  Creature = 8;
+  Vehicle = 9;
+  Pet = 10;
+  GameObject = 11;
+  DynamicObject = 12;
+  AreaTrigger = 13;
+  Corpse = 14;
+  LootObject = 15;
+  SceneObject = 16;
+  Scenario = 17;
+  AIGroup = 18;
+  DynamicDoor = 19;
+  ClientActor = 20;
+  Vignette = 21;
+  CallForHelp = 22;
+  AIResource = 23;
+  AILock = 24;
+  AILockTicket = 25;
+  ChatChannel = 26;
+  Party = 27;
+  Guild = 28;
+  WowAccount = 29;
+  BNetAccount = 30;
+  GMTask = 31;
+  MobileSession = 32;
+  RaidGroup = 33;
+  Spell = 34;
+  Mail = 35;
+  WebObj = 36;
+  LFGObject = 37;
+  LFGList = 38;
+  UserRouter = 39;
+  PVPQueueGroup = 40;
+  UserClient = 41;
+  PetBattle = 42;
+  UniqUserClient = 43;
+  BattlePet = 44;
+  CommerceObj = 45;
+  ClientSession = 46;
+  Cast = 47;
+  Invalid = 48;
+}
+
+message UniversalGuid {
+  option equality = true;
+  uint32 entry = 1;
+  UniversalHighGuid type = 2;
+  oneof kind {
+    option union = true;
+    UniversalGuid64 guid64 = 3;
+    UniversalGuid128 guid128 = 4;
+  }
+}
+
+message UniversalGuid64 {
+  option equality = true;
+  uint64 low = 1;
+  uint64 high = 2;
+}
+
+message UniversalGuid128 {
+  option equality = true;
+  uint64 low = 1;
+  uint64 high = 2;
+}
+
+message PacketChat {
+  int32 type = 1;
+  int32 language = 2;
+  UniversalGuid sender = 3;
+  UniversalGuid target = 4;
+  uint32 flags = 5;
+  string text = 6;
+}
+
+message PacketEmote {
+  int32 emote = 1;
+  UniversalGuid sender = 2;
+}
+
+message PacketPlaySound {
+  uint32 sound = 1;
+  UniversalGuid source = 2;
+  uint32 broadcastTextId = 3;
+}
+
+message PacketPlayObjectSound {
+  uint32 sound = 1;
+  UniversalGuid source = 2;
+  UniversalGuid target = 3;
+}
+
+message PacketPlayMusic {
+  uint32 music = 1;
+  UniversalGuid target = 2;
+}
+
+message PacketGossipHello {
+  UniversalGuid gossipSource = 1;
+}
+
+message GossipMessageOption {
+  uint32 optionIndex = 1;
+  int32 optionNpc = 2;
+  string text = 3;
+  bool boxCoded = 4;
+  uint32 boxCost = 5;
+  string boxText = 6;
+}
+
+message GossipQuestOption {
+  uint32 questId = 1;
+  string title = 2;
+}
+
+message PacketGossipMessage {
+  UniversalGuid gossipSource = 1;
+  uint32 menuId = 2;
+  uint32 textId = 3;
+  repeated GossipMessageOption options = 4;
+  repeated GossipQuestOption quests = 5;
+}
+
+message PacketGossipSelect {
+  UniversalGuid gossipUnit = 1;
+  uint32 menuId = 2;
+  uint32 optionId = 3;
+}
+
+message PacketGossipClose {
+  UniversalGuid gossipSource = 1;
+}
+
+message Vec2 {
+  float x = 1;
+  float y = 2;
+}
+
+message Vec3 {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message Vec4 {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  float o = 4;
+}
+
+message Quat {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  float w = 4;
+}
+
+message PacketSpellData {
+  UniversalGuid caster = 1;
+  uint32 spell = 2;
+  repeated UniversalGuid hitTargets = 3;
+  UniversalGuid targetUnit = 4;
+  optional Vec3 dstLocation = 5;
+  oneof idKind {
+    option union = true;
+    UniversalGuid castGuid = 6;
+    uint32 castId = 7;
+  }
+  uint32 flags = 8;
+  uint32 flags2 = 9;
+  uint32 castTime = 10;
+  optional int32 ammoDisplayId = 11;
+  repeated UniversalGuid missedTargets = 12;
+  repeated Vec3 targetPoints = 13;
+  optional uint32 ammoInventoryType = 14;
+  optional uint32 castCount = 15;
+}
+
+message PacketSpellStart {
+  optional PacketSpellData data = 1;
+}
+
+message PacketSpellGo {
+  optional PacketSpellData data = 1;
+}
+
+enum UniversalAuraFlag {
+  None = 0;
+  NoCaster = 0x0001;
+  Positive = 0x0002;
+  Duration = 0x0004;
+  Scalable = 0x0008;
+  Negative = 0x0010;
+  MawPower = 0x0020;
+  EffectIndex0 = 0x0040;
+  EffectIndex1 = 0x0080;
+  EffectIndex2 = 0x00100;
+}
+
+message PacketAuraUpdateEntry {
+  int32 slot = 1;
+  bool remove = 2;
+  uint32 spell = 3;
+  UniversalAuraFlag flags = 4;
+  optional UniversalGuid casterUnit = 5;
+  optional int32 duration = 6;
+  optional int32 remaining = 7;
+  optional int32 maxDuration = 8;
+}
+
+message PacketAuraUpdate {
+  UniversalGuid unit = 1;
+  repeated PacketAuraUpdateEntry updates = 2;
+}
+
+message PacketAuraUpdateAll {
+  UniversalGuid unit = 1;
+  repeated PacketAuraUpdateEntry updates = 2;
+}
+
+enum UniversalSplineFlag {
+  SplineFlagNone      = 0x00000000;
+  AnimTierSwim        = 0x00000001;
+  AnimTierHover       = 0x00000002;
+  AnimTierSubmerged   = 0x00000004;
+  Trajectory          = 0x00000008;
+  FallingSlow         = 0x00000010;
+  Done                = 0x00000020;
+  Falling             = 0x00000040;
+  NoSpline            = 0x00000080;
+  Knockback           = 0x00000100;
+  Flying              = 0x00000200;
+  OrientationFixed    = 0x00000400;
+  Catmullrom          = 0x00000800;
+  Cyclic              = 0x00001000;
+  EnterCycle          = 0x00002000;
+  Frozen              = 0x00004000;
+  TransportEnter      = 0x00008000;
+  TransportExit       = 0x00010000;
+  AnimationTier       = 0x00020000;
+  OrientationInversed = 0x00080000;
+  SmoothGroundPath    = 0x00100000;
+  Walkmode            = 0x00200000;
+  UncompressedPath    = 0x00400000;
+  CanSwim             = 0x00800000;
+  Animation           = 0x01000000;
+  Parabolic           = 0x02000000;
+  FinalPoint          = 0x04000000;
+  FinalTarget         = 0x08000000;
+  FinalAngle          = 0x10000000;
+  FadeObject          = 0x20000000;
+  Steering            = 0x40000000;
+}
+
+message PacketMonsterMove {
+  UniversalGuid mover = 1;
+  Vec3 position = 2;
+  uint32 id = 3;
+  Vec3 destination = 4;
+  int32 elapsedTime = 5;
+  uint32 moveTime = 6;
+  UniversalGuid transportGuid = 7;
+  int32 vehicleSeat = 8;
+  UniversalSplineFlag flags = 9;
+  oneof facing {
+    option union = true;
+    Vec3 lookPosition = 10;
+    float lookOrientation = 11;
+    SplineLookTarget lookTarget = 12;
+  }
+  repeated Vec3 points = 13;
+  repeated Vec3 packedPoints = 14;
+  optional SplineJump jump = 15;
+}
+
+message SplineJump {
+  float gravity = 1;
+  uint32 startTime = 2;
+  uint32 duration = 3;
+}
+
+message SplineLookTarget {
+  UniversalGuid target = 1;
+  optional float orientation = 2;
+}
+
+message PacketPhaseShift {
+  UniversalGuid client = 1;
+  UniversalGuid personalGuid = 2;
+  repeated uint32 phases = 3;
+  repeated uint32 visibleMaps = 4;
+  repeated uint32 preloadMaps = 5;
+  repeated uint32 uiMapPhase = 6;
+}
+
+message PacketSpellClick {
+  UniversalGuid target = 1;
+}
+
+message PacketPlayerLogin {
+  UniversalGuid playerGuid = 1;
+}
+
+message PacketOneShotAnimKit {
+  UniversalGuid unit = 1;
+  uint32 animKit = 2;
+}
+
+message PacketSetAnimKit {
+  UniversalGuid unit = 1;
+  uint32 animKit = 2;
+}
+
+message PacketPlaySpellVisualKit {
+  UniversalGuid unit = 1;
+  int32 kitRecId = 2;
+  int32 kitType = 3;
+  uint32 duration = 4;
+}
+
+message PacketQuestGiverAcceptQuest {
+  UniversalGuid questGiver = 1;
+  uint32 questId = 2;
+}
+
+message PacketQuestGiverCompleteQuestRequest {
+  UniversalGuid questGiver = 1;
+  uint32 questId = 2;
+}
+
+message PacketQuestGiverQuestComplete {
+  uint32 questId = 1;
+}
+
+message Currency {
+  uint32 id = 1;
+  uint32 count = 2;
+}
+
+message QuestCollect {
+  int32 id = 1;
+  int32 count = 2;
+  google.protobuf.UInt32Value flags = 3;
+}
+
+message PacketQuestGiverRequestItems {
+  uint32 questId = 1;
+  UniversalGuid questGiver = 2;
+  uint32 questGiverEntry = 3;
+  int32 emoteDelay = 4;
+  int32 emoteType = 5;
+  uint32 questFlags = 6;
+  uint32 questFlags2 = 7;
+  int32 suggestedPartyMembers = 8;
+  int32 moneyToGet = 9;
+  uint32 CollectCount = 10;
+  uint32 CurrencyCount = 11;
+  PacketQuestStatusFlags statusFlags = 12;
+  bool autoLaunched = 13;
+  google.protobuf.BoolValue canIgnoreQuest = 14;
+  google.protobuf.BoolValue isQuestIgnored = 15;
+  string questTitle = 16;
+  string completionText = 17;
+  repeated Currency currencies = 18;
+  repeated QuestCollect collect = 19;
+}
+
+message PacketNpcTextEntry {
+  float probability = 1;
+  uint32 broadcastTextId = 2;
+}
+
+message PacketNpcText {
+  uint32 entry = 1;
+  repeated PacketNpcTextEntry texts = 2;
+}
+
+message BroadcastTextEmote {
+  uint32 emoteId = 1;
+  uint32 delay = 2;
+}
+
+message PacketNpcTextOldEntry {
+  float probability = 1;
+  string text0 = 2;
+  string text1 = 3;
+  int32 language = 4;
+  repeated BroadcastTextEmote emotes = 5;
+}
+
+message PacketNpcTextOld {
+  uint32 entry = 1;
+  repeated PacketNpcTextOldEntry texts = 2;
+}
+
+enum PacketDbReplyRecordStatus {
+  RecordStatusNoneDontUse = 0;
+  RecordStatusValid  = 1;
+  RecordStatusRecordRemoved = 2;
+  RecordStatusInvalid = 3;
+  RecordStatusNotPublic = 4;
+}
+
+message PacketDbReplyBroadcastText {
+  uint32 id = 1;
+  string text0 = 2;
+  string text1 = 3;
+  int32 language = 4;
+  uint32 conditionId = 5;
+  uint32 emotesId = 6;
+  uint32 flags = 7;
+  uint32 chatBubbleDuration = 8;
+  repeated uint32 sounds = 9;
+  repeated BroadcastTextEmote emotes = 10;
+}
+
+message PacketDbReply {
+  uint32 tableHash = 1;
+  int32 recordId = 2;
+  google.protobuf.Timestamp time = 3;
+  PacketDbReplyRecordStatus status = 4;
+  oneof kind {
+    PacketDbReplyBroadcastText broadcastText = 5;
+  };
+}
+
+message UpdateValuesLegacy {
+  map<string, int64> ints = 1;
+  map<string, float> floats = 2;
+  map<string, UniversalGuid> guids = 3;
+  map<string, Quat> quaternions = 4;
+}
+
+message VisibleItemFields {
+  int32 itemID = 1;
+  uint32 itemAppearanceModID = 2;
+  uint32 itemVisual = 3;
+}
+
+message UInt32ValueWrapper {
+  google.protobuf.UInt32Value value = 1;
+}
+
+message Int32ValueWrapper {
+  google.protobuf.Int32Value value = 1;
+}
+
+message UpdateValuesUnitDataFields {
+  optional google.protobuf.Int32Value displayID = 1;
+  repeated UInt32ValueWrapper npcFlags = 2;
+  optional UniversalGuid summonedBy = 3;
+  optional UniversalGuid createdBy = 4;
+  optional google.protobuf.UInt32Value classId = 5;
+  optional google.protobuf.UInt32Value sex = 6;
+  optional google.protobuf.Int64Value health = 7;
+  repeated Int32ValueWrapper power = 8;
+  repeated Int32ValueWrapper maxPower = 9;
+  optional google.protobuf.Int64Value maxHealth = 10;
+  optional google.protobuf.Int32Value level = 11;
+  optional google.protobuf.Int32Value contentTuningID = 12;
+  optional google.protobuf.Int32Value scalingLevelMin = 13;
+  optional google.protobuf.Int32Value scalingLevelMax = 14;
+  optional google.protobuf.Int32Value scalingLevelDelta = 15;
+  optional google.protobuf.Int32Value factionTemplate = 16;
+  repeated VisibleItemFields virtualItems = 17;
+  optional google.protobuf.UInt32Value flags = 18;
+  optional google.protobuf.UInt32Value flags2 = 19;
+  optional google.protobuf.UInt32Value flags3 = 20;
+  repeated UInt32ValueWrapper attackRoundBaseTime = 21;
+  optional google.protobuf.UInt32Value rangedAttackRoundBaseTime = 22;
+  optional google.protobuf.FloatValue boundingRadius = 23;
+  optional google.protobuf.FloatValue combatReach = 24;
+  optional google.protobuf.Int32Value mountDisplayID = 25;
+  optional google.protobuf.UInt32Value standState = 26;
+  optional google.protobuf.UInt32Value petTalentPoints = 27;
+  optional google.protobuf.UInt32Value visFlags = 28;
+  optional google.protobuf.UInt32Value animTier = 29;
+  optional google.protobuf.Int32Value createdBySpell = 30;
+  optional google.protobuf.Int32Value emoteState = 31;
+  optional google.protobuf.UInt32Value sheatheState = 32;
+  optional google.protobuf.UInt32Value pvpFlags = 33;
+  optional google.protobuf.UInt32Value petFlags = 34;
+  optional google.protobuf.UInt32Value shapeshiftForm = 35;
+  optional google.protobuf.FloatValue hoverHeight = 36;
+  optional google.protobuf.Int32Value interactSpellID = 37;
+  optional google.protobuf.UInt32Value stateSpellVisualID = 38;
+  optional google.protobuf.UInt32Value stateAnimID = 39;
+  optional google.protobuf.UInt32Value stateAnimKitID = 40;
+  optional UniversalGuid charm = 41;
+  optional UniversalGuid summon = 42;
+  optional UniversalGuid critter = 43;
+  optional UniversalGuid demonCreator = 44;
+  optional UniversalGuid lookAtControllerTarget = 45;
+  optional UniversalGuid target = 46;
+  optional google.protobuf.UInt32Value race = 47;
+  optional google.protobuf.UInt32Value displayPower = 48;
+  optional google.protobuf.Int32Value effectiveLevel = 49;
+  optional google.protobuf.UInt32Value auraState = 50;
+  optional google.protobuf.FloatValue displayScale = 51;
+  optional google.protobuf.Int32Value creatureFamily = 52;
+  optional google.protobuf.Int32Value creatureType = 53;
+  optional google.protobuf.Int32Value nativeDisplayID = 54;
+  optional google.protobuf.FloatValue nativeXDisplayScale = 55;
+  repeated Int32ValueWrapper resistances = 56;
+  optional google.protobuf.Int32Value baseMana = 57;
+  optional google.protobuf.Int32Value baseHealth = 58;
+  optional UniversalGuid charmedBy = 59;
+}
+
+message UpdateValuesGameObjectDataFields
+{
+  optional UniversalGuid createdBy = 1;
+  optional google.protobuf.UInt32Value flags = 2;
+  optional Quat parentRotation = 3;
+  optional google.protobuf.Int32Value factionTemplate = 4;
+  optional google.protobuf.Int32Value state = 5;
+  optional google.protobuf.Int32Value typeID = 6;
+  optional google.protobuf.UInt32Value percentHealth = 7;
+  optional google.protobuf.Int32Value displayID = 8;
+  optional google.protobuf.UInt32Value artKit = 9;
+  optional google.protobuf.Int32Value level = 10;
+}
+
+message UpdateValuesObjectDataFields {
+  optional google.protobuf.Int32Value entryID = 1;
+  optional google.protobuf.UInt32Value dynamicFlags = 2;
+  optional google.protobuf.FloatValue scale = 3;
+  optional UpdateValuesUnitDataFields unit = 4;
+  optional UpdateValuesGameObjectDataFields gameobject = 5;
+}
+
+message UpdateValues {
+  oneof values {
+    UpdateValuesLegacy legacy = 1;
+    UpdateValuesObjectDataFields fields = 2;
+  }
+}
+
+message MovementUpdateTransport {
+  UniversalGuid transportGuid = 1;
+  Vec4 position = 2;
+  uint32 seat = 3;
+  uint32 moveTime = 4;
+  optional uint32 prevMoveTime = 5;
+  optional int32 vehicleId = 6;
+}
+
+message MovementSplineMoveData {
+  UniversalSplineFlag flags = 1;
+  int32 elapsed = 2;
+  uint32 duration = 3;
+  float durationModifier = 4;
+  float nextDurationModifier = 5;
+  oneof facing {
+    option union = true;
+    Vec3 lookPosition = 6;
+    float lookOrientation = 7;
+    SplineLookTarget lookTarget = 8;
+  }
+  optional SplineJump jump = 9;
+  repeated Vec3 points = 10;
+}
+
+message StationaryPositionData {
+  Vec3 position = 1;
+  float orientation = 2;
+}
+
+message MovementSplineData {
+  int32 id = 1;
+  Vec3 destination = 2;
+  optional MovementSplineMoveData moveData = 3;
+}
+
+message MovementUpdate {
+  UniversalGuid mover = 1;
+  uint32 moveTime = 2;
+  Vec3 position = 3;
+  float orientation = 4;
+  float pitch = 5;
+  float stepUpStartElevation = 6;
+  int32 moveIndex = 7;
+  float walkSpeed = 8;
+  float runSpeed = 9;
+  optional MovementUpdateTransport transport = 10;
+  optional uint32 fallTime = 11;
+  optional float jumpVelocity = 12;
+  optional MovementSplineData splineData = 13;
+}
+
+message VehicleCreate {
+  int32 vehicleId = 1;
+  float initialRawFacing = 2;
+}
+
+enum CreateObjectType {
+  CreateObjectEmpty = 0;
+  InRange = 1;
+  Spawn = 2;
+}
+
+message CreateObject {
+  UniversalGuid guid = 1;
+  UpdateValues values = 2;
+  CreateObjectType createType = 3;
+  optional MovementUpdate movement = 4;
+  optional MovementUpdateTransport transport = 5;
+  optional StationaryPositionData stationary = 6;
+  optional VehicleCreate vehicle = 7;
+  optional Quat rotation = 8;
+  google.protobuf.Int32Value textStartOffset = 9;
+  google.protobuf.Int32Value textLength = 10;
+  optional string text = 11;
+}
+
+message UpdateObject {
+  UniversalGuid guid = 1;
+  UpdateValues values = 2;
+  google.protobuf.Int32Value textStartOffset = 3;
+  google.protobuf.Int32Value textLength = 4;
+  optional string text = 5;
+}
+
+message DestroyedObject {
+  UniversalGuid guid = 1;
+  google.protobuf.Int32Value textStartOffset = 2;
+  google.protobuf.Int32Value textLength = 3;
+  optional string text = 4;
+}
+
+message PacketUpdateObject {
+  repeated DestroyedObject destroyed = 1;
+  repeated DestroyedObject outOfRange = 2;
+  repeated CreateObject created = 3;
+  repeated UpdateObject updated = 4;
+  uint32 mapId = 5;
+}
+
+message PacketQueryGameObjectResponse {
+  uint32 entry = 1;
+  bool hasData = 2;
+  uint32 type = 3;
+  uint32 model = 4;
+  string name = 5;
+  string iconName = 6;
+  string castCaption = 7;
+  repeated int32 data = 8;
+  float size = 9;
+  repeated uint32 items = 10;
+  oneof level {
+    option union = true;
+    int32 contentTuningId = 11;
+    int32 requiredLevel = 12;
+  }
+}
+
+message PacketQueryCreatureResponse {
+  uint32 entry = 1;
+  bool hasData = 2;
+  bool leader = 3;
+  string name = 4;
+  string nameAlt = 5;
+  uint32 typeFlags = 6;
+  uint32 typeFlags2 = 7;
+  int32 type = 8;
+  int32 family = 9;
+  int32 rank = 10;
+  repeated uint32 killCredits = 11;
+  repeated uint32 models = 12;
+  float hpMod = 13;
+  float manaMod = 14;
+  repeated uint32 questItems = 115;
+  repeated int32 questCurrencies = 122;
+  uint32 movementId = 16;
+  uint32 hpScalingExp = 17;
+  uint32 expansion = 18;
+  string title = 19;
+  string titleAlt = 20;
+  string iconName = 21;
+}
+
+message PacketClientAreaTrigger {
+  uint32 areaTrigger = 1;
+  bool enter = 2;
+}
+
+message PacketQueryPlayerNameResponse {
+  UniversalGuid playerGuid = 1;
+  bool hasData = 2;
+  string playerName = 3;
+  uint32 race = 4;
+  uint32 gender = 5;
+  uint32 class = 6;
+  uint32 level = 7;
+}
+
+message PacketQueryPlayerNameResponseWrapper {
+  repeated PacketQueryPlayerNameResponse responses = 1;
+}
+
+message PacketQuestComplete {
+  uint32 questId = 1;
+}
+
+message PacketQuestFailed {
+  uint32 questId = 1;
+  bool timerFail = 2;
+}
+
+message PacketQuestAddKillCredit {
+  uint32 questId = 1;
+  uint32 killCredit = 2;
+  uint32 count = 3;
+  uint32 requiredCount = 4;
+  optional UniversalGuid victim = 5;
+}
+
+message PacketClientUseItem {
+  int32 packSlot = 1;
+  int32 itemSlot = 2;
+  UniversalGuid castItem = 3;
+  uint32 spellId = 4;
+}
+
+message PacketClientQuestGiverChooseReward {
+  UniversalGuid questGiver = 1;
+  uint32 questId = 2;
+  optional uint32 item = 3;
+  optional uint32 rewardIndex = 4;
+}
+
+message PacketClientMove {
+  UniversalGuid mover = 1;
+  Vec4 position = 2;
+}
+
+message PacketClientUseGameObject {
+  UniversalGuid gameObject = 1;
+  bool report = 2;
+}
+
+message PacketGossipPoi {
+  Vec2 coordinates = 1;
+  uint32 flags = 2;
+  uint32 icon = 3;
+  uint32 importance = 4;
+  string name = 5;
+  optional int32 id = 6;
+  optional float height = 7;
+}
+
+message PacketGameObjectCustomAnim {
+  UniversalGuid gameObject = 1;
+  int32 anim = 2;
+  optional bool playAsDespawn = 3;
+}
+
+enum PacketQuestStatusFlags {
+  QuestStatusNone = 0;
+  QuestStatusUnk1 = 0x01;
+  KillCreditComplete = 0x02;
+  CollectableComplete = 0x04;
+  QuestStatusUnk8 = 0x08;
+  QuestStatusUnk16 = 0x10;
+  NoRequestOnComplete = 0x20;
+  QuestStatusUnk64 = 0x40;
+  QuestStatusUnk128 = 0x80;
+}
+
+message PacketSpellCastFailed {
+  optional UniversalGuid castGuid = 1;
+  uint32 spell = 2;
+  google.protobuf.UInt32Value castId = 3;
+  bool success = 4;
+}
+
+message PacketSpellFailure {
+  optional UniversalGuid castGuid = 1;
+  uint32 spell = 2;
+  google.protobuf.UInt32Value castId = 3;
+  bool success = 4;
+  UniversalGuid caster = 5;
+}
+
+message PacketLoginSetTimeSpeed {
+  google.protobuf.Timestamp serverTime = 1;
+  google.protobuf.Timestamp gameTime = 2;
+  float newSpeed = 3;
+  int32 serverTimeHolidayOffset = 4;
+  int32 gameTimeHolidayOffset = 5;
+}
+
+enum AIReaction {
+  Alert    = 0;
+  Friendly = 1;
+  Hostile  = 2;
+  Afraid   = 3;
+  Destroy  = 4;
+}
+
+message PacketAIReaction {
+  UniversalGuid unitGuid = 1;
+  AIReaction reaction = 2;
+}
+
+message PacketInitWorldStates {
+  int32 mapId = 1;
+  int32 zoneId = 2;
+  int32 areaId = 3;
+  repeated WorldState worldStates = 4;
+}
+
+message PacketUpdateWorldState {
+  WorldState worldState = 1;
+  bool hidden = 2;
+}
+
+message WorldState {
+  int32 id = 1;
+  int32 value = 2;
 }

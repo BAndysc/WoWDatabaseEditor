@@ -364,7 +364,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             {
                 SingleRecordDatabaseCellViewModel cellViewModel;
 
-                if (tableDefinition.PrimaryKey.Contains(column.DbColumnName))
+                if (tableDefinition.PrimaryKey.Contains(column.DbColumnFullName))
                     continue;
                 
                 if (column.IsConditionColumn)

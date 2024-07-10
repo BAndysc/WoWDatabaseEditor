@@ -5,6 +5,7 @@
              xmlns:tablesPanel="clr-namespace:WDE.DatabaseEditors.Services.TablesPanel;assembly=WDE.DatabaseEditors"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="tablesPanel:FancyEditorsTablesToolGroupViewModel"
+             x:Name="Root"
              x:Class="WDE.DatabaseEditors.Avalonia.Services.TablesPanel.FancyEditorsTablesToolGroupView">
   <DockPanel LastChildFill="True">
     <TextBox Name="SearchTextBox" KeyDown="Search_KeyDown" DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
@@ -19,6 +20,15 @@
           </DockPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>
+      <ListBox.Styles>
+        <Style Selector="ListBoxItem">
+          <Setter Property="ContextMenu">
+            <ContextMenu x:DataType="tablesPanel:TableItemViewModel">
+              <MenuItem Header="Edit definition" Command="{CompiledBinding #Root.((tablesPanel:FancyEditorsTablesToolGroupViewModel)DataContext).EditDefinitionCommand}" CommandParameter="{CompiledBinding .}" />
+            </ContextMenu>
+          </Setter>
+        </Style>
+      </ListBox.Styles>
     </ListBox>
   </DockPanel>
 </UserControl>

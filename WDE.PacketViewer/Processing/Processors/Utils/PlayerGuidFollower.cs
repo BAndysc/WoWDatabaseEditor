@@ -13,7 +13,7 @@ namespace WDE.PacketViewer.Processing.Processors
     [AutoRegister]
     public class PlayerGuidFollower : IPlayerGuidFollower
     {
-        public bool Process(PacketHolder packet)
+        public bool Process(ref readonly PacketHolder packet)
         {
             if (PlayerGuid != null)
                 return false;

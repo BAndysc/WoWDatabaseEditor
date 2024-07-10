@@ -163,7 +163,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     if (dist > 4 || action.MainActor == null)
                         continue;
                     if (!action.MainActor.Equals(@event.MainActor) &&
-                        !(@event.AdditionalActors != null && @event.AdditionalActors.Contains(action.MainActor)))
+                        !(@event.AdditionalActors != null && @event.AdditionalActors.Contains(action.MainActor.Value)))
                         continue;
                 }
                 
@@ -177,7 +177,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 //
                 
                 if (@event.Kind == EventType.SummonBySpell &&
-                    (action.Kind != ActionType.Summon || action.MainActor!.Entry != @event.CustomEntry))
+                    (action.Kind != ActionType.Summon || action.MainActor!.Value.Entry != @event.CustomEntry))
                     continue;
 
                 if (action.Kind == ActionType.ExitsCombat && (
@@ -223,7 +223,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     bonusMult += 0.5f;
                 
                 if (@event.Kind == EventType.SummonBySpell &&
-                    action.Kind == ActionType.Summon && action.MainActor!.Entry == @event.CustomEntry)
+                    action.Kind == ActionType.Summon && action.MainActor!.Value.Entry == @event.CustomEntry)
                     bonusMult += 10;
                 
                 if (action.Kind == ActionType.CreateObjectInRange &&
@@ -281,22 +281,22 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             eventDetectorProcessor.Initialize(gameBuild);
         }
         
-        public void ProcessUnfiltered(PacketHolder packet)
+        public void ProcessUnfiltered(ref PacketHolder packet)
         {
-            auraSlotTracker.Process(packet);
-            playerGuidFollower.Process(packet);
-            unitPositionFollower.Process(packet);
-            updateObjectFollower.Process(packet);
+            auraSlotTracker.Process(in packet);
+            playerGuidFollower.Process(in packet);
+            unitPositionFollower.Process(in packet);
+            updateObjectFollower.Process(in packet);
         }
         
-        public virtual bool Process(PacketHolder packet)
+        public virtual bool Process(ref readonly PacketHolder packet)
         {
-            auraSlotTracker.Process(packet);
-            playerGuidFollower.Process(packet);
-            unitPositionFollower.Process(packet);
+            auraSlotTracker.Process(in packet);
+            playerGuidFollower.Process(in packet);
+            unitPositionFollower.Process(in packet);
             
             eventDetectorProcessor.Flush(packet.BaseData.Time.ToDateTime());
-            var actions = actionGenerator.Process(packet);
+            var actions = actionGenerator.Process(in packet);
             if (actions != null)
             {
                 foreach (var action in actions)
@@ -309,9 +309,9 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 }
             }
 
-            eventDetectorProcessor.Process(packet);
+            eventDetectorProcessor.Process(in packet);
 
-            updateObjectFollower.Process(packet);
+            updateObjectFollower.Process(in packet);
             return true;
         }
 
@@ -357,10 +357,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             return Enumerable.Empty<(int packetId, double chance, EventHappened happened)>();
         }
 
-        public bool PreProcess(PacketHolder packet)
+        public bool PreProcess(ref readonly PacketHolder packet)
         {
-            chatEmoteSoundProcessor.Process(packet);
-            waypointsProcessor.Process(packet);
+            chatEmoteSoundProcessor.Process(in packet);
+            waypointsProcessor.Process(in packet);
             return true;
         }
     }

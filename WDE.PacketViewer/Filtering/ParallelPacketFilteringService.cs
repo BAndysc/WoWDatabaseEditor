@@ -1,6 +1,8 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DynamicData.Binding;
@@ -128,7 +130,7 @@ namespace WDE.PacketViewer.Filtering
                 {
                     try
                     {
-                        return evaluator.Evaluate(packet) is true;
+                        return evaluator.Evaluate(packet).Boolean is true;
                     }
                     catch (Exception)
                     {
@@ -140,7 +142,7 @@ namespace WDE.PacketViewer.Filtering
             return false;
         }
 
-        public async Task<ObservableCollection<PacketViewModel>?> Filter(IList<PacketViewModel> all, 
+        public async Task<IReadOnlyList<PacketViewModel>?> Filter(IReadOnlyList<PacketViewModel> all,
             IPacketViewModelStore store,
             string filter, 
             IReadOnlyFilterData? filterData,
@@ -152,24 +154,23 @@ namespace WDE.PacketViewer.Filtering
             int packetsPerThread = count / threads;
             progress.Report(0);
 
-            var filtered = new ObservableCollectionExtended<PacketViewModel>();
             if (string.IsNullOrEmpty(filter))
             {
-                using (filtered.SuspendNotifications())
+                // fast hot path
+                if (filterData == null)
                 {
-                    // fast hot path
-                    if (filterData == null)
+                    return all;
+                }
+                else
+                {
+                    var filtered = new List<PacketViewModel>(all.Count);
+                    foreach (var packet in all)
                     {
-                        filtered.AddRange(all);
+                        if (AcceptFilterData(store, packet, filterData))
+                            filtered.Add(packet);
                     }
-                    else
-                    {
-                        foreach (var packet in all)
-                        {
-                            if (AcceptFilterData(store, packet, filterData))
-                                filtered.Add(packet);
-                        }
-                    }
+
+                    return filtered;
                 }
             }
             else
@@ -177,7 +178,8 @@ namespace WDE.PacketViewer.Filtering
                 PacketPlayerLogin? playerLogin = FindPlayerLogin(all);
                 
                 Task[] tasks = new Task[threads];
-                List<PacketViewModel>[] partialResults = new List<PacketViewModel>[threads];
+                PacketViewModel[]?[] partialResults = new PacketViewModel[]?[threads];
+                int[] partialResultsCount = new int[threads];
             
                 for (int j = 0; j < threads; ++j)
                 {
@@ -185,15 +187,16 @@ namespace WDE.PacketViewer.Filtering
                     tasks[j] = Task.Run(() =>
                     {
                         var evaluator = new DatabaseExpressionEvaluator(filter, playerLogin?.PlayerGuid ?? new UniversalGuid(), store);
-                        var partialResult = new List<PacketViewModel>(packetsPerThread);
+                        var partialResult = ArrayPool<PacketViewModel>.Shared.Rent(packetsPerThread);
+                        var partialResultIndex = 0;
                         var upTo = CPU == threads - 1 ? count : (CPU + 1) * packetsPerThread;
                     
                         for (int index = CPU * packetsPerThread; index < upTo; ++index)
                         {
                             if (filterData == null || AcceptFilterData(store, all[index], filterData))
                             {
-                                if (evaluator.Evaluate(all[index]) is true)
-                                    partialResult.Add(all[index]);
+                                if (evaluator.Evaluate(all[index]).Boolean is true)
+                                    partialResult[partialResultIndex++] = all[index];
                             }
                             
                             if (cancellationToken.IsCancellationRequested)
@@ -201,12 +204,20 @@ namespace WDE.PacketViewer.Filtering
 
                             if (CPU == 0)
                             {
-                                if (index % 100 == 0)
+                                if (index % 10000 == 0)
                                     progress.Report(1.0f * index / packetsPerThread);
                             }
                         }
 
-                        partialResults[CPU] = cancellationToken.IsCancellationRequested ? null! : partialResult;
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            partialResults[CPU] = null;
+                            ArrayPool<PacketViewModel>.Shared.Return(partialResult);
+                            return;
+                        }
+
+                        partialResultsCount[CPU] = partialResultIndex;
+                        partialResults[CPU] = partialResult;
                     }, cancellationToken);
                 }
             
@@ -217,14 +228,23 @@ namespace WDE.PacketViewer.Filtering
                 if (cancellationToken.IsCancellationRequested)
                     return null;
 
-                using (filtered.SuspendNotifications())
-                    foreach (var partialResult in partialResults)
-                        filtered.AddRange(partialResult);
+                var filtered = new List<PacketViewModel>(partialResultsCount.Sum());
+                for (int thread = 0; thread < threads; ++thread)
+                {
+                    if (partialResults[thread] != null)
+                    {
+                        for (int i = 0; i < partialResultsCount[thread]; ++i)
+                        {
+                            filtered.Add(partialResults[thread]![i]);
+                        }
+                        ArrayPool<PacketViewModel>.Shared.Return(partialResults[thread]!);
+                    }
+                }
+                return filtered;
             }
-            return filtered;
         }
 
-        private PacketPlayerLogin? FindPlayerLogin(IList<PacketViewModel> all)
+        private PacketPlayerLogin? FindPlayerLogin(IReadOnlyList<PacketViewModel> all)
         {
             // CMSG_PLAYER_LOGIN should always be in the beginning, no point in traversing whole sniff
             for (int i = 0; i < Math.Min(2000, all.Count); ++i)

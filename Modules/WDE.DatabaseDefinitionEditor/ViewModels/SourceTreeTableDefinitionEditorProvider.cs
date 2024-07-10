@@ -81,4 +81,5 @@ public class SourceTreeTableDefinitionEditorProvider : ITableDefinitionEditorPro
     public string Name => "Sources";
     public bool IsValid { get; }
     public IEnumerable<DatabaseTableDefinitionJson> Definitions => definitions;
+    public event Action? DefinitionsChanged;
 }

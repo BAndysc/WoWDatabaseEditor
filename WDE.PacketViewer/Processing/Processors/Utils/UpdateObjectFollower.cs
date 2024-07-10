@@ -38,23 +38,23 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly HashSet<UniversalGuid> everCreated = new();
         private readonly Dictionary<UniversalGuid, Entity> entities = new();
 
-        protected override bool Process(PacketBase basePacket, PacketUpdateObject packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
         {
-            foreach (var destroyed in packet.Destroyed)
+            foreach (ref readonly var destroyed in packet.Destroyed.AsSpan())
             {
                 if (destroyed.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
                 entities.Remove(destroyed.Guid);
             }
 
-            foreach (var destroyed in packet.OutOfRange)
+            foreach (ref readonly var destroyed in packet.OutOfRange.AsSpan())
             {
                 if (destroyed.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
                 entities.Remove(destroyed.Guid);
             }
 
-            foreach (var created in packet.Created)
+            foreach (ref readonly var created in packet.Created.AsSpan())
             {
                 if (created.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
@@ -68,7 +68,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     entity.Guids[pair.Key] = pair.Value;
             }
             
-            foreach (var updated in packet.Updated)
+            foreach (ref readonly var updated in packet.Updated.AsSpan())
             {
                 if (updated.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
@@ -82,7 +82,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 foreach (var pair in updated.Values.Guids())
                     entity.Guids[pair.Key] = pair.Value;
             }
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
         public bool HasBeenCreated(UniversalGuid guid)
@@ -141,8 +141,8 @@ namespace WDE.PacketViewer.Processing.Processors
         public bool TryGetGuid(UniversalGuid guid, string field, out UniversalGuid number)
         {
             var num = GetGuid(guid, field);
-            number = num!;
-            return num != null;
+            number = num ?? default;
+            return num.HasValue;
         }
         
         public bool TryGetIntOrDefault(UniversalGuid guid, string field, out long number)

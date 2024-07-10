@@ -165,7 +165,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ISmartScriptOutlinerModel outlinerData,
             ISmartHighlighter highlighter,
             IDynamicContextMenuService dynamicContextMenuService,
-            IScriptBreakpointsFactory breakpointsFactory)
+            IScriptBreakpointsFactory breakpointsFactory,
+            ISmartScriptDefinitionEditorService definitionEditorService)
         {
             History = history;
             this.smartScriptDatabase = smartScriptDatabase;
@@ -197,6 +198,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.highlighter = highlighter;
             this.dynamicContextMenuService = dynamicContextMenuService;
             this.breakpointsFactory = breakpointsFactory;
+            this.definitionEditorService = definitionEditorService;
             this.eventAggregator = eventAggregator;
             selectedHighlighter = highlighter.Highlighters[0];
             script = null!;
@@ -205,7 +207,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             title = "";
             Icon = iconRegistry.GetIcon(item);
             scale = preferences.DefaultScale;
-            
+
+            SupportsNonBreakableLinks = editorFeatures.NonBreakableLinkFlag.HasValue;
+
             On(() => SelectedHighlighter, v =>
             {
                 if (script == null)
@@ -1278,6 +1282,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             NewEventBelowCommand = new AsyncCommand(() => NewEvent(true));
             NewGroupAboveCommand = new AsyncCommand(() => NewGroup(false));
             NewGroupBelowCommand = new AsyncCommand(() => NewGroup(true));
+            ToggleBreakableLinkCommand = new AsyncCommand(async () =>
+            {
+                if (editorFeatures.NonBreakableLinkFlag is { } flag)
+                {
+                    foreach (var e in Events.Where(e => e.IsSelected && e.IsEvent))
+                    {
+                        if ((e.Flags.Value & flag) != 0)
+                            e.Flags.Value &= ~flag;
+                        else
+                            e.Flags.Value |= (long)flag;
+                    }
+                }
+            });
 
             GroupSelectedEventsCommand = new AsyncAutoCommand(async () =>
             {
@@ -1611,6 +1628,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public AsyncCommand NewCommentAboveCommand { get; set; }
         public AsyncCommand NewCommentBelowCommand { get; set; }
+        public AsyncCommand ToggleBreakableLinkCommand { get; set; }
         public AsyncCommand NewActionAboveCommand { get; set; }
         public AsyncCommand NewActionBelowCommand { get; set; }
         public AsyncCommand NewEventAboveCommand { get; set; }
@@ -1627,6 +1645,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand SelectionLeft { get; set; }
         public DelegateCommand SelectAll { get; set; }
 
+        public bool SupportsDefinitionEditor => definitionEditorService.IsSupported;
+        public bool SupportsNonBreakableLinks { get; }
         public bool AnyEventOrActionSelected => AnyEventSelected || AnyActionSelected;
         public bool AnySelected => AnyGroupSelected || AnyEventSelected || AnyActionSelected;
         private bool AnyGlobalVariableSelected => script.GlobalVariables.Any(e => e.IsSelected);
@@ -1637,6 +1657,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private bool MultipleEventsSelected => Events.Count(e => e.IsSelected && e.IsEvent) >= 2;
         private bool MultipleActionsSelected => Events.SelectMany(e => e.Actions).Count(a => a.IsSelected) >= 2;
         public bool AnyActionSelected => Events.SelectMany(e => e.Actions).Any(a => a.IsSelected);
+        public bool AnyActionExclusiveSelected => !AnyEventSelected && AnyActionSelected;
         private bool MultipleConditionsSelected => Events.SelectMany(e => e.Conditions).Count(a => a.IsSelected) >= 2;
         private bool AnyConditionSelected => Events.SelectMany(e => e.Conditions).Any(a => a.IsSelected);
 
@@ -1750,6 +1771,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             RaisePropertyChanged(nameof(AnyActionSelected));
             RaisePropertyChanged(nameof(AnyEventSelected));
             RaisePropertyChanged(nameof(AnyEventOrActionSelected));
+            RaisePropertyChanged(nameof(AnyActionExclusiveSelected));
             EditConditionsCommand.RaiseCanExecuteChanged();
             GroupSelectedEventsCommand.RaiseCanExecuteChanged();
             if (!smartEditorViewModel.IsOpened)
@@ -2832,6 +2854,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ISmartHighlighter highlighter;
         private readonly IDynamicContextMenuService dynamicContextMenuService;
         private readonly IScriptBreakpointsFactory breakpointsFactory;
+        private readonly ISmartScriptDefinitionEditorService definitionEditorService;
         private readonly IEventAggregator eventAggregator;
         private ValuePublisher<IOutlinerModel> outlinerModel = new ValuePublisher<IOutlinerModel>();
         public IObservable<IOutlinerModel> OutlinerModel => outlinerModel;
@@ -2994,7 +3017,43 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 LOG.LogError(e, "Couldn't restore snapshot");
             }
         }
-        
+
+        public void OpenSelectedEventDefinitionEditor()
+        {
+            if (FirstSelectedEventIndex == -1)
+                return;
+
+            var selectedEvent = Events[FirstSelectedEventIndex];
+            definitionEditorService.EditEvent(selectedEvent.Id);
+        }
+
+        public void OpenSelectedActionDefinitionEditor()
+        {
+            if (FirstSelectedActionIndex == (-1, -1))
+                return;
+
+            var selectedAction = Events[FirstSelectedActionIndex.eventIndex].Actions[FirstSelectedActionIndex.actionIndex];
+            definitionEditorService.EditAction(selectedAction.Id);
+        }
+
+        public void OpenSelectedSourceDefinitionEditor()
+        {
+            if (FirstSelectedActionIndex == (-1, -1))
+                return;
+
+            var selectedAction = Events[FirstSelectedActionIndex.eventIndex].Actions[FirstSelectedActionIndex.actionIndex];
+            definitionEditorService.EditTarget(selectedAction.Source.Id);
+        }
+
+        public void OpenSelectedTargetDefinitionEditor()
+        {
+            if (FirstSelectedActionIndex == (-1, -1))
+                return;
+
+            var selectedAction = Events[FirstSelectedActionIndex.eventIndex].Actions[FirstSelectedActionIndex.actionIndex];
+            definitionEditorService.EditTarget(selectedAction.Target.Id);
+        }
+
         public void ClearScript()
         {
             Breakpoints?.RemoveAll().ListenErrors();

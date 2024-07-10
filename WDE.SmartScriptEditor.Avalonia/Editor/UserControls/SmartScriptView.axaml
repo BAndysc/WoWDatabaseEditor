@@ -81,9 +81,37 @@
                         <MenuItem WdeImage.MenuIcon="Icons/icon_comment_above.png" Command="{CompiledBinding NewCommentAboveCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New comment above" />
                         <MenuItem WdeImage.MenuIcon="Icons/icon_comment_below.png" Command="{CompiledBinding NewCommentBelowCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New comment below" />
                         <Separator IsVisible="{CompiledBinding AnyEventOrActionSelected}" />
+                        <MenuItem WdeImage.MenuIcon="Icons/document_link.png" Command="{CompiledBinding ToggleBreakableLinkCommand}"
+                                  Header="Toggle non-breakable link flag">
+                            <MenuItem.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <CompiledBinding Path="AnySelected" />
+                                    <CompiledBinding Path="SupportsNonBreakableLinks" />
+                                </MultiBinding>
+                            </MenuItem.IsVisible>
+                        </MenuItem>
                         <MenuItem WdeImage.MenuIcon="Icons/document_link.png" Command="{CompiledBinding AddLinkCommand}" IsVisible="{CompiledBinding AnySelected}"  Header="Add link" />
                         <MenuItem WdeImage.MenuIcon="Icons/document_conditions.png" Command="{CompiledBinding EditConditionsCommand}" Header="Edit conditions" />
                         <MenuItem WdeImage.MenuIcon="Icons/icon_hash.png" Command="{CompiledBinding DefineGlobalVariable}" Header="Define a global variable" />
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_edit.png" Header="Edit event definition" Command="{CompiledBinding OpenSelectedEventDefinitionEditor}">
+                            <MenuItem.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <CompiledBinding Path="AnyEventSelected" />
+                                    <CompiledBinding Path="SupportsDefinitionEditor" />
+                                </MultiBinding>
+                            </MenuItem.IsVisible>
+                        </MenuItem>
+                        <MenuItem WdeImage.MenuIcon="Icons/icon_edit.png" Header="Edit definition">
+                            <MenuItem.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <CompiledBinding Path="AnyActionExclusiveSelected" />
+                                    <CompiledBinding Path="SupportsDefinitionEditor" />
+                                </MultiBinding>
+                            </MenuItem.IsVisible>
+                            <MenuItem Header="Edit action" Command="{CompiledBinding OpenSelectedActionDefinitionEditor}" />
+                            <MenuItem Header="Edit source" Command="{CompiledBinding OpenSelectedSourceDefinitionEditor}" />
+                            <MenuItem Header="Edit target" Command="{CompiledBinding OpenSelectedTargetDefinitionEditor}" />
+                        </MenuItem>
                         <Separator />
                         <MenuItem WdeImage.MenuIcon="Icons/icon_copy.png" Command="{CompiledBinding Copy}" Header="Copy" />
                         <MenuItem WdeImage.MenuIcon="Icons/icon_cut.png" Command="{CompiledBinding Cut}" Header="Cut" />

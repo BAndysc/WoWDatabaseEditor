@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -18,6 +19,7 @@ using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Types;
 using WDE.Common.Utils;
@@ -41,6 +43,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
     public readonly IParameterFactory ParameterFactory;
     private readonly IDefinitionExporterService exporterService;
     private readonly IMessageBoxService messageBoxService;
+    private readonly IVersionedFilesService versionedFilesService;
     private readonly List<DefinitionStubViewModel> allDefinitions = new();
 
     public ObservableCollectionExtended<DefinitionStubViewModel> Definitions { get; } = new();
@@ -136,9 +139,14 @@ public partial class DefinitionEditorViewModel : ObservableBase
                 }
                 else
                 {
+                    if (oldSource != null)
+                        oldSource.Definitions.CollectionChanged -= OnSelectedSourceDefinitionsChanged;
                     allDefinitions.Clear();
                     if (value != null)
+                    {
                         allDefinitions.AddRange(value.Definitions.OrderBy(x => x.TableName));
+                        value.Definitions.CollectionChanged += OnSelectedSourceDefinitionsChanged;
+                    }
                     SelectedDefinition = null;
                     SelectedTable = null;
                     DoSearch();   
@@ -146,7 +154,43 @@ public partial class DefinitionEditorViewModel : ObservableBase
             }).ListenErrors();
         }
     }
-    
+
+    private void OnSelectedSourceDefinitionsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        switch (e.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+                foreach (DefinitionStubViewModel item in e.NewItems!)
+                {
+                    allDefinitions.Add(item);
+                    if (IsStubMatched(item))
+                        Definitions.Add(item);
+                }
+                break;
+            case NotifyCollectionChangedAction.Remove:
+                foreach (DefinitionStubViewModel item in e.OldItems!)
+                {
+                    allDefinitions.Remove(item);
+                    Definitions.Remove(item);
+                }
+                break;
+            case NotifyCollectionChangedAction.Replace:
+                throw new ArgumentOutOfRangeException();
+            case NotifyCollectionChangedAction.Move:
+                throw new ArgumentOutOfRangeException();
+            case NotifyCollectionChangedAction.Reset:
+            {
+                allDefinitions.Clear();
+                foreach (var definition in SelectedDefinitionSource!.Definitions)
+                    allDefinitions.Add(definition);
+                DoSearch();
+                break;
+            }
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
     public ObservableCollectionExtended<ColumnValueTypeViewModel> AllParameters { get; } = new();
     
     public AsyncAutoCommand<ColumnViewModel> PickParameterCommand { get; }
@@ -166,6 +210,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
         IDefinitionEditorSettings settings,
         IDefinitionGeneratorService generatorService,
         IMetaColumnViewModelFactory metaColumnFactory,
+        IVersionedFilesService versionedFilesService,
         IWindowManager windowManager)
     {
         RawDefinitionDocument = rawDefinitionDocument;
@@ -176,12 +221,13 @@ public partial class DefinitionEditorViewModel : ObservableBase
         this.ParameterFactory = parameterFactory;
         this.exporterService = exporterService;
         this.messageBoxService = messageBoxService;
+        this.versionedFilesService = versionedFilesService;
         ShowIntroTip = !settings.IntroShown;
         settings.IntroShown = true;
-        
+
         foreach (var provider in definitionProviders.Where(x => x.IsValid).OrderBy(x => x.Order))
-            DefinitionSources.Add(new DefinitionSourceViewModel(provider.Name, provider.Definitions.Select(x => new DefinitionStubViewModel(x)).ToList()));
-        
+            DefinitionSources.Add(AutoDispose(new DefinitionSourceViewModel(provider.Name, provider)));
+
         if (DefinitionSources.Count > 0)
             SelectedDefinitionSource = DefinitionSources[0];
 
@@ -251,8 +297,9 @@ public partial class DefinitionEditorViewModel : ObservableBase
             
             definition.AbsoluteFileName = resultFile;
             definition.FileName = Path.GetRelativePath(Environment.CurrentDirectory, resultFile);
-            
-            File.WriteAllText(resultFile, Serialize(definition));
+
+            var handle = versionedFilesService.OpenFile(new FileInfo(resultFile));
+            versionedFilesService.WriteAllText(handle, Serialize(definition));
 
             var definitionVm = new DefinitionStubViewModel(definition);
             JustAddedSource.Definitions.Add(definitionVm);
@@ -283,8 +330,9 @@ public partial class DefinitionEditorViewModel : ObservableBase
             emptyDefinition.TableName = Path.GetFileNameWithoutExtension(resultFile);
             emptyDefinition.AbsoluteFileName = resultFile;
             emptyDefinition.FileName = Path.GetRelativePath(Environment.CurrentDirectory, resultFile);
-            
-            File.WriteAllText(resultFile, Serialize(emptyDefinition));
+
+            var handle = versionedFilesService.OpenFile(new FileInfo(resultFile));
+            versionedFilesService.WriteAllText(handle, Serialize(emptyDefinition));
 
             var definitionVm = new DefinitionStubViewModel(emptyDefinition);
             JustAddedSource.Definitions.Add(definitionVm);
@@ -313,7 +361,8 @@ public partial class DefinitionEditorViewModel : ObservableBase
     public void Save(DefinitionViewModel definition)
     {
         var exported = exporterService.Export(definition);
-        File.WriteAllText(definition.SourceFile, Serialize(exported));
+        versionedFilesService.WriteAllText(definition.SourceFile, Serialize(exported));
+        versionedFilesService.MarkModified(definition.SourceFile);
         definition.DefinitionStub.Definition = exported;
     }
     
@@ -384,7 +433,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
             return false;
         }
 
-        var tableVm = new DefinitionViewModel(this, json, definition);
+        var tableVm = new DefinitionViewModel(versionedFilesService, this, json, definition);
         await tableVm.LoadDatabaseColumns();
 
         if (cancel.IsCancellationRequested)
@@ -422,7 +471,18 @@ public partial class DefinitionEditorViewModel : ObservableBase
                         var of = og.Fields[j];
                         if (tf != of)
                         {
-                            LOG.LogWarning("At index " + i + "/" + j + " there is a diff");
+                            LOG.LogWarning(new StringBuilder().Append("At index ")
+                                .Append(i)
+                                .Append($" ({exported.Groups[i].Name})")
+                                .Append("/")
+                                .Append(j)
+                                .Append($" ({tf.DbColumnName})")
+                                .Append(" there is a diff (")
+                                .Append(Path.GetRelativePath(Environment.CurrentDirectory, json.AbsoluteFileName))
+                                .AppendLine(")")
+                                .AppendLine("Original: " + JsonConvert.SerializeObject(of))
+                                .Append("Exported: " + JsonConvert.SerializeObject(tf))
+                                .ToString());
                         }
                     }                    
                 }
@@ -432,7 +492,9 @@ public partial class DefinitionEditorViewModel : ObservableBase
         }
         else
         {
-            File.WriteAllText(definition.Definition.AbsoluteFileName, Serialize(exported));
+            var fh = versionedFilesService.OpenFile(new FileInfo(definition.Definition.AbsoluteFileName));
+            versionedFilesService.WriteAllText(fh, Serialize(exported));
+            // versionedFilesService.StageFile(fh); <-- don't stage here, stage only if the user explicitly saves
             ItemsDemo.Add(new DemoItemGroup(tableVm));
             SelectedTable = tableVm;
             UpdateRawDefinition();
@@ -460,12 +522,16 @@ public partial class DefinitionEditorViewModel : ObservableBase
             Definitions.AddRange(allDefinitions);
         else
         {
-            foreach (var def in allDefinitions)
+            foreach (var def in allDefinitions.Where(IsStubMatched))
             {
-                if (def.TableName.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
-                    Definitions.Add(def);
+                Definitions.Add(def);
             }
         }
+    }
+
+    private bool IsStubMatched(DefinitionStubViewModel def)
+    {
+        return string.IsNullOrWhiteSpace(searchText) || def.TableName.Contains(searchText, StringComparison.InvariantCultureIgnoreCase);
     }
 
     public async Task<bool> UpdateViewModelFromDefinition()
@@ -504,18 +570,20 @@ public partial class DefinitionEditorViewModel : ObservableBase
     }
 }
 
-public class DefinitionStubViewModel : ObservableBase
+public partial class DefinitionStubViewModel : ObservableBase
 {
     private DatabaseTableDefinitionJson definition;
 
     public DefinitionStubViewModel(DatabaseTableDefinitionJson definition)
     {
         this.definition = definition;
-        TableName = definition.TableName;
         RelativePath = definition.FileName;
+        tableName = definition.TableName;
+        icon = definition.IconPath != null ? new ImageUri(definition.IconPath) : ImageUri.Empty;
     }
 
-    public string TableName { get; }
+    [Notify] private ImageUri? icon;
+    [Notify] private string tableName;
     public string RelativePath { get; }
 
     public DatabaseTableDefinitionJson Definition
@@ -530,19 +598,70 @@ public class DefinitionStubViewModel : ObservableBase
             if (!string.IsNullOrEmpty(oldRelativePath))
                 value.FileName = oldRelativePath;
             definition = value;
+            TableName = value.TableName;
+            Icon = value.IconPath != null ? new ImageUri(value.IconPath) : ImageUri.Empty;
         }
     }
 }
 
-public class DefinitionSourceViewModel
+public class DefinitionSourceViewModel : IDisposable
 {
+    private readonly ITableDefinitionEditorProvider? definitionsProvider;
+
+    public string SourceName { get; }
+
+    public ObservableCollectionExtended<DefinitionStubViewModel> Definitions { get; } = new ObservableCollectionExtended<DefinitionStubViewModel>();
+
+    private Dictionary<string, DefinitionStubViewModel> definitionsByRelativePath = new();
+
     public DefinitionSourceViewModel(string sourceName, IReadOnlyList<DefinitionStubViewModel> definitions)
     {
         SourceName = sourceName;
         Definitions.AddRange(definitions);
     }
 
-    public string SourceName { get; }
+    public DefinitionSourceViewModel(string sourceName, ITableDefinitionEditorProvider definitionsProvider)
+    {
+        this.definitionsProvider = definitionsProvider;
+        SourceName = sourceName;
+        definitionsProvider.DefinitionsChanged += OnDefinitionsChanged;
+        OnDefinitionsChanged();
+    }
 
-    public ObservableCollection<DefinitionStubViewModel> Definitions { get; } =new ObservableCollection<DefinitionStubViewModel>();
+    public void Dispose()
+    {
+        if (definitionsProvider != null)
+            definitionsProvider.DefinitionsChanged -= OnDefinitionsChanged;
+    }
+
+    private void OnDefinitionsChanged()
+    {
+        if (definitionsProvider == null)
+            return;
+
+        var set = new HashSet<string>();
+
+        foreach (var definition in definitionsProvider.Definitions)
+        {
+            var stub = new DefinitionStubViewModel(definition);
+            set.Add(stub.RelativePath);
+            if (definitionsByRelativePath.TryGetValue(stub.RelativePath, out var existingVm))
+                existingVm.Definition = definition;
+            else
+            {
+                Definitions.Add(stub);
+                definitionsByRelativePath[stub.RelativePath] = stub;
+            }
+        }
+
+        for (var index = Definitions.Count - 1; index >= 0; index--)
+        {
+            var definition = Definitions[index];
+            if (!set.Contains(definition.RelativePath))
+            {
+                Definitions.RemoveAt(index);
+                definitionsByRelativePath.Remove(definition.RelativePath);
+            }
+        }
+    }
 }

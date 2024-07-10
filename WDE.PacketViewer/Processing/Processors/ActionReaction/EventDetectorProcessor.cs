@@ -13,11 +13,20 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
     {
         public static List<UniversalGuid>? ToSingletonList(this UniversalGuid? guid)
         {
-            if (guid == null || guid.Type == UniversalHighGuid.Null)
+            if (guid == null)
+                return null;
+
+            return guid.Value.ToSingletonList();
+        }
+
+        public static List<UniversalGuid>? ToSingletonList(this UniversalGuid guid)
+        {
+            if (guid.Type == UniversalHighGuid.Null)
                 return null;
             return new List<UniversalGuid>() { guid };
         }
     }
+
     public enum EventType
     {
         ChatOver,
@@ -125,10 +134,17 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     AddActor(a);
                 return this;
             }
+
+            public EventBuilder AddActors(ReadOnlySpan<UniversalGuid> actors)
+            {
+                foreach (var a in actors)
+                    AddActor(a);
+                return this;
+            }
             
             public EventBuilder AddActor(UniversalGuid? actor)
             {
-                if (actor.IsEmpty())
+                if (!actor.HasValue)
                     return this;
 
                 if (mainActor == null)
@@ -137,7 +153,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 {
                     if (actors == null)
                         actors = new List<UniversalGuid>();
-                    actors.Add(actor!);
+                    actors.Add(actor.Value);
                 }
                 
                 return this;
@@ -255,7 +271,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             }
         }
         
-        protected override bool Process(PacketBase basePacket, PacketSpellClick packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellClick packet)
         {
             Event(basePacket, EventType.Spellclick)
                 .SetDescription("on spellclick")
@@ -264,13 +280,13 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 .SetTimeFactor(0.2f)
                 .RestrictAction(ActionType.SpellCasted)
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketAuraUpdate packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketAuraUpdate packet)
         {
             bool anyRemoved = false;
-            foreach (var aura in packet.Updates)
+            foreach (ref readonly var aura in packet.Updates.AsSpan())
             {
                 var spellId = auraSlotTracker.GetSpellForAuraSlot(packet.Unit, aura.Slot);
                 if (!spellId.HasValue || !IsSpellImportant(spellId.Value))
@@ -280,12 +296,12 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 {
                     anyRemoved = true;
                 }
-                else if (aura.HasRemaining)
+                else if (aura.Remaining.HasValue)
                 {
                     Event(basePacket, EventType.AuraShouldBeRemoved)
                         .SetDescription($"Aura {aura.Spell} should be removed according to duration from {packet.Unit.ToWowParserString()}")
                         .AddActor(packet.Unit)
-                        .InFuture(TimeSpan.FromMilliseconds(aura.Remaining))
+                        .InFuture(TimeSpan.FromMilliseconds(aura.Remaining.Value))
                         .SetTimeFactor(0.1f)
                         .SetCustomEntry(aura.Slot)
                         .RestrictAction(ActionType.AuraRemoved)
@@ -301,7 +317,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     .SetTimeFactor(0.6f)
                     .Push();
             }
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
         private bool IsSpellImportant(uint spellId)
@@ -325,9 +341,12 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             return true;
         }
 
-        protected override bool Process(PacketBase basePacket, PacketSpellGo packet)
+        protected override unsafe bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellGo packet)
         {
-            var spellId = packet.Data.Spell;
+            if (packet.Data == null)
+                return false;
+
+            var spellId = packet.Data->Spell;
             if (!IsSpellImportant(spellId))
                 return false;
 
@@ -338,10 +357,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 if (effectType == SpellEffectType.Summon)
                 {
                     Event(basePacket, EventType.SummonBySpell)
-                        .SetDescription("On effect SUMMON of spell " + packet.Data.Spell + " casted by " + packet.Data.Caster.ToWowParserString())
-                        .AddActor(packet.Data.Caster)
-                        .AddActor(packet.Data.TargetUnit)
-                        .AddActors(packet.Data.HitTargets)
+                        .SetDescription("On effect SUMMON of spell " + packet.Data->Spell + " casted by " + packet.Data->Caster.ToWowParserString())
+                        .AddActor(packet.Data->Caster)
+                        .AddActor(packet.Data->TargetUnit)
+                        .AddActors(packet.Data->HitTargets.AsSpan())
                         .SetTimeFactor(0.2f)
                         .SetCustomEntry((int)spellService.GetSpellEffectMiscValueA(spellId, index))
                         .Push();
@@ -349,10 +368,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 else if (effectType == SpellEffectType.OpenLock)
                 {
                     Event(basePacket, EventType.OpenGameObjectBySpell)
-                        .SetDescription("On effect OPEN_LOCK of spell " + packet.Data.Spell + " casted by " + packet.Data.Caster.ToWowParserString())
-                        .AddActor(packet.Data.TargetUnit)
-                        .AddActor(packet.Data.Caster)
-                        .AddActors(packet.Data.HitTargets)
+                        .SetDescription("On effect OPEN_LOCK of spell " + packet.Data->Spell + " casted by " + packet.Data->Caster.ToWowParserString())
+                        .AddActor(packet.Data->TargetUnit)
+                        .AddActor(packet.Data->Caster)
+                        .AddActors(packet.Data->HitTargets)
                         .SetTimeFactor(0.2f)
                         .RestrictAction(ActionType.GameObjectActivated)
                         .Push();
@@ -360,27 +379,27 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 else if (effectType == SpellEffectType.TeleportUnits)
                 {
                     Event(basePacket, EventType.TeleportUnit)
-                        .SetDescription("On effect TeleportUnits of spell " + packet.Data.Spell + " casted by " + packet.Data.Caster.ToWowParserString())
-                        .AddActors(packet.Data.HitTargets)
-                        .SetLocation(packet.Data.DstLocation)
+                        .SetDescription("On effect TeleportUnits of spell " + packet.Data->Spell + " casted by " + packet.Data->Caster.ToWowParserString())
+                        .AddActors(packet.Data->HitTargets)
+                        .SetLocation(Unpack(packet.Data->DstLocation))
                         .RestrictAction(ActionType.CreateObjectInRange)
                         .SetTimeFactor(2)
                         .Push();
                 }
             }
-            
+
             Event(basePacket, EventType.SpellCasted)
-                .SetDescription("On spell " + packet.Data.Spell + " casted by " + packet.Data.Caster.ToWowParserString())
-                .AddActor(packet.Data.Caster)
-                .AddActor(packet.Data.TargetUnit)
-                .AddActors(packet.Data.HitTargets)
+                .SetDescription("On spell " + packet.Data->Spell + " casted by " + packet.Data->Caster.ToWowParserString())
+                .AddActor(packet.Data->Caster)
+                .AddActor(packet.Data->TargetUnit)
+                .AddActors(packet.Data->HitTargets)
                 .SetTimeFactor(0.25f)
-                .SetCustomEntry((int)packet.Data.Spell)
+                .SetCustomEntry((int)packet.Data->Spell)
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
         
-        protected override bool Process(PacketBase basePacket, PacketGossipMessage packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGossipMessage packet)
         {
             Event(basePacket, EventType.GossipMessageShown)
                 .SetDescription("Gossip message shown")
@@ -390,10 +409,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 .SetCustomEntry((int)packet.MenuId)
                 .LimitActions(1)
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketGossipHello packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGossipHello packet)
         {
             Event(basePacket, EventType.GossipHello)
                 .SetDescription("Gossip hello")
@@ -403,10 +422,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 .RestrictAction(ActionType.GossipMessage)
                 .LimitActions(1)
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketGossipSelect packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketGossipSelect packet)
         {
             Event(basePacket, EventType.GossipSelect)
                 .SetDescription("Gossip selected")
@@ -415,10 +434,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 .SetTimeFactor(0.2f)
                 .TimeCutOff(TimeSpan.FromSeconds(4.5f))
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketQuestGiverAcceptQuest packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestGiverAcceptQuest packet)
         {
             Event(basePacket, EventType.QuestAccepted)
                 .SetDescription($"Quest {packet.QuestId} accepted")
@@ -426,11 +445,11 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 .AddActor(playerGuidFollower.PlayerGuid)
                 .SetTimeFactor(0.4f)
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
         private PacketClientQuestGiverChooseReward? lastChooseReward;
-        protected override bool Process(PacketBase basePacket, PacketClientQuestGiverChooseReward packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketClientQuestGiverChooseReward packet)
         {
             lastChooseReward = packet;
             Event(basePacket, EventType.PlayerPicksReward)
@@ -440,10 +459,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 .SetTimeFactor(0.2f)
                 .RestrictAction(ActionType.ServerQuestGiverCompleted)
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketQuestGiverQuestComplete packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketQuestGiverQuestComplete packet)
         {
             Event(basePacket, EventType.QuestRewarded)
                 .SetDescription($"Quest {packet.QuestId} rewarded")
@@ -452,10 +471,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 //.SetTimeFactor(0.4f)
                 .TimeCutOff(TimeSpan.FromSeconds(9))
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketClientUseGameObject packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketClientUseGameObject packet)
         {
             Event(basePacket, EventType.GameObjectUsed)
                 .SetDescription($"Object {packet.GameObject.ToWowParserString()} used")
@@ -463,10 +482,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 .AddActor(playerGuidFollower.PlayerGuid)
                 .SetTimeFactor(0.2f)
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketMonsterMove packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketMonsterMove packet)
         {
             //if (movementDetector.IsRandomMovementPacket(basePacket))
             //    return false;
@@ -514,14 +533,14 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 Event(basePacket, EventType.LookAt)
                     .SetDescription($"{packet.Mover.ToWowParserString()} {desc}")
                     .AddActor(packet.Mover)
-                    .AddActor(packet.LookTarget?.Target)
+                    .AddActor(packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookTarget ? packet.LookTarget.Target : null)
                     .SetLocation(packet.Position)
                     .Push();
             }
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketChat packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketChat packet)
         {
             Event(basePacket, EventType.StartChat)
                 .AddActor(packet.Sender)
@@ -536,20 +555,20 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 .SetDescription($"Text {packet.Text} by {packet.Sender.ToWowParserString()} over")
                 .SetTimeFactor(0.6f)
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketClientAreaTrigger packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketClientAreaTrigger packet)
         {
             Event(basePacket, EventType.ClientAreaTrigger)
                 .SetDescription("Areatrigger")
                 .AddActor(playerGuidFollower.PlayerGuid)
                 .SetTimeFactor(0.3f)
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketClientUseItem packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketClientUseItem packet)
         {
             Event(basePacket, EventType.ItemUsed)
                 .SetDescription("Item used, spell " + packet.SpellId + " casted")
@@ -557,12 +576,12 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 .SetCustomEntry((int)packet.SpellId)
                 .SetTimeFactor(0.2f)
                 .Push();
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
-        protected override bool Process(PacketBase basePacket, PacketUpdateObject packet)
+        protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
         {
-            foreach (var create in packet.Created)
+            foreach (ref readonly var create in packet.Created.AsSpan())
             {
                 if (create.Guid.Type != UniversalHighGuid.Creature &&
                     create.Guid.Type != UniversalHighGuid.GameObject &&
@@ -590,7 +609,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     .Push();
             }
             
-            foreach (var update in packet.Updated)
+            foreach (ref readonly var update in packet.Updated.AsSpan())
             {
                 if (update.Values.TryGetInt("UNIT_FIELD_HEALTH", out var hp) && hp == 0)
                 {
@@ -642,7 +661,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     }
                 }
             }
-            return base.Process(basePacket, packet);
+            return base.Process(in basePacket, in packet);
         }
 
         private float Dist((float X, float Y, float Z) a, (float X, float Y, float Z) b)

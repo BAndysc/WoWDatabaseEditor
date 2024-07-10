@@ -1,11 +1,8 @@
 using System;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Prism.Commands;
-using WDE.Common.Managers;
 using WDE.Common.Menu;
-using WDE.Common.Utils;
-using WDE.DatabaseDefinitionEditor.ViewModels;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseDefinitionEditor;
@@ -13,33 +10,15 @@ namespace WDE.DatabaseDefinitionEditor;
 [AutoRegister]
 public class DefinitionsEditorToolMenu : IToolMenuItem
 {
-    private readonly Func<StandaloneDefinitionEditorViewModel> creator;
-    private readonly Lazy<IWindowManager> windowManager;
     public string ItemName => "Table definitions editor";
     public ICommand ItemCommand { get; }
     public MenuShortcut? Shortcut => null;
 
-    private IAbstractWindowView? openedWindow;
-    
-    public DefinitionsEditorToolMenu(Func<StandaloneDefinitionEditorViewModel> creator,
-        Lazy<IWindowManager> windowManager)
+    public DefinitionsEditorToolMenu(Lazy<ITableDefinitionEditorService> editorService)
     {
-        this.creator = creator;
-        this.windowManager = windowManager;
         ItemCommand = new DelegateCommand(() =>
         {
-            if (openedWindow != null)
-                openedWindow.Activate();
-            else
-                OpenNewWindow().ListenErrors();
+            editorService.Value.Open();
         });
-    }
-
-    private async Task OpenNewWindow()
-    {
-        var vm = creator();
-        openedWindow = windowManager.Value.ShowWindow(vm, out var task);
-        await task;
-        openedWindow = null;
     }
 }

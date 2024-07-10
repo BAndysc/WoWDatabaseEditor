@@ -17,7 +17,7 @@ internal readonly struct HashedEntityPrimaryKey
 
     public HashedEntityPrimaryKey(DatabaseEntity entity, DatabaseTableDefinitionJson table)
     {
-        fields = table.PrimaryKey!.Select(key => entity.GetCell(new ColumnFullName(null, key))!).ToList();
+        fields = table.PrimaryKey!.Select(key => entity.GetCell(key)!).ToList();
         hash = 0;
         foreach (var field in fields)
             hash = HashCode.Combine(hash, field.GetHashCode());

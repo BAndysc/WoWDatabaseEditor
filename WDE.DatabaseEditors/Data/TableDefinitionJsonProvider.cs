@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WDE.Common.Services;
+using WDE.Common.Tasks;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.Module.Attributes;
 
@@ -14,12 +15,32 @@ namespace WDE.DatabaseEditors.Data
     public class TableDefinitionJsonProvider : ITableDefinitionJsonProvider
     {
         private readonly IRuntimeDataService dataService;
+        private readonly IMainThread mainThread;
+        private readonly IDirectoryWatcher watcher;
 
-        public TableDefinitionJsonProvider(IRuntimeDataService dataService)
+        private System.IDisposable? pendingFileUpdate;
+
+        public TableDefinitionJsonProvider(IRuntimeDataService dataService,
+            IMainThread mainThread)
         {
             this.dataService = dataService;
+            this.mainThread = mainThread;
+            watcher = dataService.WatchDirectory("DbDefinitions", true);
+            watcher.OnChanged += OnFileChanged;
         }
-        
+
+        private void OnFileChanged(WatcherChangeTypes type, string filePath)
+        {
+            void InvokeFileChanged()
+            {
+                FilesChanged?.Invoke();
+                pendingFileUpdate = null;
+            }
+
+            pendingFileUpdate?.Dispose();
+            pendingFileUpdate = mainThread.Delay(InvokeFileChanged, TimeSpan.FromMilliseconds(500));
+        }
+
         public async Task<IEnumerable<(string file, string content)>> GetDefinitionSources()
         {
             var files = await dataService.GetAllFiles("DbDefinitions/", "*.json");
@@ -27,6 +48,9 @@ namespace WDE.DatabaseEditors.Data
             foreach (var f in files)
             {
                 var content = await dataService.ReadAllText(f);
+                if (string.IsNullOrWhiteSpace(content))
+                    continue;
+
                 results.Add((f, content));
             }
 
@@ -45,5 +69,7 @@ namespace WDE.DatabaseEditors.Data
 
             return results;
         }
+
+        public event Action? FilesChanged;
     }
 }

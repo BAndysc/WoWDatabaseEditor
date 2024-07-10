@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Prism.Mvvm;
+using WDE.Common.Disposables;
 using WDE.MVVM.Observable;
 
 namespace WDE.MVVM
@@ -170,6 +171,11 @@ namespace WDE.MVVM
             disposables ??= new List<IDisposable>();
             disposables.Add(disposable);
             return disposable;
+        }
+
+        public void AutoDispose(Action dispose)
+        {
+            AutoDispose(new ActionDisposable(dispose));
         }
 
         private bool disposed = false;

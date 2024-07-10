@@ -94,7 +94,7 @@ namespace WDE.SmartScriptEditor.Inspections
                     found = handledEvents.Contains((int) id);
                 }
 
-                if (!found)
+                if (!found && id != 0)
                 {
                     yield return new InspectionResult()
                     {

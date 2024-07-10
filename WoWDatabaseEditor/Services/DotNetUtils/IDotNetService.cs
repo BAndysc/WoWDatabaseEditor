@@ -37,7 +37,7 @@ namespace WoWDatabaseEditorCore.Services.DotNetUtils
             {
                 var dotnetPath = "dotnet";
                 programFinder.TryLocate("dotnet", "dotnet/dotnet.exe");
-                var versions = await processService.RunAndGetOutput(dotnetPath, "--list-runtimes", null);
+                var versions = await processService.RunAndGetOutput(dotnetPath, new[]{"--list-runtimes"}, null);
                 if (versions == null)
                     return true;
                 var runtimes = versions.Split('\n');

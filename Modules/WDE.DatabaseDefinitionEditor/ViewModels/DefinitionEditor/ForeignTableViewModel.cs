@@ -39,8 +39,12 @@ public partial class ForeignTableViewModel : ObservableBase, IDropTarget
         Parent = parent;
         tableName = json.TableName;
         autofillBuildColumn = json.AutofillBuildColumn;
-        foreach (var key in (json.ForeignKeys ?? Array.Empty<string>()))
-            ForeignKeys.Add(new ForeignKeyViewModel(this, key));
+        foreach (var key in (json.ForeignKeys ?? []))
+        {
+            if (key.ForeignTable != null)
+                throw new Exception("Foreign table in foreign key does not make sense");
+            ForeignKeys.Add(new ForeignKeyViewModel(this, key.ColumnName));
+        }
         if (ForeignKeys.Count > 0)
             SelectedForeignKey = ForeignKeys[0];
         

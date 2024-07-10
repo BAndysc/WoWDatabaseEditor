@@ -23,9 +23,9 @@ namespace WDE.PacketViewer.Processing.Processors
             inner.Initialize(gameBuild);
         }
 
-        public bool Process(PacketHolder packet)
+        public bool Process(ref readonly PacketHolder packet)
         {
-            var results = inner.Process(packet);
+            var results = inner.Process(in packet);
             if (results == null)
                 return false;
 

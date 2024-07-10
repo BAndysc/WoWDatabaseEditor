@@ -13,6 +13,7 @@ using AvaloniaStyles.Controls.FastTableView;
 using DynamicData.Binding;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
+using WDE.Common.Collections;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Managers;
@@ -314,7 +315,7 @@ public partial class CreaturePathViewModel : ObservableBase, ITableRowGroup
     [Notify] private float averageSpeed;
     public string Duration => $"{(int)duration.TotalSeconds} s {(int)duration.Milliseconds} ms";
     
-    public ObservableCollectionExtended<CreatureWaypointViewModel> Waypoints { get; } = new();
+    public FastObservableCollection<CreatureWaypointViewModel> Waypoints { get; } = new();
     public IReadOnlyList<ITableRow> Rows => Waypoints;
     public event Action<ITableRowGroup, ITableRow>? RowChanged;
     public event Action<ITableRowGroup>? RowsChanged;

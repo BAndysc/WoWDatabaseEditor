@@ -3,129 +3,129 @@ using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Processors
 {
-    public class GuidExtractorProcessor : PacketProcessor<UniversalGuid?>
+    public unsafe class GuidExtractorProcessor : PacketProcessor<UniversalGuid?>
     {
-        protected override UniversalGuid? Process(PacketBase packetBaseData, PacketGossipSelect packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase packetBaseData, ref readonly PacketGossipSelect packet)
         {
             return packet.GossipUnit;
         }
 
-        protected override UniversalGuid? Process(PacketBase packetBaseData, PacketGossipMessage packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase packetBaseData, ref readonly PacketGossipMessage packet)
         {
             return packet.GossipSource;
         }
 
-        protected override UniversalGuid? Process(PacketBase packetBaseData, PacketGossipHello packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase packetBaseData, ref readonly PacketGossipHello packet)
         {
             return packet.GossipSource;
         }
 
-        protected override UniversalGuid? Process(PacketBase packetBaseData, PacketPlayObjectSound packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase packetBaseData, ref readonly PacketPlayObjectSound packet)
         {
             return packet.Source;
         }
 
-        protected override UniversalGuid? Process(PacketBase packetBaseData, PacketPlaySound packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase packetBaseData, ref readonly PacketPlaySound packet)
         {
             return packet.Source;
         }
 
-        protected override UniversalGuid? Process(PacketBase packetBaseData, PacketEmote packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase packetBaseData, ref readonly PacketEmote packet)
         {
             return packet.Sender;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketChat packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketChat packet)
         {
             return packet.Sender;
         }
 
-        protected override UniversalGuid? Process(PacketBase packetBaseData, PacketSpellGo packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase packetBaseData, ref readonly PacketSpellGo packet)
         {
-            return packet.Data?.Caster;
+            return Unpack(packet.Data, x => x->Caster);
         }
 
-        protected override UniversalGuid? Process(PacketBase packetBaseData, PacketSpellStart packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase packetBaseData, ref readonly PacketSpellStart packet)
         {
-            return packet.Data?.Caster;
+            return Unpack(packet.Data, x => x->Caster);
         }
 
-        protected override UniversalGuid? Process(PacketBase packetBaseData, PacketGossipClose packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase packetBaseData, ref readonly PacketGossipClose packet)
         {
             return packet.GossipSource;
         }
 
-        protected override UniversalGuid? Process(PacketBase packetBaseData, PacketAuraUpdate packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase packetBaseData, ref readonly PacketAuraUpdate packet)
         {
             return packet.Unit;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketMonsterMove packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketMonsterMove packet)
         {
             return packet.Mover;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketPhaseShift packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketPhaseShift packet)
         {
             return packet.Client;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketPlayMusic packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketPlayMusic packet)
         {
             return packet.Target;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketSpellClick packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketSpellClick packet)
         {
             return packet.Target;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketPlayerLogin packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketPlayerLogin packet)
         {
             return packet.PlayerGuid;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketOneShotAnimKit packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketOneShotAnimKit packet)
         {
             return packet.Unit;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketSetAnimKit packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketSetAnimKit packet)
         {
             return packet.Unit;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketPlaySpellVisualKit packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketPlaySpellVisualKit packet)
         {
             return packet.Unit;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketQuestGiverAcceptQuest packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketQuestGiverAcceptQuest packet)
         {
             return packet.QuestGiver;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketQuestGiverCompleteQuestRequest packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketQuestGiverCompleteQuestRequest packet)
         {
             return packet.QuestGiver;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketClientUseGameObject packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketClientUseGameObject packet)
         {
             return packet.GameObject;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketClientMove packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketClientMove packet)
         {
             return packet.Mover;
         }
 
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketClientQuestGiverChooseReward packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketClientQuestGiverChooseReward packet)
         {
             return packet.QuestGiver;
         }
         
-        protected override UniversalGuid? Process(PacketBase basePacket, PacketUpdateObject packet)
+        protected override UniversalGuid? Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)
         {
             if (packet.Created.Count + packet.Destroyed.Count + packet.Updated.Count + packet.OutOfRange.Count > 1)
                 return null;

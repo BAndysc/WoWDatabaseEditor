@@ -31,7 +31,7 @@ namespace WDE.PacketViewer.Processing.Processors.Utils
             waypointProcessor.Initialize(gameBuild);
         }
 
-        public bool Process(PacketHolder packet) => waypointProcessor.Process(packet);
+        public bool Process(ref readonly PacketHolder packet) => waypointProcessor.Process(in packet);
 
         public async Task<IDocument> Generate(PacketDocumentViewModel? packetDocumentViewModel)
         {

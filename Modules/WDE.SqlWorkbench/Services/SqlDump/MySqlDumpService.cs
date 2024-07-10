@@ -109,7 +109,7 @@ internal class MySqlDumpService : IMySqlDumpService
 
         var mysqldumpPath = LocateDumper(version);
         
-        var exitCode = await processService.Run(token, mysqldumpPath, string.Join(" ", arguments), null, x =>
+        var exitCode = await processService.Run(token, mysqldumpPath, arguments.ToList(), null, x =>
         {
             var bytes = System.Text.Encoding.UTF8.GetBytes(x);
             if (isClosed[0])

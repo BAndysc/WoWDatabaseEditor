@@ -220,8 +220,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                         AllItems.Add(i);
                         Items.Add(i);
-                        if (order % 50 == 0)
-                            await Task.Delay(1); // add small delay for UI to render
+                        //if (order % 50 == 0)
+                        //    await Task.Delay(1); // add small delay for UI to render
                     }
                 }
             }

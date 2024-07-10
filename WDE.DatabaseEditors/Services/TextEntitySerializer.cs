@@ -68,9 +68,9 @@ public class TextEntitySerializer : ITextEntitySerializer
             DatabaseKey key;
             
             if (definition.RecordMode == RecordMode.SingleRow)
-                key = new DatabaseKey(definition.PrimaryKey.Select(keyColumn => (long)fields[new ColumnFullName(null, keyColumn)].Object!));
+                key = new DatabaseKey(definition.PrimaryKey.Select(keyColumn => (long)fields[keyColumn].Object!));
             else 
-                key = new DatabaseKey((long)fields[new ColumnFullName(null, definition.PrimaryKey[0])].Object!); // this is what DatabaseEntity expects to have as the key, not the best solution I must say
+                key = new DatabaseKey((long)fields[definition.PrimaryKey[0]].Object!); // this is what DatabaseEntity expects to have as the key, not the best solution I must say
 
             if (forceKey.HasValue)
                 key = forceKey.Value;
