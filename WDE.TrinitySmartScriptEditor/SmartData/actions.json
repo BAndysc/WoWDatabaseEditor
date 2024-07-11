@@ -637,13 +637,13 @@
         "description": "{source}: Evade",
         "parameters": [
             {
-                    "name": "Mode",
-                    "type": "SwitchParameter", 
-        "values": { 
+                "name": "Mode",
+                "type": "SwitchParameter", 
+                "values": { 
                     "0": "Set home position to respawn position",
                     "1": "Don't set home position to respawn position"
-            }
                 }
+            }
         ],
         "tags": [
             "TrinityWrath",
