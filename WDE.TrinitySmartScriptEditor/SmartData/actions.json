@@ -636,8 +636,11 @@
         "name_readable": "Evade",
         "parameters": [
             {
-                "name": "home pos is set to respawn position when this param is 0",
-                "type": "BoolParameter"
+        "name": "Mode",
+        "type": "SwitchParameter",
+        "values": {
+        "0": "Set home position to respawn position",
+        "1": "Don't set home position to respawn position"
             }
         ],
         "description": "{source}: Evade",
@@ -656,8 +659,11 @@
         "name_readable": "Evade",
         "parameters": [
             {
-                "name": "home pos is set to respawn position when this param is 0",
-                "type": "BoolParameter"
+        "name": "Mode",
+        "type": "SwitchParameter",
+        "values": {
+        "0": "Set home position to respawn position",
+        "1": "Don't set home position to respawn position"
             }
         ],
         "description": "{source}: Evade",
