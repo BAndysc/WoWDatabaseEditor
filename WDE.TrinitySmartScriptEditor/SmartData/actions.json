@@ -636,7 +636,7 @@
         "name_readable": "Evade",
         "parameters": [
             {
-                "name": "set home pos to respawn position",
+                "name": "home pos is set to respawn position when this param is 0",
                 "type": "BoolParameter"
             }
         ],
@@ -656,7 +656,7 @@
         "name_readable": "Evade",
         "parameters": [
             {
-                "name": "set home pos to respawn position",
+                "name": "home pos is set to respawn position when this param is 0",
                 "type": "BoolParameter"
             }
         ],
