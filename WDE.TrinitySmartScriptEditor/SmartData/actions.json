@@ -634,6 +634,12 @@
         "id": 24,
         "name": "SMART_ACTION_EVADE",
         "name_readable": "Evade",
+        "parameters": [
+            {
+                "name": "set home pos to respawn position",
+                "type": "BoolParameter"
+            }
+        ],
         "description": "{source}: Evade",
         "tags": [
             "TrinityWrath",
@@ -643,10 +649,17 @@
         "implicit_source": "SMART_TARGET_SELF",
         "usable_with_script_types": "Creature,TimedActionList"
     },
+
     {
         "id": 24,
         "name": "SMART_ACTION_EVADE_AC",
         "name_readable": "Evade",
+        "parameters": [
+            {
+                "name": "set home pos to respawn position",
+                "type": "BoolParameter"
+            }
+        ],
         "description": "{source}: Evade",
         "tags": [
             "Azeroth"
