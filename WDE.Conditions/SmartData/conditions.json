@@ -856,7 +856,7 @@
 					"4": {"name": "TYPEID_AZERITE_ITEM"},
 					"5": {"name": "TYPEID_UNIT"},
 					"6": {"name": "TYPEID_PLAYER"},
-					"7": {"name": "TYPEID_ACTIVEPLAYER"},
+					"7": {"name": "TYPEID_ACTIVE_PLAYER"},
 					"8": {"name": "TYPEID_GAMEOBJECT"},
 					"9": {"name": "TYPEID_DYNAMICOBJECT"},
 					"10": {"name": "TYPEID_CORPSE"},
