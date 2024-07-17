@@ -505,7 +505,7 @@
 	{
 		"id": 31,
 		"name": "CONDITION_OBJECT_ENTRY_GUID",
-		"name_readable": "Is entry/guid/type",
+		"name_readable": "Is entry/guid/type (legacy)",
 		"help": "Condition is met if target has given entry, given guid or is given type",
 		"parameters": [
 			{
@@ -852,12 +852,17 @@
 					"0": {"name": "TYPEID_OBJECT"},
 					"1": {"name": "TYPEID_ITEM"},
 					"2": {"name": "TYPEID_CONTAINER"},
-					"3": {"name": "TYPEID_UNIT"},
-					"4": {"name": "TYPEID_PLAYER"},
-					"5": {"name": "TYPEID_GAMEOBJECT"},
-					"6": {"name": "TYPEID_DYNAMICOBJECT"},
-					"7": {"name": "TYPEID_CORPSE"},
-					"8": {"name": "TYPEID_AREATRIGGER"}
+					"3": {"name": "TYPEID_AZERITE_EMPOWERED_ITEM"},
+					"4": {"name": "TYPEID_AZERITE_ITEM"},
+					"5": {"name": "TYPEID_UNIT"},
+					"6": {"name": "TYPEID_PLAYER"},
+					"7": {"name": "TYPEID_ACTIVEPLAYER"},
+					"8": {"name": "TYPEID_GAMEOBJECT"},
+					"9": {"name": "TYPEID_DYNAMICOBJECT"},
+					"10": {"name": "TYPEID_CORPSE"},
+					"11": {"name": "TYPEID_AREATRIGGER"},
+					"12": {"name": "TYPEID_SCENEOBJECT"},
+					"13": {"name": "TYPEID_CONVERSATION"}
 				}
 			},
 			{
