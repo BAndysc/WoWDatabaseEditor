@@ -74,7 +74,7 @@ public partial class LootCrossReferencesViewModel : ObservableBase, IDialog
             case LootSourceType.Skinning:
             {
                 var loot = await databaseProvider.GetCreatureSkinningLootCrossReference((uint)lootId);
-                AddCreatureLoot(LootSourceType.Skinning, loot);
+                AddCreatureLoot(LootSourceType.Creature, loot);
                 break;
             }
             case LootSourceType.Pickpocketing:
