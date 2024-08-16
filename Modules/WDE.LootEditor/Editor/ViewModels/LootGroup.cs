@@ -71,6 +71,7 @@ public partial class LootGroup : ObservableBase, ITableRowGroup
     
     public LootEntry LootEntry { get; }
     public uint? SourceEntityEntry { get; }
+    public uint? SourceEntityDifficulty { get; }
 
     public IReadOnlyList<ITableRow> Rows => LootItems;
 
@@ -115,11 +116,12 @@ public partial class LootGroup : ObservableBase, ITableRowGroup
         LootItems.Add(vm);
     }
     
-    public LootGroup(LootEditorViewModel parentVM, LootSourceType type, LootEntry lootEntry, uint? sourceEntityEntry, ILootTemplateName? name) : this(parentVM)
+    public LootGroup(LootEditorViewModel parentVM, LootSourceType type, LootEntry lootEntry, uint? sourceEntityEntry, uint? sourceEntityDifficulty, ILootTemplateName? name) : this(parentVM)
     {
         LootSourceType = type;
         LootEntry = lootEntry;
         SourceEntityEntry = sourceEntityEntry;
+        SourceEntityDifficulty = sourceEntityDifficulty;
         CanHaveName = parentVM.LootEditorFeatures.LootGroupHasName(type);
         groupName = name?.Name;
         dontLoadRecursively = name?.DontLoadRecursively ?? false;
