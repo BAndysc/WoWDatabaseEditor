@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -13,6 +14,7 @@ using Avalonia.Threading;
 using DynamicData.Binding;
 using Microsoft.Extensions.Logging;
 using Prism.Commands;
+using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.Collections;
 using WDE.Common.Database;
@@ -47,7 +49,7 @@ using WowPacketParser.Proto.Processing;
 namespace WDE.PacketViewer.ViewModels
 {
     [AutoRegister]
-    public class PacketDocumentViewModel : ObservableBase, ISolutionItemDocument, IProgress<float>
+    public partial class PacketDocumentViewModel : ObservableBase, ISolutionItemDocument, IProgress<float>
     {
         private readonly PacketDocumentSolutionItem solutionItem;
         private readonly IMainThread mainThread;
@@ -286,48 +288,76 @@ namespace WDE.PacketViewer.ViewModels
                 RedoCommand.RaiseCanExecuteChanged();
             };
 
-            IEnumerable<int> GetFindEnumerator(int start, int count, int direction, bool wrap)
-            {
-                for (int i = start + direction; i >= 0 && i < count; i += direction)
-                    yield return i;
-                
-                if (wrap)
-                {
-                    if (direction > 0)
-                    {
-                        for (int i = 0; i < start; ++i)
-                            yield return i;
-                    }
-                    else
-                    {
-                        for (int i = count - 1; i > start; --i)
-                            yield return i;
-                    }
-                }
-            }
-            
             async Task Find(string searchText, int start, int direction)
             {
+                if (FilteringInProgress || SearchingInProgress)
+                {
+                    await messageBoxService.SimpleDialog("Error", "Filtering/Searching in progress", "Can't find while filtering is in progress");
+                    return;
+                }
                 using var _ = memoryAllocator.Increment();
 
-                var count = VisiblePackets.Count;
-                var searchToLower = searchText.ToLower();
-                foreach (var i in GetFindEnumerator(start, count, direction, true))
+                async Task<int> FindPacketIndex()
                 {
-                    var text = await packetStore.GetTextAsync(VisiblePackets[i]);
-                    if (text.Contains(searchToLower, StringComparison.InvariantCultureIgnoreCase))
+                    FastByteSearcher.OpenedFileSearcher fileSearcher = default;
+                    try
                     {
-                        SelectedPacket = VisiblePackets[i];
-                        return;
-                    }   
+                        var searcher = new FastByteSearcher(searchText, true, false);
+                        fileSearcher = packetStore.OpenFileSearcher(searcher);
+                        var count = VisiblePackets.Count;
+                        var enumerator = new EnumeratorUtils.FindEnumerator(start, count, direction, true);
+                        int checkedCount = 0;
+                        int prevPct = 0;
+                        while (enumerator.Next(out var i))
+                        {
+                            if (packetStore.PacketContainsText(ref fileSearcher, VisiblePackets[i]))
+                                return i;
+
+                            checkedCount++;
+                            var pct = (int)(checkedCount * 100.0f / count);
+                            if (pct != prevPct)
+                            {
+                                prevPct = pct;
+                                mainThread.Dispatch(() => FilteringProgress = pct);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        fileSearcher.Dispose();
+                    }
+
+                    return -1;
                 }
-                
-                await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                    .SetTitle("Find")
-                    .SetMainInstruction("Not found")
-                    .SetContent("Cannot find text: " + searchText)
-                    .WithOkButton(true)
-                    .Build());
+
+                int index;
+                try
+                {
+                    FilteringInProgress = true;
+                    SearchingInProgress = true;
+                    FilteringInProgress = true;
+                    FilteringProgress = 0;
+                    index = await Task.Run(FindPacketIndex);
+                    FilteringProgress = 1;
+                }
+                finally
+                {
+                    FilteringInProgress = false;
+                    FilteringInProgress = false;
+                    SearchingInProgress = false;
+                }
+
+                if (index != -1)
+                    SelectedPacket = VisiblePackets[index];
+                else
+                {
+                    await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                        .SetTitle("Find")
+                        .SetMainInstruction("Not found")
+                        .SetContent("Cannot find text: " + searchText)
+                        .WithOkButton(true)
+                        .Build());
+                }
             }
 
             ToggleFindCommand = new DelegateCommand(() => FindPanelEnabled = !FindPanelEnabled);
@@ -1211,98 +1241,22 @@ namespace WDE.PacketViewer.ViewModels
 
         private IPacketViewModelStore packetStore;
         
-        private FastObservableCollection<PacketViewModel> filteredPackets = new();
-        public FastObservableCollection<PacketViewModel> FilteredPackets
-        {
-            get => filteredPackets;
-            set => SetProperty(ref filteredPackets, value);
-        }
-
-        private FastObservableCollection<PacketViewModel> visiblePackets = new();
-        public FastObservableCollection<PacketViewModel> VisiblePackets
-        {
-            get => visiblePackets;
-            set => SetProperty(ref visiblePackets, value);
-        }
-
-        private PacketViewModel? selectedPacket;
-        public PacketViewModel? SelectedPacket
-        {
-            get => selectedPacket;
-            set => SetPropertyWithOldValue(ref selectedPacket, value);
-        }
-
-        private float filteringProgress;
-        public float FilteringProgress
-        {
-            get => filteringProgress;
-            set => SetProperty(ref filteringProgress, value);
-        }
+        [Notify] FastObservableCollection<PacketViewModel> filteredPackets = new();
+        [Notify] FastObservableCollection<PacketViewModel> visiblePackets = new();
+        [Notify] PacketViewModel? selectedPacket;
+        [Notify] float filteringProgress;
+        [Notify] private bool filteringInProgress;
+        [Notify] private bool loadingInProgress;
+        [Notify] private bool searchingInProgress;
+        [Notify] private bool splitUpdate;
+        [Notify] private bool hidePlayerMove;
+        [Notify] private bool disableFilters;
+        [Notify] private bool findPanelEnabled;
+        [Notify] private bool wrapLines;
+        [Notify] private bool reasonPanelVisibility;
+        [Notify] private bool showSplitUpdateTip;
 
         public bool ProgressUnknown => filteringProgress < 0;
-        
-        private bool filteringInProgress;
-        public bool FilteringInProgress
-        {
-            get => filteringInProgress;
-            set => SetProperty(ref filteringInProgress, value);
-        }
-        
-        private bool loadingInProgress;
-        public bool LoadingInProgress
-        {
-            get => loadingInProgress;
-            set => SetProperty(ref loadingInProgress, value);
-        }
-        
-        private bool splitUpdate;
-        public bool SplitUpdate
-        {
-            get => splitUpdate;
-            set => SetProperty(ref splitUpdate, value);
-        }
-        
-        private bool hidePlayerMove;
-        public bool HidePlayerMove
-        {
-            get => hidePlayerMove;
-            set => SetProperty(ref hidePlayerMove, value);
-        }
-        
-        private bool disableFilters;
-        public bool DisableFilters
-        {
-            get => disableFilters;
-            set => SetProperty(ref disableFilters, value);
-        }
-        
-        private bool findPanelEnabled;
-        public bool FindPanelEnabled
-        {
-            get => findPanelEnabled;
-            set => SetProperty(ref findPanelEnabled, value);
-        }
-        
-        private bool wrapLines;
-        public bool WrapLines
-        {
-            get => wrapLines;
-            set => SetProperty(ref wrapLines, value);
-        }
-
-        private bool reasonPanelVisibility;
-        public bool ReasonPanelVisibility
-        {
-            get => reasonPanelVisibility;
-            set => SetProperty(ref reasonPanelVisibility, value);
-        }
-
-        private bool showSplitUpdateTip;
-        public bool ShowSplitUpdateTip
-        {
-            get => showSplitUpdateTip;
-            set => SetProperty(ref showSplitUpdateTip, value);
-        }
         #endregion
 
         private bool inApplyFilterCommand;

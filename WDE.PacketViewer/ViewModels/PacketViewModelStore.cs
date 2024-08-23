@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Nito.AsyncEx;
+using WDE.Common.Utils;
 using WDE.PacketViewer.PacketParserIntegration;
 using WowPacketParser.Proto;
 
@@ -14,6 +15,8 @@ public interface IPacketViewModelStore : IDisposable
     bool Load(DumpFormatType dumpFormatType);
     Task<string> GetTextAsync(PacketViewModel packet);
     string GetText(PacketViewModel packet);
+    FastByteSearcher.OpenedFileSearcher OpenFileSearcher(FastByteSearcher searcher);
+    bool PacketContainsText(ref FastByteSearcher.OpenedFileSearcher searcher, PacketViewModel packet);
 }
 
 public class NullPacketViewModelStore : IPacketViewModelStore
@@ -23,6 +26,16 @@ public class NullPacketViewModelStore : IPacketViewModelStore
     public Task<string> GetTextAsync(PacketViewModel packet) => Task.FromResult(GetText(packet));
 
     public string GetText(PacketViewModel packet) => packet.Packet.BaseData.StringData.ToString() ?? "";
+
+    public FastByteSearcher.OpenedFileSearcher OpenFileSearcher(FastByteSearcher searcher)
+    {
+        return default;
+    }
+
+    public bool PacketContainsText(ref FastByteSearcher.OpenedFileSearcher searcher, PacketViewModel packet)
+    {
+        return false;
+    }
 
     public void Dispose()
     {
@@ -71,129 +84,94 @@ public class PacketViewModelStore : IPacketViewModelStore
     
     public async Task<string> GetTextAsync(PacketViewModel packet)
     {
-        var text = await GetTextAsync(packet.Packet.BaseData);
-        if (packet.Packet.KindCase == PacketHolder.KindOneofCase.UpdateObject)
-            return ExtractUpdate(packet, text);
-        return text;
+        return await GetTextAsync(packet.Packet.BaseData);
     }
 
     public string GetText(PacketViewModel packet)
     {
-        if (packet.Packet.KindCase == PacketHolder.KindOneofCase.UpdateObject)
-        {
-            if (packet.Id != cachedPacketId)
-            {
-                cachedPacketId = packet.Id;
-                cachedText = GetText(packet.Packet.BaseData);
-            }
-            return ExtractUpdate(packet, cachedText!);   
-        }
         return GetText(packet.Packet.BaseData);
     }
 
-    private string GetFirstThreeLines(string text)
+    private string GetText(long start, int length)
     {
-        int indexOfFirstLine = text.IndexOf("\n", StringComparison.Ordinal);
-        if (indexOfFirstLine == -1)
-            return text;
-        int indexOfSecondLine = text.IndexOf("\n", indexOfFirstLine + 1, StringComparison.Ordinal);
-        if (indexOfSecondLine == -1)
-            return text;
-        int indexOfThirdLine = text.IndexOf("\n", indexOfSecondLine + 1, StringComparison.Ordinal);
-        if (indexOfThirdLine == -1)
-            return text;
-        return text.Substring(0, indexOfThirdLine);
+        using var _ = asyncMonitor.Enter();
+        textFileStream!.Seek(start, SeekOrigin.Begin);
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(length);
+        length = textFileStream.Read(buffer, 0, length);
+        var text = Encoding.UTF8.GetString(buffer.AsSpan(0, length));
+        ArrayPool<byte>.Shared.Return(buffer);
+        return text;
     }
 
-    private string ExtractUpdate(PacketViewModel vm, string text)
+    private async Task<string> GetTextAsync(long start, int length)
     {
-        var update = vm.Packet.UpdateObject;
-        var count = update.Created.Count + update.Destroyed.Count + update.Updated.Count + update.OutOfRange.Count;
-        if (count != 1)
-            return text;
-        int? start = null;
-        int? len = null;
-        if (update.Created.Count == 1)
-        {
-            start = update.Created[0].TextStartOffset.Value;
-            len = update.Created[0].TextLength.Value;
-        }
-        else if (update.Destroyed.Count == 1)
-        {
-            start = update.Destroyed[0].TextStartOffset.Value;
-            len = update.Destroyed[0].TextLength.Value;
-        }
-        else if (update.Updated.Count == 1)
-        {
-            start = update.Updated[0].TextStartOffset.Value;
-            len = update.Updated[0].TextLength.Value;
-        }
-        else if (update.OutOfRange.Count == 1)
-        {
-            start = update.OutOfRange[0].TextStartOffset.Value;
-            len = update.OutOfRange[0].TextLength.Value;
-        }
-        if (start.HasValue && len.HasValue && start.Value + len.Value < text.Length)
-        {
-            return GetFirstThreeLines(text) + "\n" + text.Substring(start.Value, len.Value);
-        }
-        return " - file error - . Have you edited the _parsed.txt file?";
+        using var _ = await asyncMonitor.EnterAsync();
+        textFileStream!.Seek(start, SeekOrigin.Begin);
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(length);
+        length = await textFileStream.ReadAsync(buffer, 0, length);
+        var text = Encoding.UTF8.GetString(buffer.AsSpan(0, length));
+        ArrayPool<byte>.Shared.Return(buffer);
+        return text;
     }
-    
+
     private unsafe string GetText(PacketBase baseData)
     {
         if (baseData.TextStartOffset == null)
         {
             return baseData.StringData.ToString() ?? "";
         }
-        else if (textFileStream != null && baseData.TextLength != null &&
-                 baseData.TextStartOffset->Value + baseData.TextLength->Value < length)
+        else if (textFileStream != null && baseData.TextStartOffset + baseData.TextLength < length)
         {
-            using var _ = asyncMonitor.Enter();
-            textFileStream.Seek(baseData.TextStartOffset->Value, SeekOrigin.Begin);
-            var len = (int)(baseData.TextLength->Value);
-            byte[] buffer = ArrayPool<byte>.Shared.Rent(len);
-            textFileStream.Read(buffer, 0, len);
-            var text = Encoding.UTF8.GetString(buffer.AsSpan(0, len));
-            ArrayPool<byte>.Shared.Return(buffer);
+            var text = GetText(baseData.TextStartOffset.Value, baseData.TextLength);
+            if (baseData.HeaderTextStartOffset is { } headerStart && headerStart + baseData.HeaderTextLength < length)
+            {
+                var header = GetText(headerStart, baseData.HeaderTextLength);
+                return header + text;
+            }
             return text;
         }
 
         return "";
     }
 
-    
-    private Task<string> GetTextAsync(PacketBase baseData)
+    private async Task<string> GetTextAsync(PacketBase baseData)
     {
-        unsafe
-        {
-            if (baseData.TextStartOffset == null)
-            {
-                return Task.FromResult(baseData.StringData.ToString() ?? "");
-            }
-        }
+        if (baseData.TextStartOffset == null)
+            return baseData.StringData.ToString() ?? "";
 
-        async Task<string> AsyncWork(long start, int length)
+        if (textFileStream != null && baseData.TextStartOffset + baseData.TextLength < length)
         {
-            using var _ = await asyncMonitor.EnterAsync();
-            textFileStream.Seek(start, SeekOrigin.Begin);
-            var len = (int)(length);
-            byte[] buffer = ArrayPool<byte>.Shared.Rent(len);
-            await textFileStream.ReadAsync(buffer, 0, len);
-            var text = Encoding.UTF8.GetString(buffer.AsSpan(0, len));
-            ArrayPool<byte>.Shared.Return(buffer);
+            var text = await GetTextAsync(baseData.TextStartOffset.Value, baseData.TextLength);
+            if (baseData.HeaderTextStartOffset is { } headerStart && headerStart + baseData.HeaderTextLength < length)
+            {
+                var header = await GetTextAsync(headerStart, baseData.HeaderTextLength);
+                return header + text;
+            }
             return text;
         }
 
-        unsafe
-        {
-            if (textFileStream != null && baseData.TextLength != null && baseData.TextStartOffset->Value + baseData.TextLength->Value < length)
-            {
-                return AsyncWork(baseData.TextStartOffset->Value, baseData.TextLength->Value);
-            }
-        }
+        return "";
+    }
 
-        return Task.FromResult("");
+    public FastByteSearcher.OpenedFileSearcher OpenFileSearcher(FastByteSearcher searcher)
+    {
+        return searcher.OpenFile(txtFile);
+    }
+
+    public bool PacketContainsText(ref FastByteSearcher.OpenedFileSearcher searcher, PacketViewModel packet)
+    {
+        ref var baseData = ref packet.Packet.BaseData;
+        if (baseData.HeaderTextStartOffset.HasValue && baseData.IsFirstPacketWithThisHeader)
+        {
+            if (searcher.FindOne(baseData.HeaderTextStartOffset.Value, baseData.HeaderTextLength, false).HasValue)
+                return true;
+        }
+        if (baseData.TextStartOffset.HasValue)
+        {
+            if (searcher.FindOne(baseData.TextStartOffset.Value, baseData.TextLength, false).HasValue)
+                return true;
+        }
+        return false;
     }
 
     public void Dispose()

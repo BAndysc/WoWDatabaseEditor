@@ -57,12 +57,15 @@ namespace WDE.PacketViewer.Utils
                 if (ulong.TryParse(low, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var lowNum) &&
                     ulong.TryParse(high, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var highNum))
                 {
-                    guid = new UniversalGuid()
+                    var newGuid = new UniversalGuid()
                     {
                         Entry = entry,
                         Type = type,
-                        Guid128 = new UniversalGuid128() { Low = lowNum, High = highNum }
                     };
+                    newGuid.KindCase = UniversalGuid.KindOneofCase.Guid128;
+                    newGuid.Guid128.Low = lowNum;
+                    newGuid.Guid128.High = highNum;
+                    guid = newGuid;
                     return true;
                 }
             }
@@ -74,12 +77,15 @@ namespace WDE.PacketViewer.Utils
                 if (ulong.TryParse(low, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var lowNum) &&
                     ulong.TryParse(high, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var highNum))
                 {
-                    guid = new UniversalGuid()
+                    var newGuid = new UniversalGuid()
                     {
                         Entry = entry,
                         Type = type,
-                        Guid64 = new UniversalGuid64() { Low = lowNum, High = highNum }
                     };
+                    newGuid.KindCase = UniversalGuid.KindOneofCase.Guid64;
+                    newGuid.Guid64.Low = lowNum;
+                    newGuid.Guid64.High = highNum;
+                    guid = newGuid;
                     return true;
                 }
             }

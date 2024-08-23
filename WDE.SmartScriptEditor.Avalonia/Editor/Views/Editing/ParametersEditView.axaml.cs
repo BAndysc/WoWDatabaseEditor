@@ -14,8 +14,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing
     /// <summary>
     ///     Interaction logic for ParametersEditView.xaml
     /// </summary>
-    public partial class ParametersEditView : UserControl
+    public partial class ParametersEditView : UserControl, IDialogWindowActivatedListener
     {
+        private bool forceFocusFirstOnNextGotFocus = false;
+
         public ParametersEditView()
         {
             InitializeComponent();
@@ -25,13 +27,26 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing
             AvaloniaXamlLoader.Load(this);
         }
 
+        public void OnActivated()
+        {
+        }
+
+        public void OnDeactivated()
+        {
+            forceFocusFirstOnNextGotFocus = true;
+        }
+
         protected override void OnGotFocus(GotFocusEventArgs e)
         {
             base.OnGotFocus(e);
             DispatcherTimer.RunOnce(() =>
             {
-                if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() == null)
+                if (!this.FindAncestorOfType<Window>()?.IsActive ?? true)
+                    return;
+                var currentFocus = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement();
+                if (currentFocus == null || ReferenceEquals(currentFocus, this) || forceFocusFirstOnNextGotFocus)
                 {
+                    forceFocusFirstOnNextGotFocus = false;
                     if (FindFirstParameter(this) is { } firstParam)
                         FocusUtils.FocusFirstFocusableChild(firstParam);
                 }

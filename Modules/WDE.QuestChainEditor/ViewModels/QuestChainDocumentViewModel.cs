@@ -594,6 +594,8 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
 
             var quests = await databaseProvider.GetQuestTemplatesBySortIdAsync((int)zoneId);
 
+            quests = quests.Where(q => !q.Flags.HasFlagFast(QuestFlags.TrackingEvent)).ToList();
+
             if (quests.Count == 0)
             {
                 await messageBoxService.SimpleDialog("Info", "No quests found", "No quests found in the database for the selected zone or sort id");

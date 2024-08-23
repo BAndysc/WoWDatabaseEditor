@@ -12,7 +12,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Rendering\TheMaths\TheMaths.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
     </ItemGroup>
 
     <Import Project="..\Rendering\lib3d.props" />

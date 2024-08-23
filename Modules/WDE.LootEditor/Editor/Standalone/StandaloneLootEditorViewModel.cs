@@ -162,7 +162,7 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
         }
     }
 
-    public async Task<(uint actualEntry, uint actualDifficulty)> GetActualEntryAndDifficulty()
+    public async Task<(uint actualEntry, uint actualDifficulty, uint originalEntry, uint originalDifficulty)> GetActualEntryAndDifficulty()
     {
         var actualEntryToLoad = solutionEntry;
         var difficultyId = difficulty?.Id ?? 0;
@@ -178,7 +178,7 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
             difficultyId = 0;
         }
 
-        return (actualEntryToLoad, difficultyId);
+        return (actualEntryToLoad, difficultyId, solutionEntry, difficulty?.Id ?? 0);
     }
     
     public StandaloneLootEditorViewModel(
@@ -236,7 +236,8 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
                 if (!await AskToSave())
                     return;
                 
-                var (actualEntryToLoad, difficultyId) = await GetActualEntryAndDifficulty();
+                var (actualEntryToLoad, difficultyId, originalEntry, originalDifficulty) = await GetActualEntryAndDifficulty();
+                // todo, should PerEntityLootSolutionItem keep original entry and difficulty?
                 var solutionItem = new PerEntityLootSolutionItem(lootType, actualEntryToLoad, difficultyId);
                 ViewModel?.Dispose();
                 ViewModel = containerProvider.Resolve<LootEditorViewModel>((typeof(PerEntityLootSolutionItem), solutionItem), (typeof(PerDatabaseTableLootSolutionItem), null));
@@ -259,8 +260,8 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
                     await ViewModel.BeginLoad();
                 }
 
-                var (actualEntryToLoad, difficultyId) = await GetActualEntryAndDifficulty();
-                await viewModel!.AddLootFromEntity(lootType, actualEntryToLoad, difficultyId);
+                var (actualEntryToLoad, difficultyId, originalEntry, originalDifficulty) = await GetActualEntryAndDifficulty();
+                await viewModel!.AddLootFromEntity(lootType, actualEntryToLoad, difficultyId, originalEntry, originalDifficulty);
             }).WrapMessageBox<Exception>(messageBoxService);
         }
         PickEntryCommand = new AsyncAutoCommand(async () =>

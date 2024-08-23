@@ -175,18 +175,6 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "difficulty_entry_3")]
         public uint DifficultyEntry3 { get; set; }
 
-        //[Column(Name = "modelid1")]
-        //public uint ModelId1 { get; set; }
-
-        //[Column(Name = "modelid2")]
-        //public uint ModelId2 { get; set; }
-
-        //[Column(Name = "modelid3")]
-        //public uint ModelId3 { get; set; }
-
-        //[Column(Name = "modelid4")]
-        //public uint ModelId4 { get; set; }
-
         [Column(Name = "scale")]
         public float Scale { get; set; }
 
@@ -286,6 +274,12 @@ namespace WDE.TrinityMySqlDatabase.Models
             if (models == null)
                 return 0;
             return models.FirstOrDefault(x => x.Index == index)?.CreatureDisplayId ?? 0;
+        }
+
+        public ICreatureTemplate? WithModels(IReadOnlyList<CreatureTemplateModel> models)
+        {
+            this.models = models;
+            return this;
         }
 
         [Column("lootid")]

@@ -35,6 +35,11 @@ public readonly unsafe struct Utf8String
         return BytesLength == other.BytesLength && Span.SequenceEqual(other.Span);
     }
 
+    public bool Equals(ReadOnlySpan<byte> other)
+    {
+        return BytesLength == other.Length && Span.SequenceEqual(other);
+    }
+
     public override bool Equals(object obj) => obj is Utf8String other && Equals(other);
 
     public override int GetHashCode()

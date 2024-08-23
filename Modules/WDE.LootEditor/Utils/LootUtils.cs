@@ -71,7 +71,7 @@ public static class LootUtils
             case LootSourceType.Item: return "ItemParameter";
             case LootSourceType.Mail: return "MailTemplateParameter";
             case LootSourceType.Fishing: return "ZoneAreaParameter";
-            case LootSourceType.Skinning: return "CreatureParameter";
+            case LootSourceType.Skinning: return "LootSkinningParameter";
             case LootSourceType.Treasure: return "LootTreasureParameter";
             case LootSourceType.Alter: return "ItemParameter";
             case LootSourceType.Spell: return "SpellParameter";

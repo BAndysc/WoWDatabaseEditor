@@ -49,22 +49,22 @@ public class LootLoader : ILootLoader
                 }
                 return loots;
             }
-            case LootSourceType.Skinning:
-            {
-                var template = await databaseProvider.GetCreatureTemplate(solutionItemEntry);
-                if (template == null)
-                    throw new UserException("Couldn't find creature template with entry " + solutionItemEntry);
-
-                if (template.SkinningLootId == 0 || difficulty > 0)
-                {
-                    var difficulties = await databaseProvider.GetCreatureTemplateDifficulties(solutionItemEntry);
-                    var defaultDifficulty = difficulties.FirstOrDefault(x => x.DifficultyId == difficulty);
-                    if (defaultDifficulty != null || difficulty > 0)
-                        return new LootEntry[] { new(defaultDifficulty?.SkinningLootId ?? 0) };
-                }
-                
-                return new LootEntry[] { new(template.SkinningLootId) };
-            }
+            // case LootSourceType.Skinning:
+            // {
+            //     var template = await databaseProvider.GetCreatureTemplate(solutionItemEntry);
+            //     if (template == null)
+            //         throw new UserException("Couldn't find creature template with entry " + solutionItemEntry);
+            //
+            //     if (template.SkinningLootId == 0 || difficulty > 0)
+            //     {
+            //         var difficulties = await databaseProvider.GetCreatureTemplateDifficulties(solutionItemEntry);
+            //         var defaultDifficulty = difficulties.FirstOrDefault(x => x.DifficultyId == difficulty);
+            //         if (defaultDifficulty != null || difficulty > 0)
+            //             return new LootEntry[] { new(defaultDifficulty?.SkinningLootId ?? 0) };
+            //     }
+            //
+            //     return new LootEntry[] { new(template.SkinningLootId) };
+            // }
             case LootSourceType.Pickpocketing:
             {
                 var template = await databaseProvider.GetCreatureTemplate(solutionItemEntry);
@@ -102,6 +102,7 @@ public class LootLoader : ILootLoader
             case LootSourceType.Prospecting:
             case LootSourceType.Alter:
             case LootSourceType.Treasure:
+            case LootSourceType.Skinning:
                 return new LootEntry[] { new(solutionItemEntry) };
             case LootSourceType.Disenchant:
                 return new LootEntry[] { }; // note: this should be loaded from dbc itemsparse

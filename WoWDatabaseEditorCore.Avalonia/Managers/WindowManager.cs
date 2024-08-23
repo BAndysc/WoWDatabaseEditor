@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
-using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -20,13 +15,10 @@ using AvaloniaStyles.Controls;
 using WDE.Common;
 using WDE.Common.Avalonia.Components;
 using WDE.Common.Avalonia.Controls.Popups;
-using WDE.Common.Avalonia.Utils;
 using WDE.Common.Managers;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
-using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.Avalonia.Controls;
-using WoWDatabaseEditorCore.Avalonia.Extensions;
 using WoWDatabaseEditorCore.Avalonia.Views;
 
 namespace WoWDatabaseEditorCore.Avalonia.Managers
@@ -475,7 +467,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
 
         public void Activate()
         {
-            mainWindowHolder.RootWindow?.ActivateWorkaround();
+            if (mainWindowHolder.RootWindow is { } window)
+            {
+                if (window.WindowState == WindowState.Minimized)
+                    window.WindowState = WindowState.Normal;
+                window.Activate();
+            }
         }
 
         public async Task OpenPopupMenu<T>(T menuViewModel, object? control) where T : IPopupMenuViewModel
