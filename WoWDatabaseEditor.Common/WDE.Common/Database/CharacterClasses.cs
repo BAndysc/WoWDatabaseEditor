@@ -3,7 +3,7 @@ using System;
 namespace WDE.Common.Database;
 
 [Flags]
-public enum CharacterClasses
+public enum CharacterClasses : ulong
 {
     None = 0,
     Warrior = 1,

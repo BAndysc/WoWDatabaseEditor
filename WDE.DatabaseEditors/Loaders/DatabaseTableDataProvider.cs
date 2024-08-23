@@ -288,6 +288,14 @@ namespace WDE.DatabaseEditors.Loaders
 
                     var conditionsResult = new ConditionsOnlyDatabaseSource(definition.Condition.SourceGroupColumn?.Name.ColumnName, definition.Condition.SourceEntryColumn?.ColumnName, definition.Condition.SourceIdColumn?.ColumnName);
                     result = conditionsResult;
+                    var fakeColumns = new List<ColumnFullName>();
+                    if (definition.Condition.SourceGroupColumn != null)
+                        fakeColumns.Add(definition.Condition.SourceGroupColumn.Name);
+                    if (definition.Condition.SourceEntryColumn != null)
+                        fakeColumns.Add(definition.Condition.SourceEntryColumn.Value);
+                    if (definition.Condition.SourceIdColumn != null)
+                        fakeColumns.Add(definition.Condition.SourceIdColumn.Value);
+                    columns = fakeColumns;
                     
                     foreach (var key in keys)
                     {

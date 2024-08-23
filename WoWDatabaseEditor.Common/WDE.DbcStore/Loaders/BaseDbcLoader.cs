@@ -117,14 +117,16 @@ internal abstract class BaseDbcLoader : IDbcLoader
 
     protected void LoadDB2(string filename, Action<DBCDRow> doAction)
     {
-        var storage = dbcd.Load($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
+        using var stream = File.OpenRead($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
+        var storage = dbcd.Load(stream, Path.GetFileNameWithoutExtension(filename));
         foreach (DBCDRow item in storage.Values)
             doAction(item);
     }
     
     protected void Load(string filename, string fieldName, Dictionary<long, string> dictionary)
     {
-        var storage = dbcd.Load($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
+        using var stream = File.OpenRead($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
+        var storage = dbcd.Load(stream, Path.GetFileNameWithoutExtension(filename));
 
         if (fieldName == String.Empty)
         {
@@ -145,7 +147,8 @@ internal abstract class BaseDbcLoader : IDbcLoader
 
     protected void Load(string filename, string fieldName, Dictionary<long, long> dictionary)
     {
-        var storage = dbcd.Load($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
+        using var stream = File.OpenRead($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
+        var storage = dbcd.Load(stream, Path.GetFileNameWithoutExtension(filename));
 
         if (fieldName == String.Empty)
         {

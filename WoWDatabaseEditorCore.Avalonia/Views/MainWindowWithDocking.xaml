@@ -89,11 +89,11 @@
                         </Button>
                         <Button Command="{CompiledBinding GenerateCurrentSqlCommand}"
                                             ToolTip.Tip="Generate the SQL"
-                                            IsVisible="{CompiledBinding ShowExportButtons}">
+                                            IsEnabled="{CompiledBinding ShowExportButtons}">
                             <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="White" StrokeThickness="1" Data="{StaticResource ToSqlIcon}" />
                         </Button>
                         <Button Command="{CompiledBinding CopyCurrentSqlCommand}"
-                                IsVisible="{CompiledBinding ShowExportButtons}"
+                                IsEnabled="{CompiledBinding ShowExportButtons}"
                                                 ToolTip.Tip="Copy SQL">
                             <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="White" Data="{StaticResource CopyIcon}"/>
                         </Button>

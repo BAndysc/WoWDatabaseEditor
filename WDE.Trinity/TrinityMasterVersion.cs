@@ -12,7 +12,7 @@ namespace WDE.Trinity
     public class TrinityMasterVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures, IEventAiFeatures
     {
         public string Tag => "TrinityMaster";
-        public string FriendlyName => "TrinityCore Dragonflight";
+        public string FriendlyName => "TrinityCore Master (Retail)";
         public ImageUri Icon { get; } = new ImageUri("Icons/core_tc.png");
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
@@ -20,7 +20,7 @@ namespace WDE.Trinity
         public IDatabaseFeatures DatabaseFeatures => this;
         public IEventAiFeatures EventAiFeatures => this;
         public PhasingType PhasingType => PhasingType.PhaseIds; 
-        public GameVersion Version { get; } = new(10, 0, 5, 49444);
+        public GameVersion Version { get; } = new(11, 0, 2, 56263);
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>() {typeof(INpcText), typeof(ICreatureClassLevelStat), typeof(IBroadcastText)};
         public bool AlternativeTrinityDatabase => false;

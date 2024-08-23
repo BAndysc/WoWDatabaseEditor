@@ -171,7 +171,7 @@ namespace WDE.DatabaseEditors.Data.Structs
 
         public int GetHashCode(ColumnFullName obj)
         {
-            return HashCode.Combine(obj.ForeignTable, obj.ColumnName);
+            return HashCode.Combine(obj.ForeignTable?.ToLowerInvariant(), obj.ColumnName.ToLowerInvariant());
         }
     }
 

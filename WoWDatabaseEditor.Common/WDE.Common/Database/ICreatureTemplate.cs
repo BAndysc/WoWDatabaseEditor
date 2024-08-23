@@ -202,7 +202,7 @@ namespace WDE.Common.Database
         }
         
         [Flags]
-        public enum NpcFlags : long
+        public enum NpcFlags : ulong
         {
             None                  = 0x00000000,
             Gossip                = 0x00000001,

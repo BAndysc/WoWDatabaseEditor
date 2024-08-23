@@ -3,7 +3,7 @@ using System;
 namespace WDE.Common.Database;
 
 [Flags]
-public enum CharacterRaces : uint
+public enum CharacterRaces : ulong
 {
     None = 0,
     Human = 1,

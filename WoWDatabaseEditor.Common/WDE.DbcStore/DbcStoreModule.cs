@@ -13,6 +13,7 @@ using WDE.Common.Utils;
 using WDE.DbcStore.Spells;
 using WDE.DbcStore.Spells.Cataclysm;
 using WDE.DbcStore.Spells.Legion;
+using WDE.DbcStore.Spells.Retail;
 using WDE.DbcStore.Spells.Tbc;
 using WDE.DbcStore.Spells.Wrath;
 using WDE.Module;
@@ -34,6 +35,7 @@ namespace WDE.DbcStore
             containerRegistry.Register<IDbcSpellLoader, CataSpellService>(nameof(CataSpellService));
             containerRegistry.Register<IDbcSpellLoader, MopSpellService>(nameof(MopSpellService));
             containerRegistry.Register<IDbcSpellLoader, LegionSpellService>(nameof(LegionSpellService));
+            containerRegistry.Register<IDbcSpellLoader, RetailSpellService>(nameof(RetailSpellService));
         }
 
         // this could be moved to somewhere else. ItemModule?

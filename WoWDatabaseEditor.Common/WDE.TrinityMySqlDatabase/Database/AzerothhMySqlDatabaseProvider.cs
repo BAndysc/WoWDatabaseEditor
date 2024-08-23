@@ -50,7 +50,7 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
     /// </summary>
     /// <param name="templates"></param>
     /// <param name="models"></param>
-    private void MergeCreatureTemplateModels(List<MySqlCreatureTemplateAC> templates, List<CreatureTemplateModel> models)
+    private void MergeCreatureTemplateModels(List<MySqlCreatureTemplateAzeroth> templates, List<CreatureTemplateModel> models)
     {
         int j = 0;
         for (int i = 0; i < templates.Count; ++i)

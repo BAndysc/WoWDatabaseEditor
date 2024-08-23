@@ -274,6 +274,7 @@ message PacketSpellData {
   repeated Vec3 targetPoints = 13;
   optional uint32 ammoInventoryType = 14;
   optional uint32 castCount = 15;
+  optional float dstOrientation = 16;
 }
 
 message PacketSpellStart {

@@ -15,12 +15,15 @@ using WowPacketParser.Proto;
 using WDE.PacketViewer.Processing.Runners;
 using WDE.PacketViewer.Utils;
 using DynamicData;
+using Prism.Ioc;
+using WDE.Common.Managers;
+using WDE.PacketViewer.ViewModels;
 
 namespace WDE.PacketViewer.Processing.Processors
 {
     [AutoRegister]
     public unsafe class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector, ISpellCastProcessor, IAuraSlotTracker>,
-        IPacketTextDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor, IUnfilteredTwoStepPacketBoolProcessor
+        IPacketDocumentDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor, IUnfilteredTwoStepPacketBoolProcessor
     {
         private class WriterBuilder
         {
@@ -56,6 +59,7 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly PrettyFlagParameter prettyFlagParameter;
         private readonly IFromGuidSpawnTimeProcessor fromGuidSpawnTimeProcessor;
         private readonly IAuraSlotTracker auraSlotTracker;
+        private readonly IContainerProvider containerProvider;
         private readonly HighLevelUpdateDump highLevelUpdateDump;
         private readonly IDespawnDetector despawnDetector;
         private WriterBuilder? writer = null;
@@ -93,6 +97,7 @@ namespace WDE.PacketViewer.Processing.Processors
             PrettyFlagParameter prettyFlagParameter,
             IFromGuidSpawnTimeProcessor fromGuidSpawnTimeProcessor,
             IAuraSlotTracker auraSlotTracker,
+            IContainerProvider containerProvider,
             bool perGuid) : base(waypointProcessor, chatProcessor, randomMovementDetector, despawnDetector, spellCastProcessor, auraSlotTracker)
         {
             this.databaseProvider = databaseProvider;
@@ -109,6 +114,7 @@ namespace WDE.PacketViewer.Processing.Processors
             this.prettyFlagParameter = prettyFlagParameter;
             this.fromGuidSpawnTimeProcessor = fromGuidSpawnTimeProcessor;
             this.auraSlotTracker = auraSlotTracker;
+            this.containerProvider = containerProvider;
             this.highLevelUpdateDump = highLevelUpdateDump;
             this.despawnDetector = despawnDetector;
 
@@ -232,7 +238,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 return pretty ?? "GameObject " + guid.Entry + (shortGuid > 0 ? " (GUID " + shortGuid + ")" : "") + (withFull ? " " + (guid.KindCase == UniversalGuid.KindOneofCase.Guid64 ? guid.Guid64.Low : guid.Guid128.Low).ToString("X8") : "");
             }
 
-            return guid.ToString()!;
+            return guid.ToWowParserString()!;
         }
 
         private string GetStringFromDbc(Dictionary<long, string> dbc, int id)
@@ -485,9 +491,24 @@ namespace WDE.PacketViewer.Processing.Processors
             StringBuilder sb = new StringBuilder();
 
             if (packet.Flags.HasFlagFast(UniversalSplineFlag.TransportEnter))
-                sb.Append("enters " +
-                          (packet.TransportGuid.Type == UniversalHighGuid.Vehicle ? "vehicle" : "transport") + " " +
-                          NiceGuid(packet.TransportGuid) + " on seat " + packet.VehicleSeat);
+            {
+                if (packet.TransportGuid.IsEmpty())
+                {
+                    if (packet.Points.Count > 0)
+                    {
+                        var exitPos = packet.Points[0];
+                        sb.Append($"exits vehicle seat {packet.VehicleSeat} at position ({exitPos.X}, {exitPos.Y}, {exitPos.Z})");
+                    }
+                    else
+                        sb.Append($"exits vehicle seat {packet.VehicleSeat}");
+                }
+                else
+                {
+                    sb.Append("enters " +
+                              (packet.TransportGuid.Type == UniversalHighGuid.Vehicle ? "vehicle" : "transport") + " " +
+                              NiceGuid(packet.TransportGuid) + " on seat " + packet.VehicleSeat);
+                }
+            }
             else if (packet.Flags.HasFlagFast(UniversalSplineFlag.Parabolic) &&
                      packet.Points.Count == 1 && packet.PackedPoints.Count == 0 &&
                      packet.Jump != null)
@@ -580,7 +601,8 @@ namespace WDE.PacketViewer.Processing.Processors
             }
 
             var skipOrientation = lastPathSegmentHadOrientation &&
-                                  packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookOrientation;
+                                  packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookOrientation ||
+                                  packet.Flags.HasFlagFast(UniversalSplineFlag.TransportEnter);
             if (packet.FacingCase != PacketMonsterMove.FacingOneofCase.None && !skipOrientation)
             {
                 if (sb.Length > 0)
@@ -749,6 +771,13 @@ namespace WDE.PacketViewer.Processing.Processors
                 AppendLine(basePacket, destroyed.Guid, "Out of range: " + NiceGuid(destroyed.Guid));
             }
 
+            string FormatSpawnTime(TimeSpan time)
+            {
+                if (time.TotalMilliseconds < 0)
+                    return "? seconds";
+                return time.ToNiceString();
+            }
+
             foreach (ref readonly var created in packet.Created.AsSpan())
             {
                 if (created.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
@@ -759,7 +788,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 SetAppendOnNext(createType + NiceGuid(created.Guid) + " at " + VecToString(created.Movement != null ? created.Movement->Position : created.Stationary != null ? created.Stationary->Position : null,
                                     created.Movement != null ? created.Movement->Orientation : created.Stationary != null ? created.Stationary->Orientation : null) +
                                 (spawnTime == null ? "" : $" (will be destroyed in {spawnTime.Value.ToNiceString()})") +
-                                (spawnedAgo.HasValue && (spawnedAgo.Value.TotalMilliseconds > 1000 || created.CreateType == CreateObjectType.InRange) ? $" (spawned {spawnedAgo.Value.ToNiceString()} ago)" : ""));
+                                (spawnedAgo.HasValue && (spawnedAgo.Value.TotalMilliseconds > 1000 || created.CreateType == CreateObjectType.InRange) ? $" (spawned {FormatSpawnTime(spawnedAgo.Value)} ago)" : ""));
                 PrintValues(basePacket, created.Guid, created.Values, false);
                 SetAppendOnNext(null);
             }
@@ -934,20 +963,31 @@ namespace WDE.PacketViewer.Processing.Processors
             return false;
         }
 
-        public async Task<string> Generate()
+        public async Task<IDocument> Generate(PacketDocumentViewModel? vm)
         {
             StringBuilder totalBuilder = new();
+            string document;
             if (perGuidWriter == null)
-                return writer!.builder.ToString();
-            foreach (var guid in perGuidWriter)
+                document = writer!.builder.ToString();
+            else
             {
-                var universalGuid = guid.Key;
-                totalBuilder.AppendLine(universalGuid.ToWowParserString());
-                totalBuilder.AppendLine(NiceGuid(guid.Key));
-                totalBuilder.AppendLine(guid.Value.builder.ToString());
-                totalBuilder.AppendLine("\n\n\n\n");
+                foreach (var guid in perGuidWriter)
+                {
+                    var universalGuid = guid.Key;
+                    totalBuilder.AppendLine(universalGuid.ToWowParserString());
+                    totalBuilder.AppendLine(NiceGuid(guid.Key));
+                    totalBuilder.AppendLine(guid.Value.builder.ToString());
+                    totalBuilder.AppendLine("\n\n\n\n");
+                }
+                document = totalBuilder.ToString();
             }
-            return totalBuilder.ToString();
+
+            var niceGuidesReversed = guids.SafeToDictionary(x => x.Value, x => x.Key);
+
+            return containerProvider.Resolve<StoryTellerDocumentViewModel>((typeof(string), document),
+                (typeof(PacketDocumentViewModel), vm),
+                (typeof(Dictionary<int, UniversalGuid>), niceGuidesReversed),
+                (typeof(UniversalGuid?), playerGuidFollower.PlayerGuid));
         }
 
         public override bool Process(ref readonly PacketHolder packet)

@@ -7,7 +7,7 @@ using WDE.PacketViewer.Processing.Processors;
 namespace WDE.PacketViewer.Processing.ProcessorProviders
 {
     [AutoRegister]
-    public class StoryTellerDumperProvider : ITextPacketDumperProvider
+    public class StoryTellerDumperProvider : IDocumentPacketDumperProvider
     {
         private readonly IContainerProvider containerProvider;
 
@@ -20,12 +20,12 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Description => "Presents sniff as human readable story (only some packets)";
         public string Extension => "story";
         public bool RequiresSplitUpdateObject => true;
-        public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings) =>
-            Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<StoryTellerDumper>((typeof(bool), false), (typeof(IParsingSettings), settings)));
+        public Task<IPacketDocumentDumper> CreateDumper(IParsingSettings settings) =>
+            Task.FromResult<IPacketDocumentDumper>(containerProvider.Resolve<StoryTellerDumper>((typeof(bool), false), (typeof(IParsingSettings), settings)));
     }
     
     [AutoRegister]
-    public class PerGuidStoryTellerDumperProvider : ITextPacketDumperProvider
+    public class PerGuidStoryTellerDumperProvider : IDocumentPacketDumperProvider
     {
         private readonly IContainerProvider containerProvider;
 
@@ -38,7 +38,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Description => "Presents sniff as human readable story (only some packets), grouped by each guid";
         public string Extension => "story";
         public bool RequiresSplitUpdateObject => true;
-        public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings) =>
-            Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<StoryTellerDumper>((typeof(bool), true), (typeof(IParsingSettings), settings)));
+        public Task<IPacketDocumentDumper> CreateDumper(IParsingSettings settings) =>
+            Task.FromResult<IPacketDocumentDumper>(containerProvider.Resolve<StoryTellerDumper>((typeof(bool), true), (typeof(IParsingSettings), settings)));
     }
 }

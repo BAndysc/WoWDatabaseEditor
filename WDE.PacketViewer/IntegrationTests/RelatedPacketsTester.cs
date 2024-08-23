@@ -103,7 +103,7 @@ namespace WDE.PacketViewer.IntegrationTests
                     }
                 }
 
-                var finalized = splitter.Finalize();
+                var finalized = splitter.FinalizePackets();
                 if (finalized != null)
                 {
                     foreach (var p in finalized)

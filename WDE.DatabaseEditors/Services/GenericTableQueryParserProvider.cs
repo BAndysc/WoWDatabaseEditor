@@ -94,6 +94,9 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
 
     public async Task<bool> ParseDelete(DeleteQuery deleteQuery, IQueryParsingContext context)
     {
+        if (deleteQuery.TableName == DatabaseTable.WorldTable("conditions"))
+            return ParseDeleteConditions(deleteQuery, context);
+
         var defi = tableDefinitionProvider.GetDefinitionByTableName(deleteQuery.TableName);
         if (defi == null)
             return false;
@@ -135,8 +138,75 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
         return true;
     }
 
+    private bool ParseDeleteConditions(DeleteQuery deleteConditions, IQueryParsingContext context)
+    {
+        foreach (var where in deleteConditions.Where.Conditions)
+        {
+            var sourceTypeColumn = where.Columns.IndexOf("SourceTypeOrReferenceId");
+            if (sourceTypeColumn == -1)
+                return false;
+
+            if (!(where.Values[sourceTypeColumn] is long sourceType))
+                return false;
+
+            var defi = tableDefinitionProvider.Definitions.FirstOrDefault(d =>
+                d.IsOnlyConditionsTable == OnlyConditionMode.IgnoreTableCompletely &&
+                d.Condition?.SourceType == sourceType);
+
+            if (defi == null || defi.PrimaryKey.Count != 1)
+                return false;
+
+            var sourceEntryColumn = where.Columns.IndexOf("SourceEntry");
+            var sourceGroupColumn = where.Columns.IndexOf("SourceGroup");
+            var sourceIdColumn = where.Columns.IndexOf("SourceId");
+
+            DatabaseKey? key = null;
+
+            if (defi.Condition!.SourceEntryColumn.HasValue && defi.PrimaryKey[0] == defi.Condition!.SourceEntryColumn.Value)
+            {
+                if (sourceEntryColumn == -1)
+                    return false;
+
+                if (where.Values[sourceEntryColumn] is not long sourceEntry)
+                    return false;
+
+                key = new DatabaseKey(sourceEntry);
+            }
+            else if (defi.Condition!.SourceGroupColumn != null && defi.PrimaryKey[0] == defi.Condition!.SourceGroupColumn.Name)
+            {
+                if (sourceGroupColumn == -1)
+                    return false;
+
+                if (where.Values[sourceGroupColumn] is not long sourceGroup)
+                    return false;
+
+                key = new DatabaseKey(sourceGroup);
+            }
+            else if (defi.Condition!.SourceIdColumn.HasValue && defi.PrimaryKey[0] == defi.Condition!.SourceIdColumn.Value)
+            {
+                if (sourceIdColumn == -1)
+                    return false;
+
+                if (where.Values[sourceIdColumn] is not long sourceId)
+                    return false;
+
+                key = new DatabaseKey(sourceId);
+            }
+
+            if (!key.HasValue)
+                return false;
+
+            context.ProduceItem(new DatabaseTableSolutionItem(key.Value, false, true, new DatabaseTable(defi.DataDatabaseType, defi.TableName), false));
+        }
+
+        return true;
+    }
+
     public async Task<bool> ParseInsert(InsertQuery query, IQueryParsingContext context)
     {
+        if (query.TableName == DatabaseTable.WorldTable("conditions"))
+            return ParseInsertConditions(query, context);
+
         var defi = tableDefinitionProvider.GetDefinitionByTableName(query.TableName);
         if (defi == null)
             return false;
@@ -175,6 +245,73 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
                 item.Entries.Add(new SolutionItemDatabaseEntity(new DatabaseKey(lkey), false, false));
                 context.ProduceItem(item);
             }
+        }
+
+        return true;
+    }
+
+    private bool ParseInsertConditions(InsertQuery query, IQueryParsingContext context)
+    {
+        var sourceTypeColumn = query.Columns.IndexOf("SourceTypeOrReferenceId");
+        if (sourceTypeColumn == -1)
+            return false;
+
+        var sourceEntryColumn = query.Columns.IndexOf("SourceEntry");
+        var sourceGroupColumn = query.Columns.IndexOf("SourceGroup");
+        var sourceIdColumn = query.Columns.IndexOf("SourceId");
+
+        if (sourceEntryColumn == -1 && sourceGroupColumn == -1 && sourceIdColumn == -1)
+            return false;
+
+        foreach (var insert in query.Inserts)
+        {
+            if (!(insert[sourceTypeColumn] is long sourceType))
+                return false;
+
+            var defi = tableDefinitionProvider.Definitions.FirstOrDefault(d =>
+                d.IsOnlyConditionsTable == OnlyConditionMode.IgnoreTableCompletely &&
+                d.Condition?.SourceType == sourceType);
+
+            if (defi == null || defi.PrimaryKey.Count != 1)
+                return false;
+
+            DatabaseKey? key = null;
+
+            if (defi.Condition!.SourceEntryColumn.HasValue && defi.PrimaryKey[0] == defi.Condition!.SourceEntryColumn.Value)
+            {
+                if (sourceEntryColumn == -1)
+                    return false;
+
+                if (insert[sourceEntryColumn] is not long sourceEntry)
+                    return false;
+
+                key = new DatabaseKey(sourceEntry);
+            }
+            else if (defi.Condition!.SourceGroupColumn != null && defi.PrimaryKey[0] == defi.Condition!.SourceGroupColumn.Name)
+            {
+                if (sourceGroupColumn == -1)
+                    return false;
+
+                if (insert[sourceGroupColumn] is not long sourceGroup)
+                    return false;
+
+                key = new DatabaseKey(sourceGroup);
+            }
+            else if (defi.Condition!.SourceIdColumn.HasValue && defi.PrimaryKey[0] == defi.Condition!.SourceIdColumn.Value)
+            {
+                if (sourceIdColumn == -1)
+                    return false;
+
+                if (insert[sourceIdColumn] is not long sourceId)
+                    return false;
+
+                key = new DatabaseKey(sourceId);
+            }
+
+            if (!key.HasValue)
+                return false;
+
+            context.ProduceItem(new DatabaseTableSolutionItem(key.Value, false, true, new DatabaseTable(defi.DataDatabaseType, defi.TableName), false));
         }
 
         return true;

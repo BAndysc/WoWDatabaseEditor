@@ -587,18 +587,7 @@ namespace WDE.PacketViewer.ViewModels
                 if (!jumpTo.HasValue)
                     return;
 
-                int? jumpToId = null;
-                for (var index = 0; index < filteredPackets.Count; index++)
-                {
-                    if (filteredPackets[index].Id == jumpTo.Value)
-                    {
-                        jumpToId = index;
-                        break;
-                    }
-                }
-
-                if (jumpToId.HasValue)
-                    SelectedPacket = filteredPackets[jumpToId.Value];
+                SelectPacket(jumpTo.Value);
             }, () => filteredPackets.Count > 0);
 
             AutoDispose(this.ToObservable(o => o.FilteredPackets)
@@ -636,6 +625,24 @@ namespace WDE.PacketViewer.ViewModels
                 FilteredPackets.Clear();
                 VisiblePackets.Clear();
             });
+        }
+
+        public void SelectPacket(long packetNumber)
+        {
+            using var _ = memoryAllocator.Increment();
+
+            int? jumpToId = null;
+            for (var index = 0; index < filteredPackets.Count; index++)
+            {
+                if (filteredPackets[index].Id == packetNumber)
+                {
+                    jumpToId = index;
+                    break;
+                }
+            }
+
+            if (jumpToId.HasValue)
+                SelectedPacket = filteredPackets[jumpToId.Value];
         }
 
         private CancellationTokenSource? liveStreamToken;
@@ -697,7 +704,7 @@ namespace WDE.PacketViewer.ViewModels
 
                 if (splitUpdate)
                 {
-                    var finalized = splitter.Finalize();
+                    var finalized = splitter.FinalizePackets();
                     if (finalized != null)
                     {
                         foreach (var split in finalized)
@@ -777,7 +784,7 @@ namespace WDE.PacketViewer.ViewModels
                     }
                 }
 
-                var finalized = splitter.Finalize();
+                var finalized = splitter.FinalizePackets();
                 if (finalized != null)
                     foreach (var split in finalized)
                     {
