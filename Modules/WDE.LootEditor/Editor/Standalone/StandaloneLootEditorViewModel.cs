@@ -58,6 +58,8 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
         }
     }
 
+    public IReadOnlyList<LootSourceType> SupportedLootTypes { get; }
+
     [Notify] private bool canChangeLootType = true;
     [Notify] private bool canChangeEntry = true;
     [Notify] private uint solutionEntry;
@@ -192,6 +194,7 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
         ITextDocumentService textDocumentService,
         IParameterFactory parameterFactory,
         ICurrentCoreVersion currentCoreVersion,
+        ILootEditorFeatures lootEditorFeatures,
         PerDatabaseTableLootSolutionItem? solutionItem = null
         )
     {
@@ -202,6 +205,7 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
         this.parameterPickerService = parameterPickerService;
         this.messageBoxService = messageBoxService;
         this.currentCoreVersion = currentCoreVersion;
+        SupportedLootTypes = lootEditorFeatures.SupportedTypes;
         legacyDifficulties[0] = DifficultyViewModel.Legacy(0, "default");
         legacyDifficulties[1] = DifficultyViewModel.Legacy(1, "heroic dung/25 raid");
         legacyDifficulties[2] = DifficultyViewModel.Legacy(2, "10 heroic raid");

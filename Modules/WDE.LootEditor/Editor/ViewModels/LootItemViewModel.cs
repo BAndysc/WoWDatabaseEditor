@@ -249,6 +249,7 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
             SourceType = Parent.LootSourceType,
             Entry = (uint)Parent.LootEntry,
             ItemOrCurrencyId = (int)ItemOrCurrencyId.Value,
+            LootType = IsReference ? LootType.Reference : LootType.Item,
             Chance = Math.Abs(Chance.Value),
             QuestRequired = Chance.Value < 0,
             LootMode = (uint)LootMode.Value,

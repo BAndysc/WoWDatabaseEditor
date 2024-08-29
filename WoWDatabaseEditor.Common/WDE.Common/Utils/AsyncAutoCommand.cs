@@ -7,6 +7,7 @@ using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using WDE.Common.Annotations;
 using WDE.Common.Exceptions;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 
@@ -46,7 +47,14 @@ namespace WDE.Common.Utils
                     {
                         LOG.LogError(e, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                     }
-                    onException?.Invoke(e);
+                    if (onException == null)
+                    {
+                        var service = DI.Resolve<IMessageBoxService>();
+                        if (service != null)
+                            GlobalApplication.MainThread.Dispatch(() => CommandExtensions.ShowError(service, e, null));
+                    }
+                    else
+                        onException?.Invoke(e);
                 },
                 continueOnCapturedContext);
         }
@@ -116,7 +124,14 @@ namespace WDE.Common.Utils
                 e =>
                 {
                     IsBusy = false;
-                    onException?.Invoke(e);
+                    if (onException == null)
+                    {
+                        var service = DI.Resolve<IMessageBoxService>();
+                        if (service != null)
+                            GlobalApplication.MainThread.Dispatch(() => CommandExtensions.ShowError(service, e, null));
+                    }
+                    else
+                        onException?.Invoke(e);
                 },
                 continueOnCapturedContext);
         }
@@ -290,7 +305,7 @@ namespace WDE.Common.Utils
             });
         }
 
-        private static async Task ShowError(IMessageBoxService messageBoxService, Exception e, string? header,
+        internal static async Task ShowError(IMessageBoxService messageBoxService, Exception e, string? header,
             [CallerMemberName] string? caller = null,
             [CallerFilePath] string? callerFile = null,
             [CallerLineNumber] int? callerLineNumber = null)

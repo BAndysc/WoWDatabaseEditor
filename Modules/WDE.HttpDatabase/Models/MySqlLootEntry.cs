@@ -6,6 +6,7 @@ namespace WDE.HttpDatabase.Models;
 public class JsonLootEntry : ILootEntry
 {
     public LootSourceType SourceType { get; set; }
+    public LootType LootType { get; set; }
     public uint Entry { get; set; }
     public int ItemOrCurrencyId { get; set; }
     public uint Reference { get; set; }

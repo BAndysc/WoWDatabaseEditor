@@ -129,7 +129,7 @@ public abstract class BaseTrinityLootQueryGenerator : ILootQueryGenerator
     }
 }
 
-[RequiresCore("TrinityMaster", "TrinityWrath", "Azeroth")]
+[RequiresCore("TrinityWrath", "Azeroth")]
 [AutoRegister]
 [SingleInstance]
 public class TrinityLootQueryGenerator : BaseTrinityLootQueryGenerator
@@ -143,8 +143,35 @@ public class TrinityLootQueryGenerator : BaseTrinityLootQueryGenerator
         return new
         {
             Entry = x.Loot.Entry,
-            Item = x.Loot.ItemOrCurrencyId,
+            Item = x.Loot.IsReference() && x.Loot.ItemOrCurrencyId == 0 ? (long)x.Loot.Reference : x.Loot.ItemOrCurrencyId,
             Reference = x.Loot.Reference,
+            Chance = x.Loot.Chance,
+            QuestRequired = x.Loot.QuestRequired,
+            LootMode = x.Loot.LootMode,
+            GroupId = x.Loot.GroupId,
+            MinCount = x.Loot.MinCount,
+            MaxCount = x.Loot.MaxCount,
+            Comment = x.Loot.Comment
+        };
+    }
+}
+
+[RequiresCore("TrinityMaster")]
+[AutoRegister]
+[SingleInstance]
+public class TrinityMasterLootQueryGenerator : BaseTrinityLootQueryGenerator
+{
+    public TrinityMasterLootQueryGenerator(IConditionQueryGenerator conditionQueryGenerator, ICurrentCoreVersion currentCoreVersion, ILootEditorFeatures editorFeatures) : base(conditionQueryGenerator, currentCoreVersion, editorFeatures)
+    {
+    }
+
+    protected override object CreateDatabaseObjectRow(LootModel x)
+    {
+        return new
+        {
+            Entry = x.Loot.Entry,
+            Item = x.Loot.LootType == LootType.Reference ? x.Loot.Reference : (long)x.Loot.ItemOrCurrencyId,
+            ItemType = (int)x.Loot.LootType,
             Chance = x.Loot.Chance,
             QuestRequired = x.Loot.QuestRequired,
             LootMode = x.Loot.LootMode,
@@ -170,7 +197,7 @@ public class TrinityCataLootQueryGenerator : BaseTrinityLootQueryGenerator
         return new
         {
             Entry = x.Loot.Entry,
-            Item = Math.Abs(x.Loot.ItemOrCurrencyId),
+            Item = x.Loot.IsReference() && x.Loot.ItemOrCurrencyId == 0 ? (long)x.Loot.Reference : Math.Abs(x.Loot.ItemOrCurrencyId),
             IsCurrency = x.Loot.ItemOrCurrencyId < 0,
             Reference = x.Loot.Reference,
             Chance = x.Loot.Chance,

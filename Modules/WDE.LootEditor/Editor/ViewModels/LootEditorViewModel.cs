@@ -1086,7 +1086,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
 
     private IReadOnlyList<LootEntry> Roots => 
         (LootEditingMode == LootEditingMode.PerDatabaseTable) ? PerDatabaseSolutionItems :
-            Loots.Where(x => x.LootSourceType != LootSourceType.Reference || (uint)x.LootEntry == perEntitySolutionItem!.Entry)
+            Loots.Where(x => x.LootSourceType != LootSourceType.Reference || perEntitySolutionItem!.Type == LootSourceType.Reference && (uint)x.LootEntry == perEntitySolutionItem!.Entry)
                 .Select(x => x.LootEntry)
                 .ToList();
     
@@ -1128,7 +1128,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             {
                 var loot = lootGroup.LootItems[lootIndex];
                 loot.IsDuplicate = false;
-                var item = loot.ItemOrCurrencyId.Value;
+                var item = loot.IsReference ? loot.ReferenceEntry : loot.ItemOrCurrencyId.Value;
                 var minPatch = loot.MinPatch.Value;
                 if (!keys.Add((item, minPatch)))
                 {

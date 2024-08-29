@@ -1,129 +1,125 @@
 using LinqToDB.Mapping;
 using WDE.Common.Database;
 
-namespace WDE.CMMySqlDatabase.Models;
+namespace WDE.TrinityMySqlDatabase.Models;
 
-public abstract class BaseLootTemplate : ILootEntry
+public abstract class BaseMasterMySqlLootEntry : ILootEntry
 {
     public abstract LootSourceType SourceType { get; }
 
-    public LootType LootType => Reference != 0 ? LootType.Reference : LootType.Item;
+    [PrimaryKey]
+    [Column(Name = "ItemType")]
+    public LootType LootType { get; set; }
 
     [PrimaryKey]
-    [Column(Name = "entry")]
+    [Column(Name = "Entry")]
     public uint Entry { get; set; }
-    
-    [Column(Name = "item")]
+
+    [Column(Name = "Item")]
     public int ItemOrCurrencyId { get; set; }
-    
-    public uint Reference => MinCountOrReference < 0 ? (uint)-MinCountOrReference : 0;
 
-    [Column(Name = "ChanceOrQuestChance")]
+    public uint Reference => LootType == LootType.Reference ? (uint)ItemOrCurrencyId : 0;
+    
+    [Column(Name = "Chance")]
     public float Chance { get; set; }
-
-    public bool QuestRequired => Chance < 0;
-
-    public uint LootMode { get; set; }
-
-    [Column(Name = "groupid")]
-    public ushort GroupId { get; set; }
-
-    public int MinCount => MinCountOrReference >= 0 ? MinCountOrReference : 1;
     
-    [Column(Name = "maxcount")]
+    [Column(Name = "QuestRequired")]
+    public bool QuestRequired { get; set; }
+
+    [Column(Name = "LootMode")]
+    public uint LootMode { get; set; }
+    
+    [Column(Name = "GroupId")]
+    public ushort GroupId { get; set; }
+    
+    [Column(Name = "MinCount")]
+    public int MinCount { get; set; }
+    
+    [Column(Name = "MaxCount")]
     public uint MaxCount { get; set; }
 
     public int BadLuckProtectionId => 0;
 
     public uint Build => 0;
 
-    public virtual string? Comment { get; set; }
-    
-    public ushort MinPatch => 0;
-    
-    public ushort MaxPatch => 0;
-    
-    [Column(Name = "mincountOrRef")]
-    public int MinCountOrReference { get; set; }
-    
-    [Column(Name = "condition_id")]
-    public uint ConditionId { get; set; }
-}
+    [Column(Name = "Comment")]
+    public string? Comment { get; set; }
 
-public abstract class BaseLootTemplateWithComment : BaseLootTemplate
-{
-    [Column(Name = "comments")]
-    public override string? Comment { get; set; }
+    public ushort MinPatch => 0;
+
+    public ushort MaxPatch => 0;
+
+    public uint ConditionId => 0;
 }
 
 [Table(Name = "creature_loot_template")]
-public class CreatureLootTemplate : BaseLootTemplateWithComment
+public class CreatureMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.Creature;
 }
 
 [Table(Name = "gameobject_loot_template")]
-public class GameObjectLootTemplate : BaseLootTemplateWithComment
+public class GameObjectMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.GameObject;
 }
 
 [Table(Name = "item_loot_template")]
-public class ItemLootTemplate : BaseLootTemplateWithComment
+public class ItemMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.Item;
 }
 
 [Table(Name = "mail_loot_template")]
-public class MailLootTemplate : BaseLootTemplateWithComment
+public class MailMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.Mail;
 }
 
 [Table(Name = "fishing_loot_template")]
-public class FishingLootTemplate : BaseLootTemplateWithComment
+public class FishingMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.Fishing;
 }
 
 [Table(Name = "skinning_loot_template")]
-public class SkinningLootTemplate : BaseLootTemplateWithComment
+public class SkinningMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.Skinning;
 }
 
 [Table(Name = "prospecting_loot_template")]
-public class ProspectingLootTemplate : BaseLootTemplateWithComment
+public class ProspectingMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.Prospecting;
 }
 
 [Table(Name = "milling_loot_template")]
-public class MillingLootTemplate : BaseLootTemplate
+public class MillingMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.Milling;
 }
 
 [Table(Name = "disenchant_loot_template")]
-public class DisenchantLootTemplate : BaseLootTemplateWithComment
+public class DisenchantMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.Disenchant;
 }
 
 [Table(Name = "reference_loot_template")]
-public class ReferenceLootTemplate : BaseLootTemplateWithComment
+public class ReferenceMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.Reference;
 }
 
 [Table(Name = "pickpocketing_loot_template")]
-public class PickpocketingLootTemplate : BaseLootTemplateWithComment
+public class PickpocketingMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.Pickpocketing;
 }
 
 [Table(Name = "spell_loot_template")]
-public class SpellLootTemplate : BaseLootTemplate
+public class SpellMasterLootTemplate : BaseMasterMySqlLootEntry
 {
     public override LootSourceType SourceType => LootSourceType.Spell;
 }

@@ -2,9 +2,16 @@ using System;
 
 namespace WDE.Common.Database;
 
+public enum LootType
+{
+    Item        = 0,
+    Reference   = 1,
+}
+
 public interface ILootEntry
 {
     LootSourceType SourceType { get; }
+    LootType LootType { get; }
     uint Entry { get; }
     int ItemOrCurrencyId { get; }
     uint Reference { get; }
@@ -27,6 +34,7 @@ public interface ITreasureLootEntry { }
 public struct AbstractLootEntry : ILootEntry
 {
     public LootSourceType SourceType { get; set; }
+    public LootType LootType { get; set; }
     public uint Entry { get; set; }
     public int ItemOrCurrencyId { get; set; }
     public uint Reference { get; set; }
@@ -46,6 +54,7 @@ public struct AbstractLootEntry : ILootEntry
     public AbstractLootEntry(ILootEntry x)
     {
         SourceType = x.SourceType;
+        LootType = x.LootType;
         Entry = x.Entry;
         ItemOrCurrencyId = x.ItemOrCurrencyId;
         Reference = x.Reference;
@@ -82,13 +91,13 @@ public struct AbstractLootTemplateName : ILootTemplateName
 public static class LootExtensions
 {
     public static bool IsReference(this ILootEntry entry)
-        => entry.Reference > 0;
+        => entry.LootType == LootType.Reference;
     
     public static bool IsCurrency(this ILootEntry entry)
-        => entry.ItemOrCurrencyId < 0;
-    
+        => entry.LootType == LootType.Item && entry.ItemOrCurrencyId < 0;
+
     public static bool IsItem(this ILootEntry entry)
-        => !entry.IsCurrency();
+        => entry.LootType == LootType.Item && entry.ItemOrCurrencyId >= 0;
 }
 
 public enum LootSourceType

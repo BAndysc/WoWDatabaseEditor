@@ -7,6 +7,8 @@ public abstract class BaseMySqlLootEntry : ILootEntry
 {
     public abstract LootSourceType SourceType { get; }
 
+    public LootType LootType => Reference != 0 ? LootType.Reference : LootType.Item;
+
     [PrimaryKey]
     [Column(Name = "Entry")]
     public uint Entry { get; set; }

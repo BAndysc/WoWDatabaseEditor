@@ -64,7 +64,7 @@ public class CmangosLootQueryGenerator : ILootQueryGenerator
                     .BulkInsert(group.Items.Select(x => new
                     {
                         entry = x.Loot.Entry,
-                        item = x.Loot.ItemOrCurrencyId,
+                        item = x.Loot.IsReference() && x.Loot.ItemOrCurrencyId == 0 ? (long)x.Loot.Reference : x.Loot.ItemOrCurrencyId,
                         ChanceOrQuestChance = (x.Loot.QuestRequired ? -1 : 1) * x.Loot.Chance,
                         groupid = x.Loot.GroupId,
                         mincountOrRef = x.Loot.IsReference() ? -(int)x.Loot.Reference : x.Loot.MinCount,

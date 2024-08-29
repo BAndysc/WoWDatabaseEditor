@@ -22,7 +22,7 @@
     <CompletionComboBox
       IsEnabled="{CompiledBinding CanChangeLootType}"
       SelectedItem="{CompiledBinding LootType, Mode=TwoWay}"
-      controls:Extensions.EnumType="{x:Type database:LootSourceType}" />
+      Items="{CompiledBinding SupportedLootTypes}" />
 
     <Border Width="20" />
 

@@ -27,4 +27,17 @@ public class TrinityMasterDatabase : BaseTrinityDatabase
     public ITable<MasterWaypointData> WaypointData => this.GetTable<MasterWaypointData>();
     public ITable<MySqlConditionLineMaster> ConditionsMaster => this.GetTable<MySqlConditionLineMaster>();
     public ITable<MySqlConversationActor> ConversationActor => this.GetTable<MySqlConversationActor>();
+    
+    public ITable<ItemMasterLootTemplate> ItemMasterLootTemplate => this.GetTable<ItemMasterLootTemplate>();
+    public ITable<PickpocketingMasterLootTemplate> PickpocketingMasterLootTemplate => this.GetTable<PickpocketingMasterLootTemplate>();
+    public ITable<CreatureMasterLootTemplate> CreatureMasterLootTemplate => this.GetTable<CreatureMasterLootTemplate>();
+    public ITable<DisenchantMasterLootTemplate> DisenchantMasterLootTemplate => this.GetTable<DisenchantMasterLootTemplate>();
+    public ITable<ProspectingMasterLootTemplate> ProspectingMasterLootTemplate => this.GetTable<ProspectingMasterLootTemplate>();
+    public ITable<MillingMasterLootTemplate> MillingMasterLootTemplate => this.GetTable<MillingMasterLootTemplate>();
+    public ITable<ReferenceMasterLootTemplate> ReferenceMasterLootTemplate => this.GetTable<ReferenceMasterLootTemplate>();
+    public ITable<SpellMasterLootTemplate> SpellMasterLootTemplate => this.GetTable<SpellMasterLootTemplate>();
+    public ITable<MailMasterLootTemplate> MailMasterLootTemplate => this.GetTable<MailMasterLootTemplate>();
+    public ITable<GameObjectMasterLootTemplate> GameObjectMasterLootTemplate => this.GetTable<GameObjectMasterLootTemplate>();
+    public ITable<FishingMasterLootTemplate> FishingMasterLootTemplate => this.GetTable<FishingMasterLootTemplate>();
+    public ITable<SkinningMasterLootTemplate> SkinningMasterLootTemplate => this.GetTable<SkinningMasterLootTemplate>();
 }
