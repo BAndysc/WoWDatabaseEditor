@@ -59,12 +59,12 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <Border  Name="CurrentEmu" Cursor="Hand" CornerRadius="4" Height="30" Padding="16,0" VerticalAlignment="Center">
+    <Button Name="CurrentEmu" Background="{DynamicResource TitleBarHalfButtonBackground}" Cursor="Hand" CornerRadius="4" Height="30" Padding="16,0" VerticalAlignment="Center">
         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
             <WdeImage Height="20" Image="{CompiledBinding CurrentProfileIcon}" />
             <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" FontSize="16" FontWeight="Light" Text="{CompiledBinding CurrentProfileName}" />
         </StackPanel>
-        <Border.ContextFlyout>
+        <Button.Flyout>
             <Flyout Placement="BottomEdgeAlignedLeft" IsOpen="{CompiledBinding IsOpen, Mode=OneWayToSource}">
                 <Panel>
                     <StackPanel Opacity="{CompiledBinding Refreshing, Converter={StaticResource RunningConverter}}">
@@ -80,8 +80,8 @@
                     <TextBlock IsVisible="{CompiledBinding Refreshing}" VerticalAlignment="Center" HorizontalAlignment="Center">Refreshing...</TextBlock>
                 </Panel>
             </Flyout>
-        </Border.ContextFlyout>
-        <Border.Styles>
+        </Button.Flyout>
+        <Button.Styles>
             <Style Selector="Border#CurrentEmu">
                 <Setter Property="Background" Value="{DynamicResource CoreButtonBackground}"/>
             </Style>
@@ -91,10 +91,6 @@
             <Style Selector="Border#CurrentEmu:pressed">
                 <Setter Property="Background" Value="{DynamicResource CoreButtonPressedBackground}"/>
             </Style>
-        </Border.Styles>
-        <Interaction.Behaviors>
-            <behaviours:OpenContextMenuOnLeftMouseButtonBehavior />
-            <utils:PressedClassBehaviour />
-        </Interaction.Behaviors>
-    </Border>
+        </Button.Styles>
+    </Button>
 </UserControl>

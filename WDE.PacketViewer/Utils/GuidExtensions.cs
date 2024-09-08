@@ -8,7 +8,7 @@ namespace WDE.PacketViewer.Utils
 {
     public static class GuidExtensions
     {
-        public static bool IsEmpty(this ref readonly UniversalGuid guid)
+        public static bool IsEmpty(this in UniversalGuid guid)
         {
             if (guid.KindCase == UniversalGuid.KindOneofCase.Guid64)
                 return guid.Guid64.Low == 0 && guid.Guid64.High == 0;

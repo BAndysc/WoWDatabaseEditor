@@ -29,7 +29,7 @@ namespace WDE.Spells
                         var parameterPickerService = this.containerProvider.Resolve<IParameterPickerService>();
 
                         void RegisterSpellParameter(string key, string? customCounterTable = null) =>
-                           factory.RegisterCombined(key, "DbcSpellParameter", "DatabaseSpellParameter", (dbc, db) => new SpellParameter(spellPicker, dbc, db, customCounterTable), QuickAccessMode.Limited);
+                           factory.RegisterCombined(key, "DbcSpellParameter", "DatabaseSpellParameter", (dbc, db) => new SpellParameter(spellPicker, dbc, db, customCounterTable), customCounterTable == null ? QuickAccessMode.Limited : QuickAccessMode.None);
                         
                         RegisterSpellParameter("SpellParameter");
                         RegisterSpellParameter("Spell(spell_override)Parameter", "spell_override");

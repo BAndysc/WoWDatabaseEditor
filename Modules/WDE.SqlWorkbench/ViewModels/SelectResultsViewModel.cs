@@ -455,7 +455,7 @@ internal partial class SelectResultsViewModel : ObservableBase
 internal class TableController : BaseVirtualizedTableController
 {
     private readonly SelectResultsViewModel vm;
-    private static Bitmap? keyBitmap;
+    private static IImage? keyBitmap;
 
     public TableController(SelectResultsViewModel vm)
     {

@@ -87,7 +87,7 @@ public class GameClassesImage : BaseGameEnumImage
         [CharacterClasses.DemonHunter] = 11
     };
 
-    private static List<Bitmap?> cachedBitmaps = new();
+    private static List<IImage?> cachedBitmaps = new();
 
     public CharacterClasses GameClasses
     {
@@ -190,7 +190,7 @@ public class GameClassesImage : BaseGameEnumImage
             double x = 0;
             var size = Math.Min(Bounds.Width, Bounds.Height);
 
-            void DrawImage(Bitmap? bitmap, bool excluded)
+            void DrawImage(IImage? bitmap, bool excluded)
             {
                 if (bitmap != null)
                     context.DrawImage(bitmap, new Rect(x, 0, size, size));
@@ -214,7 +214,7 @@ public class GameClassesImage : BaseGameEnumImage
     protected override uint Value => (uint)GameClasses;
     protected override List<uint> EnumValues => enumValues;
     protected override List<ImageUri> Images => images;
-    protected override List<Bitmap?> CachedBitmaps => cachedBitmaps;
+    protected override List<IImage?> CachedBitmaps => cachedBitmaps;
     protected override Task? CacheInProgress
     {
         get => cacheInProgress;

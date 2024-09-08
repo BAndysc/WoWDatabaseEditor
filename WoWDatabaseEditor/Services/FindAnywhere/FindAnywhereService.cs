@@ -39,6 +39,9 @@ public class FindAnywhereService : IFindAnywhereService
 
     public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType sourceTypes, IReadOnlyList<string> parameterName, IReadOnlyList<long> parameterValue, CancellationToken cancellationToken)
     {
+        // poor's man alising
+        if (parameterName.Count == 1 && parameterName[0] == "SpellParameter")
+            parameterName = ["SpellParameter", "SpellAreaSpellParameter", "SpellOrRankedSpellParameter", "MultiSpellParameter"];
         // cacheable version
         if (parameterName.Count == 1 && parameterValue.Count == 1)
         {

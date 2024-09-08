@@ -36,7 +36,8 @@ namespace WDE.SQLEditor.ViewModels
             IMySqlHotfixExecutor hotfixExecutor,
             IStatusBar statusBar, 
             IDatabaseProvider databaseProvider,
-            ITaskRunner taskRunner, 
+            ITaskRunner taskRunner,
+            IMessageBoxService messageBoxService,
             INativeTextDocument sql)
         {
             code = sql;
@@ -59,6 +60,7 @@ namespace WDE.SQLEditor.ViewModels
                         catch (Exception e)
                         {
                             statusBar.PublishNotification(new PlainNotification(NotificationType.Error, $"Failure during {database} query execution"));
+                            messageBoxService.SimpleDialog("Error", "Error during query execution", e.Message).ListenWarnings();
                             LOG.LogError(e, message: "Error during query execution");
                         }
                     });
@@ -77,7 +79,7 @@ namespace WDE.SQLEditor.ViewModels
             ISolutionItemSqlGeneratorRegistry sqlGeneratorsRegistry,
             INativeTextDocument sql,
             IMainThread mainThread,
-            MetaSolutionSQL item) : this(mySqlExecutor, hotfixExecutor, statusBar, databaseProvider, taskRunner, sql)
+            MetaSolutionSQL item) : this(mySqlExecutor, hotfixExecutor, statusBar, databaseProvider, taskRunner,messageBoxService,  sql)
         {
             IsLoading = true;
             taskRunner.ScheduleTask("Generating SQL",

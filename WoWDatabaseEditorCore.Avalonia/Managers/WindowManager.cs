@@ -8,6 +8,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -244,15 +245,15 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                     view.ShowActivated = true;
                     if (viewModel.Icon.HasValue)
                     {
-                        var bitmap = WdeImage.LoadBitmapNowOrAsync(viewModel.Icon.Value, b =>
+                        var image = WdeImage.LoadBitmapNowOrAsync(viewModel.Icon.Value, i =>
                         {
-                            if (b != null)
+                            if (i is Bitmap bitmap)
                             {
-                                view.Icon = new WindowIcon(b);
-                                view.ManagedIcon = b;
+                                view.Icon = new WindowIcon(bitmap);
+                                view.ManagedIcon = i;
                             }
                         });
-                        if (bitmap != null)
+                        if (image is Bitmap bitmap)
                         {
                             view.Icon = new WindowIcon(bitmap);
                             view.ManagedIcon = bitmap;

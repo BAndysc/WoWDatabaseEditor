@@ -2,17 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using FuzzySharp;
 using FuzzySharp.PreProcess;
-using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.QuickAccess;
-using WDE.Common.Services;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
@@ -43,7 +40,7 @@ internal class QuickAccessRegisteredParameters : IQuickAccessRegisteredParameter
             return;
         
         registeredAll.Add((key, name));
-        
+
         if (mode == QuickAccessMode.Full)
             registeredFull.Add((key, name));
         else
@@ -87,21 +84,26 @@ public class ParametersSearch : IQuickAccessSearchProvider
             quickCommands.CloseSearchCommand.Execute(null);
         });
     }
-    
+
+    public int Order => 500;
+
     public async Task Provide(string text, Action<QuickAccessItem> produce, CancellationToken cancellationToken)
     {
         text = text.ToLower();
 
-        await Process(parameters.RegisteredFull, text, produce, cancellationToken, (a, b) =>  Fuzz.WeightedRatio(a, b.ToLower(), PreprocessMode.None));
-        await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
+        await Process(parameters.RegisteredAll, text, produce, cancellationToken, (a, b) => b.Contains(a, StringComparison.OrdinalIgnoreCase) ? 100 : 0);
         if (cancellationToken.IsCancellationRequested)
             return;
-        await Process(parameters.RegisteredLimited, text, produce, cancellationToken, (a, b) => b.Contains(a, StringComparison.OrdinalIgnoreCase) ? 100 : 0);
+        await Process(parameters.RegisteredFull, text, produce, cancellationToken, (a, b) => b.Contains(a, StringComparison.OrdinalIgnoreCase) ? 0 : Fuzz.WeightedRatio(a, b.ToLower(), PreprocessMode.None));
     }
 
     private async Task Process(IEnumerable<(string key, string name)> parameters, string text, Action<QuickAccessItem> produce, CancellationToken cancellationToken, Func<string, string, int> scorer)
     {
         List<(int, long, QuickAccessItem)> results = new();
+        long? textAsNumber = null;
+        if (long.TryParse(text, out var textAsNumber_))
+            textAsNumber = textAsNumber_;
+
         foreach (var model in parameters)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -113,7 +115,7 @@ public class ParametersSearch : IQuickAccessSearchProvider
                 continue;
 
             var nameScore = scorer(text, model.name.ToLower());
-            bool nameMatches = nameScore > 70;
+            bool nameMatches = false;//nameScore > 70;
 
             int total = 0;
             foreach (var item in parameter.Items)
@@ -121,6 +123,9 @@ public class ParametersSearch : IQuickAccessSearchProvider
                 var fullName = parameter.Prefix + item.Value.Name;
 
                 var itemScore = scorer(text, fullName);
+
+                if (textAsNumber.HasValue && textAsNumber == item.Key)
+                    itemScore = 101;
                 
                 if (nameMatches || itemScore > 70)
                 {
@@ -132,7 +137,8 @@ public class ParametersSearch : IQuickAccessSearchProvider
                     }
                     else
                     {
-                        quickItem = new QuickAccessItem(new ImageUri("Icons/icon_copy.png"), fullName,  item.Key.ToString(), model.name, quickCommands.CopyCommand, item.Key, (byte)itemScore);
+                        var icon = model.key == "SpellParameter" ? new ImageUri($"Spell/{item.Key}") : new ImageUri("Icons/icon_copy.png");
+                        quickItem = new QuickAccessItem(icon, fullName,  item.Key.ToString(), model.name, quickCommands.CopyCommand, item.Key, (byte)itemScore);
                     }
                     results.Add((-Math.Max(nameScore, itemScore), item.Key, quickItem));
                     total++;

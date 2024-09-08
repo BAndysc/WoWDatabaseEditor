@@ -7,5 +7,6 @@ namespace WDE.Common.Services
     {
         void ShowSettings();
         T? ShowSettings<T>() where T : IConfigurable;
+        void ShowSettings(IConfigurable configurable);
     }
 }

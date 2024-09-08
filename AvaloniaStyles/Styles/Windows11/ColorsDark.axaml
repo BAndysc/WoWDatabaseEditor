@@ -16,6 +16,7 @@
         <SolidColorBrush Color="#78797B" x:Key="InnerWindowBorderColor" />
         
         <SolidColorBrush Color="#2B2D31" x:Key="ContentBackground" />
+        <SolidColorBrush Color="White" Opacity="0.1" x:Key="TitleBarHalfButtonBackground" />
         
         <Thickness x:Key="ButtonBorderThemeThickness">1</Thickness>
         

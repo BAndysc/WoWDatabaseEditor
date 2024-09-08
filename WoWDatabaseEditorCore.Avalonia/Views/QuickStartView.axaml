@@ -76,7 +76,7 @@
             <Setter Property="Opacity" Value="0.2" />
         </Style>
         <Style Selector="Border.infoBox">
-            <Setter Property="Background" Value="{DynamicResource InfoBarInformationalSeverityBackgroundBrush}" />
+            <Setter Property="Background" Value="{DynamicResource TitleBarHalfButtonBackground}" />
             <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
             <Setter Property="Padding" Value="10" />
             <Setter Property="BorderThickness" Value="{DynamicResource InfoBarBorderThickness}" />

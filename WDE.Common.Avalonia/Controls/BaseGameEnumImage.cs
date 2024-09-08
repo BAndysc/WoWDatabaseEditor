@@ -34,7 +34,7 @@ public abstract class BaseGameEnumImage : Control
     
     protected abstract List<ImageUri> Images { get; }
     
-    protected abstract List<Bitmap?> CachedBitmaps { get; }
+    protected abstract List<IImage?> CachedBitmaps { get; }
     
     protected abstract Task? CacheInProgress { get; set; }
 
@@ -73,7 +73,7 @@ public abstract class BaseGameEnumImage : Control
 
     private bool instanceWaitingForCache = false;
     
-    protected bool CacheBitmaps(List<Bitmap?> cache, List<ImageUri> images)
+    protected bool CacheBitmaps(List<IImage?> cache, List<ImageUri> images)
     {
         if (instanceWaitingForCache)
             return false;
@@ -102,7 +102,7 @@ public abstract class BaseGameEnumImage : Control
             cache.Clear();
             foreach (var imageUri in images)
             {
-                Bitmap? img = null;
+                IImage? img = null;
                 try
                 {
                     img = await WdeImage.LoadBitmapAsync(imageUri);

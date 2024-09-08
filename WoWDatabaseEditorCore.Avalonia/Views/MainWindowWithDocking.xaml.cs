@@ -6,8 +6,11 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Primitives.PopupPositioning;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
@@ -181,42 +184,65 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             WindowState = (lastSize.WasMaximized ?? false) ? WindowState.Maximized : WindowState.Normal;
         }
 
+        private void ShowTooltipFlyout(Control element, string header, string content)
+        {
+            var popup = new Popup()
+            {
+                Child = new BalloonPopup()
+                {
+                    ShowTail = true,
+                    TailAlignment = HorizontalAlignment.Center,
+                    Content = new DockPanel()
+                    {
+                        Width = 300,
+                        Children =
+                        {
+                            new TextBlock()
+                            {
+                                [DockPanel.DockProperty] = global::Avalonia.Controls.Dock.Top,
+                                TextWrapping = TextWrapping.WrapWithOverflow,
+                                FontWeight = FontWeight.Bold,
+                                Text = header
+                            },
+                            new TextBlock()
+                            {
+                                TextWrapping = TextWrapping.WrapWithOverflow,
+                                Text = content
+                            }
+                        }
+                    }
+                },
+                IsLightDismissEnabled = true,
+                OverlayDismissEventPassThrough = true,
+                Placement = PlacementMode.Bottom,
+                PlacementTarget = element,
+                HorizontalOffset = 0,
+                VerticalOffset = 5
+            };
+            ((ISetLogicalParent)popup).SetParent(element);
+            popup.Open();
+        }
+
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
 
-            if (DataContext is MainWindowViewModel vm &&
-                vm.ShowSqlEditorNotification())
+            if (DataContext is MainWindowViewModel vm)
             {
-                DispatcherTimer.RunOnce(() =>
+                if (vm.ShowSqlEditorNotification())
                 {
-                    var btn = this.GetControl<Button>("OpenSQLDocument");
-                    var flyout = new Flyout()
+                    DispatcherTimer.RunOnce(() =>
                     {
-                        Content = new DockPanel()
-                        {
-                            Width = 300,
-                            Children =
-                            {
-                                new TextBlock()
-                                {
-                                    [DockPanel.DockProperty] = global::Avalonia.Controls.Dock.Top,
-                                    TextWrapping = TextWrapping.WrapWithOverflow,
-                                    FontWeight = FontWeight.Bold,
-                                    Text = "SQL editor is now available!"
-                                },
-                                new TextBlock()
-                                {
-                                    TextWrapping = TextWrapping.WrapWithOverflow,
-                                    Text =
-                                        "WoW Database Editor now features a complete SQL editor just like MySql Workbench, HeidiSQL or SQLyog. Press the button to open."
-                                }
-                            }
-                        },
-                        Placement = PlacementMode.BottomEdgeAlignedLeft,
-                    };
-                    flyout.ShowAt(btn);
-                }, TimeSpan.FromSeconds(1));   
+                        ShowTooltipFlyout(this.GetControl<Button>("OpenSQLDocument"), "SQL editor is now available!", "WoW Database Editor now features a complete SQL editor just like MySql Workbench, HeidiSQL or SQLyog. Press the button to open.");
+                    }, TimeSpan.FromSeconds(1));
+                }
+                if (vm.ShowGlobalSearchNotification())
+                {
+                    DispatcherTimer.RunOnce(() =>
+                    {
+                        ShowTooltipFlyout(this.GetControl<Button>("GlobalSearchButton"), "Global search", "Press this button to open global search in menus, creatures, gameobjects, spells, flags and more.");
+                    }, TimeSpan.FromSeconds(1));
+                }
             }
         }
 
@@ -351,6 +377,18 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             public int? LastY { get; set; }
             public int? LastWidth { get; set; }
             public int? LastHeight { get; set; }
+        }
+
+        private void FlyoutBase_OnOpened(object? sender, EventArgs e)
+        {
+            if (DataContext is MainWindowViewModel vm)
+                vm.QuickAccessViewModel.IsOpened = true;
+        }
+
+        private void FlyoutBase_OnClosed(object? sender, EventArgs e)
+        {
+            if (DataContext is MainWindowViewModel vm)
+                vm.QuickAccessViewModel.IsOpened = false;
         }
     }
 }

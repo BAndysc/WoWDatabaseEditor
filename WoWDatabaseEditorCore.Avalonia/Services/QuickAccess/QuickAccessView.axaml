@@ -8,37 +8,35 @@
              CornerRadius="{DynamicResource ControlCornerRadius}"
              x:DataType="quickAccess:QuickAccessViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.QuickAccess.QuickAccessView">
-    <Border Background="White" BorderBrush="{DynamicResource ContentBorderBrush}" BorderThickness="1"
-            Width="500"
-            CornerRadius="{DynamicResource ControlCornerRadius}"
-            BoxShadow="0 0 60 15 #60000000">
-        <DockPanel>
-            <TextBox Text="{CompiledBinding SearchText, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                     BorderThickness="0,0,0,1"
-                     CornerRadius="{DynamicResource ControlCornerRadius}"
-                     DockPanel.Dock="Top"
-                     x:Name="SearchBox"
-            ></TextBox>
-            <ListBox Background="{DynamicResource SlightlyHighlightedBackground}" MaxHeight="350" BorderThickness="0" 
-                     x:Name="ResultsList"
-                     CornerRadius="{DynamicResource ControlCornerRadius}"
-                     ItemsSource="{CompiledBinding Items}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <DockPanel LastChildFill="True">
-                            <WdeImage Margin="0,0,5,0" Width="16" Height="16" Image="{CompiledBinding Icon}" />
-                            <TextBlock Opacity="0.5" Text="{CompiledBinding ActionText}" DockPanel.Dock="Right" />
-                            <TextBlock Opacity="0.5" Text="{CompiledBinding BottomText}" DockPanel.Dock="Bottom" />
-                            <TextBlock Text="{CompiledBinding MainText}"></TextBlock>
-                        </DockPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-                <ListBox.Styles>
-                    <Style Selector="ListBoxItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    </Style>
-                </ListBox.Styles>
-            </ListBox>
-        </DockPanel>
-    </Border>
+    <DockPanel>
+        <TextBox Text="{CompiledBinding SearchText, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                 BorderThickness="0,0,0,1"
+                 CornerRadius="{DynamicResource ControlCornerRadius}"
+                 DockPanel.Dock="Top"
+                 MinHeight="30"
+                 Height="30"
+                 Watermark="🔍Search for creatures, gameobjects, flags and more..."
+                 x:Name="SearchBox"
+        ></TextBox>
+        <ListBox Background="{DynamicResource SlightlyHighlightedBackground}" MaxHeight="350" BorderThickness="0"
+                 x:Name="ResultsList"
+                 CornerRadius="{DynamicResource ControlCornerRadius}"
+                 ItemsSource="{CompiledBinding Items}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel LastChildFill="True">
+                        <WdeImage Margin="0,0,5,0" Width="16" Height="16" Image="{CompiledBinding Icon}" />
+                        <TextBlock Opacity="0.5" Text="{CompiledBinding ActionText}" DockPanel.Dock="Right" />
+                        <TextBlock Opacity="0.5" Text="{CompiledBinding BottomText}" DockPanel.Dock="Bottom" />
+                        <TextBlock Text="{CompiledBinding MainText}"></TextBlock>
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListBox.Styles>
+        </ListBox>
+    </DockPanel>
 </UserControl>

@@ -13,7 +13,10 @@ environment:
 init:
   - ps: Start-Service MySQL80
 install:
-- cmd: git submodule update --init --recursive
+- cmd: >-
+    git submodule update --init --recursive
+    
+    git config --global core.longpaths true
 before_build:
 - ps: (Get-Content WoWDatabaseEditorCore.Avalonia/Services/ProgramNameService.cs) -replace 'Subtitle => ""', 'Subtitle => "for open source emulator use"' | Out-File -encoding UTF8 WoWDatabaseEditorCore.Avalonia/Services/ProgramNameService.cs
 build_script:

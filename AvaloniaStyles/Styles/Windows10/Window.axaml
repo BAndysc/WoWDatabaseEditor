@@ -45,49 +45,55 @@
                                     <Panel DockPanel.Dock="Top">
                                         <Border Background="{DynamicResource TitleBarBackground}" IsHitTestVisible="False" Name="PART_titlebarBorder"/>
                                         <StackPanel>
-                                            <DockPanel Margin="6,0,0,0" Height="30">
-                                                <Image Source="{TemplateBinding ManagedIcon}" DockPanel.Dock="Left" Width="24"/>
+                                            <ThreeSidesPanel Margin="6,0,0,0" Height="30">
+                                                <DockPanel LastChildFill="False" ClipToBounds="True">
+                                                    <Image Source="{TemplateBinding ManagedIcon}" DockPanel.Dock="Left" Width="24"/>
 
-                                                <Menu DockPanel.Dock="Left"
-                                                    ItemsSource="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue={x:Null}}">
-                                                    <Menu.Styles>
-                                                        <Style Selector="MenuItem">
-                                                            <Setter Property="(converters:NativeMenuItemHelper.IsChecked)" Value="{Binding IsChecked}"></Setter>
-                                                            <Setter Property="(converters:NativeMenuItemHelper.ToggleType)" Value="{Binding ToggleType}"></Setter>
-                                                            <Setter Property="Header" Value="{Binding Header}"/>
-                                                            <Setter Property="InputGesture" Value="{Binding Gesture}"/>
-                                                            <Setter Property="HotKey" Value="{Binding Gesture}" />
-                                                            <Setter Property="ItemsSource" Value="{Binding Menu.Items}"/>
-                                                            <Setter Property="Command" Value="{Binding Command}"/>
-                                                            <Setter Property="CommandParameter" Value="{Binding CommandParameter}"/>
-                                                            <Setter Property="(NativeMenuBar.EnableMenuItemClickForwarding)" Value="True"/>
-                                                        </Style>
-                                                    </Menu.Styles>
-                                                </Menu>
+                                                    <Menu DockPanel.Dock="Left"
+                                                          ItemsSource="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue={x:Null}}">
+                                                        <Menu.Styles>
+                                                            <Style Selector="MenuItem">
+                                                                <Setter Property="(converters:NativeMenuItemHelper.IsChecked)" Value="{Binding IsChecked}"></Setter>
+                                                                <Setter Property="(converters:NativeMenuItemHelper.ToggleType)" Value="{Binding ToggleType}"></Setter>
+                                                                <Setter Property="Header" Value="{Binding Header}"/>
+                                                                <Setter Property="InputGesture" Value="{Binding Gesture}"/>
+                                                                <Setter Property="HotKey" Value="{Binding Gesture}" />
+                                                                <Setter Property="ItemsSource" Value="{Binding Menu.Items}"/>
+                                                                <Setter Property="Command" Value="{Binding Command}"/>
+                                                                <Setter Property="CommandParameter" Value="{Binding CommandParameter}"/>
+                                                                <Setter Property="(NativeMenuBar.EnableMenuItemClickForwarding)" Value="True"/>
+                                                            </Style>
+                                                        </Menu.Styles>
+                                                    </Menu>
 
-                                                <controls1:WindowControlButtons IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}" DockPanel.Dock="Right"/>
-                                                <ContentPresenter DockPanel.Dock="Right" Content="{Binding ToolBar.TopContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                                <DockPanel ClipToBounds="True">
                                                     <ContentPresenter DockPanel.Dock="Left" Content="{Binding ToolBar.TopLeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                        <TextBlock
-                                                            IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}"
-                                                            IsHitTestVisible="False"
-                                                            VerticalAlignment="Center"
-                                                            Opacity="0.9"
-                                                            Foreground="{DynamicResource TitleBarForeground}"
-                                                            Text="{TemplateBinding Title}" />
-                                                        <TextBlock
-                                                            IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}"
-                                                            IsHitTestVisible="False"
-                                                            VerticalAlignment="Center"
-                                                            Margin="10,0,0,0"
-                                                            Opacity="0.5"
-                                                            Foreground="{DynamicResource TitleBarForeground}"
-                                                            Text="{TemplateBinding SubTitle}" />
-                                                    </StackPanel>
                                                 </DockPanel>
-                                            </DockPanel>
+
+                                                <DockPanel LastChildFill="False">
+                                                    <controls1:WindowControlButtons IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}" DockPanel.Dock="Right"/>
+                                                    <ContentPresenter DockPanel.Dock="Right" Content="{Binding ToolBar.TopContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                </DockPanel>
+
+                                                <ContentPresenter Content="{TemplateBinding TitleContent}"
+                                                                  VerticalAlignment="Center"
+                                                                  HorizontalAlignment="Stretch"
+                                                />
+                                                        <!-- <TextBlock -->
+                                                        <!--     IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}" -->
+                                                        <!--     IsHitTestVisible="False" -->
+                                                        <!--     VerticalAlignment="Center" -->
+                                                        <!--     Opacity="0.9" -->
+                                                        <!--     Foreground="{DynamicResource TitleBarForeground}" -->
+                                                        <!--     Text="{TemplateBinding Title}" /> -->
+                                                        <!-- <TextBlock -->
+                                                        <!--     IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}" -->
+                                                        <!--     IsHitTestVisible="False" -->
+                                                        <!--     VerticalAlignment="Center" -->
+                                                        <!--     Margin="10,0,0,0" -->
+                                                        <!--     Opacity="0.5" -->
+                                                        <!--     Foreground="{DynamicResource TitleBarForeground}" -->
+                                                        <!--     Text="{TemplateBinding SubTitle}" /> -->
+                                            </ThreeSidesPanel>
                                             <controls1:ToolbarPanel HorizontalAlignment="Stretch" Margin="5,2,2,2">
                                                 <ContentPresenter HorizontalAlignment="Left" Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                                                 <ContentPresenter HorizontalAlignment="Stretch" Content="{Binding ToolBar.MiddleContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />

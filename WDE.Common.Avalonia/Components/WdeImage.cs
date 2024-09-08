@@ -8,11 +8,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles;
 using Microsoft.Extensions.FileProviders;
+using WDE.Common.Avalonia.Services;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
@@ -25,8 +27,8 @@ namespace WDE.Common.Avalonia.Components
     public class WdeImage : Image
     {
         // we are never releasing those intentionally
-        private static Dictionary<ImageUri, Bitmap?> cache = new();
-        private static Dictionary<ImageUri, Task<Bitmap?>> loadingTasks = new();
+        private static Dictionary<ImageUri, IImage?> cache = new();
+        private static Dictionary<ImageUri, Task<IImage?>> loadingTasks = new();
         private static IRuntimeDataService dataAccess;
         private static TaskCompletionSource? loadingFilesListing;
         private static HashSet<string>? existingFiles;
@@ -169,9 +171,17 @@ namespace WDE.Common.Avalonia.Components
             return existingFiles.Contains(uri);
         }
 
-        public static async Task<Bitmap?> LoadBitmapAsync(ImageUri img)
+        public static async Task<IImage?> LoadBitmapAsync(ImageUri img)
         {
-            if (!cache.TryGetValue(img, out var bitmap))
+            IImage? bitmap = null;
+            if (img.Uri != null && img.Uri.StartsWith("Spell/"))
+            {
+                if (uint.TryParse(img.Uri.Substring(6), out var id))
+                    bitmap = cache[img] = await ViewBind.ResolveViewModel<ISpellIconDatabase>().GetIcon(id);
+                else
+                    bitmap = cache[img] = null;
+            }
+            else if (!cache.TryGetValue(img, out bitmap))
             {
                 bitmap = cache[img] = await LoadBitmapImplAsync(dataAccess, img);
             }
@@ -179,7 +189,7 @@ namespace WDE.Common.Avalonia.Components
             return bitmap;
         }
 
-        public static Bitmap? LoadBitmapNowOrAsync(ImageUri img, Action<Bitmap?> onLoaded)
+        public static IImage? LoadBitmapNowOrAsync(ImageUri img, Action<IImage?> onLoaded)
         {
             if (!cache.TryGetValue(img, out var bitmap))
             {
@@ -195,7 +205,7 @@ namespace WDE.Common.Avalonia.Components
             return bitmap;
         }
 
-        public static Bitmap? LoadBitmapNowOrAsync(ImageUri img, Action onLoaded)
+        public static IImage? LoadBitmapNowOrAsync(ImageUri img, Action onLoaded)
         {
             if (!cache.TryGetValue(img, out var bitmap))
             {
@@ -211,7 +221,7 @@ namespace WDE.Common.Avalonia.Components
             return bitmap;
         }
 
-        private static async Task<Bitmap?> LoadBitmapImplAsync(IRuntimeDataService dataService, ImageUri img)
+        private static async Task<IImage?> LoadBitmapImplAsync(IRuntimeDataService dataService, ImageUri img)
         {
             if (!await FileExists(img.Uri))
                 return null;
@@ -219,7 +229,7 @@ namespace WDE.Common.Avalonia.Components
             if (loadingTasks.TryGetValue(img, out var existingLoadTask))
                 return await existingLoadTask;
 
-            var taskCompletionSource = new TaskCompletionSource<Bitmap?>();
+            var taskCompletionSource = new TaskCompletionSource<IImage?>();
             loadingTasks[img] = taskCompletionSource.Task;
 
             try

@@ -9,24 +9,32 @@ using WowPacketParser.Proto;
 namespace WDE.PacketViewer.Processing.Processors.Paths;
 
 [AutoRegister]
-[RequiresCore("TrinityCata", "TrinityWrath", "Azeroth")]
-public class SmartWaypointsSniffWaypointsExporter : ISniffWaypointsExporter
+[RequiresCore("TrinityMaster")]
+public class WaypointPathSniffWaypointsExporter : ISniffWaypointsExporter
 {
-    public string Id => "smart_script_waypoints";
-        
-    public string Name => "Smart Script Waypoints (`waypoints`)";
+    private readonly ICachedDatabaseProvider cachedDatabaseProvider;
+    public string Id => "waypoint_path";
+
+    public string Name => "Waypoints (waypoint_path)";
 
     public override string ToString() => Name;
+
+    public WaypointPathSniffWaypointsExporter(ICachedDatabaseProvider cachedDatabaseProvider)
+    {
+        this.cachedDatabaseProvider = cachedDatabaseProvider;
+    }
 
     public async Task Export(StringBuilder sb, int basePathNum, UniversalGuid guid, IWaypointProcessor.UnitMovementState state, float randomness)
     {
         var q = Queries.BeginTransaction(DataDatabaseType.World);
         List<object> toInsert = new();
-            
+
         uint pathEntry = guid.Entry;
 
         if (basePathNum > 0)
             pathEntry = (uint)(guid.Entry * 100 + (basePathNum - 1));
+
+        var npcTemplate = cachedDatabaseProvider.GetCachedCreatureTemplate(guid.Entry);
 
         foreach (var path in state.Paths)
         {
@@ -34,9 +42,17 @@ public class SmartWaypointsSniffWaypointsExporter : ISniffWaypointsExporter
 
             if (outOfRange)
                 q.StartBlockComment("Those paths are out of range, because a single entry can have up to 100 paths");
-            
+
             int pointid = 1;
-            q.Table(DatabaseTable.WorldTable("waypoints")).Where(row => row.Column<uint>("entry") == pathEntry).Delete();
+            q.Table(DatabaseTable.WorldTable("waypoint_path")).Where(row => row.Column<uint>("PathId") == pathEntry).Delete();
+            q.Table(DatabaseTable.WorldTable("waypoint_path")).Insert(new
+            {
+                PathId = pathEntry,
+                MoveType = 0,
+                Flags = 0,
+                Comment = npcTemplate == null ? $"NPC {guid.Entry} path" : npcTemplate.Name + " (" + guid.Entry + ")"
+            });
+            q.Table(DatabaseTable.WorldTable("waypoint_path_node")).Where(row => row.Column<uint>("PathId") == pathEntry).Delete();
             toInsert.Clear();
             foreach (var segment in path.Segments)
             {
@@ -44,27 +60,27 @@ public class SmartWaypointsSniffWaypointsExporter : ISniffWaypointsExporter
                 {
                     var isFirst = index == 0;
                     var isLast = index == segment.Waypoints.Count - 1;
-                        
+
                     var waypoint = segment.Waypoints[index];
                     toInsert.Add(new
                     {
-                        entry = pathEntry,
-                        pointid = pointid++,
-                        position_x = waypoint.X,
-                        position_y = waypoint.Y,
-                        position_z = waypoint.Z,
-                        orientation = isLast ? segment.FinalOrientation : null,
-                        delay = isFirst ? (int)(segment.Wait?.TotalMilliseconds ?? 0) : 0
+                        PathId = pathEntry,
+                        NodeId = pointid++,
+                        PositionX = waypoint.X,
+                        PositionY = waypoint.Y,
+                        PositionZ = waypoint.Z,
+                        Orientation = isLast ? segment.FinalOrientation : null,
+                        Delay = isFirst ? (int)(segment.Wait?.TotalMilliseconds ?? 0) : 0
                     });
                 }
             }
 
             if (toInsert.Count > 0)
-                q.Table(DatabaseTable.WorldTable("waypoints")).BulkInsert(toInsert);
+                q.Table(DatabaseTable.WorldTable("waypoint_path_node")).BulkInsert(toInsert);
 
             if (outOfRange)
                 q.EndBlockComment();
-            
+
             if (pathEntry == guid.Entry)
                 pathEntry = guid.Entry * 100;
             else

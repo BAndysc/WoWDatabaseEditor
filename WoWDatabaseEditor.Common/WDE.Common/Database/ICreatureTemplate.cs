@@ -128,14 +128,14 @@ namespace WDE.Common.Database
             Looting              = 0x00000400,
             PetInCombat          = 0x00000800,
             Pvp                  = 0x00001000,
-            Silenced             = 0x00002000, // UNIT_FLAG_FORCE_NAMEPLATE in 9.x
+            ForceNamePlate       = 0x00002000, // Silenced pre 9.x
             CannotSwim           = 0x00004000,
-            Swimming             = 0x00008000,
+            CanSwim              = 0x00008000,
             NonAttackable2       = 0x00010000,
             Pacified             = 0x00020000,
             Stunned              = 0x00040000,
             InCombat             = 0x00080000,
-            TaxiFlight           = 0x00100000,
+            OnTaxi               = 0x00100000,
             Disarmed             = 0x00200000,
             Confused             = 0x00400000,
             Fleeing              = 0x00800000,
@@ -149,7 +149,7 @@ namespace WDE.Common.Database
             Immune               = 0x80000000,
             
             ServerSideControlled = Rename | PetInCombat | InCombat | PreventEmotesFromChatText,
-            AllowedDatabaseFlags = ImmuneToPc | ImmuneToNpc | CannotSwim | Swimming | Uninteractible | Pacified,
+            AllowedDatabaseFlags = Unk6 | ImmuneToPc | ImmuneToNpc | ForceNamePlate | Uninteractible
         }
 
         [Flags]

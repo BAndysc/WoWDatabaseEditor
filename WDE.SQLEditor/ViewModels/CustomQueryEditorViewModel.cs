@@ -11,6 +11,7 @@ using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
@@ -36,6 +37,7 @@ namespace WDE.SQLEditor.ViewModels
             IDatabaseProvider databaseProvider,
             ITaskRunner taskRunner, 
             INativeTextDocument sql,
+            IMessageBoxService messageBoxService,
             ISolutionManager solutionManager,
             CustomSqlSolutionItem solutionItem)
         {
@@ -59,6 +61,7 @@ namespace WDE.SQLEditor.ViewModels
                         catch (Exception e)
                         {
                             statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failure during query execution"));
+                            messageBoxService.SimpleDialog("Error", "Error during query execution", e.Message).ListenWarnings();
                             LOG.LogError(e, "Error during query execution");
                         }
                     });

@@ -216,7 +216,12 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         public bool ShowSqlEditorNotification()
         {
-            return statisticsService.RunCounter > 10 && teachingTipService.ShowTip("SqlEditorNotification");
+            return statisticsService.RunCounter > 12 && teachingTipService.IsTipShown("GlobalSearchNotification") && teachingTipService.ShowTip("SqlEditorNotification");
+        }
+
+        public bool ShowGlobalSearchNotification()
+        {
+            return statisticsService.RunCounter > 11 && teachingTipService.ShowTip("GlobalSearchNotification");
         }
 
         private void OpenFatalLogIfExists()

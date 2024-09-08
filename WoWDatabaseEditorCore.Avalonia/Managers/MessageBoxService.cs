@@ -31,7 +31,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
         private readonly IMainWindowHolder mainWindowHolder;
         private bool loaded;
         private HashSet<Window> dialogOpened = new();
-        private List<(Func<Task>, Window)> pending = new();
+        private List<(Func<Task>, Window?)> pending = new();
 
         public MessageBoxService(IMainWindowHolder mainWindowHolder,
             IEventAggregator eventAggregator)
@@ -63,11 +63,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             if (pending.Count > 0)
             {
                 HashSet<Window> uniqueWindows = new();
-                foreach (var (task, owner) in pending.ToList())
+                foreach (var (task, owner_) in pending.ToList())
                 {
+                    var owner = owner_ ?? mainWindowHolder.RootWindow;
                     if (uniqueWindows.Add(owner))
                     {
-                        pending.Remove((task, owner));
+                        pending.Remove((task, owner_));
                         task().ListenErrors();
                     }
                 }
@@ -111,7 +112,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
 
             if (pending.Count > 0)
             {
-                var indexOfAnotherDialog = pending.FindIndex(x => x.Item2 == owner);
+                var indexOfAnotherDialog = pending.FindIndex(x => x.Item2 == owner || x.Item2 == null);
                 if (indexOfAnotherDialog == -1)
                     return viewModel.SelectedOption;
 
@@ -127,7 +128,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
         {
             var topWindow = mainWindowHolder.TopWindow;
 
-            if (loaded && !dialogOpened.Contains(topWindow))
+            if (loaded && topWindow != null && !dialogOpened.Contains(topWindow))
             {
                 return ShowNow(messageBox, topWindow);
             }
@@ -135,7 +136,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             TaskCompletionSource<T?> completionSource = new();
             Func<Task> f = async () =>
             {
-                var result = await ShowNow(messageBox, topWindow);
+                var result = await ShowNow(messageBox, topWindow ?? mainWindowHolder.RootWindow);
                 completionSource.SetResult(result);
             };
             pending.Add((f, topWindow));

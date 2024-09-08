@@ -13,7 +13,7 @@ public struct QuickAccessItem
         Description = description;
         Command = command;
         Parameter = parameter;
-        Score = score;
+        Score = -(int)score;
     }
 
     public ImageUri Icon { get; }
@@ -22,5 +22,5 @@ public struct QuickAccessItem
     public string Description { get; }
     public ICommand Command { get; }
     public object? Parameter { get; }
-    public byte Score { get; }
+    public int Score { get; }
 }

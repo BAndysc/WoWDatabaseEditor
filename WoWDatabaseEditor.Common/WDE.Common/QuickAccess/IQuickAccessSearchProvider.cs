@@ -16,6 +16,7 @@ namespace WDE.Common.QuickAccess;
 [NonUniqueProvider]
 public interface IQuickAccessSearchProvider
 {
+    int Order { get; }
     Task Provide(string text, Action<QuickAccessItem> produce, CancellationToken cancellationToken);
 }
 

@@ -14,7 +14,7 @@
   <Style Selector="controls|HamburgerMenuButton">
     <Setter Property="Template">
       <ControlTemplate>
-        <Button Width="34" Height="34"
+        <Button Width="34" Height="34" Background="{TemplateBinding Background}"
                 IsVisible="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue=False, Converter={StaticResource ListCountToBoolConverter}}">
           <Button.Content>
             <Path Fill="{Binding $parent[Button].Foreground}">

@@ -125,7 +125,7 @@ public class QuickAccessItemViewModel
 
     public string MainText => item.Text;
     
-    public byte Score => item.Score;
+    public int Score => item.Score;
 
     public void Execute()
     {

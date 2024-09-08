@@ -8,9 +8,6 @@
              x:DataType="viewModels:VisualStudioManagerViewModel"
              ClipToBounds="False"
              x:Class="WDE.SourceCodeIntegrationEditor.VisualStudioIntegration.Views.VisualStudioManagerView">
-  <UserControl.Styles>
-    <StyleInclude Source="avares://WDE.SourceCodeIntegrationEditor/VisualStudioIntegration/Views/BalloonPopup.axaml" />
-  </UserControl.Styles>
   <ItemsControl ClipToBounds="False" ItemsSource="{CompiledBinding LoosePopups}">
     <ItemsControl.ItemTemplate>
       <DataTemplate>

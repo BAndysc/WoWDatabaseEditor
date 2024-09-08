@@ -8,6 +8,7 @@ using WDE.Module.Attributes;
 namespace WoWDatabaseEditorCore.Services.NewItemService
 {
     [AutoRegister]
+    [SingleInstance]
     public class SolutionItemProviderService : ISolutionItemProvideService
     {
         private List<IRelatedSolutionItemCreator> relatedCreators { get; }

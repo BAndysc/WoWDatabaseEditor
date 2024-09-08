@@ -116,7 +116,9 @@ public class LoadCommandQuickAccess : IQuickAccessCommand, IQuickAccessSearchPro
             return bestMatch;
         return null;
     }
-    
+
+    public int Order => 700;
+
     public Task Provide(string text, Action<QuickAccessItem> produce, CancellationToken cancellationToken)
     {
         Tokenizer tokenizer = new Tokenizer(text);

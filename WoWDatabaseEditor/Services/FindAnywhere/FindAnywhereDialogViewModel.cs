@@ -40,7 +40,7 @@ public partial class FindAnywhereDialogViewModel : ObservableBase, IFindAnywhere
         IFindAnywhereService findAnywhereService)
     {
         this.databaseProvider = databaseProvider;
-        Sources.Add(new FindSourceDialog("Spell", "SpellParameter", "SpellAreaSpellParameter", "SpellOrRankedSpellParameter", "MultiSpellParameter"));
+        Sources.Add(new FindSourceDialog("Spell", "SpellParameter"));
         Sources.Add(new FindSourceDialog("Quest", "QuestParameter"));
         Sources.Add(new FindSourceDialog("Creature entry", "CreatureParameter", "CreatureGameobjectParameter"));
         Sources.Add(new FindSourceDialog("Creature spawn by guid", "CreatureGUIDParameter"));

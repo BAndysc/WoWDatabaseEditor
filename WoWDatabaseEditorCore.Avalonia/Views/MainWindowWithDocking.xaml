@@ -21,8 +21,9 @@
           Icon="../Icon.png"
           ManagedIcon="../Icon.png"
           Name="Root"
-          ExtendClientAreaToDecorationsHint="False"
-          Chrome="AlwaysSystemChrome"
+          MinWidth="1000"
+          ExtendClientAreaToDecorationsHint="True"
+          Chrome="NoSystemChrome"
           SubTitle="{CompiledBinding Subtitle}"
           Classes="MainWindow"
           x:DataType="viewModels:MainWindowViewModel"
@@ -73,7 +74,39 @@
         <Style Selector="ExtendedWindow.win11 :is(Control).HideWin11">
             <Setter Property="IsVisible" Value="False" />
         </Style>
+
+        <Style Selector="FlyoutPresenter.global-search-flyout">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Width" Value="550" />
+            <Setter Property="MinHeight" Value="0" />
+        </Style>
     </ExtendedWindow.Styles>
+
+    <controls:ExtendedWindow.TitleContent>
+        <Button
+            x:Name="GlobalSearchButton"
+            Background="{DynamicResource TitleBarHalfButtonBackground}"
+            utils:ButtonExtensions.ButtonFlyoutIsOpened="{CompiledBinding IsOpened}"
+            ToolTip.Tip="Press to open global search. Or use shortcut CTRL+R"
+            Height="30"
+            Padding="8,5,8,5"
+            DataContext="{CompiledBinding QuickAccessViewModel, Mode=OneWay}">
+            <Button.Content>
+                <StackPanel Orientation="Horizontal" Opacity="0.7">
+                    <WdeImage ImageUri="Icons/icon_search_mono.png" Width="16" Height="16" />
+                    <TextBlock Text="{Binding #Root.Title}" />
+                    <TextBlock Opacity="0.7" Text="{Binding #Root.SubTitle}" />
+                </StackPanel>
+            </Button.Content>
+            <Button.Flyout>
+                <Flyout Opened="FlyoutBase_OnOpened" Closed="FlyoutBase_OnClosed" OverlayDismissEventPassThrough="True" Placement="AnchorAndGravity" PlacementAnchor="Top" PlacementGravity="Bottom" FlyoutPresenterClasses="no-horiz-scroll global-search-flyout">
+                    <quickAccess:QuickAccessView
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Top"/>
+                </Flyout>
+            </Button.Flyout>
+        </Button>
+    </controls:ExtendedWindow.TitleContent>
 
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
@@ -102,6 +135,8 @@
                     <Border Width="30"  DockPanel.Dock="Left"/>
 
                     <profiles1:ProfilesControl DataContext="{CompiledBinding ProfilesViewModel}" DockPanel.Dock="Left"/>
+
+                    <Border Width="30"  DockPanel.Dock="Left"/>
                 </DockPanel>
             </controls:ToolBar.TopContent>
             <controls:ToolBar.LeftContent>
@@ -239,21 +274,7 @@
                                 ContentTemplate="{x:Static utils:ViewDataTemplate.Template}"
                                 ClipToBounds="False" />
             </Border>
-            <Panel Name="Panel"
-                   DataContext="{CompiledBinding QuickAccessViewModel, Mode=OneWay}"
-                   IsVisible="{CompiledBinding IsOpened, Mode=OneWay}"
-                   Background="Transparent">
-                <quickAccess:QuickAccessView
-                    HorizontalAlignment="Center"
-                    IsVisible="{CompiledBinding IsOpened, Mode=OneWay}"
-                    Margin="0,200,0,0"
-                    VerticalAlignment="Top"/>
-                <Interaction.Behaviors>
-                    <EventTriggerBehavior EventName="PointerPressed" SourceObject="{CompiledBinding #Panel}">
-                        <InvokeCommandAction Command="{Binding CloseQuickAccessCommand}" />
-                    </EventTriggerBehavior>
-                </Interaction.Behaviors>
-            </Panel>
+
         </Panel>
     </controls:ExtendedWindow.Overlay>
 

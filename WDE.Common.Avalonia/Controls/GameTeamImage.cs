@@ -49,10 +49,10 @@ public class GameTeamImage : Control
 
     private bool instanceWaitingForCache; // per control check so that only one call path waits for the task below
     private static Task? cacheInProgress; // task to load images, one per whole application
-    private static Bitmap? allyImage, hordeImage;
+    private static IImage? allyImage, hordeImage;
     private static CharacterRaces cachedAllyRaces, cachedHordeRaces, cachedAllSupportedRaces;
 
-    private static List<Bitmap?> cachedBitmaps = new();
+    private static List<IImage?> cachedBitmaps = new();
 
     static GameTeamImage()
     {

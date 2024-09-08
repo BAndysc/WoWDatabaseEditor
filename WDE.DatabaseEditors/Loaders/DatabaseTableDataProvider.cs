@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Database;
+using WDE.Common.Exceptions;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.DatabaseEditors.Data.Interfaces;
@@ -206,7 +207,7 @@ namespace WDE.DatabaseEditors.Loaders
                 {
                     result = await sqlExecutor.ExecuteSelectSql(definition, sqlStatement);
 
-                    if (definition.Condition != null)
+                    if (result.Columns > 0 && definition.Condition != null)
                     {
                         conditionsPerRowIndex = new IList<IConditionLine>[result.Rows];
 
@@ -349,7 +350,7 @@ namespace WDE.DatabaseEditors.Loaders
                     {
                         result = await sqlExecutor.ExecuteSelectSql(definition, sqlStatement);
 
-                        if (definition.Condition != null)
+                        if (result.Columns > 0 && definition.Condition != null)
                         {
                             conditionsPerRowIndex = new IList<IConditionLine>[result.Rows];
                             List<(int rowIndex, int? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();

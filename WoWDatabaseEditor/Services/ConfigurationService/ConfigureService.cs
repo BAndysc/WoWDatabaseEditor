@@ -14,6 +14,48 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService
     [SingleInstance]
     public class ConfigureService : IConfigureService
     {
+        private class Either<TA, TB>
+        {
+            private TA? a;
+            private TB? b;
+
+            private bool hasA;
+            private bool hasB;
+
+            public Either(TA x)
+            {
+                a = x;
+                hasA = true;
+            }
+
+            public Either(TB x)
+            {
+                b = x;
+                hasB = true;
+            }
+
+            public Either()
+            {
+            }
+
+            public bool TryGet<T>(out T ret)
+            {
+                if (hasA && typeof(T) == typeof(TA))
+                {
+                    ret = (T)(object)a!;
+                    return true;
+                }
+                if (hasB && typeof(T) == typeof(TB))
+                {
+                    ret = (T)(object)b!;
+                    return true;
+                }
+
+                ret = default!;
+                return false;
+            }
+        }
+
         private readonly IDocumentManager documentManager;
         private readonly Func<ConfigurationPanelViewModel> settings;
 
@@ -25,7 +67,7 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService
             this.settings = settings;
         }
 
-        private object? ShowSettings(Type? panelToOpen)
+        private object? ShowSettings(Either<Type, IConfigurable> toOpen)
         {
             if (openedPanel == null)
             {
@@ -39,9 +81,18 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService
                 });
             }
 
+            Func<IConfigurable, bool> configMatcher = config =>
+            {
+                if (toOpen.TryGet<Type>(out var type))
+                    return config.GetType() == type;
+                if (toOpen.TryGet<IConfigurable>(out var configToFind))
+                    return config.GetType() == configToFind.GetType();
+
+                return false;
+            };
+
             object? configurablePanel = null;
-            if (panelToOpen != null &&
-                openedPanel.ContainerTabItems.FirstOrDefault(x => x.GetType() == panelToOpen) is { } configurable)
+            if (openedPanel.ContainerTabItems.FirstOrDefault(configMatcher) is { } configurable)
             {
                 configurablePanel = configurable;
                 openedPanel.SelectedTabItem = configurable;
@@ -51,8 +102,10 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService
             return configurablePanel;
         }
 
-        public void ShowSettings() => ShowSettings(null);
+        public void ShowSettings() => ShowSettings(new Either<Type, IConfigurable>());
         
-        public T? ShowSettings<T>() where T : IConfigurable => (T?)ShowSettings(typeof(T));
+        public T? ShowSettings<T>() where T : IConfigurable => (T?)ShowSettings(new Either<Type, IConfigurable>(typeof(T)));
+
+        public void ShowSettings(IConfigurable configurable) => ShowSettings(new Either<Type, IConfigurable>(configurable));
     }
 }

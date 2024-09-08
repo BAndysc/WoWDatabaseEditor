@@ -123,8 +123,8 @@ namespace WDE.Parameters
             factory.Register("MillisecondsParameter", new MillisecondsParameter());
             factory.Register("GameEventParameter", AddAsyncDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
             factory.Register("CreatureParameter", AddAsyncDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration)), QuickAccessMode.Limited);
-            factory.Register("Creature(creature_text)Parameter", AddAsyncDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration, "creature_text")), QuickAccessMode.Limited);
-            factory.Register("Creature(smart_ai_text)Parameter", AddAsyncDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration, "smart_ai_text")), QuickAccessMode.Limited);
+            factory.Register("Creature(creature_text)Parameter", AddAsyncDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration, "creature_text")));
+            factory.Register("Creature(smart_ai_text)Parameter", AddAsyncDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration, "smart_ai_text")));
             factory.Register("CreatureGameobjectNameParameter", AddAsyncDatabaseParameter(new CreatureGameobjectNameParameter(database)));
             factory.Register("CreatureGameobjectParameter", AddAsyncDatabaseParameter(new CreatureGameobjectParameter(database)));
             factory.Register("QuestParameter", AddAsyncDatabaseParameter(new QuestParameter(database, questEntryProviderService)), QuickAccessMode.Limited);
@@ -135,7 +135,7 @@ namespace WDE.Parameters
             factory.Register("PlayerChoiceParameter", AddAsyncDatabaseParameter(new PlayerChoiceParameter(database)));
             factory.Register("PlayerChoiceResponseParameter", AddAsyncDatabaseParameter(new PlayerChoiceResponseParameter(database)));
             factory.Register("ServersideAreatriggerParameter", AddAsyncDatabaseParameter(new ServersideAreatriggerParameter(database)));
-            factory.Register("DatabasePhaseParameter", AddAsyncDatabaseParameter(new DatabasePhaseParameter(database)), QuickAccessMode.Limited);
+            factory.Register("DatabasePhaseParameter", AddAsyncDatabaseParameter(new DatabasePhaseParameter(database)));
             factory.Register("ConversationParameter", AddAsyncDatabaseParameter(new ConversationParameter(conversationLineStore, database)));
             factory.RegisterDepending("SceneTemplateParameter", "SceneScriptParameter", sceneScript =>AddAsyncDatabaseParameter(new SceneTemplateParameter(database, sceneScript)));
             factory.Register("BoolParameter", new BoolParameter());

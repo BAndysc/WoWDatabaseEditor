@@ -52,7 +52,7 @@ public class QuickAccessService : IQuickAccessService
     {
         this.quickCommands = quickCommands;
         this.commands = commands.ToList();
-        this.searchProviders = searchProviders.ToList();
+        this.searchProviders = searchProviders.OrderByDescending(x => x.Order).ToList();
         this.commands.Add(new HelpCommand(this));
     }
 

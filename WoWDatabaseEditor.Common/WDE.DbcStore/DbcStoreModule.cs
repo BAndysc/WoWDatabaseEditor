@@ -47,7 +47,7 @@ namespace WDE.DbcStore
                 .Subscribe(() =>
                     {
                         var factory = containerProvider.Resolve<IParameterFactory>();
-                        factory.RegisterCombined("ItemParameter", "ItemDbcParameter", "ItemDatabaseParameter", (dbc, db) => new ItemParameter(dbc, db), QuickAccessMode.Limited);
+                        factory.RegisterCombined("ItemParameter", "ItemDbcParameter", "ItemDatabaseParameter", (dbc, db) => new ItemParameter(dbc, db));
                         factory.RegisterCombined("ItemCurrencyParameter", "ItemParameter", "CurrencyTypeParameter", (items, currencies) => new ItemOrCurrencyParameter(items, currencies), QuickAccessMode.None);
                     },
                     ThreadOption.PublisherThread,

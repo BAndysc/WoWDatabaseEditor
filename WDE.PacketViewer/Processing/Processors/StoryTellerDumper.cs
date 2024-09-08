@@ -25,6 +25,8 @@ namespace WDE.PacketViewer.Processing.Processors
     public unsafe class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector, ISpellCastProcessor, IAuraSlotTracker>,
         IPacketDocumentDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor, IUnfilteredTwoStepPacketBoolProcessor
     {
+        private const int SpellRideVehicleHardcoded = 46598;
+
         private class WriterBuilder
         {
             public static WriterBuilder Null { get; } = new(true);
@@ -172,6 +174,7 @@ namespace WDE.PacketViewer.Processing.Processors
             else
             {
                 TimeSpan diff = packet.Time.ToDateTime().Subtract(state.lastTime.Value);
+                diff = TimeSpan.FromMilliseconds(((long)diff.TotalMilliseconds) / 600 * 600);
                 if (diff.TotalMilliseconds > 130)
                 {
                     state.writer.WriteLine();
@@ -325,12 +328,20 @@ namespace WDE.PacketViewer.Processing.Processors
             return base.Process(in basePacket, in packet);
         }
 
+        private bool IsSpellIgnored(uint spellId)
+        {
+            return SpellRideVehicleHardcoded == spellId;
+        }
+
         protected override bool Process(ref readonly PacketBase basePacket, ref readonly PacketSpellStart packet)
         {
             if (packet.Data == null)
                 return false;
 
             if (!spellService.Exists(packet.Data->Spell))
+                return false;
+
+            if (IsSpellIgnored(packet.Data->Spell))
                 return false;
 
             UniversalGuid? castGuid = packet.Data->IdKindCase == PacketSpellData.IdKindOneofCase.CastGuid ? packet.Data->CastGuid : null;
@@ -353,7 +364,10 @@ namespace WDE.PacketViewer.Processing.Processors
 
             if (!spellService.Exists(packet.Data->Spell))
                 return false;
-            
+
+            if (IsSpellIgnored(packet.Data->Spell))
+                return false;
+
             string targetLine = "";
             int targetCount = packet.Data->HitTargets.Count;
 
@@ -759,14 +773,14 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             foreach (ref readonly var destroyed in packet.Destroyed.AsSpan())
             {
-                if (destroyed.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
+                if (destroyed.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject or UniversalHighGuid.Transport)
                     continue;
                 AppendLine(basePacket, destroyed.Guid, "Destroyed " + NiceGuid(destroyed.Guid));
             }
 
             foreach (ref readonly var destroyed in packet.OutOfRange.AsSpan())
             {
-                if (destroyed.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
+                if (destroyed.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject or UniversalHighGuid.Transport)
                     continue;
                 AppendLine(basePacket, destroyed.Guid, "Out of range: " + NiceGuid(destroyed.Guid));
             }
@@ -780,7 +794,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
             foreach (ref readonly var created in packet.Created.AsSpan())
             {
-                if (created.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
+                if (created.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject or UniversalHighGuid.Transport)
                     continue;
                 var spawnTime = despawnDetector.GetSpawnLength(created.Guid, basePacket.Number);
                 var createType = created.CreateType == CreateObjectType.InRange ? "In range " : "Spawned ";
@@ -790,6 +804,10 @@ namespace WDE.PacketViewer.Processing.Processors
                                 (spawnTime == null ? "" : $" (will be destroyed in {spawnTime.Value.ToNiceString()})") +
                                 (spawnedAgo.HasValue && (spawnedAgo.Value.TotalMilliseconds > 1000 || created.CreateType == CreateObjectType.InRange) ? $" (spawned {FormatSpawnTime(spawnedAgo.Value)} ago)" : ""));
                 PrintValues(basePacket, created.Guid, created.Values, false);
+                if (created.Vehicle != null)
+                    AppendLine(basePacket, created.Guid, $"     UNIT_VEHICLE_ID = {created.Vehicle->VehicleId}", true);
+                if (created.Movement != null && created.Movement->Transport != null && created.Movement->Transport->VehicleId.HasValue)
+                    AppendLine(basePacket, created.Guid, $"     VEHICLE = {NiceGuid(created.Movement->Transport->TransportGuid)}, seat: {created.Movement->Transport->Seat}", true);
                 SetAppendOnNext(null);
             }
             
@@ -868,7 +886,7 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             foreach (var val in values.Ints())
             {
-                if (!IsUpdateFieldInteresting(val.Key, isUpdate))
+                if (!IsUpdateFieldInteresting(val.Key, isUpdate, val.Value == 0))
                     continue;
                 var newValue = RemoveUselessFlag(val.Key, val.Value, guid);
 
@@ -898,7 +916,7 @@ namespace WDE.PacketViewer.Processing.Processors
             
             foreach (var val in values.Floats())
             {
-                if (!IsUpdateFieldInteresting(val.Key, isUpdate))
+                if (!IsUpdateFieldInteresting(val.Key, isUpdate, val.Value == 0))
                     continue;
                 
                 if (!isUpdate || !updateObjectFollower.TryGetFloat(guid, val.Key, out var intValue))
@@ -909,7 +927,7 @@ namespace WDE.PacketViewer.Processing.Processors
             
             foreach (var val in values.Guids())
             {
-                if (!IsUpdateFieldInteresting(val.Key, isUpdate))
+                if (!IsUpdateFieldInteresting(val.Key, isUpdate, val.Value.IsEmpty()))
                     continue;
                 
                 if (!isUpdate || !updateObjectFollower.TryGetGuid(guid, val.Key, out var intValue))
@@ -931,7 +949,7 @@ namespace WDE.PacketViewer.Processing.Processors
             return value;
         }
 
-        private bool IsUpdateFieldInteresting(string field, bool isUpdate)
+        private bool IsUpdateFieldInteresting(string field, bool isUpdate, bool isZero)
         {
             switch (field)
             {
@@ -945,6 +963,8 @@ namespace WDE.PacketViewer.Processing.Processors
                 case "UNIT_NPC_FLAGS":
                 case "GAMEOBJECT_BYTES_1":
                     return true;
+                case "UNIT_CREATED_BY_SPELL":
+                    return !isZero;
             }
 
             if (isUpdate)

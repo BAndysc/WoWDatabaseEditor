@@ -340,15 +340,15 @@ namespace WDE.DbcStore
                 }
                 data.parametersToRegister.Clear();
                 
-                parameterFactory.Register("AchievementParameter", new DbcParameter(data.AchievementStore), QuickAccessMode.Full);
+                parameterFactory.Register("AchievementParameter", new DbcParameter(data.AchievementStore), QuickAccessMode.Limited);
                 parameterFactory.Register("MovieParameter", new DbcParameter(data.MovieStore), QuickAccessMode.Limited);
-                parameterFactory.Register("FactionParameter", new DbcParameter(data.FactionStore), QuickAccessMode.Limited);
+                parameterFactory.Register("FactionParameter", new DbcParameter(data.FactionStore));
                 parameterFactory.Register("FactionTemplateParameter", new FactionTemplateParameter(data.FactionStore, data.FactionTemplateStore), QuickAccessMode.Limited);
                 parameterFactory.Register("DbcSpellParameter", new DbcParameter(data.SpellStore));
                 parameterFactory.Register("CurrencyTypeParameter", new DbcParameter(data.CurrencyTypeStore));
                 parameterFactory.Register("ItemDbcParameter", new ItemSparseParameter(data.ItemSparses));
                 parameterFactory.Register("ItemRandomPropByItemParameter", new ItemRandomSelectParameter(data.ItemSparses));
-                parameterFactory.Register("EmoteParameter", new DbcParameter(data.EmoteStore), QuickAccessMode.Full);
+                parameterFactory.Register("EmoteParameter", new DbcParameter(data.EmoteStore), QuickAccessMode.Limited);
                 parameterFactory.Register("EmoteOneShotParameter", new DbcParameter(data.EmoteOneShotStore));
                 parameterFactory.Register("EmoteStateParameter", new DbcParameter(data.EmoteStateStore));
                 parameterFactory.Register("TextEmoteParameter", new DbcParameter(data.TextEmoteStore), QuickAccessMode.Limited);
@@ -448,7 +448,7 @@ namespace WDE.DbcStore
                         new TabularDataColumn(nameof(ICharShipmentContainer.Id), "Entry", 60),
                         new TabularDataColumn(nameof(ICharShipmentContainer.Name), "Name", 160),
                         new TabularDataColumn(nameof(ICharShipmentContainer.Description), "Description", 200),
-                        counterColumn), QuickAccessMode.Full);
+                        counterColumn), QuickAccessMode.Limited);
                 }
                 RegisterCharShipmentContainerParameter("CharShipmentContainerParameter");
 

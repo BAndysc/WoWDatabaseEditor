@@ -21,6 +21,7 @@ public class PrettyFlagParameter
     private readonly IParameter<long> gameobjectModel;
     private readonly IParameter<long> unitBytes0PostMop;
     private readonly IParameter<long> unitBytes0PreMop;
+    private readonly IParameter<long> spellParameter;
 
     public PrettyFlagParameter(IParameterFactory parameterFactory)
     {
@@ -39,6 +40,7 @@ public class PrettyFlagParameter
         objectName = parameterFactory.Factory("CreatureGameobjectNameParameter");
         itemName = parameterFactory.Factory("ItemParameter");
         gameObjectFlags = parameterFactory.Factory("GameObjectFlagParameter");
+        spellParameter = parameterFactory.Factory("SpellParameter");
     }
 
     public void InitializeBuild(ulong gameBuild)
@@ -85,6 +87,8 @@ public class PrettyFlagParameter
                 return gameobjectBytes1Parameter;
             case "GAMEOBJECT_DISPLAYID":
                 return gameobjectModel;
+            case "UNIT_CREATED_BY_SPELL":
+                return spellParameter;
         }
 
         return null;

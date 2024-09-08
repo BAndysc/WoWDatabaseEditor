@@ -26,6 +26,7 @@
         <StyleInclude Source="avares://AvaloniaStyles/Controls/SettingItem.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/InfoBar/InfoBar.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/HamburgerMenuButton.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/BalloonPopup.axaml" />
 
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/CompletionComboBox.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TabStrip.axaml" />

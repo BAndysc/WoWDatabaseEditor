@@ -36,6 +36,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             var window = windows.SingleOrDefault(w => w.IsActive);
             if (window is MessageBoxView)
                 window = window.Owner as Window;
+            else if (window is SplashScreenWindow)
+                window = null;
 
             window ??= windows.SingleOrDefault(w => w is MainWindowWithDocking);
             return window;

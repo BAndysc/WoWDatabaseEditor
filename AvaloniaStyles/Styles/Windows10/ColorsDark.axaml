@@ -21,6 +21,7 @@
 
     <SolidColorBrush Color="#3F3F45" x:Key="ContentBorderBrush" />
     <SolidColorBrush Color="#252526" x:Key="ContentBackground" />
+    <SolidColorBrush Color="White" Opacity="0.1" x:Key="TitleBarHalfButtonBackground" />
     <SolidColorBrush Color="#171718" x:Key="SlightlyHighlightedBackground" />
 
     <SolidColorBrush Color="#252526" x:Key="ThemeBackgroundBrush" />

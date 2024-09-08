@@ -9,10 +9,7 @@
              Name="Root"
              ClipToBounds="False"
              x:Class="WDE.SourceCodeIntegrationEditor.VisualStudioIntegration.Views.BreakpointHitPopupView">
-  <UserControl.Styles>
-    <StyleInclude Source="avares://WDE.SourceCodeIntegrationEditor/VisualStudioIntegration/Views/BalloonPopup.axaml" />
-  </UserControl.Styles>
-  <views:BalloonPopup ShowTail="{CompiledBinding ShowTail}">
+  <BalloonPopup ShowTail="{CompiledBinding ShowTail}">
     <DockPanel LastChildFill="False">
       <DockPanel DockPanel.Dock="Top" >
         <WdeImage Width="20" Height="20" ImageUri="Icons/icon_ide_visual_studio.png" Margin="0,0,4,0" />
@@ -61,5 +58,5 @@
         </TwoColumnsPanel>
       </DockPanel>
     </DockPanel>
-  </views:BalloonPopup>
+  </BalloonPopup>
 </UserControl>

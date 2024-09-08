@@ -40,7 +40,16 @@ namespace AvaloniaStyles.Controls
         
         public static readonly StyledProperty<string> SubTitleProperty =
                 AvaloniaProperty.Register<ExtendedWindow, string>(nameof(SubTitle));
-        
+
+        public static readonly StyledProperty<object?> TitleContentProperty
+            = AvaloniaProperty.Register<ExtendedWindow, object?>(nameof (TitleContent));
+
+        public object? TitleContent
+        {
+            get => GetValue(TitleContentProperty);
+            set => SetValue(TitleContentProperty, value);
+        }
+
         public IImage ManagedIcon
         {
             get => GetValue(ManagedIconProperty);

@@ -46,7 +46,12 @@ internal class ParameterSearchConfiguration : ObservableBase, IConfigurable
         {
             foreach (var param in Parameters)
             {
-                settings.SetProvider(param.ParameterKey, param.Action.Provider);
+                if (param.Action.Key == "default")
+                    settings.ResetProvider(param.ParameterKey);
+                else if (param.Action.Key == "copy")
+                    settings.SetCopy(param.ParameterKey);
+                else if (param.Action.Provider != null)
+                    settings.SetProvider(param.ParameterKey, param.Action.Provider);
                 param.Save();
             }
             settings.Save();
@@ -71,9 +76,18 @@ internal partial class SearchConfigurationParameter
     {
         ParameterName = friendlyName;
         ParameterKey = parameterKey;
+        SearchConfigurationAction? copyAction = null;
+        SearchConfigurationAction? defaultAction = null;
         Actions = providers.Select(p => new SearchConfigurationAction(p, p.GetName(), p.GetName())).ToList();
-        Actions.Add(new SearchConfigurationAction(null, "Copy", "copy"));
-        if (settings.GetProviderForParameter(parameterKey) is { } provider)
+        if (settings.GetDefaultProviderForParameter(parameterKey) is { } defaultProvider)
+            defaultAction = new SearchConfigurationAction(null, $"Default ({defaultProvider.GetName()})", "default");
+        copyAction = new SearchConfigurationAction(null, "Copy", "copy");
+        Actions.AddIfNotNull(defaultAction);
+        Actions.AddIfNotNull(copyAction);
+
+        if (settings.IsCopyForParameter(parameterKey))
+            action = savedAction = copyAction;
+        else if (settings.GetSavedProviderForParameter(parameterKey) is { } provider)
         {
             var indexOf = providers.IndexOf(provider);
             if (indexOf == -1)
@@ -81,8 +95,10 @@ internal partial class SearchConfigurationParameter
             else
                 action = savedAction = Actions[indexOf];
         }
+        else if (defaultAction != null)
+            action = savedAction = defaultAction;
         else
-            action = savedAction = Actions[^1];
+            action = savedAction = copyAction;
     }
 
     public void Save() => SavedAction = action;

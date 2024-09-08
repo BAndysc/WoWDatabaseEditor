@@ -6,6 +6,7 @@
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ColorsLight.axaml" />
     <Styles.Resources>
         <SolidColorBrush Color="#FDFCFC" x:Key="ContentBackground" />
+        <SolidColorBrush Color="#FDFCFC" Opacity="0.5" x:Key="TitleBarHalfButtonBackground" />
         
         <utils:HslDiff x:Key="AccentHue" H="0" S="1" L="0.5" />
         <!-- ccd4de-->
