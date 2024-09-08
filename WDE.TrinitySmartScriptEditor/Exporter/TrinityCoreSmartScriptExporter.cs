@@ -429,7 +429,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
         public async Task<IQuery> GenerateSql(ISmartScriptSolutionItem item, SmartScript script)
         {
-            return await new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry, conditionQueryGenerator).GetSql();
+            return await new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry, editorFeatures, conditionQueryGenerator).GetSql();
         }
 
         public int GetDatabaseScriptTypeId(SmartScriptType type)

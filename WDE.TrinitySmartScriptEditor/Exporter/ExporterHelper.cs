@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.CoreVersion;
@@ -20,6 +21,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
         private readonly ISolutionItemNameRegistry nameProvider;
+        private readonly IEditorFeatures editorFeatures;
 
         private DatabaseTable SmartScriptTableName => currentCoreVersion.Current.SmartScriptFeatures.TableName;
         
@@ -29,6 +31,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             ISmartScriptExporter scriptExporter,
             ICurrentCoreVersion currentCoreVersion,
             ISolutionItemNameRegistry nameProvider,
+            IEditorFeatures editorFeatures,
             IConditionQueryGenerator conditionQueryGenerator)
         {
             this.script = script;
@@ -38,6 +41,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             this.currentCoreVersion = currentCoreVersion;
             this.conditionQueryGenerator = conditionQueryGenerator;
             this.nameProvider = nameProvider;
+            this.editorFeatures = editorFeatures;
         }
 
         public async Task<IQuery> GetSql()
@@ -57,7 +61,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             if (serializedScript.Length == 0)
                 return;
 
-            var lines = serializedScript.Select(s => GenerateSingleSai(query, s));
+            var lines = serializedScript.Select(s => GenerateSingleSai(query, s)).ToList();
 
             query.Table(SmartScriptTableName).BulkInsert(lines);
 
@@ -71,7 +75,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             query.Add(conditionQueryGenerator.BuildInsertQuery(serializedConditions));
         }
 
-        private object GenerateSingleSai(IMultiQuery query, ISmartScriptLine line)
+        private Dictionary<string, object?> GenerateSingleSai(IMultiQuery query, ISmartScriptLine line)
         {
             IRawText entryOrGuid = query.Raw("@ENTRY");
             if (line.EntryOrGuid != script.EntryOrGuid)
@@ -88,87 +92,39 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             }
 
             var difficulties = line.Difficulties.HasValue ? string.Join(",", line.Difficulties) : "";
+            Dictionary<string, object?> columns = new();
+
+            columns["entryorguid"] = entryOrGuid;
+            columns["source_type"] = (int) line.ScriptSourceType;
+            columns["id"] = line.Id;
+            columns["link"] = line.Link;
+
+            columns["event_type"] = line.EventType;
+            columns["event_phase_mask"] = line.EventPhaseMask;
+            columns["event_chance"] = line.EventChance;
+            columns["event_flags"] = line.EventFlags;
+            for (int i = 0; i < editorFeatures.EventParametersCount.IntCount; ++i)
+                columns[$"event_param{i+1}"] = (uint)line.GetEventParam(i);
+
+            columns["action_type"] = line.ActionType;
+            for (int i = 0; i < editorFeatures.ActionParametersCount.IntCount; ++i)
+                columns[$"action_param{i+1}"] = (uint)line.GetActionParam(i);
+
+            columns["target_type"] = line.TargetType;
+            for (int i = 0; i < editorFeatures.TargetParametersCount.IntCount; ++i)
+                columns[$"target_param{i+1}"] = (uint)line.GetTargetParam(i);
+
+            columns["target_x"] = line.TargetX;
+            columns["target_y"] = line.TargetY;
+            columns["target_z"] = line.TargetZ;
+            columns["target_o"] = line.TargetO;
+
+            columns["comment"] = line.Comment;
+
             if (currentCoreVersion.Current.SmartScriptFeatures.DifficultyInSeparateColumn)
-            {
-                return new
-                {
-                    entryorguid = entryOrGuid,
-                    source_type = (int) line.ScriptSourceType,
-                    id = line.Id,
-                    link = line.Link,
-                    Difficulties = difficulties,
+                columns["Difficulties"] = difficulties;
 
-                    event_type = line.EventType,
-                    event_phase_mask = line.EventPhaseMask,
-                    event_chance = line.EventChance,
-                    event_flags = line.EventFlags,
-                    event_param1 = (uint)line.EventParam1,
-                    event_param2 = (uint)line.EventParam2,
-                    event_param3 = (uint)line.EventParam3,
-                    event_param4 = (uint)line.EventParam4,
-
-                    action_type = line.ActionType,
-                    action_param1 = (uint)line.ActionParam1,
-                    action_param2 = (uint)line.ActionParam2,
-                    action_param3 = (uint)line.ActionParam3,
-                    action_param4 = (uint)line.ActionParam4,
-                    action_param5 = (uint)line.ActionParam5,
-                    action_param6 = (uint)line.ActionParam6,
-                    action_param7 = (uint)line.ActionParam7,
-
-                    target_type = line.TargetType,
-                    target_param1 = (uint)line.TargetParam1,
-                    target_param2 = (uint)line.TargetParam2,
-                    target_param3 = (uint)line.TargetParam3,
-
-                    target_x = line.TargetX,
-                    target_y = line.TargetY,
-                    target_z = line.TargetZ,
-                    target_o = line.TargetO,
-
-                    comment = line.Comment
-                };
-            }
-            else
-            {
-                return new
-                {
-                    entryorguid = entryOrGuid,
-                    source_type = (int) line.ScriptSourceType,
-                    id = line.Id,
-                    link = line.Link,
-
-                    event_type = line.EventType,
-                    event_phase_mask = line.EventPhaseMask,
-                    event_chance = line.EventChance,
-                    event_flags = line.EventFlags,
-                    event_param1 = (uint)line.EventParam1,
-                    event_param2 = (uint)line.EventParam2,
-                    event_param3 = (uint)line.EventParam3,
-                    event_param4 = (uint)line.EventParam4,
-
-                    action_type = line.ActionType,
-                    action_param1 = (uint)line.ActionParam1,
-                    action_param2 = (uint)line.ActionParam2,
-                    action_param3 = (uint)line.ActionParam3,
-                    action_param4 = (uint)line.ActionParam4,
-                    action_param5 = (uint)line.ActionParam5,
-                    action_param6 = (uint)line.ActionParam6,
-                    action_param7 = (uint)line.ActionParam7,
-
-                    target_type = line.TargetType,
-                    target_param1 = (uint)line.TargetParam1,
-                    target_param2 = (uint)line.TargetParam2,
-                    target_param3 = (uint)line.TargetParam3,
-
-                    target_x = line.TargetX,
-                    target_y = line.TargetY,
-                    target_z = line.TargetZ,
-                    target_o = line.TargetO,
-
-                    comment = line.Comment
-                };   
-            }
+            return columns;
         }
 
         private async Task BuildUpdate(IMultiQuery query)
