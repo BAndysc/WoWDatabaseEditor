@@ -57,7 +57,7 @@
                                     <StackPanel>
 
                                         <ThreeSidesPanel Margin="6,0,0,0" Height="39">
-                                            <DockPanel LastChildFill="False" ClipToBounds="True">
+                                            <DockPanel LastChildFill="True" ClipToBounds="True">
                                                 <HamburgerMenuButton Background="{DynamicResource TitleBarHalfButtonBackground}" DockPanel.Dock="Left" Margin="0,0,30,0" />
                                                 <ContentPresenter DockPanel.Dock="Left" HorizontalAlignment="Left" Content="{Binding ToolBar.TopContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
 

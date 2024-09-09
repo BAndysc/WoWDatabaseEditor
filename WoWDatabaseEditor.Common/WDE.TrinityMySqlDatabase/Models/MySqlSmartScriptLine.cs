@@ -54,7 +54,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "event_param4")]
         public long EventParam4 { get; set; }
 
-        public long EventParam5 { get; set; }
+        public abstract long EventParam5 { get; set; }
 
         public long EventParam6 => 0;
 
@@ -87,7 +87,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "action_param6")]
         public long ActionParam6 { get; set; }
 
-        public long ActionParam7 { get; set; }
+        public abstract long ActionParam7 { get; set; }
 
         public long ActionParam8 => 0;
 
@@ -124,40 +124,6 @@ namespace WDE.TrinityMySqlDatabase.Models
         public string Comment { get; set; } = "";
 
         public BaseSqlSmartScriptLine() { }
-
-        public BaseSqlSmartScriptLine(ISmartScriptLine line)
-        {
-            EntryOrGuid = line.EntryOrGuid;
-            ScriptSourceType = line.ScriptSourceType;
-            Id = line.Id;
-            Link = line.Link;
-            EventType = line.EventType;
-            EventPhaseMask = line.EventPhaseMask;
-            EventChance = line.EventChance;
-            EventFlags = line.EventFlags;
-            EventParam1 = line.EventParam1;
-            EventParam2 = line.EventParam2;
-            EventParam3 = line.EventParam3;
-            EventParam4 = line.EventParam4;
-            EventCooldownMin = line.EventCooldownMin;
-            EventCooldownMax = line.EventCooldownMax;
-            ActionType = line.ActionType;
-            ActionParam1 = line.ActionParam1;
-            ActionParam2 = line.ActionParam2;
-            ActionParam3 = line.ActionParam3;
-            ActionParam4 = line.ActionParam4;
-            ActionParam5 = line.ActionParam5;
-            ActionParam6 = line.ActionParam6;
-            TargetType = line.TargetType;
-            TargetParam1 = line.TargetParam1;
-            TargetParam2 = line.TargetParam2;
-            TargetParam3 = line.TargetParam3;
-            TargetX = line.TargetX;
-            TargetY = line.TargetY;
-            TargetZ = line.TargetZ;
-            TargetO = line.TargetO;
-            Comment = line.Comment;
-        }
 
         // those are not used on TC
         public int LineId
@@ -225,6 +191,12 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "Difficulties")]
         public string difficulties { get; set; } = "";
 
+        [Column(Name = "action_param7")]
+        public override long ActionParam7 { get; set; }
+
+        [Column(Name = "event_param5")]
+        public override long EventParam5 { get; set; }
+
         public override SmallReadOnlyList<uint>? Difficulties
         {
             get
@@ -243,5 +215,7 @@ namespace WDE.TrinityMySqlDatabase.Models
     public class MySqlSmartScriptLine : BaseSqlSmartScriptLine
     {
         public override SmallReadOnlyList<uint>? Difficulties => default;
+        public override long EventParam5 { get; set; }
+        public override long ActionParam7 { get; set; }
     }
 }

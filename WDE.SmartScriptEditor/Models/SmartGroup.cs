@@ -1,5 +1,6 @@
 using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Models;
@@ -59,6 +60,7 @@ public class SmartGroup
     internal SmartEvent InnerEvent => e;
 }
 
+[FallbackAutoRegister]
 public class SmartGroupFakeEditorFeatures : IEditorFeatures
 {
     public static SmartGroupFakeEditorFeatures Instance { get; } = new SmartGroupFakeEditorFeatures();
