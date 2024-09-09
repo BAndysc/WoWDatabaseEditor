@@ -240,14 +240,15 @@ namespace WoWDatabaseEditorCore.Avalonia
 
         private IEnumerable<string> GetPluginDlls()
         {
-            #if !DEBUG
-            if (OperatingSystem.IsWindows())
-            {
-                return Directory.GetFiles(".", "WDE*.dll")
-                    .Where(path => !path.Contains("Test.dll") && !path.Contains("WPF") && !path.Contains("WDE.Common.Avalonia.dll"))
-                    .Select(Path.GetFullPath);
-            }
-            #endif
+            // uncomment for plugins support
+            // #if !DEBUG
+            // if (OperatingSystem.IsWindows())
+            // {
+            //     return Directory.GetFiles(".", "WDE*.dll")
+            //         .Where(path => !path.Contains("Test.dll") && !path.Contains("WPF") && !path.Contains("WDE.Common.Avalonia.dll"))
+            //         .Select(Path.GetFullPath);
+            // }
+            // #endif
 
             return Array.Empty<string>();
         }

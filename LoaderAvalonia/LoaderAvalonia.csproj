@@ -15,15 +15,12 @@
     <Import Project="..\Module.props" />
     <Import Project="..\Avalonia.props" />
 
-    <ItemGroup>
-        <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
-    </ItemGroup>
-    
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
     
     <ItemGroup>
+      <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
       <ProjectReference Include="..\BaseDesktopLoader\BaseDesktopLoader.csproj" />
       <ProjectReference Include="..\Modules\WDE.DatabaseDefinitionEditor\WDE.DatabaseDefinitionEditor.csproj" />
