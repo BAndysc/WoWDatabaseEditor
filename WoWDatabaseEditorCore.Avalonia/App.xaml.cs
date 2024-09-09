@@ -322,14 +322,31 @@ namespace WoWDatabaseEditorCore.Avalonia
             restoreFocusAfterEnableChange = new RestoreFocusAfterEnableChange();
             this.InitializeModules();
 
-            var loadedModules = Container.Resolve<IEnumerable<ModuleBase>>();
+            var loadedModules = Container.Resolve<IEnumerable<ModuleBase>>().ToList();
             
             foreach (var module in loadedModules)
                 module.RegisterFallbackTypes((IContainerRegistry)Container);
 
             var asyncInitializers = Container.Resolve<IEnumerable<IGlobalAsyncInitializer>>();
+
             foreach (var init in asyncInitializers)
-                await init.Initialize();
+            {
+                try
+                {
+                    await init.Initialize();
+                }
+                catch (Exception e)
+                {
+                    Container.Resolve<IMessageBoxService>()
+                        .ShowDialog(new MessageBoxFactory<bool>()
+                            .SetTitle("Fatal error")
+                            .SetMainInstruction("Failed to initialize module")
+                            .SetContent("Fatal error occured during module " + init.GetType() + " initialization. If you managed to see this error, then the editor recovered enough to show you this, but the editor is BUGGED now. Please report this error at github.com.\n\n" + e.Message+"\n" + e.StackTrace)
+                            .WithButton("I will report on github", true)
+                            .Build()).ListenWarnings();
+                    LOG.LogCritical(e, $"Type {init.GetType()} async initialize exception");
+                }
+            }
 
             foreach (var module in loadedModules)
                 module.FinalizeRegistration((IContainerRegistry)Container);

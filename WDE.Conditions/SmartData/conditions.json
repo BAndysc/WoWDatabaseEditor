@@ -436,6 +436,7 @@
 
 	{
 		"id": 26,
+		"tags": ["TrinityCata", "TrinityMaster"],
 		"name": "CONDITION_PHASEID",
 		"name_readable": "In phase",
 		"help": "Condition is met if target is in phase",
