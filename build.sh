@@ -2,6 +2,22 @@ set -e
 # Display installed .NET SDKs
 dotnet --list-sdks
 
+echo $APPVEYOR_PULL_REQUEST_NUMBER
+
+if [ -z "$APPVEYOR_PULL_REQUEST_NUMBER" ]; then
+    git clone -b avalonia11 https://$REPO_TOKEN@github.com/BAndysc/WoWDatabaseEditorExtras --recurse-submodules
+    
+    cd WoWDatabaseEditorExtras/WoWDatabaseEditor
+    git checkout $APPVEYOR_REPO_COMMIT
+    cd ..
+    cd ..
+
+    EXTRA_CSPROJ='<ProjectReference Include="..\\WoWDatabaseEditorExtras\\WDE.Github\\WDE.Github.csproj" />'
+    sed -i "\#</ItemGroup>#i $EXTRA_CSPROJ" "LoaderAvalonia/LoaderAvalonia.csproj"
+    sed -i '/};/i ,typeof(GithubModule)' "LoaderAvalonia/Program.cs"
+    sed -i '/using WoWDatabaseEditorCore.Avalonia;/i using WDE.Github;' "LoaderAvalonia/Program.cs"
+fi
+
 # Publish projects for Windows, macOS, and Linux
 dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false
 
@@ -39,25 +55,6 @@ mv bin/wowdatabaseeditor-avalonia-mac/WoWDatabaseEditor bin/wowdatabaseeditor-av
 mv bin/wowdatabaseeditor-avalonia-linux/WoWDatabaseEditor bin/wowdatabaseeditor-avalonia-linux/WoWDatabaseEditorCore.Avalonia
 
 mv bin/wowdatabaseeditor-avalonia-win/WoWDatabaseEditor.exe bin/wowdatabaseeditor-avalonia-win/WoWDatabaseEditorCore.Avalonia.exe
-
-echo $APPVEYOR_PULL_REQUEST_NUMBER
-
-if [ -z "$APPVEYOR_PULL_REQUEST_NUMBER" ]; then
-    git clone -b avalonia11 https://$REPO_TOKEN@github.com/BAndysc/WoWDatabaseEditorExtras --recurse-submodules
-    
-    cd WoWDatabaseEditorExtras/WoWDatabaseEditor
-    git checkout $APPVEYOR_REPO_COMMIT
-    cd ..
-    
-    mkdir modules
-    dotnet publish WDE.Github/WDE.Github.csproj -o modules/ -c Release -f net8.0
-    
-    cp modules/WDE.Github.dll ../bin/wowdatabaseeditor-avalonia-win/WDE.Github.dll
-    cp modules/WDE.Github.dll ../bin/wowdatabaseeditor-avalonia-mac/WDE.Github.dll
-    cp modules/WDE.Github.dll ../bin/wowdatabaseeditor-avalonia-linux/WDE.Github.dll
-    
-    cd ..
-fi
 
 # Cleanup operations in Windows bin directory
 cd bin/wowdatabaseeditor-avalonia-win/
