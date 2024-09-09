@@ -15,8 +15,7 @@
             "CONDITION_QUEST_NONE",
             "CONDITION_DAILY_QUEST_DONE",
             "CONDITION_QUESTSTATE",
-            "CONDITION_QUEST_OBJECTIVE_PROGRESS",
-            "CONDITION_QUEST_OBJECTIVE_COMPLETE"
+            "CONDITION_QUEST_OBJECTIVE_PROGRESS"
         ]
     },
     {
@@ -25,28 +24,34 @@
             "CONDITION_MAPID",
             "CONDITION_AREAID",
             "CONDITION_ZONEID",
+            "CONDITION_PHASEID",
             "CONDITION_TERRAIN_SWAP",
             "CONDITION_DIFFICULTY_ID",
             "CONDITION_SCENARIO_STEP"
         ]
     },
     {
-        "name": "Unit",
+        "name": "WorldObject",
         "group_members": [
-            "CONDITION_CLASS",
-            "CONDITION_RACE",
-            "CONDITION_LEVEL",
-            "CONDITION_UNIT_STATE",
             "CONDITION_TYPE_MASK",
             "CONDITION_OBJECT_ENTRY_GUID",
             "CONDITION_OBJECT_ENTRY_GUID_MASTER",
             "CONDITION_TYPE_MASK_MASTER",
-            "CONDITION_CREATURE_FAMILY",
-            "CONDITION_CREATURE_TYPE",
-            "CONDITION_STAND_STATE",
-            "CONDITION_CHARMED",
             "CONDITION_PRIVATE_OBJECT",
             "CONDITION_STRING_ID"
+        ]
+    },
+    {
+        "name": "Unit",
+        "group_members": [
+            "CONDITION_CLASS",
+            "CONDITION_LEVEL",
+            "CONDITION_UNIT_STATE",
+            "CONDITION_CREATURE_TYPE",
+            "CONDITION_RELATION_TO",
+            "CONDITION_REACTION_TO",
+            "CONDITION_STAND_STATE",
+            "CONDITION_CHARMED"
         ]
     },
     {
@@ -55,6 +60,7 @@
             "CONDITION_WORLD_STATE",
             "CONDITION_ACTIVE_EVENT",
             "CONDITION_INSTANCE_INFO",
+            "CONDITION_REALM_ACHIEVEMENT",
             "CONDITION_SCENARIO_STEP"
         ]
     },
@@ -67,19 +73,22 @@
     {
         "name": "Player",
         "group_members": [
-            "CONDITION_ACHIEVEMENT",
-            "CONDITION_TITLE",
             "CONDITION_ITEM",
             "CONDITION_ITEM_EQUIPPED",
             "CONDITION_REPUTATION_RANK",
             "CONDITION_TEAM",
-            "CONDITION_GENDER",
             "CONDITION_SKILL",
             "CONDITION_DRUNKENSTATE",
+            "CONDITION_RACE",
+            "CONDITION_ACHIEVEMENT",
+            "CONDITION_TITLE",
+            "CONDITION_GENDER",
             "CONDITION_SPELL",
+            "CONDITION_IN_WATER",
             "CONDITION_PET_TYPE",
             "CONDITION_TAXI",
             "CONDITION_GAMEMASTER",
+            "CONDITION_BATTLE_PET_COUNT",
             "CONDITION_PLAYER_CONDITION"
         ]
     },
@@ -92,20 +101,11 @@
         ]
     },
     {
-        "name": "HP",
+        "name": "Health",
         "group_members": [
             "CONDITION_ALIVE",
             "CONDITION_HP_VAL",
             "CONDITION_HP_PCT"
-        ]
-    },
-    {
-        "name": "Misc",
-        "group_members": [
-            "CONDITION_SPAWNMASK",
-            "CONDITION_PHASEID",
-            "CONDITION_RELATION_TO",
-            "CONDITION_REACTION_TO"
         ]
     },
     {

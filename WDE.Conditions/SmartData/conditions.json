@@ -320,12 +320,13 @@
 
 	{
 		"id": 19,
+		"tags": ["Azeroth", "TrinityWrath"],
 		"name": "CONDITION_SPAWNMASK",
 		"name_readable": "Has spawnmask",
 		"help": "Condition is met if target has spawn mask",
 		"parameters": [
 			{
-				"type": "Parameter",
+				"type": "MapDifficultyMaskParameter",
 				"name": "Spawn mask"
 			}
 		],
@@ -416,6 +417,21 @@
 			}
 		],
 		"description": "{target} {negate:has learned|hasn't learned} spell {pram1}"
+	},
+
+	{
+		"id": 26,
+		"tags": ["Azeroth", "TrinityWrath"],
+		"name": "CONDITION_PHASEMASK",
+		"name_readable": "In phasemask",
+		"help": "Condition is met if target is in phasemask",
+		"parameters": [
+			{
+				"type": "PhaseMaskParameter",
+				"name": "Phase Mask"
+			}
+		],
+		"description": "{target} {negate:in|is not in} phase {pram1}"
 	},
 
 	{
@@ -528,7 +544,7 @@
 	{
 		"id": 32,
 		"name": "CONDITION_TYPE_MASK",
-		"name_readable": "Has typemask",
+		"name_readable": "Has typemask (legacy)",
 		"help": "Condition is met if target is in given typemask",
 		"parameters": [
 			{
@@ -578,8 +594,8 @@
 	{
 		"id": 34,
 		"name": "CONDITION_REACTION_TO",
-		"name_readable": "Has reputation",
-		"help": "Condition is met if target has reputation",
+		"name_readable": "Has reaction",
+		"help": "Condition is met if target has reaction",
 		"parameters": [
 			{
 				"type": "SwitchParameter",
@@ -667,6 +683,28 @@
 	},
 
 	{
+		"id": 39,
+		"name": "CONDITION_REALM_ACHIEVEMENT",
+		"name_readable": "Is realm achievement complete",
+		"help": "Condition is met if realm achievement is complete",
+		"parameters": [
+			{
+				"type": "AchievementParameter",
+				"name": "Achievement Id"
+			}
+		],
+		"description": "Realm achievement {pram1} {negate:is|is not} complete"
+	},
+
+	{
+		"id": 40,
+		"name": "CONDITION_IN_WATER",
+		"name_readable": "Is in water",
+		"help": "Condition is met if player is in water",
+		"description": "{target} {negate:is|is not} in water"
+	},
+
+	{
 		"id": 41,
 		"name": "CONDITION_TERRAIN_SWAP",
 		"name_readable": "In terrain swap",
@@ -675,10 +713,10 @@
 			{
 				"type": "Parameter",
 				"name": "Terrain Swap",
-				"description": "To explain"
+				"description": "Terrain map id"
 			}
 		],
-		"description": "{target} {negate:in|is not in} terrain swap {pram1}"
+		"description": "{target} {negate:is|is not} in terrain swap {pram1}"
 	},
 
 	{
@@ -786,27 +824,29 @@
 	{
 		"id": 48,
 		"tags": ["TrinityMaster"],
-		"name": "CONDITION_QUEST_OBJECTIVE_COMPLETE",
-		"name_readable": "Has quest objective completed",
+		"name": "CONDITION_QUEST_OBJECTIVE_PROGRESS",
+		"name_readable": "Has quest objective progress",
 		"parameters": [
 			{
 				"type": "Parameter",
 				"name": "Objective ID"
 			},
-                        {
-                                "type": "Parameter",
-                                "name": "Unused"
-                        },
-                        {
-                                "type": "Parameter",
-                                "name": "Objective counter"
-                        }
+			{
+				"type": "Parameter",
+				"name": "Unused"
+			},
+			{
+				"type": "Parameter",
+				"name": "Progress value"
+			}
 		],
-		"help": "Condition is met if target player has completed quest objective",
+		"help": "Condition is met if target player has reached the specified progress value for the objective for the specified quest",
 		"description": "{target} {negate:has quest objective {pram1} == {pram3} (but hasn't rewarded quest yet)|hasn't quest objective {pram1} < {pram3} or has rewarded the quest}"
 	},
+
 	{
 		"id": 49,
+		"tags": ["Azeroth", "TrinityWrath"],
 		"name": "CONDITION_DIFFICULTY_ID",
 		"name_readable": "Is map difficulty",
 		"parameters": [
@@ -818,10 +858,23 @@
 		"help": "Condition is met if target map has difficulty id",
 		"description": "{target}'s map difficulty {negate:is|isn't} {pram1}"
 	},
+	{
+		"id": 49,
+		"tags": ["TrinityMaster"],
+		"name": "CONDITION_DIFFICULTY_ID",
+		"name_readable": "Is map difficulty",
+		"parameters": [
+			{
+				"type": "Parameter",
+				"name": "Map difficulty"
+			}
+		],
+		"help": "Condition is met if target map has difficulty id",
+		"description": "{target}'s map difficulty {negate:is|isn't} {pram1}"
+	},
 
 	{
 		"id": 50,
-		"tags": ["TrinityWrath"],
 		"name": "CONDITION_GAMEMASTER",
 		"name_readable": "Is gamemaster",
 		"parameters": [
@@ -843,7 +896,7 @@
 		"tags": ["TrinityMaster"],
 		"name": "CONDITION_OBJECT_ENTRY_GUID_MASTER",
 		"name_readable": "Is entry/guid/type",
-		"help": "[TC 9.x] Condition is met if target has given entry, given guid or is given type",
+		"help": "Condition is met if target has given entry, given guid or is given type",
 		"parameters": [
 			{
 				"type": "SwitchParameter",
@@ -883,7 +936,7 @@
 		"tags": ["TrinityMaster"],
 		"name": "CONDITION_TYPE_MASK_MASTER",
 		"name_readable": "Has typemask",
-		"help": "[TC 9.x] Condition is met if target is in given typemask",
+		"help": "Condition is met if target is of given typemask",
 		"parameters": [
 			{
 				"type": "FlagParameter",
@@ -891,14 +944,19 @@
 				"values": {
 					"1": {"name": "TYPEMASK_OBJECT"},
 					"2": {"name": "TYPEMASK_ITEM"},
-					"6": {"name": "TYPEMASK_CONTAINER", "description": "TYPEMASK_ITEM | 0x0004"},
-					"8": {"name": "TYPEMASK_UNIT"},
-					"16": {"name": "TYPEMASK_PLAYER"},
-					"32": {"name": "TYPEMASK_GAMEOBJECT"},
-					"64": {"name": "TYPEMASK_DYNAMICOBJECT"},
-					"128": {"name": "TYPEMASK_CORPSE"},
-					"256": {"name": "TYPEMASK_AREATRIGGER"},
-					"88": {"name": "TYPEMASK_SEER", "description": "TYPEMASK_PLAYER | TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT"}
+					"4": {"name": "TYPEMASK_CONTAINER"},
+					"8": {"name": "TYPEMASK_AZERITE_EMPOWERED_ITEM"},
+					"16": {"name": "TYPEMASK_AZERITE_ITEM"},
+					"32": {"name": "TYPEMASK_UNIT"},
+					"64": {"name": "TYPEMASK_PLAYER"},
+					"128": {"name": "TYPEMASK_ACTIVE_PLAYER"},
+					"256": {"name": "TYPEMASK_GAMEOBJECT"},
+					"512": {"name": "TYPEMASK_DYNAMICOBJECT"},
+					"1024": {"name": "TYPEMASK_CORPSE"},
+					"2048": {"name": "TYPEMASK_AREATRIGGER"},
+					"4096": {"name": "TYPEMASK_SCENEOBJECT"},
+					"8192": {"name": "TYPEMASK_CONVERSATION"},
+					"544": {"name": "TYPEMASK_SEER", "description": "TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT"}
 				}
 			}
 		],
@@ -907,27 +965,38 @@
 
 	{
 		"id": 53,
-		"name": "CONDITION_CREATURE_FAMILY",
-		"name_readable": "Is of family",
-		"help": "Condition is met if target is creature of family",
+		"tags": ["TrinityMaster"],
+		"name": "CONDITION_BATTLE_PET_COUNT",
+		"name_readable": "Has Battle Pet Count",
+		"help": "Condition is met if target has count of battle pet species",
 		"parameters": [
 			{
 				"type": "Parameter",
-				"name": "Family"
+				"name": "SpeciesId"
+			},
+			{
+				"type": "Parameter",
+				"name": "Count"
+			},
+			{
+				"type": "ConditionsComparisonTypeParameter",
+				"name": "Comparison",
+				"description": "Comparison type"
 			}
 		],
-		"description": "{target} {negate:is|is not} of family {pram1}"
+		"description": "{target} {negate:has|has not} count of battle pet species {pram1} {negate:{pram3value:choose(0|1|2|3|4):=|>|<|>=|<=|invalid value}|{pram3value:choose(0|1|2|3|4):!=|<=|>=|<|>|invalid value}} {pram2}"
 	},
 
 	{
 		"id": 54,
+		"tags": ["TrinityMaster"],
 		"name": "CONDITION_SCENARIO_STEP",
 		"name_readable": "Is at Scenario Step",
 		"help": "Condition is met if target is at Scenario with Step",
 		"parameters": [
 			{
 				"type": "Parameter",
-				"name": "ScenarioStep ID"
+				"name": "ScenarioStep Id"
 			}
 		],
 		"description": "{target} {negate:is|is not} at Scenario with Step {pram1}"
@@ -935,13 +1004,14 @@
 
 	{
 		"id": 55,
+		"tags": ["TrinityMaster"],
 		"name": "CONDITION_SCENE_IN_PROGRESS",
 		"name_readable": "Has Scene In Progress",
 		"help": "Condition is met if target has a scene playing",
 		"parameters": [
 			{
 				"type": "Parameter",
-				"name": "SceneId"
+				"name": "Scene Id"
 			}
 		],
 		"description": "{target} {negate:has|has not} Scene {pram1} in progress"
@@ -949,20 +1019,22 @@
 
 	{
 		"id": 56,
+		"tags": ["TrinityMaster"],
 		"name": "CONDITION_PLAYER_CONDITION",
-		"name_readable": "Player Condition met",
+		"name_readable": "Has PlayerCondition met",
 		"help": "Condition is met if target has a player condition met",
 		"parameters": [
 			{
 				"type": "PlayerConditionParameter",
-				"name": "Condition id"
+				"name": "PlayerCondition Id"
 			}
 		],
-		"description": "{target} {negate:meets|does not meet} player condition {pram1}"
+		"description": "{target} {negate:meets|does not meet} PlayerCondition {pram1}"
 	},
 
 	{
 		"id": 57,
+		"tags": ["TrinityMaster"],
 		"name": "CONDITION_PRIVATE_OBJECT",
 		"name_readable": "Is Private Object",
 		"help": "Condition is met if the target is a private object",
@@ -971,15 +1043,16 @@
 
 	{
 		"id": 58,
+		"tags": ["TrinityMaster"],
 		"name": "CONDITION_STRING_ID",
 		"name_readable": "Has StringId",
 		"help": "Condition is met if target has a specific string id",
 		"sparameters": [
 			{
-				"name": "String id"
+				"name": "String Id"
 			}
 		],
-		"description": "{target} {negate:is|is not} {spram1}"
+		"description": "{target} {negate:has|has not} StringID {spram1}"
 	}
 
 ]
