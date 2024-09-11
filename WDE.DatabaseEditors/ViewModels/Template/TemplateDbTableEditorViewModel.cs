@@ -44,7 +44,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
     public partial class TemplateDbTableEditorViewModel : ViewModelBase
     {
         private const string TipYouCanRevertId = "TableEditor.YouCanRevert";
-    
+
         private readonly ITeachingTipService teachingTipService;
         private readonly ICreatureStatCalculatorService creatureStatCalculatorService;
         private readonly IConditionEditService conditionEditService;
@@ -52,7 +52,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         private readonly IMetaColumnsSupportService metaColumnsSupportService;
 
         private readonly IDatabaseTableDataProvider tableDataProvider;
-        
+
         public ObservableCollection<string> Header { get; } = new();
         [Notify] private DatabaseRowsGroupViewModel? selectedGroup;
         public ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> FilteredRows { get; }
@@ -61,7 +61,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         private HashSet<(DatabaseKey key, ColumnFullName columnName)> forceUpdateCells = new HashSet<(DatabaseKey, ColumnFullName)>();
 
         [Notify] private bool allowMultipleKeys = true;
-        
+
         public AsyncAutoCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> EditConditionsCommand { get; }
@@ -75,11 +75,11 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         private bool canOpenRevertTip;
         public bool YouCanRevertTipOpened { get; set; }
-        
+
         public TemplateDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
-            IEventAggregator eventAggregator, ISolutionManager solutionManager, 
+            IEventAggregator eventAggregator, ISolutionManager solutionManager,
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             ISolutionItemNameRegistry solutionItemName, IDatabaseQueryExecutor mySqlExecutor,
             IQueryGenerator queryGenerator, ITeachingTipService teachingTipService,
@@ -90,9 +90,9 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             IParameterPickerService parameterPickerService,
             IConditionEditService conditionEditService,
             IStatusBar statusBar, ITableEditorPickerService tableEditorPickerService,
-            IMetaColumnsSupportService metaColumnsSupportService) : base(history, solutionItem, solutionItemName, 
-            solutionManager, solutionTasksService, eventAggregator, 
-            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, 
+            IMetaColumnsSupportService metaColumnsSupportService) : base(history, solutionItem, solutionItemName,
+            solutionManager, solutionTasksService, eventAggregator,
+            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService,
             commandService, parameterPickerService, statusBar, mySqlExecutor)
         {
@@ -118,7 +118,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 .Bind(out ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> filteredFields)
                 .Subscribe(a =>
                 {
-                    
+
                 }, b => throw b));
             FilteredRows = filteredFields;
 
@@ -137,7 +137,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 throw new UserException($"Table definition " + tableDefinition.Id + " is a template type editor, therefore its primary key should be a single column.");
 
             Debug.Assert(tableDefinition.PrimaryKey.Count == 1);
-            
+
             ScheduleLoading();
         }
 
@@ -153,7 +153,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
             var key = new IDatabaseProvider.ConditionKey(tableDefinition.Condition.SourceType);
             if (tableDefinition.Condition.SourceGroupColumn is {} sourceGroup)
-                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceGroup.Name)));
+                key = key.WithGroup(sourceGroup.Calculate(view.ParentEntity.GetTypedValueOrThrow<long>(sourceGroup.Name)));
             if (tableDefinition.Condition.SourceEntryColumn is { } sourceEntry)
                 key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceEntry));
             if (tableDefinition.Condition.SourceIdColumn is { } sourceId)
@@ -182,14 +182,14 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         {
             if (!allowMultipleKeys)
                 return;
-            
+
             var parameter = parameterFactory.Factory(tableDefinition.Picker);
             var (selected, ok) = await parameterPickerService.PickParameter(parameter, 0);
             if (!ok)
                 return;
 
             var data = await tableDataProvider.Load(tableDefinition.Id, null, null,null, new []{new DatabaseKey(selected)});
-            if (data == null) 
+            if (data == null)
                 return;
 
             foreach (var entity in data.Entities)
@@ -218,10 +218,10 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 await AddEntity(entity);
             }
         }
-        
+
         private void SetToNull(DatabaseCellViewModel? view)
         {
-            if (view != null && view.CanBeNull && !view.Parent.IsReadOnly) 
+            if (view != null && view.CanBeNull && !view.Parent.IsReadOnly)
                 view.ParameterValue!.SetNull();
         }
 
@@ -229,7 +229,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         {
             if (view == null || view.Parent.IsReadOnly || view.TableField == null)
                 return;
-            
+
             view.ParameterValue!.Revert();
         }
 
@@ -248,7 +248,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         private Func<DatabaseRowViewModel, bool> FilterItem(string text)
         {
-            if (string.IsNullOrEmpty(text)) 
+            if (string.IsNullOrEmpty(text))
                 return _ => true;
             var lower = text.ToLower().Trim();
             if (lower.Contains("||"))
@@ -265,7 +265,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             else
                 return item => item.Name.Contains(lower, StringComparison.OrdinalIgnoreCase);
         }
-        
+
         private bool ContainsEntity(DatabaseEntity entity)
         {
             foreach (var e in Entities)
@@ -300,17 +300,17 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             var indexOfEntity = Entities.IndexOf(entity);
             if (indexOfEntity == -1)
                 return false;
-            
+
             entities[0].RemoveAt(indexOfEntity);
             Header.RemoveAt(indexOfEntity);
             foreach (var row in Rows.Items)
                 row.Cells.RemoveAt(indexOfEntity);
 
             ReEvalVisibility();
-            
+
             return true;
         }
-        
+
         public Task<bool> AddEntity(DatabaseEntity entity)
         {
             return Task.FromResult(ForceInsertEntity(entity, Entities.Count));
@@ -324,12 +324,12 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             var savedItem = sessionService.Find(pseudoItem);
             if (savedItem is DatabaseTableSolutionItem savedTableItem)
                 savedTableItem.UpdateEntitiesWithOriginalValues(new List<DatabaseEntity>(){entity});
-            
+
             foreach (var row in Rows.Items)
             {
                 var column = row.ColumnData;
                 DatabaseCellViewModel cellViewModel;
-                
+
                 if (column.IsConditionColumn)
                 {
                     var label = Observable.Select(entity.ToObservable(e => e.Conditions), c => "Conditions (" + c.CountActualConditions() + ")");
@@ -343,7 +343,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                         var parameterValue = new ParameterValue<string, DatabaseEntity>(entity, new ValueHolder<string>(evaluator.Evaluate(entity)!.ToString(), false),
                             new ValueHolder<string>("", false), StringParameter.Instance);
                         entity.OnAction += _ => parameterValue.Value = evaluator.Evaluate(entity)!.ToString();
-                        cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, parameterValue));   
+                        cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, parameterValue));
                     }
                     else if (column.Meta!.StartsWith("customfield:"))
                     {
@@ -360,7 +360,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                     var cell = entity.GetCell(column.DbColumnFullName);
                     if (cell == null)
                         throw new Exception("this should never happen");
-                            
+
                     IParameterValue parameterValue = null!;
                     if (cell is DatabaseField<long> longParam)
                     {
@@ -403,7 +403,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                         }));
                 }
 
-                
+
                 row.Cells.Insert(index, cellViewModel);
             }
 
@@ -422,7 +422,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             }
 
             ReEvalVisibility();
-            
+
             return true;
         }
 
@@ -454,13 +454,13 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             }
 
             await AsyncAddEntities(data.Entities);
-            
+
             historyHandler = History.AddHandler(AutoDispose(new TemplateTableEditorHistoryHandler(this)));
         }
 
         private TemplateTableEditorHistoryHandler? historyHandler;
         public override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
-        
+
         private void RowOnFieldModified()
         {
             if (teachingTipService.ShowTip(TipYouCanRevertId))
@@ -506,7 +506,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         {
             IMultiQuery multi = Queries.BeginTransaction(tableDefinition.DataDatabaseType);
             multi.Add(await base.GenerateSaveQuery());
-            
+
             foreach (var pair in forceUpdateCells)
             {
                 var entity = Entities.FirstOrDefault(e => e.Key == pair.key);
@@ -527,7 +527,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         {
             return groupVisibilityByName[str];
         }
-        
+
         private string searchText = "";
         public string SearchText
         {

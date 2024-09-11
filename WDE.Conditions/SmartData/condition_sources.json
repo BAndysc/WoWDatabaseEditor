@@ -262,6 +262,7 @@
       "description": "_loot_template.item or reference_loot_template.item"
     }
   },
+
   {
     "id": 13,
     "name": "CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET",
@@ -288,6 +289,93 @@
         },
         "4": {
           "name": "EFFECT_2"
+        },
+        "8": {
+          "name": "EFFECT_3 (master)"
+        },
+        "16": {
+          "name": "EFFECT_4 (master)"
+        },
+        "32": {
+          "name": "EFFECT_5 (master)"
+        },
+        "64": {
+          "name": "EFFECT_6 (master)"
+        },
+        "128": {
+          "name": "EFFECT_7 (master)"
+        },
+        "256": {
+          "name": "EFFECT_8 (master)"
+        },
+        "512": {
+          "name": "EFFECT_9 (master)"
+        },
+        "1024": {
+          "name": "EFFECT_10 (master)"
+        },
+        "2048": {
+          "name": "EFFECT_11 (master)"
+        },
+        "4096": {
+          "name": "EFFECT_12 (master)"
+        },
+        "8192": {
+          "name": "EFFECT_13 (master)"
+        },
+        "16384": {
+          "name": "EFFECT_14 (master)"
+        },
+        "32768": {
+          "name": "EFFECT_15 (master)"
+        },
+        "65536": {
+          "name": "EFFECT_16 (master)"
+        },
+        "131072": {
+          "name": "EFFECT_17 (master)"
+        },
+        "262144": {
+          "name": "EFFECT_18 (master)"
+        },
+        "524288": {
+          "name": "EFFECT_19 (master)"
+        },
+        "1048576": {
+          "name": "EFFECT_20 (master)"
+        },
+        "2097152": {
+          "name": "EFFECT_21 (master)"
+        },
+        "4194304": {
+          "name": "EFFECT_22 (master)"
+        },
+        "8388608": {
+          "name": "EFFECT_23 (master)"
+        },
+        "16777216": {
+          "name": "EFFECT_24 (master)"
+        },
+        "33554432": {
+          "name": "EFFECT_25 (master)"
+        },
+        "67108864": {
+          "name": "EFFECT_26 (master)"
+        },
+        "134217728": {
+          "name": "EFFECT_27 (master)"
+        },
+        "268435456": {
+          "name": "EFFECT_28 (master)"
+        },
+        "536870912": {
+          "name": "EFFECT_29 (master)"
+        },
+        "1073741824": {
+          "name": "EFFECT_30 (master)"
+        },
+        "2147483648": {
+          "name": "EFFECT_31 (master)"
         }
       }
     },
@@ -296,6 +384,7 @@
       "name": "spell entry"
     }
   },
+
   {
     "id": 14,
     "name": "CONDITION_SOURCE_TYPE_GOSSIP_MENU",
@@ -321,6 +410,7 @@
       "description": "gossip_menu.text_id"
     }
   },
+
   {
     "id": 15,
     "name": "CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION",
@@ -346,6 +436,7 @@
       "description": "gossip_menu_option.id"
     }
   },
+
   {
     "id": 16,
     "name": "CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE",
@@ -366,6 +457,7 @@
       "description": "Must be vehicle"
     }
   },
+
   {
     "id": 17,
     "name": "CONDITION_SOURCE_TYPE_SPELL",
@@ -385,6 +477,7 @@
       "name": "Spell entry"
     }
   },
+
   {
     "id": 18,
     "name": "CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT",
@@ -408,9 +501,10 @@
       "name": "Spell entry"
     }
   },
+
   {
     "id": 19,
-    "name": "CONDITION_SOURCE_TYPE_QUEST_ACCEPT",
+    "name": "CONDITION_SOURCE_TYPE_QUEST_AVAILABLE",
     "description": "Let player accept quest {entry}",
     "targets": {
       "0": {
@@ -423,21 +517,7 @@
       "name": "Quest entry"
     }
   },
-  {
-    "id": 20,
-    "name": "CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK",
-    "description": "Show quest {entry} mark",
-    "targets": {
-      "0": {
-        "description": "Player",
-        "comment": "Player"
-      }
-    },
-    "entry": {
-      "type": "QuestParameter",
-      "name": "Quest entry"
-    }
-  },
+
   {
     "id": 21,
     "name": "CONDITION_SOURCE_TYPE_VEHICLE_SPELL",
@@ -461,6 +541,7 @@
       "name": "Spell entry"
     }
   },
+
   {
     "id": 22,
     "name": "CONDITION_SOURCE_TYPE_SMART_EVENT",
@@ -474,6 +555,7 @@
       }
     }
   },
+
   {
     "id": 23,
     "name": "CONDITION_SOURCE_TYPE_NPC_VENDOR",
@@ -482,6 +564,10 @@
       "0": {
         "description": "Player",
         "comment": "Player"
+      },
+      "1": {
+        "description": "Vendor",
+        "comment": "Vendor"
       }
     },
     "group": {
@@ -495,7 +581,6 @@
       "description": "npc_vendor.item"
     }
   },
-
 
   {
     "id": 24,
@@ -517,6 +602,7 @@
       "description": "Spell ID of aura which triggers the proc"
     }
   },
+
   {
     "id": 25,
     "name": "CONDITION_SOURCE_TYPE_TERRAIN_SWAP",
@@ -532,6 +618,7 @@
       "name": "Terrain swap"
     }
   },
+
   {
     "id": 26,
     "name": "CONDITION_SOURCE_TYPE_PHASE",
@@ -551,8 +638,7 @@
       "name": "Zone/Area"
     }
   },
-  
-  
+
   {
     "id": 27,
     "name": "CONDITION_SOURCE_TYPE_GRAVEYARD",
@@ -564,13 +650,13 @@
       }
     },
     "group": {
-      "type": "Parameter",
-      "name": "Group",
+      "type": "ZoneAreaParameter",
+      "name": "Zone",
       "description": ""
     },
     "entry": {
       "type": "Parameter",
-      "name": "Entry",
+      "name": "Graveyard id",
       "description": ""
     }
   },
@@ -591,7 +677,7 @@
     },
     "entry": {
       "type": "BoolParameter",
-      "name": "Serverside?"
+      "name": "Is Custom"
     }
   },
 
@@ -662,8 +748,24 @@
       "name": "Entry"
     },
     "group": {
-      "type": "Parameter",
-      "name": "Object type"
+      "type": "SwitchParameter",
+      "name": "Object type",
+      "values": {
+        "0": {"name": "TYPEID_OBJECT"},
+        "1": {"name": "TYPEID_ITEM"},
+        "2": {"name": "TYPEID_CONTAINER"},
+        "3": {"name": "TYPEID_AZERITE_EMPOWERED_ITEM"},
+        "4": {"name": "TYPEID_AZERITE_ITEM"},
+        "5": {"name": "TYPEID_UNIT"},
+        "6": {"name": "TYPEID_PLAYER"},
+        "7": {"name": "TYPEID_ACTIVE_PLAYER"},
+        "8": {"name": "TYPEID_GAMEOBJECT"},
+        "9": {"name": "TYPEID_DYNAMICOBJECT"},
+        "10": {"name": "TYPEID_CORPSE"},
+        "11": {"name": "TYPEID_AREATRIGGER"},
+        "12": {"name": "TYPEID_SCENEOBJECT"},
+        "13": {"name": "TYPEID_CONVERSATION"}
+      }
     }
   },
 
@@ -680,6 +782,22 @@
     "entry": {
       "type": "Parameter",
       "name": "Spawn group id"
+    }
+  },
+
+  {
+    "id": 34,
+    "name": "CONDITION_SOURCE_TYPE_PLAYER_CONDITION",
+    "description": "Define serverside player condition {entry}",
+    "targets": {
+      "0": {
+        "description": "Object",
+        "comment": "Object"
+      }
+    },
+    "entry": {
+      "type": "Parameter",
+      "name": "Player condition id"
     }
   }
 ]

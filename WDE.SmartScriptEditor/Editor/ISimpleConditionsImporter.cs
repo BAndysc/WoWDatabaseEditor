@@ -6,6 +6,6 @@ namespace WDE.SmartScriptEditor.Editor;
 
 public interface ISimpleConditionsImporter
 {
-    Dictionary<int, List<SmartCondition>> ImportConditions(SmartScriptBase script, IReadOnlyList<IConditionLine>? conditions);
+    Dictionary<long, List<SmartCondition>> ImportConditions(SmartScriptBase script, IReadOnlyList<IConditionLine>? conditions);
     List<SmartCondition> ImportConditions(SmartScriptBase script, IReadOnlyList<ICondition> conditions);
 }

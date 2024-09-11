@@ -23,7 +23,7 @@ namespace WDE.Common.Database
         Task<ICreatureTemplate?> GetCreatureTemplate(uint entry);
 
         Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry);
-        
+
         Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry);
 
         Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry);
@@ -44,7 +44,7 @@ namespace WDE.Common.Database
 
         Task<IReadOnlyList<IBroadcastText>> GetBroadcastTextsAsync();
         Task<IReadOnlyList<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry);
-        
+
         Task<IReadOnlyList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList);
         Task<IReadOnlyList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type);
 
@@ -52,7 +52,7 @@ namespace WDE.Common.Database
 
         Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(ConditionKeyMask keyMask, ConditionKey manualKey);
         Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(ConditionKeyMask keyMask, ICollection<ConditionKey> manualKeys);
-        
+
         Task<IReadOnlyList<ISpellScriptName>> GetSpellScriptNames(int spellId);
 
         Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType);
@@ -100,12 +100,12 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
         Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId);
         Task<IReadOnlyList<ISceneTemplate>?> GetSceneTemplatesAsync();
-        
+
         Task<IPhaseName?> GetPhaseNameAsync(uint phaseId);
         Task<IReadOnlyList<IPhaseName>?> GetPhaseNamesAsync();
 
         Task<IReadOnlyList<INpcSpellClickSpell>> GetNpcSpellClickSpells(uint creatureId);
-        
+
         Task<IReadOnlyList<ICreatureAddon>> GetCreatureAddons();
         Task<IReadOnlyList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
         Task<IReadOnlyList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates();
@@ -127,12 +127,12 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<IMangosCreatureMovement>?> GetMangosCreatureMovement(uint guid);
         Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId);
         Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId);
-            
+
         Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type, uint entry);
         Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type);
         Task<ILootTemplateName?> GetLootTemplateName(LootSourceType type, uint entry);
         Task<IReadOnlyList<ILootTemplateName>> GetLootTemplateName(LootSourceType type);
-        
+
         Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureLootCrossReference(uint lootId);
         Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureSkinningLootCrossReference(uint lootId);
         Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId);
@@ -141,11 +141,11 @@ namespace WDE.Common.Database
 
         Task<IReadOnlyList<IConversationActor>> GetConversationActors();
         Task<IReadOnlyList<IConversationActorTemplate>> GetConversationActorTemplates();
-        
+
         Task<ICreature?> GetCreatureByGuidAsync(uint entry, uint guid);
         Task<IReadOnlyList<ICoreCommandHelp>> GetCommands();
         Task<ICreatureModelInfo?> GetCreatureModelInfo(uint displayId);
-        
+
         Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId);
         Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId);
 
@@ -159,7 +159,7 @@ namespace WDE.Common.Database
             Target,
             Source
         }
-        
+
         [Flags]
         public enum ConditionKeyMask
         {
@@ -173,11 +173,11 @@ namespace WDE.Common.Database
         public struct ConditionKey : IEquatable<ConditionKey>
         {
             public readonly int SourceType;
-            public readonly int? SourceGroup;
+            public readonly long? SourceGroup;
             public readonly int? SourceEntry;
             public readonly int? SourceId;
 
-            public ConditionKey(int sourceType, int? sourceGroup = null, int? sourceEntry = null, int? sourceId = null)
+            public ConditionKey(int sourceType, long? sourceGroup = null, int? sourceEntry = null, int? sourceId = null)
             {
                 SourceType = sourceType;
                 SourceGroup = sourceGroup;
@@ -185,7 +185,7 @@ namespace WDE.Common.Database
                 SourceId = sourceId;
             }
 
-            public ConditionKey WithGroup(int group)
+            public ConditionKey WithGroup(long group)
             {
                 return new ConditionKey(SourceType, group, SourceEntry, SourceId);
             }
@@ -207,7 +207,7 @@ namespace WDE.Common.Database
                     mask.HasFlagFast(ConditionKeyMask.SourceEntry) ? SourceEntry : null,
                     mask.HasFlagFast(ConditionKeyMask.SourceId) ? SourceId : null);
             }
-            
+
             public bool Equals(ConditionKey other)
             {
                 return SourceType == other.SourceType && SourceGroup == other.SourceGroup && SourceEntry == other.SourceEntry && SourceId == other.SourceId;
@@ -242,7 +242,7 @@ namespace WDE.Common.Database
         {
             return Task.FromResult<IReadOnlyList<IDbScriptRandomTemplate>?>(null);
         }
-        
+
         Task<ICreatureAiSummon?> GetCreatureAiSummon(uint entry);
 
         public enum RandomTemplateType
@@ -251,5 +251,5 @@ namespace WDE.Common.Database
             RelayScript = 1
         }
     }
-    
+
 }

@@ -28,8 +28,8 @@ namespace WDE.DatabaseEditors.Loaders
         private readonly IDatabaseProvider databaseProvider;
         private readonly IDatabaseTableModelGenerator tableModelGenerator;
         private readonly Dictionary<DatabaseTable, ICustomDatabaseTableSourcePostLoad> customPostLoadSources;
-        
-        public DatabaseTableDataProvider(ITableDefinitionProvider tableDefinitionProvider, 
+
+        public DatabaseTableDataProvider(ITableDefinitionProvider tableDefinitionProvider,
             IDatabaseQueryExecutor sqlExecutor,
             IMessageBoxService messageBoxService,
             IDatabaseProvider databaseProvider,
@@ -43,7 +43,7 @@ namespace WDE.DatabaseEditors.Loaders
             this.tableModelGenerator = tableModelGenerator;
             this.customPostLoadSources = customPostLoadSources.ToDictionary(x => x.Table, x => x);
         }
-        
+
         private (string query, List<ColumnFullName> selectedColumns) BuildSQLQueryForSingleRow(DatabaseTableDefinitionJson tableDefinitionJson, string? customWhere, long? offset, int? limit)
         {
             var tableName = tableDefinitionJson.TableName;
@@ -71,12 +71,12 @@ namespace WDE.DatabaseEditors.Loaders
                     return $"LEFT JOIN `{table.TableName}` ON " + string.Join(" AND ", where);
                 }));
             }
-            
+
             var where = string.IsNullOrEmpty(customWhere) ? "" : $"WHERE ({customWhere})";
             var query = $"SELECT {names} FROM `{tableDefinitionJson.TableName}` {joins} {where} ORDER BY {string.Join(", ", tableDefinitionJson.PrimaryKey.Select(x => $"`{x}`"))} ASC LIMIT {limit ?? 300} OFFSET {offset ?? 0}";
             return (query, columns.Select(c => c.DbColumnFullName).ToList());
         }
-        
+
         private (string query, List<ColumnFullName> selectedColumns) BuildSQLQueryFromTableDefinition(DatabaseTableDefinitionJson tableDefinitionJson, DatabaseKey[] entries)
         {
             var tableName = tableDefinitionJson.TableName;
@@ -105,11 +105,11 @@ namespace WDE.DatabaseEditors.Loaders
                     return $"LEFT JOIN `{table.TableName}` ON " + string.Join(" AND ", where);
                 }));
             }
-            
+
             var query = $"SELECT {names} FROM {tableDefinitionJson.TableName} {joins} WHERE `{tableName}`.`{tablePrimaryKey}` IN ({string.Join(", ", entries)});";
             return (query, columns.Select(c => c.DbColumnFullName).ToList());
         }
-        
+
         public async Task<long> GetCount(DatabaseTable tableName, string? customWhere, IEnumerable<DatabaseKey>? keys)
         {
             var definition = tableDefinitionProvider.GetDefinitionByTableName(tableName);
@@ -170,7 +170,7 @@ namespace WDE.DatabaseEditors.Loaders
                 }));
             }
         }
-        
+
         public async Task<IDatabaseTableData?> Load(DatabaseTable tableName, string? customWhere, long? offset, int? limit, DatabaseKey[]? keys)
         {
             var definition = tableDefinitionProvider.GetDefinitionByTableName(tableName);
@@ -211,17 +211,18 @@ namespace WDE.DatabaseEditors.Loaders
                     {
                         conditionsPerRowIndex = new IList<IConditionLine>[result.Rows];
 
-                        List<(int rowIndex, int? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
+                        List<(int rowIndex, long? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
                         var sourceGroupColumnIndex = definition.Condition.SourceGroupColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceGroupColumn.Name.ColumnName);
                         var sourceEntryColumnIndex = definition.Condition.SourceEntryColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceEntryColumn.Value.ColumnName);
                         var sourceIdColumnIndex = definition.Condition.SourceIdColumn == null ? null : (int?) result.ColumnIndex(definition.Condition.SourceIdColumn.Value.ColumnName);
                         foreach (var row in result)
                         {
-                            int? sourceGroup = null, sourceEntry = null, sourceId = null;
+                            long? sourceGroup = null;
+                            int? sourceEntry = null, sourceId = null;
 
                             if (sourceGroupColumnIndex.HasValue &&
-                                int.TryParse(result.Value(row, sourceGroupColumnIndex.Value)!.ToString(), out var groupInt))
-                                sourceGroup = definition.Condition.SourceGroupColumn!.Calculate(groupInt);
+                                int.TryParse(result.Value(row, sourceGroupColumnIndex.Value)!.ToString(), out var groupLong))
+                                sourceGroup = definition.Condition.SourceGroupColumn!.Calculate(groupLong);
 
                             if (sourceEntryColumnIndex.HasValue &&
                                 int.TryParse(result.Value(row, sourceEntryColumnIndex.Value)!.ToString(), out var entryInt))
@@ -234,15 +235,15 @@ namespace WDE.DatabaseEditors.Loaders
                             conditionsToLoad.Add((row, sourceGroup, sourceEntry, sourceId));
                             conditionsPerRowIndex[row] = new List<IConditionLine>();
                         }
-                        
-                        var allConditions = await databaseProvider.GetConditionsForAsync(keyMask, conditionsToLoad.Select(c => 
+
+                        var allConditions = await databaseProvider.GetConditionsForAsync(keyMask, conditionsToLoad.Select(c =>
                             new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, c.sourceGroup, c.sourceEntry, c.sourceId)).ToList());
-                        
-                        var groupedConditions = allConditions.GroupBy(line => (keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) ? (int?)line.SourceGroup : null,
+
+                        var groupedConditions = allConditions.GroupBy(line => (keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) ? (long?)line.SourceGroup : null,
                             keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry) ? (int?)line.SourceEntry : null,
                             keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId) ? (int?)line.SourceId : null))
                             .ToDictionary(key => key.Key, values => values.ToList());
-                        
+
                         foreach (var (rowIndex, sourceGroup, sourceEntry, sourceId) in conditionsToLoad)
                         {
                             if (groupedConditions.TryGetValue((sourceGroup, sourceEntry, sourceId), out var conditionList))
@@ -277,7 +278,7 @@ namespace WDE.DatabaseEditors.Loaders
                         .WithOkButton(false)
                         .Build());
                     return null;
-                }                
+                }
             }
             else if (keys != null && keys.Length > 0)
             {
@@ -297,16 +298,17 @@ namespace WDE.DatabaseEditors.Loaders
                     if (definition.Condition.SourceIdColumn != null)
                         fakeColumns.Add(definition.Condition.SourceIdColumn.Value);
                     columns = fakeColumns;
-                    
+
                     foreach (var key in keys)
                     {
                         Debug.Assert(key.Count == 1, "todo?");
-                        int? sourceGroup = null, sourceEntry = null, sourceId = null;
+                        long? sourceGroup = null;
+                        int? sourceEntry = null, sourceId = null;
                         if (definition.Condition.SourceGroupColumn != null &&
                             definition.TablePrimaryKeyColumnName == definition.Condition.SourceGroupColumn.Name)
                         {
                             keyMask = IDatabaseProvider.ConditionKeyMask.SourceGroup;
-                            sourceGroup = definition.Condition.SourceGroupColumn.Calculate((int)key[0]);
+                            sourceGroup = definition.Condition.SourceGroupColumn.Calculate(key[0]);
                         }
 
                         if (definition.Condition.SourceEntryColumn != null &&
@@ -322,7 +324,7 @@ namespace WDE.DatabaseEditors.Loaders
                             keyMask = IDatabaseProvider.ConditionKeyMask.SourceId;
                             sourceId = (int)key[0];
                         }
-                        
+
                         IReadOnlyList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
                             new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, sourceGroup,
                                 sourceEntry, sourceId));
@@ -353,17 +355,18 @@ namespace WDE.DatabaseEditors.Loaders
                         if (result.Columns > 0 && definition.Condition != null)
                         {
                             conditionsPerRowIndex = new IList<IConditionLine>[result.Rows];
-                            List<(int rowIndex, int? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
+                            List<(int rowIndex, long? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
                             var sourceGroupColumnIndex = definition.Condition.SourceGroupColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceGroupColumn.Name.ColumnName);
                             var sourceEntryColumnIndex = definition.Condition.SourceEntryColumn == null ? null : (int?)result.ColumnIndex(definition.Condition.SourceEntryColumn.Value.ColumnName);
                             var sourceIdColumnIndex = definition.Condition.SourceIdColumn == null ? null : (int?) result.ColumnIndex(definition.Condition.SourceIdColumn.Value.ColumnName);
                             foreach (var rowIndex in result)
                             {
-                                int? sourceGroup = null, sourceEntry = null, sourceId = null;
+                                long? sourceGroup = null;
+                                int? sourceEntry = null, sourceId = null;
 
                                 if (sourceGroupColumnIndex.HasValue &&
-                                    int.TryParse(result.Value(rowIndex, sourceGroupColumnIndex.Value)!.ToString(), out var groupInt))
-                                    sourceGroup = definition.Condition.SourceGroupColumn!.Calculate(groupInt);
+                                    int.TryParse(result.Value(rowIndex, sourceGroupColumnIndex.Value)!.ToString(), out var groupLong))
+                                    sourceGroup = definition.Condition.SourceGroupColumn!.Calculate(groupLong);
 
                                 if (sourceEntryColumnIndex.HasValue &&
                                     int.TryParse(result.Value(rowIndex, sourceEntryColumnIndex.Value)!.ToString(), out var entryInt))
@@ -376,15 +379,15 @@ namespace WDE.DatabaseEditors.Loaders
                                 conditionsToLoad.Add((rowIndex, sourceGroup, sourceEntry, sourceId));
                                 conditionsPerRowIndex[rowIndex] = new List<IConditionLine>();
                             }
-                            
-                            var allConditions = await databaseProvider.GetConditionsForAsync(keyMask, conditionsToLoad.Select(c => 
+
+                            var allConditions = await databaseProvider.GetConditionsForAsync(keyMask, conditionsToLoad.Select(c =>
                                 new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, c.sourceGroup, c.sourceEntry, c.sourceId)).ToList());
-                        
-                            var groupedConditions = allConditions.GroupBy(line => (keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) ? (int?)line.SourceGroup : null,
+
+                            var groupedConditions = allConditions.GroupBy(line => (keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) ? (long?)line.SourceGroup : null,
                                     keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry) ? (int?)line.SourceEntry : null,
                                     keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId) ? (int?)line.SourceId : null))
                                 .ToDictionary(key => key.Key, values => values.ToList());
-                        
+
                             foreach (var (rowIndex, sourceGroup, sourceEntry, sourceId) in conditionsToLoad)
                             {
                                 if (groupedConditions.TryGetValue((sourceGroup, sourceEntry, sourceId), out var conditionList))
@@ -406,7 +409,7 @@ namespace WDE.DatabaseEditors.Loaders
                             .WithOkButton(false)
                             .Build());
                         return null;
-                    }   
+                    }
                 }
             }
 
@@ -427,7 +430,7 @@ namespace WDE.DatabaseEditors.Loaders
             private readonly string? entry;
             private readonly string? id;
             private readonly List<string> columns;
-            private List<(int col1, int col2, int col3)> rows = new();
+            private List<(long col1, int col2, int col3)> rows = new();
             private List<IList<IConditionLine>> conditions = new();
 
             public ConditionsOnlyDatabaseSource(string? group, string? entry, string? id)
@@ -483,9 +486,9 @@ namespace WDE.DatabaseEditors.Loaders
 
             public int ColumnIndex(string columnName) => columns.IndexOf(columnName);
 
-            public void Add(int sourceGroup, int sourceEntry, int sourceId, List<IConditionLine> conditions)
+            public void Add(long sourceGroup, int sourceEntry, int sourceId, List<IConditionLine> conditions)
             {
-                Span<int> columns = stackalloc int[3];
+                Span<long> columns = stackalloc long[3];
                 this.conditions.Add(conditions);
                 int i = 0;
                 if (group != null)
@@ -494,7 +497,7 @@ namespace WDE.DatabaseEditors.Loaders
                     columns[i++] = sourceEntry;
                 if (id != null)
                     columns[i++] = sourceId;
-                rows.Add((columns[0], columns[1], columns[2]));
+                rows.Add((columns[0], (int)columns[1], (int)columns[2]));
             }
 
             public IList<IConditionLine>[] Conditions => conditions.ToArray();
