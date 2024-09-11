@@ -1,7 +1,7 @@
 {
   "id": "spell_implicit_target",
   "compatibility": [
-    "TrinityWrath", "Azeroth", "TrinityCata"
+    "TrinityMaster"
   ],
   "name": "Spell Implicit Target conditions",
   "single_solution_name": "{name} implicit target",
@@ -45,7 +45,7 @@
         {
           "name": "Spell effect",
           "db_column_name": "spell_effect",
-          "value_type": "SpellEffectMaskNo0Parameter",
+          "value_type": "SpellEffectMasterMaskNo0Parameter",
           "default": 7
         },
         {

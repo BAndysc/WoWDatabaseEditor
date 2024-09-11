@@ -9,12 +9,12 @@ namespace WDE.SmartScriptEditor.Editor;
 [SingleInstance]
 public class SimpleConditionsImporter : ISimpleConditionsImporter
 {
-    public Dictionary<int, List<SmartCondition>> ImportConditions(SmartScriptBase script, IReadOnlyList<IConditionLine>? conditions)
+    public Dictionary<long, List<SmartCondition>> ImportConditions(SmartScriptBase script, IReadOnlyList<IConditionLine>? conditions)
     {
-        Dictionary<int, List<SmartCondition>> conds = new();
+        Dictionary<long, List<SmartCondition>> conds = new();
         if (conditions != null)
         {
-            Dictionary<int, int> prevElseGroupPerLine = new();
+            Dictionary<long, int> prevElseGroupPerLine = new();
             foreach (IConditionLine line in conditions)
             {
                 SmartCondition? condition = script.SafeConditionFactory(line);
@@ -27,7 +27,7 @@ public class SimpleConditionsImporter : ISimpleConditionsImporter
 
                 if (!prevElseGroupPerLine.TryGetValue(line.SourceGroup - 1, out var prevElseGroup))
                     prevElseGroup = prevElseGroupPerLine[line.SourceGroup - 1] = 0;
-                
+
                 if (prevElseGroup != line.ElseGroup && conds[line.SourceGroup - 1].Count > 0)
                 {
                     var or = script.SafeConditionFactory(-1);
@@ -37,7 +37,7 @@ public class SimpleConditionsImporter : ISimpleConditionsImporter
                 }
 
                 conds[line.SourceGroup - 1].Add(condition);
-            }   
+            }
         }
 
         return conds;
@@ -53,7 +53,7 @@ public class SimpleConditionsImporter : ISimpleConditionsImporter
 
             if (condition == null)
                 continue;
-            
+
             if (prevElseGroup != line.ElseGroup && conds.Count > 0)
             {
                 var or = script.SafeConditionFactory(-1);

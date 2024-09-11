@@ -54,7 +54,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 this.customQueryGenerators[gen.TableName] = gen;
             }
         }
-        
+
         public IQuery GenerateQuery(IReadOnlyList<DatabaseKey> keys, IReadOnlyList<DatabaseKey>? deletedKeys, IDatabaseTableData tableData)
         {
             if (customQueryGenerators.TryGetValue(tableData.TableDefinition.Id, out var customQueryGenerator))
@@ -70,17 +70,17 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 return GenerateSingleRecordQuery(keys, deletedKeys, tableData);
             return GenerateUpdateQuery(tableData);
         }
-        
+
         public IQuery GenerateSingleRecordQuery(IReadOnlyList<DatabaseKey> keys, IReadOnlyList<DatabaseKey>? deletedKeys, IDatabaseTableData tableData)
         {
             var query = Queries.BeginTransaction(tableData.TableDefinition.DataDatabaseType);
 
             // delete
             GeneratePrimaryKeyDeletion(tableData.TableDefinition, deletedKeys, query);
-            
+
             //insert
             query.Add(GenerateInsertQuery(tableData.Entities.Where(e => !e.ExistInDatabase).Select(e => e.GenerateKey(tableData.TableDefinition)).ToList(), tableData));
-            
+
             //update
             foreach (var entity in tableData.Entities)
             {
@@ -92,7 +92,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             {
                 query.Add(appender.Generate(keys, deletedKeys, tableData));
             }
-            
+
             return query.Close();
         }
 
@@ -114,7 +114,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 return where;
             }
         }
-        
+
         private static IWhere GenerateWherePrimaryKey(DatabaseTableDefinitionJson definition, ITable table, DatabaseKey key)
         {
             return GenerateWherePrimaryKey(definition.GroupByKeys, table, key);
@@ -145,7 +145,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     }
                 }
             }
-            
+
             table = query.Table(definition.Id);
             if (keys.Count > 1 && keys[0].Count == 1)
             {
@@ -168,7 +168,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
         public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity) =>
             GenerateDeleteQuery(table, entity.GenerateKey(table));
-        
+
         public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, DatabaseKey key)
         {
             var query = Queries.BeginTransaction(table.DataDatabaseType);
@@ -202,17 +202,17 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 if (ReferenceEquals(null, x)) return -1;
 
                 var sortByList = definition.SortBy ?? definition.PrimaryKey;
-                
+
                 if (sortByList == null || sortByList.Count == 0)
                     return 0;
 
                 foreach (var sortBy in sortByList)
                 {
                     var comparisonResult = x.GetCell(sortBy)?.CompareTo(y.GetCell(sortBy)) ?? 0;
-                    if (comparisonResult != 0) 
+                    if (comparisonResult != 0)
                         return comparisonResult;
                 }
-                
+
                 var existInDatabaseComparison = x.ExistInDatabase.CompareTo(y.ExistInDatabase);
                 if (existInDatabaseComparison != 0) return existInDatabaseComparison;
                 return x.Phantom || y.Phantom ? 0 : x.Key.CompareTo(y.Key);
@@ -225,9 +225,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 return Queries.Empty(tableData.TableDefinition.DataDatabaseType);
 
             IMultiQuery query = Queries.BeginTransaction(tableData.TableDefinition.DataDatabaseType);
-            
+
             query.Add(GenerateDeleteQuery(tableData.TableDefinition, keys));
-            
+
             if (tableData.Entities.Count == 0)
                 return query.Close();
 
@@ -239,14 +239,14 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
             HashSet<HashedEntityPrimaryKey> entityKeys = new();
             Dictionary<DatabaseTable, List<Dictionary<string, object?>>> inserts = new(tableData.Entities.Count);
-            
+
             List<string> duplicates = new List<string>();
             var comparer = new EntityComparer(tableData.TableDefinition);
             foreach (var entity in tableData.Entities.OrderBy(t => t, comparer))
             {
                 if (!entity.Phantom && !keys.Contains(entity.Key))
                     continue;
-                
+
                 bool duplicate = tableData.TableDefinition.PrimaryKey != null && !entityKeys.Add(new HashedEntityPrimaryKey(entity, tableData.TableDefinition));
                 foreach (var table in columns)
                 {
@@ -308,7 +308,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             foreach (var i in inserts)
             {
                 query.Table(i.Key)
-                    .BulkInsert(i.Value);   
+                    .BulkInsert(i.Value);
             }
 
             if (duplicates.Count > 0)
@@ -327,7 +327,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
         {
             if (tableData.TableDefinition.Condition == null)
                 return Queries.Empty(tableData.TableDefinition.DataDatabaseType);
-            
+
             IMultiQuery query = Queries.BeginTransaction(tableData.TableDefinition.DataDatabaseType);
 
             if (tableData.TableDefinition.RecordMode == RecordMode.SingleRow)
@@ -346,7 +346,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 if (entity.Conditions == null)
                     continue;
 
-                int sourceGroup = 0;
+                long sourceGroup = 0;
                 int sourceEntry = 0;
                 int sourceId = 0;
 
@@ -358,7 +358,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
                     entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn.Name) is DatabaseField<long>
                         groupCell)
-                    sourceGroup = tableData.TableDefinition.Condition.SourceGroupColumn.Calculate((int)groupCell.Current.Value);
+                    sourceGroup = tableData.TableDefinition.Condition.SourceGroupColumn.Calculate(groupCell.Current.Value);
 
                 if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
                     entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn.Value) is DatabaseField<long>
@@ -385,7 +385,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 if (entity.Conditions == null)
                     continue;
 
-                int sourceGroup = 0;
+                long sourceGroup = 0;
                 int sourceEntry = 0;
                 int sourceId = 0;
 
@@ -397,7 +397,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
                     entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn.Name) is DatabaseField<long>
                         groupCell)
-                    sourceGroup = tableData.TableDefinition.Condition.SourceGroupColumn.Calculate((int)groupCell.Current.Value);
+                    sourceGroup = tableData.TableDefinition.Condition.SourceGroupColumn.Calculate(groupCell.Current.Value);
 
                 if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
                     entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn.Value) is DatabaseField<long>
@@ -420,7 +420,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 return Queries.Empty(tableData.TableDefinition.DataDatabaseType);
 
             Debug.Assert(keys[0].Count == 1);
-            
+
             string? columnKey = null;
 
             bool doAbs = false;
@@ -506,13 +506,13 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     {
                         var foreignKey = new ColumnFullName(foreign.TableName, foreign.ForeignKeys[index].ColumnName);
                         var thisKey = definition.PrimaryKey![index];
-                        
+
                         fieldsByTable[new DatabaseTable(definition.DataDatabaseType, foreign.TableName)].Insert(0,
                             new DatabaseField<long>(foreignKey, new ValueHolder<long>(entity.GetTypedValueOrThrow<long>(thisKey), false)));
                     }
                 }
             }
-            
+
             if (entity.ExistInDatabase)
             {
                 foreach (var table in fieldsByTable)
@@ -523,7 +523,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     var updates = table.Value
                         .Where(f => f.IsModified)
                         .ToList();
-                    
+
                     IList<ColumnFullName> groupByKeys = definition.GroupByKeys;
                     string? autoFillBuildColumn = definition.AutofillBuildColumn;
                     if (table.Key != definition.Id)
@@ -549,7 +549,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
                     if (autoFillBuildColumn != null)
                         update = update.Set(autoFillBuildColumn, currentCoreVersion.Current.Version.Build);
-                    
+
                     update.Update();
                 }
 
@@ -611,11 +611,11 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
             return query.Close();
         }
-        
+
         private IQuery GenerateUpdateQuery(IDatabaseTableData tableData)
         {
             IMultiQuery query = Queries.BeginTransaction(tableData.TableDefinition.DataDatabaseType);
-            
+
             foreach (var entity in tableData.Entities)
             {
                 query.Add(GenerateUpdateQuery(tableData.TableDefinition, entity));
@@ -630,7 +630,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             if (tableName == definition.Id)
             {
                 return GenerateWherePrimaryKey(definition, table, entity.GenerateKey(definition));
-            } 
+            }
             else
             {
                 var foreignKeys = definition.ForeignTableByName![tableName.Table].ForeignKeys;
@@ -639,7 +639,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     .Where(row =>
                         row.Column<uint>(foreignKeys[0].ColumnName) ==
                         (uint)entity.GetTypedValueOrThrow<long>(definition.PrimaryKey![0]));
-                            
+
                 for (int i = 1; i < foreignKeys.Length; ++i)
                 {
                     var foreignKey = foreignKeys[i];

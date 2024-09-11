@@ -60,17 +60,17 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public override ICommand Cut { get; }
 
         [Notify] private string searchText = "";
-        
-        [AlsoNotify(nameof(FocusedEntity))] 
-        [AlsoNotify(nameof(SelectedRow))] 
+
+        [AlsoNotify(nameof(FocusedEntity))]
+        [AlsoNotify(nameof(SelectedRow))]
         [AlsoNotify(nameof(FocusedCell))]
         [Notify] private VerticalCursor focusedRowIndex = VerticalCursor.None;
-        
+
         [AlsoNotify(nameof(FocusedCell))]
         [Notify] private int focusedCellIndex = -1;
         public DatabaseCellViewModel? FocusedCell => SelectedRow != null && focusedCellIndex >= 0 && focusedCellIndex < SelectedRow.Cells.Count ? SelectedRow.Cells[focusedCellIndex] : null;
         public ITableMultiSelection MultiSelection { get; } = new TableMultiSelection();
-        
+
         public DatabaseEntityViewModel? SelectedRow
         {
             get => focusedRowIndex.GroupIndex >= 0 && focusedRowIndex.GroupIndex < Rows.Count &&
@@ -95,7 +95,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             {
                 if (value && splitMode == MultiRowSplitMode.Horizontal)
                     return;
-                
+
                 splitMode = value ? MultiRowSplitMode.Horizontal : (splitMode == MultiRowSplitMode.Horizontal ? MultiRowSplitMode.None : splitMode);
                 editorSettings.MultiRowSplitMode = splitMode;
                 RaisePropertyChanged(nameof(SplitHorizontal));
@@ -110,7 +110,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             {
                 if (value && splitMode == MultiRowSplitMode.Vertical)
                     return;
-                
+
                 splitMode = value ? MultiRowSplitMode.Vertical : (splitMode == MultiRowSplitMode.Vertical ? MultiRowSplitMode.None : splitMode);
                 editorSettings.MultiRowSplitMode = splitMode;
                 RaisePropertyChanged(nameof(SplitHorizontal));
@@ -151,7 +151,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public MultiRowDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
-            IEventAggregator eventAggregator, ISolutionManager solutionManager, 
+            IEventAggregator eventAggregator, ISolutionManager solutionManager,
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             ISolutionItemNameRegistry solutionItemName, IDatabaseQueryExecutor mySqlExecutor,
             IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator,
@@ -165,9 +165,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IClipboardService clipboardService,
             ITextEntitySerializer serializer,
             ICommentGeneratorService commentGeneratorService,
-            DocumentMode mode = DocumentMode.Editor) 
-            : base(history, solutionItem, solutionItemName, 
-            solutionManager, solutionTasksService, eventAggregator, 
+            DocumentMode mode = DocumentMode.Editor)
+            : base(history, solutionItem, solutionItemName,
+            solutionManager, solutionTasksService, eventAggregator,
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService, commandService,
             parameterPickerService, statusBar, mySqlExecutor)
@@ -379,10 +379,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             {
                 if (Rows.Count == 0)
                     return;
-                
+
                 var groupIndex = focusedRowIndex.GroupIndex < 0 || focusedRowIndex.GroupIndex >= Rows.Count ? 0 : focusedRowIndex.GroupIndex;
                 var rowsInGroup = Rows[groupIndex].Count;
-                
+
                 MultiSelection.Clear();
                 for (var row = 0; row < rowsInGroup; row++)
                     MultiSelection.Add(new VerticalCursor(groupIndex, row));
@@ -395,7 +395,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             KeyBindings.Add(new CommandKeyBinding(SelectAllCommand, "Cmd+A"));
             KeyBindings.Add(new CommandKeyBinding(cutRowsCommand, "Ctrl+X"));
             KeyBindings.Add(new CommandKeyBinding(cutRowsCommand, "Cmd+X"));
-            
+
             Debug.Assert(tableDefinition.GroupByKeys.Count == 1);
 
             ScheduleLoading();
@@ -407,7 +407,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             if (autoIncrementColumn != null)
             {
                 long max = 0;
-                
+
                 if (byEntryGroups[key].Count > 0)
                     max = 1 + byEntryGroups[key].Max(t =>
                     {
@@ -415,7 +415,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                             return lField.Current.Value;
                         return 0L;
                     });
-                
+
                 if (freshEntity.GetCell(autoIncrementColumn.DbColumnFullName) is DatabaseField<long> lField)
                     lField.Current.Value = max;
             }
@@ -424,7 +424,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             ForceInsertEntity(freshEntity, index ?? elementsInGroup);
             return freshEntity;
         }
-        
+
         private void AddRowByGroup(DatabaseEntitiesGroupViewModel group)
         {
             AddRow(group.Key, null);
@@ -440,11 +440,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 await messageBoxService.SimpleDialog("Too many items", "Too many items", "You are trying to add too many items at once, sorry");
                 return;
             }
-            
+
             Debug.Assert(tableDefinition.GroupByKeys.Count == 1);
 
             var containedKeys = keys.Where(val => ContainsKey(new DatabaseKey(val))).ToList();
-            
+
             if (containedKeys.Count > 0)
             {
                 await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
@@ -455,7 +455,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     .SetIcon(MessageBoxIcon.Warning)
                     .Build());
             }
-            
+
             using var _ = BulkEdit("Load data");
             foreach (var keyValue in keys)
             {
@@ -463,9 +463,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
                 if (ContainsKey(key))
                     continue;
-            
+
                 var data = await tableDataProvider.Load(tableDefinition.Id, null, null,null, new[]{key});
-                if (data == null) 
+                if (data == null)
                     continue;
 
                 var group = new DatabaseEntitiesGroupViewModel(key, GenerateName(key[0]), () => GenerateNameAsync(key[0]));
@@ -482,13 +482,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     Rows.Insert(index, group);
                     entities.Insert(index, collection);
                 }));
-                AddEntities(data.Entities);   
+                AddEntities(data.Entities);
             }
         }
-        
+
         private void SetToNull(DatabaseCellViewModel? view)
         {
-            if (view != null && view.CanBeNull && !view.IsReadOnly) 
+            if (view != null && view.CanBeNull && !view.IsReadOnly)
                 view.ParameterValue?.SetNull();
         }
 
@@ -514,7 +514,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
             var key = new IDatabaseProvider.ConditionKey(tableDefinition.Condition.SourceType);
             if (tableDefinition.Condition.SourceGroupColumn is {} sourceGroup)
-                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceGroup.Name)));
+                key = key.WithGroup(sourceGroup.Calculate(view.ParentEntity.GetTypedValueOrThrow<long>(sourceGroup.Name)));
             if (tableDefinition.Condition.SourceEntryColumn is { } sourceEntry)
                 key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceEntry));
             if (tableDefinition.Condition.SourceIdColumn is { } sourceId)
@@ -532,12 +532,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     lf.Current.Value = view.ParentEntity.Conditions.Count > 0 ? 1 : 0;
             }
         }
-        
+
         private async Task Revert(DatabaseCellViewModel? view)
         {
             if (view == null || view.IsReadOnly)
                 return;
-            
+
             view.ParameterValue?.Revert();
         }
 
@@ -603,7 +603,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     .Subscribe(width =>
                     {
                         tablePersonalSettings.UpdateWidth(TableDefinition.Id, col.ColumnIdForUi, col.PreferredWidth ?? 100,  ((int)(width) / 5) * 5);
-                    }));   
+                    }));
             }
 
             foreach (var entity in solutionItem.Entries)
@@ -632,7 +632,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         {
             return ForceRemoveEntity(entity);
         }
-        
+
         public void RedoExecuteDelete(DatabaseEntity entity)
         {
             if (mySqlExecutor.IsConnected(tableDefinition))
@@ -649,7 +649,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 return false;
 
             var vm = byEntryGroups[entity.Key][indexOfEntity.index];
-                
+
             DoAction(new AnonymousHistoryAction("Remove row", () =>
             {
                 entities[indexOfEntity.group].Insert(indexOfEntity.index, entity);
@@ -659,9 +659,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 entities[indexOfEntity.group].RemoveAt(indexOfEntity.index);
                 var vm = byEntryGroups[entity.Key].GetAndRemove(entity);
                 if (SelectedRow == vm)
-                    FocusedRowIndex = VerticalCursor.None;    
+                    FocusedRowIndex = VerticalCursor.None;
             }));
-            
+
             return true;
         }
 
@@ -682,7 +682,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         {
             var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key[0]);
             var row = new DatabaseEntityViewModel(entity, name);
-            
+
             int columnIndex = 0;
             foreach (var column in columns)
             {
@@ -738,7 +738,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                         if (column.AutogenerateComment != null)
                         {
                             var autoGenComment = commentGeneratorService.GenerateAutoCommentOnly(entity, TableDefinition, column.DbColumnFullName);
-                            
+
                             stringParam.Current.Value = stringParam.Current.Value.GetCommentUnlessDefault(autoGenComment, column.CanBeNull);
                             stringParam.Original.Value = stringParam.Original.Value.GetCommentUnlessDefault(autoGenComment, column.CanBeNull);
                         }
@@ -761,9 +761,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             {
                 if (!byEntryGroups.TryGetValue(entity.Key, out var group))
                     return;
-                
+
                 var groupIndex = Rows.IndexOf(group);
-                
+
                 group.RemoveAt(index);
                 entities[groupIndex].RemoveAt(index);
             }, () =>
@@ -798,7 +798,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 AddEntity(entity, index);
             }
         }
-        
+
         protected override List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
         {
             return null; // because in multirow we always delete and reinsert all
@@ -842,10 +842,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                         compareResult = cellA.AsLongValue.CompareTo(cellB.AsLongValue);
                     else
                         compareResult = string.Compare(cellA.StringValue, cellB.StringValue, StringComparison.Ordinal);
-                    
+
                     if (compareResult != 0)
                         return compareResult;
-                    
+
                     // secondary column index, if exists, will be always long
                     if (secondarColumnIndex != -1)
                     {

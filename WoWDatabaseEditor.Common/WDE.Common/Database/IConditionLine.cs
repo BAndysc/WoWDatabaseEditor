@@ -36,7 +36,7 @@ namespace WDE.Common.Database
     {
         int SourceType { get; }
 
-        int SourceGroup { get; }
+        long SourceGroup { get; }
 
         int SourceEntry { get; }
 
@@ -49,7 +49,7 @@ namespace WDE.Common.Database
         {
             return condition.ConditionIndex > 0;
         }
-        
+
         public static bool IsActualCondition(this ICondition condition)
         {
             return !condition.IsParentCondition();
@@ -59,7 +59,7 @@ namespace WDE.Common.Database
         {
             return list?.Count(cond => cond.IsActualCondition()) ?? 0;
         }
-        
+
         public static long GetConditionValue(this ICondition line, int i)
         {
             switch (i)
@@ -72,7 +72,7 @@ namespace WDE.Common.Database
 
             throw new ArgumentOutOfRangeException();
         }
-        
+
         public static string GetConditionValueString(this ICondition line, int i)
         {
             switch (i)
@@ -83,7 +83,7 @@ namespace WDE.Common.Database
             throw new ArgumentOutOfRangeException();
         }
     }
-    
+
     // KEEP IT POCO!
     [Equatable] // keep equatable only for primary key columns
     public partial class AbstractConditionLine : IConditionLine
@@ -109,11 +109,11 @@ namespace WDE.Common.Database
             NegativeCondition = line.NegativeCondition;
             Comment = line.Comment;
         }
-        
-        public AbstractConditionLine(IDatabaseProvider.ConditionKey key, ICondition condition) 
+
+        public AbstractConditionLine(IDatabaseProvider.ConditionKey key, ICondition condition)
             : this(key.SourceType, key.SourceGroup ?? 0, key.SourceEntry ?? 0, key.SourceId ?? 0, condition) {}
 
-        public AbstractConditionLine(int sourceType, int sourceGroup, int sourceEntry, int sourceId, ICondition condition)
+        public AbstractConditionLine(int sourceType, long sourceGroup, int sourceEntry, int sourceId, ICondition condition)
         {
             SourceType = sourceType;
             SourceGroup = sourceGroup;
@@ -137,7 +137,7 @@ namespace WDE.Common.Database
         public int SourceType { get; init; }
 
         [DefaultEquality]
-        public int SourceGroup { get; init; }
+        public long SourceGroup { get; init; }
 
         [DefaultEquality]
         public int SourceEntry { get; init; }
@@ -181,7 +181,7 @@ namespace WDE.Common.Database
         [IgnoreEquality]
         public string? Comment { get; init; }
     }
-    
+
     // KEEP it POCO
     [Equatable] // keep equatable for primary key columns only
     public partial class AbstractCondition : ICondition
@@ -203,11 +203,11 @@ namespace WDE.Common.Database
             NegativeCondition = line.NegativeCondition;
             Comment = line.Comment;
         }
-        
+
         [DefaultEquality] public int ElseGroup { get; init; }
-        
+
         [DefaultEquality] public int ConditionIndex { get; init; }
-        
+
         [DefaultEquality] public int ConditionParent { get; init; }
 
         [DefaultEquality] public int ConditionType { get; init; }
@@ -219,7 +219,7 @@ namespace WDE.Common.Database
         [DefaultEquality] public long ConditionValue2 { get; init; }
 
         [DefaultEquality] public long ConditionValue3 { get; init; }
-        
+
         [DefaultEquality] public long ConditionValue4 { get; init; }
 
         [DefaultEquality] public string ConditionStringValue1 { get; init; } = "";

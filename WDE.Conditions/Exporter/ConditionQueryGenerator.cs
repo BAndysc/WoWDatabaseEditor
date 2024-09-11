@@ -16,12 +16,12 @@ namespace WDE.Conditions.Exporter
         {
             this.currentCoreVersion = currentCoreVersion;
         }
-        
+
         public IQuery BuildDeleteQuery(IDatabaseProvider.ConditionKey key)
         {
             return Queries.Table(DatabaseTable.WorldTable("conditions"))
                 .Where(row => row.Column<int>("SourceTypeOrReferenceId") == key.SourceType &&
-                              (!key.SourceGroup.HasValue || row.Column<int>("SourceGroup") == key.SourceGroup.Value) &&
+                              (!key.SourceGroup.HasValue || row.Column<long>("SourceGroup") == key.SourceGroup.Value) &&
                               (!key.SourceEntry.HasValue || row.Column<int>("SourceEntry") == key.SourceEntry.Value) &&
                               (!key.SourceId.HasValue || row.Column<int>("SourceId") == key.SourceId.Value))
                 .Delete();

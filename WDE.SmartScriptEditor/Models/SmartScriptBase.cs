@@ -25,16 +25,16 @@ namespace WDE.SmartScriptEditor.Models
         private readonly ISmartScriptImporter importer;
 
         public readonly ObservableCollection<SmartEvent> Events;
-        
+
         private readonly SmartSelectionHelper selectionHelper;
-        
+
         public abstract SmartScriptType SourceType { get; }
         public event Action? ScriptSelectedChanged;
         public event Action<SmartEvent?, SmartAction?, EventChangedMask>? EventChanged;
         public event Action? InvalidateVisual;
-        
-        public ObservableCollection<object> AllSmartObjectsFlat { get; } 
-        
+
+        public ObservableCollection<object> AllSmartObjectsFlat { get; }
+
         public ObservableCollection<SmartAction> AllActions { get; }
 
         public ObservableCollection<GlobalVariable> GlobalVariables { get; } = new();
@@ -46,16 +46,16 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartGenericJsonData GetEventData(SmartEvent e) =>
             smartDataManager.GetRawData(SmartType.SmartEvent, e.Id);
-        
+
         public SmartGenericJsonData? TryGetEventData(SmartEvent e) =>
             smartDataManager.Contains(SmartType.SmartEvent, e.Id) ? smartDataManager.GetRawData(SmartType.SmartEvent, e.Id) : null;
-        
+
         public SmartGenericJsonData? TryGetSourceData(SmartSource s) =>
             smartDataManager.Contains(SmartType.SmartSource, s.Id) ? smartDataManager.GetRawData(SmartType.SmartSource, s.Id) : null;
-        
+
         public SmartGenericJsonData? TryGetTargetData(SmartTarget t) =>
             smartDataManager.Contains(SmartType.SmartTarget, t.Id) ? smartDataManager.GetRawData(SmartType.SmartTarget, t.Id) : null;
-        
+
         public SmartScriptBase(ISmartFactory smartFactory,
             IEditorFeatures editorFeatures,
             ISmartDataManager smartDataManager,
@@ -77,7 +77,7 @@ namespace WDE.SmartScriptEditor.Models
             };
             AllSmartObjectsFlat = selectionHelper.AllSmartObjectsFlat;
             AllActions = selectionHelper.AllActions;
-            
+
             Events.ToStream(false)
                 .Subscribe((e) =>
                 {
@@ -99,7 +99,7 @@ namespace WDE.SmartScriptEditor.Models
                     else if (e.Type == CollectionEventType.Remove)
                     {
                         e.Item.Parent = null;
-                        e.Item.Group = null; 
+                        e.Item.Group = null;
                         if (e.Item.IsGroup)
                         {
                             RegroupAllEvents();
@@ -195,7 +195,7 @@ namespace WDE.SmartScriptEditor.Models
                     eventId.Next();
                     continue;
                 }
-                
+
                 e.VirtualLineId = virtualLineId;
                 if (e.Actions.Count == 0)
                 {
@@ -212,15 +212,15 @@ namespace WDE.SmartScriptEditor.Models
                     {
                         a.IsInInlineActionList = inInlineActionList;
                         a.DestinationTimedActionListId = inlineActionListId;
-                        
+
                         if (a.ActionFlags.HasFlagFast(ActionFlags.DecreaseIndent) && indent > 0)
                             indent--;
-                        
+
                         a.Indent = indent;
-                        
+
                         if (a.ActionFlags.HasFlagFast(ActionFlags.IncreaseIndent))
                             indent++;
-                        
+
                         a.VirtualLineId = virtualLineId++;
                         if (a.Id == SmartConstants.ActionLink ||
                             a.Id == SmartConstants.ActionComment ||
@@ -285,14 +285,14 @@ namespace WDE.SmartScriptEditor.Models
 
             return TryGetEventGroup(indexOfEvent, out group, out endGroup);
         }
-        
+
         public bool TryGetEventGroup(int indexOfEvent, out SmartGroup group, out SmartEvent endGroup)
         {
             group = null!;
             endGroup = null!;
             if (indexOfEvent >= Events.Count)
                 return false;
-            
+
             while (indexOfEvent >= 0)
             {
                 if (Events[indexOfEvent].IsEndGroup)
@@ -341,7 +341,7 @@ namespace WDE.SmartScriptEditor.Models
         }
 
         public SmartGroup InsertGroupBegin(ref int index, string header, string? description, bool expanded)
-        {   
+        {
             var previousGroup = FindMatchingBackwards(index - 1, e => e.IsGroup);
             if (previousGroup != null && previousGroup.IsBeginGroup)
             {
@@ -349,7 +349,7 @@ namespace WDE.SmartScriptEditor.Models
                 if (InsertGroupEnd(index))
                     index++;
             }
-            
+
             var groupBegin = SmartEvent.NewBeginGroup();
             var groupBeginView = new SmartGroup(groupBegin);
             groupBeginView.Header = header;
@@ -364,7 +364,7 @@ namespace WDE.SmartScriptEditor.Models
             var previousGroup = FindMatchingBackwards(index - 1, e => e.IsGroup);
             if (previousGroup == null || previousGroup.IsEndGroup)
                 return false;
-            
+
             var groupEnd = SmartEvent.NewEndGroup();
             Events.Insert(index, groupEnd);
             return true;
@@ -377,7 +377,7 @@ namespace WDE.SmartScriptEditor.Models
             var prevIndex = 0;
             var conds = importer.ImportConditions(this, conditions?.ToList() ?? new List<IConditionLine>());
 
-            Dictionary<int, List<ICondition>>? targetConditions = null;
+            Dictionary<long, List<ICondition>>? targetConditions = null;
             if (targetConditionLines != null)
                 targetConditions = targetConditionLines.GroupBy(x => x.SourceGroup).ToDictionary(x => x.Key, x => x.ToList<ICondition>());
 
@@ -399,7 +399,7 @@ namespace WDE.SmartScriptEditor.Models
                     hasOpenedGroup = true;
                     continue;
                 }
-                
+
                 if (line.EventType == SmartConstants.EventGroupEnd &&
                     line.Comment.TryParseEndGroupComment())
                 {
@@ -408,20 +408,20 @@ namespace WDE.SmartScriptEditor.Models
                     hasOpenedGroup = false;
                     continue;
                 }
-                
+
                 if (currentEvent == null || prevIndex != line.Id)
                 {
                     prevIndex = line.Id;
                     currentEvent = SafeEventFactory(line);
                     if (currentEvent == null)
                         continue;
-                    
+
                     currentEvent.Parent = this;
                     Events.Insert(index++, currentEvent);
                     newEvents.Add(currentEvent);
                     if (conds.TryGetValue(prevIndex, out var conditionList))
                         foreach (var cond in conditionList)
-                            currentEvent.Conditions.Add(cond);   
+                            currentEvent.Conditions.Add(cond);
                 }
 
                 if (line.ActionType != -1)
@@ -432,17 +432,17 @@ namespace WDE.SmartScriptEditor.Models
                         action.Comment = line.Comment.Contains(" // ")
                             ? line.Comment.Substring(line.Comment.IndexOf(" // ") + 4).Trim()
                             : "";
-                        
+
                         if (targetConditions != null &&
                             line.SourceConditionId > 0 &&
                             targetConditions.TryGetValue(line.SourceConditionId, out var srcConditions))
                             action.Source.Conditions = srcConditions;
-                        
+
                         if (targetConditions != null &&
                             line.TargetConditionId > 0 &&
                             targetConditions.TryGetValue(line.TargetConditionId, out var targtConditions))
                             action.Target.Conditions = targtConditions;
-                        
+
                         currentEvent.AddAction(action);
                     }
                 }
@@ -471,7 +471,7 @@ namespace WDE.SmartScriptEditor.Models
                     .Build());
             }
         }
-        
+
         public SmartAction? SafeActionFactory(int actionId, SmartSource source, SmartTarget target)
         {
             try
@@ -490,7 +490,7 @@ namespace WDE.SmartScriptEditor.Models
 
             return null;
         }
-        
+
         public SmartAction? SafeActionFactory(ISmartScriptLine line)
         {
             try
@@ -509,7 +509,7 @@ namespace WDE.SmartScriptEditor.Models
 
             return null;
         }
-        
+
         public SmartCondition? SafeConditionFactory(ICondition line)
         {
             try
@@ -528,7 +528,7 @@ namespace WDE.SmartScriptEditor.Models
 
             return null;
         }
-        
+
         public SmartCondition? SafeConditionFactory(int id)
         {
             try
@@ -547,7 +547,7 @@ namespace WDE.SmartScriptEditor.Models
 
             return null;
         }
-        
+
         public SmartEvent? SafeEventFactory(ISmartScriptLine line)
         {
             try

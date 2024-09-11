@@ -14,7 +14,7 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "SourceGroup")]
         [PrimaryKey]
-        public int SourceGroup { get; set; }
+        public long SourceGroup { get; set; }
 
         [Column(Name = "SourceEntry")]
         [PrimaryKey]
@@ -51,7 +51,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "ConditionValue3")]
         [PrimaryKey]
         public long ConditionValue3 { get; set; }
-        
+
         public long ConditionValue4 { get; set; }
 
         public virtual string ConditionStringValue1 { get; set; } = "";

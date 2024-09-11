@@ -38,7 +38,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             this.editorFeatures = editorFeatures;
             this.simpleConditionsImporter = simpleConditionsImporter;
         }
-        
+
         private bool TryParseGlobalVariable(SmartScript script, ISmartScriptLine line)
         {
             if (line.EventType != SmartConstants.EventAiInitialize)
@@ -54,7 +54,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             return false;
         }
 
-        public Dictionary<int, List<SmartCondition>> ImportConditions(SmartScriptBase script, IReadOnlyList<IConditionLine> lines)
+        public Dictionary<long, List<SmartCondition>> ImportConditions(SmartScriptBase script, IReadOnlyList<IConditionLine> lines)
         {
             return simpleConditionsImporter.ImportConditions(script, lines);
         }
@@ -83,7 +83,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 .Where(pair => pair.Count() > 1)
                 .Select(pair => pair.Key)
                 .ToHashSet();
-            
+
             Dictionary<int, int>? linkToTriggerTimedEventId = null;
             if (doubleLinks.Count > 0)
             {
@@ -315,26 +315,26 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                         startPathToActionParent[a.GetParameter(0).Value] = e; // point id
                 }
             }
-            
+
             for (var index = script.Events.Count - 1; index >= 0; index--)
             {
                 var e = script.Events[index];
-                
+
                 if (e.Actions.Count == 0 || e.Actions[0].Id != SmartConstants.ActionBeginInlineActionList)
                     continue;
 
                 if (!startPathToActionParent.TryGetValue(e.GetParameter(1).Value, out var startPathEvent))
                     continue;
-                
+
                 if ((e.Id == SmartConstants.EventWaypointsEnded && e.GetParameter(0).Value == 0) ||
-                    (e.Id == SmartConstants.EventMovementInform && 
+                    (e.Id == SmartConstants.EventMovementInform &&
                      e.GetParameter(0).Value == SmartConstants.MovementTypePointMotionType &&
                      e.GetParameter(1).Value != 0))
                 {
                     script.Events.Remove(e);
                     startPathEvent.AddAction(smartFactory.ActionFactory(SmartConstants.ActionAfterMovement, null, null));
                     for (int i = 1; i < e.Actions.Count; ++i)
-                        startPathEvent.AddAction(e.Actions[i]);   
+                        startPathEvent.AddAction(e.Actions[i]);
                 }
             }
 
@@ -345,7 +345,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     var e = script.Events[index];
                     if (e.Id != SmartConstants.EventTriggerTimed)
                         continue;
-                    
+
                     if (e.Actions.Count != 1)
                         continue;
 
@@ -354,7 +354,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
                     if (!onTimedEventToRemove.Contains((int)e.GetParameter(0).Value))
                         continue;
-                    
+
                     script.Events.RemoveAt(index);
                 }
             }
@@ -376,14 +376,14 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         {
             if (mergeIfPossible is false)
                 return (true, mergeIfPossible);
-            
+
             var lines = await databaseProvider.GetLinesCallingSmartTimedActionList((int)timedActionList);
             if (lines.Count > 1)
                 return (true, mergeIfPossible);
 
             if (mergeIfPossible is true)
                 return (false, mergeIfPossible);
-            
+
             return (false, await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                 .SetTitle("Merge timed action list")
                 .SetMainInstruction("Do you want to merge timed action list into main script?")

@@ -98,13 +98,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 if (ignoreShowOnlyModifiedEvents)
                     return;
                 ignoreShowOnlyModifiedEvents = true;
-                
+
                 async Task ScheduleLoadingAndUpdateOnlyModified(bool showOnlyModified)
                 {
                     if (!await BeforeLoadData())
                     {
                         ignoreShowOnlyModifiedEvents = false;
-                        return;                        
+                        return;
                     }
                     History.MarkAsSaved(); // workaround for double showing message regarding unsaved changes
                     this.showOnlyModified = showOnlyModified;
@@ -117,7 +117,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 ScheduleLoadingAndUpdateOnlyModified(value).ListenErrors();
             }
         }
-        
+
         private MultiRowSplitMode splitMode;
         public bool SplitView => splitMode != MultiRowSplitMode.None;
 
@@ -128,7 +128,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 if (value && splitMode == MultiRowSplitMode.Horizontal)
                     return;
-                
+
                 splitMode = value ? MultiRowSplitMode.Horizontal : (splitMode == MultiRowSplitMode.Horizontal ? MultiRowSplitMode.None : splitMode);
                 editorSettings.MultiRowSplitMode = splitMode;
                 RaisePropertyChanged(nameof(SplitHorizontal));
@@ -143,7 +143,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 if (value && splitMode == MultiRowSplitMode.Vertical)
                     return;
-                
+
                 splitMode = value ? MultiRowSplitMode.Vertical : (splitMode == MultiRowSplitMode.Vertical ? MultiRowSplitMode.None : splitMode);
                 editorSettings.MultiRowSplitMode = splitMode;
                 RaisePropertyChanged(nameof(SplitHorizontal));
@@ -164,13 +164,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public DelegateCommand<SingleRecordDatabaseCellViewModel?> SetNullCommand { get; }
         public AsyncAutoCommand<SingleRecordDatabaseCellViewModel?> DuplicateCommand { get; }
         public AsyncAutoCommand<SingleRecordDatabaseCellViewModel> OpenParameterWindow { get; }
-        
+
         public AsyncAutoCommand DeleteRowSelectedCommand { get; }
         public DelegateCommand SetNullSelectedCommand { get; }
         public DelegateCommand GenerateInsertQueryForSelectedCommand { get; }
         public AsyncAutoCommand DuplicateSelectedCommand { get; }
         public AsyncAutoCommand RevertSelectedCommand { get; }
-        
+
         public AsyncAutoCommand PreviousDataPage { get; }
         public AsyncAutoCommand RefreshQuery { get; }
         public AsyncAutoCommand NextDataPage { get; }
@@ -179,7 +179,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public SingleRowDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
-            IEventAggregator eventAggregator, ISolutionManager solutionManager, 
+            IEventAggregator eventAggregator, ISolutionManager solutionManager,
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             ISolutionItemNameRegistry solutionItemName, IDatabaseQueryExecutor mySqlExecutor,
             IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator,
@@ -193,8 +193,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             IClipboardService clipboardService, IMetaColumnsSupportService metaColumnsSupportService,
             ITablePersonalSettings personalSettings,
             DocumentMode mode = DocumentMode.Editor)
-            : base(history, solutionItem, solutionItemName, 
-            solutionManager, solutionTasksService, eventAggregator, 
+            : base(history, solutionItem, solutionItemName,
+            solutionManager, solutionTasksService, eventAggregator,
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService, commandService,
             parameterPickerService, statusBar, mySqlExecutor)
@@ -250,11 +250,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 {
                     foreach (var x in MultiSelection.AllReversed())
                         ForceRemoveEntity(Entities[x.RowIndex]);
-                    MultiSelection.Clear();   
+                    MultiSelection.Clear();
                 }
             }, () => FocusedRow != null);
             AutoDispose(this.ToObservable(() => FocusedRow).Subscribe(_ => DeleteRowSelectedCommand.RaiseCanExecuteChanged()));
-            
+
             DuplicateSelectedCommand = new AsyncAutoCommand(async () => await Duplicate(FocusedRow!.Entity), () => FocusedRow != null);
             AutoDispose(this.ToObservable(() => FocusedRow).Subscribe(_ => DuplicateSelectedCommand.RaiseCanExecuteChanged()));
 
@@ -266,10 +266,10 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 var item = new MetaSolutionSQL(new JustQuerySolutionItem(query));
                 eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
             }, () => !MultiSelection.Empty).ObservesProperty(() => FocusedRow);
-            
+
             foreach (var key in solutionItem.Entries.Select(x => x.Key))
                 keys.Add(key);
-            
+
             AutoDispose(new ActionDisposable(() =>
             {
                 rowsDisposable.ForEach(x => x.Dispose());
@@ -315,14 +315,14 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     }
                 }
             }, () => FocusedCell != null);
-            
+
             var definition = tableDefinitionProvider.GetDefinition(solutionItem.TableName);
             FilterViewModel = new MySqlFilterViewModel(definition, () =>
             {
                 OffsetQuery = 0;
                 return ScheduleLoading();
             }, parameterFactory, parameterPickerService);
-            
+
             var pseudoItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
             var savedItem = sessionService.Find(pseudoItem);
             if (savedItem is DatabaseTableSolutionItem savedTableItem)
@@ -339,7 +339,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }
 
             OnlyGroup = new List<ITableRowGroup>() { new FakeGroup(Rows) };
-            
+
             KeyBindings.Add(new CommandKeyBinding(new DelegateCommand(() =>
             {
                 for (int i = 0, count = Entities.Count; i < count; i++)
@@ -347,7 +347,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     MultiSelection.Add(new VerticalCursor(0, i));
                 }
             }), "Ctrl+A"));
-            
+
             ScheduleLoading();
         }
 
@@ -412,7 +412,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             DoUndoableAction("Add row", () => ForceRemoveEntity(freshEntity), () => ForceInsertEntity(freshEntity, index.Value));
             return freshEntity;
         }
-        
+
         private async Task<bool> CheckIfKeyExistsAndWarn(DatabaseKey key, int excludeIndex)
         {
             if (await ContainsKey(key, excludeIndex))
@@ -463,10 +463,10 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             MultiSelection.Clear();
             MultiSelection.Add(FocusedRowIndex);
         }
-        
+
         private void SetToNull(SingleRecordDatabaseCellViewModel? view)
         {
-            if (view != null && view.CanBeNull && !view.IsReadOnly) 
+            if (view != null && view.CanBeNull && !view.IsReadOnly)
                 view.ParameterValue?.SetNull();
         }
 
@@ -496,7 +496,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             var key = new IDatabaseProvider.ConditionKey(tableDefinition.Condition.SourceType);
             if (tableDefinition.Condition.SourceGroupColumn is {} sourceGroup)
-                key = key.WithGroup(sourceGroup.Calculate((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceGroup.Name)));
+                key = key.WithGroup(sourceGroup.Calculate(view.ParentEntity.GetTypedValueOrThrow<long>(sourceGroup.Name)));
             if (tableDefinition.Condition.SourceEntryColumn is { } sourceEntry)
                 key = key.WithEntry((int)view.ParentEntity.GetTypedValueOrThrow<long>(sourceEntry));
             if (tableDefinition.Condition.SourceIdColumn is { } sourceId)
@@ -583,7 +583,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             History.MarkAsSaved();
             return true;
         }
-        
+
         protected override async Task InternalLoadData(DatabaseTableData data)
         {
             History.Clear();
@@ -639,7 +639,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 beforeLoadSelectedRow.HasValue
                     ? Entities.IndexIf(e => e.GenerateKey(TableDefinition) == beforeLoadSelectedRow)
                     : (Entities.Count > 0 ? 0 : -1));
-            
+
             AllRows = (ulong)await tableDataProvider.GetCount(tableDefinition.Id, FilterViewModel.BuildWhere(), showOnlyModified ? keys : null);
             var start = allRows == 0 ? 0 : offsetQuery + 1;
             RowsSummaryText = $"{start} - {(long)offsetQuery + data.Entities.Count} of {allRows} rows";
@@ -659,7 +659,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             settings.DefaultValueHandling = DefaultValueHandling.Ignore;
             return settings;
         }
-        
+
         public override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
 
         private SingleRowTableEditorHistoryHandler? historyHandler;
@@ -667,7 +667,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         protected override void UpdateSolutionItem()
         {
             var previousData = solutionItem.Entries.Where(e => Entities.All(entity => entity.GenerateKey(TableDefinition) != e.Key));
-            
+
             solutionItem.Entries = Entities.Where(e => (!e.ExistInDatabase || EntityIsModified(e)) && !e.Phantom)
                 .Select(e => new SolutionItemDatabaseEntity(e.Key, e.ExistInDatabase, e.ConditionsModified, GetOriginalFields(e)))
                 .Union(previousData)
@@ -692,11 +692,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 removedKeys.Add(entity.Key);
                 forceInsertKeys.Remove(entity.Key);
             }
-            
+
             entities[0].RemoveAt(indexOfEntity);
             if (FocusedRow?.Entity == entity)
                 FocusedRowIndex = VerticalCursor.None;
-            
+
             Rows[indexOfEntity].ChangedCell -= OnRowChangedCell;
             Rows[indexOfEntity].Changed -= OnRowChanged;
             Rows.RemoveAt(indexOfEntity);
@@ -726,7 +726,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 row.ChangedCell -= OnRowChangedCell;
                 row.Changed -= OnRowChanged;
             }));
-            
+
             int columnIndex = 0;
             foreach (var column in columns)
             {
@@ -786,7 +786,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 row.Cells.Add(cellViewModel);
                 columnIndex++;
             }
-            
+
             entities[0].Insert(index, entity);
             Rows.Insert(index, row);
             focusedRowIndex = VerticalCursor.None;
@@ -813,7 +813,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         }
 
         private async Task ReKey(DatabaseEntityViewModel entity)
-        {   
+        {
             Debug.Assert(!entity.IsPhantomEntity);
             DatabaseKey BuildKey(DatabaseEntity e)
             {
@@ -827,7 +827,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             if (newRealKey == entity.Entity.Key)
                 return; // no re-keying needed
-            
+
             int indexOfRow = Rows.IndexOf(entity);
             historyHandler!.DoAction(new AnonymousHistoryAction("Change key", () =>
             {
@@ -859,7 +859,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             if (row.IsPhantomEntity)
                 return;
-            
+
             if (EntityIsModified(row.Entity))
                 keys.Add(row.Entity.Key);
             else
@@ -876,7 +876,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             return await databaseTableDataProvider.GetCount(tableDefinition.Id, null, new [] { key }) > 0;
         }
-        
+
         private void AddEntitiesAndFocus(IReadOnlyList<DatabaseEntity> tableDataEntities)
         {
             foreach (var entity in tableDataEntities)
@@ -891,7 +891,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             var sql = await GenerateQuery();
             return new List<(ISolutionItem, IQuery)>() { (solutionItem, sql) };
         }
-        
+
         private T AutoDisposeEntity<T>(T entity) where T : IDisposable
         {
             rowsDisposable.Add(entity);
@@ -925,7 +925,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             var newDataKeys = newData.Select(e => e.GenerateKey(TableDefinition)).ToArray();
             var oldKeys = keys.Except(newDataKeys).ToArray();
-            
+
             IDatabaseTableData? data = null;
             if (oldKeys.Length > 0)
             {
@@ -936,7 +936,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }
 
             data = new DatabaseTableData(tableDefinition, data == null ? newData : data.Entities.Union(newData).ToList());
-            
+
             var query = queryGenerator.GenerateQuery(GenerateKeys(), GenerateDeletedKeys(saveQuery), data);
 
             if (!saveQuery)
@@ -954,7 +954,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }
             return multi.Close();
         }
-        
+
         public async Task<bool> ShallSavePreventClosing()
         {
             for (var index = 0; index < Entities.Count; index++)
@@ -967,9 +967,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     return true;
             }
 
-            return false;    
+            return false;
         }
-        
+
         protected override Task AfterSave()
         {
             forceInsertKeys.Clear();
@@ -1014,10 +1014,10 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                         forceDeleteKeys.Remove(Entities[i].Key);
                     }
                 }));
-                History.MarkAsSaved();   
+                History.MarkAsSaved();
             }
         }
-        
+
         public async Task TryFind(DatabaseKey key, string? customWhere = null)
         {
             var condition = $"`{tableDefinition.GroupByKeys[0]}` < {key[0]}";
@@ -1027,7 +1027,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 var expected = string.Join(", ", tableDefinition.GroupByKeys);
                 throw new Exception($"Key count does not match group by count! The key is: {key}. Expected columns: ({expected})");
             }
-            
+
             for (int i = 1; i < key.Count; ++i)
             {
                 var sb = new StringBuilder();
@@ -1047,14 +1047,14 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 FilterViewModel.FilterText = customWhere;
                 FilterViewModel.SelectedColumn = FilterViewModel.RawSqlColumn;
             }
-            
+
             if (!string.IsNullOrEmpty(FilterViewModel.BuildWhere()))
                 where = where.Where(r => r.Raw<bool>(FilterViewModel.BuildWhere()));
 
             var query = where.Select("COUNT(*) AS C");
 
             var result = await mySqlExecutor.ExecuteSelectSql(tableDefinition, query.QueryString);
-            
+
             var count = result.Rows == 0 ? 0L : result.Value(0, result.ColumnIndex("C"));
             var offset = Convert.ToInt64(count);
             var modifiedOffset = (ulong)Math.Max(0, offset - LimitQuery / 2 + 1);
