@@ -60,13 +60,22 @@ internal class Connection : ObservableBase, IConnection
         connectionTask = tcs.Task;
         
         refCount++;
-        connection = await connector.ConnectAsync(data.Credentials, data.SafeMode);
-        opened = true;
-        RaisePropertyChanged(nameof(IsOpened));
-        autoCommit = true;
-        tcs.SetResult(connection);
-        connectionTask = null;
-        return new Session(this);
+        try
+        {
+            connection = await connector.ConnectAsync(data.Credentials, data.SafeMode);
+            opened = true;
+            RaisePropertyChanged(nameof(IsOpened));
+            autoCommit = true;
+            tcs.SetResult(connection);
+            connectionTask = null;
+            return new Session(this);
+        }
+        catch (Exception e)
+        {
+            tcs.SetException(e);
+            connectionTask = null;
+            throw;
+        }
     }
 
     public async Task CancelAllAsync()

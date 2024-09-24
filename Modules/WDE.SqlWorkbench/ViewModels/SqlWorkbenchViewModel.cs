@@ -563,7 +563,6 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
             MySqlSession = await connection.OpenSessionAsync();
             if (IsDisposed)
                 await MySqlSession.DisposeAsync();
-            IsConnecting = false;
         }
         catch (Exception e)
         {
@@ -573,6 +572,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
         {
             tcs.SetResult();
             connectTask = null;
+            IsConnecting = false;
         }
     }
 

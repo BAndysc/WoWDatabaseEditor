@@ -195,11 +195,19 @@ internal class SqlsLanguageServer : ISqlLanguageServer
         disposedClients.Add(false);
         filesPerClient.Add(new List<SqlsLanguageServerFile>());
 
-        await CreateClientAsync(id);
-        connectionTasks.Remove(id);
-        taskCompletionSource.SetResult();
-        
-        return id;
+        try
+        {
+            await CreateClientAsync(id);
+            connectionTasks.Remove(id);
+            taskCompletionSource.SetResult();
+            return id;
+        }
+        catch (Exception e)
+        {
+            connectionTasks.Remove(id);
+            taskCompletionSource.SetException(e);
+            throw;
+        }
     }
 
     public async Task<ISqlLanguageServerFile> NewFileAsync(LanguageServerConnectionId connectionId)
