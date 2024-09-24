@@ -331,5 +331,6 @@ internal class MopDbcLoader : BaseDbcLoader
                 PowerTypeValue = row.GetByte(135),
             });
         });
+        Load("PhaseXPhaseGroup.dbc", row => data.PhaseXPhaseGroup.Add(new (row.GetInt(0), row.GetUShort(1), row.GetInt(2))));
     }
 }

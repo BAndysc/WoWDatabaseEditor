@@ -26,6 +26,7 @@ public interface IGamePhaseService
 [SingleInstance]
 public class GamePhaseService : IGamePhaseService
 {
+    private readonly IPhaseStore phaseStore;
     private uint activePhaseMask;
     public ObservableCollection<GamePhaseViewModel> Phases { get; } = new();
     public ObservableCollection<GamePhaseViewModel> ActivePhases { get; } = new();
@@ -36,15 +37,39 @@ public class GamePhaseService : IGamePhaseService
         if (!phaseIds.HasValue && !phaseGroup.HasValue)
             return true;
 
-        if (phaseIds.HasValue)
+        if (phaseGroup.HasValue)
         {
-            foreach (var phaseId in phaseIds)
-                if (ActivePhases.All(x => x.Entry != phaseId))
-                    return false;
-            return true;
+            if (phaseGroup == 0)
+                return ActivePhases.Count == 0;
+
+            var phaseGroupEntry = phaseStore.GetPhaseXPhaseGroupById(phaseGroup.Value);
+
+            if (phaseGroupEntry == null)
+                return false;
+
+            foreach (var phaseId in phaseGroupEntry.Phases)
+                if (ActivePhases.Any(x => x.Entry == phaseId))
+                    return true;
+
+            return false;
         }
 
-        throw new Exception("Phase group not yet implemented (implement dbc loading first)");
+        if (phaseIds.HasValue)
+        {
+            if (phaseIds.Value.Count == 0 || phaseIds.Value is [0])
+            {
+                return ActivePhases.Count == 0;
+            }
+            else
+            {
+                foreach (var phaseId in phaseIds)
+                    if (ActivePhases.Any(x => x.Entry == phaseId))
+                        return true;
+                return false;
+            }
+        }
+
+        return false;
     }
 
     public bool PhaseMaskOverlaps(uint phaseMask)
@@ -53,9 +78,11 @@ public class GamePhaseService : IGamePhaseService
     }
 
     public GamePhaseService(IDbcStore dbcStore,
+        IPhaseStore phaseStore,
         IEventAggregator eventAggregator,
         ICurrentCoreVersion currentCoreVersion)
     {
+        this.phaseStore = phaseStore;
         ActivePhasesObservable = FunctionalExtensions.Select(ActivePhases.ToCountChangedObservable(), _ => ActivePhases);
 
         if (currentCoreVersion.Current.PhasingType == PhasingType.PhaseIds)

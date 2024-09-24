@@ -105,5 +105,7 @@ internal class RetailDbcLoader : BaseDbcLoader
         Load("QuestSort.db2", "SortName_lang", data.QuestSortStore);
         Load("TaxiNodes.db2",  "Name_lang", data.TaxiNodeStore);
         LoadDB2("TaxiPath.db2",  row => data.TaxiPathsStore.Add(row.ID, (row.Field<int>("FromTaxiNode"), row.Field<int>("ToTaxiNode"))));
+        LoadDB2("PhaseXPhaseGroup.db2", row => data.PhaseXPhaseGroup.Add(new (row.ID, row.Field<ushort>("PhaseID"), row.Field<int>("PhaseGroupID"))));
+        LoadDB2("Phase.db2", row => data.PhaseStore[row.ID] = $"Phase {row.ID}");
     }
 }

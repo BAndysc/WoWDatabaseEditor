@@ -90,4 +90,5 @@ public class DbcData
     public List<ConversationLine> ConversationLines { get; } = new();
     public List<Vehicle> Vehicles { get; } = new();
     public List<IPlayerCondition> PlayerConditions { get; } = new();
+    public List<PhaseXPhaseGroupRow> PhaseXPhaseGroup { get; } = new();
 }

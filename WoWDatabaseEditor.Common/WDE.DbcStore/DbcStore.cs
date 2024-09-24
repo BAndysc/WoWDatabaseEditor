@@ -65,7 +65,7 @@ namespace WDE.DbcStore
     [AutoRegister]
     [SingleInstance]
     public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore, IGarrMissionStore,
-        IItemStore, IConversationLineStore, IVehicleStore, IPlayerConditionStore
+        IItemStore, IConversationLineStore, IVehicleStore, IPlayerConditionStore, IPhaseStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -189,6 +189,10 @@ namespace WDE.DbcStore
         public IReadOnlyList<IItemSparse> ItemSparses { get; internal set; } = Array.Empty<IItemSparse>();
         public Dictionary<int, ItemSparse> ItemSparsById { get; internal set; } = new();
         public IItemSparse? GetItemSparseById(int id) => ItemSparsById.GetValueOrDefault(id);
+
+        public IReadOnlyList<PhaseXPhaseGroup> PhaseXPhaseGroups { get; internal set; } = [];
+        public Dictionary<int, PhaseXPhaseGroup> PhaseXPhaseGroupById { get; internal set; } = new();
+        public PhaseXPhaseGroup? GetPhaseXPhaseGroupById(int id) => PhaseXPhaseGroupById.GetValueOrDefault(id);
 
         internal void Load()
         {            
@@ -330,7 +334,12 @@ namespace WDE.DbcStore
                     if (containersById.TryGetValue(shipment.ContainerId, out var container))
                         shipment.Container = container;
                 }
-                
+
+                store.PhaseXPhaseGroups = data.PhaseXPhaseGroup.GroupBy(x => x.PhaseGroupId)
+                    .Select(pair => new PhaseXPhaseGroup(pair.Key, pair.Select(x => x.PhaseId)))
+                    .ToArray();
+                store.PhaseXPhaseGroupById = store.PhaseXPhaseGroups.ToDictionary(x => x.PhaseGroupId);
+
                 foreach (var (parameterName, options) in data.parametersToRegister)
                 {
                     parameterFactory.Register(parameterName, new Parameter()

@@ -543,5 +543,6 @@ internal class LegionDbcLoader : BaseDbcLoader
                 MovementFlags1 = row.GetInt(80, 1),
             });
         });
+        Load("PhaseXPhaseGroup.db2", row => data.PhaseXPhaseGroup.Add(new (row.GetInt(0), row.GetUShort(1), row.GetInt(2))));
     }
 }

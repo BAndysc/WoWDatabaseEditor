@@ -181,5 +181,6 @@ internal class CataDbcLoader : BaseDbcLoader
                 veh.Seats[i] = row.GetUShort(6 + i);
             return veh;
         });
+        Load("PhaseXPhaseGroup.dbc", row => data.PhaseXPhaseGroup.Add(new (row.GetInt(0), row.GetUShort(1), row.GetInt(2))));
     }
 }
