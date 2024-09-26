@@ -655,7 +655,7 @@ namespace WDE.DbcStore
         
         public Task<(long, bool)> PickValue(long value)
         {
-            windowManager.OpenUrl($"https://wow.tools/dbc/?dbc={dbcName}&build={buildString}#page=1&colFilter[0]=exact:{value}");
+            windowManager.OpenUrl($"https://wowtools.work/dbc/?dbc={dbcName}&build={buildString}#page=1&colFilter[0]=exact:{value}");
             return Task.FromResult((0L, false));
         }
     }
@@ -682,7 +682,7 @@ namespace WDE.DbcStore
         
         public Task<(long, bool)> PickValue(long value)
         {
-            windowManager.OpenUrl($"https://wow.tools/dbc/?dbc={dbcName}&build={buildString}#page=1&colFilter[0]=exact:{value}");
+            windowManager.OpenUrl($"https://wowtools.work/dbc/?dbc={dbcName}&build={buildString}#page=1&colFilter[0]=exact:{value}");
             return Task.FromResult((0L, false));
         }
     }
