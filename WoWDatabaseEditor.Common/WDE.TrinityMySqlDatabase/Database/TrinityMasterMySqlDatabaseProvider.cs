@@ -621,18 +621,18 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         await using var database = Database();
         var loot = new[]
         {
-            await database.CreatureMasterLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.GameObjectMasterLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.ItemMasterLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.FishingMasterLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.PickpocketingMasterLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.SkinningMasterLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.DisenchantMasterLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.ProspectingMasterLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.MillingMasterLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.MailMasterLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.SpellMasterLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.ReferenceLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+            await database.CreatureMasterLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
+            await database.GameObjectMasterLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
+            await database.ItemMasterLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
+            await database.FishingMasterLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
+            await database.PickpocketingMasterLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
+            await database.SkinningMasterLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
+            await database.DisenchantMasterLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
+            await database.ProspectingMasterLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
+            await database.MillingMasterLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
+            await database.MailMasterLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
+            await database.SpellMasterLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
+            await database.ReferenceLootTemplate.Where(x => x.ItemOrCurrencyId == lootId && x.LootType == LootType.Reference).ToListAsync<ILootEntry>(),
         };
         return loot.SelectMany(x => x).ToList();
     }

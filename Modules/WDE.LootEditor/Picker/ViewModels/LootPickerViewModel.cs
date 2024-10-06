@@ -45,7 +45,9 @@ public partial class LootPickerViewModel : ObservableBase, IDialog
 
     private List<LootGroupViewModel> allItems = new();
     public ObservableCollection<LootGroupViewModel> Items { get; } = new();
-    
+
+    public uint? AcceptedLootEntry { get; private set; }
+
     public List<TableTableColumnHeader> Columns { get; } = new()
     {
         new ("Item or currency", 60),
@@ -70,6 +72,18 @@ public partial class LootPickerViewModel : ObservableBase, IDialog
         this.lootType = type;
         Accept = new DelegateCommand(() =>
         {
+            if (FocusedGroup != null)
+            {
+                AcceptedLootEntry = FocusedGroup.LootEntry;
+            }
+            else if (uint.TryParse(SearchText, out var lootEntry))
+            {
+                AcceptedLootEntry = lootEntry;
+            }
+            else
+            {
+                AcceptedLootEntry = Items.FirstOrDefault()?.LootEntry;
+            }
             CloseOk?.Invoke();
         });
         Cancel = new DelegateCommand(() =>
