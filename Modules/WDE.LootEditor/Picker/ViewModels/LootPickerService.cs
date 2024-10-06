@@ -45,7 +45,7 @@ public class LootPickerService : ILootPickerService
         if (!await windowManager.ShowDialog(vm))
             return null;
 
-        return vm.FocusedGroup?.LootEntry ?? vm.Items.FirstOrDefault()?.LootEntry;
+        return vm.AcceptedLootEntry;
     }
 
     public async Task<IReadOnlyList<uint>> PickLoots(LootSourceType lootType)

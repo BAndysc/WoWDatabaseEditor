@@ -454,7 +454,7 @@ namespace WDE.DatabaseEditors.Loaders
 
             public Type ColumnType(int index) => typeof(int);
 
-            public object? Value(int row, int column) => Value<int>(row, column);
+            public object? Value(int row, int column) => Value<long>(row, column);
 
             public T? Value<T>(int row, int column)
             {
