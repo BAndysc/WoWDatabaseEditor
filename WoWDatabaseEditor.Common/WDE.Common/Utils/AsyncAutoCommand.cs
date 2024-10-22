@@ -157,8 +157,59 @@ namespace WDE.Common.Utils
             remove => command.CanExecuteChanged -= value;
         }
     }
-    
-    
+
+    public class CommandExceptionWrap<T> : IAsyncCommand where T : Exception
+    {
+        private readonly ICommand parent;
+        private readonly Action<T>? onError;
+        private readonly Func<T, Task>? onErrorTask;
+
+        public CommandExceptionWrap(ICommand parent, Action<T> onError)
+        {
+            this.parent = parent;
+            this.onError = onError;
+        }
+
+        public CommandExceptionWrap(ICommand parent, Func<T, Task> onError)
+        {
+            this.parent = parent;
+            this.onErrorTask = onError;
+        }
+
+        public bool CanExecute(object? parameter) => parent.CanExecute(parameter);
+
+        public void Execute(object? parameter)
+        {
+            ExecuteAsync().ListenErrors();
+        }
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add => parent.CanExecuteChanged += value;
+            remove => parent.CanExecuteChanged -= value;
+        }
+
+        public async Task ExecuteAsync()
+        {
+            try
+            {
+                parent.Execute(null);
+            }
+            catch (T e)
+            {
+                onError?.Invoke(e);
+                if (onErrorTask != null)
+                    await onErrorTask(e);
+            }
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            if (parent is DelegateCommand delegateCommand)
+                delegateCommand.RaiseCanExecuteChanged();
+        }
+    }
+
     public class AsyncCommandExceptionWrap<T> : ICommand, IAsyncCommand where T : Exception
     {
         private readonly IAsyncCommand parent;
@@ -285,6 +336,14 @@ namespace WDE.Common.Utils
         public static IAsyncCommand<R> WrapMessageBox<T, R>(this IAsyncCommand<R> cmd, IMessageBoxService messageBoxService, string? header = null) where T : Exception
         {
             return new AsyncCommandExceptionWrap<T, R>(cmd, async (e) =>
+            {
+                await ShowError(messageBoxService, e, header);
+            });
+        }
+
+        public static ICommand WrapMessageBox<T>(this ICommand cmd, IMessageBoxService messageBoxService, string? header = null) where T : Exception
+        {
+            return new CommandExceptionWrap<T>(cmd, async (e) =>
             {
                 await ShowError(messageBoxService, e, header);
             });
