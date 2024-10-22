@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using WDE.Common.Database;
 using WDE.Common.Services;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.CustomCommands;
 using WDE.DatabaseEditors.Data.Interfaces;
@@ -29,19 +30,28 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
     private readonly ITableDefinitionProvider definitionProvider;
     private readonly IRemoteConnectorService remoteConnectorService;
     private readonly IDatabaseTableCommandService commandService;
+    private readonly IMessageBoxService messageBoxService;
 
     public MetaColumnsSupportService(ITableEditorPickerService tableEditorPickerService,
         ITableDefinitionProvider definitionProvider,
         IRemoteConnectorService remoteConnectorService,
-        IDatabaseTableCommandService commandService)
+        IDatabaseTableCommandService commandService,
+        IMessageBoxService messageBoxService)
     {
         this.tableEditorPickerService = tableEditorPickerService;
         this.definitionProvider = definitionProvider;
         this.remoteConnectorService = remoteConnectorService;
         this.commandService = commandService;
+        this.messageBoxService = messageBoxService;
     }
-    
+
     public (ICommand, string) GenerateCommand(ViewModelBase? viewModel, DataDatabaseType database, string metaColumn, DatabaseEntity entity, DatabaseKey realKey)
+    {
+        var (cmd, name) = GenerateCommandInternal(viewModel, database, metaColumn, entity, realKey);
+        return (cmd.WrapMessageBox<Exception>(messageBoxService), name);
+    }
+
+    private (ICommand, string) GenerateCommandInternal(ViewModelBase? viewModel, DataDatabaseType database, string metaColumn, DatabaseEntity entity, DatabaseKey realKey)
     {
         if (metaColumn.StartsWith("table:"))
         {
