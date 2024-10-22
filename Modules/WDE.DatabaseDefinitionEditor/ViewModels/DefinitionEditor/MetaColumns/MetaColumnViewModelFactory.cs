@@ -50,6 +50,11 @@ public class MetaColumnViewModelFactory : IMetaColumnViewModelFactory
             "Editor command",
             "A button which executes a chosen editor command for the table",
             p => new TableCommandMetaColumnViewModel(p)),
+
+        new MetaColumnTypeViewModel("loot",
+            "Open the loot editor",
+            "A button which a loot editor window for given loot id",
+            p => new LootMetaColumnViewModel(p)),
     };
 
     public BaseMetaColumnViewModel Factory(ColumnViewModel parent, string description)
@@ -70,6 +75,8 @@ public class MetaColumnViewModelFactory : IMetaColumnViewModelFactory
             return new One2OneMetaColumnViewModel(parent, description);
         if (description.StartsWith("table:"))
             return new SingleRowTableReferenceMetaColumnViewModel(parent, description);
+        if (description.StartsWith("loot:"))
+            return new LootMetaColumnViewModel(parent, description);
         return new GenericMetaColumnViewModel(parent, description);
     }
 }

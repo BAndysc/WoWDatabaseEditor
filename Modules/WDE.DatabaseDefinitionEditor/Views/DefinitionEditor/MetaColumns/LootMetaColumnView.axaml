@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:metaColumns="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor.MetaColumns"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="metaColumns:LootMetaColumnViewModel"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:database="clr-namespace:WDE.Common.Database;assembly=WDE.Common"
+             xmlns:controls1="clr-namespace:WDE.DatabaseDefinitionEditor.Views.Controls"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditor.MetaColumns.LootMetaColumnView">
+    <TwoColumnsPanel>
+        <TextBlock>Loot Source Type:</TextBlock>
+        <CompletionComboBox
+            SelectedItem="{CompiledBinding LootType}" controls:Extensions.EnumType="{x:Type database:LootSourceType}" />
+
+        <TextBlock>Key column:</TextBlock>
+        <controls1:DatabaseColumnCompletionBox
+            Database="{CompiledBinding Parent.Parent.Parent.DataDatabaseType}"
+            TableName="{CompiledBinding Parent.Parent.Parent.TableName}"
+            ColumnName="{CompiledBinding LootIdColumn}" />
+    </TwoColumnsPanel>
+</UserControl>

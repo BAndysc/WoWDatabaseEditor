@@ -29,18 +29,21 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
     private readonly ITableEditorPickerService tableEditorPickerService;
     private readonly ITableDefinitionProvider definitionProvider;
     private readonly IRemoteConnectorService remoteConnectorService;
+    private readonly ILootService lootService;
     private readonly IDatabaseTableCommandService commandService;
     private readonly IMessageBoxService messageBoxService;
 
     public MetaColumnsSupportService(ITableEditorPickerService tableEditorPickerService,
         ITableDefinitionProvider definitionProvider,
         IRemoteConnectorService remoteConnectorService,
+        ILootService lootService,
         IDatabaseTableCommandService commandService,
         IMessageBoxService messageBoxService)
     {
         this.tableEditorPickerService = tableEditorPickerService;
         this.definitionProvider = definitionProvider;
         this.remoteConnectorService = remoteConnectorService;
+        this.lootService = lootService;
         this.commandService = commandService;
         this.messageBoxService = messageBoxService;
     }
@@ -75,6 +78,19 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
             return (new DelegateCommand(() =>
             {
                 tableEditorPickerService.ShowTable(table, null, new DatabaseKey(entity.GetTypedValueOrThrow<long>(new ColumnFullName(null, key)))).ListenErrors();
+            }), "Open");
+        }
+        if (metaColumn.StartsWith("loot:"))
+        {
+            var parts = metaColumn.Substring("loot:".Length).Split(";");
+            if (parts.Length != 2)
+                throw new ArgumentException("Meta column invalid format: " + metaColumn + " (expected loot:[loot type];[column name]");
+            if (!Enum.TryParse<LootSourceType>(parts[0], out var lootSourceType))
+                throw new ArgumentException("Can't parse " + parts[0] + " as LootSourceType enum");
+            var lootIdColumn = ColumnFullName.Parse(parts[1]);
+            return (new DelegateCommand(() =>
+            {
+                lootService.OpenStandaloneLootEditor(lootSourceType, (uint)entity.GetTypedValueOrThrow<long>(lootIdColumn), 0);
             }), "Open");
         }
         if (metaColumn.StartsWith("one2one:"))
