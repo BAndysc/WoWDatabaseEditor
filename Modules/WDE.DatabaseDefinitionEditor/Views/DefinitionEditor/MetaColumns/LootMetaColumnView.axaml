@@ -19,5 +19,10 @@
             Database="{CompiledBinding Parent.Parent.Parent.DataDatabaseType}"
             TableName="{CompiledBinding Parent.Parent.Parent.TableName}"
             ColumnName="{CompiledBinding LootIdColumn}" />
+
+        <Border />
+        <CheckBox IsChecked="{CompiledBinding RawId}"
+                  ToolTip.Tip="When true, the value from the column above will be used as *_loot_template.entry. When false, the editor will treat the column value as a entry to do lookup for its loot id. I.e. for creature_template, this would lookup the template and its lootid value."
+                  >Use value as raw loot id</CheckBox>
     </TwoColumnsPanel>
 </UserControl>

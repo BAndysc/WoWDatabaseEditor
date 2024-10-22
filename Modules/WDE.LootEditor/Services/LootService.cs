@@ -12,6 +12,7 @@ using WDE.Common.Services;
 using WDE.Common.Utils;
 using WDE.LootEditor.Editor.Standalone;
 using WDE.LootEditor.Solution;
+using WDE.LootEditor.Solution.PerDatabaseTable;
 using WDE.Module.Attributes;
 
 namespace WDE.LootEditor.Services;
@@ -22,6 +23,7 @@ public class LootService : ILootService
     private readonly IWindowManager windowManager;
     private readonly IEventAggregator eventAggregator;
     private readonly ICurrentCoreVersion currentCoreVersion;
+    private readonly IContainerProvider containerProvider;
     private readonly Func<StandaloneLootEditorViewModel> creator;
 
     private IAbstractWindowView? currentWindow;
@@ -31,11 +33,13 @@ public class LootService : ILootService
     public LootService(IWindowManager windowManager,
         IEventAggregator eventAggregator,
         ICurrentCoreVersion currentCoreVersion,
+        IContainerProvider containerProvider,
         Func<StandaloneLootEditorViewModel> creator)
     {
         this.windowManager = windowManager;
         this.eventAggregator = eventAggregator;
         this.currentCoreVersion = currentCoreVersion;
+        this.containerProvider = containerProvider;
         this.creator = creator;
     }
     
@@ -65,7 +69,7 @@ public class LootService : ILootService
         }
         else
         {
-            using var vm = creator();
+            var vm = creator();
             vm.LootType = type;
             vm.SolutionEntry = solutionEntry;
             if (currentCoreVersion.Current.LootEditingMode == LootEditingMode.PerLogicalEntity)
@@ -75,14 +79,31 @@ public class LootService : ILootService
             }
             typedWindows[(type, solutionEntry)] = window = windowManager.ShowWindow(vm, out var task);
             vm.LoadLootCommand.Execute(null);
-            WindowLifetimeTask(window, type, solutionEntry, task).ListenErrors();
+            WindowLifetimeTask(vm, window, type, solutionEntry, task).ListenErrors();
         }
     }
 
-    private async Task WindowLifetimeTask(IAbstractWindowView window, LootSourceType type, uint solutionEntry, Task lifetime)
+    public void OpenStandaloneLootEditor(LootSourceType type, LootEntry rawLootEntry)
+    {
+        async Task Load()
+        {
+            var vm = containerProvider.Resolve<StandaloneLootEditorViewModel>((typeof(PerDatabaseTableLootSolutionItem), new PerDatabaseTableLootSolutionItem(type)));
+            await vm.ViewModel!.AddLootId(rawLootEntry, null, null);
+            var window = windowManager.ShowWindow(vm, out var task);
+
+            await task;
+            vm.Dispose();
+        }
+
+        Load().ListenErrors();
+    }
+
+    private async Task WindowLifetimeTask(StandaloneLootEditorViewModel vm, IAbstractWindowView window,
+        LootSourceType type, uint solutionEntry, Task lifetime)
     {
         await lifetime;
         typedWindows.Remove((type, solutionEntry));
+        vm.Dispose();
     }
 
     private async Task WindowLifetimeTask(IAbstractWindowView window, Task lifetime)

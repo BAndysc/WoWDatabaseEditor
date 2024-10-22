@@ -9,5 +9,6 @@ public interface ILootService
 {
     Task OpenStandaloneLootEditor();
     void OpenStandaloneLootEditor(LootSourceType type, uint solutionEntry, uint difficultyId);
+    void OpenStandaloneLootEditor(LootSourceType type, LootEntry rawLootEntry);
     Task EditLoot(LootSourceType type, uint solutionEntry, uint difficultyId);
 }

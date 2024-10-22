@@ -83,14 +83,20 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
         if (metaColumn.StartsWith("loot:"))
         {
             var parts = metaColumn.Substring("loot:".Length).Split(";");
-            if (parts.Length != 2)
+            if (parts.Length != 2 && parts.Length != 3)
                 throw new ArgumentException("Meta column invalid format: " + metaColumn + " (expected loot:[loot type];[column name]");
             if (!Enum.TryParse<LootSourceType>(parts[0], out var lootSourceType))
                 throw new ArgumentException("Can't parse " + parts[0] + " as LootSourceType enum");
             var lootIdColumn = ColumnFullName.Parse(parts[1]);
+            var isRaw = parts.Length >= 3 && parts[2] == "raw";
+
             return (new DelegateCommand(() =>
             {
-                lootService.OpenStandaloneLootEditor(lootSourceType, (uint)entity.GetTypedValueOrThrow<long>(lootIdColumn), 0);
+                var entry = (uint)entity.GetTypedValueOrThrow<long>(lootIdColumn);
+                if (isRaw)
+                    lootService.OpenStandaloneLootEditor(lootSourceType, new LootEntry(entry));
+                else
+                    lootService.OpenStandaloneLootEditor(lootSourceType, entry, 0);
             }), "Open");
         }
         if (metaColumn.StartsWith("one2one:"))
