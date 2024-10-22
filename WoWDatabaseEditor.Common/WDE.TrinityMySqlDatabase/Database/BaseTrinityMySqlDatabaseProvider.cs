@@ -758,6 +758,9 @@ namespace WDE.TrinityMySqlDatabase.Database
             return creatures;
         }
 
+        public async Task<IGarrisonMissionTemplate?> GetGarrisonMissionTemplate(int entry) => null;
+        public async Task<IReadOnlyList<IGarrisonMissionTemplate>> GetGarrisonMissionTemplates() => [];
+
         private bool Supports<R>()
         {
             return !currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(R));

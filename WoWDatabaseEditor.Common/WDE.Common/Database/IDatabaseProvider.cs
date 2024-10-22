@@ -149,6 +149,9 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId);
         Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId);
 
+        Task<IReadOnlyList<IGarrisonMissionTemplate>> GetGarrisonMissionTemplates();
+        Task<IGarrisonMissionTemplate?> GetGarrisonMissionTemplate(int entry);
+
         // @todo: make it async one day
         IList<IPhaseName>? GetPhaseNames();
 

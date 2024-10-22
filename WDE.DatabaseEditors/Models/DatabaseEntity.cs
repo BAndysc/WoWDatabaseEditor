@@ -139,10 +139,10 @@ namespace WDE.DatabaseEditors.Models
         {
             var cell = GetCell(columnName);
             if (cell == null)
-                throw new Exception("No column named " + columnName);
+                throw new Exception("No column named `" + columnName + "`");
             var typed = cell as DatabaseField<T>;
             if (typed == null)
-                throw new Exception("No column named " + columnName + " with type " + typeof(T));
+                throw new Exception("No column named `" + columnName + "` with type " + typeof(T));
             return typed.Current.Value;
         }
 

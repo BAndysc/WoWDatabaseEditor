@@ -732,5 +732,8 @@ namespace WDE.CMMySqlDatabase.Database
             creatures.AddRange(gameobjects);
             return creatures;
         }
+
+        public async Task<IGarrisonMissionTemplate?> GetGarrisonMissionTemplate(int entry) => null;
+        public async Task<IReadOnlyList<IGarrisonMissionTemplate>> GetGarrisonMissionTemplates() => [];
     }
 }
