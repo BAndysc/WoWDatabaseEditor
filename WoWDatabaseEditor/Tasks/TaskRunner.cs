@@ -119,6 +119,7 @@ namespace WoWDatabaseEditorCore.Tasks
                     {
                         AssertMainThread();
                         LOG.LogError(e);
+                        messageBoxService.Value.SimpleDialog("Error", "Error", e.Message).ListenErrors();
                         progress.ReportFail();
                         taskCompletionSource.SetException(e);
                     }
