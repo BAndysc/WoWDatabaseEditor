@@ -37,10 +37,10 @@ public class DataStoreLoggerSink : ILogEventSink
         
         string exception = logEvent.Exception?.Message ?? (logEvent.Level >= LogEventLevel.Error ? message : string.Empty);
 
-        AddLogEntry(logLevel, eventId, message, exception);
+        AddLogEntry(logLevel, eventId, message, exception, logEvent.Exception?.StackTrace);
     }
 
-    protected virtual void AddLogEntry(LogLevel logLevel, EventId eventId, string message, string exception)
+    protected virtual void AddLogEntry(LogLevel logLevel, EventId eventId, string message, string exception, string? stackTrace)
     {
         ILogDataStore? dataStore = dataStoreProvider.Invoke();
 
@@ -54,7 +54,8 @@ public class DataStoreLoggerSink : ILogEventSink
             LogLevel = logLevel,
             EventId = eventId,
             State = message,
-            Exception = exception
+            Exception = exception,
+            StackTrace = stackTrace
         });
     }
 

@@ -45,6 +45,7 @@
                 <DataGridTextColumn CellStyleClasses="size" Header="Event Id" Width="120" Binding="{CompiledBinding EventId, Converter={StaticResource EventIdConverter}}" />
                 <DataGridTextColumn CellStyleClasses="size" Header="State" Width="300" Binding="{CompiledBinding State}" />
                 <DataGridTextColumn CellStyleClasses="size" Header="Exception" Width="300" Binding="{CompiledBinding Exception}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="Stack Trace" Width="300" Binding="{CompiledBinding StackTrace}" />
             </DataGrid.Columns>
         </DataGrid>
 

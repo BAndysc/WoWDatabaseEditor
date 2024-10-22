@@ -17,5 +17,7 @@ public class LogModel
 
     public string? Exception { get; set; }
 
+    public string? StackTrace { get; set; }
+
     #endregion
 }
