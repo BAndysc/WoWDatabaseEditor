@@ -23,6 +23,7 @@ public interface ILootEntry
 }
 
 public interface ITreasureLootEntry { }
+public interface IGarrisonMissionLootEntry { }
 
 public struct AbstractLootEntry : ILootEntry
 {
@@ -107,6 +108,7 @@ public enum LootSourceType
     Milling,
     Prospecting,
     Pickpocketing,
+    Mission
 }
 
 public readonly struct LootEntry : IEquatable<LootEntry>
