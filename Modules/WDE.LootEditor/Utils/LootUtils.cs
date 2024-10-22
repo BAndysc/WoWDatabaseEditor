@@ -82,7 +82,7 @@ public static class LootUtils
             case LootSourceType.Milling: return "ItemParameter";
             case LootSourceType.Prospecting: return "ItemParameter";
             case LootSourceType.Pickpocketing: return "CreatureParameter";
-            case LootSourceType.Mission: return "Parameter";
+            case LootSourceType.Mission: return "GarrisonMissionParameter";
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
