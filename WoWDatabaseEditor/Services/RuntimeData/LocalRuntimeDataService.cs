@@ -49,6 +49,11 @@ public class LocalRuntimeDataService : IRuntimeDataService
         return new DirectoryWatcher(path, recursive);
     }
 
+    public Task<bool> ExistsLocalFile(string path)
+    {
+        return Exists(path);
+    }
+
     public async Task<string> ReadAllText(string path)
     {
         try

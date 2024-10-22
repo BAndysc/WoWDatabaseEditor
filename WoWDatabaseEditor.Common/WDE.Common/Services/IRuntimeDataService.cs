@@ -14,6 +14,7 @@ public interface IRuntimeDataService
     Task<IReadOnlyList<string>> GetAllFiles(string directory, string searchPattern);
     Task<bool> Exists(string path);
     IDirectoryWatcher WatchDirectory(string path, bool recursive);
+    Task<bool> ExistsLocalFile(string path);
 }
 
 public interface IDirectoryWatcher : System.IDisposable

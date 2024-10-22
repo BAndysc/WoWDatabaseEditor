@@ -166,7 +166,7 @@ namespace WDE.Common.Avalonia.Components
                 loadingFilesListing = null;
             }
 
-            return existingFiles.Contains(uri);
+            return existingFiles.Contains(uri) || await dataAccess.ExistsLocalFile(uri);
         }
 
         public static async Task<Bitmap?> LoadBitmapAsync(ImageUri img)

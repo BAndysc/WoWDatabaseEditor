@@ -51,6 +51,11 @@ public class WebRuntimeDataService : IRuntimeDataService
         return NullDirectoryWatcher.Instance;
     }
 
+    public async Task<bool> ExistsLocalFile(string path)
+    {
+        return false;
+    }
+
     public async Task<byte[]> ReadAllBytes(string path)
     {
         try
