@@ -1,6 +1,13 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Styles.Resources>
+        <CornerRadius x:Key="SmartCornerRadius">4</CornerRadius>
+        <CornerRadius x:Key="SmartCornerRadius_Left">4,0,0,4</CornerRadius>
+        <CornerRadius x:Key="SmartCornerRadius_Bottom">0,0,4,4</CornerRadius>
+        <CornerRadius x:Key="SmartCornerRadius_Big">6</CornerRadius>
+        <CornerRadius x:Key="SmartCornerRadius_Big_Top">6,6,0,0</CornerRadius>
+        <CornerRadius x:Key="SmartCornerRadius_Big_Bottom">0,0,6,6</CornerRadius>
+
         <SolidColorBrush x:Key="SmartScripts.Background" Color="#F5F6FC" />
 
         <SolidColorBrush x:Key="SmartScripts.Actions.Background" Color="#F5F6FC" />
@@ -26,6 +33,7 @@
         <SolidColorBrush x:Key="SmartScripts.Event.Selected.Background" Color="#FFF5F2BF" />
         <SolidColorBrush x:Key="SmartScripts.Event.Selected.Foreground" Color="#FF282828" />
         <SolidColorBrush x:Key="SmartScripts.Event.Selected.Border" Color="#FFF5C61F" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Filler" Color="#FFF5C61F" />
     
         <SolidColorBrush x:Key="SmartScripts.Event.Flag.Background" Color="#1976d2" />
         <SolidColorBrush x:Key="SmartScripts.Event.Phase.Background" Color="#009688" />

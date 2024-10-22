@@ -30,7 +30,7 @@
             </DrawingGroup>
         </DrawingImage>
     </UserControl.Resources>
-    <controls:GroupingListBox Items="{CompiledBinding Problems}" BorderThickness="0" Name="ListBox"> 
+    <controls:GroupingListBox Items="{CompiledBinding Problems}" Name="ListBox">
         <controls:GroupingListBox.HeaderTemplate>
             <DataTemplate x:DataType="problemsTool:DocumentProblemsViewModel">
                 <controls:GroupingHeader GroupName="{CompiledBinding Name}">

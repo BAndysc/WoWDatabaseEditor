@@ -12,6 +12,7 @@
         <SolidColorBrush Color="#4168CF" x:Key="TopBarButtonBackground" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         <SolidColorBrush Color="#4077DD" x:Key="TopBarButtonHoverBackground" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         <SolidColorBrush Color="#4069C6" x:Key="TopBarButtonPressedBackground" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <ControlTheme x:Key="{x:Type ClassicWindow}" TargetType="ClassicWindow" BasedOn="{StaticResource {x:Type Window}}" />
     </Styles.Resources>
     
     <Style Selector="ExtendedTitleBar">
@@ -31,6 +32,7 @@
     </Style>-->
 
     <Style Selector="ExtendedWindow">
+        <Setter Property="RoundCorners" Value="True" />
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="24" />
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
@@ -203,6 +205,7 @@
     <!--- dialog -->
 
     <Style Selector="BaseMessageBoxWindow">
+        <Setter Property="RoundCorners" Value="True" />
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
         <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
         <Setter Property="ExtendClientAreaChromeHints" Value="NoChrome" />

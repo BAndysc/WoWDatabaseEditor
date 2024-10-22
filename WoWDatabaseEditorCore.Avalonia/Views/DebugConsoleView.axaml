@@ -9,6 +9,5 @@
              x:DataType="viewModels:DebugConsoleViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Views.DebugConsoleView">
     <avaloniaEdit:TextEditor Document="{CompiledBinding ConsoleLog, Converter={x:Static NativeTextDocumentConverter.Instance}}" 
-                             BorderThickness="0"
                              ShowLineNumbers="True" FontFamily="Consolas,Menlo,Courier,Courier New" />
 </UserControl>

@@ -48,7 +48,7 @@
     
     <DockPanel LastChildFill="True">
         <Button Command="{CompiledBinding ClearConsole}" DockPanel.Dock="Top">Clear</Button>
-        <avaloniaEdit:TextEditor IsReadOnly="True" Document="{CompiledBinding Text, Converter={x:Static NativeTextDocumentConverter.Instance}}" BorderThickness="0" x:Name="MyAvalonEdit"
+        <avaloniaEdit:TextEditor IsReadOnly="True" Document="{CompiledBinding Text, Converter={x:Static NativeTextDocumentConverter.Instance}}" x:Name="MyAvalonEdit"
                                FontFamily="Consolas,Menlo,Courier,Courier New"/>
         
     </DockPanel>

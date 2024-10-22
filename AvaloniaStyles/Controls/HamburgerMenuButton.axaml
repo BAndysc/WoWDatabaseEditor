@@ -37,8 +37,8 @@
           </Button.Flyout>
           <Button.Styles>
             <Style Selector="MenuItem">
-              <Setter Property="(converters:NativeMenuItemHelper.IsChecked)" Value="{Binding IsChecked}"></Setter>
-              <Setter Property="(converters:NativeMenuItemHelper.ToggleType)" Value="{Binding ToggleType}"></Setter>
+              <Setter Property="IsChecked" Value="{Binding IsChecked}"></Setter>
+              <Setter Property="ToggleType" Value="{Binding ToggleType, Converter={x:Static converters:NativeMenuItemToggleTypeToMenuItemToggleTypeConverter.Instance}}" />
               <Setter Property="Header" Value="{Binding Header}" />
               <Setter Property="InputGesture" Value="{Binding Gesture}" />
               <Setter Property="HotKey" Value="{Binding Gesture}" />

@@ -18,11 +18,12 @@
         <Setter Property="ItemHeight" Value="24" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Name="border"
+                <ClassicBorderDecorator Name="border"
                         ClipToBounds="{TemplateBinding ClipToBounds}"
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
+                        BorderStyle="Sunken"
                         CornerRadius="{TemplateBinding CornerRadius}">
                     <DockPanel LastChildFill="True" Grid.IsSharedSizeScope="True">
                         <ScrollViewer HorizontalScrollBarVisibility="Hidden"
@@ -30,8 +31,8 @@
                                            Name="PART_HeaderScroll"
                                            DockPanel.Dock="Top">
                             <GridViewHeader>
-                                <Grid Name="PART_header">
-                                </Grid>
+                                <GridEx Name="PART_header">
+                                </GridEx>
                             </GridViewHeader>
                         </ScrollViewer>
                     
@@ -53,7 +54,7 @@
                             </ScrollViewer>
                         </Border>
                     </DockPanel>
-                </Border>
+                </ClassicBorderDecorator>
             </ControlTemplate>
         </Setter>
     </Style>

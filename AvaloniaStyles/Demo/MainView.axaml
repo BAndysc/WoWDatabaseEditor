@@ -8,7 +8,6 @@
              x:Class="AvaloniaStyles.Demo.MainView">
     <ScrollViewer Margin="10" Background="{DynamicResource MainColorBackground}">
         <StackPanel Spacing="10" Orientation="Vertical" Background="Transparent">
-            
             <Border BorderThickness="1" BorderBrush="Black">
                 <Grid ColumnDefinitions="100,5,20">
                     <ToolbarControl>

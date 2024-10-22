@@ -344,6 +344,14 @@ public class VirtualizedGridViewItemPresenter : Panel
         
         foreach (var column in columns)
             AddColumn(column.PreferedWidth);
+
+        // last
+        var c = new ColumnDefinition(isHeader ? new GridLength(1, GridUnitType.Star) : default)
+        {
+            SharedSizeGroup = $"col{(i++)}",
+            MinWidth = 20,
+        };
+        grid.ColumnDefinitions.Add(c);
     }
 
     internal static void AddSplitter(Grid grid)

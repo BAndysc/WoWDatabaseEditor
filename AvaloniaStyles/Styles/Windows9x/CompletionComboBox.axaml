@@ -1,0 +1,116 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls"
+        xmlns:common="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia"
+        xmlns:utils="clr-namespace:Classic.Avalonia.Theme.Utils;assembly=Classic.Avalonia.Theme">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="controls|CompletionComboBox">
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static common:SystemColors.WindowTextBrushKey}}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static common:SystemColors.WindowBrushKey}}" />
+        <Setter Property="BorderBrush" Value="{x:Static ClassicBorderDecorator.ClassicBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="2" />
+        <!--        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />-->
+        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="MinHeight" Value="{DynamicResource TextControlThemeMinHeight}" />
+        <Setter Property="MinWidth" Value="{DynamicResource TextControlThemeMinWidth}" />
+        <Setter Property="Padding" Value="{DynamicResource TextControlThemePadding}" />
+       <!-- <Setter Property="Cursor" Value="Ibeam" /> -->
+
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid Name="PART_LayoutRoot">
+                    <ToggleButton Content="{TemplateBinding SelectedItem}"
+                                  HorizontalAlignment="Stretch"
+                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                  Background="{TemplateBinding Background}"
+                                  Padding="{TemplateBinding Padding}"
+                                  VerticalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch"
+                                  Name="PART_Button"
+                                  IsChecked="{TemplateBinding IsDropDownOpen, Mode=TwoWay}" ContentTemplate="{TemplateBinding ButtonItemTemplate}"></ToggleButton>
+                    <Popup Name="PART_Popup"
+                           IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                           WindowManagerAddShadowHint="True"
+                           MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                           IsLightDismissEnabled="{TemplateBinding IsLightDismissEnabled}"
+                           MaxWidth="700"
+                           MaxHeight="600"
+                           PlacementConstraintAdjustment="SlideY,SlideX"
+                           Placement="BottomEdgeAlignedLeft"
+                           PlacementGravity="BottomLeft"
+                           PlacementTarget="PART_Button">
+                        <ClassicBorderDecorator Name="PART_SuggestionsContainer"
+                                                BorderStyle="AltRaised"
+                                                RenderOptions.EdgeMode="Aliased"
+                                                RenderOptions.BitmapInterpolationMode="None"
+                                                utils:FontUtils.FontAliasing="{DynamicResource {x:Static common:SystemParameters.FontAliasingKey}}"
+                                                BorderThickness="2"
+                                                Padding="{DynamicResource AutoCompleteListMargin}"
+                                                Background="{DynamicResource {x:Static common:SystemColors.ControlBrushKey}}">
+                            <DockPanel>
+                                <TextBox Name="PART_SearchTextBox" Watermark="{TemplateBinding Watermark}" Text="{TemplateBinding SearchText, Mode=TwoWay}" DockPanel.Dock="Top" />
+                                <ListBox Name="PART_SelectingItemsControl"
+                                         ItemTemplate="{TemplateBinding ItemTemplate}"
+                                         Margin="{DynamicResource AutoCompleteListPadding}" />
+                            </DockPanel>
+                        </ClassicBorderDecorator>
+                    </Popup>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|CompletionComboBox /template/ ToggleButton ClassicBorderDecorator">
+        <Setter Property="BorderStyle" Value="Sunken" />
+    </Style>
+    
+    <Style Selector="controls|CompletionComboBox:pointerover ToggleButton:not(:checked) ContentPresenter#PART_ContentPresenter">
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource TextControlBackgroundPointerOver}" />
+    </Style>
+    
+    <Style Selector="TextBox:focus">
+        <Setter Property="Foreground" Value="{DynamicResource TextControlForegroundFocused}" />
+    </Style>
+
+    <Style Selector="TextBox:focus /template/ TextBlock#PART_Watermark, TextBox:focus /template/ TextBlock#PART_FloatingWatermark">
+        <Setter Property="Foreground" Value="{DynamicResource TextControlPlaceholderForegroundFocused}" />
+    </Style>
+
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource TextControlBackgroundFocused}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushFocused}"/>
+        <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThicknessFocused}" />
+    </Style>
+    
+    <!--<Style Selector="controls|CompletionComboBox ToggleButton:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundChecked}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushChecked}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundChecked}" />
+    </Style>-->
+
+    <Style Selector="controls|CompletionComboBox ToggleButton:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundCheckedPointerOver}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPointerOver}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPointerOver}" />
+    </Style>
+
+    <Style Selector="controls|CompletionComboBox ToggleButton:checked:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundCheckedPressed}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPressed}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPressed}" />
+    </Style>
+
+    <Style Selector="controls|CompletionComboBox:disabled ToggleButton:checked:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static common:SystemColors.GrayTextBrushKey}}" />
+    </Style>
+
+    <Style Selector="controls|CompletionComboBox:disabled /template/ ToggleButton ClassicBorderDecorator">
+        <Setter Property="Background" Value="{DynamicResource {x:Static common:SystemColors.ControlBrushKey}}" />
+    </Style>
+</Styles>

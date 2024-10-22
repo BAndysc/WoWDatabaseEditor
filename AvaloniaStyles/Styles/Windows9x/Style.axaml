@@ -1,0 +1,44 @@
+<Styles xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:commonControls="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
+    
+    
+    <Styles.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="WindowMessageBox.axaml" />
+                <ResourceInclude Source="Window.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <system:Double x:Key="ControlContentThemeFontSize">11</system:Double>
+            <!-- <FontFamily x:Key="ContentControlThemeFontFamily">Tahoma</FontFamily> -->
+            <!-- <FontFamily x:Key="MainFontSans">Tahoma</FontFamily> -->
+            <FontFamily x:Key="{x:Static commonControls:NonClientMetrics.CaptionFontKey}">/Styles/Windows9x/#MS Sans Serif</FontFamily>
+            <FontFamily x:Key="ContentControlThemeFontFamily">/Styles/Windows9x/#MS Sans Serif</FontFamily>
+            <FontFamily x:Key="MainFontSans">/Styles/Windows9x/#MS Sans Serif</FontFamily>
+            <StaticResource x:Key="SystemControlForegroundBaseHighBrush" ResourceKey="{x:Static commonControls:SystemColors.WindowTextBrushKey}" />
+        </ResourceDictionary>
+    </Styles.Resources>
+
+    <StyleInclude Source="avares://Classic.Avalonia.Theme.Dock/Classic.axaml" />
+    <StyleInclude Source="avares://Classic.Avalonia.Theme.DataGrid/Classic.axaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/CompletionComboBox.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/VirtualizedGridViewControl/VirtualizedGridViewStyle.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/GroupingListBox.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/WizardPanel.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/ToolbarControl.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/SettingItem.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/InfoBar/InfoBar.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/BalloonPopup.axaml" />
+    <StyleInclude Source="avares://AvaloniaEdit/Themes/Simple/AvaloniaEdit.xaml" />
+
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows9x/ColorsLight.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows9x/ToolbarButton.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows9x/ToolbarPanel.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows9x/GroupingListBox.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows9x/TextEditor.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows9x/GridView.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows9x/CompletionComboBox.axaml" />
+
+</Styles>

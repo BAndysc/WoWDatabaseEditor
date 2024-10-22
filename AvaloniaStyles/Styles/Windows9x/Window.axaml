@@ -1,0 +1,118 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:AvaloniaStyles.Converters"
+                    xmlns:utils="clr-namespace:Classic.Avalonia.Theme.Utils;assembly=Classic.Avalonia.Theme"
+                    xmlns:commonControls="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
+    <ControlTheme x:Key="{x:Type ExtendedWindow}" TargetType="ExtendedWindow" BasedOn="{StaticResource ClassicWindow}">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel RenderOptions.EdgeMode="Aliased"
+                       RenderOptions.BitmapInterpolationMode="None"
+                       utils:FontUtils.FontAliasing="{DynamicResource {x:Static commonControls:SystemParameters.FontAliasingKey}}">
+                    <Border Name="PART_TransparencyFallback"
+                            IsHitTestVisible="False"
+                            Margin="2" />
+                    <Border Background="{TemplateBinding Background}"
+                            IsHitTestVisible="False"
+                            Margin="2" />
+                    <VisualLayerManager>
+                        <VisualLayerManager.ChromeOverlayLayer>
+                            <TitleBar />
+                        </VisualLayerManager.ChromeOverlayLayer>
+
+                        <DockPanel Name="RootLayout" Margin="4" ClipToBounds="True">
+
+                            <utils:AutoAttachTitleBar DockPanel.Dock="Top" />
+
+                            <Panel DockPanel.Dock="Top">
+                                <Menu
+                                      ItemsSource="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue={x:Null}}">
+                                    <Menu.Styles>
+                                        <Style Selector="MenuItem">
+                                            <Setter Property="IsChecked" Value="{Binding IsChecked}"></Setter>
+                                            <Setter Property="ToggleType"
+                                                    Value="{Binding ToggleType, Converter={x:Static converters:NativeMenuItemToggleTypeToMenuItemToggleTypeConverter.Instance}}" />
+                                            <Setter Property="Header" Value="{Binding Header}" />
+                                            <Setter Property="InputGesture" Value="{Binding Gesture}" />
+                                            <Setter Property="HotKey" Value="{Binding Gesture}" />
+                                            <Setter Property="ItemsSource" Value="{Binding Menu.Items}" />
+                                            <Setter Property="Command" Value="{Binding Command}" />
+                                            <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
+                                            <Setter Property="(NativeMenuBar.EnableMenuItemClickForwarding)" Value="True" />
+                                        </Style>
+                                    </Menu.Styles>
+                                </Menu>
+                                <!-- <ContentPresenter Content="{TemplateBinding TitleContent}" -->
+                                <!--                   VerticalAlignment="Center" -->
+                                <!--                   HorizontalAlignment="Right" /> -->
+                            </Panel>
+
+
+                            <Separator DockPanel.Dock="Top" Name="PART_ToolbarSeparator1" />
+
+                            <ToolbarPanel HorizontalAlignment="Stretch" Margin="5,2,2,2" DockPanel.Dock="Top"
+                                          Name="PART_Toolbar">
+                                <commonControls:RebarHandle />
+                                <ContentPresenter HorizontalAlignment="Left"
+                                                  Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                <ContentPresenter HorizontalAlignment="Stretch"
+                                                  Content="{Binding ToolBar.MiddleContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                <ContentPresenter HorizontalAlignment="Left"
+                                                  Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                            </ToolbarPanel>
+
+                            <Separator DockPanel.Dock="Top" Name="PART_ToolbarSeparator2" />
+
+                            <ContentPresenter Content="{TemplateBinding StatusBar}" DockPanel.Dock="Bottom"
+                                              Name="StatusBar" />
+
+                            <Separator DockPanel.Dock="Bottom" Name="PART_StatusBarSeparator" />
+                            <Border Padding="4" Name="PART_content">
+                                <Panel>
+                                    <ContentPresenter Name="PART_ContentPresenter"
+                                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                      Content="{TemplateBinding Content}" />
+                                    <ContentPresenter Content="{TemplateBinding Overlay}" />
+                                </Panel>
+                            </Border>
+                        </DockPanel>
+
+                    </VisualLayerManager>
+
+                    <ClassicBorderDecorator Name="Bd"
+                                            BorderStyle="AltRaised"
+                                            IsHitTestVisible="False" />
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^ /template/ Separator#PART_ToolbarSeparator1">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="^ /template/ Separator#PART_ToolbarSeparator2">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="^ /template/ ToolbarPanel#PART_Toolbar">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="^ /template/ Separator#PART_StatusBarSeparator">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="^:has-statusbar">
+            <Style Selector="^ /template/ Separator#PART_StatusBarSeparator">
+                <Setter Property="IsVisible" Value="True" />
+            </Style>
+        </Style>
+        <Style Selector="^:has-toolbar">
+            <Style Selector="^ /template/ Separator#PART_ToolbarSeparator1">
+                <Setter Property="IsVisible" Value="True" />
+            </Style>
+            <Style Selector="^ /template/ Separator#PART_ToolbarSeparator2">
+                <Setter Property="IsVisible" Value="True" />
+            </Style>
+            <Style Selector="^ /template/ ToolbarPanel#PART_Toolbar">
+                <Setter Property="IsVisible" Value="True" />
+            </Style>
+        </Style>
+
+    </ControlTheme>
+</ResourceDictionary>

@@ -22,3 +22,6 @@
 [submodule "Libraries/DiffPlex.Avalonia"]
 	path = Libraries/DiffPlex.Avalonia
 	url = https://github.com/BAndysc/DiffPlex.Avalonia.git
+[submodule "Libraries/Classic.Avalonia"]
+	path = Libraries/Classic.Avalonia
+	url = https://github.com/BAndysc/Classic.Avalonia

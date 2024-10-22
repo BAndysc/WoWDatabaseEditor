@@ -16,9 +16,10 @@
                            IsEnabled="{CompiledBinding FilteringInProgress, Converter={x:Static BoolConverters.Not}}">
         <components:ButtonImage ToolTip.Tip="Saves to text file filtered packets" Command="{CompiledBinding SaveToFileCommand}" Image="Icons/icon_save_to_txt.png" />
 
-        <ToggleButton ToolTip.Tip="Find" IsChecked="{CompiledBinding FindPanelEnabled, Mode=TwoWay}">
-            <components:WdeImage ImageUri="Icons/icon_find.png" />
-        </ToggleButton>
+        <ButtonImage ToolTip.Tip="Find"
+                     Image="Icons/icon_find.png"
+                     IsToggleButton="True"
+                     IsChecked="{CompiledBinding FindPanelEnabled, Mode=TwoWay}" />
         
         <Border Width="15" />
 
@@ -28,21 +29,25 @@
         
         <components:ButtonImage ToolTip.Tip="Go to packet&#xA;&#xA;Shortcut: Control + G" Image="Icons/icon_goto_packet.png" Command="{CompiledBinding GoToPacketCommand}" />
         
-        <ToggleButton ToolTip.Tip="Toggle 'reason panel' visibility. This panel shows what is most likely trigger of the action inside the packet." IsChecked="{CompiledBinding ReasonPanelVisibility, Mode=TwoWay}">
-            <components:WdeImage ImageUri="Icons/icon_bulb.png" />
-        </ToggleButton>
+        <ButtonImage ToolTip.Tip="Toggle 'reason panel' visibility. This panel shows what is most likely trigger of the action inside the packet."
+                     Image="Icons/icon_bulb.png"
+                     IsToggleButton="True"
+                     IsChecked="{CompiledBinding ReasonPanelVisibility, Mode=TwoWay}" />
         
-        <ToggleButton ToolTip.Tip="Wrap/don't wrap lines in the preview" IsChecked="{CompiledBinding WrapLines, Mode=TwoWay}">
-            <components:WdeImage ImageUri="Icons/icon_word_wrap.png" />
-        </ToggleButton>
+        <ButtonImage ToolTip.Tip="Wrap/don't wrap lines in the preview"
+                     Image="Icons/icon_word_wrap.png"
+                     IsToggleButton="True"
+                     IsChecked="{CompiledBinding WrapLines, Mode=TwoWay}" />
 
-        <ToggleButton ToolTip.Tip="Temporarily disable filters" IsChecked="{CompiledBinding DisableFilters, Mode=TwoWay}">
-            <components:WdeImage ImageUri="Icons/icon_filters_disable.png" />
-        </ToggleButton>
+        <ButtonImage ToolTip.Tip="Temporarily disable filters"
+                     Image="Icons/icon_filters_disable.png"
+                     IsToggleButton="True"
+                     IsChecked="{CompiledBinding DisableFilters, Mode=TwoWay}" />
         
-        <DropDownButton DataContext="{CompiledBinding ParsingSettings}">
-            <components:WdeImage ToolTip.Tip="Settings" ImageUri="Icons/icon_wrench.png" />
-            <DropDownButton.Flyout>
+        <ButtonImage DataContext="{CompiledBinding ParsingSettings}"
+                     ToolTip.Tip="Settings"
+                     Image="Icons/icon_wrench.png" >
+            <ButtonImage.Flyout>
                 <Flyout>
                     <StackPanel>
                         <GroupingHeader>Dumpers general settings</GroupingHeader>
@@ -62,17 +67,13 @@
                         </controls:CompletionComboBox>
                     </StackPanel>
                 </Flyout>
-            </DropDownButton.Flyout>
-        </DropDownButton>
+            </ButtonImage.Flyout>
+        </ButtonImage>
 
         <Border Width="15" />
         
-        <DropDownButton>
-            <StackPanel Orientation="Horizontal">
-                <components:WdeImage ImageUri="Icons/icon_cog_reload.png" />
-                <TextBlock>Dump</TextBlock>
-            </StackPanel>
-            <DropDownButton.Flyout>
+        <ButtonImage Text="Dump" Image="Icons/icon_cog_reload.png">
+            <ButtonImage.Flyout>
                 <Flyout FlyoutPresenterClasses="no-horiz-scroll">
                     <StackPanel Orientation="Vertical">
                         <ItemsControl ItemsSource="{CompiledBinding Processors}">
@@ -94,19 +95,18 @@
                         <Button ClickMode="Press" Command="{CompiledBinding RunProcessors}" Content="Execute" />
                     </StackPanel>
                 </Flyout>
-            </DropDownButton.Flyout>
-        </DropDownButton>
+            </ButtonImage.Flyout>
+        </ButtonImage>
         
         <Border Width="15" />
         
         <ItemsControl ItemsSource="{CompiledBinding Processors}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="viewModels:ProcessorViewModel">
-                    <Button Command="{Binding #Root.DataContext.QuickRunProcessor}"
-                            CommandParameter="{CompiledBinding .}"
-                        ToolTip.Tip="{CompiledBinding Name}">
-                        <components:WdeImage Image="{CompiledBinding Image}" />
-                    </Button>
+                    <ButtonImage Command="{Binding #Root.DataContext.QuickRunProcessor}"
+                                 Image="{CompiledBinding Image}"
+                                 CommandParameter="{CompiledBinding .}"
+                                 ToolTip.Tip="{CompiledBinding Name}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>

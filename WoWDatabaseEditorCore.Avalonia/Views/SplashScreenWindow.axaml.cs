@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using AvaloniaStyles;
 using WDE.Common.Types;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views;
@@ -15,21 +16,21 @@ public partial class SplashScreenWindow : Window
         this.AttachDevTools();
 #endif
         DataContext = this;
+        if (SystemTheme.EffectiveTheme == SystemThemeOptions.Windows9x)
+        {
+            PART_Classic.IsVisible = true;
+            PART_Modern.IsVisible = false;
+            this.Width = 400;
+            this.Height = 247;
+            this.SystemDecorations = SystemDecorations.None;
+        }
+        else
+        {
+            PART_Classic.IsVisible = false;
+            PART_Modern.IsVisible = true;
+            this.Width = 512;
+            this.Height = 512;
+            this.SystemDecorations = SystemDecorations.BorderOnly;
+        }
     }
-    
-    public List<A> Items { get; } = new List<A>()
-    {
-        new A(),
-        new A(),
-    };
-    
-    public List<ColumnDescriptor> Columns { get; } = new List<ColumnDescriptor>()
-    {
-        ColumnDescriptor.TextColumn("Name", "Name", 100, false)
-    };
-}
-
-public class A
-{
-    public string Name => "abc";
 }

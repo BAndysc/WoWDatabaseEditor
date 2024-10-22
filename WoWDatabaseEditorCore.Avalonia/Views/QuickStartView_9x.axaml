@@ -1,0 +1,42 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
+        xmlns:newItemService="clr-namespace:WoWDatabaseEditorCore.Services.NewItemService;assembly=WoWDatabaseEditorCore">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+
+    <Styles.Resources>
+        <system:Boolean x:Key="AlternativeTitle">True</system:Boolean>
+        <system:Boolean x:Key="RegularTitle">False</system:Boolean>
+    </Styles.Resources>
+    <Style Selector="Button.FlattyButton">
+        <Setter Property="Width" Value="80" />
+        <Setter Property="Height" Value="64" />
+        <Setter Property="Margin" Value="0,0,8,8" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel Background="Transparent" x:DataType="newItemService:NewItemPrototypeInfo">
+                    <Border Name="Bg" CornerRadius="3" />
+                    <Border Padding="3,3" Background="Transparent">
+                        <StackPanel Orientation="Vertical">
+                            <WdeImage Name="Icon" Image="{CompiledBinding Image}" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                            <AccessText TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Text="{CompiledBinding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="Button.FlattyButton:pressed">
+    </Style>
+    <Style Selector="Button.FlattyButton /template/ Border#Bg">
+        <Setter Property="Background" Value="Black" />
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="Button.FlattyButton:pointerover /template/ WdeImage#Icon">
+        <Setter Property="IconStyle" Value="SelectedItem" />
+    </Style>
+</Styles>

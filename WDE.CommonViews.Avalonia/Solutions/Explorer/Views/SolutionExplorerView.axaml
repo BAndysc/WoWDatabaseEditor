@@ -103,8 +103,8 @@
         </TreeView.Styles>
         <TreeView.DataTemplates>
             <TreeDataTemplate DataType="viewModels:SolutionItemViewModel" ItemsSource="{CompiledBinding Children}">
-                <DockPanel Classes="TreeViewItemRow" LastChildFill="True" Height="26" Background="Transparent">
-                    <components:WdeImage Width="14" Height="14" Stretch="Fill" Margin="0,0,6,0" Image="{CompiledBinding Icon}" />
+                <DockPanel Classes="TreeViewItemRow" LastChildFill="True" Background="Transparent">
+                    <components:WdeImage Width="14" Height="14" Margin="0,0,6,0" Image="{CompiledBinding Icon}" />
                     <TextBlock Padding="2" VerticalAlignment="Center" Text="{CompiledBinding ExtraId}"
                                FontFamily="Consolas,Menlo,Courier,Courier New" Background="{DynamicResource ContentSpecialBackground}"
                                Foreground="{DynamicResource ContentSpecialForeground}" Margin="0,0,7,0">

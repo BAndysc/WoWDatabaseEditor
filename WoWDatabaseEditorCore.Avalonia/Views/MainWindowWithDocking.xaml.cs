@@ -29,6 +29,7 @@ using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
+using WoWDatabaseEditorCore.Avalonia.Clippy;
 using WoWDatabaseEditorCore.Avalonia.Docking;
 using WoWDatabaseEditorCore.Avalonia.Docking.Serialization;
 using WoWDatabaseEditorCore.Settings;
@@ -108,7 +109,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             
             // we have to do it before InitializeComponent!
             var primaryScreen = Screens.Primary ?? Screens.All.FirstOrDefault();
-            GlobalApplication.HighDpi = true;// (primaryScreen?.PixelDensity ?? 1) > 1.5f; // enable hidpi res for everyone? check if it results in higher quality icons
+            GlobalApplication.HighDpi = (primaryScreen?.Scaling ?? 1) >= 1.5f; // enable hidpi res for everyone? check if it results in higher quality icons
             
             InitializeComponent();
             this.AttachDevTools();
@@ -135,6 +136,16 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                     Application.Current!.Resources["DisplayButtonImageIcon"] = style is ToolBarButtonStyle.Icon or ToolBarButtonStyle.IconAndText;
                     Application.Current!.Resources["DisplayButtonImageText"] = style is ToolBarButtonStyle.Text or ToolBarButtonStyle.IconAndText;
                 });
+
+            bool once = true;
+            this.Activated += (_, __) =>
+            {
+                if (DataContext is MainWindowViewModel vm)
+                {
+                    vm.Activated(once, SystemTheme.EffectiveTheme == SystemThemeOptions.Windows9x);
+                    once = false;
+                }
+            };
 
             DragDrop.SetAllowDrop(this, true);
             AddHandler(DragDrop.DragEnterEvent, DragEnter);
@@ -298,7 +309,18 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         protected override void OnClosing(WindowClosingEventArgs e)
         {
             base.OnClosing(e);
-            // we use screen coords for size so that size is custom app scaling independent 
+            // we use screen coords for size so that size is custom app scaling independent
+            if (DataContext is MainWindowViewModel closeAwareViewModel)
+            {
+                if (!realClosing)
+                {
+                    TryClose(closeAwareViewModel).ListenErrors();
+                    e.Cancel = true;
+                    return;
+                }
+                else
+                    closeAwareViewModel.NotifyWillClose();
+            }
             var screenTopLeftPoint = this.PointToScreen(new Point(Position.X, Position.Y));
             var screenBottomRightPoint = this.PointToScreen(new Point(Position.X + this.ClientSize.Width, Position.Y + this.ClientSize.Height));
             userSettings.Update(new WindowLastSize()
@@ -311,16 +333,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             });
             fileSystem.WriteAllText(DockSettingsFile,
                 JsonConvert.SerializeObject(avaloniaDockAdapter.SerializeDock(), Formatting.Indented));
-            if (DataContext is MainWindowViewModel closeAwareViewModel)
-            {
-                if (!realClosing)
-                {
-                    TryClose(closeAwareViewModel).ListenErrors();
-                    e.Cancel = true;
-                }
-                else
-                    closeAwareViewModel.NotifyWillClose();
-            }
         }
 
         protected override void OnClosed(EventArgs e)

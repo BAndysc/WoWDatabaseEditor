@@ -1,0 +1,16 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <!-- Add Controls for Previewer Here -->
+    </Border>
+  </Design.PreviewWith>
+
+  <ClassicTheme FontAliasing="True" />
+  <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows9x/Style.axaml"/>
+  <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows9x/ColorsLight.axaml" />
+
+  <Styles.Resources>
+    <SolidColorBrush x:Key="SystemControlTransparentBrush" Color="Transparent" />
+  </Styles.Resources>
+</Styles>

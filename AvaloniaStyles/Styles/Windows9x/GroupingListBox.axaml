@@ -1,0 +1,9 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:commonControls="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
+    <Style Selector="GroupingListBox">
+        <Setter Property="Background" Value="{DynamicResource {x:Static commonControls:SystemColors.WindowBrushKey}}" />
+        <Setter Property="BorderBrush" Value="{x:Static ClassicBorderDecorator.ClassicBorderBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+    </Style>
+</Styles>

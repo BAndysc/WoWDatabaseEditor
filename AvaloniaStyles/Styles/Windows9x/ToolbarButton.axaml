@@ -1,0 +1,228 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:commonControls="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+
+    <Styles.Resources>
+      <ControlTheme x:Key="{x:Type commonControls:ToolBarButton}"
+                    TargetType="commonControls:ToolBarButton">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Background" Value="Transparent" />
+        <!-- <Setter Property="Background" Value="{DynamicResource {x:Static common:SystemColors.ControlBrushKey}}" /> -->
+        <Setter Property="Template">
+          <ControlTemplate>
+            <ClassicBorderDecorator
+              BorderThickness="1"
+              Background="{TemplateBinding Background}"
+              x:Name="PART_Border"
+              >
+              <StackPanel x:Name="PART_Layout" Margin="{TemplateBinding Padding}">
+                <Border x:Name="PART_IconWrapper">
+                  <StackPanel Orientation="Horizontal" x:Name="PART_IconLayout" HorizontalAlignment="Center">
+                    <commonControls:IconRenderer Source="{TemplateBinding SmallIcon}"
+                                                LargeSource="{TemplateBinding LargeIcon}"
+                                                HorizontalAlignment="Center"
+                                                x:Name="PART_Icon"/>
+                    <Path
+                      x:Name="PART_FlyoutArrow"
+                      Fill="{TemplateBinding Foreground}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Data="{StaticResource ToolBarButtonDownArrowGeometry}"/>
+                  </StackPanel>
+                </Border>
+                <AccessText Text="{TemplateBinding Text}" x:Name="PART_Text" VerticalAlignment="Center" TextAlignment="Center" />
+              </StackPanel>
+            </ClassicBorderDecorator>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^ /template/ ClassicBorderDecorator#PART_Border">
+          <Setter Property="BorderStyle" Value="None" />
+        </Style>
+        <Style Selector="^ /template/ Path#PART_FlyoutArrow">
+          <Setter Property="Margin" Value="0,1,2,0" />
+        </Style>
+
+        <Style Selector="^[Size=Small]">
+          <Style Selector="^ /template/ commonControls|IconRenderer#PART_Icon">
+            <Setter Property="Height" Value="16" />
+            <Setter Property="Width" Value="16" />
+          </Style>
+          <Style Selector="^ /template/ Border#PART_IconWrapper">
+            <Setter Property="Margin" Value="3,2,3,2" />
+          </Style>
+          <Style Selector="^[TextPlacement=Right],^[TextPlacement=RightPreferNoText]">
+          </Style>
+          <Style Selector="^ /template/ Path#PART_FlyoutArrow">
+            <Setter Property="Margin" Value="2,1,0,0" />
+          </Style>
+          <Style Selector="^[TextPlacement=Right],^[TextPlacement=RightPreferNoText][PreferText=True]">
+            <Style Selector="^:text /template/ AccessText#PART_Text">
+              <Setter Property="Margin" Value="0,0,7,0" />
+            </Style>
+            <Style Selector="^:not(:text) /template/ AccessText#PART_Text">
+              <Setter Property="Margin" Value="0,0,4,0" />
+            </Style>
+            <Style Selector="^ /template/ Border#PART_IconWrapper">
+              <Setter Property="Margin" Value="4,2,1,2" />
+            </Style>
+          </Style>
+          <Style Selector="^[TextPlacement=Down]">
+            <Style Selector="^ /template/ Border#PART_IconWrapper">
+              <Setter Property="MinWidth" Value="33" />
+              <Setter Property="Margin" Value="7,2,8,2" />
+            </Style>
+            <Style Selector="^ /template/ Path#PART_FlyoutArrow">
+              <Setter Property="Margin" Value="4,1,2,0" />
+            </Style>
+          </Style>
+        </Style>
+
+        <Style Selector="^[Size=Large]">
+          <Style Selector="^ /template/ commonControls|IconRenderer#PART_Icon">
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Width" Value="24" />
+          </Style>
+          <Style Selector="^ /template/ AccessText#PART_Text">
+            <Setter Property="Margin" Value="1,-1,1,0" />
+          </Style>
+          <Style Selector="^[TextPlacement=NoText]">
+            <Style Selector="^ /template/ Border#PART_IconWrapper">
+              <Setter Property="Margin" Value="0,0,1,0" />
+            </Style>
+          </Style>
+          <Style Selector="^[TextPlacement=Down]">
+            <Style Selector="^ /template/ Border#PART_IconWrapper">
+              <Setter Property="MinWidth" Value="33" />
+              <Setter Property="Margin" Value="7,0,8,0" />
+            </Style>
+            <Style Selector="^ /template/ Path#PART_FlyoutArrow">
+              <Setter Property="Margin" Value="2,1,2,0" />
+            </Style>
+          </Style>
+          <Style Selector="^[TextPlacement=Right],^[TextPlacement=RightPreferNoText]">
+            <Style Selector="^ /template/ Border#PART_IconWrapper">
+              <Setter Property="Margin" Value="2,0,0,0" />
+            </Style>
+            <Style Selector="^ /template/ AccessText#PART_Text">
+              <Setter Property="Margin" Value="0,0,6,0" />
+            </Style>
+          </Style>
+        </Style>
+
+        <Style Selector="^[TextPlacement=Right]">
+          <Style Selector="^:noicon /template/ commonControls|IconRenderer#PART_Icon">
+            <Setter Property="Width" Value="0" />
+          </Style>
+          <Style Selector="^ /template/ StackPanel#PART_Layout">
+            <Setter Property="Orientation" Value="Horizontal" />
+          </Style>
+        </Style>
+
+        <Style Selector="^[TextPlacement=RightPreferNoText]">
+          <Style Selector="^:noicon /template/ commonControls|IconRenderer#PART_Icon">
+            <Setter Property="Width" Value="0" />
+          </Style>
+          <Style Selector="^ /template/ StackPanel#PART_Layout">
+            <Setter Property="Orientation" Value="Horizontal" />
+          </Style>
+        </Style>
+
+        <Style Selector="^[TextPlacement=Down]">
+          <Style Selector="^:noicon /template/ commonControls|IconRenderer#PART_Icon">
+            <Setter Property="Height" Value="0" />
+          </Style>
+          <Style Selector="^ /template/ StackPanel#PART_Layout">
+            <Setter Property="Orientation" Value="Vertical" />
+          </Style>
+        </Style>
+
+        <Style Selector="^[TextPlacement=NoText]">
+          <Style Selector="^ /template/ AccessText#PART_Text">
+            <Setter Property="IsVisible" Value="False" />
+          </Style>
+        </Style>
+
+        <Style Selector="^[TextPlacement=RightPreferNoText]">
+          <Style Selector="^ /template/ AccessText#PART_Text">
+            <Setter Property="IsVisible" Value="False" />
+          </Style>
+
+          <Style Selector="^[PreferText=True]">
+            <Style Selector="^ /template/ AccessText#PART_Text">
+              <Setter Property="IsVisible" Value="True" />
+            </Style>
+          </Style>
+        </Style>
+
+        <Style Selector="^:pointerover">
+          <Style Selector="^ /template/ ClassicBorderDecorator#PART_Border">
+            <Setter Property="BorderStyle" Value="ThinRaised" />
+          </Style>
+        </Style>
+
+        <Style Selector="^:pressed">
+          <Style Selector="^ /template/ ClassicBorderDecorator#PART_Border">
+            <Setter Property="BorderStyle" Value="ThinPressedInnerShadow" />
+          </Style>
+        </Style>
+
+        <Style Selector="^[GrayscaleIcon=true]">
+          <Style Selector="^ /template/ commonControls|IconRenderer#PART_Icon">
+            <Setter Property="IconStyle" Value="Grayscale" />
+          </Style>
+          <Style Selector="^:pointerover">
+            <Style Selector="^ /template/ commonControls|IconRenderer#PART_Icon">
+              <Setter Property="IconStyle" Value="Normal" />
+            </Style>
+          </Style>
+        </Style>
+
+        <Style Selector="^[IsToggleButton=true]">
+          <Style Selector="^:checked">
+            <Style Selector="^ /template/ ClassicBorderDecorator#PART_Border">
+              <Setter Property="Background" Value="{DynamicResource DiagonalBrush}" />
+              <Setter Property="BorderStyle" Value="ThinPressedInnerShadow" />
+            </Style>
+            <Style Selector="^:pointerover /template/ ClassicBorderDecorator#PART_Border">
+              <Setter Property="Background" Value="Transparent" />
+              <!-- <Setter Property="Background" Value="{DynamicResource {x:Static common:SystemColors.ControlBrushKey}}" /> -->
+            </Style>
+            <Style Selector="^ /template/ commonControls|IconRenderer#PART_Icon">
+              <Setter Property="IconStyle" Value="Normal" />
+            </Style>
+          </Style>
+        </Style>
+
+        <Style Selector="^">
+          <Style Selector="^ /template/ Path#PART_FlyoutArrow">
+            <Setter Property="IsVisible" Value="False" />
+          </Style>
+        </Style>
+        <Style Selector="^:has-flyout">
+          <Style Selector="^ /template/ Path#PART_FlyoutArrow">
+            <Setter Property="IsVisible" Value="True" />
+          </Style>
+        </Style>
+        <Style Selector="^:flyout-open">
+          <Style Selector="^ /template/ ClassicBorderDecorator#PART_Border">
+            <Setter Property="BorderStyle" Value="ThinPressedInnerShadow" />
+          </Style>
+          <Style Selector="^ /template/ commonControls|IconRenderer#PART_Icon">
+            <Setter Property="IconStyle" Value="Normal" />
+          </Style>
+        </Style>
+
+        <Style Selector="^:disabled">
+          <Setter Property="Foreground" Value="{DynamicResource {x:Static commonControls:SystemColors.GrayTextBrushKey}}" />
+          <Style Selector="^ /template/ commonControls|IconRenderer#PART_Icon">
+            <Setter Property="IconStyle" Value="Disabled" />
+          </Style>
+        </Style>
+      </ControlTheme>
+    </Styles.Resources>
+</Styles>

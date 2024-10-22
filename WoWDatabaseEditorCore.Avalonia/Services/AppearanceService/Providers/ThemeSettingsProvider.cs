@@ -22,7 +22,9 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers
                 Settings.CustomScaling,
                 Settings.Hue,
                 Remap(Settings.Saturation, -1, 1, 0, 1),
-                Remap(Settings.Lightness, -1, 1, 0, 1));
+                Remap(Settings.Lightness, -1, 1, 0, 1),
+                Settings.AprilsFoolOverride,
+                Settings.ThemeVariant ?? "Classic");
         }
 
         private ThemeSettings Settings { get; set; }
@@ -32,10 +34,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers
             return Settings;
         }
 
-        public void UpdateSettings(Theme theme, double? customScaling, double hue, double saturation, double lightness)
+        public void UpdateSettings(Theme theme, double? customScaling, double hue, double saturation, double lightness, int? aprilsFoolOverride, string? themeVariant)
         {
-            Settings = new ThemeSettings(theme.Name, customScaling.HasValue, customScaling ?? 1, hue, saturation, lightness);
-            userSettings.Update(new ThemeSettings(theme.Name, customScaling.HasValue, customScaling ?? 1, hue, Remap(saturation, 0, 1, -1, 1), Remap(lightness, 0, 1, -1, 1)));
+            Settings = new ThemeSettings(theme.Name, customScaling.HasValue, customScaling ?? 1, hue, saturation, lightness, aprilsFoolOverride, themeVariant);
+            userSettings.Update(new ThemeSettings(theme.Name, customScaling.HasValue, customScaling ?? 1, hue, Remap(saturation, 0, 1, -1, 1), Remap(lightness, 0, 1, -1, 1), aprilsFoolOverride, themeVariant));
         }
 
         private double Remap(double val, double min, double max, double newMin, double newMax)

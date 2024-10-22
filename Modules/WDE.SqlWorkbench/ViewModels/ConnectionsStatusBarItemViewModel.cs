@@ -15,7 +15,6 @@ namespace WDE.SqlWorkbench.ViewModels;
 internal partial class ConnectionsStatusBarItemViewModel : ObservableBase, IConnectionsStatusBarItem
 {
     private readonly IConnectionsManager connectionsManager;
-    [Notify] private bool isPanelVisible;
 
     public ConnectionsStatusBarItemViewModel(IConnectionsManager connectionsManager)
     {

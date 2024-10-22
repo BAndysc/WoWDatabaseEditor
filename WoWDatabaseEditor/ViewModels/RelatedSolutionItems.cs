@@ -102,7 +102,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public RelatedSolutionItemViewModel(string name, ImageUri icon, ICommand createCommand)
         {
             Name = name;
-            Icon = icon;
+            Icon = icon.Uri?.Contains("_big") ?? false ? new ImageUri(icon.Uri.Replace("_big", "")) : icon;
             CreateCommand = createCommand;
         }
 

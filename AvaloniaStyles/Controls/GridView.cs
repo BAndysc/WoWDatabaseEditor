@@ -186,6 +186,10 @@ namespace AvaloniaStyles.Controls
                 Grid.SetColumn(splitter, i++);
                 header.Children.Add(splitter);
             }
+            //last
+            var lastCell = new GridViewColumnHeader() { ColumnName = "" };
+            Grid.SetColumn(lastCell, i++);
+            header.Children.Add(lastCell);
 
             BindFixMultiSelect();
         }
@@ -330,7 +334,7 @@ namespace AvaloniaStyles.Controls
             }
 
             // additional column in header makes it easier to resize
-            grid.ColumnDefinitions.Add(new ColumnDefinition(20, GridUnitType.Pixel));
+            grid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star){MinWidth = 20});
         }
 
         static GridView()

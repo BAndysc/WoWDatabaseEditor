@@ -37,7 +37,7 @@ public partial class VirtualizedSmartScriptPanel
         }
     }
     
-    private void ArrangeAction(in SizingContext context, SmartAction action, double y, out double actionHeight)
+    private Control? ArrangeAction(in SizingContext context, SmartAction action, double y, out double actionHeight)
     {
         actionHeight = action.CachedHeight ?? 0;
         var actionRect = context.actionRect.WithVertical(y, actionHeight);
@@ -56,7 +56,10 @@ public partial class VirtualizedSmartScriptPanel
             }
             view.Measure(new Size(actionRect.Width, float.PositiveInfinity));
             view.Arrange(actionRect);
+            return view;
         }
+
+        return null;
     }
     
     private void ArrangeEvent(in SizingContext context, SmartEvent e, bool inGroup, double startY, out double totalHeight)
@@ -70,9 +73,13 @@ public partial class VirtualizedSmartScriptPanel
         {
             if (action.Id == SmartConstants.ActionComment && HideComments)
                 continue;
-            ArrangeAction(in context, action, y, out var actionHeight);
+            var view = ArrangeAction(in context, action, y, out var actionHeight);
             y += actionHeight + ActionSpacing;
             actionsHeight += actionHeight + ActionSpacing;
+            if (view != null)
+            {
+                view.Classes.Set("last", action == e.Actions[^1]);
+            }
         }
 
         if ((!useCompactView || actionsHeight + AddActionHeight < e.Position.Height) && !AnyDragging && mouseY >= e.Position.Y && mouseY <= e.Position.Bottom)

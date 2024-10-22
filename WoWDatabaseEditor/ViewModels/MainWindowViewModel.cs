@@ -52,6 +52,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly ITeachingTipService teachingTipService;
         private readonly IStatisticsService statisticsService;
         private readonly IUpdateViewModel updateViewModel;
+        private readonly IClippy clippy;
 
         private readonly Dictionary<string, ITool> toolById = new();
 
@@ -87,11 +88,11 @@ namespace WoWDatabaseEditorCore.ViewModels
             IGlobalServiceRoot globalServiceRoot,
             TopBarQuickAccessViewModel topBarQuickAccessViewModel,
             SessionRestoreService sessionRestoreService,
-            IConnectionsStatusBarItem connectionsViewModel,
             ITeachingTipService teachingTipService,
             IStatisticsService statisticsService,
             ICurrentCoreVersion currentCoreVersion,
             IUpdateViewModel updateViewModel,
+            IClippy clippy,
             IVisualStudioManagerViewModel visualStudioManagerViewModel,
             IEnumerable<IVersionedFilesViewModel> versionedFilesViewModel,
             Func<IFindAnywhereDialogViewModel> findAnywhereCreator)
@@ -100,7 +101,6 @@ namespace WoWDatabaseEditorCore.ViewModels
             StatusBar = statusBarViewModel;
             TopBarQuickAccess = topBarQuickAccessViewModel;
             SessionRestoreService = sessionRestoreService;
-            ConnectionsViewModel = connectionsViewModel;
             VisualStudioManagerViewModel = visualStudioManagerViewModel;
             VersionedFilesViewModel = versionedFilesViewModel.FirstOrDefault();
             this.statusBar = statusBar;
@@ -115,6 +115,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.teachingTipService = teachingTipService;
             this.statisticsService = statisticsService;
             this.updateViewModel = updateViewModel;
+            this.clippy = clippy;
             this.programNameAddons = nameAddons.ToList();
             Title = "";
             Subtitle = programNameService.Subtitle;
@@ -263,7 +264,6 @@ namespace WoWDatabaseEditorCore.ViewModels
         public ProfilesViewModel ProfilesViewModel { get; }
         public TopBarQuickAccessViewModel TopBarQuickAccess { get; }
         public SessionRestoreService SessionRestoreService { get; }
-        public IConnectionsStatusBarItem ConnectionsViewModel { get; }
         public IVisualStudioManagerViewModel VisualStudioManagerViewModel { get; }
 
         public List<IMainMenuItem> MenuItemProviders { get; }
@@ -335,6 +335,14 @@ namespace WoWDatabaseEditorCore.ViewModels
             }
 
             return null;
+        }
+
+        public void Activated(bool firstTime, bool classicTheme)
+        {
+            if (firstTime && classicTheme && teachingTipService.ShowTip("ClassicClippy_Once"))
+            {
+                clippy.Open();
+            }
         }
 
         public void LoadDefault()

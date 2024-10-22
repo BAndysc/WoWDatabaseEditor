@@ -25,9 +25,6 @@
             <GeometryDrawing  Brush="#30000000" Geometry="F1M189.055999755859,-557.611022949219C177.322998046875,-523.179016113281,170.667007446289,-486.356994628906,170.667007446289,-448L170.666000366211,-448.001007080078C170.666000366211,-274.263000488281,301.269012451172,-130.731994628906,469.3330078125,-109.611999511719L469.3330078125,-192.001007080078 341.3330078125,-320.001007080078 341.3330078125,-405.334014892578 189.055999755859,-557.611022949219z M640,-764.202026367188L640,-746.666015625C640,-699.56201171875,601.77099609375,-661.3330078125,554.6669921875,-661.3330078125L512,-661.3330078125 512,-618.666015625C512,-571.56201171875,473.77099609375,-533.3330078125,426.6669921875,-533.3330078125L426.6669921875,-405.3330078125 597.333984375,-405.3330078125C644.43798828125,-405.3330078125,682.6669921875,-367.10400390625,682.6669921875,-320L682.6669921875,-277.3330078125C711.97900390625,-277.3330078125,754.218994140625,-262.528015136719,782.080017089844,-240.085006713867L782.080017089844,-240.083999633789C826.580993652344,-297.726989746094 853.3330078125,-369.705993652344 853.3330078125,-447.998992919922 853.3330078125,-590.932983398438 764.927978515625,-713.471008300781 640,-764.202026367188z M512,-874.6669921875C747.263977050781,-874.6669921875 938.6669921875,-683.263977050781 938.6669921875,-448 938.6669921875,-212.735992431641 747.263977050781,-21.3330001831055 512,-21.3329925537109 276.735992431641,-21.3330001831055 85.3330001831055,-212.735992431641 85.3330001831055,-448 85.3330001831055,-683.263977050781 276.735992431641,-874.6669921875 512,-874.6669921875z"   />
         </DrawingImage>
     </Styles.Resources>
-    
-    <styles:StyleIncludeColorAware DarkSource="avares://WDE.SmartScriptEditor.Avalonia/Themes/ColorsDark.axaml"
-                                   LightSource="avares://WDE.SmartScriptEditor.Avalonia/Themes/ColorsLight.axaml"/>
 
     <Style Selector="controls|SmartActionView:action">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -131,7 +128,7 @@
     <Style Selector="controls|SmartGroupView">
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Name="PART_Border" BorderThickness="1" CornerRadius="4" Padding="6">
+                <Border Name="PART_Border" BorderThickness="1" CornerRadius="{DynamicResource SmartCornerRadius}" Padding="6">
                     <DockPanel>
                         <controls:ToggleAllCheckBox DockPanel.Dock="Left" 
                                                     AltCommand="{TemplateBinding ToggleAllCommand}"
@@ -157,7 +154,7 @@
         <Setter Property="Template">
             <ControlTemplate x:DataType="models:SmartEvent">
                 <DockPanel LastChildFill="True">
-                    <Border Name="Main" BorderThickness="1" CornerRadius="4,0,0,4" DockPanel.Dock="Top">
+                    <ClassicBorderDecorator Name="Main" BorderStyle="ThinRaised" BorderThickness="1" CornerRadius="{DynamicResource SmartCornerRadius_Left}" DockPanel.Dock="Top">
                         <Border Padding="5" Background="{TemplateBinding SpecialBackground}" Name="Inner">
                             <DockPanel LastChildFill="True">
                                 <controls:SmartEventFlagsView Margin="2,0,0,0" TextElement.Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" DockPanel.Dock="Right"/>
@@ -168,32 +165,33 @@
                                     <TextBlock Foreground="White" FontWeight="Bold" FontSize="11" Text="{CompiledBinding TimerIdNumber}"/>
                                 </Border>
                                 <extendedTextBlock:FormattedTextBlock
+                                    Name="PART_FormattedTextBlock"
                                     ContextArray="{CompiledBinding Context}"
                                     IsSelected="{CompiledBinding IsSelected}"
                                     Text="{CompiledBinding Readable}" />
                             </DockPanel>
                         </Border>
-                    </Border>
-                    <Border Name="Filler" CornerRadius="0,0,4,4" Margin="20,0,0,0" />
+                    </ClassicBorderDecorator>
+                    <Border Name="Filler" CornerRadius="{DynamicResource SmartCornerRadius_Bottom}" Margin="20,0,0,0" />
                 </DockPanel>
             </ControlTemplate>
         </Setter>
     </Style>
-    <Style Selector="controls|SmartEventView /template/ Border#Main">
+    <Style Selector="controls|SmartEventView /template/ ClassicBorderDecorator#Main">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Border}" />
     </Style>
     <Style Selector="controls|SmartEventView /template/ Border#Filler">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Condition.Background}" />
     </Style>
-    <Style Selector="controls|SmartEventView:selected /template/ Border#Main">
+    <Style Selector="controls|SmartEventView:selected /template/ ClassicBorderDecorator#Main">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
     </Style>
     <Style Selector="controls|SmartEventView:selected /template/ Border#Inner">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Selected.Background}" />
     </Style>
     <Style Selector="controls|SmartEventView:selected /template/ Border#Filler">
-        <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Selected.Filler}" />
     </Style>
 
     <Style Selector="controls|SmartEventView /template/ extendedTextBlock|FormattedTextBlock:overlink">
@@ -215,13 +213,13 @@
         </Setter>
     </Style>
     <Style Selector="controls|GlobalVariableView.first Border#PART_Var">
-        <Setter Property="CornerRadius" Value="6,6,0,0" />
+        <Setter Property="CornerRadius" Value="{DynamicResource SmartCornerRadius_Big_Top}" />
     </Style>
     <Style Selector="controls|GlobalVariableView.last Border#PART_Var">
-        <Setter Property="CornerRadius" Value="0, 0, 6,6" />
+        <Setter Property="CornerRadius" Value="{DynamicResource SmartCornerRadius_Big_Bottom}" />
     </Style>
     <Style Selector="controls|GlobalVariableView.first.last Border#PART_Var">
-        <Setter Property="CornerRadius" Value="6,6,6,6" />
+        <Setter Property="CornerRadius" Value="{DynamicResource SmartCornerRadius_Big}" />
     </Style>
     <Style Selector="controls|GlobalVariableView Border#PART_Var">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Border}" />
@@ -290,4 +288,9 @@
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="BoxShadow" Value="none" />
     </Style>
+
+    <styles:StyleIncludeColorAware DarkSource="avares://WDE.SmartScriptEditor.Avalonia/Themes/ColorsDark.axaml"
+                                   LightSource="avares://WDE.SmartScriptEditor.Avalonia/Themes/ColorsLight.axaml"
+                                   Win9x="avares://WDE.SmartScriptEditor.Avalonia/Themes/ColorsWin9x.axaml"/>
+
 </Styles>

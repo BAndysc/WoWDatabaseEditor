@@ -1,7 +1,9 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls"
-        xmlns:converters="clr-namespace:AvaloniaStyles.Converters">
+        xmlns:converters="clr-namespace:AvaloniaStyles.Converters"
+        xmlns:utils="clr-namespace:Classic.Avalonia.Theme.Utils;assembly=Classic.Avalonia.Theme"
+        xmlns:common="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
     <Style Selector="controls1|ExtendedTitleBar">
         <Setter Property="Height" Value="32" />
         <Setter Property="Template">
@@ -16,6 +18,7 @@
     
     <Styles.Resources>
         <converters:ChromeToBoolConverter x:Key="ChromeToBoolConverter" NoChrome="True" AlwaysChrome="False" MacChromeOnly="True" />
+        <ControlTheme x:Key="{x:Type ClassicWindow}" TargetType="ClassicWindow" BasedOn="{StaticResource {x:Type Window}}" />
     </Styles.Resources>
     
     <!--<Style Selector="controls1|ToolBar StackPanel">
@@ -23,6 +26,7 @@
     </Style>-->
 
     <Style Selector="controls1|ExtendedWindow">
+        <Setter Property="RoundCorners" Value="True" />
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="24" />
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
@@ -53,8 +57,8 @@
                                                           ItemsSource="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue={x:Null}}">
                                                         <Menu.Styles>
                                                             <Style Selector="MenuItem">
-                                                                <Setter Property="(converters:NativeMenuItemHelper.IsChecked)" Value="{Binding IsChecked}"></Setter>
-                                                                <Setter Property="(converters:NativeMenuItemHelper.ToggleType)" Value="{Binding ToggleType}"></Setter>
+                                                                <Setter Property="IsChecked" Value="{Binding IsChecked}"></Setter>
+                                                                <Setter Property="ToggleType" Value="{Binding ToggleType, Converter={x:Static converters:NativeMenuItemToggleTypeToMenuItemToggleTypeConverter.Instance}}" />
                                                                 <Setter Property="Header" Value="{Binding Header}"/>
                                                                 <Setter Property="InputGesture" Value="{Binding Gesture}"/>
                                                                 <Setter Property="HotKey" Value="{Binding Gesture}" />

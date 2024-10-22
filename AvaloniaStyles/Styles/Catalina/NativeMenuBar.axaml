@@ -3,7 +3,7 @@
         xmlns:converters="clr-namespace:AvaloniaStyles.Converters">
     <Style Selector="NativeMenuBar MenuItem">
         <Setter Property="HotKey" Value="{Binding Gesture}" />
-        <Setter Property="(converters:NativeMenuItemHelper.IsChecked)" Value="{Binding IsChecked}"></Setter>
-        <Setter Property="(converters:NativeMenuItemHelper.ToggleType)" Value="{Binding ToggleType}"></Setter>
+        <Setter Property="IsChecked" Value="{Binding IsChecked}"></Setter>
+        <Setter Property="ToggleType" Value="{Binding ToggleType, Converter={x:Static converters:NativeMenuItemToggleTypeToMenuItemToggleTypeConverter.Instance}}" />
     </Style>
 </Styles>

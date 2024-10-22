@@ -67,18 +67,6 @@ public partial class StatusBarViewModel : ObservableBase
 
         OpenProblemTool = new DelegateCommand(() => documentManager.Value.OpenTool<ProblemsViewModel>());
 
-        ToggleConnectionsPanelVisibility = new DelegateCommand(() =>
-        {
-            tasksViewModel.IsPanelVisible = false;
-            Connections.IsPanelVisible = !Connections.IsPanelVisible;
-        });
-
-        ToggleTasksPanelVisibility = new DelegateCommand(() =>
-        {
-            Connections.IsPanelVisible = false;
-            tasksViewModel.IsPanelVisible = !tasksViewModel.IsPanelVisible;
-        });
-
         OpenBreakpointsWindow = new DelegateCommand(() =>
         {
             this.debuggerInspector.Value.OpenInspector();
@@ -124,10 +112,6 @@ public partial class StatusBarViewModel : ObservableBase
             }
         }, () => getter() > 0);
     }
-
-    public ICommand ToggleConnectionsPanelVisibility { get; }
-
-    public ICommand ToggleTasksPanelVisibility { get; }
 
     public ICommand CopyNextCreatureGuidCommand { get; }
 

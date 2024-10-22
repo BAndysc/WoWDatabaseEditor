@@ -1,0 +1,61 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls"
+        xmlns:common="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
+    <Style Selector="controls|GridView">
+        <Setter Property="BorderBrush" Value="{x:Static ClassicBorderDecorator.ClassicBorderBrush}"/>
+    </Style>
+    <Style Selector="controls|GridViewHeader">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static common:SystemColors.ControlBrushKey}}"/>
+        <Setter Property="BorderBrush" Value="{x:Static ClassicBorderDecorator.ClassicBorderBrush}"/>
+    </Style>
+    <Style Selector="GridViewColumnHeader">
+        <Setter Property="Margin" Value="0,0,-6,0" />
+    </Style>
+    <Style Selector="controls|GridViewColumnHeader TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static common:SystemColors.ControlBrushKey}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static common:SystemColors.WindowTextBrushKey}}"/>
+    </Style>
+    <Style Selector="controls|GridView GridSplitter">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border
+                    Background="Transparent"/>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|GridView">
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="BorderBrush" Value="{x:Static ClassicBorderDecorator.ClassicBorderBrush}"/>
+    </Style>
+    <Style Selector="controls|GridViewListBox">
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static common:SystemColors.WindowTextBrushKey}}"/>
+        <Setter Property="Background" Value="{DynamicResource {x:Static common:SystemColors.WindowBrushKey}}"/>
+    </Style>
+    <Style Selector="controls|GridView ListBoxItem">
+        <Setter Property="MinHeight" Value="26" />
+    </Style>
+    <Style Selector="controls|GridView ListBoxItem TextBlock">
+        <Setter Property="Padding" Value="8,0,0,0" />
+    </Style>
+    
+    
+    <Style Selector="controls|VirtualizedGridView">
+        <Setter Property="BorderBrush" Value="{x:Static ClassicBorderDecorator.ClassicBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static common:SystemColors.WindowBrushKey}}"/>
+    </Style>
+    <Style Selector="controls|VirtualizedGridView GridSplitter">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border
+                    Background="Transparent"/>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|VirtualizedGridView ListBoxItem TextBlock">
+        <Setter Property="Padding" Value="8,0,0,0" />
+    </Style>
+</Styles>

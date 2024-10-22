@@ -1,0 +1,55 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
+        xmlns:newItemService="clr-namespace:WoWDatabaseEditorCore.Services.NewItemService;assembly=WoWDatabaseEditorCore">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+
+    <Styles.Resources>
+        <system:Boolean x:Key="AlternativeTitle">False</system:Boolean>
+        <system:Boolean x:Key="RegularTitle">True</system:Boolean>
+    </Styles.Resources>
+
+    <Style Selector="Button.FlattyButton">
+        <Setter Property="Width" Value="100" />
+        <Setter Property="Height" Value="80" />
+        <Setter Property="Margin" Value="0,0,8,8" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel Background="Transparent" x:DataType="newItemService:NewItemPrototypeInfo">
+                    <Border Name="Bg" CornerRadius="3" />
+                    <Border Padding="3,3" Background="Transparent">
+                        <StackPanel Orientation="Vertical">
+                            <WdeImage Image="{CompiledBinding Image}" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                            <AccessText TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Text="{CompiledBinding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.8" TextAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+        <Setter Property="RenderTransform" Value="none" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="Button.FlattyButton:pressed">
+        <Setter Property="RenderTransform" Value="scale(0.9)" />
+    </Style>
+    <Style Selector="Button.FlattyButton /template/ Border#Bg">
+        <Setter Property="Background" Value="Black" />
+        <Setter Property="Opacity" Value="0" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:.125" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="Button.FlattyButton:pointerover /template/ Border#Bg">
+        <Setter Property="Opacity" Value="0.2" />
+    </Style>
+</Styles>

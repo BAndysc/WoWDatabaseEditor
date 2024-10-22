@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -155,6 +156,7 @@ public partial class VeryFastTableView : RenderedPanel, IFastTableContext
             Gesture = new KeyGesture(Key.Delete),
             Command = openAndErase
         });
+        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.SubpixelAntialias);
     }
 
     private ScrollViewer? boundScrollViewer;

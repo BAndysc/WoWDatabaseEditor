@@ -24,15 +24,16 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         <ToolbarSpacer />
-        <ToggleButton ToolTip.Tip="Toggle areatriggers visibility" IsChecked="{CompiledBinding ShowAreaTriggers, Mode=TwoWay}">
-            <WdeImage ImageUri="Icons/icon_areatrigger.png" />
-        </ToggleButton>
-        <ToggleButton ToolTip.Tip="Toggle map chunk visibility" IsChecked="{CompiledBinding ShowGrid, Mode=TwoWay}">
-            <WdeImage ImageUri="Icons/icon_grid.png" />
-        </ToggleButton>
-        <DropDownButton>
-            <WdeImage ImageUri="Icons/icon_day_night.png" />
-            <DropDownButton.Flyout>
+        <ButtonImage ToolTip.Tip="Toggle areatriggers visibility"
+                     Image="Icons/icon_areatrigger.png"
+                     IsToggleButton="True"
+                     IsChecked="{CompiledBinding ShowAreaTriggers, Mode=TwoWay}" />
+        <ButtonImage ToolTip.Tip="Toggle map chunk visibility"
+                     Image="Icons/icon_grid.png"
+                     IsToggleButton="True"
+                     IsChecked="{CompiledBinding ShowGrid, Mode=TwoWay}" />
+        <ButtonImage Image="Icons/icon_day_night.png">
+            <ButtonImage.Flyout>
                 <Flyout>
                     <StackPanel Orientation="Vertical" Width="400">
                         <CheckBox Name="TimeFlow" IsChecked="{CompiledBinding DisableTimeFlow, Mode=TwoWay}">Disable time flow</CheckBox>
@@ -60,7 +61,7 @@
                         </DockPanel>
                     </StackPanel>
                 </Flyout>
-            </DropDownButton.Flyout>
-        </DropDownButton>
+            </ButtonImage.Flyout>
+        </ButtonImage>
     </ToolbarPanel>
 </UserControl>

@@ -11,36 +11,35 @@
     <ToolbarControl DockPanel.Dock="Top">
       <Button Command="{CompiledBinding ClearCommand}">Clear</Button>
     </ToolbarControl>
-    <ScrollViewer HorizontalScrollBarVisibility="Auto">
-      <VirtualizedTreeView Items="{CompiledBinding FlatTree}"
-                           SelectedNode="{CompiledBinding SelectedNode, Mode=TwoWay}"
-                           >
-        <VirtualizedTreeView.DataTemplates>
-          <DataTemplate DataType="logs:DebuggerLogObjectViewModel" x:DataType="logs:DebuggerLogObjectViewModel">
-            <StackPanel Orientation="Horizontal" Spacing="5" TextBlock.FontFamily="{DynamicResource MonoFont}">
-              <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="{CompiledBinding Key, StringFormat={}{0}:}" />
-              <TextBlock VerticalAlignment="Center" IsVisible="{CompiledBinding !IsExpanded}" Text="{CompiledBinding CollapsedText}" />
-            </StackPanel>
-          </DataTemplate>
-          <DataTemplate DataType="logs:DebuggerLogValueViewModel" x:DataType="logs:DebuggerLogValueViewModel">
-            <StackPanel Orientation="Horizontal" Spacing="5" TextBlock.FontFamily="{DynamicResource MonoFont}">
-              <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="{CompiledBinding Key, StringFormat={}{0}:}" />
-              <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Value}" />
-              <TextBlock VerticalAlignment="Center" Text="{CompiledBinding ValueExplained}" Opacity="0.5" Margin="20,0,0,0" />
-            </StackPanel>
-          </DataTemplate>
-          <DataTemplate DataType="logs:DebuggerLogTextViewModel" x:DataType="logs:DebuggerLogTextViewModel">
-            <StackPanel Orientation="Horizontal" Spacing="5" TextBlock.FontFamily="{DynamicResource MonoFont}">
-              <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Text}" FontStyle="Italic" />
-            </StackPanel>
-          </DataTemplate>
-        </VirtualizedTreeView.DataTemplates>
-        <VirtualizedTreeView.ContextMenu>
-          <FixedContextMenu>
-            <MenuItem Command="{CompiledBinding CopySelectedNodeCommand}" Header="Copy" />
-          </FixedContextMenu>
-        </VirtualizedTreeView.ContextMenu>
-      </VirtualizedTreeView>
-    </ScrollViewer>
+    <VirtualizedTreeView Items="{CompiledBinding FlatTree}"
+                         SelectedNode="{CompiledBinding SelectedNode, Mode=TwoWay}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                         >
+      <VirtualizedTreeView.DataTemplates>
+        <DataTemplate DataType="logs:DebuggerLogObjectViewModel" x:DataType="logs:DebuggerLogObjectViewModel">
+          <StackPanel Orientation="Horizontal" Spacing="5" TextBlock.FontFamily="{DynamicResource MonoFont}">
+            <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="{CompiledBinding Key, StringFormat={}{0}:}" />
+            <TextBlock VerticalAlignment="Center" IsVisible="{CompiledBinding !IsExpanded}" Text="{CompiledBinding CollapsedText}" />
+          </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="logs:DebuggerLogValueViewModel" x:DataType="logs:DebuggerLogValueViewModel">
+          <StackPanel Orientation="Horizontal" Spacing="5" TextBlock.FontFamily="{DynamicResource MonoFont}">
+            <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="{CompiledBinding Key, StringFormat={}{0}:}" />
+            <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Value}" />
+            <TextBlock VerticalAlignment="Center" Text="{CompiledBinding ValueExplained}" Opacity="0.5" Margin="20,0,0,0" />
+          </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="logs:DebuggerLogTextViewModel" x:DataType="logs:DebuggerLogTextViewModel">
+          <StackPanel Orientation="Horizontal" Spacing="5" TextBlock.FontFamily="{DynamicResource MonoFont}">
+            <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Text}" FontStyle="Italic" />
+          </StackPanel>
+        </DataTemplate>
+      </VirtualizedTreeView.DataTemplates>
+      <VirtualizedTreeView.ContextMenu>
+        <FixedContextMenu>
+          <MenuItem Command="{CompiledBinding CopySelectedNodeCommand}" Header="Copy" />
+        </FixedContextMenu>
+      </VirtualizedTreeView.ContextMenu>
+    </VirtualizedTreeView>
   </DockPanel>
 </UserControl>

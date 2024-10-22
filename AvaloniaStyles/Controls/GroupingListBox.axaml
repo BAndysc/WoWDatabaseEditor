@@ -31,9 +31,10 @@
         </Setter>
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Background="{TemplateBinding Background}"
+                <ClassicBorderDecorator Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}">
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        BorderStyle="Sunken">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Name="PART_ScrollViewer">
                         <ItemsControl ItemsSource="{TemplateBinding Items}" Name="PART_ParentItems">
                             <ItemsControl.ItemTemplate>
@@ -49,7 +50,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </ScrollViewer>
-                </Border>
+                </ClassicBorderDecorator>
             </ControlTemplate>
         </Setter>
     </Style>

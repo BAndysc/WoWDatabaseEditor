@@ -45,7 +45,26 @@
         <Setter Property="Data" Value="{StaticResource TreeViewItemExpandedChevronPathData}" />
       </Style>
     </ControlTheme>
+    <ControlTheme x:Key="{x:Type VirtualizedTreeView}" TargetType="VirtualizedTreeView">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <ClassicBorderDecorator BorderStyle="Sunken" BorderThickness="2" Background="{DynamicResource TextControlBackgroundFocused}">
+            <ScrollViewer
+              HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+              VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+              <VirtualizedTreeViewPresenter Items="{TemplateBinding Items}"
+                                            IsFiltered="{TemplateBinding IsFiltered}"
+                                            RequestRender="{TemplateBinding RequestRender}"
+                                            SelectedNode="{TemplateBinding SelectedNode, Mode=TwoWay}"
+                                            RowHeight="{TemplateBinding RowHeight}"
+                                            NeverShrinkWidth="{TemplateBinding NeverShrinkWidth}"/>
+            </ScrollViewer>
+          </ClassicBorderDecorator>
+        </ControlTemplate>
+      </Setter>
+    </ControlTheme>
   </Styles.Resources>
+
   
   <Style Selector="controls|VirtualizedTreeViewItem">
     <Setter Property="Padding" Value="0" />
@@ -88,7 +107,7 @@
     <Setter Property="Background" Value="{DynamicResource TreeViewItemBackgroundPointerOver}" />
     <Setter Property="BorderBrush" Value="{DynamicResource TreeViewItemBorderBrushPointerOver}" />
   </Style>
-  <Style Selector="VirtualizedTreeViewItem /template/ Border#PART_LayoutRoot:pointerover > ContentPresenter#PART_HeaderPresenter">
+  <Style Selector="VirtualizedTreeViewItem:pointerover">
     <Setter Property="TextElement.Foreground" Value="{DynamicResource TreeViewItemForegroundPointerOver}" />
   </Style>
 
@@ -97,7 +116,7 @@
     <Setter Property="Background" Value="{DynamicResource TreeViewItemBackgroundPressed}" />
     <Setter Property="BorderBrush" Value="{DynamicResource TreeViewItemBorderBrushPressed}" />
   </Style>
-  <Style Selector="VirtualizedTreeViewItem:pressed /template/ Border#PART_LayoutRoot:pointerover > ContentPresenter#PART_HeaderPresenter">
+  <Style Selector="VirtualizedTreeViewItem:pressed:pointerover">
     <Setter Property="TextElement.Foreground" Value="{DynamicResource TreeViewItemForegroundPressed}" />
   </Style>
 
@@ -106,7 +125,7 @@
     <Setter Property="Background" Value="{DynamicResource TreeViewItemBackgroundDisabled}" />
     <Setter Property="BorderBrush" Value="{DynamicResource TreeViewItemBorderBrushDisabled}" />
   </Style>
-  <Style Selector="VirtualizedTreeViewItem:disabled /template/ Border#PART_LayoutRoot > ContentPresenter#PART_HeaderPresenter">
+  <Style Selector="VirtualizedTreeViewItem:disabled">
     <Setter Property="TextElement.Foreground" Value="{DynamicResource TreeViewItemForegroundDisabled}" />
   </Style>
 
@@ -115,7 +134,7 @@
     <Setter Property="Background" Value="{DynamicResource TreeViewItemBackgroundSelected}" />
     <Setter Property="BorderBrush" Value="{DynamicResource TreeViewItemBorderBrushSelected}" />
   </Style>
-  <Style Selector="VirtualizedTreeViewItem:selected /template/ Border#PART_LayoutRoot > ContentPresenter#PART_HeaderPresenter">
+  <Style Selector="VirtualizedTreeViewItem:selected">
     <Setter Property="TextElement.Foreground" Value="{DynamicResource TreeViewItemForegroundSelected}" />
   </Style>
 
@@ -124,7 +143,7 @@
     <Setter Property="Background" Value="{DynamicResource TreeViewItemBackgroundSelectedPointerOver}" />
     <Setter Property="BorderBrush" Value="{DynamicResource TreeViewItemBorderBrushSelectedPointerOver}" />
   </Style>
-  <Style Selector="VirtualizedTreeViewItem:selected /template/ Border#PART_LayoutRoot:pointerover > ContentPresenter#PART_HeaderPresenter">
+  <Style Selector="VirtualizedTreeViewItem:selected:pointerover">
     <Setter Property="TextElement.Foreground" Value="{DynamicResource TreeViewItemForegroundSelectedPointerOver}" />
   </Style>
 
@@ -133,7 +152,7 @@
     <Setter Property="Background" Value="{DynamicResource TreeViewItemBackgroundSelectedPressed}" />
     <Setter Property="BorderBrush" Value="{DynamicResource TreeViewItemBorderBrushSelectedPressed}" />
   </Style>
-  <Style Selector="VirtualizedTreeViewItem:pressed:selected /template/ Border#PART_LayoutRoot:pointerover > ContentPresenter#PART_HeaderPresenter">
+  <Style Selector="VirtualizedTreeViewItem:pressed:selected:pointerover">
     <Setter Property="TextElement.Foreground" Value="{DynamicResource TreeViewItemForegroundSelectedPressed}" />
   </Style>
 
@@ -142,7 +161,7 @@
     <Setter Property="Background" Value="{DynamicResource TreeViewItemBackgroundSelectedDisabled}" />
     <Setter Property="BorderBrush" Value="{DynamicResource TreeViewItemBorderBrushSelectedDisabled}" />
   </Style>
-  <Style Selector="VirtualizedTreeViewItem:disabled:selected /template/ Border#PART_LayoutRoot > ContentPresenter#PART_HeaderPresenter">
+  <Style Selector="VirtualizedTreeViewItem:disabled:selected">
     <Setter Property="TextElement.Foreground" Value="{DynamicResource TreeViewItemForegroundSelectedDisabled}" />
   </Style>
 </Styles>

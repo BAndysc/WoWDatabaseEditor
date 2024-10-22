@@ -4,11 +4,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="WoWDatabaseEditorCore.Avalonia.Views.SplashScreenWindow"
-        Width="512"
-        Height="512"
+        Width="400"
+        Height="247"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="0"
+        SystemDecorations="None"
         Background="#2577BA"
         CanResize="False"
         WindowStartupLocation="CenterScreen"
@@ -16,6 +17,15 @@
         ShowActivated="True"
         Title="WoW Database Editor Splash Screen">
     <Panel>
-        <Image Source="avares://WoWDatabaseEditorCore.Avalonia.GUI/logo.png" />
+        <Panel Name="PART_Classic">
+            <Image Source="avares://WoWDatabaseEditorCore.Avalonia.GUI/logo.gif" />
+            <StackPanel Margin="103,160,20,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Orientation="Vertical" Spacing="0">
+                <TextBlock Text="Product ID: 8327592384732482" Margin="0,0,0,20" />
+                <TextBlock Text="Copyright 1983-1996 BAndysc. No right reserved. This program is not protected by US nor international copyright laws as not described in Help About. April Fools'!" TextWrapping="WrapWithOverflow" />
+            </StackPanel>
+        </Panel>
+        <Panel Name="PART_Modern">
+            <Image Source="avares://WoWDatabaseEditorCore.Avalonia.GUI/logo.png" />
+        </Panel>
     </Panel>
 </Window>

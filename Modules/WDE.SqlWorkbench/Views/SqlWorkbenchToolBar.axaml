@@ -26,17 +26,20 @@
     
     <Border Width="20" />
     
-    <ToggleButton ToolTip.Tip="Continue On Error" IsChecked="{CompiledBinding ContinueOnError}">
-      <WdeImage ImageUri="Icons/icon_noise.png" />
-    </ToggleButton>
+    <ButtonImage ToolTip.Tip="Continue On Error"
+                 Image="Icons/icon_noise.png"
+                 IsToggleButton="True"
+                 IsChecked="{CompiledBinding ContinueOnError}" />
     
     <Border Width="20" />
     
     <ButtonImage ToolTip.Tip="Commit transaction" Image="Icons/icon_accept_transaction.png" Command="{CompiledBinding CommitCommand}" IsEnabled="{CompiledBinding !IsAutoCommit}" />
     <ButtonImage ToolTip.Tip="Reject transaction" Image="Icons/icon_reject_transaction.png" Command="{CompiledBinding RollbackCommand}" IsEnabled="{CompiledBinding !IsAutoCommit}" />
-    <ToggleButton ToolTip.Tip="Auto commit after each query" Command="{CompiledBinding ToggleIsAutoCommit}" IsChecked="{CompiledBinding IsAutoCommit, Mode=OneWay}">
-      <WdeImage ImageUri="Icons/icon_auto_commit.png" />
-    </ToggleButton>
+    <ButtonImage ToolTip.Tip="Auto commit after each query"
+                 IsToggleButton="True"
+                 Image="Icons/icon_auto_commit.png"
+                 Command="{CompiledBinding ToggleIsAutoCommit}"
+                 IsChecked="{CompiledBinding IsAutoCommit, Mode=OneWay}" />
     
     <Border Width="20" />
 
@@ -51,12 +54,13 @@
     <Border Width="20" />
     
     <ButtonImage Command="{CompiledBinding BeautifyCommand}" ToolTip.Tip="Beautify the query" Image="Icons/icon_cleanup.png" />
-    <ToggleButton ToolTip.Tip="Toggle displaying non printable characters (spaces, tabs, new lines)" IsChecked="{CompiledBinding ShowNonPrintableChars}">
-      <WdeImage ImageUri="Icons/icon_paragraph.png" />
-    </ToggleButton>
-    <ToggleButton ToolTip.Tip="Toggle word wrap" IsChecked="{CompiledBinding WordWrap}">
-      <WdeImage ImageUri="Icons/icon_word_wrap.png" />
-    </ToggleButton>
-    
+    <ButtonImage ToolTip.Tip="Toggle displaying non printable characters (spaces, tabs, new lines)"
+                 Image="Icons/icon_paragraph.png"
+                 IsToggleButton="True"
+                 IsChecked="{CompiledBinding ShowNonPrintableChars}" />
+    <ButtonImage ToolTip.Tip="Toggle word wrap"
+                 Image="Icons/icon_word_wrap.png"
+                 IsToggleButton="True"
+                 IsChecked="{CompiledBinding WordWrap}" />
   </ToolbarPanel>
 </UserControl>

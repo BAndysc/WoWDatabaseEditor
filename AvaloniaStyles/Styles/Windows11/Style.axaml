@@ -17,6 +17,7 @@
                 </Style.Resources>
         </Style>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/FastTableView/Style.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/CompletionComboBox.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/GroupingListBox.axaml" />
@@ -28,6 +29,9 @@
         <StyleInclude Source="avares://AvaloniaStyles/Controls/HamburgerMenuButton.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/BalloonPopup.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/SettingsHeader.axaml" />
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <StyleInclude Source="avares://Classic.CommonControls.Avalonia/Themes/Fluent.axaml" />
 
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/CompletionComboBox.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TabStrip.axaml" />

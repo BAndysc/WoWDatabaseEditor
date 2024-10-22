@@ -18,7 +18,8 @@ namespace WoWDatabaseEditorCore.Providers
 
         public EditorViewMenuItemProvider(IDocumentManager documentManager, 
             Func<QuickStartViewModel> quickStartCreator,
-            IGameViewService gameViewService)
+            IGameViewService gameViewService,
+            IClippy clippy)
         {
             SubItems = new List<IMenuItem>(documentManager.AllTools.Count);
             SubItems.Add(new ModuleMenuItem("Open quick start", new DelegateCommand(() =>
@@ -31,6 +32,8 @@ namespace WoWDatabaseEditorCore.Providers
             {
                 SubItems.Add(new ModuleMenuItem(window.Title, new DelegateCommand(() => documentManager.OpenTool(window.GetType()))));
             }
+            SubItems.Add(new ModuleManuSeparatorItem());
+            SubItems.Add(new ModuleMenuItem("Open assistant", new DelegateCommand(clippy.Open)));
         }
     }
 }

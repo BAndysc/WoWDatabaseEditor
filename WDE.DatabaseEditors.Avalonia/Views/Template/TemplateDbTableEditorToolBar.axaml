@@ -21,10 +21,9 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="viewModels:TableCommandViewModel">
-                    <Button Command="{CompiledBinding Command}"
-                            ToolTip.Tip="{CompiledBinding Name}">
-                        <components:WdeImage Image="{CompiledBinding Icon}" />
-                    </Button>
+                    <ButtonImage Command="{CompiledBinding Command}"
+                            Image="{CompiledBinding Icon}"
+                            ToolTip.Tip="{CompiledBinding Name}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

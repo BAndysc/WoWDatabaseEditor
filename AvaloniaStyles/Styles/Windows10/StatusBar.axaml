@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls"
+        xmlns:commonControls="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
     <Style Selector="controls|StatusBar">
         <Setter Property="Height" Value="26" />
         <Setter Property="BorderThickness" Value="0"/>
@@ -17,10 +18,12 @@
         </Setter>
     </Style>
     
-    <Style Selector="controls|StatusBar Button">
+    <Style Selector="commonControls|StatusBarItem Button">
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="TextElement.Foreground" Value="White" />
+    </Style>
+    <Style Selector="commonControls|StatusBarItem > ContentPresenter > Panel > Button /template/ ContentPresenter#PART_ContentPresenter">
     </Style>
     <Style Selector="controls|StatusBar Button /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
@@ -40,5 +43,9 @@
     <Style Selector="controls|StatusBar Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="#40000000" />
         <Setter Property="TextElement.Foreground" Value="White" />
+    </Style>
+
+    <Style Selector="commonControls|StatusBarItem">
+        <Setter Property="Background" Value="Transparent" />
     </Style>
 </Styles>

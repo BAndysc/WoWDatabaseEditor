@@ -11,6 +11,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Classic.Avalonia.Theme;
 using Microsoft.Extensions.Logging;
 using Prism.Events;
 using Prism.Ioc;
@@ -463,6 +464,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             var color = Application.Current!.Resources["AccentHue"];
             AvaloniaXamlLoader.Load(this); // this call loses the color in Resources :shrug:
             Application.Current!.Resources["AccentHue"] = color;
+            Application.Current!.Resources["ClassicBorderBrush"] = ClassicBorderDecorator.ClassicBorderBrush;
         }
 
         private class Conflict

@@ -46,6 +46,5 @@ namespace WDE.Common.Managers
     public interface IConnectionsStatusBarItem : INotifyPropertyChanged
     {
         int OpenedConnections { get; }
-        bool IsPanelVisible { get; set; }
     }
 }

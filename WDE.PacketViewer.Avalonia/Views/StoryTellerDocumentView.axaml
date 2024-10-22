@@ -8,7 +8,6 @@
              x:DataType="viewModels:StoryTellerDocumentViewModel"
              x:Class="WDE.PacketViewer.Avalonia.Views.StoryTellerDocumentView">
   <avaloniaEdit:TextEditor Document="{CompiledBinding Document, Converter={x:Static NativeTextDocumentConverter.Instance}}"
-                           BorderThickness="0"
                            Name="Editor"
                            PointerMoved="Editor_OnPointerMoved"
                            ContextRequested="Editor_OnContextRequested"

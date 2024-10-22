@@ -13,7 +13,6 @@
     </ToolbarPanel>
     <avaloniaEdit:TextEditor IsReadOnly="True" 
                              Document="{CompiledBinding Text, Converter={x:Static NativeTextDocumentConverter.Instance}}" 
-                             BorderThickness="0" 
                              x:Name="MyAvalonEdit"
                              FontFamily="{DynamicResource MonoFont}"/>
   </DockPanel>

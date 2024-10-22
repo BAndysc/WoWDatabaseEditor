@@ -29,8 +29,47 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
             return result;
         }
 
+        private SerializedDock? Simplify(SerializedDock dock)
+        {
+            for (var index = dock.Children.Count - 1; index >= 0; index--)
+            {
+                var children = dock.Children[index];
+                if (Simplify(children) is { } child)
+                {
+                    dock.Children[index] = child;
+                }
+                else
+                {
+                    dock.Children.RemoveAt(index);
+                }
+            }
+
+            var allChildrenAreSplitters = dock.Children.Count > 0 &&
+                                          dock.Children.All(c => c.DockableType == SerializedDockableType.Splitter);
+            if (allChildrenAreSplitters)
+                return null;
+
+            var nextCanBeSplitter = false;
+            for (var index = 0; index < dock.Children.Count; index++)
+            {
+                var children = dock.Children[index];
+                if (!nextCanBeSplitter && children.DockableType == SerializedDockableType.Splitter)
+                {
+                    dock.Children.RemoveAt(index);
+                    index--;
+                }
+                else
+                {
+                    nextCanBeSplitter = children.DockableType != SerializedDockableType.Splitter;
+                }
+            }
+
+            return dock;
+        }
+
         public IRootDock? Deserialize(SerializedDock serializedDock, out IReadOnlyList<IDockable>? dockablesToPin)
         {
+            serializedDock = Simplify(serializedDock) ?? new SerializedDock() { DockableType = SerializedDockableType.RootDock };
             dockablesToPin = null;
             if (serializedDock.DockableType != SerializedDockableType.RootDock)
                 return null;

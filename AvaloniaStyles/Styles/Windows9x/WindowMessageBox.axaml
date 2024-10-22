@@ -1,0 +1,80 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:utils="clr-namespace:Classic.Avalonia.Theme.Utils;assembly=Classic.Avalonia.Theme"
+                    xmlns:common="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia"
+                    x:ClassModifier="internal">
+    <ControlTheme x:Key="{x:Type BaseMessageBoxWindow}" TargetType="BaseMessageBoxWindow">
+        <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
+        <Setter Property="Foreground"
+                Value="{DynamicResource {x:Static common:SystemColors.WindowTextBrushKey}}"/>
+        <Setter Property="Background"
+                Value="{DynamicResource {x:Static common:SystemColors.ControlBrushKey}}"/>
+        <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource HighlightForegroundColor}" />
+        <Setter Property="FontSize" Value="{DynamicResource FontSizeNormal}" />
+        <Setter Property="MinWidth" Value="150" />
+        <Setter Property="MinHeight" Value="50" />
+        <Setter Property="ExtendClientAreaChromeHints" Value="NoChrome" />
+        <Setter Property="SystemDecorations" Value="Full" /> <!-- with Full on Windows 11 we get rounded borders and shadow, which is bad, but unfortunately with None, dragging and resizing doesn't work -->
+        <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
+
+        <Style Selector="^.__classic_theme_is_mac">
+            <Setter Property="SystemDecorations" Value="None" /> <!-- on a mac None decorations work fine and we still can drag and resize the window -->
+        </Style>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel
+                    RenderOptions.TextRenderingMode="Alias"
+                    RenderOptions.EdgeMode="Aliased"
+                    RenderOptions.BitmapInterpolationMode="None">
+                    <Border Name="PART_TransparencyFallback"
+                            IsHitTestVisible="False"
+                            Margin="2" />
+                    <Border Background="{TemplateBinding Background}"
+                            IsHitTestVisible="False"
+                            Margin="2" />
+
+                    <DockPanel Name="RootLayout" Margin="4" ClipToBounds="True">
+
+                        <utils:AutoAttachTitleBar DockPanel.Dock="Top" />
+
+                        <VisualLayerManager>
+                            <VisualLayerManager.ChromeOverlayLayer>
+                                <TitleBar />
+                            </VisualLayerManager.ChromeOverlayLayer>
+
+                            <DockPanel Margin="9,10">
+                                <ContentPresenter DockPanel.Dock="Bottom"
+                                                  Content="{TemplateBinding Content}"
+                                                  Name="Buttons"
+                                                  HorizontalContentAlignment="Center"
+                                                  Background="{DynamicResource MessageBoxBottomPanelBackground}"
+                                                  BorderBrush="{DynamicResource MessageBoxBottomPanelBorder}">
+                                    <ContentPresenter.Styles>
+                                        <Style Selector="StretchStackPanel">
+                                            <Setter Property="Spacing" Value="10" />
+                                            <Setter Property="Stretch" Value="False" />
+                                        </Style>
+                                    </ContentPresenter.Styles>
+                                </ContentPresenter>
+
+                                <ContentPresenter Content="{TemplateBinding Image}"
+                                                  VerticalContentAlignment="Top"
+                                                  VerticalAlignment="Top"
+                                                  Width="32" Height="32"
+                                                  Margin="0,0,15,0" />
+
+                                <TextBlock HorizontalAlignment="Left" TextAlignment="Left" Margin="0,3,0,0" TextWrapping="WrapWithOverflow" Text="{TemplateBinding Message}" />
+                            </DockPanel>
+
+                        </VisualLayerManager>
+                    </DockPanel>
+
+                    <ClassicBorderDecorator Name="Bd"
+                                            BorderStyle="AltRaised"
+                                            BorderThickness="2"
+                                            IsHitTestVisible="False" />
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

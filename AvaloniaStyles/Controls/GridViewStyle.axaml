@@ -30,8 +30,9 @@
         <Setter Property="BorderBrush" Value="Gray" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Border BorderThickness="{TemplateBinding BorderThickness}" 
+                <ClassicBorderDecorator BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{TemplateBinding CornerRadius}"
+                        BorderStyle="Sunken"
                         BorderBrush="{TemplateBinding BorderBrush}">
                     <DockPanel LastChildFill="True" Grid.IsSharedSizeScope="True">
                         <ScrollViewer HorizontalScrollBarVisibility="Hidden" 
@@ -39,8 +40,8 @@
                                       Name="PART_HeaderScroll"
                                       DockPanel.Dock="Top">
                             <controls:GridViewHeader>
-                                <Grid Name="PART_header">
-                                </Grid>
+                                <GridEx Name="PART_header">
+                                </GridEx>
                             </controls:GridViewHeader>
                         </ScrollViewer>
 
@@ -59,7 +60,7 @@
                             </controls:GridViewListBox>
                         </ScrollViewer>
                     </DockPanel>
-                </Border>
+                </ClassicBorderDecorator>
             </ControlTemplate>
         </Setter>
     </Style>
@@ -83,11 +84,17 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Background="{TemplateBinding Background}">
+                <ClassicBorderDecorator Background="{TemplateBinding Background}"
+                                        BorderStyle="Raised"
+                                        Name="PART_Border"
+                                        BorderThickness="3">
                     <TextBlock Text="{TemplateBinding ColumnName}" Padding="10,5,5,5"  FontWeight="Bold" FontSize="11"/>
-                </Border>
+                </ClassicBorderDecorator>
             </ControlTemplate>
         </Setter>
+        <Style Selector="^:pressed /template/ ClassicBorderDecorator#PART_Border">
+            <Setter Property="BorderStyle" Value="RaisedPressed" />
+        </Style>
     </Style>
     
     <Style Selector="controls|GridViewHeader">

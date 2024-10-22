@@ -36,6 +36,7 @@
                   ItemsSource="{CompiledBinding DataStore.Entries}" AutoGenerateColumns="False"
                   CanUserSortColumns="False"
                   IsReadOnly="True"
+                  BorderThickness="0"
                   FontFamily="{DynamicResource MonoFont}"
                   CanUserResizeColumns="True"
                   LayoutUpdated="OnLayoutUpdated">

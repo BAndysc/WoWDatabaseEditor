@@ -16,68 +16,67 @@
     <DockPanel LastChildFill="True" KeyboardNavigation.TabNavigation="Local"> 
         <TextBox TabIndex="0" Name="SearchTextBox" KeyDown="Search_KeyDown" DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
         <Panel>
-            <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                <VirtualizedTreeView Items="{CompiledBinding FlatItems}"
-                                     SelectedNode="{CompiledBinding Selected}"
-                                     IsFiltered="True"
-                                     TabIndex="1"
-                                     x:Name="VirtualizedTreeView"
-                                     KeyDown="InputElement_OnKeyDown"
-                                     DoubleTapped="InputElement_OnDoubleTapped"
-                                     RequestRender="{CompiledBinding ListUpdated}"
-                >
-                    <VirtualizedTreeView.DataTemplates>
-                        <DataTemplate DataType="tablesPanel:INamedNodeType" x:DataType="tablesPanel:INamedNodeType">
-                            <DockPanel>
-                                <WdeImage Width="16" Height="16" Margin="0,0,5,0" Image="{CompiledBinding Icon}" />
-                                <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Name}" />
-                            </DockPanel>
-                        </DataTemplate>
-                        <DataTemplate DataType="tablesPanel:RowLoadingViewModel" x:DataType="tablesPanel:RowLoadingViewModel">
-                            <DockPanel>
-                                <utils:LoadingSpinner VerticalAlignment="Center" Width="24" Height="24" Margin="0,0,5,0" />
-                                <TextBlock Opacity="0.5" Text="Loading..." VerticalAlignment="Center" />
-                            </DockPanel>
-                        </DataTemplate>
-                    </VirtualizedTreeView.DataTemplates>
-                    <VirtualizedTreeView.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Select Rows" Command="{CompiledBinding SelectRowsCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
-                            <MenuItem Header="Alter Table" Command="{CompiledBinding AlterTableComment}" IsVisible="{CompiledBinding IsTableNotViewSelected}" />
-                            <MenuItem Header="Table Inspector" Command="{CompiledBinding InspectTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
-                            <MenuItem Header="Open Tab" Command="{CompiledBinding OpenTabCommand}" IsVisible="{CompiledBinding IsDatabaseSelected}" />
-                            <MenuItem Header="Database Inspector" Command="{CompiledBinding InspectDatabaseCommand}" IsVisible="{CompiledBinding IsDatabaseSelected}" />
-                            <Separator IsVisible="{CompiledBinding IsTableSelected}" />
-                            <Separator IsVisible="{CompiledBinding IsDatabaseSelected}" />
-                            <MenuItem Header="Copy Name" Command="{CompiledBinding CopyNameCommand}" />
-                            <MenuItem Header="Copy" IsVisible="{CompiledBinding IsTableSelected}">
-                                <MenuItem Header="Select All Statement" Command="{CompiledBinding CopySelectAllCommand}" />
-                                <MenuItem Header="Insert Statement" Command="{CompiledBinding CopyInsertCommand}" />
-                                <MenuItem Header="Update Statement" Command="{CompiledBinding CopyUpdateCommand}" />
-                                <MenuItem Header="Delete Statement" Command="{CompiledBinding CopyDeleteCommand}" />
-                                <MenuItem Header="Create Statement" Command="{CompiledBinding CopyCreateCommand}" />
-                            </MenuItem>
-                            <Separator />
-                            <MenuItem Header="New Table" Command="{CompiledBinding AddNewTableCommand}" />
-                            <MenuItem Header="New">
-                                <MenuItem Header="View" Command="{CompiledBinding AddNewViewCommand}" />
-                                <MenuItem Header="Procedure" Command="{CompiledBinding AddNewProcedureCommand}" />
-                                <MenuItem Header="Function" Command="{CompiledBinding AddNewFunctionCommand}" />
-                            </MenuItem>
-                            <MenuItem Header="Import" Command="{CompiledBinding ImportDatabaseCommand}" IsVisible="{CompiledBinding IsDatabaseSelected}" />
-                            <MenuItem Header="Dump Table" Command="{CompiledBinding DumpTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
-                            <MenuItem Header="Dump Database" Command="{CompiledBinding DumpDatabaseCommand}" IsVisible="{CompiledBinding IsDatabaseSelected}" />
-                            <Separator IsVisible="{CompiledBinding IsTableSelected}" />
-                            <MenuItem Header="Drop View" Command="{CompiledBinding DropTableCommand}" IsVisible="{CompiledBinding IsViewSelected}" />
-                            <MenuItem Header="Drop Table" Command="{CompiledBinding DropTableCommand}" IsVisible="{CompiledBinding IsTableNotViewSelected}" />
-                            <MenuItem Header="Truncate Table" Command="{CompiledBinding  TruncateTableCommand}" IsVisible="{CompiledBinding IsTableNotViewSelected}" />
-                            <Separator IsVisible="{CompiledBinding IsTableSelected}" />
-                            <MenuItem Header="Refresh Database" Command="{CompiledBinding RefreshDatabaseCommand}" />
-                            <MenuItem Header="Open Separate Connection Tab" Command="{CompiledBinding OpenSeparateConnectionCommand}" />
-                        </ContextMenu>
-                    </VirtualizedTreeView.ContextMenu>
-                </VirtualizedTreeView>
-            </ScrollViewer>
+            <VirtualizedTreeView Items="{CompiledBinding FlatItems}"
+                                 SelectedNode="{CompiledBinding Selected}"
+                                 IsFiltered="True"
+                                 TabIndex="1"
+                                 x:Name="VirtualizedTreeView"
+                                 KeyDown="InputElement_OnKeyDown"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                 DoubleTapped="InputElement_OnDoubleTapped"
+                                 RequestRender="{CompiledBinding ListUpdated}"
+            >
+                <VirtualizedTreeView.DataTemplates>
+                    <DataTemplate DataType="tablesPanel:INamedNodeType" x:DataType="tablesPanel:INamedNodeType">
+                        <DockPanel>
+                            <WdeImage Width="16" Height="16" Margin="0,0,5,0" Image="{CompiledBinding Icon}" />
+                            <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Name}" />
+                        </DockPanel>
+                    </DataTemplate>
+                    <DataTemplate DataType="tablesPanel:RowLoadingViewModel" x:DataType="tablesPanel:RowLoadingViewModel">
+                        <DockPanel>
+                            <utils:LoadingSpinner VerticalAlignment="Center" Width="24" Height="24" Margin="0,0,5,0" />
+                            <TextBlock Opacity="0.5" Text="Loading..." VerticalAlignment="Center" />
+                        </DockPanel>
+                    </DataTemplate>
+                </VirtualizedTreeView.DataTemplates>
+                <VirtualizedTreeView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Select Rows" Command="{CompiledBinding SelectRowsCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
+                        <MenuItem Header="Alter Table" Command="{CompiledBinding AlterTableComment}" IsVisible="{CompiledBinding IsTableNotViewSelected}" />
+                        <MenuItem Header="Table Inspector" Command="{CompiledBinding InspectTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
+                        <MenuItem Header="Open Tab" Command="{CompiledBinding OpenTabCommand}" IsVisible="{CompiledBinding IsDatabaseSelected}" />
+                        <MenuItem Header="Database Inspector" Command="{CompiledBinding InspectDatabaseCommand}" IsVisible="{CompiledBinding IsDatabaseSelected}" />
+                        <Separator IsVisible="{CompiledBinding IsTableSelected}" />
+                        <Separator IsVisible="{CompiledBinding IsDatabaseSelected}" />
+                        <MenuItem Header="Copy Name" Command="{CompiledBinding CopyNameCommand}" />
+                        <MenuItem Header="Copy" IsVisible="{CompiledBinding IsTableSelected}">
+                            <MenuItem Header="Select All Statement" Command="{CompiledBinding CopySelectAllCommand}" />
+                            <MenuItem Header="Insert Statement" Command="{CompiledBinding CopyInsertCommand}" />
+                            <MenuItem Header="Update Statement" Command="{CompiledBinding CopyUpdateCommand}" />
+                            <MenuItem Header="Delete Statement" Command="{CompiledBinding CopyDeleteCommand}" />
+                            <MenuItem Header="Create Statement" Command="{CompiledBinding CopyCreateCommand}" />
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="New Table" Command="{CompiledBinding AddNewTableCommand}" />
+                        <MenuItem Header="New">
+                            <MenuItem Header="View" Command="{CompiledBinding AddNewViewCommand}" />
+                            <MenuItem Header="Procedure" Command="{CompiledBinding AddNewProcedureCommand}" />
+                            <MenuItem Header="Function" Command="{CompiledBinding AddNewFunctionCommand}" />
+                        </MenuItem>
+                        <MenuItem Header="Import" Command="{CompiledBinding ImportDatabaseCommand}" IsVisible="{CompiledBinding IsDatabaseSelected}" />
+                        <MenuItem Header="Dump Table" Command="{CompiledBinding DumpTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
+                        <MenuItem Header="Dump Database" Command="{CompiledBinding DumpDatabaseCommand}" IsVisible="{CompiledBinding IsDatabaseSelected}" />
+                        <Separator IsVisible="{CompiledBinding IsTableSelected}" />
+                        <MenuItem Header="Drop View" Command="{CompiledBinding DropTableCommand}" IsVisible="{CompiledBinding IsViewSelected}" />
+                        <MenuItem Header="Drop Table" Command="{CompiledBinding DropTableCommand}" IsVisible="{CompiledBinding IsTableNotViewSelected}" />
+                        <MenuItem Header="Truncate Table" Command="{CompiledBinding  TruncateTableCommand}" IsVisible="{CompiledBinding IsTableNotViewSelected}" />
+                        <Separator IsVisible="{CompiledBinding IsTableSelected}" />
+                        <MenuItem Header="Refresh Database" Command="{CompiledBinding RefreshDatabaseCommand}" />
+                        <MenuItem Header="Open Separate Connection Tab" Command="{CompiledBinding OpenSeparateConnectionCommand}" />
+                    </ContextMenu>
+                </VirtualizedTreeView.ContextMenu>
+            </VirtualizedTreeView>
             <utils:LoadingSpinner IsVisible="{CompiledBinding IsLoading}" />
         </Panel>
     </DockPanel>

@@ -1,0 +1,57 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls"
+        xmlns:commonControls="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
+
+        <Styles.Resources>
+                <ControlTheme x:Key="BigToolbarButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                </ControlTheme>
+        </Styles.Resources>
+
+        <Style Selector="commonControls|ToolBarButton:text:icon /template/ AccessText#PART_Text">
+                <Setter Property="IsVisible" Value="{DynamicResource DisplayButtonImageText}" />
+        </Style>
+        <Style Selector="commonControls|ToolBarButton:text:icon /template/ commonControls|IconRenderer#PART_Icon">
+                <Setter Property="IsVisible" Value="{DynamicResource DisplayButtonImageIcon}" />
+        </Style>
+
+        <Style Selector="controls|ToolbarPanel">
+                <Setter Property="Spacing" Value="0" />
+                <Setter Property="Background" Value="{DynamicResource TitleBarBackground}" />
+        </Style>
+        
+        <Style Selector="controls|ToolbarPanel > TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > TextBox">
+                <Setter Property="MinHeight" Value="22" />
+                <Setter Property="MaxHeight" Value="22" />
+                <Setter Property="Padding" Value="6,2" />
+        </Style>
+
+        <!-- toolbarpanel > contentpresenter -> button -->
+
+        <!-- toolbarpanel -> ItemsControl > contentpresenter -> button for nested toolbar panels -->
+
+        <!-- ToolbarItemsControl -> contentpresenter -> button -->
+
+        <!-- ToolbarControl -> button -->
+        <!-- drop down -->
+
+        <Style Selector="controls|ToolbarPanel > CheckBox">
+                <Setter Property="MinHeight" Value="22" />
+                <Setter Property="Height" Value="22" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > ComboBox">
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="Height" Value="22" />
+                <Setter Property="MinHeight" Value="22" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > CompletionComboBox">
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="Height" Value="22" />
+                <Setter Property="MinHeight" Value="22" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+</Styles>

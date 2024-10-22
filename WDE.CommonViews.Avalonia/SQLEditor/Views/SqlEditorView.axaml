@@ -13,7 +13,6 @@
     <Panel>
       <avaloniaEdit:TextEditor controls:AvalonEditExtra.SyntaxExtension="sql" Document="{Binding Code, Converter={x:Static NativeTextDocumentConverter.Instance}}" Padding="5" x:Name="MyAvalonEdit"
                                ShowLineNumbers="True"
-                               BorderThickness="0"
                                utils:FocusUtils.FocusFirst="True"
                                IsEnabled="{CompiledBinding !IsLoading}"
                                FontFamily="Consolas,Menlo,Courier,Courier New" />

@@ -1,226 +1,256 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
-    
-        <Style Selector="controls|ToolbarPanel">
-                <Setter Property="Background" Value="{DynamicResource TitleBarBackground}" />
-        </Style>
-        
-        <Style Selector="controls|ToolbarPanel > TextBlock">
-                <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > TextBox">
-                <Setter Property="MinHeight" Value="24" />
-                <Setter Property="MaxHeight" Value="24" />
-                <Setter Property="Padding" Value="6,2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > :is(Button)">
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="Padding" Value="0" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Height" Value="24" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > :is(Button) /template/ ContentPresenter">
-                <Setter Property="MinHeight" Value="24" />
-                <Setter Property="VerticalContentAlignment" Value="Center" />
-                <Setter Property="HorizontalContentAlignment" Value="Center" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > :is(Button) :is(Image)">
-                <Setter Property="Height" Value="24"/>
-                <Setter Property="Width" Value="24" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > :is(Button) TextBlock">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > :is(Button) AccessText">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > :is(Button):disabled">
-                <Setter Property="Opacity" Value="0.2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
-                <Setter Property="Background" Value="Transparent" />
-        </Style>
-        
-        
-        <!-- toolbarpanel > contentpresenter -> button -->
-        
-        <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button)">
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="Padding" Value="0" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Height" Value="24" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button) /template/ ContentPresenter">
-                <Setter Property="MinHeight" Value="24" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button) :is(Image)">
-                <Setter Property="Height" Value="24"/>
-                <Setter Property="Width" Value="24" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button) TextBlock">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button) AccessText">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button):disabled">
-                <Setter Property="Opacity" Value="0.2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
-                <Setter Property="Background" Value="Transparent" />
-        </Style>
-        
-        <!-- toolbarpanel -> ItemsControl > contentpresenter -> button for nested toolbar panels -->
-        
-        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button)">
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="Padding" Value="0" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Height" Value="24" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button) /template/ ContentPresenter">
-                <Setter Property="MinHeight" Value="24" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button) :is(Image)">
-                <Setter Property="Height" Value="24"/>
-                <Setter Property="Width" Value="24" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button) TextBlock">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button) AccessText">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button):disabled">
-                <Setter Property="Opacity" Value="0.2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
-                <Setter Property="Background" Value="Transparent" />
-        </Style>
-        
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls"
+        xmlns:commonControls="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
 
-        <!-- ToolbarItemsControl -> contentpresenter -> button -->
-        <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button)">
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="Padding" Value="0" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Height" Value="24" />
+    <Styles.Resources>
+        <ControlTheme x:Key="BigToolbarButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Width" Value="34" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="BorderThickness" Value="1" />
+        </ControlTheme>
+    </Styles.Resources>
+
+    <Style Selector="controls|ToolbarPanel">
+        <Setter Property="Background" Value="{DynamicResource TitleBarBackground}" />
+    </Style>
+
+    <Style Selector="commonControls|ToolBarButton">
+        <Setter Property="Size" Value="Large" />
+        <Style Selector="^:disabled">
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource ButtonForegroundDisabled}" />
+            <Style Selector="^ /template/ commonControls|IconRenderer#PART_Icon">
+                <Setter Property="IconStyle" Value="Grayscale" />
+            </Style>
         </Style>
-        <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button) /template/ ContentPresenter">
-                <Setter Property="MinHeight" Value="24" />
-                <Setter Property="VerticalAlignment" Value="Center" />
+        <Style Selector="^:text:icon /template/ AccessText#PART_Text">
+            <Setter Property="IsVisible" Value="{DynamicResource DisplayButtonImageText}" />
         </Style>
-        <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button) :is(Image)">
-                <Setter Property="Height" Value="24"/>
-                <Setter Property="Width" Value="24" />
+        <Style Selector="^:text:icon /template/ commonControls|IconRenderer#PART_Icon">
+            <Setter Property="IsVisible" Value="{DynamicResource DisplayButtonImageIcon}" />
         </Style>
-        <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button) TextBlock">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button) AccessText">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button):disabled">
-                <Setter Property="Opacity" Value="0.2" />
-        </Style>
-        <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
-                <Setter Property="Background" Value="Transparent" />
-        </Style>
-        
-        
-        <!-- ToolbarControl -> button -->
-        <Style Selector="ToolbarControl > :is(Button)">
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="Padding" Value="0" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Height" Value="24" />
-        </Style>
-        <Style Selector="ToolbarControl > :is(Button) /template/ ContentPresenter">
-                <Setter Property="MinHeight" Value="24" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style Selector="ToolbarControl > :is(Button) :is(Image)">
-                <Setter Property="Height" Value="24"/>
-                <Setter Property="Width" Value="24" />
-        </Style>
-        <Style Selector="ToolbarControl > :is(Button) TextBlock">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="ToolbarControl > :is(Button) AccessText">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="ToolbarControl > :is(Button):disabled">
-                <Setter Property="Opacity" Value="0.2" />
-        </Style>
-        <Style Selector="ToolbarControl > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
-                <Setter Property="Background" Value="Transparent" />
-        </Style>
-        
-        <!-- drop down -->
-        <Style Selector="controls|ToolbarPanel > DropDownButton">
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="Padding" Value="0" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Height" Value="24" />
-                <Setter Property="MinHeight" Value="24" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > DropDownButton /template/ ContentPresenter#PART_ContentPresenter">
-                <Setter Property="Height" Value="24" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > DropDownButton /template/ ContentPresenter#PART_ContentPresenter :is(Image)">
-                <Setter Property="Height" Value="24"/>
-                <Setter Property="Width" Value="24" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > DropDownButton /template/ ContentPresenter#PART_ContentPresenter TextBlock">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > DropDownButton /template/ ContentPresenter#PART_ContentPresenter AccessText">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="Margin" Value="2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > DropDownButton:disabled">
-                <Setter Property="Opacity" Value="0.2" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > DropDownButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
-                <Setter Property="Background" Value="Transparent" />
-        </Style>
-        
-        
-        
-        <Style Selector="controls|ToolbarPanel > CheckBox">
-                <Setter Property="MinHeight" Value="24" />
-                <Setter Property="Height" Value="24" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > ComboBox">
-                <Setter Property="Padding" Value="12,0,5,0"/>
-                <Setter Property="Height" Value="24" />
-                <Setter Property="MinHeight" Value="24" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style Selector="controls|ToolbarPanel > CompletionComboBox">
-                <Setter Property="Padding" Value="12,0,5,0"/>
-                <Setter Property="Height" Value="24" />
-                <Setter Property="MinHeight" Value="24" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
+    </Style>
+
+    <Style Selector="controls|ToolbarPanel > TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > TextBox">
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="MaxHeight" Value="24" />
+        <Setter Property="Padding" Value="6,2" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > :is(Button)">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > :is(Button) /template/ ContentPresenter">
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > :is(Button) :is(Image)">
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="24" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > :is(Button) TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > :is(Button) AccessText">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > :is(Button):disabled">
+        <Setter Property="Opacity" Value="0.2" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+
+    <!-- toolbarpanel > contentpresenter -> button -->
+
+    <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button)">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button) /template/ ContentPresenter">
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button) :is(Image)">
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="24" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button) TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button) AccessText">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button):disabled">
+        <Setter Property="Opacity" Value="0.2" />
+    </Style>
+    <Style
+        Selector="controls|ToolbarPanel > ContentPresenter > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <!-- toolbarpanel -> ItemsControl > contentpresenter -> button for nested toolbar panels -->
+
+    <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button)">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button) /template/ ContentPresenter">
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button) :is(Image)">
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="24" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button) TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button) AccessText">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button):disabled">
+        <Setter Property="Opacity" Value="0.2" />
+    </Style>
+    <Style
+        Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+
+    <!-- ToolbarItemsControl -> contentpresenter -> button -->
+    <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button)">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button) /template/ ContentPresenter">
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button) :is(Image)">
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="24" />
+    </Style>
+    <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button) TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button) AccessText">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style Selector="ToolbarItemsControl > ContentPresenter > :is(Button):disabled">
+        <Setter Property="Opacity" Value="0.2" />
+    </Style>
+    <Style
+        Selector="ToolbarItemsControl > ContentPresenter > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+
+    <!-- ToolbarControl -> button -->
+    <Style Selector="ToolbarControl > :is(Button)">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style Selector="ToolbarControl > :is(Button) /template/ ContentPresenter">
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ToolbarControl > :is(Button) :is(Image)">
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="24" />
+    </Style>
+    <Style Selector="ToolbarControl > :is(Button) TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style Selector="ToolbarControl > :is(Button) AccessText">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style Selector="ToolbarControl > :is(Button):disabled">
+        <Setter Property="Opacity" Value="0.2" />
+    </Style>
+    <Style Selector="ToolbarControl > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <!-- drop down -->
+    <Style Selector="controls|ToolbarPanel > DropDownButton">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="MinHeight" Value="24" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > DropDownButton /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style
+        Selector="controls|ToolbarPanel > DropDownButton /template/ ContentPresenter#PART_ContentPresenter :is(Image)">
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Width" Value="24" />
+    </Style>
+    <Style
+        Selector="controls|ToolbarPanel > DropDownButton /template/ ContentPresenter#PART_ContentPresenter TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style
+        Selector="controls|ToolbarPanel > DropDownButton /template/ ContentPresenter#PART_ContentPresenter AccessText">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > DropDownButton:disabled">
+        <Setter Property="Opacity" Value="0.2" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > DropDownButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+
+    <Style Selector="controls|ToolbarPanel > CheckBox">
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > ComboBox">
+        <Setter Property="Padding" Value="12,0,5,0" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="controls|ToolbarPanel > CompletionComboBox">
+        <Setter Property="Padding" Value="12,0,5,0" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
 </Styles>

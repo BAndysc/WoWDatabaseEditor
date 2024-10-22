@@ -7,35 +7,30 @@
              x:DataType="inspector:DebugPointsInspectorViewModel"
              x:Class="WDE.Debugger.Views.Inspector.DebugPointsInspectorView">
   <Grid ColumnDefinitions="350,5,*">
-    <Border
-      Background="{DynamicResource ThemeBackgroundBrush}"
-      BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-      BorderThickness="{DynamicResource ThemeBorderThickness}">
-      <ScrollViewer HorizontalScrollBarVisibility="Auto">
-        <VirtualizedTreeView Items="{CompiledBinding FlatItems}" SelectedNode="{CompiledBinding SelectedNode, Mode=TwoWay}">
-          <VirtualizedTreeView.DataTemplates>
-            <DataTemplate x:DataType="inspector:InspectorDebugSourceViewModel" DataType="inspector:InspectorDebugSourceViewModel">
-              <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Name }" />
-            </DataTemplate>
-            <DataTemplate x:DataType="inspector:InspectorDebugPointViewModel" DataType="inspector:InspectorDebugPointViewModel">
-              <StackPanel Orientation="Horizontal">
-                <CheckBox IsChecked="{CompiledBinding IsEnabled}" />
-                <BreakpointIcon IsConnected="{CompiledBinding IsConnected}"
-                                IsDisabled="{CompiledBinding !IsEnabled}"
-                                IsDeactivated="{CompiledBinding IsDeactivated}"
-                                State="{CompiledBinding State}"
-                                SuspendsExecution="{CompiledBinding SuspendExecution}"
-                                Width="16"
-                                Height="16"
-                                Margin="0,0,8,0"
-                                VerticalAlignment="Center" />
-                <TextBlock Text="{CompiledBinding Header}" VerticalAlignment="Center" />
-              </StackPanel>
-            </DataTemplate>
-          </VirtualizedTreeView.DataTemplates>
-        </VirtualizedTreeView>
-      </ScrollViewer>
-    </Border>
+    <VirtualizedTreeView Items="{CompiledBinding FlatItems}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                         SelectedNode="{CompiledBinding SelectedNode, Mode=TwoWay}">
+      <VirtualizedTreeView.DataTemplates>
+        <DataTemplate x:DataType="inspector:InspectorDebugSourceViewModel" DataType="inspector:InspectorDebugSourceViewModel">
+          <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Name }" />
+        </DataTemplate>
+        <DataTemplate x:DataType="inspector:InspectorDebugPointViewModel" DataType="inspector:InspectorDebugPointViewModel">
+          <StackPanel Orientation="Horizontal">
+            <CheckBox IsChecked="{CompiledBinding IsEnabled}" />
+            <BreakpointIcon IsConnected="{CompiledBinding IsConnected}"
+                            IsDisabled="{CompiledBinding !IsEnabled}"
+                            IsDeactivated="{CompiledBinding IsDeactivated}"
+                            State="{CompiledBinding State}"
+                            SuspendsExecution="{CompiledBinding SuspendExecution}"
+                            Width="16"
+                            Height="16"
+                            Margin="0,0,8,0"
+                            VerticalAlignment="Center" />
+            <TextBlock Text="{CompiledBinding Header}" VerticalAlignment="Center" />
+          </StackPanel>
+        </DataTemplate>
+      </VirtualizedTreeView.DataTemplates>
+    </VirtualizedTreeView>
 
     <GridSplitter Classes="horizontal" Grid.Column="1" />
 

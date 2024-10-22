@@ -9,18 +9,23 @@
              Name="Root"
              x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.SmartScriptEditorToolBar">
     <ToolbarPanel>
-        <ToggleButton IsChecked="{CompiledBinding HideComments}" ToolTip.Tip="Hide comments (doesn't remove)" >
-            <WdeImage ImageUri="Icons/icon_remove_comment.png"></WdeImage>
-        </ToggleButton>
-        <ToggleButton IsChecked="{CompiledBinding HideConditions}" ToolTip.Tip="Hide conditions (doesn't remove)" >
-            <TextBlock Text="Hide conditions" VerticalAlignment="Center" />
-        </ToggleButton>
+        <ButtonImage IsChecked="{CompiledBinding HideComments}"
+                     Image="Icons/icon_remove_comment.png"
+                     IsToggleButton="True"
+                     ToolTip.Tip="Hide comments (doesn't remove)" />
+
+        <ButtonImage IsChecked="{CompiledBinding HideConditions}"
+                     IsToggleButton="True"
+                     Text="Hide conditions"
+                     ToolTip.Tip="Hide conditions (doesn't remove)" />
         <ItemsControl ItemsSource="{CompiledBinding ExtensionCommands}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="editor:SmartExtensionCommand">
-                    <Button Command="{CompiledBinding  Command}" CommandParameter="{Binding #Root.DataContext}" ToolTip.Tip="{CompiledBinding Name}">
-                        <WdeImage Image="{CompiledBinding Icon}" />
-                    </Button>
+                    <ButtonImage Command="{CompiledBinding  Command}"
+                            Image="{CompiledBinding Icon}"
+                            CommandParameter="{Binding #Root.DataContext}"
+                            ToolTip.Tip="{CompiledBinding Name}">
+                    </ButtonImage>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>
@@ -39,8 +44,8 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
         <TextBox Name="SearchTextBox" Padding="8,0" MinHeight="22" MinWidth="150" Watermark="Search in script" Text="{CompiledBinding SearchText}" />
-        <Button Padding="2" Background="Transparent" BorderBrush="{x:Null}" ToolTip.Tip="Clear search" Command="{CompiledBinding ClearSearchCommand}">
-            <WdeImage ImageUri="Icons/icon_close.png" Width="12" Height="12"></WdeImage>
-        </Button>
+        <ButtonImage Background="Transparent"
+                Image="Icons/icon_close.png"
+                ToolTip.Tip="Clear search" Command="{CompiledBinding ClearSearchCommand}" />
     </ToolbarPanel>
 </UserControl>

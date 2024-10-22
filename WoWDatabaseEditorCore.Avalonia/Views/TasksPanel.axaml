@@ -8,11 +8,6 @@
              xmlns:utils1="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Border BorderThickness="1"
-            Background="{DynamicResource ContentBackground}"
-            BorderBrush="Gray"
-            CornerRadius="{DynamicResource ControlCornerRadius}"
-            Width="300" Height="350" BoxShadow="0 0 30 5 #50000000">
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Label DockPanel.Dock="Top">Running tasks</Label>
@@ -59,9 +54,13 @@
                                     <Style Selector="Button">
                                         <Setter Property="Opacity" Value="0.5" />
                                         <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
                                     </Style>
                                     <Style Selector="Button:pointerover">
                                         <Setter Property="Background" Value="#07000000" />
+                                        <Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+                                            <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+                                        </Style>
                                     </Style>
                                     <Style Selector="Button:pressed /template/ ContentPresenter">
                                         <Setter Property="Background" Value="#16000000" />
@@ -81,5 +80,4 @@
             </ScrollViewer>
         </DockPanel>
     </Grid>
-</Border>
 </UserControl>

@@ -13,6 +13,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles;
+using Classic.CommonControls;
 using Microsoft.Extensions.FileProviders;
 using WDE.Common.Avalonia.Services;
 using WDE.Common.Avalonia.Utils;
@@ -24,7 +25,7 @@ using AvaloniaProperty = Avalonia.AvaloniaProperty;
 
 namespace WDE.Common.Avalonia.Components
 {
-    public class WdeImage : Image
+    public class WdeImage : IconRenderer
     {
         // we are never releasing those intentionally
         private static Dictionary<ImageUri, IImage?> cache = new();
@@ -33,7 +34,7 @@ namespace WDE.Common.Avalonia.Components
         private static TaskCompletionSource? loadingFilesListing;
         private static HashSet<string>? existingFiles;
         private static IDirectoryWatcher? watcher;
-        private static Action<ImageUri?>? imagesChanged;
+        private static HashSet<WdeImage> imagesChanged = new();
 
         public static readonly AttachedProperty<object?> MenuIconProperty = AvaloniaProperty.RegisterAttached<AvaloniaObject, object?>("MenuIcon", typeof(WdeImage));
 
@@ -57,8 +58,12 @@ namespace WDE.Common.Avalonia.Components
                 var relativePath = Path.GetRelativePath(Environment.CurrentDirectory, path);
                 Dispatcher.UIThread.Post(() =>
                 {
+                    var uri = new ImageUri(relativePath);
                     cache.Remove(new ImageUri(relativePath));
-                    imagesChanged?.Invoke(new ImageUri(relativePath));
+                    foreach (var img in imagesChanged)
+                    {
+                        img.ImageChanged(uri);
+                    }
                 });
             };
 
@@ -107,7 +112,7 @@ namespace WDE.Common.Avalonia.Components
                 Func().ListenErrors();
             });
         }
-        
+
         public ImageUri Image
         {
             get => (ImageUri?) GetValue(ImageProperty) ?? new ImageUri("");
@@ -127,7 +132,7 @@ namespace WDE.Common.Avalonia.Components
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
-            imagesChanged += ImageChanged;
+            imagesChanged.Add(this);
         }
 
         private void ImageChanged(ImageUri? triggering)
@@ -146,7 +151,7 @@ namespace WDE.Common.Avalonia.Components
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnDetachedFromVisualTree(e);
-            imagesChanged -= ImageChanged;
+            imagesChanged.Remove(this);
         }
 
         private static async Task<bool> FileExists(string? uri)
@@ -160,7 +165,8 @@ namespace WDE.Common.Avalonia.Components
             if (existingFiles == null)
             {
                 loadingFilesListing = new TaskCompletionSource();
-                var files = await dataAccess.GetAllFiles("Icons/", "*.png");
+                var files = (await dataAccess.GetAllFiles("Icons/", "*.png"))
+                    .Concat(await dataAccess.GetAllFiles("Icons/", "*.gif"));
                 existingFiles = new HashSet<string>();
                 foreach (var file in files)
                     existingFiles.Add(file);
@@ -262,7 +268,14 @@ namespace WDE.Common.Avalonia.Components
             string? uri = image.Uri;
             if (string.IsNullOrEmpty(uri))
                 return null;
-             
+
+            if (SystemTheme.EffectiveTheme == SystemThemeOptions.Windows9x)
+            {
+                var win9xUri = Path.ChangeExtension(uri.Replace("Icons/", "Icons/win9x/"), "gif");
+                if (await FileExists(win9xUri))
+                    uri = win9xUri;
+            }
+
             if (SystemTheme.EffectiveThemeIsDark)
             {
                 var extension = Path.GetExtension(uri);

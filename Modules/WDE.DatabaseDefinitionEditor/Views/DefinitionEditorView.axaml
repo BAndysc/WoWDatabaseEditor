@@ -88,7 +88,6 @@
                 <TabItem Header="Raw json" x:Name="RawJsonTab">
                     <avaloniaEdit:TextEditor AvalonEditExtra.SyntaxExtension="json"
                                              Document="{CompiledBinding RawDefinitionDocument, Converter={x:Static NativeTextDocumentConverter.Instance}}" 
-                                             BorderThickness="0"
                                              ShowLineNumbers="True"
                                              FontFamily="Consolas,Menlo,Courier,Courier New" />
                 </TabItem>

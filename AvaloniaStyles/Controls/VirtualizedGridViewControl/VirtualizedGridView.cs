@@ -198,11 +198,8 @@ public class VirtualizedGridView : TemplatedControl
         
         VirtualizedGridViewItemPresenter.SetupGridColumns(columns, header, true, useCheckBoxes);
 
-        // additional column in header makes it easier to resize
-        header.ColumnDefinitions.Add(new ColumnDefinition(20, GridUnitType.Pixel));
-        
         int i = 0;
-        void AddHeaderCell(string name)
+        void AddHeaderCell(string name, bool last = false)
         {
             var headerCell = new GridViewColumnHeader()
             {
@@ -216,6 +213,9 @@ public class VirtualizedGridView : TemplatedControl
             Grid.SetColumn(headerCell, i++);
             header.Children.Add(headerCell);
 
+            if (last)
+                return;
+
             var splitter = new GridSplitter();
             splitter.Focusable = false;
             Grid.SetColumn(splitter, i++);
@@ -227,6 +227,8 @@ public class VirtualizedGridView : TemplatedControl
         
         foreach (var column in Columns)
             AddHeaderCell(column.Name);
+
+        AddHeaderCell("", true);
     }
 
     private void OnContentScroll(object? sender, ScrollChangedEventArgs e)

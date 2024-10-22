@@ -1,0 +1,36 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+        xmlns:common="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+
+
+    <Style Selector="avaloniaEdit|TextEditor">
+        <Setter Property="Background" Value="{DynamicResource {x:Static common:SystemColors.WindowBrushKey}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static common:SystemColors.WindowTextBrushKey}}" />
+        <Setter Property="BorderBrush" Value="{x:Static ClassicBorderDecorator.ClassicBorderBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="Padding" Value="1" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ClassicBorderDecorator Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderStyle="Sunken"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                    <ScrollViewer Focusable="False"
+                                  Name="PART_ScrollViewer"
+                                  VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}"
+                                  HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}"
+                                  VerticalContentAlignment="Top"
+                                  HorizontalContentAlignment="Left"
+                                  Padding="{TemplateBinding Padding}" />
+                </ClassicBorderDecorator>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

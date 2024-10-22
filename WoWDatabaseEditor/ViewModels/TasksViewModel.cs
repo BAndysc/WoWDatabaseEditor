@@ -19,8 +19,6 @@ namespace WoWDatabaseEditorCore.ViewModels
     {
         public ObservableCollection<TaskViewModel> Tasks { get; } = new ObservableCollection<TaskViewModel>();
 
-        public ICommand TogglePanelVisibility { get; }
-        
         private int pendingTasksCount;
         public int PendingTasksCount
         {
@@ -28,13 +26,6 @@ namespace WoWDatabaseEditorCore.ViewModels
             private set => SetProperty(ref pendingTasksCount, value);
         }
 
-        private bool isPanelVisible;
-        public bool IsPanelVisible
-        {
-            get => isPanelVisible;
-            set => SetProperty(ref isPanelVisible, value);
-        }
-        
         public TasksViewModel(TaskRunner taskRunner)
         {
             taskRunner.Tasks.CollectionChanged += TasksOnCollectionChanged;
@@ -51,8 +42,6 @@ namespace WoWDatabaseEditorCore.ViewModels
                 foreach (TaskViewModel vm in args.OldItems)
                     vm.Dispose();
             };
-
-            TogglePanelVisibility = new DelegateCommand(() => IsPanelVisible = !IsPanelVisible);
         }
 
         private void TasksOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

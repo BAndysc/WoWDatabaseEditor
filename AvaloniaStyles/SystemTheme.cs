@@ -19,7 +19,8 @@ namespace AvaloniaStyles
         DarkWindows10,
         LightWindows10,
         DarkWindows11,
-        LightWindows11
+        LightWindows11,
+        Windows9x
     }
     
     public class SystemTheme : StyleInclude
@@ -47,7 +48,7 @@ namespace AvaloniaStyles
 
         public bool ThemeUsesDock =>
             mode is SystemThemeOptions.DarkWindows10 or SystemThemeOptions.DarkWindows11 or
-                SystemThemeOptions.LightWindows10 or SystemThemeOptions.LightWindows11;
+                SystemThemeOptions.LightWindows10 or SystemThemeOptions.LightWindows11 or SystemThemeOptions.Windows9x;
 
         protected static SystemThemeOptions ResolveTheme(SystemThemeOptions theme)
         {
@@ -104,6 +105,9 @@ namespace AvaloniaStyles
                         break;
                     case SystemThemeOptions.LightWindows11:
                         Source = new Uri("avares://AvaloniaStyles/Styles/Windows11Light.axaml", UriKind.Absolute);
+                        break;
+                    case SystemThemeOptions.Windows9x:
+                        Source = new Uri("avares://AvaloniaStyles/Styles/Windows9x.axaml", UriKind.Absolute);
                         break;
                 }
             }

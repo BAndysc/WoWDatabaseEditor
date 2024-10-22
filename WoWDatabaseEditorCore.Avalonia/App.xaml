@@ -7,6 +7,9 @@
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:avalonia="clr-namespace:WoWDatabaseEditorCore.Avalonia"
              xmlns:settings="clr-namespace:WDE.Common.Settings;assembly=WDE.Common"
+             xmlns:fastTableView="clr-namespace:AvaloniaStyles.Controls.FastTableView;assembly=AvaloniaStyles"
+             xmlns:utils="clr-namespace:Classic.Avalonia.Theme.Utils;assembly=Classic.Avalonia.Theme"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              x:Class="WoWDatabaseEditorCore.Avalonia.App"
              RequestedThemeVariant="Light"
              Name="WoW Database Editor">
@@ -45,6 +48,7 @@
         <ResourceDictionary.MergedDictionaries>
             <ResourceDictionary>
                 <FontFamily x:Key="MonoFont">Consolas,Menlo,Courier,Courier New</FontFamily>
+                <FontFamily x:Key="Lato">avares://AvaloniaStyles/Styles/Assets#Lato</FontFamily>
                 <DrawingImage x:Key="StatusBarIconNotice">
                 <DrawingImage.Drawing>
                     <DrawingGroup >
@@ -90,12 +94,9 @@
     </Application.Resources>
     <Application.Styles>
         <appearanceService:AvaloniaThemeStyle />
-        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
         <StyleInclude Source="avares://WDE.Common.Avalonia/Themes/Generic.axaml" />
         <StyleInclude Source="avares://WDE.SmartScriptEditor.Avalonia/Themes/Generic.axaml"/>
         <StyleInclude Source="avares://WDE.EventAiEditor.Avalonia/Themes/Generic.axaml"/>
-        <StyleInclude Source="avares://AvaloniaStyles/Controls/FastTableView/Style.axaml" />
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
         <StyleInclude Source="avares://WoWDatabaseEditorCore.Avalonia.GUI/Controls/SingleView/FakeWindow.axaml"/>
         <StyleInclude Source="avares://WoWDatabaseEditorCore.Avalonia.GUI/Controls/SingleView/FakeWindowControl.axaml"/>
 
@@ -120,6 +121,14 @@
             <Setter Property="BringIntoViewOnFocusChange" Value="False" />
         </Style>
 
+        <!-- override Classic font for VeryFastTableView -->
+        <Style Selector=":is(fastTableView|VeryFastTableView)">
+            <Setter Property="TextElement.FontFamily" Value="{StaticResource Lato}" />
+            <Setter Property="(utils:FontUtils.FontAliasing)" Value="False" />
+        </Style>
+        <Style Selector="avaloniaEdit|TextEditor">
+            <Setter Property="(utils:FontUtils.FontAliasing)" Value="False" />
+        </Style>
 
         <Style Selector="TextBox.noErrors DataValidationErrors">
             <!-- I don't want to display data validation errors here -->

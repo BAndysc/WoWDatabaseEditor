@@ -1,6 +1,10 @@
+using System;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
+using AvaloniaStyles.Utils;
+using WDE.Common.Disposables;
 
 namespace AvaloniaStyles.Controls
 {
@@ -20,6 +24,9 @@ namespace AvaloniaStyles.Controls
         
         public static readonly StyledProperty<object> TopLeftContentProperty =
             AvaloniaProperty.Register<ToolBar, object>(nameof(TopLeftContent));
+
+        public static readonly DirectProperty<ToolBar, bool> IsEmptyProperty =
+            AvaloniaProperty.RegisterDirect<ToolBar, bool>(nameof(IsEmpty), o => o.IsEmpty);
 
         public object MiddleContent
         {
@@ -51,6 +58,30 @@ namespace AvaloniaStyles.Controls
             set => SetValue(RightContentProperty, value);
         }
 
+        private bool _isEmpty;
+        public bool IsEmpty
+        {
+            get => _isEmpty;
+        }
+
+        private bool IsContentEmpty(object? o)
+        {
+            if (o == null)
+            {
+                return true;
+            }
+
+            if (o is ContentControl cc)
+            {
+                if (cc.Content == null)
+                    return true;
+                if (cc.ContentTemplate is IExtendedDataTemplate ct)
+                    return !ct.HasContent(cc.Content);
+            }
+
+            return false;
+        }
+
         static ToolBar()
         {
             MiddleContentProperty.Changed.AddClassHandler<ToolBar>(Action);
@@ -60,13 +91,48 @@ namespace AvaloniaStyles.Controls
             TopLeftContentProperty.Changed.AddClassHandler<ToolBar>(Action);
         }
 
-        private static void Action(ToolBar titlebar, AvaloniaPropertyChangedEventArgs args)
+        private static void Action(ToolBar toolbar, AvaloniaPropertyChangedEventArgs args)
         {
-            if (args.OldValue is ILogical oldLogical) 
-                titlebar.LogicalChildren.Remove(oldLogical);
+            using var _ = toolbar.IsEmptyUpdateScope();
+            if (args.OldValue is ILogical oldLogical)
+            {
+                toolbar.LogicalChildren.Remove(oldLogical);
+                if (oldLogical is ContentControl cc)
+                {
+                    cc.PropertyChanged -= toolbar.OnContentPropertyChanged;
+                }
+            }
 
-            if (args.NewValue is ILogical newLogical) 
-                titlebar.LogicalChildren.Add(newLogical);
+            if (args.NewValue is ILogical newLogical)
+            {
+                toolbar.LogicalChildren.Add(newLogical);
+                if (newLogical is ContentControl cc)
+                {
+                    cc.PropertyChanged += toolbar.OnContentPropertyChanged;
+                }
+            }
+        }
+
+        private void OnContentPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            using var _ = IsEmptyUpdateScope();
+        }
+
+        private IDisposable IsEmptyUpdateScope()
+        {
+            var wasEmpty = _isEmpty;
+            return new ActionDisposable(() =>
+            {
+                _isEmpty = IsContentEmpty(MiddleContent) &&
+                          IsContentEmpty(LeftContent) &&
+                          IsContentEmpty(RightContent) &&
+                          IsContentEmpty(TopContent) &&
+                          IsContentEmpty(TopLeftContent);
+                if (_isEmpty != wasEmpty)
+                {
+                    RaisePropertyChanged(IsEmptyProperty, wasEmpty, _isEmpty);
+                }
+            });
         }
     }
 }

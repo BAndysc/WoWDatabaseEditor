@@ -26,6 +26,7 @@
           Chrome="NoSystemChrome"
           SubTitle="{CompiledBinding Subtitle}"
           Classes="MainWindow"
+          RoundCorners="True"
           x:DataType="viewModels:MainWindowViewModel"
           utils:MenuBind.MenuItems="{CompiledBinding MenuItemProviders}"
           utils:MenuBind.MenuItemsGestures="{CompiledBinding MenuItemProviders}"
@@ -141,18 +142,18 @@
             </controls:ToolBar.TopContent>
             <controls:ToolBar.LeftContent>
                 <ToolbarPanel>
-                    <ToggleButton ToolTip.Tip="Show tables list" IsChecked="{CompiledBinding ShowTablesList, Mode=TwoWay}">
-                        <WdeImage Classes.Checked="{CompiledBinding ShowTablesList}">
-                            <WdeImage.Styles>
-                                <Style Selector="WdeImage:not(.Checked)">
-                                    <Setter Property="ImageUri" Value="Icons/icon_tables.png" />
-                                </Style>
-                                <Style Selector="WdeImage.Checked">
-                                    <Setter Property="ImageUri" Value="Icons/icon_tables_white.png" />
-                                </Style>
-                            </WdeImage.Styles>
-                        </WdeImage>
-                    </ToggleButton>
+                    <ButtonImage ToolTip.Tip="Show tables list"
+                                  IsToggleButton="True"
+                                  IsChecked="{CompiledBinding ShowTablesList, Mode=TwoWay}">
+                        <Interaction.Behaviors>
+                            <DataTriggerBehavior Binding="{CompiledBinding ShowTablesList}" Value="True">
+                                <ChangePropertyAction PropertyName="Image" Value="Icons/icon_tables_white.png" />
+                            </DataTriggerBehavior>
+                            <DataTriggerBehavior Binding="{CompiledBinding ShowTablesList}" Value="False">
+                                <ChangePropertyAction PropertyName="Image" Value="Icons/icon_tables.png" />
+                            </DataTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </ButtonImage>
 
                     <controls:ToolbarPanel IsVisible="{CompiledBinding HasAnyType}" DataContext="{CompiledBinding QuickGoToViewModel}">
                         <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Entry:</TextBlock>
@@ -217,23 +218,45 @@
                         </ToolbarItemsControl.ItemTemplate>
                     </ToolbarItemsControl>
 
-                    <Button x:Name="DownloadUpdate" ToolTip.Tip="Update is ready to download. Press to download/install." Command="{CompiledBinding DownloadUpdateCommand}" IsVisible="{CompiledBinding HasUpdateToDownload}" BorderThickness="1" Margin="20,0,0,0" Width="34" Height="34">
+                    <Button x:Name="DownloadUpdate"
+                            Theme="{DynamicResource BigToolbarButton}"
+                            ToolTip.Tip="Update is ready to download. Press to download/install."
+                            Command="{CompiledBinding DownloadUpdateCommand}"
+                            IsVisible="{CompiledBinding HasUpdateToDownload}"
+                            Margin="20,0,0,0">
                         <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource DownloadUpdateIcon}" />
                     </Button>
 
-                    <Button x:Name="CloudUpload" IsVisible="{CompiledBinding VersionedFilesViewModel.AnyPendingFiles, FallbackValue={x:False}}" ToolTip.Tip="{CompiledBinding VersionedFilesViewModel.StagedFilesCount, StringFormat={}{0} Pending Files (click to see them)}" Command="{CompiledBinding VersionedFilesViewModel.OpenUploadWindow}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
+                    <Button x:Name="CloudUpload"
+                            Theme="{DynamicResource BigToolbarButton}"
+                            IsVisible="{CompiledBinding VersionedFilesViewModel.AnyPendingFiles, FallbackValue={x:False}}"
+                            ToolTip.Tip="{CompiledBinding VersionedFilesViewModel.StagedFilesCount, StringFormat={}{0} Pending Files (click to see them)}"
+                            Command="{CompiledBinding VersionedFilesViewModel.OpenUploadWindow}"
+                            Margin="5,0,0,0">
                         <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource CloudUpload}" />
                     </Button>
 
-                    <Button x:Name="OpenSQLDocument" ToolTip.Tip="New SQL document" Command="{CompiledBinding OpenSqlDocumentCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
+                    <Button x:Name="OpenSQLDocument"
+                            Theme="{DynamicResource BigToolbarButton}"
+                            ToolTip.Tip="New SQL document"
+                            Command="{CompiledBinding OpenSqlDocumentCommand}"
+                            Margin="5,0,0,0">
                         <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource ToSqlIcon}" />
                     </Button>
 
-                    <Button ToolTip.Tip="Open game view" Classes="HideWin10" Command="{CompiledBinding Open3DCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
+                    <Button ToolTip.Tip="Open game view"
+                            Theme="{DynamicResource BigToolbarButton}"
+                            Classes="HideWin10"
+                            Command="{CompiledBinding Open3DCommand}"
+                            Margin="5,0,0,0">
                         <Path VerticalAlignment="Center" Width="16" Fill="{Binding $parent[Button].Foreground}" Data="{StaticResource Open3DIcon}" />
                     </Button>
 
-                    <Button ToolTip.Tip="Find anywhere" Classes="HideWin10" Command="{CompiledBinding FindAnywhereCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
+                    <Button ToolTip.Tip="Find anywhere"
+                            Theme="{DynamicResource BigToolbarButton}"
+                            Classes="HideWin10"
+                            Command="{CompiledBinding FindAnywhereCommand}"
+                            Margin="5,0,0,0">
                         <Path VerticalAlignment="Center" Width="16" Fill="{Binding $parent[Button].Foreground}" Data="{StaticResource FindAnywhereIcon}" />
                     </Button>
                 </ToolbarPanel>
@@ -253,28 +276,6 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Bottom"
                             ClipToBounds="False"/>
-
-            <views:TasksPanel DataContext="{CompiledBinding TasksViewModel}"
-                              Margin="0,0,5,0"
-                              HorizontalAlignment="Right"
-                              VerticalAlignment="Bottom"
-                              ClipToBounds="False"
-                              IsVisible="{CompiledBinding IsPanelVisible, Mode=OneWay}" />
-            <Border BorderThickness="1"
-                    Background="{DynamicResource ContentBackground}"
-                    BorderBrush="Gray"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom"
-                    Margin="0,0,155,0"
-                    DataContext="{CompiledBinding ConnectionsViewModel}"
-                    IsVisible="{CompiledBinding IsPanelVisible, Mode=OneWay}"
-                    CornerRadius="{DynamicResource ControlCornerRadius}"
-                    Width="300" Height="350" BoxShadow="0 0 30 5 #50000000">
-                <ContentControl Content="{CompiledBinding .}"
-                                ContentTemplate="{x:Static utils:ViewDataTemplate.Template}"
-                                ClipToBounds="False" />
-            </Border>
-
         </Panel>
     </controls:ExtendedWindow.Overlay>
 

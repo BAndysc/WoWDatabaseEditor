@@ -7,7 +7,7 @@
              xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore">
     <avaloniaEdit:TextEditor Document="{CompiledBinding Document, Converter={x:Static NativeTextDocumentConverter.Instance}}" 
-                             BorderThickness="0"
                              controls:AvalonEditExtra.SyntaxExtension="{CompiledBinding Extension}"
+                             BorderThickness="0"
                              ShowLineNumbers="True" FontFamily="Consolas,Menlo,Courier,Courier New" />
 </UserControl>

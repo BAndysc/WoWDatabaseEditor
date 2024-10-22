@@ -92,10 +92,9 @@
                     <ItemsControl ItemsSource="{CompiledBinding RelatedSolutionItems.List}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="viewModels:RelatedSolutionItemViewModel">
-                                <Button Command="{CompiledBinding CreateCommand}"
-                                        ToolTip.Tip="{CompiledBinding Name}">
-                                    <components:WdeImage Image="{CompiledBinding Icon}" />
-                                </Button>
+                                <ButtonImage Command="{CompiledBinding CreateCommand}"
+                                             Image="{CompiledBinding Icon}"
+                                        ToolTip.Tip="{CompiledBinding Name}" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                         <ItemsControl.ItemsPanel>
@@ -105,15 +104,19 @@
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
 
-                    <Button x:Name="OpenSQLDocument" ToolTip.Tip="New SQL document" Command="{CompiledBinding OpenSqlDocumentCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
+                    <Button x:Name="OpenSQLDocument" ToolTip.Tip="New SQL document" Command="{CompiledBinding OpenSqlDocumentCommand}" Margin="5,0,0,0"
+                            Theme="{DynamicResource BigToolbarButton}">
                         <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource ToSqlIcon}" />
                     </Button>
 
-                    <Button ToolTip.Tip="Open game view" IsVisible="{CompiledBinding Is3dViewSupported}" Classes="HideWin10" Command="{CompiledBinding Open3DCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
+                    <Button ToolTip.Tip="Open game view" IsVisible="{CompiledBinding Is3dViewSupported}" Classes="HideWin10" Command="{CompiledBinding Open3DCommand}" Margin="5,0,0,0"
+                            Theme="{DynamicResource BigToolbarButton}">
                         <Path VerticalAlignment="Center" Width="16" Fill="{Binding $parent[Button].Foreground}" Data="{StaticResource Open3DIcon}" />
                     </Button>
 
-                    <Button ToolTip.Tip="Find anywhere" Classes="HideWin10" Command="{CompiledBinding FindAnywhereCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
+                    <Button ToolTip.Tip="Find anywhere" Classes="HideWin10" Command="{CompiledBinding FindAnywhereCommand}"
+                            Theme="{DynamicResource BigToolbarButton}"
+                            Margin="5,0,0,0">
                         <Path VerticalAlignment="Center" Width="16" Fill="{Binding $parent[Button].Foreground}" Data="{StaticResource FindAnywhereIcon}" />
                     </Button>
                 </ToolbarPanel>
@@ -124,18 +127,18 @@
             </DockPanel>
 
             <ToolbarPanel DockPanel.Dock="Top">
-                <ToggleButton ToolTip.Tip="Show tables list" IsChecked="{CompiledBinding ShowTablesList, Mode=TwoWay}">
-                    <WdeImage Classes.Checked="{CompiledBinding ShowTablesList}">
-                        <WdeImage.Styles>
-                            <Style Selector="WdeImage:not(.Checked)">
-                                <Setter Property="ImageUri" Value="Icons/icon_tables.png" />
-                            </Style>
-                            <Style Selector="WdeImage.Checked">
-                                <Setter Property="ImageUri" Value="Icons/icon_tables_white.png" />
-                            </Style>
-                        </WdeImage.Styles>
-                    </WdeImage>
-                </ToggleButton>
+                <ButtonImage ToolTip.Tip="Show tables list"
+                             IsToggleButton="True"
+                             IsChecked="{CompiledBinding ShowTablesList, Mode=TwoWay}">
+                    <Interaction.Behaviors>
+                        <DataTriggerBehavior Binding="{CompiledBinding ShowTablesList}" Value="True">
+                            <ChangePropertyAction PropertyName="Image" Value="Icons/icon_tables_white.png" />
+                        </DataTriggerBehavior>
+                        <DataTriggerBehavior Binding="{CompiledBinding ShowTablesList}" Value="False">
+                            <ChangePropertyAction PropertyName="Image" Value="Icons/icon_tables.png" />
+                        </DataTriggerBehavior>
+                    </Interaction.Behaviors>
+                </ButtonImage>
 
                 <controls:ToolbarPanel IsVisible="{CompiledBinding HasAnyType}" DataContext="{CompiledBinding QuickGoToViewModel}">
                     <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Entry:</TextBlock>
@@ -226,29 +229,6 @@
                 </idc:DockControl>
 
                 <Panel Name="PART_Overlay">
-
-                    <views:TasksPanel DataContext="{CompiledBinding TasksViewModel}"
-                                      Margin="0,0,5,0"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Bottom"
-                                      ClipToBounds="False"
-                                      IsVisible="{CompiledBinding IsPanelVisible, Mode=OneWay}" />
-
-                    <Border BorderThickness="1"
-                            Background="{DynamicResource ContentBackground}"
-                            BorderBrush="Gray"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Bottom"
-                            Margin="0,0,155,0"
-                            DataContext="{CompiledBinding ConnectionsViewModel}"
-                            IsVisible="{CompiledBinding IsPanelVisible, Mode=OneWay}"
-                            CornerRadius="{DynamicResource ControlCornerRadius}"
-                            Width="300" Height="350" BoxShadow="0 0 30 5 #50000000">
-                        <ContentControl Content="{CompiledBinding .}"
-                                        ContentTemplate="{x:Static utils:ViewDataTemplate.Template}"
-                                        ClipToBounds="False" />
-                    </Border>
-
                     <Panel Name="Panel"
                            DataContext="{CompiledBinding QuickAccessViewModel, Mode=OneWay}"
                            IsVisible="{CompiledBinding IsOpened, Mode=OneWay}"

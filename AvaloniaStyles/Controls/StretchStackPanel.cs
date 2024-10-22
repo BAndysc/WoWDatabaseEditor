@@ -23,6 +23,12 @@ public class StretchStackPanel : Panel
         set => SetValue(StretchProperty, value);
     }
 
+    static StretchStackPanel()
+    {
+        AffectsArrange<StretchStackPanel>(StretchProperty, SpacingProperty);
+        AffectsMeasure<StretchStackPanel>(StretchProperty, SpacingProperty);
+    }
+
     protected override Size ArrangeOverride(Size finalSize)
     {
         Avalonia.Controls.Controls children = Children;

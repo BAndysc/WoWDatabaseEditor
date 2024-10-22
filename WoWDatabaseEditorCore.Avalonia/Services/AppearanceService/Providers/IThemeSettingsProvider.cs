@@ -6,6 +6,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers
     public interface IThemeSettingsProvider
     {
         ThemeSettings GetSettings();
-        void UpdateSettings(Theme themeName, double? customScaling, double hue, double saturation, double lightness);
+        void UpdateSettings(Theme themeName, double? customScaling, double hue, double saturation, double lightness, int? aprilsFoolOverride, string? themeVariant);
     }
 }

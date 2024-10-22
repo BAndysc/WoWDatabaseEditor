@@ -7,10 +7,11 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
 using AvaloniaStyles.Utils;
+using Classic.Avalonia.Theme;
 
 namespace AvaloniaStyles.Controls
 {
-    public class BaseMessageBoxWindow : Window
+    public class BaseMessageBoxWindow : ClassicWindow
     {
         protected override Type StyleKeyOverride => typeof(BaseMessageBoxWindow);
 

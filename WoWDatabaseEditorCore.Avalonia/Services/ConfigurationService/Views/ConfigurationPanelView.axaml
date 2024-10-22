@@ -7,59 +7,96 @@
                    xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
                    xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels;assembly=WoWDatabaseEditorCore"
                    xmlns:common="clr-namespace:WDE.Common;assembly=WDE.Common"
+                   xmlns:commonControls="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia"
                    x:DataType="viewModels:ConfigurationPanelViewModel"
+                   x:Name="Root"
                    Background="{DynamicResource SlightlyHighlightedBackground}"
                    prism:ViewModelLocator.AutoWireViewModel="False">
     <UserControl.Resources>
         <converters:NullConverter x:Key="IsNullConverter" Inverted="true" />
+        <Template x:Key="Win9xTemplate">
+            <Panel Background="{DynamicResource {x:Static commonControls:SystemColors.ControlBrushKey}}">
+                <TabControl ItemsSource="{CompiledBinding ContainerTabItems}" SelectedItem="{CompiledBinding SelectedTabItem, Mode=TwoWay}">
+                <TabControl.ItemTemplate>
+                    <DataTemplate x:DataType="common:IConfigurable">
+                        <TextBlock Text="{CompiledBinding Name}" />
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate x:DataType="common:IConfigurable">
+                        <DockPanel LastChildFill="True">
+                            <TextBlock DockPanel.Dock="Top" Text="{CompiledBinding Name}" FontSize="32" FontWeight="Light" />
+                            <Grid Margin="10" DockPanel.Dock="Bottom">
+                                <Button Margin="0,10,0,0" Content="Save" HorizontalAlignment="Left" Width="119"
+                                        Command="{CompiledBinding #Root.((viewModels:ConfigurationPanelViewModel)DataContext).Save}" />
+                            </Grid>
+                            <DockPanel LastChildFill="True">
+                                <TextBlock DockPanel.Dock="Top"
+                                           TextWrapping="WrapWithOverflow"
+                                           FontSize="18"
+                                           FontWeight="Light"
+                                           Margin="0,0,0,17"
+                                           IsVisible="{CompiledBinding ShortDescription, Converter={StaticResource IsNullConverter}}"
+                                           Text="{CompiledBinding ShortDescription}" />
+                                <ContentControl Content="{CompiledBinding .}" HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch" />
+                            </DockPanel>
+                        </DockPanel>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+            </Panel>
+        </Template>
+        <Template x:Key="DefaultTemplate">
+             <Grid ColumnDefinitions="Auto,*">
+                <controls:GroupingListBox Items="{CompiledBinding Groups}"
+                                          BorderThickness="0"
+                                          Background="{DynamicResource SlightlyHighlightedBackground}"
+                                          SelectedItem="{CompiledBinding SelectedTabItem, Mode=TwoWay}">
+                    <controls:GroupingListBox.ItemTemplate>
+                        <DataTemplate x:DataType="common:IConfigurable">
+                            <StackPanel Orientation="Horizontal">
+                                <WdeImage Image="{CompiledBinding Icon}" Width="24" Height="24" Margin="0,-2,15,-2" />
+                                <TextBlock Name="SettingName" Text="{CompiledBinding Name}" VerticalAlignment="Center" />
+                                <TextBlock Text="*" IsVisible="{CompiledBinding IsModified}" FontWeight="Bold" VerticalAlignment="Center" />
+                                <Interaction.Behaviors>
+                                    <DataTriggerBehavior Binding="{CompiledBinding IsModified}" ComparisonCondition="Equal" Value="False">
+                                        <ChangePropertyAction TargetObject="{Binding #SettingName}" PropertyName="FontWeight" Value="Normal"/>
+                                    </DataTriggerBehavior>
+                                    <DataTriggerBehavior Binding="{CompiledBinding IsModified}" ComparisonCondition="Equal" Value="True">
+                                        <ChangePropertyAction TargetObject="{Binding #SettingName}" PropertyName="FontWeight" Value="Bold"/>
+                                    </DataTriggerBehavior>
+                                </Interaction.Behaviors>
+                            </StackPanel>
+                        </DataTemplate>
+                    </controls:GroupingListBox.ItemTemplate>
+                    <controls:GroupingListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Margin" Value="6,0,0,0" />
+                        </Style>
+                    </controls:GroupingListBox.Styles>
+                </controls:GroupingListBox>
+                <Border Grid.Column="1" Padding="15,7">
+                    <DockPanel LastChildFill="True">
+                        <TextBlock DockPanel.Dock="Top" Text="{CompiledBinding SelectedTabItem.Name}" FontSize="32" FontWeight="Light" />
+                        <Grid Margin="10" DockPanel.Dock="Bottom">
+                            <Button Margin="0,10,0,0" Content="Save" HorizontalAlignment="Left" Width="119"
+                                    Command="{CompiledBinding Save}" />
+                        </Grid>
+                        <DockPanel LastChildFill="True">
+                            <TextBlock DockPanel.Dock="Top"
+                                       TextWrapping="WrapWithOverflow"
+                                       FontSize="18"
+                                       FontWeight="Light"
+                                       Margin="0,0,0,17"
+                                       IsVisible="{CompiledBinding SelectedTabItem.ShortDescription, Converter={StaticResource IsNullConverter}}"
+                                       Text="{CompiledBinding SelectedTabItem.ShortDescription}" />
+                            <ContentControl Content="{CompiledBinding SelectedTabItem}" HorizontalContentAlignment="Stretch"
+                                            VerticalContentAlignment="Stretch" />
+                        </DockPanel>
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </Template>
     </UserControl.Resources>
-    <Grid ColumnDefinitions="Auto,*">
-        <controls:GroupingListBox Items="{CompiledBinding Groups}"
-                                  BorderThickness="0"
-                                  Background="{DynamicResource SlightlyHighlightedBackground}"
-                                  SelectedItem="{CompiledBinding SelectedTabItem, Mode=TwoWay}">
-            <controls:GroupingListBox.ItemTemplate>
-                <DataTemplate x:DataType="common:IConfigurable">
-                    <StackPanel Orientation="Horizontal">
-                        <WdeImage Image="{CompiledBinding Icon}" Width="24" Height="24" Margin="0,-2,15,-2" />
-                        <TextBlock Name="SettingName" Text="{CompiledBinding Name}" VerticalAlignment="Center" />
-                        <TextBlock Text="*" IsVisible="{CompiledBinding IsModified}" FontWeight="Bold" VerticalAlignment="Center" />
-                        <Interaction.Behaviors>
-                            <DataTriggerBehavior Binding="{CompiledBinding IsModified}" ComparisonCondition="Equal" Value="False">
-                                <ChangePropertyAction TargetObject="{Binding #SettingName}" PropertyName="FontWeight" Value="Normal"/>
-                            </DataTriggerBehavior>
-                            <DataTriggerBehavior Binding="{CompiledBinding IsModified}" ComparisonCondition="Equal" Value="True">
-                                <ChangePropertyAction TargetObject="{Binding #SettingName}" PropertyName="FontWeight" Value="Bold"/>
-                            </DataTriggerBehavior>
-                        </Interaction.Behaviors>
-                    </StackPanel>
-                </DataTemplate>
-            </controls:GroupingListBox.ItemTemplate>
-            <controls:GroupingListBox.Styles>
-                <Style Selector="ListBoxItem">
-                    <Setter Property="Margin" Value="6,0,0,0" />
-                </Style>
-            </controls:GroupingListBox.Styles>
-        </controls:GroupingListBox>
-        <Border Grid.Column="1" Padding="15,7">
-            <DockPanel LastChildFill="True"> 
-                <TextBlock DockPanel.Dock="Top" Text="{CompiledBinding SelectedTabItem.Name}" FontSize="32" FontWeight="Light" />
-                <Grid Margin="10" DockPanel.Dock="Bottom">
-                    <Button Margin="0,10,0,0" Content="Save" HorizontalAlignment="Left" Width="119"
-                            Command="{CompiledBinding Save}" />
-                </Grid>
-                <DockPanel LastChildFill="True">
-                    <TextBlock DockPanel.Dock="Top" 
-                               TextWrapping="WrapWithOverflow" 
-                               FontSize="18" 
-                               FontWeight="Light"
-                               Margin="0,0,0,17" 
-                               IsVisible="{CompiledBinding SelectedTabItem.ShortDescription, Converter={StaticResource IsNullConverter}}"
-                               Text="{CompiledBinding SelectedTabItem.ShortDescription}" />
-                    <ContentControl Content="{CompiledBinding SelectedTabItem}" HorizontalContentAlignment="Stretch"
-                                    VerticalContentAlignment="Stretch" />
-                </DockPanel>
-            </DockPanel>
-        </Border>
-    </Grid>
 </UserControl>

@@ -10,6 +10,8 @@
              xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
+             xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="Root"
@@ -21,6 +23,7 @@
         <converters:InverseBoolConverter x:Key="InversedBoolConverter" />
     </UserControl.Resources>
     <UserControl.Styles>
+        <styles:StyleIncludeColorAware Win9x="QuickStartView_9x.axaml" LightSource="QuickStartView_win1x.axaml" DarkSource="QuickStartView_win1x.axaml" />
         <Style Selector="Button.LinkALike">
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
@@ -35,46 +38,6 @@
         <Style Selector="Button.LinkALike:pointerover TextBlock">
             <Setter Property="TextDecorations" Value="Underline" />
         </Style>
-        
-        <Style Selector="Button.FlattyButton">
-            <Setter Property="Width" Value="100" />
-            <Setter Property="Height" Value="80" />
-            <Setter Property="Margin" Value="0,0,8,8" />
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Panel Background="Transparent">
-                        <Border Name="Bg" CornerRadius="3" />
-                        <Border Padding="3,3" Background="Transparent">
-                            <StackPanel Orientation="Vertical">
-                                <components:WdeImage Image="{Binding Image}" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Top" />
-                                <TextBlock TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.8" TextAlignment="Center" />
-                            </StackPanel>
-                        </Border>
-                    </Panel>
-                </ControlTemplate>
-            </Setter>
-            <Setter Property="RenderTransform" Value="none" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
-                </Transitions>
-            </Setter>
-        </Style>
-        <Style Selector="Button.FlattyButton:pressed">
-            <Setter Property="RenderTransform" Value="scale(0.9)" />    
-        </Style>
-        <Style Selector="Button.FlattyButton /template/ Border#Bg">
-            <Setter Property="Background" Value="Black" />
-            <Setter Property="Opacity" Value="0" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:.125" />
-                </Transitions>
-            </Setter>
-        </Style>
-        <Style Selector="Button.FlattyButton:pointerover /template/ Border#Bg">
-            <Setter Property="Opacity" Value="0.2" />
-        </Style>
         <Style Selector="Border.infoBox">
             <Setter Property="Background" Value="{DynamicResource TitleBarHalfButtonBackground}" />
             <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
@@ -88,7 +51,11 @@
             <Border BorderThickness="0,0,0,2" BorderBrush="{DynamicResource AccentColorMedium}">
                 <DockPanel VerticalAlignment="Bottom" LastChildFill="False">
                     <Image Source="../Icon.png" Width="56" Height="56" />
-                    <TextBlock VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow" Text="{CompiledBinding ProgramTitle}" />
+                    <TextBlock Text="WoW Database" FontFamily="Arial" FontSize="34" VerticalAlignment="Bottom" IsVisible="{DynamicResource AlternativeTitle}" />
+                    <TextBlock Text="Editor" FontFamily="Arial Black" Margin="6,0,6,0" FontSize="34" VerticalAlignment="Bottom"  IsVisible="{DynamicResource AlternativeTitle}"/>
+                    <TextBlock Text="97" FontFamily="Arial" FontWeight="Light" FontSize="54" VerticalAlignment="Bottom"  IsVisible="{DynamicResource AlternativeTitle}"/>
+
+                    <TextBlock VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow" Text="{CompiledBinding ProgramTitle}" IsVisible="{DynamicResource RegularTitle}" />
                     <TextBlock VerticalAlignment="Bottom" FontSize="20" Opacity="0.7" Margin="10,0,0,0" TextWrapping="WrapWithOverflow" Text="{CompiledBinding ProgramSubtitle}" />
                     
                     <!-- <WdeImage Cursor="Hand" x:Name="Party2021" VerticalAlignment="Bottom" ImageUri="Icons/document_party_big.png" -->

@@ -74,7 +74,8 @@
       
       <avaloniaEdit:TextEditor Name="TextEditor" FontFamily="{DynamicResource MonoFont}"
                                PointerHover="TextEditor_OnPointerHover"
-                               AvalonEditExtra.SyntaxExtension="sql" 
+                               AvalonEditExtra.SyntaxExtension="sql"
+                               BorderThickness="0"
                                IsModified="{CompiledBinding IsDocumentModified, Mode=TwoWay}"
                                IsEnabled="{CompiledBinding IsEnabled}"
                                WordWrap="{CompiledBinding WordWrap}"

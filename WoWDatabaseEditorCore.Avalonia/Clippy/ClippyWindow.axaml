@@ -1,0 +1,99 @@
+<ClassicWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:gif="clr-namespace:Avalonia.Labs.Gif;assembly=Avalonia.Labs.Gif"
+        xmlns:commonControls="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia"
+        xmlns:clippy="clr-namespace:WoWDatabaseEditorCore.Avalonia.Clippy"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="WoWDatabaseEditorCore.Avalonia.Clippy.ClippyWindow"
+        CanResize="False"
+        SizeToContent="WidthAndHeight"
+        ShowInTaskbar="False"
+        RenderOptions.EdgeMode="Aliased"
+        MinWidth="100"
+        Title="">
+    <ClassicWindow.Resources>
+        <ControlTheme x:Key="ClippyButton" TargetType="Button">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="PART_Border" BorderThickness="1" CornerRadius="7" Padding="3,5,5,2">
+                        <DockPanel>
+                            <commonControls:IconRenderer Name="PART_Icon" Source="avares://WoWDatabaseEditorCore.Avalonia.GUI/Clippy/btn.gif" Width="10" Height="10"
+                                                         Margin="0,-1,6,0" />
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              Name="PART_ContentPresenter"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        </DockPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^ /template/ Border#PART_Border">
+                <Setter Property="BorderBrush" Value="#B2B2B2" />
+            </Style>
+            <Style Selector="^:pointerover">
+                <Style Selector="^ /template/ commonControls|IconRenderer#PART_Icon">
+                    <Setter Property="Source" Value="avares://WoWDatabaseEditorCore.Avalonia.GUI/Clippy/btn_hover.gif" />
+                </Style>
+            </Style>
+            <Style Selector="^:pressed">
+                <Style Selector="^ /template/ commonControls|IconRenderer#PART_Icon">
+                    <Setter Property="Source" Value="avares://WoWDatabaseEditorCore.Avalonia.GUI/Clippy/btn_pressed.gif" />
+                </Style>
+                <Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="RenderTransform" Value="translate(1px, 1px)" />
+                </Style>
+            </Style>
+            <Style Selector="^:disabled">
+                <Setter Property="Foreground" Value="#B2B2B2" />
+                <Style Selector="^ /template/ commonControls|IconRenderer#PART_Icon">
+                    <Setter Property="IconStyle" Value="Grayscale" />
+                </Style>
+            </Style>
+        </ControlTheme>
+
+        <ControlTheme x:Key="ClippyButtonList" TargetType="Button" BasedOn="{StaticResource ClippyButton}">
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Style Selector="^ /template/ Border#PART_Border">
+                <Setter Property="BorderBrush" Value="Transparent" />
+            </Style>
+        </ControlTheme>
+
+        <Template x:Key="PopupContentTemplate">
+            <Border Background="#FFFFD1" BorderThickness="1" BorderBrush="Black" CornerRadius="8" Padding="6,10" x:DataType="clippy:ClippyViewModel" Name="Root">
+                <DockPanel LastChildFill="False">
+                    <TextBlock FontWeight="Bold" DockPanel.Dock="Top" Margin="0,0,0,10" TextWrapping="WrapWithOverflow" Text="{CompiledBinding Question.Question}"></TextBlock>
+                    <ItemsControl DockPanel.Dock="Top"  ItemsSource="{CompiledBinding Question.Answers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="system:String">
+                                <Button Theme="{StaticResource ClippyButtonList}"
+                                        Command="{CompiledBinding $parent[ItemsControl].((clippy:ClippyViewModel)DataContext).Question.SelectOption}"
+                                        CommandParameter="{CompiledBinding .}"
+                                        Content="{CompiledBinding .}"></Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical" Spacing="6" Margin="0,0,0,10" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <StretchStackPanel Stretch="True" Spacing="12" DockPanel.Dock="Bottom">
+                        <Button Theme="{StaticResource ClippyButton}" IsEnabled="False">Tips</Button>
+                        <Button Theme="{StaticResource ClippyButton}" IsEnabled="False">Options</Button>
+                        <Button Theme="{StaticResource ClippyButton}" Command="{CompiledBinding CloseQuestion}">Close</Button>
+                    </StretchStackPanel>
+                    <Panel Height="1" Background="#B2B2B2" DockPanel.Dock="Bottom" Margin="0,0,0,7" />
+                </DockPanel>
+            </Border>
+        </Template>
+    </ClassicWindow.Resources>
+    <Panel>
+        <gif:GifImage Width="124" Height="92" Source="avares://WoWDatabaseEditorCore.Avalonia.GUI/Clippy/clippy.gif" Name="Clippy">
+        </gif:GifImage>
+    </Panel>
+</ClassicWindow>

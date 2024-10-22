@@ -10,7 +10,6 @@
     <DockPanel>
         <Button DockPanel.Dock="Top" Command="{CompiledBinding ClearLog}">Clear</Button>
         <avaloniaEdit:TextEditor Document="{CompiledBinding LogDocument, Converter={x:Static NativeTextDocumentConverter.Instance}}" 
-                                 BorderThickness="0"
                                  AvalonEditExtra.SyntaxExtension="sql"
                                  Padding="5"
                                  ShowLineNumbers="True" FontFamily="Consolas,Menlo,Courier,Courier New" />

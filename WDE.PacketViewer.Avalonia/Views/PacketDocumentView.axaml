@@ -104,9 +104,9 @@
                                   Width="32"
                                   DockPanel.Dock="Left" ItemsSource="{CompiledBinding MostRecentlySearched}"
                                   SelectedItem="{CompiledBinding MostRecentlySearchedItem}" />
-                        <Button DockPanel.Dock="Right" Command="{CompiledBinding OpenFilterDialogCommand}">
-                            <components:WdeImage ImageUri="Icons/icon_filter.png" Width="24" Height="24" />
-                        </Button>
+                        <ButtonImage DockPanel.Dock="Right"
+                                     Image="Icons/icon_filter.png"
+                                     Command="{CompiledBinding OpenFilterDialogCommand}" />
                         <Panel>
                             <views:FilterTextEditor Document="{CompiledBinding FilterText, Converter={StaticResource DocumentConverter}}"
                                                 BorderThickness="0"
@@ -187,7 +187,6 @@
                 <Grid Grid.Column="2" RowDefinitions="*,5,100" Name="RightPanel">
                     <!-- text view -->
                     <avaloniaEdit:TextEditor
-                        BorderThickness="0"
                         Padding="2"
                         Document="{CompiledBinding SelectedPacketPreview, Converter={StaticResource DocumentConverter}}"
                         ShowLineNumbers="True"

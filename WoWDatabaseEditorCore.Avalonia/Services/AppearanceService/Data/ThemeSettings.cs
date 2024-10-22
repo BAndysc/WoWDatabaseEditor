@@ -16,7 +16,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Data
         
         public double Lightness { get; } /* -1 --- 1 */
 
-        public ThemeSettings(string name, bool useCustomScaling, double customScaling, double hue, double saturation, double lightness)
+        public int? AprilsFoolOverride { get; }
+
+        public string? ThemeVariant { get; }
+
+        public ThemeSettings(string name, bool useCustomScaling, double customScaling, double hue, double saturation, double lightness, int? aprilsFoolOverride, string? themeVariant)
         {
             Name = name;
             UseCustomScaling = useCustomScaling;
@@ -24,6 +28,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Data
             Hue = hue;
             Saturation = saturation;
             Lightness = lightness;
+            AprilsFoolOverride = aprilsFoolOverride;
+            ThemeVariant = themeVariant;
         }
     }
 }

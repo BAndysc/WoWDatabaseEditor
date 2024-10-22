@@ -1,0 +1,15 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:common="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
+        <Styles.Resources>
+                <SolidColorBrush x:Key="FastTableView.OddRowBackground" Color="{DynamicResource {x:Static common:SystemColors.WindowColorKey}}" />
+                <SolidColorBrush x:Key="FastTableView.SelectedRowBackground" Color="{DynamicResource {x:Static common:SystemColors.HighlightColorKey}}" />
+                <SolidColorBrush x:Key="FastTableView.EvenRowBackground" Color="#F0F0F0" />
+                <SolidColorBrush x:Key="FastTableView.HeaderBackground" Color="{DynamicResource {x:Static common:SystemColors.ControlColorKey}}" />
+                <SolidColorBrush x:Key="FastTableView.HeaderHoverBackground" Color="{DynamicResource {x:Static common:SystemColors.ControlColorKey}}" />
+                <SolidColorBrush x:Key="FastTableView.HeaderPressedBackground" Color="{DynamicResource {x:Static common:SystemColors.ControlColorKey}}" />
+                <SolidColorBrush x:Key="FastTableView.TextBrush" Color="{DynamicResource {x:Static common:SystemColors.WindowTextColorKey}}" />
+                <SolidColorBrush x:Key="FastTableView.FocusTextBrush" Color="{DynamicResource {x:Static common:SystemColors.HighlightTextColorKey}}" />
+                <SolidColorBrush x:Key="FastTableView.HoverRowBackground" Color="{DynamicResource {x:Static common:SystemColors.WindowColorKey}}" />
+        </Styles.Resources>
+</Styles>

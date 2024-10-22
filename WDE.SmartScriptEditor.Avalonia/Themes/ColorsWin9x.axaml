@@ -1,0 +1,68 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:common="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia"
+        xmlns:controls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls">
+
+    <Style Selector="controls|SmartEventView:selected /template/ FormattedTextBlock#PART_FormattedTextBlock">
+        <Setter Property="Background" Value="{DynamicResource {x:Static common:SystemColors.HighlightColorKey}}" />
+    </Style>
+    <Style Selector="controls|SmartActionView:action /template/ Border">
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+    <Style Selector="controls|SmartActionView:action.last /template/ Border">
+        <Setter Property="BorderThickness" Value="0,0,0,0" />
+    </Style>
+    <Styles.Resources>
+        <CornerRadius x:Key="SmartCornerRadius">0</CornerRadius>
+        <CornerRadius x:Key="SmartCornerRadius_Left">0</CornerRadius>
+        <CornerRadius x:Key="SmartCornerRadius_Bottom">0</CornerRadius>
+        <CornerRadius x:Key="SmartCornerRadius_Big">0</CornerRadius>
+        <CornerRadius x:Key="SmartCornerRadius_Big_Top">0</CornerRadius>
+        <CornerRadius x:Key="SmartCornerRadius_Big_Bottom">0</CornerRadius>
+        <SolidColorBrush x:Key="SmartScripts.Background" Color="{DynamicResource {x:Static common:SystemColors.ControlColorKey}}" Opacity="0.6" />
+
+        <SolidColorBrush x:Key="SmartScripts.Actions.Background" Color="Transparent" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Border" Color="{DynamicResource {x:Static common:SystemColors.ControlDarkColorKey}}" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Background" Color="Transparent" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Selected.Border" Color="{DynamicResource {x:Static common:SystemColors.ControlDarkColorKey}}" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Selected.Background" Color="{DynamicResource {x:Static common:SystemColors.HighlightColorKey}}" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Foreground" Color="Black" />
+
+        <SolidColorBrush x:Key="SmartScripts.Parameter.Foreground" Color="#3C76BE" />
+        <SolidColorBrush x:Key="SmartScripts.Source.Foreground" Color="#2E8A8A" /> <!-- #378B6F-->
+
+        <SolidColorBrush x:Key="SmartScripts.Comment.Background" Color="White" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Border" Color="Transparent" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Foreground" Color="#009000" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Border" Color="Transparent" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Background" Color="{DynamicResource {x:Static common:SystemColors.HighlightColorKey}}" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Selected" Color="#009000" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Foreground" Color="{DynamicResource {x:Static common:SystemColors.HighlightTextColorKey}}" />
+
+
+        <SolidColorBrush x:Key="SmartScripts.Event.Background" Color="{DynamicResource {x:Static common:SystemColors.ControlColorKey}}" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Foreground" Color="{DynamicResource {x:Static common:SystemColors.WindowTextColorKey}}" />
+        <StaticResource x:Key="SmartScripts.Event.Border" ResourceKey="ClassicBorderBrush" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Background" Color="{DynamicResource {x:Static common:SystemColors.ControlColorKey}}" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Foreground" Color="{DynamicResource {x:Static common:SystemColors.HighlightTextColorKey}}" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Filler" Color="{DynamicResource {x:Static common:SystemColors.ControlColorKey}}" />
+        <StaticResource x:Key="SmartScripts.Event.Selected.Border" ResourceKey="ClassicBorderBrush" />
+    
+        <SolidColorBrush x:Key="SmartScripts.Event.Flag.Background" Color="#1976d2" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Phase.Background" Color="#009688" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Flag.Foreground" Color="White" />
+        
+        <SolidColorBrush x:Key="SmartScripts.Event.Chance.Background" Color="#27ae60" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Timer.Background" Color="#6D2EAE" />
+
+        <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="{DynamicResource {x:Static common:SystemColors.ControlColorKey}}" />
+        <SolidColorBrush x:Key="SmartScripts.Condition.Foreground" Color="#77000000" />
+        
+        <SolidColorBrush x:Key="SmartScripts.Group.Background" Color="{DynamicResource {x:Static common:SystemColors.ControlLightColorKey}}" />
+        <SolidColorBrush x:Key="SmartScripts.Group.Foreground" Color="Black" />
+        <SolidColorBrush x:Key="SmartScripts.Group.Border" Color="Black" />
+        <SolidColorBrush x:Key="SmartScripts.Group.Selected.Background" Color="{DynamicResource {x:Static common:SystemColors.ControlLightColorKey}}" />
+        <SolidColorBrush x:Key="SmartScripts.Group.Selected.Foreground" Color="Black" />
+        <SolidColorBrush x:Key="SmartScripts.Group.Selected.Border" Color="Black" />
+    </Styles.Resources>
+</Styles>

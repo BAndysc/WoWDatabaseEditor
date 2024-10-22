@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
 using Avalonia.Media;
+using AvaloniaStyles.Utils;
 using Prism.Ioc;
 using WDE.Common.Windows;
 
@@ -36,7 +37,7 @@ namespace WDE.Common.Avalonia.Utils
         }
     }
 
-    public class ToolbarDataTemplate : IDataTemplate
+    public class ToolbarDataTemplate : IExtendedDataTemplate
     {
         public static IDataTemplate Template { get; } = new ToolbarDataTemplate();
         public Control Build(object? param)
@@ -60,6 +61,13 @@ namespace WDE.Common.Avalonia.Utils
         public bool Match(object? data)
         {
             return data is not Control && data is not string;
+        }
+
+        public bool HasContent(object? data)
+        {
+            return Match(data) &&
+                   ViewBind.AppViewLocator != null && data != null &&
+                    ViewBind.AppViewLocator.TryResolveToolBar(data.GetType(), out var toolbarType);
         }
     }
     

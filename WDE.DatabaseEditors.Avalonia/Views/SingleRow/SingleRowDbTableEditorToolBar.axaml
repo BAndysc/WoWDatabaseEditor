@@ -12,12 +12,15 @@
              IsEnabled="{Binding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.SingleRow.SingleRowDbTableEditorToolBar">
     <controls:ToolbarPanel>
-        <ToggleButton ToolTip.Tip="Split view horizontally" IsChecked="{CompiledBinding SplitHorizontal, Mode=TwoWay}">
-            <components:WdeImage ImageUri="Icons/icon_split_horiz.png" />
-        </ToggleButton>
-        <ToggleButton ToolTip.Tip="Split view vertically" IsChecked="{CompiledBinding SplitVertical, Mode=TwoWay}">
-            <components:WdeImage ImageUri="Icons/icon_split_vert.png" />
-        </ToggleButton>
+        <ButtonImage ToolTip.Tip="Split view horizontally"
+                     Image="Icons/icon_split_horiz.png"
+                     IsToggleButton="True"
+                     IsChecked="{CompiledBinding SplitHorizontal, Mode=TwoWay}" />
+
+        <ButtonImage ToolTip.Tip="Split view vertically"
+                     Image="Icons/icon_split_vert.png"
+                     IsToggleButton="True"
+                     IsChecked="{CompiledBinding SplitVertical, Mode=TwoWay}" />
         
         <ItemsControl ItemsSource="{CompiledBinding ToolbarCommands}">
             <ItemsControl.ItemsPanel>
@@ -27,10 +30,9 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="viewModels:TableCommandViewModel">
-                    <Button Command="{CompiledBinding Command}"
-                            ToolTip.Tip="{CompiledBinding Name}">
-                        <components:WdeImage Image="{CompiledBinding Icon}" />
-                    </Button>
+                    <ButtonImage Command="{CompiledBinding Command}"
+                                 Image="{CompiledBinding Icon}"
+                            ToolTip.Tip="{CompiledBinding Name}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

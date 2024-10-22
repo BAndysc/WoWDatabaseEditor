@@ -27,7 +27,6 @@ namespace WoWDatabaseEditorCore.Managers
     internal class NullConnectionsStatusBarItem : IConnectionsStatusBarItem
     {
         public int OpenedConnections => 0;
-        public bool IsPanelVisible { get; set; }
         public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

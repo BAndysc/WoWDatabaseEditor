@@ -12,10 +12,11 @@ using Avalonia.Platform;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using AvaloniaStyles.Utils;
+using Classic.Avalonia.Theme;
 
 namespace AvaloniaStyles.Controls
 {
-    public class ExtendedWindow : Window
+    public class ExtendedWindow : ClassicWindow
     {
         public static readonly StyledProperty<IImage> ManagedIconProperty =
             AvaloniaProperty.Register<ExtendedWindow, IImage>(nameof(ManagedIcon));
@@ -99,7 +100,8 @@ namespace AvaloniaStyles.Controls
         }
         
         protected override Type StyleKeyOverride => typeof(ExtendedWindow);
-        
+
+
         static ExtendedWindow()
         {
             IsActiveProperty.Changed.AddClassHandler<Window>((w, _) =>
@@ -147,7 +149,6 @@ namespace AvaloniaStyles.Controls
         }
 
         private IDisposable? backgroundBrushBinding;
-
         private void UnbindBackgroundBrush()
         {
             backgroundBrushBinding?.Dispose();
@@ -283,6 +284,10 @@ namespace AvaloniaStyles.Controls
         {
             if (e.OldValue is ILogical oldChild)
             {
+                if (oldChild is ToolBar tb)
+                {
+                    tb.PropertyChanged -= OnToolbarPropertyChanged;
+                }
                 LogicalChildren.Remove(oldChild);
                 PseudoClasses.Remove(pseudoclass);
             }
@@ -290,7 +295,30 @@ namespace AvaloniaStyles.Controls
             if (e.NewValue is ILogical newChild)
             {
                 LogicalChildren.Add(newChild);
-                PseudoClasses.Add(pseudoclass);
+                if (newChild is ToolBar tb)
+                {
+                    tb.PropertyChanged += OnToolbarPropertyChanged;
+                    OnToolbarPropertyChanged(tb, null!);
+                }
+                else
+                {
+                    PseudoClasses.Add(pseudoclass);
+                }
+            }
+        }
+
+        private void OnToolbarPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (sender is ToolBar tb)
+            {
+                if (tb.IsEmpty)
+                {
+                    PseudoClasses.Remove(":has-toolbar");
+                }
+                else
+                {
+                    PseudoClasses.Add(":has-toolbar");
+                }
             }
         }
 

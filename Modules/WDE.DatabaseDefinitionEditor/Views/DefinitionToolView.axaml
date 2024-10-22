@@ -31,7 +31,6 @@
                                          IsEnabled="{CompiledBinding IsLoading, Converter={StaticResource InverseBoolConverter}}"
                                          AvalonEditExtra.SyntaxExtension="json"
                                          Document="{CompiledBinding Definition, Converter={StaticResource DocumentConverter}}" 
-                                         BorderThickness="0"
                                          ShowLineNumbers="True"
                                          FontFamily="Consolas,Menlo,Courier,Courier New">
                 </avaloniaEdit:TextEditor>
@@ -63,7 +62,6 @@
                 <DockPanel Grid.Column="2">
                     <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Padding="4" TextWrapping="WrapWithOverflow">Raport:</TextBlock>
                     <avaloniaEdit:TextEditor Document="{CompiledBinding Raport, Converter={StaticResource DocumentConverter}}" 
-                                             BorderThickness="0"
                                              ShowLineNumbers="True"
                                              FontFamily="Consolas,Menlo,Courier,Courier New">
                     </avaloniaEdit:TextEditor>

@@ -27,10 +27,18 @@
       <AvaloniaResource Remove="Styles\BigSur\**" />
       <AvaloniaResource Remove="Styles\Catalina\**" />
       <AvaloniaResource Remove="Styles\MacOs\**" />
+      <None Remove="Styles\Windows9x\MS-Sans-Serif.ttf" />
+      <AvaloniaResource Include="Styles\Windows9x\MS-Sans-Serif.ttf" />
+      <None Remove="Styles\Windows9x\MS-Sans-Serif-Bold.ttf" />
+      <AvaloniaResource Include="Styles\Windows9x\MS-Sans-Serif-Bold.ttf" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />
       <ProjectReference Include="..\Dock\src\Dock.Avalonia\Dock.Avalonia.csproj" />
+      <ProjectReference Include="..\Libraries\Classic.Avalonia\src\Classic.Avalonia.Theme.DataGrid\Classic.Avalonia.Theme.DataGrid.csproj" />
+      <ProjectReference Include="..\Libraries\Classic.Avalonia\src\Classic.Avalonia.Theme.Dock\Classic.Avalonia.Theme.Dock.csproj" />
+      <ProjectReference Include="..\Libraries\Classic.Avalonia\src\Classic.Avalonia.Theme\Classic.Avalonia.Theme.csproj" />
+      <ProjectReference Include="..\Libraries\Classic.Avalonia\src\Classic.CommonControls.Avalonia\Classic.CommonControls.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>

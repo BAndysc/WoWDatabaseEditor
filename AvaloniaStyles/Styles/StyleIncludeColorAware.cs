@@ -12,10 +12,10 @@ namespace AvaloniaStyles.Styles
             set
             {
                 lightSource = value;
-                Source = SystemTheme.EffectiveThemeIsDark ? DarkSource : LightSource;
+                UpdateSource();
             }
         }
-        
+
         private Uri? darkSource;
         public Uri? DarkSource
         {
@@ -23,10 +23,26 @@ namespace AvaloniaStyles.Styles
             set
             {
                 darkSource = value;
-                Source = SystemTheme.EffectiveThemeIsDark ? DarkSource : LightSource;
+                UpdateSource();
             }
         }
-        
+
+        private Uri? win9x;
+        public Uri? Win9x
+        {
+            get => win9x;
+            set
+            {
+                win9x = value;
+                UpdateSource();
+            }
+        }
+
+        private void UpdateSource()
+        {
+            Source = SystemTheme.EffectiveTheme == SystemThemeOptions.Windows9x && Win9x != null ? Win9x : (SystemTheme.EffectiveThemeIsDark ? DarkSource : LightSource);
+        }
+
         public StyleIncludeColorAware(Uri baseUri) : base(baseUri)
         {
         }

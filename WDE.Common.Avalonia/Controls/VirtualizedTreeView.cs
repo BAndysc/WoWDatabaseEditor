@@ -25,22 +25,71 @@ using WDE.MVVM.Utils;
 
 namespace WDE.Common.Avalonia.Controls;
 
-public class VirtualizedTreeView : RenderedPanel, ILogicalScrollable
+public class VirtualizedTreeView : TemplatedControl
 {
     public static readonly StyledProperty<IReadOnlyList<INodeType>?> ItemsProperty = AvaloniaProperty.Register<VirtualizedTreeView, IReadOnlyList<INodeType>?>(nameof(Items));
     public static readonly StyledProperty<bool> IsFilteredProperty = AvaloniaProperty.Register<VirtualizedTreeView, bool>(nameof(IsFiltered));
     public static readonly StyledProperty<bool> RequestRenderProperty = AvaloniaProperty.Register<VirtualizedTreeView, bool>(nameof(RequestRender));
     public static readonly StyledProperty<INodeType?> SelectedNodeProperty = AvaloniaProperty.Register<VirtualizedTreeView, INodeType?>(nameof(SelectedNode), defaultBindingMode: BindingMode.TwoWay);
     public static readonly DirectProperty<VirtualizedTreeView, float> RowHeightProperty = AvaloniaProperty.RegisterDirect<VirtualizedTreeView, float>(nameof(RowHeight), x => x.RowHeight, (x, v) => x.RowHeight = v);
+    public static readonly StyledProperty<bool> NeverShrinkWidthProperty = AvaloniaProperty.Register<VirtualizedTreeView, bool>("NeverShrinkWidth");
+
+    private float rowHeight = 28;
+
+    public bool IsFiltered
+    {
+        get => GetValue(IsFilteredProperty);
+        set => SetValue(IsFilteredProperty, value);
+    }
+
+    public bool RequestRender
+    {
+        get => GetValue(RequestRenderProperty);
+        set => SetValue(RequestRenderProperty, value);
+    }
+
+    public IReadOnlyList<INodeType>? Items
+    {
+        get => GetValue(ItemsProperty);
+        set => SetValue(ItemsProperty, value);
+    }
+
+    public INodeType? SelectedNode
+    {
+        get => GetValue(SelectedNodeProperty);
+        set => SetValue(SelectedNodeProperty, value);
+    }
+
+    public bool NeverShrinkWidth
+    {
+        get => GetValue(NeverShrinkWidthProperty);
+        set => SetValue(NeverShrinkWidthProperty, value);
+    }
+
+    public float RowHeight
+    {
+        get => rowHeight;
+        set => SetAndRaise(RowHeightProperty, ref rowHeight, value);
+    }
+}
+
+public class VirtualizedTreeViewPresenter : RenderedPanel, ILogicalScrollable
+{
+    public static readonly StyledProperty<IReadOnlyList<INodeType>?> ItemsProperty = AvaloniaProperty.Register<VirtualizedTreeViewPresenter, IReadOnlyList<INodeType>?>(nameof(Items));
+    public static readonly StyledProperty<bool> IsFilteredProperty = AvaloniaProperty.Register<VirtualizedTreeViewPresenter, bool>(nameof(IsFiltered));
+    public static readonly StyledProperty<bool> RequestRenderProperty = AvaloniaProperty.Register<VirtualizedTreeViewPresenter, bool>(nameof(RequestRender));
+    public static readonly StyledProperty<INodeType?> SelectedNodeProperty = AvaloniaProperty.Register<VirtualizedTreeViewPresenter, INodeType?>(nameof(SelectedNode), defaultBindingMode: BindingMode.TwoWay);
+    public static readonly DirectProperty<VirtualizedTreeViewPresenter, float> RowHeightProperty = AvaloniaProperty.RegisterDirect<VirtualizedTreeViewPresenter, float>(nameof(RowHeight), x => x.RowHeight, (x, v) => x.RowHeight = v);
+    public static readonly StyledProperty<bool> NeverShrinkWidthProperty = AvaloniaProperty.Register<VirtualizedTreeViewPresenter, bool>("NeverShrinkWidth");
 
     private float rowHeight = 28;
     private RecyclableViewList[] views;
 
     private bool pendingScrollToSelected;
 
-    static VirtualizedTreeView()
+    static VirtualizedTreeViewPresenter()
     {
-        SelectedNodeProperty.Changed.AddClassHandler<VirtualizedTreeView>((tree, args) =>
+        SelectedNodeProperty.Changed.AddClassHandler<VirtualizedTreeViewPresenter>((tree, args) =>
         {
             if (args.NewValue is INodeType node)
             {
@@ -49,16 +98,16 @@ public class VirtualizedTreeView : RenderedPanel, ILogicalScrollable
                 tree.InvalidateArrange();
             }
         });
-        ItemsProperty.Changed.AddClassHandler<VirtualizedTreeView>((tree, args) => tree.ItemsChanged(args));
-        AffectsArrange<VirtualizedTreeView>(IsFilteredProperty);
-        AffectsMeasure<VirtualizedTreeView>(IsFilteredProperty);
-        AffectsArrange<VirtualizedTreeView>(RequestRenderProperty);
-        AffectsMeasure<VirtualizedTreeView>(RequestRenderProperty);
-        AffectsArrange<VirtualizedTreeView>(SelectedNodeProperty);
-        FocusableProperty.OverrideDefaultValue<VirtualizedTreeView>(true);
+        ItemsProperty.Changed.AddClassHandler<VirtualizedTreeViewPresenter>((tree, args) => tree.ItemsChanged(args));
+        AffectsArrange<VirtualizedTreeViewPresenter>(IsFilteredProperty);
+        AffectsMeasure<VirtualizedTreeViewPresenter>(IsFilteredProperty);
+        AffectsArrange<VirtualizedTreeViewPresenter>(RequestRenderProperty);
+        AffectsMeasure<VirtualizedTreeViewPresenter>(RequestRenderProperty);
+        AffectsArrange<VirtualizedTreeViewPresenter>(SelectedNodeProperty);
+        FocusableProperty.OverrideDefaultValue<VirtualizedTreeViewPresenter>(true);
 
-        AffectsMeasure<VirtualizedTreeView>(BoundsProperty);
-        AffectsArrange<VirtualizedTreeView>(BoundsProperty);
+        AffectsMeasure<VirtualizedTreeViewPresenter>(BoundsProperty);
+        AffectsArrange<VirtualizedTreeViewPresenter>(BoundsProperty);
     }
 
     public float RowHeight
@@ -67,7 +116,7 @@ public class VirtualizedTreeView : RenderedPanel, ILogicalScrollable
         set => SetAndRaise(RowHeightProperty, ref rowHeight, value);
     }
 
-    public VirtualizedTreeView()
+    public VirtualizedTreeViewPresenter()
     {
         views = new RecyclableViewList[0];
     }
@@ -299,17 +348,18 @@ public class VirtualizedTreeView : RenderedPanel, ILogicalScrollable
 
     protected override Size ArrangeOverride(Size finalSize)
     {
-        if (views.Length != DataTemplates.Count)
+        var dataTemplates = this.FindAncestorOfType<VirtualizedTreeView>()?.DataTemplates ?? [];
+        if (views.Length != dataTemplates.Count)
         {
             var oldViewsLength = views.Length;
-            Array.Resize(ref views, DataTemplates.Count);
+            Array.Resize(ref views, dataTemplates.Count);
             for (int i = oldViewsLength; i < views.Length; ++i)
                 views[i] = new RecyclableViewList(this);
         }
 
         for (var i = 0; i < views.Length; i++)
         {
-            var template = DataTemplates[i];
+            var template = dataTemplates[i];
             views[i].Reset(new FuncDataTemplate(template.Match, (_, _) => new VirtualizedTreeViewItem(){ContentTemplate = template}));
         }
 
@@ -357,7 +407,7 @@ public class VirtualizedTreeView : RenderedPanel, ILogicalScrollable
                 VirtualizedTreeViewItem? element = null;
                 for (int i = 0; i < views.Length; ++i)
                 {
-                    if (DataTemplates[i].Match(row))
+                    if (dataTemplates[i].Match(row))
                     {
                         element = (VirtualizedTreeViewItem)views[i].GetNext(row);
                         break;
@@ -368,7 +418,7 @@ public class VirtualizedTreeView : RenderedPanel, ILogicalScrollable
                 {
                     DataContext = row,
                     ContentTemplate = new FuncDataTemplate(_ => true,
-                        (_, _) => new TextBlock() { Text = "No template! Define <DataTemplates>" })
+                        (_, _) => new TextBlock() { Text = "No template! Define <dataTemplates>" })
                 };
 
                 element.Measure(rowRect.Size);
@@ -396,8 +446,6 @@ public class VirtualizedTreeView : RenderedPanel, ILogicalScrollable
         return finalSize;
     }
 
-    public static readonly StyledProperty<bool> NeverShrinkWidthProperty = AvaloniaProperty.Register<VirtualizedTreeView, bool>("NeverShrinkWidth");
-
     public override void Render(DrawingContext context)
     {
         if (Items == null)
@@ -406,7 +454,7 @@ public class VirtualizedTreeView : RenderedPanel, ILogicalScrollable
         if (this.FindAncestorOfType<ScrollViewer>() is not { } scrollViewer)
         {
             context.DrawText(
-                new FormattedText("VirtualizedTreeView must be wrapped in ScrollViewer!",
+                new FormattedText("VirtualizedTreeViewPresenter must be wrapped in ScrollViewer!",
                     CultureInfo.InvariantCulture,
                     FlowDirection.LeftToRight,
                     Typeface.Default,
