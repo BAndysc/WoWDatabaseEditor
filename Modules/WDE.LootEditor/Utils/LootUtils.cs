@@ -26,6 +26,7 @@ public static class LootUtils
             case LootSourceType.Skinning:
             case LootSourceType.Treasure:
             case LootSourceType.Pickpocketing:
+            case LootSourceType.Mission:
                 return false;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -56,6 +57,7 @@ public static class LootUtils
             case LootSourceType.Skinning:
             case LootSourceType.Treasure:
             case LootSourceType.Pickpocketing:
+            case LootSourceType.Mission:
                 return true;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -80,6 +82,7 @@ public static class LootUtils
             case LootSourceType.Milling: return "ItemParameter";
             case LootSourceType.Prospecting: return "ItemParameter";
             case LootSourceType.Pickpocketing: return "CreatureParameter";
+            case LootSourceType.Mission: return "Parameter";
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
