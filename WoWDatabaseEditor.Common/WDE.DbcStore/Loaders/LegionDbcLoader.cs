@@ -543,5 +543,10 @@ internal class LegionDbcLoader : BaseDbcLoader
                 MovementFlags1 = row.GetInt(80, 1),
             });
         });
+        Load("RewardPack.db2", data.RewardPacks, row => new RewardPack()
+        {
+            Id = row.Key,
+            TreasurePickerID = row.GetUInt(6)
+        });
     }
 }

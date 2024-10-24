@@ -65,7 +65,7 @@ namespace WDE.DbcStore
     [AutoRegister]
     [SingleInstance]
     public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore, IGarrMissionStore,
-        IItemStore, IConversationLineStore, IVehicleStore, IPlayerConditionStore
+        IItemStore, IConversationLineStore, IVehicleStore, IPlayerConditionStore, IRewardPackStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -190,6 +190,10 @@ namespace WDE.DbcStore
         public Dictionary<int, ItemSparse> ItemSparsById { get; internal set; } = new();
         public IItemSparse? GetItemSparseById(int id) => ItemSparsById.GetValueOrDefault(id);
 
+        public IReadOnlyList<IRewardPack> RewardPacks { get; internal set; } = Array.Empty<IRewardPack>();
+        public Dictionary<uint, IRewardPack> RewardPackById { get; internal set; } = new();
+        public IRewardPack? GetRewardPack(uint id) => RewardPackById.GetValueOrDefault(id);
+
         internal void Load()
         {            
             parameterFactory.Register("RaceMaskParameter", new RaceMaskParameter(currentCoreVersion.Current.GameVersionFeatures.AllRaces, raceProviderService), QuickAccessMode.Limited);
@@ -298,6 +302,9 @@ namespace WDE.DbcStore
 
                 store.ItemSparses = data.ItemSparses;
                 store.ItemSparsById = data.ItemSparses.ToDictionary(a => a.Id, a => a);
+
+                store.RewardPacks = data.RewardPacks;
+                store.RewardPackById = data.RewardPacks.ToDictionary(a => a.Id, a => (IRewardPack)a);
 
                 var currencyCategoryById = data.CurrencyCategories.ToDictionary(x => x.Id, x => x);
                 foreach (var curr in data.CurrencyTypes)
