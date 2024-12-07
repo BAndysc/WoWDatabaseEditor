@@ -84,6 +84,7 @@ namespace WDE.Common.Database
         int ActionMenuId { get; }
         uint ActionPoiId { get; }
         uint ActionScriptId { get; }
+        uint CharShipmentId { get; }
         uint BoxCoded { get; }
         uint BoxMoney { get; }
         string? BoxText { get; }
@@ -121,6 +122,7 @@ namespace WDE.Common.Database
         public int ActionMenuId { get; set; }
         public uint ActionPoiId { get; set; }
         public uint ActionScriptId { get; set; }
+        public uint CharShipmentId { get; set; }
         public uint BoxCoded { get; set; }
         public uint BoxMoney { get; set; }
         public string? BoxText { get; set; }
