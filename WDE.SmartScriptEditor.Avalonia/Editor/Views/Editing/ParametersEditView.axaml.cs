@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
@@ -18,6 +20,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing
     public partial class ParametersEditView : UserControl, IDialogWindowActivatedListener
     {
         private bool forceFocusFirstOnNextGotFocus = false;
+        private IDisposable? onDeactivated;
 
         public ParametersEditView()
         {
@@ -30,11 +33,27 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing
 
         public void OnActivated()
         {
+            onDeactivated?.Dispose();
+            onDeactivated = null;
         }
 
         public void OnDeactivated()
         {
-            forceFocusFirstOnNextGotFocus = true;
+            onDeactivated?.Dispose();
+            onDeactivated = null;
+            onDeactivated = DispatcherTimer.RunOnce(() =>
+            {
+                if (Application.Current!.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime classic)
+                {
+                    var windows = classic.Windows;
+                    var anyIsActive = windows.Any(x => x.IsActive);
+                    Console.WriteLine("Any active: " + anyIsActive + " " + (anyIsActive ? "": "probably an alt-tab, ignoring"));
+                    if (anyIsActive)
+                    {
+                        forceFocusFirstOnNextGotFocus = true;
+                    }
+                }
+            }, TimeSpan.FromMilliseconds(16));
         }
 
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
