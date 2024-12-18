@@ -2519,11 +2519,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         }
                     }, targetConditions, canPickTarget.Not()));
                 }
-
-                if (openActionPickerInstantly)
-                {
-                    mainThread.Delay(() => selectActionTypeCommand().ListenErrors(), TimeSpan.FromMilliseconds(1));
-                }
             }
 
             ParametersEditViewModel viewModel = new(itemFromListProvider,
@@ -2581,6 +2576,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 viewModel.KeyBindings.Add(new CommandKeyBinding(new AsyncAutoCommand(() => selectTargetTypeCommand()), "Ctrl+T"));
                 viewModel.KeyBindings.Add(new CommandKeyBinding(new AsyncAutoCommand(() => selectTargetTypeCommand()), "Cmd+T"));
+            }
+
+            if (!isComment && openActionPickerInstantly && selectActionTypeCommand != null)
+            {
+                mainThread.Delay(async () =>
+                {
+                    int maxWait = 1000;
+                    while (viewModel.BoundsViews.Count == 0 && maxWait-- >=0)
+                    {
+                        await Task.Delay(1);
+                    }
+                    await Task.Delay(16);
+                    selectActionTypeCommand().ListenErrors();
+                }, TimeSpan.FromMilliseconds(1));
             }
             
             return viewModel;

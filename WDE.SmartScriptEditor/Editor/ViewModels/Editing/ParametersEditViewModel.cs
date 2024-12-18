@@ -149,6 +149,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public event Action? CloseCancel;
         public event Action? CloseOk;
         public event Action? BeforeAccept;
+
+        public void AttachView(object view)
+        {
+            boundViews.Add(view);
+        }
+
+        public void DetachView(object view)
+        {
+            boundViews.Remove(view);
+        }
+
+        private List<object> boundViews = new();
+
+        public IReadOnlyList<object> BoundsViews => boundViews;
     }
     
     public class Grouping<TKey, TVal> : ObservableCollectionExtended<TVal>, IGrouping<TKey, TVal>, IDisposable where TVal : notnull

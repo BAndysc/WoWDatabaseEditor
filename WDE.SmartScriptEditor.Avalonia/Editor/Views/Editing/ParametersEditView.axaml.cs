@@ -1,4 +1,5 @@
 ﻿using System;
+using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -34,6 +35,24 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing
         public void OnDeactivated()
         {
             forceFocusFirstOnNextGotFocus = true;
+        }
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            if (DataContext is ParametersEditViewModel vm)
+            {
+                vm.AttachView(this);
+            }
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            if (DataContext is ParametersEditViewModel vm)
+            {
+                vm.DetachView(this);
+            }
         }
 
         protected override void OnGotFocus(GotFocusEventArgs e)
