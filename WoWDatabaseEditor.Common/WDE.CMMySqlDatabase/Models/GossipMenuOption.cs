@@ -37,6 +37,7 @@ public class GossipMenuOption : IGossipMenuOption
 
     public uint ActionScriptId => 0;
     public uint CharShipmentId => 0;
+    public uint LfgDungeonId => 0;
 
     [Column(Name = "box_coded")]
     public uint BoxCoded { get; set; }

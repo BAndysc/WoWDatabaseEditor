@@ -37,6 +37,7 @@ namespace WDE.MySqlDatabaseCommon.CommonModels
 
         public uint ActionScriptId => 0;
         public uint CharShipmentId => 0;
+        public uint LfgDungeonId => 0;
 
         [Column(Name = "BoxCoded")]
         public uint BoxCoded { get; set; }
@@ -88,6 +89,7 @@ namespace WDE.MySqlDatabaseCommon.CommonModels
 
         public uint ActionScriptId => 0;
         public uint CharShipmentId => 0;
+        public uint LfgDungeonId => 0;
 
         [Column(Name = "BoxCoded")]
         public uint BoxCoded { get; set; }
