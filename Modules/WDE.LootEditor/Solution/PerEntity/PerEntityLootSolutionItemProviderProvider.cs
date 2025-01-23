@@ -66,7 +66,7 @@ public class PerEntityLootSolutionItemProviderProvider : ISolutionItemProviderPr
     {
         foreach (var supportedType in features.SupportedTypes)
         {
-            if (supportedType is LootSourceType.Disenchant)
+            if (supportedType is LootSourceType.Disenchant || supportedType is LootSourceType.Obliterate)
                 continue; // need to research how to implement them (i.e. for disenchant we need to know DisenchantID from the dbc)
             
             yield return new PerEntityLootSolutionItemProvider(parameterPickerService,

@@ -27,6 +27,7 @@ public static class LootUtils
             case LootSourceType.Treasure:
             case LootSourceType.Pickpocketing:
             case LootSourceType.Mission:
+            case LootSourceType.Obliterate:
                 return false;
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
@@ -46,6 +47,7 @@ public static class LootUtils
             case LootSourceType.Prospecting:
             case LootSourceType.Alter:
             case LootSourceType.Mail:
+            case LootSourceType.Obliterate:
                 return false;
             // because loot entry = disenchantId which is in dbc
             case LootSourceType.Disenchant:
@@ -82,6 +84,7 @@ public static class LootUtils
             case LootSourceType.Milling: return "ItemParameter";
             case LootSourceType.Prospecting: return "ItemParameter";
             case LootSourceType.Pickpocketing: return "CreatureParameter";
+            case LootSourceType.Obliterate: return "ItemParameter";
             case LootSourceType.Mission: return "GarrisonMissionParameter";
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);

@@ -108,7 +108,8 @@ public enum LootSourceType
     Milling,
     Prospecting,
     Pickpocketing,
-    Mission
+    Mission,
+    Obliterate,
 }
 
 public readonly struct LootEntry : IEquatable<LootEntry>

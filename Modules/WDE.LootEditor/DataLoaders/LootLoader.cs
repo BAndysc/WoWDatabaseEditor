@@ -114,6 +114,7 @@ public class LootLoader : ILootLoader
             case LootSourceType.Skinning:
                 return new LootEntry[] { new(solutionItemEntry) };
             case LootSourceType.Disenchant:
+            case LootSourceType.Obliterate:
                 return new LootEntry[] { }; // note: this should be loaded from dbc itemsparse
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
