@@ -22,7 +22,7 @@ Application has a built-in auto updater, so you do **not** have to redownload a 
 
 ## Mac OS / Linux / Windows version
 
-**To run the editor, you need [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0) for your OS**.
+**To run the editor, you need [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) for your OS**.
 
 WoW Database Editor is compatibile with both MacOS, Linux and Windows.
 
