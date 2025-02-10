@@ -10,9 +10,9 @@ namespace WDE.SmartScriptEditor
 {
     public class SmartScriptSolutionItem : ISolutionItem, ISmartScriptSolutionItem
     {
-        public SmartScriptSolutionItem(int entry, SmartScriptType smartType)
+        public SmartScriptSolutionItem(int entryOrGuid, SmartScriptType smartType)
         {
-            EntryOrGuid = entry;
+            EntryOrGuid = entryOrGuid;
             SmartType = smartType;
         }
 
