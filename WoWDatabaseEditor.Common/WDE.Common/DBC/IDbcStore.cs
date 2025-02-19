@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Prism.Events;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.DBC
@@ -22,7 +23,7 @@ namespace WDE.Common.DBC
         Dictionary<long, long> BattlePetSpeciesIdStore { get; }
     }
     
-    public class DbcLoadedEvent : PubSubEvent<IDbcStore>
+    public class DbcLoadedEvent : PubSubEvent<IDbcStore>, ILoadingEvent
     {
     }
 }

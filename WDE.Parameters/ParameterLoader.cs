@@ -40,12 +40,14 @@ namespace WDE.Parameters
         private readonly IQuestEntryProviderService questEntryProviderService;
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly IConversationLineStore conversationLineStore;
+        // private readonly ISandboxScalingStore sandboxScalingStore;
         private readonly Lazy<IWindowManager> windowManager;
         private readonly Lazy<IParameterPickerService> parameterPickerService;
         private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
 
         private Dictionary<Type, List<IDatabaseObserver>> reloadable = new();
         private List<LateAsyncLoadParameter> asyncDatabaseParameters = new();
+        private List<LateAsyncLoadParameter> asyncDatabaseDbcParameters = new();
         private List<LateLoadParameter> databaseParameters = new();
         internal ParameterLoader(ICachedDatabaseProvider database,
             IParameterDefinitionProvider parameterDefinitionProvider,
@@ -58,6 +60,7 @@ namespace WDE.Parameters
             IQuestEntryProviderService questEntryProviderService,
             ICurrentCoreVersion currentCoreVersion,
             IConversationLineStore conversationLineStore,
+            // ISandboxScalingStore sandboxScalingStore,
             Lazy<IWindowManager> windowManager,
             Lazy<IParameterPickerService> parameterPickerService,
             IQuickAccessRegisteredParameters quickAccessRegisteredParameters)
@@ -73,6 +76,7 @@ namespace WDE.Parameters
             this.questEntryProviderService = questEntryProviderService;
             this.currentCoreVersion = currentCoreVersion;
             this.conversationLineStore = conversationLineStore;
+            // this.sandboxScalingStore = sandboxScalingStore;
             this.windowManager = windowManager;
             this.parameterPickerService = parameterPickerService;
             this.quickAccessRegisteredParameters = quickAccessRegisteredParameters;
@@ -146,6 +150,7 @@ namespace WDE.Parameters
             factory.Register("UnixTimestampParameter", new UnixTimestampParameter(0, windowManager));
             factory.Register("UnixTimestampSince2000Parameter", new UnixTimestampParameter(946684800, windowManager));
             factory.Register("GameobjectBytes1Parameter", new GameObjectBytes1Parameter());
+            // factory.Register("SandboxScalingParameter", AddAsyncDatabaseDbcParameter(new SandboxScalingParameter(database, sandboxScalingStore)));
             
             factory.RegisterCombined("UnitBytes0Parameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
                 (race, @class, gender, power) => currentCoreVersion.Current.Version.Build >= 17359 ? new UnitBytesPostMopParameter(race, @class, gender, power) : new UnitBytesPreMopParameter(race, @class, gender, power));
@@ -183,7 +188,24 @@ namespace WDE.Parameters
                 }
             }
 
-            loadingEventAggregator.OnEvent<DatabaseLoadedEvent>().SubscribeAction(_ => OnDatabaseLoad().ListenErrors());
+            async Task OnDatabaseAndDbcLoad()
+            {
+                foreach (var p in asyncDatabaseDbcParameters)
+                {
+                    await p.LateLoad();
+                    factory.Updated(p);
+                }
+            }
+
+            var databaseLoaded = loadingEventAggregator.OnEvent<DatabaseLoadedEvent>();
+            var dbcLoaded = loadingEventAggregator.OnEvent<DbcLoadedEvent>();
+            databaseLoaded.SubscribeAction(_ => OnDatabaseLoad().ListenErrors());
+            databaseLoaded.CombineLatest(dbcLoaded)
+                .SubscribeAction(tuple =>
+                {
+                    if (tuple.First is { } && tuple.Second is { })
+                        OnDatabaseAndDbcLoad().ListenErrors();
+                });
         }
     
         private T AddDatabaseParameter<T>(T t) where T : LateLoadParameter
@@ -207,6 +229,18 @@ namespace WDE.Parameters
                 list.Add(databaseObserver);
             }
             asyncDatabaseParameters.Add(t);
+            return t;
+        }
+
+        private T AddAsyncDatabaseDbcParameter<T>(T t) where T : LateAsyncLoadParameter
+        {
+            if (t is IDatabaseObserver databaseObserver)
+            {
+                if (!reloadable.TryGetValue(databaseObserver.ObservedType, out var list))
+                    list = reloadable[databaseObserver.ObservedType] = new();
+                list.Add(databaseObserver);
+            }
+            asyncDatabaseDbcParameters.Add(t);
             return t;
         }
     }
@@ -1041,4 +1075,41 @@ namespace WDE.Parameters
             return key.ToString();
         }
     }
+
+    // public class SandboxScalingParameter : LateAsyncLoadParameter
+    // {
+    //     private readonly IDatabaseProvider databaseProvider;
+    //     private readonly ISandboxScalingStore sandboxScalingStore;
+    //
+    //     public SandboxScalingParameter(IDatabaseProvider databaseProvider, ISandboxScalingStore sandboxScalingStore)
+    //     {
+    //         this.databaseProvider = databaseProvider;
+    //         this.sandboxScalingStore = sandboxScalingStore;
+    //     }
+    //
+    //     public override async Task LateLoad()
+    //     {
+    //         var items = new Dictionary<long, SelectOption>();
+    //         var scalings = sandboxScalingStore.SandboxScalings;
+    //         var hotfixes = await databaseProvider.GetSandboxScalingDbcAsync();
+    //         var names = await databaseProvider.GetSandboxScalingNamesAsync();
+    //
+    //         var hotfixesById = hotfixes.ToDictionary(x => x.Id, x => x);
+    //         var namesById = names.ToDictionary(x => x.Id, x => x);
+    //
+    //         foreach (var scaling in scalings)
+    //         {
+    //             var name = namesById.GetValueOrDefault(scaling.Id) ?? "Unknown";
+    //             var minLevel = scaling.MinLevel;
+    //             var maxLevel = scaling.MaxLevel;
+    //             if (hotfixesById.TryGetValue(scaling.Id, out var hotfix))
+    //             {
+    //                 minLevel = hotfix.MinLevel;
+    //                 maxLevel = hotfix.MaxLevel;
+    //             }
+    //             items.Add(scaling.Id, new SelectOption($"{name} ({minLevel}-{maxLevel})"));
+    //         }
+    //         Items = items;
+    //     }
+    // }
 }
