@@ -217,6 +217,8 @@ public class ProtobufSourceGenerator : ISourceGenerator
                     var fieldType = Parse(fieldTypeStr);
                     var packedOption = field.fieldOptions()?.fieldOption()?.FirstOrDefault(o =>
                         string.Equals(o.optionName().GetText(), "packed", StringComparison.OrdinalIgnoreCase));
+                    var asWellKnownWrapperOption = field.fieldOptions()?.fieldOption().FirstOrDefault(o =>
+                        string.Equals(o.optionName().GetText(), "AsWellKnownWrapper", StringComparison.OrdinalIgnoreCase));
                     message.Fields.Add(new FieldDefinition
                     {
                         Name = GetUniqueFieldName(message.Name, field.fieldName().GetText().ToTitleCase()),
@@ -228,6 +230,9 @@ public class ProtobufSourceGenerator : ISourceGenerator
                             ? string.Equals(packedOption.constant().GetText(), "true",
                                 StringComparison.OrdinalIgnoreCase)
                             : fieldType.IsPackedByDefault(),
+                        AsWellKnownWrapper = asWellKnownWrapperOption != null &&
+                                            string.Equals(asWellKnownWrapperOption.constant().GetText(), "true",
+                                                StringComparison.OrdinalIgnoreCase),
                     });
                 }
                 else if (element.oneof() is { } oneof)
@@ -590,6 +595,10 @@ public class ProtobufSourceGenerator : ISourceGenerator
                 codeGenerator.OpenBlock($"case FieldIds.{field.Name}:");
                 if (field.IsRepeated)
                 {
+                    if (field.AsWellKnownWrapper)
+                    {
+                        throw new NotImplementedException("I didn't implement repeated well known wrappers yet");
+                    }
                     if (field.IsPacked)
                     {
                         if (!field.Type.IsScalar)
@@ -644,7 +653,17 @@ public class ProtobufSourceGenerator : ISourceGenerator
                     }
                     else
                     {
-                        codeGenerator.AppendLine($"{field.Name} = {ReadType(field.Type, "reader")};");
+                        if (field.AsWellKnownWrapper)
+                        {
+                            codeGenerator.AppendLine("var subReader = reader.ReadMessage();");
+                            codeGenerator.AppendLine("if (!subReader.Next()) break; ");
+                            codeGenerator.AppendLine("if (subReader.Tag != 1) { throw new InvalidOperationException(\"Can't read well known wrapper, because of an invalid tag\"); }");
+                            codeGenerator.AppendLine($"{field.Name} = {ReadType(field.Type, "subReader")};");
+                        }
+                        else
+                        {
+                            codeGenerator.AppendLine($"{field.Name} = {ReadType(field.Type, "reader")};");
+                        }
                     }
                 }
 
@@ -841,6 +860,7 @@ public class ProtobufSourceGenerator : ISourceGenerator
         public bool IsOptional { get; set; }
         public bool IsOptionalPointer { get; set; } = true;
         public bool IsPacked { get; set; }
+        public bool AsWellKnownWrapper { get; set; }
     }
 
     public class EnumDefinition

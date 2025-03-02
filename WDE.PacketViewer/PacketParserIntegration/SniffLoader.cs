@@ -10,8 +10,6 @@ using WDE.PacketViewer.Utils;
 using WowPacketParser.PacketStructures;
 using WowPacketParser.Proto;
 
-//using WowPacketParser.PacketStructures;
-
 namespace WDE.PacketViewer.PacketParserIntegration
 {
     [AutoRegister]
@@ -59,9 +57,9 @@ namespace WDE.PacketViewer.PacketParserIntegration
                 {
                     var versionType = await GetVersionAndDump(parsedPath);
                     runParser = !versionType.HasValue ||
-                                     versionType.Value.Item1 != StructureVersion.ProtobufStructureVersion ||
-                                     (versionType.Value.Item2 == DumpFormatType.UniversalProto && withText) ||
-                                     (versionType.Value.Item2 == DumpFormatType.UniversalProtoWithSeparateText && !File.Exists(parsedTextPath));
+                                     !ParserVersionCompatible(versionType.Value.Version) ||
+                                     (versionType.Value.Format == DumpFormatType.UniversalProto && withText) ||
+                                     (versionType.Value.Format == DumpFormatType.UniversalProtoWithSeparateText && !File.Exists(parsedTextPath));
                 }
                 
                 if (runParser)
@@ -74,15 +72,31 @@ namespace WDE.PacketViewer.PacketParserIntegration
                     }
                 }
                 path = parsedPath;
+                if (!File.Exists(path) || new FileInfo(path).Length == 0)
+                {
+                    throw new ParserException("Parser didn't generate the output file. Aborting. Open debug console (Help->Open Debug Console) and report the issue on github.");
+                }
+
+                var versionType2 = await GetVersionAndDump(path);
+                if (!versionType2.HasValue)
+                {
+                    throw new ParserException("Parser didn't generate the output file. Aborting. Open debug console (Help->Open Debug Console) and report the issue on github.");
+                }
+
+                if (!ParserVersionCompatible(versionType2.Value.Version))
+                {
+                    throw new ParserException(
+                        $"Your parser generated an output file in a different format ({versionType2.Value.Item1}) than expected (>= {StructureVersion.MinProtobufStructureVersion} and <= {StructureVersion.MaxProtobufStructureVersion}). Aborting. If you downloaded the parser from the internet, make sure you have the latest version.");
+                }
             }
             else if (extension == ".dat")
             {
                 var parsedTextPath = Path.ChangeExtension(path, "txt");
                 var versionType = await GetVersionAndDump(path); 
                 bool runParser = !versionType.HasValue ||
-                                 versionType.Value.Item1 != StructureVersion.ProtobufStructureVersion ||
-                                 (versionType.Value.Item2 == DumpFormatType.UniversalProto && withText) ||
-                                 (versionType.Value.Item2 == DumpFormatType.UniversalProtoWithSeparateText && !File.Exists(parsedTextPath));
+                                 !ParserVersionCompatible(versionType.Value.Version) ||
+                                 (versionType.Value.Format == DumpFormatType.UniversalProto && withText) ||
+                                 (versionType.Value.Format == DumpFormatType.UniversalProtoWithSeparateText && !File.Exists(parsedTextPath));
                 
                 if (runParser)
                 {
@@ -124,6 +138,12 @@ namespace WDE.PacketViewer.PacketParserIntegration
             return packets;
         }
 
+        private bool ParserVersionCompatible(ulong version)
+        {
+            return version >= StructureVersion.MinProtobufStructureVersion &&
+                   version <= StructureVersion.MaxProtobufStructureVersion;
+        }
+
         private bool IsFileInUse(string path)
         {
             if (!File.Exists(path))
@@ -141,7 +161,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
             return false;
         }
 
-        public unsafe Task<(ulong, DumpFormatType)?> GetVersionAndDump(string path)
+        public unsafe Task<(ulong Version, DumpFormatType Format)?> GetVersionAndDump(string path)
         {
             using var input = File.OpenRead(path);
             var firstBytes = new byte[100]; // enough for the header

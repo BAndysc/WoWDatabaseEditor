@@ -28,8 +28,8 @@ message PacketBase {
   string opcode = 2;
   google.protobuf.Timestamp time = 3;
   string stringData = 4;
-  optional int64 textStartOffset = 5;
-  int32 textLength = 6;
+  optional int64 textStartOffset = 5 [AsWellKnownWrapper = true];
+  int32 textLength = 6 [AsWellKnownWrapper = true];
   optional int64 headerTextStartOffset = 900;
   int32 headerTextLength = 901;
   bool isFirstPacketWithThisHeader = 902;
@@ -709,23 +709,23 @@ message CreateObject {
   optional StationaryPositionData stationary = 6;
   optional VehicleCreate vehicle = 7;
   optional Quat rotation = 8;
-  optional int32 textStartOffset = 9;
-  optional int32 textLength = 10;
+  optional int32 textStartOffset = 9 [AsWellKnownWrapper = true];
+  optional int32 textLength = 10 [AsWellKnownWrapper = true];
   optional string text = 11;
 }
 
 message UpdateObject {
   UniversalGuid guid = 1;
   UpdateValues values = 2;
-  optional int32 textStartOffset = 3;
-  optional int32 textLength = 4;
+  optional int32 textStartOffset = 3 [AsWellKnownWrapper = true];
+  optional int32 textLength = 4 [AsWellKnownWrapper = true];
   optional string text = 5;
 }
 
 message DestroyedObject {
   UniversalGuid guid = 1;
-  optional int32 textStartOffset = 2;
-  optional int32 textLength = 3;
+  optional int32 textStartOffset = 2 [AsWellKnownWrapper = true];
+  optional int32 textLength = 3 [AsWellKnownWrapper = true];
   optional string text = 4;
 }
 

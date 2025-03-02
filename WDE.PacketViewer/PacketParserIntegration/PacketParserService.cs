@@ -183,6 +183,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
             processStartInfo.WorkingDirectory = Path.GetDirectoryName(path)!;
             processStartInfo.UseShellExecute = false;
             processStartInfo.RedirectStandardOutput = true;
+            processStartInfo.RedirectStandardError = true;
             processStartInfo.CreateNoWindow = true;
 
             Process process = new Process();
@@ -192,11 +193,17 @@ namespace WDE.PacketViewer.PacketParserIntegration
                 if (float.TryParse(data.Data, out var p))
                     progress.Report(p);
             };
+            process.ErrorDataReceived += (sender, data) =>
+            {
+                if (data.Data != null)
+                    LOG.LogWarning(data.Data);
+            };
             
             if (!process.Start())
                 throw new CouldNotRunParserException();
             
             process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
             try
             {
                 await process.WaitForExitAsync(token);
