@@ -17,6 +17,7 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
     </ItemGroup>
     
     <PropertyGroup>

@@ -24,6 +24,7 @@
         <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\..\WDE.Parameters\WDE.Parameters.csproj" />
         <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
         <ProjectReference Include="..\..\WDE.TrinitySmartScriptEditor\WDE.TrinitySmartScriptEditor.csproj" />
         <ProjectReference Include="..\..\Rendering\OpenGLBindings\OpenGLBindings.csproj" />
         <ProjectReference Include="..\..\Rendering\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />

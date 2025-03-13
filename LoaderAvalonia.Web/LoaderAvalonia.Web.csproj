@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net8.0-browser</TargetFramework>
         <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
@@ -16,11 +16,12 @@
     <Import Project="..\Avalonia.props" />
     
     <ItemGroup>
-        <WasmExtraFilesToDeploy Include="AppBundle\**"/>
+        <WasmExtraFilesToDeploy Include="AppBundle\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Browser" Version="11.2.999-cibuild0048166-alpha"/>
+        <PackageReference Include="Avalonia.Browser" Version="11.2.999-cibuild0048166-alpha" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
     </ItemGroup>
 
     <ItemGroup>
@@ -58,49 +59,49 @@
         <ItemGroup>
             <IconsSource Include="$(OutputPath)Icons\**\*.*" />
         </ItemGroup>
-        <Copy SourceFiles="@(IconsSource)" DestinationFiles ="@(IconsSource->'$(OutputPath)AppBundle\Icons\%(RecursiveDir)%(Filename)%(Extension)')" />
+        <Copy SourceFiles="@(IconsSource)" DestinationFiles="@(IconsSource->'$(OutputPath)AppBundle\Icons\%(RecursiveDir)%(Filename)%(Extension)')" />
 
         <Message Text="Copying DatabaseContextualParameters..." Importance="High" />
         <ItemGroup>
             <DatabaseContextualParametersSource Include="$(OutputPath)DatabaseContextualParameters\**\*.*" />
         </ItemGroup>
-        <Copy SourceFiles="@(DatabaseContextualParametersSource)" DestinationFiles ="@(DatabaseContextualParametersSource->'$(OutputPath)AppBundle\DatabaseContextualParameters\%(RecursiveDir)%(Filename)%(Extension)')" />
+        <Copy SourceFiles="@(DatabaseContextualParametersSource)" DestinationFiles="@(DatabaseContextualParametersSource->'$(OutputPath)AppBundle\DatabaseContextualParameters\%(RecursiveDir)%(Filename)%(Extension)')" />
 
         <Message Text="Copying DbDefinitions..." Importance="High" />
         <ItemGroup>
             <DbDefinitionsSource Include="$(OutputPath)DbDefinitions\**\*.*" />
         </ItemGroup>
-        <Copy SourceFiles="@(DbDefinitionsSource)" DestinationFiles ="@(DbDefinitionsSource->'$(OutputPath)AppBundle\DbDefinitions\%(RecursiveDir)%(Filename)%(Extension)')" />
+        <Copy SourceFiles="@(DbDefinitionsSource)" DestinationFiles="@(DbDefinitionsSource->'$(OutputPath)AppBundle\DbDefinitions\%(RecursiveDir)%(Filename)%(Extension)')" />
 
         <Message Text="Copying Parameters..." Importance="High" />
         <ItemGroup>
             <ParametersSource Include="$(OutputPath)Parameters\**\*.*" />
         </ItemGroup>
-        <Copy SourceFiles="@(ParametersSource)" DestinationFiles ="@(ParametersSource->'$(OutputPath)AppBundle\Parameters\%(RecursiveDir)%(Filename)%(Extension)')" />
+        <Copy SourceFiles="@(ParametersSource)" DestinationFiles="@(ParametersSource->'$(OutputPath)AppBundle\Parameters\%(RecursiveDir)%(Filename)%(Extension)')" />
 
         <Message Text="Copying Resources..." Importance="High" />
         <ItemGroup>
             <ResourcesSource Include="$(OutputPath)Resources\**\*.*" />
         </ItemGroup>
-        <Copy SourceFiles="@(ResourcesSource)" DestinationFiles ="@(ResourcesSource->'$(OutputPath)AppBundle\Resources\%(RecursiveDir)%(Filename)%(Extension)')" />
+        <Copy SourceFiles="@(ResourcesSource)" DestinationFiles="@(ResourcesSource->'$(OutputPath)AppBundle\Resources\%(RecursiveDir)%(Filename)%(Extension)')" />
 
         <Message Text="Copying SmartData..." Importance="High" />
         <ItemGroup>
             <SmartDataSource Include="$(OutputPath)SmartData\**\*.*" />
         </ItemGroup>
-        <Copy SourceFiles="@(SmartDataSource)" DestinationFiles ="@(SmartDataSource->'$(OutputPath)AppBundle\SmartData\%(RecursiveDir)%(Filename)%(Extension)')" />
+        <Copy SourceFiles="@(SmartDataSource)" DestinationFiles="@(SmartDataSource->'$(OutputPath)AppBundle\SmartData\%(RecursiveDir)%(Filename)%(Extension)')" />
 
         <Message Text="Copying EventScriptData..." Importance="High" />
         <ItemGroup>
             <EventScriptDataSource Include="$(OutputPath)EventScriptData\**\*.*" />
         </ItemGroup>
-        <Copy SourceFiles="@(EventScriptDataSource)" DestinationFiles ="@(EventScriptDataSource->'$(OutputPath)AppBundle\EventScriptData\%(RecursiveDir)%(Filename)%(Extension)')" />
+        <Copy SourceFiles="@(EventScriptDataSource)" DestinationFiles="@(EventScriptDataSource->'$(OutputPath)AppBundle\EventScriptData\%(RecursiveDir)%(Filename)%(Extension)')" />
 
         <Message Text="Copying CodeCompletionData..." Importance="High" />
         <ItemGroup>
             <CodeCompletionDataSource Include="$(OutputPath)CodeCompletionData\**\*.*" />
         </ItemGroup>
-        <Copy SourceFiles="@(CodeCompletionDataSource)" DestinationFiles ="@(CodeCompletionDataSource->'$(OutputPath)AppBundle\CodeCompletionData\%(RecursiveDir)%(Filename)%(Extension)')" />
+        <Copy SourceFiles="@(CodeCompletionDataSource)" DestinationFiles="@(CodeCompletionDataSource->'$(OutputPath)AppBundle\CodeCompletionData\%(RecursiveDir)%(Filename)%(Extension)')" />
 
 
         <ProduceDirectoryListingTask BasePath="$(OutputPath)\AppBundle" Folder="Icons" />
