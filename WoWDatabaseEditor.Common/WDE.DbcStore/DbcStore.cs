@@ -70,6 +70,7 @@ namespace WDE.DbcStore
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IEventAggregator eventAggregator;
+        private readonly ILoadingEventAggregator loadingEventAggregator;
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly ITabularDataPicker dataPicker;
         private readonly IWindowManager windowManager;
@@ -87,6 +88,7 @@ namespace WDE.DbcStore
             IDbcSettingsProvider settingsProvider,
             IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator,
+            ILoadingEventAggregator loadingEventAggregator,
             ICurrentCoreVersion currentCoreVersion,
             ITabularDataPicker dataPicker,
             IWindowManager windowManager,
@@ -102,6 +104,7 @@ namespace WDE.DbcStore
             dbcSettingsProvider = settingsProvider;
             this.messageBoxService = messageBoxService;
             this.eventAggregator = eventAggregator;
+            this.loadingEventAggregator = loadingEventAggregator;
             this.currentCoreVersion = currentCoreVersion;
             this.dataPicker = dataPicker;
             this.windowManager = windowManager;
@@ -506,6 +509,7 @@ namespace WDE.DbcStore
                 store.InvokeChangedSpells();
                 
                 store.eventAggregator.GetEvent<DbcLoadedEvent>().Publish(store);
+                store.loadingEventAggregator.Publish<DbcLoadedEvent>();
             }
             
             public void Run(ITaskProgress progress)
