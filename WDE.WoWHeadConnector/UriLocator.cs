@@ -10,12 +10,12 @@ namespace WDE.WoWHeadConnector
     {
         public Uri Npc(HeadSourceType source, uint entry)
         {
-            string prefix = "";
+            string suffix = "";
             if (source == HeadSourceType.Classic)
-                prefix = "classic.";
+                suffix = "classic/";
             else if (source == HeadSourceType.Tbc)
-                prefix = "tbc.";
-            return new Uri($"https://{prefix}wowhead.com/npc={entry}/");
+                suffix = "tbc/";
+            return new Uri($"https://wowhead.com/{suffix}npc={entry}/");
         }
     }
 }
