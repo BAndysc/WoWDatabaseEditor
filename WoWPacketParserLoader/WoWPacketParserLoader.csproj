@@ -11,6 +11,7 @@
         <ProjectReference Include="..\WoWPacketParser\WowPacketParserModule.BattleNet.V37165\WowPacketParserModule.BattleNet.V37165.csproj" />
         <ProjectReference Include="..\WoWPacketParser\WowPacketParserModule.Substructures\WowPacketParserModule.Substructures.csproj" />
         <ProjectReference Include="..\WoWPacketParser\WowPacketParserModule.V10_0_0_46181\WowPacketParserModule.V10_0_0_46181.csproj" />
+        <ProjectReference Include="..\WoWPacketParser\WowPacketParserModule.V11_0_0_55666\WowPacketParserModule.V11_0_0_55666.csproj" />
         <ProjectReference Include="..\WoWPacketParser\WowPacketParserModule.V1_13_2_31446\WowPacketParserModule.V1_13_2_31446.csproj" />
         <ProjectReference Include="..\WoWPacketParser\WowPacketParserModule.V2_4_3_8606\WowPacketParserModule.V2_4_3_8606.csproj" />
         <ProjectReference Include="..\WoWPacketParser\WowPacketParserModule.V3_4_0_45166\WowPacketParserModule.V3_4_0_45166.csproj" />

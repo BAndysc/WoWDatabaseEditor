@@ -264,6 +264,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoZeroSharp", "Libraries
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoZeroGenerator", "Libraries\ProtoZeroGenerator\ProtoZeroGenerator.csproj", "{AF118205-0EBD-44B1-9D95-9C0836DD6160}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WowPacketParserModule.V11_0_0_55666", "WoWPacketParser\WowPacketParserModule.V11_0_0_55666\WowPacketParserModule.V11_0_0_55666.csproj", "{1330B373-DD55-4232-8255-D00E1D1A703C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -730,6 +732,10 @@ Global
 		{AF118205-0EBD-44B1-9D95-9C0836DD6160}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF118205-0EBD-44B1-9D95-9C0836DD6160}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF118205-0EBD-44B1-9D95-9C0836DD6160}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1330B373-DD55-4232-8255-D00E1D1A703C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1330B373-DD55-4232-8255-D00E1D1A703C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1330B373-DD55-4232-8255-D00E1D1A703C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1330B373-DD55-4232-8255-D00E1D1A703C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -836,6 +842,7 @@ Global
 		{B236A117-9AF5-4C21-AB7B-7E170269124B} = {59AF6589-114A-4603-863D-469057E87A23}
 		{584381A1-D370-41B4-B0D7-A40B1ED7F726} = {47A1CB3E-73CD-4798-A089-169C2473204E}
 		{AF118205-0EBD-44B1-9D95-9C0836DD6160} = {47A1CB3E-73CD-4798-A089-169C2473204E}
+		{1330B373-DD55-4232-8255-D00E1D1A703C} = {5B4101BE-5A22-4B88-9E94-FFC484E04BDE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E63D4A5-8159-4344-B556-1E1D8D63DA99}
