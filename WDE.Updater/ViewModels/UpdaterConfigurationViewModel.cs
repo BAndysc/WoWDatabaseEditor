@@ -3,6 +3,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using WDE.Common;
 using WDE.Common.Services;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.Updater.Services;
@@ -71,6 +72,7 @@ namespace WDE.Updater.ViewModels
         }
         
         public ICommand Save { get; }
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_update_big.png");
         public string Name => "Editor updates";
         public string ShortDescription =>
             "WoW Database Editor can automatically check for updates. No personal data is sent during checking. You can change the behaviour or check for updates manually here."; 

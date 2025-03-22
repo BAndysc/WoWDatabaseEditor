@@ -5,6 +5,7 @@ using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.Managers;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
@@ -17,6 +18,7 @@ public partial class ServerExecutableConfigurationPanelViewModel : ObservableBas
     private readonly IWindowManager windowManager;
     private readonly IServerExecutableConfiguration configuration;
     public ICommand Save { get; }
+    public ImageUri Icon { get; } = new ImageUri("Icons/document_program_big.png");
     public string Name => "World server executable";
     public string? ShortDescription => "You can configure your world and auth server paths for easy start/stop button access in the statusbar";
     public bool IsRestartRequired => false;

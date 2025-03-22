@@ -4,6 +4,7 @@ using Prism.Mvvm;
 using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
@@ -81,6 +82,7 @@ namespace WDE.MPQ.ViewModels
 
         public ICommand Save { get; set; }
         public string Name => "Client data files";
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_file_big.png");
         public string ShortDescription =>
             "The editor can open 3.3.5, 4.3.4, 5.4.8 and 7.3.5 files for extended features.";
         public bool IsModified { get; set; }

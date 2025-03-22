@@ -8,6 +8,7 @@
                    xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels;assembly=WoWDatabaseEditorCore"
                    xmlns:common="clr-namespace:WDE.Common;assembly=WDE.Common"
                    x:DataType="viewModels:ConfigurationPanelViewModel"
+                   Background="{DynamicResource SlightlyHighlightedBackground}"
                    prism:ViewModelLocator.AutoWireViewModel="False">
     <UserControl.Resources>
         <converters:NullConverter x:Key="IsNullConverter" Inverted="true" />
@@ -15,12 +16,14 @@
     <Grid ColumnDefinitions="Auto,*">
         <controls:GroupingListBox Items="{CompiledBinding Groups}"
                                   BorderThickness="0"
+                                  Background="{DynamicResource SlightlyHighlightedBackground}"
                                   SelectedItem="{CompiledBinding SelectedTabItem, Mode=TwoWay}">
             <controls:GroupingListBox.ItemTemplate>
                 <DataTemplate x:DataType="common:IConfigurable">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Name="SettingName" Text="{CompiledBinding Name}" />
-                        <TextBlock Text="*" IsVisible="{CompiledBinding IsModified}" FontWeight="Bold" />
+                        <WdeImage Image="{CompiledBinding Icon}" Width="24" Height="24" Margin="0,-2,15,-2" />
+                        <TextBlock Name="SettingName" Text="{CompiledBinding Name}" VerticalAlignment="Center" />
+                        <TextBlock Text="*" IsVisible="{CompiledBinding IsModified}" FontWeight="Bold" VerticalAlignment="Center" />
                         <Interaction.Behaviors>
                             <DataTriggerBehavior Binding="{CompiledBinding IsModified}" ComparisonCondition="Equal" Value="False">
                                 <ChangePropertyAction TargetObject="{Binding #SettingName}" PropertyName="FontWeight" Value="Normal"/>
@@ -32,8 +35,13 @@
                     </StackPanel>
                 </DataTemplate>
             </controls:GroupingListBox.ItemTemplate>
+            <controls:GroupingListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Margin" Value="6,0,0,0" />
+                </Style>
+            </controls:GroupingListBox.Styles>
         </controls:GroupingListBox>
-        <Border  Grid.Column="1" Background="{DynamicResource SlightlyHighlightedBackground}" Padding="15,7">
+        <Border Grid.Column="1" Padding="15,7">
             <DockPanel LastChildFill="True"> 
                 <TextBlock DockPanel.Dock="Top" Text="{CompiledBinding SelectedTabItem.Name}" FontSize="32" FontWeight="Light" />
                 <Grid Margin="10" DockPanel.Dock="Bottom">

@@ -15,9 +15,9 @@
     <SolidColorBrush Color="#2D2D30" x:Key="ThemeControlLowBrush" />
     <SolidColorBrush Color="#999999" x:Key="ThemeBorderLowBrush" />
 
-    <SolidColorBrush Color="#3579C6" x:Key="StatusBarBackground" Accent.Hue="{DynamicResource AccentHue}" />
+    <SolidColorBrush Color="#3579C6" x:Key="StatusBarBackground" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
 
-    <SolidColorBrush Color="#5fa2da" x:Key="AccentColorMedium" Accent.Hue="{DynamicResource AccentHue}" />
+    <SolidColorBrush Color="#5fa2da" x:Key="AccentColorMedium" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
 
     <SolidColorBrush Color="#3F3F45" x:Key="ContentBorderBrush" />
     <SolidColorBrush Color="#252526" x:Key="ContentBackground" />
@@ -73,15 +73,15 @@
     <SolidColorBrush x:Key="DockThemeBorderLowBrush" Color="#3F3F46" />
 
     <!-- dock more -->
-    <SolidColorBrush x:Key="DockApplicationAccentBrushLow" Accent.BaseColor="#007ACC"
+    <SolidColorBrush x:Key="DockApplicationAccentBrushLow" Accent.BaseColor="#007ACC" Accent.L="0.4,0.6"
                      Accent.Hue="{DynamicResource AccentHue}" />
-    <SolidColorBrush x:Key="DockApplicationAccentBrushMed" Accent.BaseColor="#1C97EA"
+    <SolidColorBrush x:Key="DockApplicationAccentBrushMed" Accent.BaseColor="#1C97EA" Accent.L="0.4,0.6"
                      Accent.Hue="{DynamicResource AccentHue}" />
-    <SolidColorBrush x:Key="DockApplicationAccentBrushHigh" Accent.BaseColor="#52B0EF"
+    <SolidColorBrush x:Key="DockApplicationAccentBrushHigh" Accent.BaseColor="#52B0EF" Accent.L="0.4,0.6"
                      Accent.Hue="{DynamicResource AccentHue}" />
-    <SolidColorBrush x:Key="DockApplicationAccentForegroundBrush" Accent.BaseColor="#F0F0F0"
+    <SolidColorBrush x:Key="DockApplicationAccentForegroundBrush" Accent.BaseColor="#F0F0F0" Accent.L="0.4,0.6"
                      Accent.Hue="{DynamicResource AccentHue}" />
-    <SolidColorBrush x:Key="DockApplicationAccentBrushIndicator" Accent.BaseColor="#007ACC"
+    <SolidColorBrush x:Key="DockApplicationAccentBrushIndicator" Accent.BaseColor="#007ACC" Accent.L="0.4,0.6"
                      Accent.Hue="{DynamicResource AccentHue}" />
 
     <!-- wizard -->
@@ -103,7 +103,7 @@
     <SolidColorBrush x:Key="SettingItemBorder" Color="#494949" />
 
     <!-- -->
-    <SolidColorBrush x:Key="GroupingHeaderColor" Color="#2AA0C4" Accent.Hue="{DynamicResource AccentHue}" />
+    <SolidColorBrush x:Key="GroupingHeaderColor" Color="#2AA0C4" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
 
     <!-- universal colors -->
     <SolidColorBrush x:Key="BluishColor" Color="#2AA0C4" />

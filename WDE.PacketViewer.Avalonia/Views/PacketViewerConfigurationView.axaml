@@ -24,7 +24,7 @@
     </UserControl.Styles>
     <ScrollViewer HorizontalScrollBarVisibility="Disabled"  Grid.IsSharedSizeScope="True">
         <StackPanel>
-            <controls:SettingsHeader Text="Defaults" />
+            <SettingsHeader Text="Defaults" />
             <StackPanel Orientation="Vertical">
                 <SettingItem Header="Always split UPDATE_OBJECT" Help="If you want to filter individual updates, you have to split UPDATE_OBJECT packets. This option can be also manually triggered for each sniff, however you may enable it globally be default. Note: it DOES increase memory usage.">
                     <ToggleSwitch IsChecked="{CompiledBinding AlwaysSplitUpdates, Mode=TwoWay}"></ToggleSwitch>
@@ -43,7 +43,7 @@
                 </SettingItem>
             </StackPanel>
             
-            <controls:SettingsHeader Text="WoW Packet Parser settings" />
+            <SettingsHeader Text="WoW Packet Parser settings" />
             <ItemsControl ItemsSource="{CompiledBinding ParserSettings}">
                 <ItemsControl.DataTemplates>
                     <DataTemplate DataType="viewModels:ParserBoolSettingViewModel">
@@ -60,7 +60,7 @@
             </ItemsControl>
             
             <StackPanel IsVisible="{CompiledBinding IsDebugBuild, Mode=OneTime}">
-                <controls:SettingsHeader Text="[Development] Integration test" />
+                <SettingsHeader Text="[Development] Integration test" />
                 <StackPanel>
                     <SettingItem Header="This is only for development purposes">
                         <ToggleSwitch Name="ShowIntegrationTest" />

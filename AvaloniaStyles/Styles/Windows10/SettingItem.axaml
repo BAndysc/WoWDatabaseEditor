@@ -4,4 +4,12 @@
                 <Setter Property="Background" Value="{DynamicResource SettingItemBackground}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource SettingItemBorder}" />
         </Style>
+
+        <Style Selector="SettingsHeader">
+                <Setter Property="Template">
+                        <ControlTemplate>
+                                <TextBlock FontWeight="Bold" Name="Text" FontSize="13" Margin="0,15,0,5" Text="{TemplateBinding Text}" />
+                        </ControlTemplate>
+                </Setter>
+        </Style>
 </Styles>

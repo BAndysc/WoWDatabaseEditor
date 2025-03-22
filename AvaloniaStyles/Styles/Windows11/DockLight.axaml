@@ -2,9 +2,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia">
         <Styles.Resources>
-                <SolidColorBrush Accent.BaseColor="#4D6082" x:Key="ToolChromeControl.Grip"  Accent.Hue="{DynamicResource AccentHue}" />
-                <SolidColorBrush Accent.BaseColor="#515F7F" x:Key="DocumentControl.PART_TabStripItem"  Accent.Hue="{DynamicResource AccentHue}" />
-                <SolidColorBrush Accent.BaseColor="#5F7096" x:Key="DocumentControl.PART_TabStrip.pointerover.not.selected"  Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Accent.BaseColor="#4D6082" x:Key="ToolChromeControl.Grip" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Accent.BaseColor="#515F7F" x:Key="DocumentControl.PART_TabStripItem" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Accent.BaseColor="#5F7096" x:Key="DocumentControl.PART_TabStrip.pointerover.not.selected" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         </Styles.Resources>
         <Style Selector="idc|ToolChromeControl">
                 <Setter Property="Background" Value="Transparent"/>

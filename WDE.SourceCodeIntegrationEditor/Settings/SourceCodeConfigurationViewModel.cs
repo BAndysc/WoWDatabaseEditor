@@ -6,6 +6,7 @@ using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.Managers;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 
@@ -76,6 +77,7 @@ internal partial class SourceCodeConfigurationViewModel : ObservableBase, IConfi
     }
 
     public ICommand Save { get; }
+    public ImageUri Icon { get; } = new ImageUri("Icons/document_code_big.png");
     public string Name => "Server source code";
     public string? ShortDescription => "If you provide the path to the server source code, Find Anywhere will use it to search in the source code.";
     [Notify] private bool isModified;

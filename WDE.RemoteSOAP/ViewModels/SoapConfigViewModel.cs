@@ -3,6 +3,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.RemoteSOAP.Providers;
@@ -108,6 +109,7 @@ namespace WDE.RemoteSOAP.ViewModels
 
         public ICommand Save { get; }
 
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_remotedesktop_big.png");
         public string Name => "Soap connector";
 
         public string ShortDescription =>

@@ -47,21 +47,27 @@ public readonly struct HslColor
         return new Color((byte)(opacity * 255), (byte)result.X, (byte)result.Y, (byte)result.Z);
     }
 
-    public HslColor Scale(HslDiff? scaler)
+    public HslColor ClampL(double min, double max)
+    {
+        return new HslColor(H, S, Math.Clamp(L, min, max));
+    }
+
+    public HslColor Scale(HslDiff? scaler, double minL, double maxL)
     {
         if (scaler == null)
             return this;
-        
+
         double l = L;
-        if (scaler.L > 0.5)
+        var scalerL = Math.Clamp(scaler.L, minL, maxL);
+        if (scalerL > 0.5)
         {
-            var intensity01 = 1 - (Math.Clamp(scaler.L, 0, 1) - 0.5) * 2;
+            var intensity01 = 1 - (Math.Clamp(scalerL, 0, 1) - 0.5) * 2;
             var slower = Math.Pow(intensity01, 0.1);
             l = slower * Math.Pow(L, intensity01) + 1 - slower;
         }
-        else if (scaler.L < 0.5)
+        else if (scalerL < 0.5)
         {
-            var intensity01 = Math.Clamp(scaler.L, 0, 1) * 2;
+            var intensity01 = Math.Clamp(scalerL, 0, 1) * 2;
             var slower = Math.Sqrt(intensity01);
             l = slower * Math.Pow(L, 1 / intensity01);
         }

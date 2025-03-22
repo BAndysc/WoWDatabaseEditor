@@ -9,7 +9,7 @@
              x:Class="WDE.CommonViews.Avalonia.Mpq.MpqSettingsView">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical">
-            <controls:SettingsHeader Text="Client files" />
+            <SettingsHeader Text="Client files" />
             <StackPanel Grid.IsSharedSizeScope="True">
                 <SettingItem Header="WoW Path" Help="Please select a folder with Wrath's wow.exe in it.">
                     <DockPanel LastChildFill="True">

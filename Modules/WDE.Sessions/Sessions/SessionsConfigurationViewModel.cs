@@ -3,6 +3,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using WDE.Common;
 using WDE.Common.Sessions;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 
@@ -15,6 +16,7 @@ namespace WDE.Sessions.Sessions
         private bool? deleteOnSave;
         private bool isModified;
         public ICommand Save { get; }
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_groupofprojects_big.png");
         public string Name => "Sessions";
         public string? ShortDescription =>
             "Sessions allow you to easily generate SQL with changes you made since the last time you begun a session";

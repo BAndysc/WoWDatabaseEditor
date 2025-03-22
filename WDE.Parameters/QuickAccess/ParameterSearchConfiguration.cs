@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
@@ -59,6 +60,7 @@ internal class ParameterSearchConfiguration : ObservableBase, IConfigurable
     }
     
     public ICommand Save { get; }
+    public ImageUri Icon { get; } = new ImageUri("Icons/document_startmenu_big.png");
     public string Name => "Quick access";
     public string? ShortDescription => "You can configure the default action in quick access window for each parameter here";
     public bool IsModified => Parameters.Any(p => p.IsModified);

@@ -16,6 +16,7 @@ namespace WDE.DatabaseDefinitionEditor.ViewModels
     public partial class ToolsViewModel : BindableBase, IConfigurable
     {
         public ICommand Save { get; }
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_table1_big.png");
         public string Name => "Database table editor";
         public string ShortDescription => "This is not really settings, it is a tool to generate table definitions for new tables in your database";
         public bool IsModified => DefinitionEditor.IsModified;

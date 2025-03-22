@@ -1,9 +1,8 @@
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Metadata;
 
-namespace WDE.Common.Avalonia.Controls
+namespace AvaloniaStyles.Controls
 {
     public class SettingsHeader : TemplatedControl
     {

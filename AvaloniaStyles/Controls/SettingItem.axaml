@@ -40,7 +40,7 @@
                             <ColumnDefinition Width="Auto" MinWidth="50" SharedSizeGroup="Left" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Row="1" Grid.ColumnSpan="2" TextWrapping="WrapWithOverflow" 
+                        <SelectableTextBlock Grid.Row="1" Grid.ColumnSpan="2" TextWrapping="WrapWithOverflow"
                                    Text="{TemplateBinding Help}"
                                    Margin="0,6,0,0" IsVisible="{TemplateBinding Help, Converter={x:Static ObjectConverters.IsNotNull}}"
                                    Opacity="0.5" />

@@ -23,6 +23,7 @@ namespace WoWDatabaseEditorCore.Services.QuickLoadService
         public ICommand RemoveDivider { get; }
         public ICommand SetVisibleAll { get; }
         public ICommand SetVisibleNone { get; }
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_homepage_big.png");
         public string Name => "Quick start";
         public string? ShortDescription => "You can configure look and feel for you quick start panel";
 

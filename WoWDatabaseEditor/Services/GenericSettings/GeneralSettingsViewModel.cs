@@ -5,6 +5,7 @@ using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.Settings;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
@@ -37,6 +38,7 @@ public class GeneralSettingsViewModel : ObservableBase, IGeneralSettings
     public IList<GeneralSettingsGroupViewModel> Groups { get; }
 
     public ICommand Save { get; }
+    public ImageUri Icon { get; } = new ImageUri("Icons/document_setting_big.png");
     public string Name => "General settings";
     public string? ShortDescription => null;
     public bool IsModified => Groups.Any(x => x.IsModified);

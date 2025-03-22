@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows.Input;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WDE.Common
@@ -9,6 +10,7 @@ namespace WDE.Common
     {
         ICommand Save { get; }
         string Name { get; }
+        ImageUri Icon { get; }
         string? ShortDescription { get; }
         bool IsModified { get; }
         bool IsRestartRequired { get; }

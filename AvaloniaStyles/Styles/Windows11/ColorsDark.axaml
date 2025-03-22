@@ -40,12 +40,12 @@
         </LinearGradientBrush>
         
         
-        <SolidColorBrush x:Key="PrimaryButtonBackground" Color="#118aed"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush x:Key="PrimaryButtonBackgroundPointerOver" Color="#1494FF"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPointerOver" Color="#1494FF"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush x:Key="PrimaryButtonBackgroundPressed" Color="#0F74C7"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPressed" Color="#0F74C7"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush x:Key="PrimaryButtonForeground" Color="White"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBackground" Color="#118aed" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBackgroundPointerOver" Color="#1494FF" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPointerOver" Color="#1494FF" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBackgroundPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonForeground" Color="White" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         
         <!-- textbox -->
         <Thickness x:Key="TextControlBorderThemeThickness">0,0,0,1</Thickness>
@@ -83,6 +83,15 @@
         <SolidColorBrush x:Key="SettingItemBorder" Color="#494949" />
         
         <!-- dock -->
-        <SolidColorBrush Accent.BaseColor="{DynamicResource SystemAccentColor}" x:Key="DockThemeAccentBrush"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="{DynamicResource SystemAccentColor}" x:Key="DockThemeAccentBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+
+        <!-- listboxitem -->
+        <SolidColorBrush x:Key="ListBoxItem_Background" Color="Transparent" />
+        <SolidColorBrush x:Key="ListBoxItem_Background_Hover" Color="#10ffffff" />
+        <SolidColorBrush x:Key="ListBoxItem_Background_Pressed" Color="#10ffffff" />
+        <SolidColorBrush x:Key="ListBoxItem_Background_Selected" Color="#10ffffff" />
+        <SolidColorBrush x:Key="ListBoxItem_Background_Selected_Hover" Color="#0Affffff" />
+        <SolidColorBrush x:Key="ListBoxItem_Background_Selected_Pressed" Color="#14ffffff" />
+        <SolidColorBrush x:Key="ListBoxItem_Forecolor_Selected_Pressed" Color="#CDCDCD" />
     </Styles.Resources>
 </Styles>

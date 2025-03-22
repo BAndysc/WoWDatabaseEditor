@@ -1,6 +1,86 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Style Selector="ListBoxItem">
-        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
-    </Style>
+    <Styles.Resources>
+        <ControlTheme x:Key="{x:Type ListBox}" TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+            <!-- <Setter Property="ItemContainerTheme" Value="{DynamicResource Win11ListBoxItem}" /> -->
+        </ControlTheme>
+        <ControlTheme x:Key="{x:Type ListBoxItem}" TargetType="ListBoxItem">
+            <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+            <Setter Property="Background" Value="{DynamicResource ListBoxItem_Background}" />
+            <Setter Property="Padding" Value="8,8" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Panel>
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          CornerRadius="{TemplateBinding CornerRadius}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Content="{TemplateBinding Content}"
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                        <Border Background="#2A66BA" Width="3"
+                                HorizontalAlignment="Left" VerticalAlignment="Center"
+                                Height="16" CornerRadius="{StaticResource ControlCornerRadius}"
+                                Margin="1,0,0,0"
+                                Name="PART_SelectionMarker">
+                            <Border.Transitions>
+                                <Transitions>
+                                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:1" Easing="ElasticEaseOut"/>
+                                </Transitions>
+                            </Border.Transitions>
+                        </Border>
+                    </Panel>
+                </ControlTemplate>
+            </Setter>
+
+            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="{DynamicResource ListBoxItem_Background_Hover}" />
+                <Setter Property="Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
+            </Style>
+
+            <!--  Pressed State  -->
+            <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="{DynamicResource ListBoxItem_Background_Pressed}" />
+                <Setter Property="Foreground" Value="#5A5A5A" />
+            </Style>
+
+            <Style Selector="^ /template/ Border#PART_SelectionMarker">
+                <Setter Property="RenderTransform" Value="scaleY(0)"/>
+            </Style>
+
+            <!--  Selected State  -->
+            <Style Selector="^:selected">
+
+                <Style Selector="^ /template/ Border#PART_SelectionMarker">
+                    <Setter Property="RenderTransform" Value="scaleY(1)"/>
+                </Style>
+
+                <Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource ListBoxItem_Background_Selected}" />
+                    <Setter Property="Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
+                </Style>
+
+                <!--  Selected Unfocused State  -->
+                <Style Selector="^:not(:focus) /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource ListBoxItem_Background_Selected}" />
+                    <Setter Property="Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
+                </Style>
+
+                <!--  Selected PointerOver State  -->
+                <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource ListBoxItem_Background_Selected_Hover}" />
+                    <Setter Property="Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
+                </Style>
+
+                <!--  Selected Pressed State  -->
+                <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource ListBoxItem_Background_Selected_Pressed}" />
+                    <Setter Property="Foreground" Value="{DynamicResource ListBoxItem_Forecolor_Selected_Pressed}" />
+                </Style>
+            </Style>
+        </ControlTheme>
+    </Styles.Resources>
 </Styles>

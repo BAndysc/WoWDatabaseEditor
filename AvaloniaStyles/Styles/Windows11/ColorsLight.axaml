@@ -7,6 +7,7 @@
     <Styles.Resources>
         <SolidColorBrush Color="#FDFCFC" x:Key="ContentBackground" />
         <SolidColorBrush Color="#FDFCFC" Opacity="0.5" x:Key="TitleBarHalfButtonBackground" />
+        <SolidColorBrush Color="#F3F3F3" x:Key="SlightlyHighlightedBackground" />
         
         <utils:HslDiff x:Key="AccentHue" H="0" S="1" L="0.5" />
         <!-- ccd4de-->
@@ -14,9 +15,9 @@
         <SolidColorBrush Color="#b0c0cf" x:Key="WindowContentBackground"  Accent.Hue="{DynamicResource AccentHue}" />
         <SolidColorBrush Color="#b0c0cf" x:Key="MainWindowContentBackground"  Accent.Hue="{DynamicResource AccentHue}" /> <!-- dark: #293955-->
         
-        <SolidColorBrush Color="#007ACC" x:Key="StatusBarBackground"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#007ACC" x:Key="StatusBarBackground" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
 
-        <SolidColorBrush Color="#5fa2da" x:Key="AccentColorMedium"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#5fa2da" x:Key="AccentColorMedium" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         
         <SolidColorBrush Color="#7F7F7F" x:Key="OuterWindowBorderColor" />
         <SolidColorBrush Color="White" x:Key="InnerWindowBorderColor" />
@@ -48,12 +49,12 @@
         </LinearGradientBrush>
         <StaticResource x:Key="ButtonBorderBrush" ResourceKey="ControlElevationBorderBrush" />
         
-        <SolidColorBrush x:Key="PrimaryButtonBackground" Color="#118aed"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush x:Key="PrimaryButtonBackgroundPointerOver" Color="#1494FF"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPointerOver" Color="#1494FF"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush x:Key="PrimaryButtonBackgroundPressed" Color="#0F74C7"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPressed" Color="#0F74C7"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush x:Key="PrimaryButtonForeground" Color="White"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBackground" Color="#118aed" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBackgroundPointerOver" Color="#1494FF" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPointerOver" Color="#1494FF" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBackgroundPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonForeground" Color="White" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         
         <!-- textbox -->
         <Thickness x:Key="TextControlBorderThemeThickness">0,0,0,1</Thickness>
@@ -85,12 +86,22 @@
         <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#0F000000" />
         <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#0F000000" />
         <SolidColorBrush x:Key="ComboBoxBorderBrushDisabled" Color="#0F000000" />
+        <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#F8F8F8" />
         
         <!-- setting item -->
-        <SolidColorBrush x:Key="SettingItemBackground" Color="#F0F0F0" />
-        <SolidColorBrush x:Key="SettingItemBorder" Color="#DDDDDD" />
+        <SolidColorBrush x:Key="SettingItemBackground" Color="#FBFBFB" />
+        <SolidColorBrush x:Key="SettingItemBorder" Color="#E5E5E5" />
         
         <!-- dock -->
         <!--<SolidColorBrush BaseColor="{DynamicResource SystemAccentColor}" x:Key="DockThemeAccentBrush"  Accent.Hue="{DynamicResource AccentHue}" />-->
+
+        <!-- listboxitem -->
+        <SolidColorBrush x:Key="ListBoxItem_Background" Color="Transparent" />
+        <SolidColorBrush x:Key="ListBoxItem_Background_Hover" Color="#08000000" />
+        <SolidColorBrush x:Key="ListBoxItem_Background_Pressed" Color="#08000000" />
+        <SolidColorBrush x:Key="ListBoxItem_Background_Selected" Color="#08000000" />
+        <SolidColorBrush x:Key="ListBoxItem_Background_Selected_Hover" Color="#05000000" />
+        <SolidColorBrush x:Key="ListBoxItem_Background_Selected_Pressed" Color="#0A000000" />
+        <SolidColorBrush x:Key="ListBoxItem_Forecolor_Selected_Pressed" Color="#5A5A5A" />
     </Styles.Resources>
 </Styles>

@@ -3,6 +3,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using WDE.Common;
 using WDE.Common.CoreVersion;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 
@@ -50,6 +51,7 @@ namespace WoWDatabaseEditorCore.CoreVersion.ViewModels
         }
         
         public ICommand Save { get; }
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_core_big.png");
         public string ShortDescription =>
             "Choose which core version will you be working with. Particular modules (like SmartScripts module) can respect that.";
         public string Name => "Core version";

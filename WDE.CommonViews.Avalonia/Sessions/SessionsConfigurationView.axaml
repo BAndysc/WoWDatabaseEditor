@@ -9,7 +9,7 @@
              x:Class="WDE.CommonViews.Avalonia.Sessions.SessionsConfigurationView">
     <ScrollViewer>
         <StackPanel>
-            <controls:SettingsHeader Text="Recently deleted sessions" />
+            <SettingsHeader Text="Recently deleted sessions" />
             <Button Command="{CompiledBinding RestoreSelectedSession}">Restore</Button>
             <ListBox ItemsSource="{CompiledBinding DeletedSessions}" 
                      SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}">

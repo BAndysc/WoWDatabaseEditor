@@ -17,6 +17,7 @@ using SixLabors.ImageSharp.ColorSpaces;
 using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Common.Tasks;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -123,6 +124,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
         }
 
         public ICommand Save { get; }
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_brush_big.png");
         public string Name => "Appearance";
         public string ShortDescription => "Wow Database Editor is supplied with few looks, check them out!";
         public bool IsRestartRequired => true;

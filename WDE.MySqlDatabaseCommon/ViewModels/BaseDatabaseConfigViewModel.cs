@@ -2,6 +2,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
+using WDE.Common.Types;
 using WDE.MVVM;
 using WDE.MySqlDatabaseCommon.Providers;
 
@@ -66,6 +67,7 @@ namespace WDE.MySqlDatabaseCommon.ViewModels
 
         public ICommand Save { get; }
         public abstract string Name { get; }
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_sql0_big.png");
         public abstract string? ShortDescription { get; }
         public SettingsViewModel WorldDatabase { get; } = new SettingsViewModel();
         public SettingsViewModel AuthDatabase { get; } = new SettingsViewModel();

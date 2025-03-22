@@ -149,6 +149,7 @@ namespace WDE.PacketViewer.ViewModels
         
         public ICommand RunTestsCommand { get; }
         public ICommand Save { get; }
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_index_big.png");
         public string Name => "Packet viewer";
         public string? ShortDescription =>
             "WoW Database Editor has builtin integration with TrinityCore's Packet Parser.";

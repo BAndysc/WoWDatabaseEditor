@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Extensions;
 
@@ -37,6 +38,7 @@ namespace WoWDatabaseEditorCore.ModulesManagement.Configuration.ViewModels
             #pragma warning restore IL3000
         }
 
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_module_big.png");
         public string Name => "Modules";
         public string ShortDescription => "List of all loaded modules";
         public ICommand Save { get; }

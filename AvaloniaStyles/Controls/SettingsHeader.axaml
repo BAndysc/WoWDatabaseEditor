@@ -1,11 +1,10 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="using:WDE.Common.Avalonia.Controls">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Design.PreviewWith>
-        <controls:SettingsHeader />
+        <SettingsHeader />
     </Design.PreviewWith>
 
-    <Style Selector="controls|SettingsHeader">
+    <Style Selector="SettingsHeader">
         <Setter Property="Template">
             <ControlTemplate>
                 <DockPanel LastChildFill="True" Margin="0,10,0,10">

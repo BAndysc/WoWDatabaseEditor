@@ -6,56 +6,60 @@
              x:DataType="viewModels:BaseDatabaseConfigViewModel"
              prism:ViewModelLocator.AutoWireViewModel="False">
     <ScrollViewer>
-        <StackPanel>
-            <TextBlock FontWeight="Bold" FontSize="20">World database:</TextBlock>
-            <Grid DataContext="{CompiledBinding WorldDatabase}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <TextBlock Text="Host" VerticalAlignment="Center" />
-                <TextBlock Text="Port" Grid.Row="1" VerticalAlignment="Center" />
-                <TextBlock Text="User" Grid.Row="2" VerticalAlignment="Center" />
-                <TextBlock Text="Password" Grid.Row="3" VerticalAlignment="Center" />
-                <TextBlock Text="Database" Grid.Row="4" VerticalAlignment="Center" />
-                <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{CompiledBinding Host, Mode=TwoWay}" />
-                <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{CompiledBinding Port, Mode=TwoWay}" />
-                <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{CompiledBinding User, Mode=TwoWay}" />
-                <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{CompiledBinding Password, Mode=TwoWay}" />
-                <TextBox Margin="5" Grid.Column="1" Grid.Row="4" Text="{CompiledBinding Database, Mode=TwoWay}" />
-            </Grid>
-            
-            <TextBlock FontWeight="Bold" FontSize="20">Auth database:</TextBlock>
-            <Grid DataContext="{CompiledBinding AuthDatabase}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <TextBlock Text="Host" VerticalAlignment="Center" />
-                <TextBlock Text="Port" Grid.Row="1" VerticalAlignment="Center" />
-                <TextBlock Text="User" Grid.Row="2" VerticalAlignment="Center" />
-                <TextBlock Text="Password" Grid.Row="3" VerticalAlignment="Center" />
-                <TextBlock Text="Database" Grid.Row="4" VerticalAlignment="Center" />
-                <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{CompiledBinding Host, Mode=TwoWay}" />
-                <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{CompiledBinding Port, Mode=TwoWay}" />
-                <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{CompiledBinding User, Mode=TwoWay}" />
-                <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{CompiledBinding Password, Mode=TwoWay}" />
-                <TextBox Margin="5" Grid.Column="1" Grid.Row="4" Text="{CompiledBinding Database, Mode=TwoWay}" />
-            </Grid>
+        <StackPanel Grid.IsSharedSizeScope="True">
+            <SettingsHeader Text="World database" />
+            <StackPanel DataContext="{Binding WorldDatabase}">
+                <SettingItem Header="Host">
+                    <TextBox Text="{Binding Host, Mode=TwoWay}" />
+                </SettingItem>
+
+                <SettingItem Header="Port">
+                    <TextBox Text="{Binding Port, Mode=TwoWay}" />
+                </SettingItem>
+
+                <SettingItem Header="User">
+                    <TextBox Text="{Binding User, Mode=TwoWay}" />
+                </SettingItem>
+
+                <SettingItem Header="Password">
+                    <TextBox Text="{Binding Password, Mode=TwoWay}"  RevealPassword="{Binding #TogglePassword.IsPressed}" PasswordChar="•">
+                        <TextBox.InnerRightContent>
+                            <Button Name="TogglePassword">Show</Button>
+                        </TextBox.InnerRightContent>
+                    </TextBox>
+                </SettingItem>
+
+                <SettingItem Header="Database">
+                    <TextBox Text="{Binding Database, Mode=TwoWay}" />
+                </SettingItem>
+            </StackPanel>
+
+            <SettingsHeader Text="Auth database" />
+            <StackPanel DataContext="{Binding AuthDatabase}">
+                <SettingItem Header="Host">
+                    <TextBox Text="{Binding Host, Mode=TwoWay}" />
+                </SettingItem>
+
+                <SettingItem Header="Port">
+                    <TextBox Text="{Binding Port, Mode=TwoWay}" />
+                </SettingItem>
+
+                <SettingItem Header="User">
+                    <TextBox Text="{Binding User, Mode=TwoWay}" />
+                </SettingItem>
+
+                <SettingItem Header="Password">
+                    <TextBox Text="{Binding Password, Mode=TwoWay}"  RevealPassword="{Binding #ToggleAuthPassword.IsPressed}" PasswordChar="•">
+                        <TextBox.InnerRightContent>
+                            <Button Name="ToggleAuthPassword">Show</Button>
+                        </TextBox.InnerRightContent>
+                    </TextBox>
+                </SettingItem>
+
+                <SettingItem Header="Database">
+                    <TextBox Text="{Binding Database, Mode=TwoWay}" />
+                </SettingItem>
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

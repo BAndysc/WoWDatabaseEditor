@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
@@ -68,6 +69,7 @@ public partial class PersonalGuidConfigurationViewModel : ObservableBase, IConfi
 
 
     public ICommand Save { get; }
+    public ImageUri Icon { get; } = new ImageUri("Icons/document_id_big.png");
     public string Name => "GUID range for spawns";
     public string? ShortDescription => "Use this to set the range of GUIDs for spawns";
 

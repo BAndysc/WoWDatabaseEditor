@@ -9,7 +9,7 @@
              prism:ViewModelLocator.AutoWireViewModel="False">
     <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.IsSharedSizeScope="True">
         <StackPanel>
-            <controls:SettingsHeader Text="Themes" />
+            <SettingsHeader Text="Themes" />
             <StackPanel>
                 <SettingItem Header="Current theme">
                     <TextBlock FontWeight="Bold" Text="{CompiledBinding CurrentThemeName}" />
@@ -26,7 +26,7 @@
                 </SettingItem>
             </StackPanel>
             
-            <controls:SettingsHeader Text="Scaling" />
+            <SettingsHeader Text="Scaling" />
             <StackPanel>
                 <SettingItem Header="Recommended scaling">
                     <TextBlock VerticalAlignment="Center"  Text="{CompiledBinding RecommendedScalingPercentage, StringFormat={}{0}%}" FontWeight="Bold" />

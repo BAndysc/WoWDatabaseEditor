@@ -14,9 +14,9 @@
         <SolidColorBrush Color="White" x:Key="ThemeControlLowBrush" />
         <SolidColorBrush Color="#74747F" x:Key="ThemeBorderLowBrush" />
         
-        <SolidColorBrush Color="#007ACC" x:Key="StatusBarBackground"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#007ACC" x:Key="StatusBarBackground" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         
-        <SolidColorBrush Color="#5fa2da" x:Key="AccentColorMedium"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#5fa2da" x:Key="AccentColorMedium" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         
         <SolidColorBrush Color="#74747F" x:Key="ContentBorderBrush" />
         <SolidColorBrush Color="White" x:Key="ContentBackground" />
@@ -133,7 +133,7 @@
         <SolidColorBrush x:Key="SettingItemBorder" Color="#DDDDDD" />
         
         <!-- -->
-        <SolidColorBrush x:Key="GroupingHeaderColor" Color="#226E8B"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="GroupingHeaderColor" Color="#226E8B" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         
         <!-- universal colors -->
         <SolidColorBrush x:Key="BluishColor" Color="#226E8B" />

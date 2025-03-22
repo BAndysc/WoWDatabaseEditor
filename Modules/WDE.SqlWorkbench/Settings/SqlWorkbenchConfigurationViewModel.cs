@@ -15,6 +15,7 @@ using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Common.Utils.DragDrop;
 using WDE.Module.Attributes;
@@ -39,6 +40,7 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
     [Notify] [AlsoNotify(nameof(IsModified))] private bool connectionsContainerIsModified;
     
     public ICommand Save { get; }
+    public ImageUri Icon { get; } = new ImageUri("Icons/document_sql0_big.png");
     public string Name => "SQL Editor";
     public string? ShortDescription => "You can open raw SQL editor and execute queries on your database. Your world/hotfix databases are available by default. If you want to open sessions to other databases, you can provide the credentials here.";
     public bool IsRestartRequired => true;

@@ -5,6 +5,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
 using WDE.Common.Managers;
+using WDE.Common.Types;
 using WDE.DbcStore.Data;
 using WDE.DbcStore.Providers;
 using WDE.Module.Attributes;
@@ -100,6 +101,7 @@ namespace WDE.DbcStore.ViewModels
         public ObservableCollection<DBCLocales> DBCLocales { get; }
         
         public string Name => "DBC";
+        public ImageUri Icon { get; } = new ImageUri("Icons/document_table0_big.png");
 
         public ICommand Save { get; }
         public ICommand PickFolder { get; }

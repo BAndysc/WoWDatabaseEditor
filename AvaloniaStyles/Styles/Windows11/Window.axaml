@@ -9,9 +9,9 @@
 
     <Styles.Resources>
         <converters:ChromeToBoolConverter x:Key="ChromeToBoolConverter" NoChrome="True" AlwaysChrome="False" MacChromeOnly="True" />
-        <SolidColorBrush Color="#4168CF" x:Key="TopBarButtonBackground"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush Color="#4077DD" x:Key="TopBarButtonHoverBackground"  Accent.Hue="{DynamicResource AccentHue}" />
-        <SolidColorBrush Color="#4069C6" x:Key="TopBarButtonPressedBackground"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#4168CF" x:Key="TopBarButtonBackground" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#4077DD" x:Key="TopBarButtonHoverBackground" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#4069C6" x:Key="TopBarButtonPressedBackground" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
     </Styles.Resources>
     
     <Style Selector="ExtendedTitleBar">
