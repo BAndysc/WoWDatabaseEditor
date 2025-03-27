@@ -82,7 +82,7 @@
                         <MenuItem WdeImage.MenuIcon="Icons/icon_comment_below.png" Command="{CompiledBinding NewCommentBelowCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New comment below" />
                         <Separator IsVisible="{CompiledBinding AnyEventOrActionSelected}" />
                         <MenuItem WdeImage.MenuIcon="Icons/document_link.png" Command="{CompiledBinding ToggleBreakableLinkCommand}"
-                                  Header="Toggle non-breakable link flag">
+                                  Header="Toggle No Link Break on Missing Target">
                             <MenuItem.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <CompiledBinding Path="AnySelected" />
