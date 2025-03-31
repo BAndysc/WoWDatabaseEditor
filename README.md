@@ -5,6 +5,8 @@ This project is a continuation of [Visual SAI Studio](https://github.com/Bandysc
 
 (screenshots below)
 
+![aprilsfool](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/aprilsfool.png)
+
 # Supported server versions
 
  * Supported database: TC 3.3.5, TC 4.3.4 ("preservation project"), TC master (10.0.x), AzerothCore (3.3.5)

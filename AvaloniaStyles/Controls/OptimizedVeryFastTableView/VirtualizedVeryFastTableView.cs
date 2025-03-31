@@ -135,6 +135,7 @@ public partial class VirtualizedVeryFastTableView : RenderedPanel, ICustomKeyboa
     public VirtualizedVeryFastTableView()
     {
         UpdateKeyBindings();
+        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.SubpixelAntialias);
     }
     
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
