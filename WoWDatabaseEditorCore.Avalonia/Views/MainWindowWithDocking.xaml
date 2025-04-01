@@ -26,7 +26,6 @@
           Chrome="NoSystemChrome"
           SubTitle="{CompiledBinding Subtitle}"
           Classes="MainWindow"
-          RoundCorners="True"
           x:DataType="viewModels:MainWindowViewModel"
           utils:MenuBind.MenuItems="{CompiledBinding MenuItemProviders}"
           utils:MenuBind.MenuItemsGestures="{CompiledBinding MenuItemProviders}"

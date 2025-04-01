@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using AvaloniaStyles;
+using Classic.Avalonia.Theme;
 using WDE.Common.Types;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views;
@@ -33,4 +34,16 @@ public partial class SplashScreenWindow : Window
             this.SystemDecorations = SystemDecorations.BorderOnly;
         }
     }
+
+    protected override void ExtendClientAreaToDecorationsChanged(bool isExtended)
+    {
+        base.ExtendClientAreaToDecorationsChanged(isExtended);
+
+        // Fix for Windows: disable rounded corners
+        if (SystemTheme.EffectiveTheme == SystemThemeOptions.Windows9x)
+        {
+            ClassicWindow.DisableRoundedCorners(this);
+        }
+    }
+
 }
