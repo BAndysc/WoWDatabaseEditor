@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Browser" Version="11.1.3-cibuild0051668-beta"/>
+        <PackageReference Include="Avalonia.Browser" Version="11.3.999-cibuild0055834-alpha"/>
     </ItemGroup>
 
     <ItemGroup>

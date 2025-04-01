@@ -9,7 +9,6 @@
     </PropertyGroup>
     <Import Project="..\Avalonia.props" />
     <ItemGroup>
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="7.0.9" />
     </ItemGroup>
     <ItemGroup>

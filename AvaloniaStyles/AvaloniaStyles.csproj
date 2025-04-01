@@ -16,7 +16,6 @@
     
     <Import Project="..\Avalonia.props" />
     <ItemGroup>
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
         <PackageReference Include="FuzzySharp" Version="2.0.2" />
     </ItemGroup>

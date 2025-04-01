@@ -5,6 +5,9 @@
     <LangVersion>latest</LangVersion>
     <IsPackable>true</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RestoreAdditionalProjectSources>
+      https://nuget-feed-all.avaloniaui.net/v3/index.json;
+    </RestoreAdditionalProjectSources>
   </PropertyGroup>
 
   <Import Project="..\..\Avalonia.props" />

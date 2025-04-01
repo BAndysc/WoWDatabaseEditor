@@ -13,9 +13,6 @@
     <Import Project="..\Module.props" />    
     <Import Project="..\Avalonia.props" />
     <ItemGroup>
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
-    </ItemGroup>
-    <ItemGroup>
         <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />
         <ProjectReference Include="..\Modules\WDE.Sessions\WDE.Sessions.csproj" />
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
