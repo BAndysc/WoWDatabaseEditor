@@ -108,8 +108,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             avaloniaDockAdapter = new AvaloniaDockAdapter(documentManager, layoutViewModelResolver);
             
             // we have to do it before InitializeComponent!
-            var primaryScreen = Screens.Primary ?? Screens.All.FirstOrDefault();
-            GlobalApplication.HighDpi = (primaryScreen?.Scaling ?? 1) >= 1.5f; // enable hidpi res for everyone? check if it results in higher quality icons
+            var scaling = Screens.All.Select(f => f.Scaling).Max();
+            if (OperatingSystem.IsMacOS())
+            {
+                // https://github.com/AvaloniaUI/Avalonia/commit/c0276f75b9213e8ac90cda97f18f93b397e7a3c4
+                // macOS always returns 1.0, but it is not true, if we can't detect it, at least we can set it to 2.0
+                scaling = 2;
+            }
+            GlobalApplication.HighDpi = scaling >= 1.5f; // enable hidpi res for everyone? check if it results in higher quality icons
             
             InitializeComponent();
             this.AttachDevTools();

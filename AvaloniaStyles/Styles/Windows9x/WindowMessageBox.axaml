@@ -63,7 +63,10 @@
                                                   Width="32" Height="32"
                                                   Margin="0,0,15,0" />
 
-                                <TextBlock HorizontalAlignment="Left" TextAlignment="Left" Margin="0,3,0,0" TextWrapping="WrapWithOverflow" Text="{TemplateBinding Message}" />
+                                <TextBlock HorizontalAlignment="Left" TextAlignment="Left" Margin="0,3,0,0" TextWrapping="WrapWithOverflow" >
+                                    <Run Text="{TemplateBinding Header}" />
+                                    <Run Text="{TemplateBinding Message}" />
+                                </TextBlock>
                             </DockPanel>
 
                         </VisualLayerManager>
