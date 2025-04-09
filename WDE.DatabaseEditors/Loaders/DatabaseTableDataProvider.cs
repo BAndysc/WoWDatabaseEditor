@@ -464,7 +464,7 @@ namespace WDE.DatabaseEditors.Loaders
 
             public string ColumnName(int index) => columns[index];
 
-            public Type ColumnType(int index) => typeof(int);
+            public Type ColumnType(int index) => typeof(long);
 
             public object? Value(int row, int column) => Value<long>(row, column);
 
@@ -473,13 +473,22 @@ namespace WDE.DatabaseEditors.Loaders
                 if (typeof(T) == typeof(int))
                 {
                     if (column == 0)
-                        return (T)(object)rows[row].col1;
+                        return (T)(object)(int)(rows[row].col1);
                     if (column == 1)
-                        return (T)(object)rows[row].col2;
+                        return (T)(object)(int)(rows[row].col2);
                     if (column == 2)
-                        return (T)(object)rows[row].col3;
+                        return (T)(object)(int)(rows[row].col3);
                 }
-                return default;
+                else if (typeof(T) == typeof(long))
+                {
+                    if (column == 0)
+                        return (T)(object)(long)(rows[row].col1);
+                    if (column == 1)
+                        return (T)(object)(long)(rows[row].col2);
+                    if (column == 2)
+                        return (T)(object)(long)(rows[row].col3);
+                }
+                throw new ArgumentOutOfRangeException("Invalid column type (" + typeof(T) + "), expected int or long");
             }
 
             public bool IsNull(int row, int column) => false;

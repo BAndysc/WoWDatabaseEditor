@@ -235,26 +235,40 @@ namespace WDE.DatabaseEditors.ViewModels
                 IsLoading = false;
                 return false;
             }
-            var data = await LoadData();
 
-            if (data == null)
+            try
+            {
+                var data = await LoadData();
+
+                if (data == null)
+                {
+                    await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
+                        .SetMainInstruction($"Editor failed to load data from database!")
+                        .SetIcon(MessageBoxIcon.Error)
+                        .WithOkButton(true)
+                        .Build());
+                    IsLoading = false;
+                    return false;
+                }
+
+                solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
+
+                entities.Do(e => e.RemoveAll());
+                entities.RemoveAll();
+                await InternalLoadData(data);
+                IsLoading = false;
+                return true;
+            }
+            catch (Exception e)
             {
                 await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
                     .SetMainInstruction($"Editor failed to load data from database!")
+                    .SetContent(e.Message)
                     .SetIcon(MessageBoxIcon.Error)
                     .WithOkButton(true)
                     .Build());
-                IsLoading = false;
-                return false;
+                throw;
             }
-
-            solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
-            
-            entities.Do(e => e.RemoveAll());
-            entities.RemoveAll();
-            await InternalLoadData(data);
-            IsLoading = false;
-            return true;
         }
 
         private void LoadAndCreateCommands()
