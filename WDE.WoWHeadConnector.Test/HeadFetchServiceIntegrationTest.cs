@@ -42,7 +42,7 @@ namespace WDE.WoWHeadConnector.Test
         public async Task TestHexthralledSoldierMaster()
         {
             var abilities = await headService.FetchNpcAbilities(HeadSourceType.Master, 137134);
-            CollectionAssert.AreEquivalent(new uint[]{261827, 261828}, abilities.Select(a => a.SpellId));
+            CollectionAssert.AreEquivalent(new uint[]{224729, 261827, 261828}, abilities.Select(a => a.SpellId));
         }
 
         [Test]
