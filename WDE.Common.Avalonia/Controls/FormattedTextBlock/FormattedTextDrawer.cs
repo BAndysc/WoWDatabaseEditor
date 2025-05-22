@@ -38,7 +38,7 @@ namespace WDE.Common.Avalonia.Controls
                 wrapped = true;
             }
 
-            double alignedY = y + (lineHeight - ft.Height) + fontBaseLine - ft.Baseline;
+            double alignedY = y + (lineHeight - ft.Height);// + fontBaseLine - ft.Baseline;
             
             context.DrawText(ft, new Point(x, alignedY));
 
