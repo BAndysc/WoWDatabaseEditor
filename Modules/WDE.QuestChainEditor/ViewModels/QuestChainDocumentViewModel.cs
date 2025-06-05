@@ -278,6 +278,15 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                     .Select(x => x.EntryOrExclusiveGroupId)));
             }
         });
+        
+        CopyTitle = new DelegateCommand(() =>
+        {
+            if (SelectedItems.Count > 0)
+            {
+                clipboardService.SetText(string.Join(", ", SelectedItems.Where(x => x is QuestViewModel)
+                    .Select(x => ((QuestViewModel)x).Name)));
+            }
+        });
 
         ToggleExclusiveGroupTypeCommand = new DelegateCommand<ExclusiveGroupViewModel>(group =>
         {
@@ -1384,6 +1393,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
     public string Title => "Quest chain";
     public bool Resizeable => true;
     public ICommand Copy { get; }
+    public ICommand CopyTitle { get; }
     public ICommand Cut => AlwaysDisabledCommand.Command;
     public ICommand Paste => AlwaysDisabledCommand.Command;
     public IAsyncCommand Save { get; }

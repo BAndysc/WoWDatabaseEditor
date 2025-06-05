@@ -497,6 +497,10 @@
                                       InputGesture="Ctrl+C"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).Copy}" />
 
+                            <MenuItem Header="Copy title"
+                                      utils:MenuBind.Icon="Icons/icon_duplicate.png"
+                                      Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).CopyTitle}" />
+
                             <MenuItem Header="Open WowHead"
                                       utils:MenuBind.Icon="Icons/icon_head_red.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).OpenWowHeadCommand}"
