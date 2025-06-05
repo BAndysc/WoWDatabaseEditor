@@ -43,8 +43,8 @@ public class StandaloneQuestChainEditorViewModel : ObservableBase, IDialog, IWin
         }).WrapMessageBox<Exception>(messageBoxService);
         Accept = new AsyncAutoCommand(async () =>
         {
-            await ViewModel.Save.ExecuteAsync();
-            CloseOk?.Invoke();
+            //await ViewModel.Save.ExecuteAsync();
+            //CloseOk?.Invoke();
         });
         Cancel = NullCommand.Command; // do nothing on Escape, becuase this is a standalone editor, not a dialog
     }
