@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Newtonsoft.Json;
 using WDE.Common;
+using WDE.Common.Annotations;
 using WDE.Common.Database;
 using WDE.Common.Factories;
 using WDE.HttpDatabase.Models;
@@ -1418,6 +1419,16 @@ public class HttpDatabaseProviderImpl : IAsyncDatabaseProvider
             LOG.LogError(e);
             return Array.Empty<IQuestRelation>();
         }
+    }
+
+    public async Task<IReadOnlyList<IGarrisonMissionTemplate>> GetGarrisonMissionTemplates()
+    {
+        return Array.Empty<IGarrisonMissionTemplate>();
+    }
+
+    public async Task<IGarrisonMissionTemplate?> GetGarrisonMissionTemplate(int entry)
+    {
+        return null;
     }
 
     public IList<IPhaseName>? GetPhaseNames()

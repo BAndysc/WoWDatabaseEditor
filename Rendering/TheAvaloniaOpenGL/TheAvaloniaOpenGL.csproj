@@ -14,7 +14,7 @@
       <ProjectReference Include="..\TheMaths\TheMaths.csproj" />
     </ItemGroup>
 
-    <Import Project="..\..\avalonia.props" />
+    <Import Project="..\..\Avalonia.props" />
     <Import Project="..\lib3d.props" />
 
     <ItemGroup>

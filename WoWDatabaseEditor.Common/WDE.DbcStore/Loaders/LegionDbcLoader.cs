@@ -122,10 +122,10 @@ internal class LegionDbcLoader : BaseDbcLoader
         Load("ItemRandomSuffix.db2", 0, 1, data.ItemRandomSuffixStore);
         Load("ItemSet.db2", 0, 1, data.ItemSetStore);
         Load("LFGDungeons.db2", 0, 1, data.LFGDungeonStore);
-        Load("chrRaces.db2", 30, 2, data.RaceStore);
-        Load("achievement.db2", row => data.AchievementStore.Add(row.GetInt(12), row.GetString(0)));
-        Load("spell.db2", row => data.SpellStore.Add(row.Key, row.GetString(1)));
-        Load("chrClasses.db2", 19, 1, data.ClassStore);
+        Load("ChrRaces.db2", 30, 2, data.RaceStore);
+        Load("Achievement.db2", row => data.AchievementStore.Add(row.GetInt(12), row.GetString(0)));
+        Load("Spell.db2", row => data.SpellStore.Add(row.Key, row.GetString(1)));
+        Load("ChrClasses.db2", 19, 1, data.ClassStore);
 
         Load("Emotes.db2", row =>
         {
@@ -151,7 +151,7 @@ internal class LegionDbcLoader : BaseDbcLoader
                 data.HolidaysStore[id] = "Holiday " + id;
         });
         Load("Languages.db2", 1, 0, data.LanguageStore);
-        Load("MailTemplate.DB2", row =>
+        Load("MailTemplate.db2", row =>
         {
             var body = row.GetString(1);
             var name = body.TrimToLength(50);
