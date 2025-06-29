@@ -120,7 +120,11 @@ public partial class QuestChainDocumentView : UserControl
 
         rootViewModel.ShiftAltConnectionMessageVisible = false;
 
-        rootViewModel.PendingConnection.RequirementType = e.KeyModifiers == 0 ? QuestRequirementType.Completed : QuestRequirementType.Breadcrumb;
+        rootViewModel.PendingConnection.RequirementType = e.KeyModifiers == 0
+            ? ConnectionType.Completed
+            : (e.KeyModifiers == KeyModifiers.Control
+                ? ConnectionType.Breadcrumb
+                : ConnectionType.FactionChange);
     }
 
     private void OnEndConnectorOverride(object? sender, PendingConnectionConnectorOverrideEventArgs e)
@@ -128,8 +132,9 @@ public partial class QuestChainDocumentView : UserControl
         if (DataContext is not QuestChainDocumentViewModel vm)
             return;
 
-        // if pending connection is breadcrumb, then connection to group is not allowed, no matter if user holds shift or not
-        if (vm.PendingConnection.RequirementType == QuestRequirementType.Breadcrumb &&
+        // if pending connection is breadcrumb OR faction change, then connection to group is not allowed, no matter if user holds shift or not
+        if ((vm.PendingConnection.RequirementType == ConnectionType.Breadcrumb ||
+             vm.PendingConnection.RequirementType == ConnectionType.FactionChange) &&
                  e.PotentialConnector != null &&
                  e.PotentialConnector.DataContext is ExclusiveGroupViewModel)
         {
@@ -154,7 +159,7 @@ public partial class QuestChainDocumentView : UserControl
             }
 
             // connection to quest in group goes to the group unless pending connection is breadcrumb
-            if (vm.PendingConnection.RequirementType != QuestRequirementType.Breadcrumb &&
+            if (vm.PendingConnection.RequirementType != ConnectionType.Breadcrumb &&
                 e.PotentialConnector.DataContext is QuestViewModel qvm2 &&
                 qvm2.ExclusiveGroup != null &&
                 editor.ContainerFromItem(qvm2.ExclusiveGroup) is { } groupContainer &&

@@ -7,4 +7,5 @@ public interface IQuestChainEditorPreferences
 {
     bool AutoLayout { get; set; }
     bool NeverShowIncorrectDatabaseDataWarning { get; set; }
+    bool HideFactionChangeArrows { get; set; }
 }

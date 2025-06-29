@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using WDE.Common.Collections;
 using WDE.Common.Database;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.QuestChainEditor.Models;
 
@@ -31,6 +32,7 @@ public class QuestChainLoader : IQuestChainLoader
     {
         HashSet<uint> loaded = new();
         Queue<uint> toLoad = new();
+        Dictionary<uint, QuestModel> questModels = new();
         foreach (var entry in entries)
             toLoad.Enqueue(entry);
 
@@ -44,95 +46,147 @@ public class QuestChainLoader : IQuestChainLoader
         Dictionary<uint, int> questToExclusiveGroup = new();
         MultiDictionary<int, uint> exclusiveGroupToQuests = new();
 
-        while (toLoad.Count > 0)
+        async Task RecursiveLoad()
         {
-            var entry = toLoad.Dequeue();
-            if (!loaded.Add(entry))
-                continue;
-
-            var questModel = await quests.GetOrCreate(entry, source.GetTemplate);
-            token.ThrowIfCancellationRequested();
-            var template = questModel.Template;
-
-            if (template.PrevQuestId != 0)
+            while (toLoad.Count > 0)
             {
-                if (Math.Abs(template.PrevQuestId) == template.Entry)
-                    nonFatalErrors?.Add($"Quest {template.Entry} has itself as previous quest. Ignoring.");
-                else if (template.PrevQuestId > 0)
-                    mustBeCompleted.Add(template.Entry, (uint)template.PrevQuestId);
-                else if (template.PrevQuestId < 0)
-                    mustBeActive.Add(template.Entry, (uint)(-template.PrevQuestId));
+                var entry = toLoad.Dequeue();
+                if (!loaded.Add(entry))
+                    continue;
 
-                toLoad.Enqueue((uint)Math.Abs(template.PrevQuestId));
-            }
-
-            if (template.NextQuestId != 0)
-            {
-                if (Math.Abs(template.NextQuestId) == template.Entry)
-                    nonFatalErrors?.Add($"Quest {template.Entry} has itself as next quest. Ignoring.");
-                else if (template.NextQuestId > 0)
-                    mustBeCompleted.Add((uint)template.NextQuestId, template.Entry);
-                else if (template.NextQuestId < 0)
-                    mustBeActive.Add((uint)(-template.NextQuestId), template.Entry);
-                toLoad.Enqueue((uint)Math.Abs(template.NextQuestId));
-            }
-
-            if (template.BreadcrumbForQuestId != 0)
-            {
-                if (Math.Abs(template.BreadcrumbForQuestId) == template.Entry)
-                    nonFatalErrors?.Add($"Quest {template.Entry} has itself as breadcrumb quest. Ignoring.");
-                else if (template.BreadcrumbForQuestId > 0)
-                    breadcrumbs.Add((uint)template.BreadcrumbForQuestId, template.Entry);
-                else if (template.BreadcrumbForQuestId < 0)
-                {
-                    nonFatalErrors?.Add($"Quest {template.Entry} has negative breadcrumb quest id {template.BreadcrumbForQuestId}. Not sure what it is supposed to mean. Changed to positive breadcrumb quest id.");
-                    breadcrumbs.Add((uint)-template.BreadcrumbForQuestId, template.Entry);
-                    //throw new Exception("BreadcrumbForQuestId < 0 this is not legal");
-                }
-                toLoad.Enqueue((uint)Math.Abs(template.BreadcrumbForQuestId));
-            }
-
-            if (template.ExclusiveGroup != 0)
-            {
-                if (template.ExclusiveGroup > 0)
-                    orGroups.Add((uint)template.ExclusiveGroup, template.Entry);
-                else if (template.ExclusiveGroup < 0)
-                    andGroups.Add((uint)(-template.ExclusiveGroup), template.Entry);
-                questToExclusiveGroup[template.Entry] = template.ExclusiveGroup;
-                exclusiveGroupToQuests.Add(template.ExclusiveGroup, template.Entry);
-            }
-
-            var byPrevious = await source.GetByPreviousQuestId(entry);
-            token.ThrowIfCancellationRequested();
-            foreach (var next in byPrevious)
-            {
-                toLoad.Enqueue(next.Entry);
-            }
-
-            var byNext = await source.GetByNextQuestId(entry);
-            token.ThrowIfCancellationRequested();
-            foreach (var next in byNext)
-            {
-                toLoad.Enqueue(next.Entry);
-            }
-
-            if (template.ExclusiveGroup != 0)
-            {
-                var byExclusiveGroup = await source.GetByExclusiveGroup(template.ExclusiveGroup);
+                var questModel = await quests.GetOrCreate(entry, source.GetTemplate);
+                questModels[questModel.Entry] = questModel;
                 token.ThrowIfCancellationRequested();
-                foreach (var next in byExclusiveGroup)
+                var template = questModel.Template;
+
+                if (template.PrevQuestId != 0)
+                {
+                    if (Math.Abs(template.PrevQuestId) == template.Entry)
+                        nonFatalErrors?.Add($"Quest {template.Entry} has itself as previous quest. Ignoring.");
+                    else if (template.PrevQuestId > 0)
+                        mustBeCompleted.Add(template.Entry, (uint)template.PrevQuestId);
+                    else if (template.PrevQuestId < 0)
+                        mustBeActive.Add(template.Entry, (uint)(-template.PrevQuestId));
+
+                    toLoad.Enqueue((uint)Math.Abs(template.PrevQuestId));
+                }
+
+                if (template.NextQuestId != 0)
+                {
+                    if (Math.Abs(template.NextQuestId) == template.Entry)
+                        nonFatalErrors?.Add($"Quest {template.Entry} has itself as next quest. Ignoring.");
+                    else if (template.NextQuestId > 0)
+                        mustBeCompleted.Add((uint)template.NextQuestId, template.Entry);
+                    else if (template.NextQuestId < 0)
+                        mustBeActive.Add((uint)(-template.NextQuestId), template.Entry);
+                    toLoad.Enqueue((uint)Math.Abs(template.NextQuestId));
+                }
+
+                if (template.BreadcrumbForQuestId != 0)
+                {
+                    if (Math.Abs(template.BreadcrumbForQuestId) == template.Entry)
+                        nonFatalErrors?.Add($"Quest {template.Entry} has itself as breadcrumb quest. Ignoring.");
+                    else if (template.BreadcrumbForQuestId > 0)
+                        breadcrumbs.Add((uint)template.BreadcrumbForQuestId, template.Entry);
+                    else if (template.BreadcrumbForQuestId < 0)
+                    {
+                        nonFatalErrors?.Add($"Quest {template.Entry} has negative breadcrumb quest id {template.BreadcrumbForQuestId}. Not sure what it is supposed to mean. Changed to positive breadcrumb quest id.");
+                        breadcrumbs.Add((uint)-template.BreadcrumbForQuestId, template.Entry);
+                        //throw new Exception("BreadcrumbForQuestId < 0 this is not legal");
+                    }
+                    toLoad.Enqueue((uint)Math.Abs(template.BreadcrumbForQuestId));
+                }
+
+                if (template.ExclusiveGroup != 0)
+                {
+                    if (template.ExclusiveGroup > 0)
+                        orGroups.Add((uint)template.ExclusiveGroup, template.Entry);
+                    else if (template.ExclusiveGroup < 0)
+                        andGroups.Add((uint)(-template.ExclusiveGroup), template.Entry);
+                    questToExclusiveGroup[template.Entry] = template.ExclusiveGroup;
+                    exclusiveGroupToQuests.Add(template.ExclusiveGroup, template.Entry);
+                }
+
+                var byPrevious = await source.GetByPreviousQuestId(entry);
+                token.ThrowIfCancellationRequested();
+                foreach (var next in byPrevious)
+                {
+                    toLoad.Enqueue(next.Entry);
+                }
+
+                var byNext = await source.GetByNextQuestId(entry);
+                token.ThrowIfCancellationRequested();
+                foreach (var next in byNext)
+                {
+                    toLoad.Enqueue(next.Entry);
+                }
+
+                if (template.ExclusiveGroup != 0)
+                {
+                    var byExclusiveGroup = await source.GetByExclusiveGroup(template.ExclusiveGroup);
+                    token.ThrowIfCancellationRequested();
+                    foreach (var next in byExclusiveGroup)
+                    {
+                        toLoad.Enqueue(next.Entry);
+                    }
+                }
+
+                var byBreadcrumb = await source.GetByBreadCrumbQuestId(entry);
+                token.ThrowIfCancellationRequested();
+                foreach (var next in byBreadcrumb)
                 {
                     toLoad.Enqueue(next.Entry);
                 }
             }
-
-            var byBreadcrumb = await source.GetByBreadCrumbQuestId(entry);
-            token.ThrowIfCancellationRequested();
-            foreach (var next in byBreadcrumb)
-            {
-                toLoad.Enqueue(next.Entry);
-            }
         }
+
+        await RecursiveLoad();
+
+        var factionOpposite = await source.GetQuestFactionChange(loaded.ToArray());
+        Dictionary<uint, IQuestTemplate> allianceToHorde = new();
+        factionOpposite.Each(pair =>
+        {
+            if (allianceToHorde.TryGetValue(pair.AllianceQuest.Entry, out var hordeQuest))
+            {
+                nonFatalErrors?.Add($"Quest '{pair.AllianceQuest.Name}' ({pair.AllianceQuest.Entry}) already has a horde counterpart '{hordeQuest.Name}' ({hordeQuest.Entry}). Ignoring this pair, using '{pair.HordeQuest.Name}' ({pair.HordeQuest.Entry}) instead.");
+            }
+            allianceToHorde[pair.AllianceQuest.Entry] = pair.HordeQuest;
+        });
+
+        foreach (var (alliance, horde) in allianceToHorde)
+        {
+            toLoad.Enqueue(alliance);
+            toLoad.Enqueue(horde.Entry);
+        }
+
+        await RecursiveLoad();
+
+        factionOpposite.Each(pair =>
+        {
+            if (questModels.TryGetValue(pair.AllianceQuest.Entry, out var allianceQuest) &&
+                questModels.TryGetValue(pair.HordeQuest.Entry, out var hordeQuest))
+            {
+                // override with the last value
+                if (allianceQuest.OtherFactionQuest.HasValue &&
+                    allianceQuest.OtherFactionQuest.Value.Id != pair.HordeQuest.Entry)
+                {
+                    if (questModels.TryGetValue(allianceQuest.OtherFactionQuest.Value.Id, out var previousQuestModel))
+                        previousQuestModel.OtherFactionQuest = null;
+                }
+                if (hordeQuest.OtherFactionQuest.HasValue &&
+                    hordeQuest.OtherFactionQuest.Value.Id != pair.AllianceQuest.Entry)
+                {
+                    if (questModels.TryGetValue(hordeQuest.OtherFactionQuest.Value.Id, out var previousQuestModel))
+                        previousQuestModel.OtherFactionQuest = null;
+                }
+                allianceQuest.OtherFactionQuest = new OtherFactionQuest(pair.HordeQuest.Entry, OtherFactionQuest.Hint.Horde);
+                hordeQuest.OtherFactionQuest = new OtherFactionQuest(pair.AllianceQuest.Entry, OtherFactionQuest.Hint.Alliance);
+            }
+            else
+            {
+                nonFatalErrors?.Add($"Quest '{pair.AllianceQuest.Name}' ({pair.AllianceQuest.Entry}) or '{pair.HordeQuest.Name}' ({pair.HordeQuest.Entry}) not found in the loaded quest chain. Ignoring this pair.");
+            }
+        });
 
         List<(uint, uint)> toRemove = new List<(uint, uint)>();
         foreach (var quest in breadcrumbs.Keys)

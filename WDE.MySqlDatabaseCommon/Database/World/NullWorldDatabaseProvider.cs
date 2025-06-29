@@ -187,6 +187,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public async Task<IGarrisonMissionTemplate?> GetGarrisonMissionTemplate(int entry) => null;
 
+        public async Task<IReadOnlyList<IQuestFactionChange>> GetQuestFactionChanges() => [];
         public ISceneTemplate? GetSceneTemplate(uint sceneId) => null;
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => Task.FromResult<ISceneTemplate?>(null);
         public Task<IReadOnlyList<ISceneTemplate>?> GetSceneTemplatesAsync() => Task.FromResult<IReadOnlyList<ISceneTemplate>?>(null);

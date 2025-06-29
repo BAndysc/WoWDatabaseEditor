@@ -32,6 +32,16 @@ public class QuestChainEditorPreferences : IQuestChainEditorPreferences
         }
     }
 
+    public bool HideFactionChangeArrows
+    {
+        get => data.HideFactionChangeArrows;
+        set
+        {
+            data.HideFactionChangeArrows = value;
+            Save();
+        }
+    }
+
     private void Save()
     {
         userSettings.Update(data);
@@ -50,6 +60,8 @@ public class QuestChainEditorPreferences : IQuestChainEditorPreferences
         [DefaultValue(true)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public bool AutoLayout { get; set; } = true;
+
+        public bool HideFactionChangeArrows { get; set; } = false;
 
         public bool NeverShowIncorrectDatabaseDataWarning { get; set; }
     }

@@ -83,7 +83,7 @@ public class AutomaticGraphLayouter : IAutomaticGraphLayouter
                 AddNode(subGroup, GetNodeOrParentGroup(node));
             }
 
-            foreach (var conn in connections)
+            foreach (var conn in connections.Where(c => c.RequirementType != ConnectionType.FactionChange))
             {
                 if (conn.FromNode != null && conn.ToNode != null)
                 {
@@ -163,6 +163,9 @@ public class AutomaticGraphLayouter : IAutomaticGraphLayouter
 
                 foreach (var connection in node.Connector.Connections)
                 {
+                    if (connection.RequirementType == ConnectionType.FactionChange)
+                        continue;
+
                     if (connection.FromNode == null || connection.ToNode == null)
                         continue;
 
@@ -183,6 +186,9 @@ public class AutomaticGraphLayouter : IAutomaticGraphLayouter
                     {
                         foreach (var connection in quest.Connector.Connections)
                         {
+                            if (connection.RequirementType == ConnectionType.FactionChange)
+                                continue;
+
                             if (connection.FromNode == null || connection.ToNode == null)
                                 continue;
 
