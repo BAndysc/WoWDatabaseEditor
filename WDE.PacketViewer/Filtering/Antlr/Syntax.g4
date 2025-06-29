@@ -16,7 +16,7 @@ expr
     | 'false'                               # EFalse
     | INT                                   # EInt
     | STRING                   #EStr
-    | '!' expr                         # ENegate
+    | ('!' | 'not' | 'NOT' ) expr   # ENegate
     | expr '*' expr                 # EMulOp
     | expr '/' expr                 # EDivOp
     | expr '+' expr                 # EPlusOp

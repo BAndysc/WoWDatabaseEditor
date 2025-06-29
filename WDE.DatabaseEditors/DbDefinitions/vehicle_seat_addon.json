@@ -1,7 +1,8 @@
 {
   "id": "vehicle_seat_addon",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath",
+    "TrinityMaster"
   ],
   "name": "Vehicle Seat Addon",
   "single_solution_name": "Vehicle Seat Addon Table",
@@ -59,7 +60,7 @@
         {
           "name": "Exit Param Value",
           "db_column_name": "ExitParamValue",
-          "value_type": "int",
+          "value_type": "VehicleExitPositionParameter",
           "can_be_null": true
         }
       ]

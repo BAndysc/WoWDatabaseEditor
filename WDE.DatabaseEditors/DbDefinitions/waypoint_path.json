@@ -1,0 +1,64 @@
+{
+  "compatibility": [
+    "TrinityMaster"
+  ],
+  "name": "Waypoint Path",
+  "single_solution_name": "Waypoint Path Table",
+  "multi_solution_name": "Waypoint Path Table",
+  "description": "Use to define paths for npcs",
+  "table_name": "waypoint_path",
+  "table_index_name": "PathId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Waypoints",
+  "icon_path": "Icons/document_waypoints.png",
+  "reload_command": "reload waypoint_path",
+  "primary_key": [
+    "PathId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Path Id",
+          "db_column_name": "PathId",
+          "value_type": "uint",
+          "read_only": true,
+          "preferred_width": 106.0
+        },
+        {
+          "name": "Move Type",
+          "db_column_name": "MoveType",
+          "value_type": "WaypointPathMoveTypeParameter",
+          "preferred_width": 88.0
+        },
+        {
+          "name": "Nodes",
+          "meta": "tableByKey:waypoint_path_node;PathId",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "Flags",
+          "value_type": "WaypointPathFlagsParameter",
+          "zero_is_blank": true,
+          "preferred_width": 306.0
+        },
+        {
+          "name": "Velocity",
+          "db_column_name": "Velocity",
+          "value_type": "float",
+          "can_be_null": true,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comment",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

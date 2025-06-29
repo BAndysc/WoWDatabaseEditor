@@ -107,5 +107,16 @@ internal class RetailDbcLoader : BaseDbcLoader
         LoadDB2("TaxiPath.db2",  row => data.TaxiPathsStore.Add(row.ID, (row.Field<int>("FromTaxiNode"), row.Field<int>("ToTaxiNode"))));
         LoadDB2("PhaseXPhaseGroup.db2", row => data.PhaseXPhaseGroup.Add(new (row.ID, row.Field<ushort>("PhaseID"), row.Field<int>("PhaseGroupID"))));
         LoadDB2("Phase.db2", row => data.PhaseStore[row.ID] = $"Phase {row.ID}");
+        LoadDB2("Vehicle.db2", row =>
+        {
+            var veh = new Vehicle()
+            {
+                Id = (uint)row.ID,
+            };
+            var seats = row.Field<ushort[]>("SeatID");
+            for (int i = 0; i < IVehicle.MaxSeats; ++i)
+                veh.Seats[i] = seats[i];
+            data.Vehicles.Add(veh);
+        });
     }
 }

@@ -2096,7 +2096,7 @@
 			"19": {"name": "Use Art Kit 0"},
 			"20": {"name": "Use Art Kit 1"},
 			"21": {"name": "Use Art Kit 2"},
-			"22": {"name": "Use Art Kit 3"},
+			"22": {"name": "Use Art Kit 3"}
 			//"23": {"name": "Set Tap List"}
 		}
 	},
@@ -3545,6 +3545,42 @@
 			"0": "tank",
 			"1": "healer",
 			"2": "damage"
+		}
+	},
+	"WaypointPathMoveTypeParameter": {
+		"values": {
+			"0": "Walk",
+			"1": "Run",
+			"2": "Fly",
+			"3": "Land",
+			"4": "Take off"
+		}
+	},
+	"WaypointPathFlagsParameter": {
+		"isflag": true,
+		"values": {
+			"0": "None",
+			"1": "Follow Path Backwards From End To Start",
+			"2": "Exact Spline Path"
+		}
+	},
+	"VehicleSeatIndexParameter": {
+		"values": {
+			"0": "seat 0",
+			"1": "seat 1",
+			"2": "seat 2",
+			"3": "seat 3",
+			"4": "seat 4",
+			"5": "seat 5",
+			"6": "seat 6",
+			"7": "seat 7"
+		}
+	},
+	"VehicleExitPositionParameter": {
+		"values": {
+			"0": "None",
+			"1": "Relative offset",
+			"2": "Absolute destination"
 		}
 	}
 }

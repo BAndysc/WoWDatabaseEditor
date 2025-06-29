@@ -1,7 +1,7 @@
 {
     "id": "spell_target_position",
     "compatibility": [
-      "TrinityWrath", "TrinityCata"
+      "TrinityWrath", "TrinityCata", "TrinityMaster"
     ],
     "name": "Spell Target Position",
     "single_solution_name": "{name} target position editor",

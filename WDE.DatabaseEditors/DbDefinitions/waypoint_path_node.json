@@ -1,0 +1,64 @@
+{
+  "compatibility": [
+    "TrinityMaster"
+  ],
+  "name": "Waypoint Path Node",
+  "single_solution_name": "{key} Path Waypoints",
+  "multi_solution_name": "Multiple Paths Waypoints",
+  "description": "Use for defining paths for npcs",
+  "table_name": "waypoint_path_node",
+  "table_index_name": "PathId",
+  "record_mode": "MultiRecord",
+  "skip_quick_load": true,
+  "group_name": "Waypoints",
+  "icon_path": "Icons/document_waypoints2.png",
+  "reload_command": "reload waypoint_path",
+  "primary_key": [
+    "PathId",
+    "NodeId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Path Id",
+          "db_column_name": "PathId",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Node Id",
+          "db_column_name": "NodeId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "PositionX",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "PositionY",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "PositionZ",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "Orientation",
+          "value_type": "float",
+          "can_be_null": true
+        },
+        {
+          "name": "Delay",
+          "db_column_name": "Delay",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}
