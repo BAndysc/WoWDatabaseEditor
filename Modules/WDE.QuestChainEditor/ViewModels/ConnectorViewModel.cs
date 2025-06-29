@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using Avalonia;
+using DynamicData.Binding;
 using WDE.MVVM;
 
 namespace WDE.QuestChainEditor.ViewModels;
@@ -9,15 +11,19 @@ public class ConnectorViewModel : ObservableBase
     public ConnectorViewModel(BaseQuestViewModel node)
     {
         Node = node;
-        Connections = new ObservableCollection<ConnectionViewModel>();
-        Connections.CollectionChanged += (e, w) => { RaisePropertyChanged(nameof(NonEmpty)); };
+        Connections = new ObservableCollectionExtended<ConnectionViewModel>();
+        Connections.CollectionChanged += (e, w) =>
+        {
+            RaisePropertyChanged(nameof(NonEmpty));
+            RaisePropertyChanged(nameof(Empty));
+        };
     }
 
-    public ObservableCollection<ConnectionViewModel> Connections { get; }
+    public ObservableCollectionExtended<ConnectionViewModel> Connections { get; }
 
-    public bool NonEmpty => Connections.Count != 0;
+    public bool NonEmpty => Connections.Count(c => c.RequirementType != ConnectionType.FactionChange) > 0;
 
-    public bool Empty => Connections.Count == 0;
+    public bool Empty => !NonEmpty;
 
     public BaseQuestViewModel Node { get; }
 

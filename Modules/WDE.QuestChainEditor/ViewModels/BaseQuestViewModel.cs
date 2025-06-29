@@ -3,9 +3,9 @@ using System.Linq;
 using System.Numerics;
 using Avalonia;
 using PropertyChanged.SourceGenerator;
+using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.QuestChainEditor.Models;
-using WDE.QuestChainEditor.Services;
 
 namespace WDE.QuestChainEditor.ViewModels;
 
@@ -18,6 +18,7 @@ public abstract partial class BaseQuestViewModel : ObservableBase
     [Notify] private Point anchor;
     [Notify] private double perfectX;
     [Notify] private double perfectY;
+    [Notify] private bool isHighlighted;
 
     private Rect bounds;
     private Point location;
@@ -87,13 +88,25 @@ public abstract partial class BaseQuestViewModel : ObservableBase
 
     public IEnumerable<(BaseQuestViewModel prerequisite, QuestRequirementType requirementType, ConnectionViewModel conn)> Prerequisites =>
         Connector.Connections.Where(conn => conn.ToNode == this && conn.FromNode != null)
-            .Select(x => (x.FromNode!, x.RequirementType, x))
+            .Where(x => x.RequirementType != ConnectionType.FactionChange)
+            .Select(x => (x.FromNode!, x.RequirementType.ToRequirementType(), x))
             .ToList();
 
     public IEnumerable<(BaseQuestViewModel requirementFor, QuestRequirementType requirementType, ConnectionViewModel conn)> RequirementFor =>
         Connector.Connections.Where(conn => conn.FromNode == this && conn.ToNode != null)
-            .Select(x => (x.ToNode!, x.RequirementType, x))
+            .Where(x => x.RequirementType != ConnectionType.FactionChange)
+            .Select(x => (x.ToNode!, x.RequirementType.ToRequirementType(), x))
             .ToList();
+
+    public (QuestViewModel quest, ConnectionViewModel conn)? FactionChange =>
+        Connector.Connections.Where(conn =>
+                (conn.FromNode == this && conn.ToNode != null ||
+                 conn.ToNode == this && conn.FromNode != null)
+                && conn.RequirementType == ConnectionType.FactionChange)
+            .FirstOrDefaultMap<ConnectionViewModel, (QuestViewModel quest, ConnectionViewModel conn)?>
+                (x => (x.FromNode == this ? (QuestViewModel)x.ToNode! : (QuestViewModel)x.FromNode!, x));
+
+    public QuestViewModel? OtherFactionQuest => FactionChange?.quest;
 
     public abstract int EntryOrExclusiveGroupId { get; }
 
@@ -103,5 +116,13 @@ public abstract partial class BaseQuestViewModel : ObservableBase
         Connector = AddConnector();
         //RequiresConnector = AddInputConnector();
         //IsRequiredByConnector = AddOutputConnector();
+
+        Connector.Connections.CollectionChanged += (e, w) =>
+        {
+            RaisePropertyChanged(nameof(Prerequisites));
+            RaisePropertyChanged(nameof(RequirementFor));
+            RaisePropertyChanged(nameof(FactionChange));
+            RaisePropertyChanged(nameof(OtherFactionQuest));
+        };
     }
 }

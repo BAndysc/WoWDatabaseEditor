@@ -11,4 +11,5 @@ public interface IQuestTemplateSource
     public Task<IEnumerable<IQuestTemplate>> GetByPreviousQuestId(uint previous);
     public Task<IEnumerable<IQuestTemplate>> GetByNextQuestId(uint previous);
     public Task<IEnumerable<IQuestTemplate>> GetByBreadCrumbQuestId(uint questId);
+    public Task<IReadOnlyList<(IQuestTemplate AllianceQuest, IQuestTemplate HordeQuest)>> GetQuestFactionChange(uint[] questIds);
 }

@@ -149,6 +149,8 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId);
         Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId);
 
+        Task<IReadOnlyList<IQuestFactionChange>> GetQuestFactionChanges() => Task.FromResult<IReadOnlyList<IQuestFactionChange>>([]);
+
         // @todo: make it async one day
         IList<IPhaseName>? GetPhaseNames();
 

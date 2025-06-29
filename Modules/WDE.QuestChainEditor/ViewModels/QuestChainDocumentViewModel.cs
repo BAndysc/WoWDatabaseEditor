@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
@@ -34,6 +36,7 @@ using WDE.QuestChainEditor.GraphLayouting.ViewModels;
 using WDE.QuestChainEditor.Models;
 using WDE.QuestChainEditor.QueryGenerators;
 using WDE.QuestChainEditor.Services;
+using WDE.QuestChainEditor.Views;
 using WDE.SqlQueryGenerator;
 
 namespace WDE.QuestChainEditor.ViewModels;
@@ -69,6 +72,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
 
     public ObservableCollectionExtended<BaseQuestViewModel> Elements { get; } = new();
     public ObservableCollectionExtended<ConnectionViewModel> Connections { get; } = new();
+    public ObservableCollection<ConnectionViewModel> VisibleConnections { get; } = new();
     public ObservableCollectionExtended<ConnectionViewModel> SelectedConnections { get; } = new();
     public ObservableCollectionExtended<BaseQuestViewModel> SelectedItems { get; } = new();
 
@@ -184,6 +188,45 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
             .Where(x => x.Value != null && x.Value.Count > 0)
             .SafeToDictionary(x => x.Key, x => (IReadOnlyList<ICondition>)x.Value.Select(c => (ICondition)c).ToList());
         autoLayout = userPreferences.AutoLayout;
+        hideFactionChangeArrows = userPreferences.HideFactionChangeArrows;
+
+        Connections.ToStream(false)
+            .Subscribe(change =>
+            {
+                if (change.Type == CollectionEventType.Add)
+                {
+                    if (!hideFactionChangeArrows || change.Item.RequirementType != ConnectionType.FactionChange)
+                        VisibleConnections.Add(change.Item);
+                }
+                else if (change.Type == CollectionEventType.Remove)
+                {
+                    VisibleConnections.Remove(change.Item);
+                }
+            });
+        this.ToObservable(() => HideFactionChangeArrows)
+            .Subscribe(hideFactionChangeArrows =>
+            {
+                if (hideFactionChangeArrows)
+                {
+                    foreach (var conn in VisibleConnections.ToList())
+                    {
+                        if (conn.RequirementType == ConnectionType.FactionChange)
+                            VisibleConnections.Remove(conn);
+                    }
+                }
+                else
+                {
+                    var connSet = new HashSet<ConnectionViewModel>(VisibleConnections);
+                    foreach (var conn in Connections)
+                    {
+                        if (conn.RequirementType == ConnectionType.FactionChange)
+                        {
+                            if (!connSet.Contains(conn))
+                                VisibleConnections.Add(conn);
+                        }
+                    }
+                }
+            });
 
         if (sessionService.CurrentSession is { } currentSession &&
             !sessionService.IsPaused)
@@ -217,6 +260,8 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
 
         layoutSettingsViewModel.SettingsChanged += RelayoutGraph;
         AutoDispose(new ActionDisposable(() => layoutSettingsViewModel.SettingsChanged -= RelayoutGraph));
+
+        SelectedItems.CollectionChanged += (_, __) => UpdateIsHighlighted();
 
         History.OnRedo += () =>
         {
@@ -511,17 +556,17 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
 
         CreateConnectionCommand = new AsyncAutoCommand(async () =>
         {
-            if (PendingConnection.To == null)
+            var to = PendingConnection.To;
+            if (to == null)
             {
                 var quest = await PickQuest();
                 if (!quest.HasValue)
                     return;
 
-                var vm = await LoadQuestWithDependencies(quest.Value, PendingConnection.TargetLocation, false);
-                AddConnection(PendingConnection.From!, vm, PendingConnection.RequirementType);
+                to = await LoadQuestWithDependencies(quest.Value, PendingConnection.TargetLocation, false);
             }
-            else
-               AddConnection(PendingConnection.From!, PendingConnection.To!, PendingConnection.RequirementType);
+
+            AddConnection(PendingConnection.From!, to, PendingConnection.RequirementType);
         }, () => PendingConnection.From != null && PendingConnection.From != PendingConnection.To);
 
         DeleteSelectedExclusiveGroupsCommand = new DelegateCommand(() =>
@@ -669,6 +714,16 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
         RaisePropertyChanged(nameof(IsPickingQuest));
     }
 
+    public void UpdateIsHighlighted()
+    {
+        foreach (var quest in Elements.Where(x => x is QuestViewModel).Cast<QuestViewModel>())
+        {
+            quest.IsHighlighted = quest.FactionChange is {} factionChange &&
+                                  !SelectedItems.Contains(quest) &&
+                                  SelectedItems.Contains(factionChange.quest);
+        }
+    }
+
     public async Task<QuestViewModel> LoadQuestWithDependencies(uint quest, Point targetLocation, bool navigateToQuest)
     {
         if (entryToQuest.TryGetValue(quest, out var existingQuestViewModel))
@@ -752,13 +807,13 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                             {
                                 if (group.RequirementFor.All(conn => conn.Item1 != viewModel))
                                 {
-                                    var connection = new ConnectionViewModel(type, group, viewModel);
+                                    var connection = new ConnectionViewModel(type.ToConnectionType(), group, viewModel);
                                     addedConnections.Add(connection);
                                 }
                             }
                             else
                             {
-                                var connection = new ConnectionViewModel(type, requiredQuest, viewModel);
+                                var connection = new ConnectionViewModel(type.ToConnectionType(), requiredQuest, viewModel);
                                 addedConnections.Add(connection);
                             }
                         }
@@ -806,10 +861,34 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                             }
                         }
 
-                        var connectionToGroup = new ConnectionViewModel(requires.Item2, originalFrom, groupViewModel);
+                        var connectionToGroup = new ConnectionViewModel(requires.Item2.ToConnectionType(), originalFrom, groupViewModel);
                         addedConnections.Add(connectionToGroup);
                     }
                 }
+            }
+
+            foreach (var quest in questStore)
+            {
+                if (quest.OtherFactionQuest is not {} otherFactionQuest)
+                    continue;
+
+                var questVm = GetOrCreate(quest.Template);
+                var otherQuestVm = GetOrCreate(questStore[otherFactionQuest.Id].Template);
+
+                if (otherQuestVm.OtherFactionQuest is {} otherOtherQuest)
+                {
+                    Debug.Assert(otherOtherQuest.Entry == questVm.Entry);
+                    continue;
+                }
+
+                if (questVm.OtherFactionQuest is { } otherQuest)
+                {
+                    Debug.Assert(otherQuest.Entry == otherQuestVm.Entry);
+                    continue;
+                }
+
+                var conn = new ConnectionViewModel(ConnectionType.FactionChange, questVm, otherQuestVm);
+                addedConnections.Add(conn);
             }
 
             foreach (var group in addedQuests.OfType<ExclusiveGroupViewModel>())
@@ -830,7 +909,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
             foreach (var q in questStore)
             {
                 if (!existingData.ContainsKey(q.Entry))
-                    newExistingData.Add(new ChainRawData(q.Template));
+                    newExistingData.Add(new ChainRawData(q.Template, q.OtherFactionQuest));
                 if (!existingConditions.ContainsKey(q.Entry) && q.Conditions.Count > 0)
                     newExistingConditions.Add((q.Entry, q.Conditions));
             }
@@ -964,6 +1043,70 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
         }
     }
 
+    // based on prerequisites finds faction for the quest
+    OtherFactionQuest.Hint FindFactionHintFor(BaseQuestViewModel vm)
+    {
+        OtherFactionQuest.Hint GetQuestHint(QuestViewModel qvm)
+        {
+            var isOnlyHorde = qvm.Races != 0 && (qvm.Races & CharacterRaces.AllAlliance) == 0;
+            var isOnlyAlliance = qvm.Races != 0 && (qvm.Races & CharacterRaces.AllHorde) == 0;
+            if (isOnlyHorde)
+                return OtherFactionQuest.Hint.Horde;
+            if (isOnlyAlliance)
+                return OtherFactionQuest.Hint.Alliance;
+            return OtherFactionQuest.Hint.None;
+        }
+        if (vm is QuestViewModel qvm && GetQuestHint(qvm) is {} hint && hint != OtherFactionQuest.Hint.None)
+        {
+            return hint;
+        }
+        else if (vm is ExclusiveGroupViewModel groupVm && groupVm.Quests.Count > 0)
+        {
+            OtherFactionQuest.Hint? hint_ = null;
+            foreach (var quest in groupVm.Quests)
+            {
+                var questHint = FindFactionHintFor(quest);
+                if (hint_ == null)
+                {
+                    hint_ = questHint;
+                }
+                else if (hint_ != questHint)
+                {
+                    hint_ = null;
+                    break;
+                }
+            }
+            if (hint_ != null && hint_ != OtherFactionQuest.Hint.None)
+            {
+                return hint_.Value;
+            }
+        }
+
+        OtherFactionQuest.Hint? hint__ = null;
+        var prerequisites = vm.Prerequisites;
+        if (vm is QuestViewModel questViewModel && questViewModel.ExclusiveGroup is { } partOfGroup)
+        {
+            prerequisites = prerequisites.Concat(partOfGroup.Prerequisites);
+        }
+        foreach (var preReq in prerequisites)
+        {
+            if (preReq.requirementType == QuestRequirementType.Completed)
+            {
+                var preReqHint = FindFactionHintFor(preReq.prerequisite);
+                if (hint__ == null)
+                {
+                    hint__ = preReqHint;
+                }
+                else if (hint__ != preReqHint)
+                {
+                    hint__ = null;
+                    break;
+                }
+            }
+        }
+        return hint__ ?? OtherFactionQuest.Hint.None;
+    }
+
     internal async Task<QuestStore> BuildCurrentQuestStore()
     {
         RefreshProblems();
@@ -982,6 +1125,8 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                 var model = await store.GetOrCreate(quest.Entry, questTemplateSource.GetTemplate);
                 model.AllowableRaces = quest.Races;
                 model.AllowableClasses = quest.Classes;
+                model.OtherFactionQuest = quest.FactionChange is {} fc ? new OtherFactionQuest(fc.Item1.Entry, FindFactionHintFor(fc.quest)) : null;
+
                 if (quest.HasConditions)
                     model.Conditions = quest.Conditions;
 
@@ -1125,7 +1270,8 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
         return false;
     }
 
-    private List<ConnectionViewModel>? GetConflictingConnections(BaseQuestViewModel from, BaseQuestViewModel to)
+    private List<ConnectionViewModel>? GetConflictingConnections(BaseQuestViewModel from, BaseQuestViewModel to,
+        ConnectionType requirementType)
     {
         List<ConnectionViewModel>? conflicting = null;
 
@@ -1147,6 +1293,21 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
                 conflicting ??= new();
                 conflicting.Add(conn);
             }
+        }
+
+        if (requirementType == ConnectionType.FactionChange)
+        {
+             // if there is any faction change for either quest, then it conflicts with potential new From -> To
+             if (from.FactionChange is { } existing)
+             {
+                 conflicting ??= new();
+                conflicting.Add(existing.Item2);
+             }
+             if (to.FactionChange is { } existing2)
+             {
+                 conflicting ??= new();
+                 conflicting.Add(existing2.Item2);
+             }
         }
 
         return conflicting;
@@ -1303,14 +1464,46 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
             }
         }
 
+        void CheckFactionChange()
+        {
+            foreach (var quest in Elements
+                         .Where(e => e is QuestViewModel)
+                         .Cast<QuestViewModel>())
+            {
+                if (quest.OtherFactionQuest is not { } other)
+                    continue;
+
+                var thisQuestHint = Check(quest);
+                var otherQuestHint = Check(other);
+                if (thisQuestHint != OtherFactionQuest.Hint.None &&
+                    otherQuestHint != OtherFactionQuest.Hint.None &&
+                    thisQuestHint == otherQuestHint)
+                {
+                    AddProblem($"Quest {quest} has a faction change connection to {other}, but they have same faction requirements: {thisQuestHint} and {otherQuestHint}.", quest, other);
+                }
+            }
+            OtherFactionQuest.Hint Check(QuestViewModel quest)
+            {
+                var hint = FindFactionHintFor(quest);
+                if (hint == OtherFactionQuest.Hint.None)
+                {
+                    AddProblem($"Unable to determine faction requirement for quest {quest}, so it can't have a faction change connection", quest);
+                }
+
+                return hint;
+            }
+        }
+
+
         DetectOverlappingExclusiveGroups();
         //DetectHangingAllGroups(); // maybe they are not pointless? idk
         OnlySingleBreadcrumbs();
+        CheckFactionChange();
     }
 
     private bool HasConnection(BaseQuestViewModel from, BaseQuestViewModel to, QuestRequirementType? expectedType = null)
     {
-        return from.Connector.Connections.Any(x => x.FromNode == from && x.ToNode == to && (!expectedType.HasValue || x.RequirementType == expectedType.Value));
+        return from.Connector.Connections.Any(x => x.FromNode == from && x.ToNode == to && (!expectedType.HasValue || x.RequirementType == expectedType.Value.ToConnectionType()));
     }
 
     public async Task<string?> PickPlayerName()
@@ -1361,6 +1554,16 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
         }
     }
 
+    public bool HideFactionChangeArrows
+    {
+        get => hideFactionChangeArrows;
+        set
+        {
+            SetProperty(ref hideFactionChangeArrows, value);
+            userPreferences.HideFactionChangeArrows = value;
+        }
+    }
+
     private CancellationTokenSource? previousRelayout;
 
     [Notify] [AlsoNotify(nameof(IsCalculatingGraphLayout))] private int calculatingGraphLayoutStack;
@@ -1398,6 +1601,7 @@ public partial class QuestChainDocumentViewModel : ObservableBase, ISolutionItem
 
     private TaskCompletionSource<uint?>? questPickingTask;
     private bool autoLayout;
+    private bool hideFactionChangeArrows;
 
     public bool IsPickingQuest
     {

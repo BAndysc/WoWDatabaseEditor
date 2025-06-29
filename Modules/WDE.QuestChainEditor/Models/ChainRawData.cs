@@ -4,10 +4,20 @@ using WDE.Common.Database;
 
 namespace WDE.QuestChainEditor.Models;
 
+public record struct OtherFactionQuest(uint Id, OtherFactionQuest.Hint FactionHint)
+{
+    public enum Hint
+    {
+        None,
+        Horde,
+        Alliance
+    }
+}
+
 public class ChainRawData
 {
     [JsonConstructor]
-    public ChainRawData(uint id, long allowableClasses, long allowableRaces, int prevQuestId = 0, int nextQuestId = 0, int exclusiveGroup = 0, int breadcrumbQuestId = 0)
+    public ChainRawData(uint id, long allowableClasses, long allowableRaces, int prevQuestId = 0, int nextQuestId = 0, int exclusiveGroup = 0, int breadcrumbQuestId = 0, OtherFactionQuest? otherFactionQuest = null)
     {
         Id = id;
         AllowableClasses = allowableClasses;
@@ -16,9 +26,10 @@ public class ChainRawData
         NextQuestId = nextQuestId;
         ExclusiveGroup = exclusiveGroup;
         BreadcrumbQuestId = breadcrumbQuestId;
+        OtherFactionQuest = otherFactionQuest;
     }
 
-    public ChainRawData(IQuestTemplate template)
+    public ChainRawData(IQuestTemplate template, OtherFactionQuest? otherFactionQuest)
     {
         Id = template.Entry;
         AllowableClasses = (long)template.AllowableClasses;
@@ -27,6 +38,7 @@ public class ChainRawData
         NextQuestId = template.NextQuestId;
         ExclusiveGroup = template.ExclusiveGroup;
         BreadcrumbQuestId = template.BreadcrumbForQuestId;
+        OtherFactionQuest = otherFactionQuest;
     }
 
     public uint Id { get; init; }
@@ -36,6 +48,7 @@ public class ChainRawData
     public int NextQuestId { get; set; }
     public int ExclusiveGroup { get; set; }
     public int BreadcrumbQuestId { get; set; }
+    public OtherFactionQuest? OtherFactionQuest { get; set; }
 
     public override string ToString()
     {
@@ -45,7 +58,10 @@ public class ChainRawData
     protected bool Equals(ChainRawData other)
     {
         return Id == other.Id && PrevQuestId == other.PrevQuestId && NextQuestId == other.NextQuestId && ExclusiveGroup == other.ExclusiveGroup && BreadcrumbQuestId == other.BreadcrumbQuestId
-               && AllowableClasses == other.AllowableClasses && AllowableRaces == other.AllowableRaces;
+               && AllowableClasses == other.AllowableClasses && AllowableRaces == other.AllowableRaces
+               && (OtherFactionQuest == null && other.OtherFactionQuest == null ||
+                   OtherFactionQuest != null && other.OtherFactionQuest != null &&
+                   OtherFactionQuest.Value.Id == other.OtherFactionQuest.Value.Id);
     }
 
     public override bool Equals(object? obj)
@@ -73,6 +89,6 @@ public class ChainRawData
 
     public ChainRawData Clone()
     {
-        return new ChainRawData(Id, AllowableClasses, AllowableRaces, PrevQuestId, NextQuestId, ExclusiveGroup, BreadcrumbQuestId);
+        return new ChainRawData(Id, AllowableClasses, AllowableRaces, PrevQuestId, NextQuestId, ExclusiveGroup, BreadcrumbQuestId, OtherFactionQuest);
     }
 }

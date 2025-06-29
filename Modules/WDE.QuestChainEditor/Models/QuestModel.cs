@@ -19,6 +19,7 @@ public class QuestModel
     public uint Entry { get; }
     public CharacterClasses AllowableClasses { get; set; }
     public CharacterRaces AllowableRaces { get; set; }
+    public OtherFactionQuest? OtherFactionQuest { get; set; }
     public IReadOnlyList<ICondition> Conditions { get; set; } = Array.Empty<ICondition>();
     private List<QuestGroup> mustBeCompleted = new();
     private List<QuestGroup> mustBeActive = new();
@@ -108,6 +109,7 @@ public class QuestModel
         clone.breadcrumbs = breadcrumbs.Select(x => x.Clone()).ToList();
         clone.AllowableClasses = AllowableClasses;
         clone.AllowableRaces = AllowableRaces;
+        clone.OtherFactionQuest = OtherFactionQuest;
         clone.Conditions = Conditions.Select(x => new AbstractCondition(x)).ToList();
         return clone;
     }

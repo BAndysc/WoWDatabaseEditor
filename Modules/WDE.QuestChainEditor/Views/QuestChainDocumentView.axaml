@@ -101,7 +101,12 @@
                     <converters:ConnectionTypeToBrushConverter x:Key="RequirementTypeToBrush"
                                                                          Completed="#5CA2C9"
                                                                          MustBeActive="#5DC796"
-                                                                         Breadcrumb="#C75571" />
+                                                                         Breadcrumb="#C75571"
+                                                                         FactionChange="#AF84FF"/>
+                    <BoolToBrushConverter x:Key="HighlightedBrushConverter"
+                                          WhenTrue="#AF84FF"
+                                          WhenFalse="Transparent"
+                                          ></BoolToBrushConverter>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -157,7 +162,7 @@
                              DisplayConnectionsOnTop="True"
                              Background="{StaticResource SmallGridLinesDrawingBrush}"
                              PendingConnection="{CompiledBinding PendingConnection}"
-                             Connections="{CompiledBinding Connections}"
+                             Connections="{CompiledBinding VisibleConnections}"
                              ItemsSource="{CompiledBinding Elements}"
                              SelectedItems="{CompiledBinding SelectedItems}"
                              SelectedConnections="{CompiledBinding SelectedConnections}"
@@ -266,8 +271,8 @@
                               BasedOn="{StaticResource {x:Type nodify:ItemContainer}}">
                     <Setter Property="ClipToBounds"
                             Value="False" />
-                    <Setter Property="BorderBrush"
-                            Value="Transparent"/>
+                    <Setter Property="BorderBrush" x:DataType="viewModels:BaseQuestViewModel"
+                            Value="{CompiledBinding IsHighlighted, Converter={StaticResource HighlightedBrushConverter}}"/>
                     <Setter Property="BorderThickness"
                             Value="2"/>
                     <Setter Property="Bounds" x:DataType="viewModels:BaseQuestViewModel"
@@ -725,6 +730,11 @@
                             <!-- races -->
                             <GameRacesImage HorizontalAlignment="Center" MaxHeight="16" Races="{CompiledBinding Races}" />
                             <GameClassesImage HorizontalAlignment="Center" MaxHeight="16" GameClasses="{CompiledBinding Classes}" />
+
+                            <TextBlock Text="{CompiledBinding OtherFactionQuest.Entry, FallbackValue={x:Null}, StringFormat=Faction Change: {0}}"
+                                       IsVisible="{CompiledBinding OtherFactionQuest, Converter={x:Static NullConverter.IsNotNull}}"
+                                       Opacity="0.5"
+                            />
                         </StackPanel>
                     </views:HeaderedStateNode>
                 </DataTemplate>

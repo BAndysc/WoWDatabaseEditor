@@ -499,6 +499,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId) => WaitForCache(nonCachedDatabase.GetQuestEnders(questId));
 
+        public Task<IReadOnlyList<IQuestFactionChange>> GetQuestFactionChanges() => nonCachedDatabase.GetQuestFactionChanges();
+
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => WaitForCache(nonCachedDatabase.GetSceneTemplateAsync(sceneId));
 
         public Task<IReadOnlyList<ISceneTemplate>?> GetSceneTemplatesAsync() => WaitForCache(nonCachedDatabase.GetSceneTemplatesAsync());

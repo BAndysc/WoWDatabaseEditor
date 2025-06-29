@@ -26,8 +26,7 @@ public partial class QuestChainDocumentViewModel
         {
             foreach (var (conn, type, from, to) in connectedNodes)
             {
-                conn.From = from.Connector;
-                conn.To = to.Connector;
+                conn.Attach(from.Connector, to.Connector);
                 Connections.Add(conn);
             }
         }, () =>
@@ -127,8 +126,7 @@ public partial class QuestChainDocumentViewModel
         {
             foreach (var (from, to, conn) in oldConnections)
             {
-                conn.From = from?.Connector;
-                conn.To = to?.Connector;
+                conn.Attach(from, to);
                 Connections.Add(conn);
             }
         }, () =>
@@ -141,12 +139,12 @@ public partial class QuestChainDocumentViewModel
         }));
     }
 
-    public void AddConnection(BaseQuestViewModel from, BaseQuestViewModel to, QuestRequirementType requirementType)
+    public void AddConnection(BaseQuestViewModel from, BaseQuestViewModel to, ConnectionType requirementType)
     {
         if (from == to)
             return;
 
-        var conflicting = GetConflictingConnections(from, to);
+        var conflicting = GetConflictingConnections(from, to, requirementType);
         var conflictingConnections = conflicting?.Select(x => (x.FromNode, x.ToNode, x))?.ToList();
 
         var connection = new ConnectionViewModel(requirementType, from, to);
@@ -159,8 +157,7 @@ public partial class QuestChainDocumentViewModel
             {
                 foreach (var (oldFrom, oldTo, oldConn) in conflictingConnections)
                 {
-                    oldConn.From = oldFrom?.Connector;
-                    oldConn.To = oldTo?.Connector;
+                    oldConn.Attach(oldFrom, oldTo);
                     Connections.Add(oldConn);
                 }
             }
@@ -175,8 +172,7 @@ public partial class QuestChainDocumentViewModel
                 }
             }
 
-            connection.From = from.Connector;
-            connection.To = to.Connector;
+            connection.Attach(from, to);
             Connections.Add(connection);
         }));
     }
@@ -241,7 +237,7 @@ public partial class QuestChainDocumentViewModel
                     {
                         connectionsToRemove.Add((conn, from, quest));
                         if (fromAdded.Add((from, type)))
-                            connectionsToAdd.Add((new ConnectionViewModel(type, null, null), from, newGroup));
+                            connectionsToAdd.Add((new ConnectionViewModel(type.ToConnectionType(), null, null), from, newGroup));
                     }
                 }
             }
@@ -258,7 +254,7 @@ public partial class QuestChainDocumentViewModel
                     {
                         connectionsToRemove.Add((conn, quest, to));
                         if (toAdded.Add((to, type)))
-                            connectionsToAdd.Add((new ConnectionViewModel(type, null, null), newGroup, to));
+                            connectionsToAdd.Add((new ConnectionViewModel(type.ToConnectionType(), null, null), newGroup, to));
                     }
                 }
             }
@@ -280,8 +276,7 @@ public partial class QuestChainDocumentViewModel
 
             foreach (var (conn, from, to) in connectionsToRemove)
             {
-                conn.From = from.Connector;
-                conn.To = to.Connector;
+                conn.Attach(from, to);
                 Connections.Add(conn);
             }
 
@@ -314,8 +309,7 @@ public partial class QuestChainDocumentViewModel
 
             foreach (var (conn, from, to) in connectionsToAdd)
             {
-                conn.From = from.Connector;
-                conn.To = to.Connector;
+                conn.Attach(from, to);
                 Connections.Add(conn);
             }
         }));
@@ -395,7 +389,7 @@ public partial class QuestChainDocumentViewModel
             }));
     }
 
-    private void SetConnectionType(ConnectionViewModel conn, QuestRequirementType newType)
+    private void SetConnectionType(ConnectionViewModel conn, ConnectionType newType)
     {
         var oldType = conn.RequirementType;
         if (oldType == newType)
@@ -421,7 +415,7 @@ public partial class QuestChainDocumentViewModel
             {
                 foreach (var conn in conns)
                 {
-                    conn.RequirementType = newType;
+                    conn.RequirementType = newType.ToConnectionType();
                 }
             }));
     }
@@ -503,7 +497,7 @@ public partial class QuestChainDocumentViewModel
                 foreach (var q in group.Quests)
                 {
                     if (!q.Prerequisites.Any(tuple => tuple.prerequisite == from && tuple.requirementType == type))
-                        connectionsToAdd.Add((new ConnectionViewModel(type), from, q));
+                        connectionsToAdd.Add((new ConnectionViewModel(type.ToConnectionType()), from, q));
                 }
                 connectionsToRemove.Add((conn, from, group));
             }
@@ -513,7 +507,7 @@ public partial class QuestChainDocumentViewModel
                 foreach (var q in group.Quests)
                 {
                     if (!q.RequirementFor.Any(tuple => tuple.requirementFor == to && tuple.requirementType == type))
-                        connectionsToAdd.Add((new ConnectionViewModel(type), q, to));
+                        connectionsToAdd.Add((new ConnectionViewModel(type.ToConnectionType()), q, to));
                 }
                 connectionsToRemove.Add((conn, group, to));
             }
@@ -530,8 +524,7 @@ public partial class QuestChainDocumentViewModel
 
             foreach (var (conn, from, to) in connectionsToRemove)
             {
-                conn.From = from.Connector;
-                conn.To = to.Connector;
+                conn.Attach(from, to);
                 Connections.Add(conn);
             }
 
@@ -557,8 +550,7 @@ public partial class QuestChainDocumentViewModel
 
             foreach (var (conn, from, to) in connectionsToAdd)
             {
-                conn.From = from.Connector;
-                conn.To = to.Connector;
+                conn.Attach(from, to);
                 Connections.Add(conn);
             }
         }));
@@ -592,6 +584,15 @@ public partial class QuestChainDocumentViewModel
                 if (connections.Add(conn.conn))
                 {
                     connectionsToRemove.Add((conn.prerequisite, vm, conn.conn));
+                }
+            }
+
+            if (vm.FactionChange is { } otherFactionQuest)
+            {
+                Traverse(otherFactionQuest.quest);
+                if (connections.Add(otherFactionQuest.conn))
+                {
+                    connectionsToRemove.Add((otherFactionQuest.conn.FromNode!, otherFactionQuest.conn.ToNode!, otherFactionQuest.conn));
                 }
             }
 
@@ -655,8 +656,7 @@ public partial class QuestChainDocumentViewModel
 
             foreach (var conn in connectionsToRemove)
             {
-                conn.conn.From = conn.from.Connector;
-                conn.conn.To = conn.to.Connector;
+                conn.conn.Attach(conn.from, conn.to);
                 Connections.Add(conn.conn);
             }
         }, () =>
@@ -702,7 +702,7 @@ public partial class QuestChainDocumentViewModel
                 {
                     if (!ConnectionExists(quest.ExclusiveGroup!, requirementFor))
                     {
-                        var newConnection = new ConnectionViewModel(requirementType,quest.ExclusiveGroup, requirementFor);
+                        var newConnection = new ConnectionViewModel(requirementType.ToConnectionType(),quest.ExclusiveGroup, requirementFor);
                         connectionsToAdd.Add((newConnection, quest.ExclusiveGroup!, requirementFor));
                     }
                     connectionsToRemove.Add((conn, quest, requirementFor));
@@ -714,7 +714,7 @@ public partial class QuestChainDocumentViewModel
                 {
                     if (!ConnectionExists(prerequisite, quest.ExclusiveGroup!))
                     {
-                        var newConnection = new ConnectionViewModel(requirementType, prerequisite, quest.ExclusiveGroup);
+                        var newConnection = new ConnectionViewModel(requirementType.ToConnectionType(), prerequisite, quest.ExclusiveGroup);
                         connectionsToAdd.Add((newConnection, prerequisite, quest.ExclusiveGroup!));
                     }
 
@@ -735,8 +735,7 @@ public partial class QuestChainDocumentViewModel
             }
             foreach (var (conn, from, to) in connectionsToRemove)
             {
-                conn.From = from.Connector;
-                conn.To = to.Connector;
+                conn.Attach(from, to);
                 Connections.Add(conn);
             }
         }, () =>
@@ -748,8 +747,7 @@ public partial class QuestChainDocumentViewModel
             }
             foreach (var (conn, from, to) in connectionsToAdd)
             {
-                conn.From = from.Connector;
-                conn.To = to.Connector;
+                conn.Attach(from, to);
                 Connections.Add(conn);
             }
         }));

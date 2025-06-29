@@ -83,5 +83,13 @@ namespace WDE.Common.Utils
                 .OrderBy(a => a.oldIndex)
                 .Select(a => a.index);
         }
+
+        public static R? FirstOrDefaultMap<T, R>(this IEnumerable<T>? source, Func<T, R> selector)
+        {
+            if (source == null)
+                return default;
+            using var enumerator = source.GetEnumerator();
+            return enumerator.MoveNext() ? selector(enumerator.Current) : default;
+        }
     }
 }

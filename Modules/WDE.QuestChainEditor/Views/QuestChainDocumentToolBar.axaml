@@ -9,6 +9,7 @@
              x:Class="WDE.QuestChainEditor.Views.QuestChainDocumentToolBar">
     <ToolbarPanel>
         <CheckBox IsChecked="{CompiledBinding AutoLayout}">AutoLayout</CheckBox>
+        <CheckBox IsChecked="{CompiledBinding HideFactionChangeArrows}">Hide Faction Change Arrows</CheckBox>
         <ToolbarSpacer />
         <ButtonImage Image="Icons/icon_cog_reload.png">
           <ButtonImage.Flyout>

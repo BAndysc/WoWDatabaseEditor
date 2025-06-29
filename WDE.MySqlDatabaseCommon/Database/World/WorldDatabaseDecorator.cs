@@ -166,6 +166,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId) => impl.GetQuestStarters(questId);
         public Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId) => impl.GetQuestEnders(questId);
 
+        public Task<IReadOnlyList<IQuestFactionChange>> GetQuestFactionChanges() => impl.GetQuestFactionChanges();
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => impl.GetSceneTemplateAsync(sceneId);
         public Task<IReadOnlyList<ISceneTemplate>?> GetSceneTemplatesAsync() => impl.GetSceneTemplatesAsync();
         public Task<IPhaseName?> GetPhaseNameAsync(uint phaseId) => impl.GetPhaseNameAsync(phaseId);
