@@ -46,10 +46,10 @@ namespace WDE.WoWHeadConnector.Test
         }
 
         [Test]
-        public async Task TestHexthralledSoldierTbc()
+        public async Task TestHoggerTbc()
         {
-            var abilities = await headService.FetchNpcAbilities(HeadSourceType.Tbc, 137134);
-            Assert.AreEqual(0, abilities.Count);
+            var abilities = await headService.FetchNpcAbilities(HeadSourceType.Tbc, 448);
+            CollectionAssert.AreEquivalent(new uint[]{ 6730, 6016, 6268 }, abilities.Select(a => a.SpellId));
         }
 
         [Test]
