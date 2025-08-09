@@ -5,6 +5,7 @@ using TheEngine.Coroutines;
 using TheEngine.ECS;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
+using TheEngine.Utils;
 using Unity;
 using WDE.Common.Database;
 using WDE.Common.DBC;
@@ -67,6 +68,7 @@ public class Game : IGame
         registry.RegisterInstance(typeof(IFontManager), engine.FontManager);
         registry.RegisterInstance(typeof(IInputManager), engine.InputManager);
         registry.RegisterInstance(typeof(ILightManager), engine.LightManager);
+        registry.RegisterInstance(typeof(EntityInspector), engine.EntityInspector);
         registry.RegisterInstance(typeof(IMaterialManager), engine.MaterialManager);
         registry.RegisterInstance(typeof(IMeshManager), engine.MeshManager);
         registry.RegisterInstance(typeof(IRenderManager), engine.RenderManager);

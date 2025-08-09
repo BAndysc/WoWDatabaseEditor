@@ -30,6 +30,7 @@ namespace TheAvaloniaOpenGL.Resources
                 width /= 2;
                 height /= 2;
             }
+            SizeInBytes = width * height * pixels.Length * 4;
             ArrayPool<Rgba32>.Shared.Return(data);
             device.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, mipsCount - 1);
             

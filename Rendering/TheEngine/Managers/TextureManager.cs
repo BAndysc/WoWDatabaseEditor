@@ -1,5 +1,5 @@
 ﻿#if DEBUG
-#define DEBUG_CREATE_CALLSTACK
+// #define DEBUG_CREATE_CALLSTACK
 #endif
 
 using System;
@@ -14,49 +14,73 @@ using TheMaths;
 
 namespace TheEngine.Managers
 {
+    internal class Texture : ITexture
+    {
+        private readonly Engine engine;
+
+        public Texture(Engine engine ,TextureHandle handle, INativeTexture nativeTexture)
+        {
+            this.engine = engine;
+            Handle = handle;
+            NativeTexture = nativeTexture;
+        }
+
+        ~Texture()
+        {
+            engine.textureManager.AddToDisposeList(this);
+        }
+
+        public TextureHandle Handle { get; }
+        public int Width => NativeTexture.Width;
+        public int Height => NativeTexture.Height;
+        internal INativeTexture NativeTexture { get; }
+    }
+
     internal class TextureManager : ITextureManager, IDisposable
     {
         private readonly Engine engine;
-        private Dictionary<string, TextureHandle> texturesByPath;
-        private Dictionary<TextureHandle, int> byPathReferencesCount = new();
+        private Dictionary<string, ITexture> texturesByPath;
         #if DEBUG_CREATE_CALLSTACK
-        private Dictionary<ITexture, System.Diagnostics.StackTrace> createCallStack = new();
+        private Dictionary<TextureHandle, System.Diagnostics.StackTrace> createCallStack = new();
         #endif
         
-        public TextureHandle EmptyTexture { get; private set; }
-        private ITexture emptyTextureImpl { get; set; }
-        
-        private List<ITexture?> allTextures;
+        public ITexture EmptyTexture { get; private set; }
+        private INativeTexture emptyTextureImpl { get; set; }
+        private int disposeIndex = 0;
+        private List<Texture>[] disposeLists = [new(), new()];
+        private List<WeakReference<Texture>?> allTextures;
 
         internal TextureManager(Engine engine)
         {
-            texturesByPath = new Dictionary<string, TextureHandle>();
-            allTextures = new List<ITexture?>();
+            texturesByPath = new Dictionary<string, ITexture>();
+            allTextures = new();
             this.engine = engine;
 
             EmptyTexture = CreateTexture(new uint[] { 0xFFFFFFFF }, 1, 1);
-            emptyTextureImpl = GetTextureByHandle(EmptyTexture)!;
+            emptyTextureImpl = ((Texture)EmptyTexture).NativeTexture;
         }
 
         internal ITexture? this[TextureHandle handle]
         {
-            get => handle.Handle == 0 ? null : allTextures[handle.Handle - 1];
-            set => allTextures[handle.Handle - 1] = value;
+            get
+            {
+                return handle.Handle == 0 ? null : allTextures[handle.Handle - 1] != null && allTextures[handle.Handle - 1].TryGetTarget(out var tex) ? tex : null;
+            }
         }
-        
+
         public void Dispose()
         {
             emptyTextureImpl.Dispose();
             foreach (var tex in allTextures)
             {
-                if (tex == null || tex == emptyTextureImpl)
+                if (tex == null || !tex.TryGetTarget(out var target))
                     continue;
                 #if DEBUG_CREATE_CALLSTACK
-                Console.WriteLine("Texture not disposed! Created: " + createCallStack[tex].ToString());
+                Console.WriteLine("Texture not disposed! Created: " + createCallStack[target.Handle].ToString());
                 #else
                 Console.WriteLine("Texture not disposed!");
                 #endif
-                tex.Dispose();
+                target.NativeTexture.Dispose();
             }
             allTextures.Clear();
             texturesByPath.Clear();
@@ -67,74 +91,46 @@ namespace TheEngine.Managers
         
         private TextureHandle AllocHandle() => new TextureHandle(allTextures.Count + 1);
 
-        public TextureHandle CreateDummyHandle()
+        private ITexture AddTexture(INativeTexture texture)
         {
-            return AddTexture(emptyTextureImpl);
-        }
-
-        private TextureHandle AddTexture(ITexture texture)
-        {
-            var textureHandle = AllocHandle();
-            allTextures.Add(texture);
+            var handle = AllocHandle();
+            var tex = new Texture(engine, handle, texture);
+            allTextures.Add(new WeakReference<Texture>(tex));
 #if DEBUG_CREATE_CALLSTACK
             if (texture != emptyTextureImpl)
-                createCallStack[texture] = new System.Diagnostics.StackTrace(2, true);
+                createCallStack[handle] = new System.Diagnostics.StackTrace(2, true);
 #endif
-            return textureHandle;
+            engine.statsManager.TextureBytes += (ulong)texture.SizeInBytes;
+            return tex;
         }
 
-        public void DisposeTexture(TextureHandle handle)
+        public void DisposeTexture(ITexture? tex)
         {
-            if (handle.Handle == 0)
+            if (tex == null)
                 return;
 
-            if (byPathReferencesCount.TryGetValue(handle, out var refCount))
+            if (tex.Handle.Handle == 0)
+                return;
+
+            var texture = ((Texture)tex);
+
+            if (texture.NativeTexture != emptyTextureImpl)
             {
-                if (refCount == 1)
-                    byPathReferencesCount.Remove(handle);
-                else
-                {
-                    byPathReferencesCount[handle]--;
-                    return;
-                }
+                texture.NativeTexture.Dispose();
+                engine.statsManager.TextureBytes -= (ulong)texture.NativeTexture.SizeInBytes;
             }
-            
-            var tex = GetTextureByHandle(handle);
-            if (tex != emptyTextureImpl)
-                tex?.Dispose();
 #if DEBUG_CREATE_CALLSTACK
             if (tex != null)
-               createCallStack.Remove(tex);
+               createCallStack.Remove(tex.Handle);
 #endif
-            this[handle] = null;
+            allTextures[tex.Handle.Handle - 1] = null;
         }
-        
-        public void ReplaceHandles(TextureHandle old, TextureHandle @new)
-        {
-            var oldTexture = GetTextureByHandle(old);
-            var newTexture = GetTextureByHandle(@new);
-            this[old] = newTexture;
-            if (oldTexture != emptyTextureImpl)
-                oldTexture.Dispose();
-#if DEBUG_CREATE_CALLSTACK
-            createCallStack.Remove(oldTexture);
-#endif
-            this[@new] = null;
-        }
-        
-        public TextureHandle LoadTexture(string path)
+
+        public ITexture LoadTexture(string path)
         {
             if (texturesByPath.TryGetValue(path, out var handle))
             {
-                if (this[handle] != null)
-                {
-                    byPathReferencesCount[handle]++;
-                    return handle;
-                }
-                else
-                {
-                    texturesByPath.Remove(path);
-                }
+                return handle;
             }
 
             using Image<Rgba32> image = Image.Load<Rgba32>(path);
@@ -145,49 +141,48 @@ namespace TheEngine.Managers
                     x.GetRowSpan(i).CopyTo(array.AsSpan(i * x.Width));
             });
 
-            var textureHandle = CreateTexture(new Rgba32[][]{array}, image.Width, image.Height, true);
-            texturesByPath.Add(path, textureHandle);
-            byPathReferencesCount.Add(textureHandle, 1);
-            return textureHandle;
+            var texture = CreateTexture(new Rgba32[][]{array}, image.Width, image.Height, true);
+            texturesByPath.Add(path, texture);
+            return texture;
         }
         
-        public TextureHandle CreateTexture(Vector4[] pixels, int width, int height)
+        public ITexture CreateTexture(Vector4[] pixels, int width, int height)
         {
             var texture = engine.Device.CreateTexture(width, height, pixels);
             return AddTexture(texture);
         }
 
-        public TextureHandle CreateTexture(float[] pixels, int width, int height)
+        public ITexture CreateTexture(float[] pixels, int width, int height)
         {
             var texture = engine.Device.CreateTexture(width, height, pixels);
             return AddTexture(texture);
         }
 
-        public TextureHandle CreateTexture(uint[]? pixels, int width, int height, TextureFormat format = TextureFormat.R8G8B8A8)
+        public ITexture CreateTexture(uint[]? pixels, int width, int height, TextureFormat format = TextureFormat.R8G8B8A8)
         {
             var texture = engine.Device.CreateTexture(width, height, pixels, format);
             return AddTexture(texture);
         }
         
-        public TextureHandle CreateTexture(Rgba32[][] pixels, int width, int height, bool generateMips)
+        public ITexture CreateTexture(Rgba32[][] pixels, int width, int height, bool generateMips)
         {
             var texture = engine.Device.CreateTexture(width, height, pixels, generateMips);
             return AddTexture(texture);
         }
         
-        public unsafe TextureHandle CreateTexture(Rgba32* pixels, int width, int height, bool generateMips)
+        public unsafe ITexture CreateTexture(Rgba32* pixels, int width, int height, bool generateMips)
         {
             var texture = engine.Device.CreateTexture(width, height, pixels, generateMips);
             return AddTexture(texture);
         }
         
-        public TextureHandle CreateTextureArray(Rgba32[][][] textures, int width, int height)
+        public ITexture CreateTextureArray(Rgba32[][][] textures, int width, int height)
         {
             var texture = engine.Device.CreateTextureArray(width, height, textures);
             return AddTexture(texture);
         }
         
-        public TextureHandle CreateRenderTexture(int width, int height, int colorAttachments = 1)
+        public ITexture CreateRenderTexture(int width, int height, int colorAttachments = 1)
         {
             width = Math.Max(1, width);
             height = Math.Max(1, height);
@@ -195,24 +190,37 @@ namespace TheEngine.Managers
             return AddTexture(texture);
         }
         
-        public TextureHandle CreateRenderTextureWithDepth(int width, int height, out TextureHandle depthTexture, int colorAttachments = 1)
+        public ITexture CreateRenderTextureWithDepth(int width, int height, out ITexture depthTexture, int colorAttachments = 1)
         {
             depthTexture = CreateTexture(null, width, height, TextureFormat.DepthComponent);
-            var texture = engine.Device.CreateRenderTexture(width, height, colorAttachments, (Texture)GetTextureByHandle(depthTexture)!);
+            var texture = engine.Device.CreateRenderTexture(width, height, colorAttachments, (Texture2D)GetTextureByHandle(depthTexture.Handle)!);
             return AddTexture(texture);
         }
         
-        public TextureHandle CreateRenderTextureWithColorAndDepth(int width, int height, out TextureHandle colorTexture, out TextureHandle depthTexture)
+        public ITexture CreateRenderTextureWithColorAndDepth(int width, int height, out ITexture colorTexture, out ITexture depthTexture)
         {
             depthTexture = CreateTexture(null, width, height, TextureFormat.DepthComponent);
             colorTexture = CreateTexture(null, width, height, TextureFormat.R8G8B8A8);
-            var texture = engine.Device.CreateRenderTexture((Texture)GetTextureByHandle(colorTexture)!, (Texture)GetTextureByHandle(depthTexture)!);
+            var texture = engine.Device.CreateRenderTexture((Texture2D)GetTextureByHandle(colorTexture.Handle)!, (Texture2D)GetTextureByHandle(depthTexture.Handle)!);
+            return AddTexture(texture);
+        }
+
+        public ITexture CreateRenderTexture(ITexture colorTexture, ITexture depthTexture, ITexture colorTexture1)
+        {
+            var color = ((Texture)colorTexture).NativeTexture ?? throw new ArgumentException("Color texture handle is invalid.");
+            var depth = ((Texture)depthTexture).NativeTexture ?? throw new ArgumentException("Depth texture handle is invalid.");
+            var color1 =  colorTexture1 != default ? ((Texture)colorTexture1).NativeTexture : null;
+            if (color1 != null && (color1.Width != color.Width || color1.Height != color.Height))
+                throw new ArgumentException("Color texture and color1 texture must have the same dimensions.");
+            if (color.Width != depth.Width || color.Height != depth.Height)
+                throw new ArgumentException("Color texture and depth texture must have the same dimensions.");
+            var texture = engine.Device.CreateRenderTexture((Texture2D)color, (Texture2D)depth, (Texture2D)color1);
             return AddTexture(texture);
         }
         
-        public void ScreenshotRenderTexture(TextureHandle handle, string fileName, int colorAttachmentIndex = 0)
+        public void ScreenshotRenderTexture(ITexture handle, string fileName, int colorAttachmentIndex = 0)
         {
-            var rt = GetTextureByHandle(handle) as RenderTexture;
+            var rt = ((Texture)handle).NativeTexture as RenderTexture;
             rt.ActivateSourceFrameBuffer(colorAttachmentIndex);
             Rgba32[] pixels = new Rgba32[rt.Width * rt.Height];
             engine.Device.device.ReadPixels(0, 0, rt.Width, rt.Height, PixelFormat.Rgba, PixelType.UnsignedByte, pixels.AsSpan());
@@ -220,35 +228,35 @@ namespace TheEngine.Managers
             image.SaveAsPng(fileName);
         }
 
-        internal ITexture? GetTextureByHandle(TextureHandle textureHandle)
+        internal INativeTexture? GetTextureByHandle(TextureHandle handle)
         {
-            return this[textureHandle];
+            return ((Texture)this[handle])?.NativeTexture;
         }
         
-        public void SetFiltering(TextureHandle handle, FilteringMode mode)
+        public void SetFiltering(ITexture texture, FilteringMode mode)
         {
-            GetTextureByHandle(handle).SetFiltering(mode);
+            ((Texture)texture).NativeTexture.SetFiltering(mode);
         }
         
-        public void SetWrapping(TextureHandle handle, WrapMode mode)
+        public void SetWrapping(ITexture texture, WrapMode mode)
         {
-            GetTextureByHandle(handle).SetWrapping(mode);
+            ((Texture)texture).NativeTexture.SetWrapping(mode);
         }
 
-        public void BlitFramebuffers(TextureHandle src, TextureHandle dst, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, BlitFramebufferFilter filter)
+        public void BlitFramebuffers(ITexture src, ITexture dst, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, BlitFramebufferFilter filter)
         {
-            var srcTex = GetTextureByHandle(src) as RenderTexture;
-            var dstTex = GetTextureByHandle(dst) as RenderTexture;
+            var srcTex = ((Texture)src).NativeTexture as RenderTexture;
+            var dstTex = ((Texture)dst).NativeTexture as RenderTexture;
             
             srcTex!.ActivateSourceFrameBuffer(0);
             dstTex!.ActivateRenderFrameBuffer();
             engine.Device.device.BlitFramebuffer(srcX0, srcY0, srcX1, srcY1,  dstX0, dstY0,  dstX1,  dstY1, mask, filter);
         }
         
-        public void BlitRenderTextures(TextureHandle src, TextureHandle dst)
+        public void BlitRenderTextures(ITexture src, ITexture dst)
         {
-            var srcTex = GetTextureByHandle(src) as RenderTexture;
-            var dstTex = GetTextureByHandle(dst) as RenderTexture;
+            var srcTex = ((Texture)src).NativeTexture as RenderTexture;
+            var dstTex = ((Texture)dst).NativeTexture as RenderTexture;
             
             srcTex!.ActivateSourceFrameBuffer(0);
             dstTex!.ActivateRenderFrameBuffer();
@@ -258,7 +266,33 @@ namespace TheEngine.Managers
 
         public bool TextureExists(TextureHandle handle)
         {
-            return allTextures.Count > handle.Handle && allTextures[handle.Handle] != null;
+            return allTextures.Count >= handle.Handle && allTextures[handle.Handle - 1] != null;
+        }
+
+        internal void Update()
+        {
+            List<Texture> toDispose;
+            lock (this)
+            {
+                toDispose = disposeLists[disposeIndex];
+                disposeIndex = 1 - disposeIndex;
+            }
+
+            foreach (var texture in toDispose)
+            {
+                DisposeTexture(texture);
+            }
+            toDispose.Clear();
+        }
+
+        internal void AddToDisposeList(Texture texture)
+        {
+            lock (this)
+            {
+                if (texture.NativeTexture.NativeHandle == 0)
+                    return;
+                disposeLists[disposeIndex].Add(texture);
+            }
         }
     }
 }

@@ -11,13 +11,13 @@ namespace WDE.MpqReader.Structures
     public class WorldMapObjectGroup : System.IDisposable
     {
         public readonly WorldMapObjectGroupHeader Header;
-        public readonly PooledArray<WorldMapObjectPoly> Polygons;
-        public readonly PooledArray<ushort> Indices;
-        public readonly PooledArray<Vector3> Vertices;
+        public readonly PooledArray<WorldMapObjectPoly>? Polygons;
+        public readonly PooledArray<ushort>? Indices;
+        public readonly PooledArray<Vector3>? Vertices;
         public readonly PooledArray<Color>? VertexColors;
         public readonly PooledArray<Color>? VertexColors2;
         public readonly ushort[] CollisionOnlyIndices;
-        public readonly PooledArray<Vector3> Normals;
+        public readonly PooledArray<Vector3>? Normals;
         public readonly List<PooledArray<Vector2>> UVs = new();
         public readonly WorldMapObjectBatch[]? Batches;
         public readonly WorldMapObjectLiquid Liquid;
@@ -221,10 +221,10 @@ namespace WDE.MpqReader.Structures
         {
             VertexColors?.Dispose();
             VertexColors2?.Dispose();
-            Polygons.Dispose();
-            Indices.Dispose();
-            Vertices.Dispose();
-            Normals.Dispose();
+            Polygons?.Dispose();
+            Indices?.Dispose();
+            Vertices?.Dispose();
+            Normals?.Dispose();
             foreach (var uv in UVs)
                 uv.Dispose();
         }

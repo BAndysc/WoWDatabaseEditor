@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using OpenTK.Graphics.OpenGL4;
+using TheAvaloniaOpenGL.Resources;
 using ActiveUniformType = OpenGLBindings.ActiveUniformType;
 using BlendEquationMode = OpenGLBindings.BlendEquationMode;
 using BlendingFactorDest = OpenGLBindings.BlendingFactorDest;
@@ -531,6 +532,34 @@ namespace TheAvaloniaOpenGL
         {
             
         }
+
+        private List<INativeBuffer>[] buffersToDispose = [new(), new()];
+        private int currentBufferDisposeIndex = 0;
+
+        public void AddToDispose(INativeBuffer nativeBuffer)
+        {
+            lock (this)
+            {
+                buffersToDispose[currentBufferDisposeIndex].Add(nativeBuffer);
+            }
+        }
+
+        public void DisposeBuffers()
+        {
+            List<INativeBuffer> toDispose;
+            lock (this)
+            {
+                toDispose = buffersToDispose[currentBufferDisposeIndex];
+                currentBufferDisposeIndex = 1 - currentBufferDisposeIndex;
+            }
+            foreach (var buffer in toDispose)
+            {
+                buffer.Dispose();
+            }
+            toDispose.Clear();
+        }
+
+        public long TotalBufferBytes { get; set; }
 
         public void BlitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, OpenGLBindings.BlitFramebufferFilter filter)
         {

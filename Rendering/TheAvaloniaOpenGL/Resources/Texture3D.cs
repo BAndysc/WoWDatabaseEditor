@@ -1,7 +1,7 @@
 ﻿
 namespace TheAvaloniaOpenGL.Resources
 {
-    public class TextureCube : IDisposable, ITexture
+    public class TextureCube : IDisposable, INativeTexture
     {
         private readonly IDevice device;
 
@@ -10,6 +10,7 @@ namespace TheAvaloniaOpenGL.Resources
         public int Width { get; }
 
         public int Height { get; }
+        public int NativeHandle => 0;
 
         //private Texture2D texture { get; }
 
@@ -76,6 +77,8 @@ namespace TheAvaloniaOpenGL.Resources
         {
             throw new Exception();
         }
+
+        public int SizeInBytes => 0;
 
         public void Dispose()
         {

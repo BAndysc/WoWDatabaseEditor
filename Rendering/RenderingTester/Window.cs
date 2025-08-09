@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reactive.Disposables;
 using Prism.Ioc;
+using TheEngine.Utils;
 using Unity;
 using Unity.Extension;
 using Unity.Resolution;
@@ -18,6 +19,7 @@ using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
+using WDE.MapRenderer.Modules;
 using WDE.MapSpawns;
 using WDE.MapSpawns.Rendering;
 using WDE.Module;
@@ -40,16 +42,24 @@ public class DummyStatusBar : IStatusBar
 
 public class DummyGameView : IGameView
 {
-    public IEnumerable<Func<IContainerProvider, IGameModule>> Modules { get; } =
-        new List<Func<IContainerProvider, IGameModule>>()
-        {
-            provider => provider.Resolve<StandaloneCustomGameModule>(),
-            provider => provider.Resolve<DebugWindow>(),
-            provider => provider.Resolve<SpawnViewer>()
-        };
+    private List<Func<IContainerProvider, IGameModule>> modules =
+    [
+        provider => provider.Resolve<StandaloneCustomGameModule>(),
+        provider => provider.Resolve<DebugWindow>(),
+        provider => provider.Resolve<SpawnViewer>(),
+        provider => provider.Resolve<WorldMapGameModule>(),
+        provider => provider.Resolve<DebugInfoGameModule>()
+    ];
+
+    public IEnumerable<Func<IContainerProvider, IGameModule>> Modules => modules;
     public event Action<Func<IContainerProvider, IGameModule>>? ModuleRegistered;
     public event Action<Func<IContainerProvider, IGameModule>>? ModuleRemoved;
     public IDisposable RegisterGameModule(Func<IContainerProvider, IGameModule> gameModule) => Disposable.Empty;
+
+    public void AddModule<T>() where T : IGameModule
+    {
+        modules.Add(provider => provider.Resolve<T>());
+    }
 
     public Task<Game> Open()
     {
@@ -69,6 +79,7 @@ public class DummyGameProperties : IGameProperties
     public int TextureQuality { get; set; } = 3;
     public float DynamicResolution { get; set; } = 1;
     public bool RenderGui { get; set; } = true;
+    public bool LoadWorld { get; set; } = true;
 }
 
 public class DummyMessageBox : IMessageBoxService

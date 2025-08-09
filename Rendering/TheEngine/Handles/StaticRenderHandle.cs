@@ -4,7 +4,7 @@ namespace TheEngine.Handles
 {
     public struct StaticRenderHandle
     {
-        internal Entity Handle { get; }
+        public Entity Handle { get; }
 
         internal StaticRenderHandle(Entity id)
         {
@@ -14,7 +14,7 @@ namespace TheEngine.Handles
     
     public struct DynamicRenderHandle
     {
-        internal Entity Handle { get; }
+        public Entity Handle { get; }
 
         internal DynamicRenderHandle(Entity id)
         {

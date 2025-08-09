@@ -6,6 +6,7 @@ namespace TheEngine.Input
 {
     internal class Keyboard : IKeyboard
     {
+        private readonly Engine engine;
         internal volatile bool[] downKeys = new bool[255];
         internal Key[] justPressedKeys = new Key[20];
         internal Key[] justReleasedKeys = new Key[20];
@@ -13,6 +14,11 @@ namespace TheEngine.Input
         internal int justPressedKeysIndex = 0;
         internal int justReleasedKeysIndex = 0;
         internal int justTextInputIndex = 0;
+
+        public Keyboard(Engine engine)
+        {
+            this.engine = engine;
+        }
 
         internal void PostUpdate()
         {
@@ -47,10 +53,12 @@ namespace TheEngine.Input
                 justReleasedKeys[justReleasedKeysIndex++] = key;
         }
         
-        public bool IsDown(Key keys)
+        public bool RawIsDown(Key keys)
         {
             return downKeys[(int)keys];
         }
+
+        public bool IsDown(Key keys) => RawIsDown(keys) && engine.gameView.HasFocus;
         
         public bool JustPressed(Key key)
         {
@@ -67,10 +75,14 @@ namespace TheEngine.Input
                     return true;
             return false;
         }
+
+        public Vector3 GetAxis(Vector3 axis, Key positive, Key negative) => engine.gameView.HasFocus
+            ? RawGetAxis(axis, positive, negative)
+            : default;
         
-        public Vector3 GetAxis(Vector3 axis, Key positive, Key negative)
+        public Vector3 RawGetAxis(Vector3 axis, Key positive, Key negative)
         {
-            return axis * (IsDown(positive) ? 1 : 0) + axis * (IsDown(negative) ? -1 : 0);
+            return axis * (RawIsDown(positive) ? 1 : 0) + axis * (RawIsDown(negative) ? -1 : 0);
         }
 
         public void ReleaseAllKeys()

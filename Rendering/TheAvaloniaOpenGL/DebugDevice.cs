@@ -1,4 +1,5 @@
 using OpenGLBindings;
+using TheAvaloniaOpenGL.Resources;
 
 namespace TheAvaloniaOpenGL
 {
@@ -525,6 +526,22 @@ namespace TheAvaloniaOpenGL
         public void Debug(string msg)
         {
             commands.Add(msg);
+        }
+
+        public void AddToDispose(INativeBuffer nativeBuffer)
+        {
+            device.AddToDispose(nativeBuffer);
+        }
+
+        public void DisposeBuffers()
+        {
+            device.DisposeBuffers();
+        }
+
+        public long TotalBufferBytes
+        {
+            get => device.TotalBufferBytes;
+            set => device.TotalBufferBytes = value;
         }
     }
 }

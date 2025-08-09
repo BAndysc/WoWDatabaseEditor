@@ -1,4 +1,5 @@
 using TheEngine.Handles;
+using TheEngine.Interfaces;
 
 namespace TheEngine.Utils;
 
@@ -16,26 +17,24 @@ public class ScreenRenderTexture : System.IDisposable
         Update();
     }
     
-    public TextureHandle Handle { get; private set; }
-    
-    public static implicit operator TextureHandle(ScreenRenderTexture d) => d.Handle;
+    public ITexture? Texure { get; private set; }
 
     public void Update()
     {
         if (width != (int)engine.WindowHost.WindowWidth ||
             height != (int)engine.WindowHost.WindowHeight ||
-            Handle.IsEmpty)
+            Texure == null)
         {
             width = (int)engine.WindowHost.WindowWidth;
             height = (int)engine.WindowHost.WindowHeight;
-            engine.TextureManager.DisposeTexture(Handle);
-            Handle = engine.textureManager.CreateRenderTexture(Math.Max(1, (int)(width * scale)),Math.Max(1, (int)(height * scale)));
+            engine.TextureManager.DisposeTexture(Texure);
+            Texure = engine.textureManager.CreateRenderTexture(Math.Max(1, (int)(width * scale)),Math.Max(1, (int)(height * scale)));
         }
     }
     
     public void Dispose()
     {
-        engine.TextureManager.DisposeTexture(Handle);
-        Handle = default;
+        engine.TextureManager.DisposeTexture(Texure);
+        Texure = default;
     }
 }

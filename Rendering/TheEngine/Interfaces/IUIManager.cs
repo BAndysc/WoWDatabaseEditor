@@ -13,14 +13,17 @@ namespace TheEngine.Interfaces
     
     public interface IUIManager
     {
-        Entity DrawPersistentWorldText(string font, Vector2 pivot, string text, float fontSize, Matrix localToWorld, float visibilityDistance = 200);
-        void DrawWorldText(string font, Vector2 pivot, ReadOnlySpan<char> text, float fontSize, Matrix localToWorld);
+        Entity DrawPersistentWorldText(string font, Vector2 pivot, string text, float fontSize, Matrix localToWorld, float visibilityDistance = 200, Vector4? fontColor = null,
+            Vector4? backgroundColor = null);
+        void DrawWorldText(string font, Vector2 pivot, ReadOnlySpan<char> text, float fontSize, Matrix localToWorld, Vector4 foreColor, Vector4? backgroundColor = null);
         void DrawText(string font, ReadOnlySpan<char> text, float fontSize, float x, float y, float? maxWidth, Vector4 color);
         void DrawBox(float x, float y, float w, float h, Vector4 color);
         Vector2 MeasureText(string font, ReadOnlySpan<char> text, float fontSize);
 
         IImGui BeginImmediateDrawAbs(float x, float y);
         IImGui BeginImmediateDrawRel(float x, float y, float pivotX, float pivotY);
+
+        event Action OnMenuBarDraw;
     }
 
     public interface IImGui : System.IDisposable

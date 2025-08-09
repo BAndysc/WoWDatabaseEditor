@@ -55,7 +55,7 @@ public class WorldMapGameModule : IGameModule
             if (!ImGui.Begin("Map", ImGuiWindowFlags.AlwaysAutoResize))
                 return;
 
-            var contentPosition = ImGui.GetWindowContentRegionMin() + ImGui.GetWindowPos();
+            var contentPosition = /* ImGui.GetWindowContentRegionMin() + */ImGui.GetWindowPos();
             var localSpaceCursorPosition = ImGui.GetIO().MousePos - contentPosition;
             var percentCursorPosition = new Vector2(1, 1) - localSpaceCursorPosition / (Constants.Blocks * ButtonWidth);
             var wowCursorPosition = new Vector2(percentCursorPosition.Y * Constants.MapSize - Constants.MapSize/2, percentCursorPosition.X * Constants.MapSize - Constants.MapSize / 2);

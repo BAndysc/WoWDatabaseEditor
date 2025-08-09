@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Text;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine;
 using TheEngine.Coroutines;
@@ -108,15 +109,26 @@ namespace WDE.MapRenderer.Managers
         Wrath_Decal
     };
 
+    public struct MdxBatchData
+    {
+        public int colorIndex;
+        public int textureTransformIndex;
+        public int textureTransformIndex2;
+        public int geoset;
+        public bool activeByDefault;
+        public M2 model;
+    }
     
     public class MdxManager : System.IDisposable
     {
         public class MdxInstance
         {
             public IMesh mesh;
-            public (Material material, int submesh)[] materials;
+            public (Material material, int submesh, MdxBatchData batch)[] materials;
             public M2 model;
             public float scale = 1;
+            public FileId fileId;
+            public uint displayId;
             private bool? hasAnimations;
             public List<(M2AttachmentType, MdxInstance)>? attachments;
 
@@ -130,7 +142,7 @@ namespace WDE.MapRenderer.Managers
                     if (model.sequences.Length == 0)
                         return false;
 
-                    if (model.bones.Length == 0)
+                    if (model.bones.Length == 0 && model.colors.Length == 0 && model.texture_transforms.Length == 0)
                         return false;
 
                     model.bones.LoadAnimation(0);
@@ -158,25 +170,74 @@ namespace WDE.MapRenderer.Managers
                         }
                     }
 
+                    for (int colorIndex = 0; colorIndex < model.colors.Length; ++colorIndex)
+                    {
+                        if (model.colors[colorIndex].color.Length > 0 && model.colors[colorIndex].color.Timestamps(0).Length > 0)
+                        {
+                            anyHas = true;
+                            break;
+                        }
+                        if (model.colors[colorIndex].alpha.Length > 0 && model.colors[colorIndex].alpha.Timestamps(0).Length > 0)
+                        {
+                            anyHas = true;
+                            break;
+                        }
+                    }
+
+                    for (int textureTransformIndex = 0; textureTransformIndex < model.texture_transforms.Length; ++textureTransformIndex)
+                    {
+                        if (model.texture_transforms[textureTransformIndex].translation.Length > 0 &&
+                            model.texture_transforms[textureTransformIndex].translation.Timestamps(0).Length > 0)
+                        {
+                            anyHas = true;
+                            break;
+                        }
+                        if (model.texture_transforms[textureTransformIndex].rotation.Length > 0 &&
+                            model.texture_transforms[textureTransformIndex].rotation.Timestamps(0).Length > 0)
+                        {
+                            anyHas = true;
+                            break;
+                        }
+                        if (model.texture_transforms[textureTransformIndex].scaling.Length > 0 &&
+                            model.texture_transforms[textureTransformIndex].scaling.Timestamps(0).Length > 0)
+                        {
+                            anyHas = true;
+                            break;
+                        }
+                    }
+
                     hasAnimations = anyHas;
                     return  anyHas;
                 }
             }
         }
 
-        private Dictionary<FileId, (M2, M2Skin)?> m2s = new();
-        private Dictionary<FileId, Task<(M2, M2Skin)?>> m2sCurrentlyLoaded = new();
+        private class M2WithSkin
+        {
+            public M2 m2;
+            public M2Skin skin;
+        }
+
+        private class InternalMesh
+        {
+            public IMesh mesh;
+            public M2 m2;
+            public M2Skin skin;
+        }
+
+        private Dictionary<FileId, WeakReference<M2WithSkin>?> m2s = new();
+        private Dictionary<FileId, Task<M2WithSkin?>> m2sCurrentlyLoaded = new();
         
-        private Dictionary<FileId, (IMesh, M2, M2Skin)?> internalMeshes = new();
-        private Dictionary<FileId, Task<(IMesh, M2, M2Skin)?>> internalMeshesCurrentlyLoaded = new();
+        private Dictionary<FileId, WeakReference<InternalMesh>?> internalMeshes = new();
+        private Dictionary<FileId, Task<InternalMesh?>> internalMeshesCurrentlyLoaded = new();
         
-        private Dictionary<FileId, MdxInstance?> meshes = new();
+        private Dictionary<FileId, WeakReference<MdxInstance>?> meshes = new();
         private Dictionary<FileId, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
-        private Dictionary<uint, MdxInstance?> creaturemeshes = new();
+        private Dictionary<uint, WeakReference<MdxInstance>?> creaturemeshes = new();
         private Dictionary<uint, Task<(MdxInstance?, WmoManager.WmoInstance?)?>> gameObjectMeshesCurrentlyLoaded = new();
-        private Dictionary<uint, (MdxInstance?, WmoManager.WmoInstance?)?> gameObjectmeshes = new();
+        private Dictionary<uint, (WeakReference<MdxInstance>?, WeakReference<WmoManager.WmoInstance>?)?> gameObjectmeshes = new();
         private Dictionary<uint, Task<MdxInstance?>> creatureMeshesCurrentlyLoaded = new();
-        private Dictionary<(uint displayId, bool right, ushort raceGender), MdxInstance?> itemMeshes = new();
+        private Dictionary<(uint displayId, bool right, ushort raceGender), WeakReference<MdxInstance>?> itemMeshes = new();
         private Dictionary<(uint displayId, bool right, ushort raceGender), Task<MdxInstance?>> itemMeshesCurrentlyLoaded = new();
         private readonly IGameFiles gameFiles;
         private readonly IMeshManager meshManager;
@@ -243,7 +304,7 @@ namespace WDE.MapRenderer.Managers
             this.inputManager = inputManager;
             this.uiManager = uiManager;
             identityBonesBuffer = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, AnimationSystem.MAX_BONES, BufferInternalFormat.Float4);
-            identityBonesBuffer.UpdateBuffer(AnimationSystem.IdentityBones(AnimationSystem.MAX_BONES).Span);
+            identityBonesBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(AnimationSystem.MAX_BONES).Span);
         }
 
         // Sources : wowdev.wiki/DB/ItemDisplayInfo#Geoset_Group_Field_Meaning and wowdev.wiki/Character_Customization#Geosets
@@ -280,18 +341,26 @@ namespace WDE.MapRenderer.Managers
         private readonly int geosetUNK28 = 2801; // {0: No Geoset; 1: Default}
         // BFA/SL+ geosets.
 
-        public IEnumerator LoadCreatureModel(uint displayid, TaskCompletionSource<MdxInstance?> result)
+        public async ValueTask<MdxInstance?> LoadCreatureModel(uint displayid)
         {
             if (creaturemeshes.TryGetValue(displayid, out var loadedMeshInstance))
             {
-                result.SetResult(loadedMeshInstance);
-                yield break;
+                if (loadedMeshInstance == null)
+                {
+                    return null;
+                }
+                if (loadedMeshInstance.TryGetTarget(out var loadedMeshInstanceTarget))
+                {
+                    return loadedMeshInstanceTarget;
+                }
+                else
+                {
+                    creaturemeshes.Remove(displayid);
+                }
             }
             if (creatureMeshesCurrentlyLoaded.TryGetValue(displayid, out var loadInProgress))
             {
-                yield return new WaitForTask(loadInProgress);
-                result.SetResult(creaturemeshes[displayid]);
-                yield break;
+                return await loadInProgress;
             }
             
             var completion = new TaskCompletionSource<MdxInstance?>();
@@ -304,27 +373,24 @@ namespace WDE.MapRenderer.Managers
                 creaturemeshes[displayid] = null;
                 completion.SetResult(null);
                 creatureMeshesCurrentlyLoaded.Remove(displayid);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
 
             var m2FilePath = modelData.ModelName;
-            TaskCompletionSource<(IMesh, M2, M2Skin)?> m2File = new();
-            yield return InternalLoadM2Mesh(m2FilePath, m2File);
+            var m2File = await InternalLoadM2Mesh(m2FilePath);
 
-            if (!m2File.Task.Result.HasValue)
+            if (m2File == null)
             {
                 Console.WriteLine("Cannot find model " + displayid + " (" + m2FilePath + ")");
                 creaturemeshes[displayid] = null;
                 completion.SetResult(null);
                 creatureMeshesCurrentlyLoaded.Remove(displayid);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
 
-            var mesh = m2File.Task.Result.Value.Item1;
-            M2 m2 = m2File.Task.Result.Value.Item2;
-            M2Skin skin = m2File.Task.Result.Value.Item3;
+            var mesh = m2File.mesh;
+            M2 m2 = m2File.m2;
+            M2Skin skin = m2File.skin;
 
             // 1 : load items to define active geosets
             // 2 : if no item, set default geosets
@@ -338,7 +404,6 @@ namespace WDE.MapRenderer.Managers
                 if (creatureDisplayInfoExtraStore.TryGetValue(creatureDisplayInfo.ExtendedDisplayInfoID, out var displayinfoextra))
                 {
                     attachments = new();
-                    var itemModelPromise = new TaskCompletionSource<MdxInstance?>();
 
                     isCharacterModel = true;
                     int geosetSkin = 0;
@@ -376,9 +441,21 @@ namespace WDE.MapRenderer.Managers
                     CharHairGeosets hairstyle = charHairGeosetsStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId == displayinfoextra.HairStyle); // maybe +1 like beards ?
                     if (hairstyle != null)
                     {
-                        geosetHair += hairstyle.GeosetId;
+                        if (hairstyle.ShowScalp != 0 && hairstyle.GeosetId == 0)
+                        {
+                            // looks like scalp geoset is 1?
+                            geosetHair = 1;
+                        }
+                        else
+                        {
+                            geosetHair += hairstyle.GeosetId;
+                        }
                         // use CharHairGeosetsStore.ShowScalp (bald) or is it only some client stuff ?
                         // showscalp seems to be used for some races like goblins that don't use normal variations, but how ?
+                    }
+                    else
+                    {
+                        geosetHair = 1; // scalp?
                     }
                     //else Console.WriteLine("invalid hairstyle id for display id " + creatureDisplayInfo.Id + " race " + displayinfoextra.Race + " gender " + displayinfoextra.Gender);
                     // goblin males require to always lookup hairstyle even with default because their scalp geoset is an edditional geoset defined in charHairGeosetsStore variation 0
@@ -403,10 +480,10 @@ namespace WDE.MapRenderer.Managers
                         ItemDisplayInfo helmDisplayInfo = itemDisplayInfoStore[displayinfoextra.Helm];
                         // geoset group 2 ? some enable/disable 2100 (head) ?
                         geosetHelm = 2702 + helmDisplayInfo.geosetGroup1;
-                        yield return LoadItemMesh(displayinfoextra.Helm, false, displayinfoextra.Race, displayinfoextra.Gender, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
+                        var itemModel = await LoadItemMesh(displayinfoextra.Helm, false, displayinfoextra.Race, displayinfoextra.Gender);
+                        if (itemModel != null)
                         {
-                            attachments.Add((M2AttachmentType.Helm, itemModelPromise.Task.Result));
+                            attachments.Add((M2AttachmentType.Helm, itemModel));
 
                             // set helm geoset visibility
                             // todo : figure out what negative hidegeoset numbers means
@@ -462,21 +539,18 @@ namespace WDE.MapRenderer.Managers
                                 }
                             }
                         }
-                        itemModelPromise = new();
                     }
 
                     if (displayinfoextra.Shoulder > 0)
                     {
                         geosetShoulders = 2601 + itemDisplayInfoStore[(uint)displayinfoextra.Shoulder].geosetGroup1;
-                        yield return LoadItemMesh(displayinfoextra.Shoulder, false, 0, 0, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
-                            attachments.Add((M2AttachmentType.ShoulderLeft, itemModelPromise.Task.Result));
-                        itemModelPromise = new();
-                        
-                        yield return LoadItemMesh(displayinfoextra.Shoulder, true, 0, 0, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
-                            attachments.Add((M2AttachmentType.ShoulderRight, itemModelPromise.Task.Result));
-                        itemModelPromise = new();
+                        var shoulderLeft = await LoadItemMesh(displayinfoextra.Shoulder, false, 0, 0);
+                        if (shoulderLeft != null)
+                            attachments.Add((M2AttachmentType.ShoulderLeft, shoulderLeft));
+
+                        var shoulderRight = await LoadItemMesh(displayinfoextra.Shoulder, true, 0, 0);
+                        if (shoulderRight != null)
+                            attachments.Add((M2AttachmentType.ShoulderRight, shoulderRight));
                     }
 
                     if (displayinfoextra.Shirt > 0)
@@ -541,7 +615,7 @@ namespace WDE.MapRenderer.Managers
                 }
             }
             
-            (Material, int)[] materials = new (Material, int)[skin.Batches.Length];
+            (Material, int, MdxBatchData batch)[] materials = new (Material, int, MdxBatchData)[skin.Batches.Length];
             int j = 0;
             foreach (var batch in skin.Batches)
             {
@@ -559,33 +633,34 @@ namespace WDE.MapRenderer.Managers
                 
                 // titi, check if element is active
                 // loading all meshes for non humanoids (crdisplayinfoextra users), might need tob e tweaked
-                if (isCharacterModel && !activeGeosets!.Contains(sectionSkinSectionId))
-                    continue;
+                var geosetActive = !isCharacterModel || activeGeosets!.Contains(sectionSkinSectionId);
+                if (!geosetActive)
+                     continue;
 
                 j++;
 
-                TextureHandle? th = null;
-                TextureHandle? th2 = null;
-                TextureHandle? th3 = null;
+                ITexture? th = null;
+                ITexture? th2 = null;
+                ITexture? th3 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
-                    if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
+                    if (batch.textureLookupId + i >= m2.texture_lookup_table.Length)
                     {
-                        if (th2.HasValue)
+                        if (th2 != null)
                             th3 = textureManager.EmptyTexture;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
                         Console.WriteLine("File " + displayid + " batch " + j + " tex " + i + " out of range");
                         continue;
                     }
-                    var texId = m2.textureLookupTable[batch.textureLookupId + i];
+                    var texId = m2.texture_lookup_table[batch.textureLookupId + i];
                     if (texId == -1)
                     {
-                        if (th2.HasValue)
+                        if (th2 != null)
                             th3 = textureManager.EmptyTexture;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -628,8 +703,9 @@ namespace WDE.MapRenderer.Managers
                                 // cloak
                                 if (1500 <= sectionSkinSectionId && sectionSkinSectionId <= 1599)
                                 {
-                                    var capedisplayinfo = itemDisplayInfoStore.First(x => x.Id == displayinfoextra.Cape);
-                                    texFile = "Item\\ObjectComponents\\Cape\\" + capedisplayinfo.LeftModelTexture + ".blp";
+                                    var capedisplayinfo = itemDisplayInfoStore.FirstOrDefault(x => x.Id == displayinfoextra.Cape);
+                                    if (capedisplayinfo != null)
+                                        texFile = "Item\\ObjectComponents\\Cape\\" + capedisplayinfo.LeftModelTexture + ".blp";
                                     if (texFile == default)
                                         Console.WriteLine("Couldn't get Cape texture from displayextra : " + displayinfoextra);
                                 }
@@ -715,24 +791,23 @@ namespace WDE.MapRenderer.Managers
 
                         else
                         {
-                            // Console.WriteLine("Wasn't able to set texture for display id " + displayid);
-                            // Console.WriteLine("texture type : " + textureDefType + " not implemented yet");
+                            Console.WriteLine("Wasn't able to set texture for display id " + displayid);
+                            Console.WriteLine("texture type : " + textureDefType + " not implemented yet");
                         }
 
                         // System.Diagnostics.Debug.WriteLine($"M2 texture path :  {texFile}");
                         // var texFile = textureDef.filename.AsString();
-                        var tcs = new TaskCompletionSource<TextureHandle>();
                         if (texFile == default)
                         {
                             Console.WriteLine("texture path is empty for display id : " + displayid + " dispextra : " + creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID);
                             Console.WriteLine("texture type : " + textureDefType);
                             Console.WriteLine("skin section id : " + sectionSkinSectionId);
                         }
-                        yield return textureManager.GetTexture(texFile, tcs);
-                        var resTex = tcs.Task.Result;
-                        if (th2.HasValue)
+
+                        var resTex = await textureManager.GetTexture(texFile);
+                        if (th2 != null)
                             th3 = resTex;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = resTex;
                         else
                             th = resTex;
@@ -741,7 +816,17 @@ namespace WDE.MapRenderer.Managers
 
                 var material = CreateMaterial(m2, in batch, th, th2, th3);
 
-                materials[j - 1] = (material, batch.skinSectionIndex);
+                var batchData = new MdxBatchData()
+                {
+                    activeByDefault = geosetActive,
+                    colorIndex = batch.colorIndex,
+                    geoset = sectionSkinSectionId,
+                    textureTransformIndex = batch.textureUVAnimationLookupId == -1 || batch.textureUVAnimationLookupId >= m2.texture_transforms_lookup_table.Length ? -1 : m2.texture_transforms_lookup_table[batch.textureUVAnimationLookupId],
+                    textureTransformIndex2 = batch.textureUVAnimationLookupId == -1 || batch.textureUVAnimationLookupId >= m2.texture_transforms_lookup_table.Length ? -1 : m2.texture_transforms_lookup_table[batch.textureUVAnimationLookupId],
+                    model = m2
+                };
+
+                materials[j - 1] = (material, batch.skinSectionIndex, batchData);
             }
 
             if (j == 0)
@@ -750,8 +835,7 @@ namespace WDE.MapRenderer.Managers
                 creaturemeshes[displayid] = null;
                 completion.SetResult(null);
                 creatureMeshesCurrentlyLoaded.Remove(displayid);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
 
             var mdx = new MdxInstance
@@ -760,15 +844,17 @@ namespace WDE.MapRenderer.Managers
                 materials = materials.AsSpan(0, j).ToArray(),
                 model = m2,
                 attachments = attachments,
-                scale = creatureDisplayInfo.CreatureModelScale
+                scale = creatureDisplayInfo.CreatureModelScale,
+                fileId = m2FilePath,
+                displayId = displayid
             };
-            creaturemeshes.Add(displayid, mdx); // titi test
+            creaturemeshes.Add(displayid, new WeakReference<MdxInstance>(mdx)); // titi test
             completion.SetResult(mdx);
             creatureMeshesCurrentlyLoaded.Remove(displayid);
-            result.SetResult(mdx);    
+            return mdx;
         }
 
-        private Material CreateMaterial(M2 m2, in M2Batch batch, TextureHandle? textureHandle1, TextureHandle? textureHandle2, TextureHandle? textureHandle3)
+        private Material CreateMaterial(M2 m2, in M2Batch batch, ITexture? textureHandle1, ITexture? textureHandle2, ITexture? textureHandle3)
         {
             ref readonly var materialDef = ref m2.materials[batch.materialIndex];
             var material = materialManager.CreateMaterial("data/m2.json");
@@ -816,7 +902,7 @@ namespace WDE.MapRenderer.Managers
             if (materialDef.blending_mode == M2Blend.M2BlendOpaque)
             {
                 material.BlendingEnabled = false;
-                material.SetUniform("alphaTest", -1);
+                material.SetUniform("alphaTest", 1.0f / 255.0f);
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendAlphaKey)
             {
@@ -882,43 +968,50 @@ namespace WDE.MapRenderer.Managers
             return material;
         }
 
-        public IEnumerator LoadItemMesh(uint displayid, bool right, uint race, uint gender, TaskCompletionSource<MdxInstance?> result)
+        public async ValueTask<MdxInstance?> LoadItemMesh(uint displayid, bool right, uint race, uint gender)
         {
             ushort raceGenderKey = (ushort)(race << 1 | gender);
-            if (itemMeshes.ContainsKey((displayid, right, raceGenderKey)))
+            var key = (displayid, right, raceGenderKey);
+            if (itemMeshes.TryGetValue(key, out var itemMeshInstance))
             {
-                result.SetResult(itemMeshes[(displayid, right, raceGenderKey)]);
-                yield break;
+                if (itemMeshInstance == null)
+                {
+                    return null;
+                }
+                if (itemMeshInstance.TryGetTarget(out var itemMeshInstanceTarget))
+                {
+                    return itemMeshInstanceTarget;
+                }
+                else
+                {
+                    itemMeshes.Remove(key);
+                }
             }
 
-            if (itemMeshesCurrentlyLoaded.TryGetValue((displayid, right, raceGenderKey), out var loadInProgress))
+            if (itemMeshesCurrentlyLoaded.TryGetValue(key, out var loadInProgress))
             {
-                yield return new WaitForTask(loadInProgress);
-                result.SetResult(itemMeshes[(displayid, right, raceGenderKey)]);
-                yield break;
+                return await loadInProgress;
             }
 
             var completion = new TaskCompletionSource<MdxInstance?>();
-            itemMeshesCurrentlyLoaded[(displayid, right, raceGenderKey)] = completion.Task;
+            itemMeshesCurrentlyLoaded[key] = completion.Task;
 
             if (!itemDisplayInfoStore.TryGetValue(displayid, out var displayInfo))
             {
                 Console.WriteLine("Cannot find item display id " + displayid);
-                itemMeshes[(displayid, right, raceGenderKey)] = null;
+                itemMeshes[key] = null;
                 completion.SetResult(null);
-                itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
-                result.SetResult(null);
-                yield break;
+                itemMeshesCurrentlyLoaded.Remove(key);
+                return null;
             }
 
             if ((displayInfo.LeftModel == default && !right) ||
                 (displayInfo.RightModel == default && right))
             {
-                itemMeshes[(displayid, right, raceGenderKey)] = null;
+                itemMeshes[key] = null;
                 completion.SetResult(null);
-                itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
-                result.SetResult(null);
-                yield break;
+                itemMeshesCurrentlyLoaded.Remove(key);
+                return null;
             }
 
             var model = (right ? displayInfo.RightModel : displayInfo.LeftModel);
@@ -958,24 +1051,22 @@ namespace WDE.MapRenderer.Managers
                 texture = folderPath + texture + ".blp";
             }
 
-            TaskCompletionSource<(IMesh, M2, M2Skin)?> m2File = new();
-            yield return InternalLoadM2Mesh(model, m2File);
+            var m2File= await InternalLoadM2Mesh(model);
 
-            if (!m2File.Task.Result.HasValue)
+            if (m2File == null)
             {
                 Console.WriteLine("Cannot find model " + model);
-                itemMeshes[(displayid, right, raceGenderKey)] = null;
+                itemMeshes[key] = null;
                 completion.SetResult(null);
-                itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
-                result.SetResult(null);
-                yield break;
+                itemMeshesCurrentlyLoaded.Remove(key);
+                return null;
             }
 
-            var mesh = m2File.Task.Result.Value.Item1;
-            M2 m2 = m2File.Task.Result.Value.Item2;
-            M2Skin skin = m2File.Task.Result.Value.Item3;
-            
-            (Material, int)[] materials = new (Material, int)[skin.Batches.Length];
+            var mesh = m2File.mesh;
+            M2 m2 = m2File.m2;
+            M2Skin skin = m2File.skin;
+
+            (Material, int, MdxBatchData)[] materials = new (Material, int, MdxBatchData)[skin.Batches.Length];
             int j = 0;
             foreach (var batch in skin.Batches)
             {
@@ -992,28 +1083,28 @@ namespace WDE.MapRenderer.Managers
                 
                 j++;
 
-                TextureHandle? th = null;
-                TextureHandle? th2 = null;
-                TextureHandle? th3 = null;
+                ITexture? th = null;
+                ITexture? th2 = null;
+                ITexture? th3 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
-                    if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
+                    if (batch.textureLookupId + i >= m2.texture_lookup_table.Length)
                     {
-                        if (th2.HasValue)
+                        if (th2 != null)
                             th3 = textureManager.EmptyTexture;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
                         Console.WriteLine("File " + model + " batch " + j + " tex " + i + " out of range");
                         continue;
                     }
-                    var texId = m2.textureLookupTable[batch.textureLookupId + i];
+                    var texId = m2.texture_lookup_table[batch.textureLookupId + i];
                     if (texId == -1)
                     {
-                        if (th2.HasValue)
+                        if (th2 != null)
                             th3 = textureManager.EmptyTexture;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -1030,57 +1121,80 @@ namespace WDE.MapRenderer.Managers
                                 Console.WriteLine("okay, so there is model " + model + " which has texture type: " + textureDefType + ". What is it?");
                             texFile = texture;
                         }
-                        
-                        var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return textureManager.GetTexture(texFile, tcs);
-                        var resTex = tcs.Task.Result;
-                        if (th2.HasValue)
+
+                        var resTex = await textureManager.GetTexture(texFile);
+                        if (th2 != null)
                             th3 = resTex;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = resTex;
                         else
                             th = resTex;
                     }
                 }
 
-                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2, th3), batch.skinSectionIndex);
+                var batchData = new MdxBatchData()
+                {
+                    activeByDefault = true,
+                    colorIndex = batch.colorIndex,
+                    geoset = -1,
+                    textureTransformIndex = batch.textureUVAnimationLookupId == -1 || batch.textureUVAnimationLookupId >= m2.texture_transforms_lookup_table.Length ? -1 : m2.texture_transforms_lookup_table[batch.textureUVAnimationLookupId],
+                    textureTransformIndex2 = batch.textureUVAnimationLookupId == -1 || batch.textureUVAnimationLookupId >= m2.texture_transforms_lookup_table.Length ? -1 : m2.texture_transforms_lookup_table[batch.textureUVAnimationLookupId],
+                    model = m2
+                };
+
+                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2, th3), batch.skinSectionIndex, batchData);
             }
             
             if (j == 0)
             {
                 Console.WriteLine("Model " + model + " has 0 materials");
-                itemMeshes[(displayid, right, raceGenderKey)] = null;
+                itemMeshes[key] = null;
                 completion.SetResult(null);
-                itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
-                result.SetResult(null);
-                yield break;
+                itemMeshesCurrentlyLoaded.Remove(key);
+                return null;
             }
 
             var mdx = new MdxInstance
             {
                 mesh = mesh,
                 materials = materials.AsSpan(0, j).ToArray(),
-                model = m2
+                model = m2,
+                fileId = model,
+                displayId = displayid
             };
-            itemMeshes.Add((displayid, right, raceGenderKey), mdx);
-            completion.SetResult(null);
-            itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
-            result.SetResult(mdx);
+            itemMeshes.Add(key, new WeakReference<MdxInstance>(mdx));
+            completion.SetResult(mdx);
+            itemMeshesCurrentlyLoaded.Remove(key);
+            return mdx;
         }
         
-        public IEnumerator LoadGameObjectModel(uint gameObjectDisplayId, TaskCompletionSource<(MdxInstance?, WmoManager.WmoInstance?)?> result)
+        public async ValueTask<(MdxInstance?, WmoManager.WmoInstance?)?> LoadGameObjectModel(uint gameObjectDisplayId)
         {
-            if (gameObjectmeshes.ContainsKey(gameObjectDisplayId))
+            if (gameObjectmeshes.TryGetValue(gameObjectDisplayId, out var gameObjectMeshInstance))
             {
-                result.SetResult(gameObjectmeshes[gameObjectDisplayId]);
-                yield break;
+                if (gameObjectMeshInstance == null)
+                {
+                    return null;
+                }
+
+                if (gameObjectMeshInstance.Value.Item1 != null &&
+                    gameObjectMeshInstance.Value.Item1.TryGetTarget(out var gameObjectMdx))
+                {
+                    return (gameObjectMdx, null);
+                }
+
+                if (gameObjectMeshInstance.Value.Item2 != null &&
+                    gameObjectMeshInstance.Value.Item2.TryGetTarget(out var gameObjectWmo))
+                {
+                    return (null, gameObjectWmo);
+                }
+
+                gameObjectmeshes.Remove(gameObjectDisplayId);
             }
 
             if (gameObjectMeshesCurrentlyLoaded.TryGetValue(gameObjectDisplayId, out var loadInProgress))
             {
-                yield return new WaitForTask(loadInProgress);
-                result.SetResult(gameObjectmeshes[gameObjectDisplayId]);
-                yield break;
+                return await loadInProgress;
             }
 
             var completion = new TaskCompletionSource<(MdxInstance?, WmoManager.WmoInstance?)?>();
@@ -1092,8 +1206,7 @@ namespace WDE.MapRenderer.Managers
                 gameObjectmeshes[gameObjectDisplayId] = null;
                 completion.SetResult(null);
                 gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
 
             bool isWmo = false;
@@ -1104,55 +1217,57 @@ namespace WDE.MapRenderer.Managers
             }
             else if (displayInfo.ModelName.FileType == FileId.Type.FileId)
             {
-                var header = gameFiles.ReadFile(displayInfo.ModelName, maxReadBytes: 4);
-                yield return header;
+                var header = await gameFiles.ReadFile(displayInfo.ModelName, maxReadBytes: 4);
 
-                if (header.Result == null)
+                if (header == null)
                 {
                     Console.WriteLine("Cannot find model " + gameObjectDisplayId);
                     gameObjectmeshes[gameObjectDisplayId] = null;
                     completion.SetResult(null);
                     gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
-                    result.SetResult(null);
-                    yield break;
+                    return null;
                 }
 
-                if (header.Result[0] == 'R' && header.Result[1] == 'E' && header.Result[2] == 'V' && header.Result[3] == 'M')
+                if (header[0] == 'R' && header[1] == 'E' && header[2] == 'V' && header[3] == 'M')
                     isWmo = true;
-                header.Result.Dispose();
+                header.Dispose();
             }
             
             if (isWmo)
             {
-                var wmoInstance = new TaskCompletionSource<WmoManager.WmoInstance?>();
-                yield return wmoManager.LoadWorldMapObject(displayInfo.ModelName, wmoInstance);
-                var res = gameObjectmeshes[gameObjectDisplayId] = (null, wmoInstance.Task.Result);
-                completion.SetResult(null);
+                var wmoInstance = await wmoManager.LoadWorldMapObject(displayInfo.ModelName);
+                if (wmoInstance == null)
+                {
+                    gameObjectmeshes[gameObjectDisplayId] = null;
+                    completion.SetResult(null);
+                    gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
+                    return null;
+                }
+                gameObjectmeshes[gameObjectDisplayId] = (null, new WeakReference<WmoManager.WmoInstance>(wmoInstance));
+                completion.SetResult((null, wmoInstance));
                 gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
-                result.SetResult(res);
-                yield break;
+                return (null, wmoInstance);
             }
 
             var m2FilePath = displayInfo.ModelName;
             
-            TaskCompletionSource<(IMesh, M2, M2Skin)?> m2File = new();
-            yield return InternalLoadM2Mesh(m2FilePath, m2File);
+            var m2File = await InternalLoadM2Mesh(m2FilePath);
 
-            if (!m2File.Task.Result.HasValue)
+            if (m2File == null)
             {
                 Console.WriteLine("Cannot find path " + displayInfo.ModelName);
                 gameObjectmeshes[gameObjectDisplayId] = null;
                 completion.SetResult(null);
                 gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
 
-            var mesh = m2File.Task.Result.Value.Item1;
-            M2 m2 = m2File.Task.Result.Value.Item2;
-            M2Skin skin = m2File.Task.Result.Value.Item3;
+            var mesh = m2File.mesh;
+            M2 m2 = m2File.m2;
+            M2Skin skin = m2File.skin;
 
-            (Material, int)[] materials = new (Material, int)[skin.Batches.Length];
+
+            (Material, int, MdxBatchData)[] materials = new (Material, int, MdxBatchData)[skin.Batches.Length];
             int j = 0;
             foreach (var batch in skin.Batches)
             {
@@ -1169,28 +1284,28 @@ namespace WDE.MapRenderer.Managers
                 
                 j++;
                 
-                TextureHandle? th = null;
-                TextureHandle? th2 = null;
-                TextureHandle? th3 = null;
+                ITexture? th = null;
+                ITexture? th2 = null;
+                ITexture? th3 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
-                    if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
+                    if (batch.textureLookupId + i >= m2.texture_lookup_table.Length)
                     {
-                        if (th2.HasValue)
+                        if (th2 != null)
                             th3 = textureManager.EmptyTexture;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
                         Console.WriteLine("File " + gameObjectDisplayId + " batch " + j + " tex " + i + " out of range");
                         continue;
                     }
-                    var texId = m2.textureLookupTable[batch.textureLookupId + i];
+                    var texId = m2.texture_lookup_table[batch.textureLookupId + i];
                     if (texId == -1)
                     {
-                        if (th2.HasValue)
+                        if (th2 != null)
                             th3 = textureManager.EmptyTexture;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -1198,19 +1313,26 @@ namespace WDE.MapRenderer.Managers
                     else
                     {
                         var texFile = m2.textures[texId].filename.AsString();
-                        var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return textureManager.GetTexture(texFile, tcs);
-                        var resTex = tcs.Task.Result;
-                        if (th2.HasValue)
+                        var resTex = await textureManager.GetTexture(texFile);
+                        if (th2 != null)
                             th3 = resTex;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = resTex;
                         else
                             th = resTex;
                     }
                 }
 
-                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2, th3), batch.skinSectionIndex);
+                var batchData = new MdxBatchData()
+                {
+                    activeByDefault = true,
+                    colorIndex = batch.colorIndex,
+                    geoset = -1,
+                    textureTransformIndex = batch.textureUVAnimationLookupId == -1 || batch.textureUVAnimationLookupId >= m2.texture_transforms_lookup_table.Length ? -1 : m2.texture_transforms_lookup_table[batch.textureUVAnimationLookupId],
+                    textureTransformIndex2 = batch.textureUVAnimationLookupId == -1 || batch.textureUVAnimationLookupId >= m2.texture_transforms_lookup_table.Length ? -1 : m2.texture_transforms_lookup_table[batch.textureUVAnimationLookupId],
+                    model = m2
+                };
+                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2, th3), batch.skinSectionIndex, batchData);
             }
 
             if (j == 0)
@@ -1219,35 +1341,44 @@ namespace WDE.MapRenderer.Managers
                 gameObjectmeshes[gameObjectDisplayId] = null;
                 completion.SetResult(null);
                 gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
 
             var mdx = new MdxInstance
             {
                 mesh = mesh,
                 materials = materials.AsSpan(0, j).ToArray(),
-                model = m2
+                model = m2,
+                fileId = displayInfo.ModelName,
+                displayId = gameObjectDisplayId
             };
-            gameObjectmeshes.Add(gameObjectDisplayId, (mdx, null));
-            completion.SetResult(null);
+            gameObjectmeshes.Add(gameObjectDisplayId, (new WeakReference<MdxInstance>(mdx), null));
+            completion.SetResult((mdx, null));
             gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
-            result.SetResult((mdx, null));
+            return (mdx, null);
         }
         
-        public IEnumerator LoadM2Mesh(FileId path, TaskCompletionSource<MdxInstance?> result)
+        public async ValueTask<MdxInstance?> LoadM2Mesh(FileId path)
         {
-            if (meshes.ContainsKey(path))
+            if (meshes.TryGetValue(path, out var mesh1))
             {
-                result.SetResult(meshes[path]);
-                yield break;
+                if (mesh1 == null)
+                {
+                    return null;
+                }
+                if (mesh1.TryGetTarget(out var meshInstance))
+                {
+                    return meshInstance;
+                }
+                else
+                {
+                    meshes.Remove(path);
+                }
             }
 
             if (meshesCurrentlyLoaded.TryGetValue(path, out var loadInProgress))
             {
-                yield return new WaitForTask(loadInProgress);
-                result.SetResult(meshes[path]);
-                yield break;
+                return await loadInProgress;
             }
 
             var completion = new TaskCompletionSource<MdxInstance?>();
@@ -1255,24 +1386,22 @@ namespace WDE.MapRenderer.Managers
 
             var m2FilePath = path;
             
-            TaskCompletionSource<(IMesh, M2, M2Skin)?> m2File = new();
-            yield return InternalLoadM2Mesh(m2FilePath, m2File);
+            var m2File = await InternalLoadM2Mesh(m2FilePath);
 
-            if (!m2File.Task.Result.HasValue)
+            if (m2File == null)
             {
                 Console.WriteLine("Cannot find model " + path);
                 meshes[path] = null;
                 completion.SetResult(null);
                 meshesCurrentlyLoaded.Remove(path);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
-            
-            var mesh = m2File.Task.Result.Value.Item1;
-            M2 m2 = m2File.Task.Result.Value.Item2;
-            M2Skin skin = m2File.Task.Result.Value.Item3;
 
-            (Material, int)[] materials = new (Material, int)[skin.Batches.Length];
+            var mesh = m2File.mesh;
+            M2 m2 = m2File.m2;
+            M2Skin skin = m2File.skin;
+
+            (Material, int, MdxBatchData)[] materials = new (Material, int, MdxBatchData)[skin.Batches.Length];
             int j = 0;
             foreach (var batch in skin.Batches)
             {
@@ -1289,28 +1418,28 @@ namespace WDE.MapRenderer.Managers
 
                 j++;
 
-                TextureHandle? th = null;
-                TextureHandle? th2 = null;
-                TextureHandle? th3 = null;
+                ITexture? th = null;
+                ITexture? th2 = null;
+                ITexture? th3 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
-                    if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
+                    if (batch.textureLookupId + i >= m2.texture_lookup_table.Length)
                     {
-                        if (th2.HasValue)
+                        if (th2 != null)
                             th3 = textureManager.EmptyTexture;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
                         Console.WriteLine("File " + path + " batch " + j + " tex " + i + " out of range");
                         continue;
                     }
-                    var texId = m2.textureLookupTable[batch.textureLookupId + i];
+                    var texId = m2.texture_lookup_table[batch.textureLookupId + i];
                     if (texId == -1)
                     {
-                        if (th2.HasValue)
+                        if (th2 != null)
                             th3 = textureManager.EmptyTexture;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -1318,19 +1447,26 @@ namespace WDE.MapRenderer.Managers
                     else
                     {
                         var texFile = m2.textures[texId].filename.AsString();
-                        var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return textureManager.GetTexture(texFile, tcs);
-                        var resTex = tcs.Task.Result;
-                        if (th2.HasValue)
+                        var resTex = await textureManager.GetTexture(texFile);
+                        if (th2 != null)
                             th3 = resTex;
-                        else if (th.HasValue)
+                        else if (th != null)
                             th2 = resTex;
                         else
                             th = resTex;
                     }
                 }
 
-                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2, th3), batch.skinSectionIndex);
+                var batchData = new MdxBatchData()
+                {
+                    activeByDefault = true,
+                    colorIndex = batch.colorIndex,
+                    geoset = -1,
+                    textureTransformIndex = batch.textureUVAnimationLookupId == -1 || batch.textureUVAnimationLookupId >= m2.texture_transforms_lookup_table.Length ? -1 : m2.texture_transforms_lookup_table[batch.textureUVAnimationLookupId],
+                    textureTransformIndex2 = batch.textureUVAnimationLookupId == -1 || batch.textureUVAnimationLookupId >= m2.texture_transforms_lookup_table.Length ? -1 : m2.texture_transforms_lookup_table[batch.textureUVAnimationLookupId],
+                    model = m2
+                };
+                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2, th3), batch.skinSectionIndex, batchData);
             }
             
             if (j == 0)
@@ -1339,57 +1475,58 @@ namespace WDE.MapRenderer.Managers
                 meshes[path] = null;
                 completion.SetResult(null);
                 meshesCurrentlyLoaded.Remove(path);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
 
             var mdx = new MdxInstance
             {
                 mesh = mesh,
                 materials = materials.AsSpan(0, j).ToArray(),
-                model = m2
+                model = m2,
+                fileId = m2FilePath,
+                displayId = 0
             };
-            meshes.Add(path, mdx);
-            completion.SetResult(null);
+            meshes.Add(path, new WeakReference<MdxInstance>(mdx));
+            completion.SetResult(mdx);
             meshesCurrentlyLoaded.Remove(path);
-            result.SetResult(mdx);
+            return mdx;
         }
         
-        private IEnumerator InternalLoadM2Mesh(FileId path, TaskCompletionSource<(IMesh, M2, M2Skin)?> result)
+        private async ValueTask<InternalMesh?> InternalLoadM2Mesh(FileId path)
         {
-            if (internalMeshes.ContainsKey(path))
+            if (internalMeshes.TryGetValue(path, out var internalMesh))
             {
-                result.SetResult(internalMeshes[path]);
-                yield break;
+                if (internalMesh.TryGetTarget(out var target))
+                {
+                    return target;
+                }
+
+                internalMeshes.Remove(path);
             }
 
             if (internalMeshesCurrentlyLoaded.TryGetValue(path, out var loadInProgress))
             {
-                yield return new WaitForTask(loadInProgress);
-                result.SetResult(internalMeshes[path]);
-                yield break;
+                return await loadInProgress;
             }
 
-            var completion = new TaskCompletionSource<(IMesh, M2, M2Skin)?>();
+            var completion = new TaskCompletionSource<InternalMesh?>();
             internalMeshesCurrentlyLoaded[path] = completion.Task;
 
             var m2FilePath = path;
             
-            TaskCompletionSource<(M2, M2Skin)?> m2File = new();
-            yield return LoadM2File(m2FilePath, m2File);
+            var m2File = await LoadM2File(m2FilePath);
 
-            if (!m2File.Task.Result.HasValue)
+            if (!m2File.HasValue)
             {
                 Console.WriteLine("Cannot find model " + path);
                 internalMeshes[path] = null;
                 completion.SetResult(null);
                 internalMeshesCurrentlyLoaded.Remove(path);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
 
-            M2 m2 = m2File.Task.Result.Value.Item1;
-            M2Skin skin = m2File.Task.Result.Value.Item2;
+            M2 m2 = m2File.Value.Item1;
+            M2Skin skin = m2File.Value.Item2;
             
             Vector3[] vertices = null!;
             Vector3[] normals = null!;
@@ -1398,27 +1535,26 @@ namespace WDE.MapRenderer.Managers
             Color[] boneWeights = null!;
             Color[] boneIndices = null!;
 
-            yield return new WaitForTask(Task.Run(() =>
+            await engine.EnterThreadPool;
+            var count = skin.Vertices.Length;
+            vertices = new Vector3[count];
+            normals = new Vector3[count];
+            uv1 = new Vector2[count];
+            uv2 = new Vector2[count];
+            boneWeights = new Color[count];
+            boneIndices = new Color[count];
+
+            for (int i = 0; i < count; ++i)
             {
-                var count = skin.Vertices.Length;
-                vertices = new Vector3[count];
-                normals = new Vector3[count];
-                uv1 = new Vector2[count];
-                uv2 = new Vector2[count];
-                boneWeights = new Color[count];
-                boneIndices = new Color[count];
-                
-                for (int i = 0; i < count; ++i)
-                {
-                    ref readonly var vert = ref m2.vertices[skin.Vertices[i]];
-                    vertices[i] = vert.pos;
-                    normals[i] = vert.normal;
-                    uv1[i] = vert.tex_coord1;
-                    uv2[i] = vert.tex_coord2;
-                    boneWeights[i] = vert.bone_weights;
-                    boneIndices[i] = vert.bone_indices;
-                }
-            }));
+                ref readonly var vert = ref m2.vertices[skin.Vertices[i]];
+                vertices[i] = vert.pos;
+                normals[i] = vert.normal;
+                uv1[i] = vert.tex_coord1;
+                uv2[i] = vert.tex_coord2;
+                boneWeights[i] = vert.bone_weights;
+                boneIndices[i] = vert.bone_indices;
+            }
+            await engine.EnterGameLoop;
             
             var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, boneWeights, boneIndices);
             
@@ -1429,80 +1565,83 @@ namespace WDE.MapRenderer.Managers
             foreach (var subMesh in skin.SubMeshes)
             {
                 var sectionIndexCount = subMesh.indexCount;
-                var sectionIndexStart = subMesh.indexStart;
-                mesh.SetIndices(skin.Indices.AsSpan(sectionIndexStart, Math.Min(sectionIndexCount, skin.Indices.Length - sectionIndexStart)), j++);
+                var sectionIndexStart = subMesh.indexStart | (subMesh.Level << 16);
+                var indices = skin.Indices.AsSpan(sectionIndexStart, Math.Min(sectionIndexCount, skin.Indices.Length - sectionIndexStart));
+                mesh.SetIndices(indices, j++);
             }
-            
             mesh.RebuildIndices();
-            
-            internalMeshes.Add(path, (mesh, m2, skin));
-            completion.SetResult(null);
+
+            var internalMesh_ = new InternalMesh()
+            {
+                mesh = mesh,
+                m2 = m2,
+                skin = skin
+            };
+            internalMeshes.Add(path, new WeakReference<InternalMesh>(internalMesh_));
+            completion.SetResult(internalMesh_);
             internalMeshesCurrentlyLoaded.Remove(path);
-            result.SetResult((mesh, m2, skin));
+            return internalMesh_;
         }
         
-        public IEnumerator LoadM2File(FileId path, TaskCompletionSource<(M2, M2Skin)?> result)
+        public async ValueTask<(M2, M2Skin)?> LoadM2File(FileId path)
         {          
             path = path.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
             path = path.Replace("mdl", "M2", StringComparison.InvariantCultureIgnoreCase); // apparently there are still some MDL models	
             
-            if (m2s.ContainsKey(path))
+            if (m2s.TryGetValue(path, out var m2Data))
             {
-                result.SetResult(m2s[path]);
-                yield break;
+                if (m2Data.TryGetTarget(out var target))
+                    return (target.m2, target.skin);
+                m2s.Remove(path);
             }
 
             if (m2sCurrentlyLoaded.TryGetValue(path, out var loadInProgress))
             {
-                yield return new WaitForTask(loadInProgress);
-                result.SetResult(m2s[path]);
-                yield break;
+                var loaded = await loadInProgress;
+                return loaded == null ? null : (loaded.m2, loaded.skin);
             }
 
-            var completion = new TaskCompletionSource<(M2, M2Skin)?>();
+            var completion = new TaskCompletionSource<M2WithSkin?>();
             m2sCurrentlyLoaded[path] = completion.Task;
 
-            var file = gameFiles.ReadFile(path);
+            var file = await gameFiles.ReadFile(path);
 
-            yield return new WaitForTask(file);
-            
-            if (file.Result == null)
+            if (file == null)
             {
                 Console.WriteLine("Cannot find model " + path);
                 meshes[path] = null;
                 completion.SetResult(null);
                 meshesCurrentlyLoaded.Remove(path);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
             
             M2 m2 = null!;
-            
-            yield return new WaitForTask(Task.Run(() =>
+
+            await engine.EnterThreadPool;
+            try
             {
-                try
+                m2 = M2.Read(new MemoryBinaryReader(file), gameFiles.WoWVersion, path, p =>
                 {
-                    m2 = M2.Read(new MemoryBinaryReader(file.Result), gameFiles.WoWVersion, path, p =>
-                    {
-                        // TODO: can I use ReadFileSync? Can be problematic...
-                        var bytes = gameFiles.ReadFileSyncLocked(p, true);
-                        if (bytes == null)
-                            return null;
-                        return new MemoryBinaryReader(bytes);
-                    });
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    //Directory.CreateDirectory("broken_models");
-                    //File.WriteAllBytes("broken_models/" + path, file.Result.AsArray().AsSpan(file.Result.Length).ToArray());
-                    //File.WriteAllText("broken_models/" + path + ".txt", e.ToString());
-                }
-                finally
-                {
-                    file.Result.Dispose();
-                }
-            }));
+                    // TODO: can I use ReadFileSync? Can be problematic...
+                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
+                    if (bytes == null)
+                        return null;
+                    return new MemoryBinaryReader(bytes);
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //Directory.CreateDirectory("broken_models");
+                //File.WriteAllBytes("broken_models/" + path, file.Result.AsArray().AsSpan(file.Result.Length).ToArray());
+                //File.WriteAllText("broken_models/" + path + ".txt", e.ToString());
+            }
+            finally
+            {
+                file.Dispose();
+            }
+
+            await engine.EnterGameLoop;
 
             if (m2 == null)
             {
@@ -1510,8 +1649,7 @@ namespace WDE.MapRenderer.Managers
                 meshes[path] = null;
                 completion.SetResult(null);
                 meshesCurrentlyLoaded.Remove(path);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
             
             FileId skinFilePath;
@@ -1524,33 +1662,35 @@ namespace WDE.MapRenderer.Managers
                 skinFilePath = m2.skinFileId;
             }
             
-            var skinFile = gameFiles.ReadFile(skinFilePath);
-            
-            yield return new WaitForTask(skinFile);
-            
-            if (skinFile.Result == null)
+            var skinFile = await gameFiles.ReadFile(skinFilePath);
+
+            if (skinFile == null)
             {
                 Console.WriteLine("Cannot find model " + path);
                 meshes[path] = null;
                 completion.SetResult(null);
                 meshesCurrentlyLoaded.Remove(path);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
 
             M2Skin skin = new();
-            
-            
-            yield return new WaitForTask(Task.Run(() =>
+
+            await engine.EnterThreadPool;
+
+            skin = new M2Skin(new MemoryBinaryReader(skinFile));
+            skinFile.Dispose();
+
+            await engine.EnterGameLoop;
+
+            var m2WithSkin = new M2WithSkin()
             {
-                skin = new M2Skin(new MemoryBinaryReader(skinFile.Result));
-                skinFile.Result.Dispose();
-            }));
-            
-            m2s.Add(path, (m2, skin));
-            completion.SetResult(null);
+                m2 = m2,
+                skin = skin
+            };
+            m2s.Add(path, new WeakReference<M2WithSkin>(m2WithSkin));
+            completion.SetResult(m2WithSkin);
             m2sCurrentlyLoaded.Remove(path);
-            result.SetResult((m2, skin));
+            return (m2, skin);
         }
         
         public void RenderGUI()
@@ -1567,9 +1707,9 @@ namespace WDE.MapRenderer.Managers
 
             if (!Use_Texture_Combiner_Combos)
             {
-                ushort textureUnitValue = m2.textureUnitLookupTable[textureUnit.textureUnitLookupId];
+                short textureUnitValue = m2.tex_unit_lookup_table[textureUnit.textureUnitLookupId];
 
-                bool envMapped = textureUnitValue == short.MaxValue;
+                bool envMapped = textureUnitValue == -1;
                 bool isTransparent = blendingMode != 0;
 
                 if (isTransparent)
@@ -1599,8 +1739,8 @@ namespace WDE.MapRenderer.Managers
                     if (i == 0 && blendingMode == 0)
                         blendOverride = 0;
 
-                    ushort textureUnitValue = m2.textureUnitLookupTable[i + textureUnit.textureUnitLookupId];
-                    bool isEnvMapped = textureUnitValue == short.MaxValue;
+                    short textureUnitValue = m2.tex_unit_lookup_table[i + textureUnit.textureUnitLookupId];
+                    bool isEnvMapped = textureUnitValue == -1;
                     bool isTransparent = textureUnitValue == 1;
 
                     blendOverrideModifier[i] = blendOverride | ((isEnvMapped ? 1 : 0) * 8);
@@ -1778,7 +1918,7 @@ namespace WDE.MapRenderer.Managers
 
                 ushort t1PixelMode = (ushort)((shaderId >> 4) & 0x7);
                 bool t1EnvMapped = ((shaderId >> 4) & 0x8) != 0;
-                ushort textureUnitValue = m2.textureUnitLookupTable[batch.textureUnitLookupId];
+                short textureUnitValue = m2.tex_unit_lookup_table[batch.textureUnitLookupId];
 
                 if (textureCount == 1)
                 {
@@ -1943,8 +2083,8 @@ namespace WDE.MapRenderer.Managers
             identityBonesBuffer.Dispose();
             
             foreach (var mesh in internalMeshes.Values)
-                if (mesh.HasValue)
-                    meshManager.DisposeMesh(mesh.Value.Item1);
+                if (mesh != null && mesh.TryGetTarget(out var target))
+                    meshManager.DisposeMesh(target.mesh);
         }
     }
 }

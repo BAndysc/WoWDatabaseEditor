@@ -3,10 +3,13 @@ using System.Windows.Input;
 using Avalonia.Animation;
 using ImGuiNET;
 using Prism.Ioc;
+using TheEngine;
 using TheEngine.Components;
 using TheEngine.ECS;
 using TheEngine.Input;
 using TheEngine.Interfaces;
+using TheEngine.Structures;
+using TheEngine.Utils;
 using TheMaths;
 using WDE.Common.Database;
 using WDE.Common.Services;
@@ -37,6 +40,7 @@ public class SpawnViewer : IGameModule
     private readonly IMainThread mainThread;
     private readonly MdxManager mdxManager;
     private readonly AnimationSystem animationSystem;
+    private readonly Engine engine;
     private readonly SpawnInfoBoxWindow infoBoxWindow;
     public object? ViewModel => null;
 
@@ -46,6 +50,8 @@ public class SpawnViewer : IGameModule
 
     private SpawnDragger spawnDragger;
     private readonly SpawnContextMenu spawnContextMenu;
+
+    private RenderLayer renderLayer;
 
     public SpawnViewer(ICachedDatabaseProvider databaseProvider,
         ISpawnsContainer spawnsContainer,
@@ -60,6 +66,7 @@ public class SpawnViewer : IGameModule
         IMainThread mainThread,
         MdxManager mdxManager,
         AnimationSystem animationSystem,
+        Engine engine,
         
         SpawnDragger spawnDragger,
         SpawnContextMenu spawnContextMenu,
@@ -78,6 +85,7 @@ public class SpawnViewer : IGameModule
         this.mainThread = mainThread;
         this.mdxManager = mdxManager;
         this.animationSystem = animationSystem;
+        this.engine = engine;
         this.infoBoxWindow = infoBoxWindow;
         this.spawnDragger = spawnDragger;
         this.spawnContextMenu = spawnContextMenu;
@@ -90,11 +98,13 @@ public class SpawnViewer : IGameModule
     
     public void Initialize()
     {
+        renderLayer = gameContext.Engine.RenderManager.RegisterRenderLayer("Map Spawns");
         gameContext.Engine.RenderManager.AddPostprocess(postProcess);
     }
     
     public void Dispose()
     {
+        gameContext.Engine.RenderManager.UnregisterRenderLayer(renderLayer);
         spawnSelectionService.SelectedSpawn.Value = null;
         spawnsContainer.Clear();
         
@@ -156,7 +166,7 @@ public class SpawnViewer : IGameModule
         // here we can reload the spawn to load new values
     }
 
-    public void Render()
+    public void Render(float delta)
     {
         postProcess.Render(spawnSelectionService.SelectedSpawn.Value?.WorldObject?.Renderers);
     }
@@ -178,16 +188,16 @@ public class SpawnViewer : IGameModule
             return;
 
         loadedMap = (int)gameContext.CurrentMap.Id;
-        gameContext.StartCoroutine(LoadSpawnDataCoroutine(loadedMap.Value));
+        LoadSpawnDataCoroutine(loadedMap.Value).FireAndForget();
     }
 
-    private IEnumerator LoadSpawnDataCoroutine(int mapId)
+    private async ValueTask LoadSpawnDataCoroutine(int mapId)
     {
         while (spawnsContainer.IsLoading && gameContext.CurrentMap.Id == mapId)
-            yield return null;
+            await engine.NextFrame;
 
         if (gameContext.CurrentMap.Id != mapId) // could have changed while waiting
-            yield break;
+            return;
         
         spawnsContainer.LoadMap(mapId);
     }
@@ -204,19 +214,19 @@ public class SpawnViewer : IGameModule
         }
     }
 
-    public IEnumerator LoadChunk(int mapId, int chunkX, int chunkZ, CancellationToken cancellationToken)
+    public async ValueTask LoadChunk(int mapId, int chunkX, int chunkZ, CancellationToken cancellationToken)
     {
-        while ((spawnsContainer.IsLoading || spawnsContainer.LoadedMap != mapId) 
+        while ((spawnsContainer.IsLoading || spawnsContainer.LoadedMap != mapId)
                && !cancellationToken.IsCancellationRequested)
-            yield return null;
+            await engine.NextFrame;
 
         if (cancellationToken.IsCancellationRequested)
-            yield break;
+            return;
 
         foreach (var spawn in spawnsContainer.SpawnsPerChunk[chunkX, chunkZ]!)
         {
             if (cancellationToken.IsCancellationRequested)
-                yield break;
+                return;
             
             if (spawn is CreatureSpawnInstance creatureSpawnInstance)
             {
@@ -225,9 +235,12 @@ public class SpawnViewer : IGameModule
                 if (template == null)
                     continue;
 
-                var creatureInstance = new CreatureInstance(gameContext, template, null);
+                var creatureInstance = new CreatureInstance(gameContext, template, null, renderLayer);
 
-                yield return creatureInstance.Load();
+                await creatureInstance.Load();
+
+                if (cancellationToken.IsCancellationRequested)
+                    return;
 
                 creatureInstance.EnableRendering = spawn.IsVisibleInPhase(gamePhaseService) && 
                                                    spawn.IsVisibleInEvents(gameEventService);
@@ -239,9 +252,9 @@ public class SpawnViewer : IGameModule
 
                 if (creatureSpawnInstance.Equipment is { } eq)
                 {
-                    yield return creatureInstance.SetVirtualItem(0, eq.Item1);
-                    yield return creatureInstance.SetVirtualItem(1, eq.Item2);
-                    yield return creatureInstance.SetVirtualItem(2, eq.Item3);
+                    await creatureInstance.SetVirtualItem(0, eq.Item1, cancellationToken);
+                    await creatureInstance.SetVirtualItem(1, eq.Item2, cancellationToken);
+                    await creatureInstance.SetVirtualItem(2, eq.Item3, cancellationToken);
                 }
                 
                 if (creatureSpawnInstance.Addon is {} addon)
@@ -251,13 +264,15 @@ public class SpawnViewer : IGameModule
 
                     if (addon.Mount != 0)
                     {
-                        TaskCompletionSource<MdxManager.MdxInstance?> mountModelTask = new();
-                        yield return mdxManager.LoadCreatureModel(addon.Mount, mountModelTask);
-                        if (mountModelTask.Task.Result is { } mountModel)
+                        var mountModel = await mdxManager.LoadCreatureModel(addon.Mount);
+                        if (mountModel != null && !cancellationToken.IsCancellationRequested)
                             creatureInstance.Mount = mountModel;
                     }
                 }
-                
+
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
                 entityManager.AddManagedComponent(creatureInstance.WorldObjectEntity, spawn);
             }
             else if (spawn is GameObjectSpawnInstance gameObjectSpawnInstance)
@@ -267,9 +282,12 @@ public class SpawnViewer : IGameModule
                 if (template == null)
                     continue;
 
-                var gameobjectInstance = new GameObjectInstance(gameContext, template, null);
+                var gameobjectInstance = new GameObjectInstance(gameContext, template, null, renderLayer);
 
-                yield return gameobjectInstance.Load();
+                await gameobjectInstance.Load();
+
+                if (cancellationToken.IsCancellationRequested)
+                    return;
 
                 gameobjectInstance.EnableRendering = spawn.IsVisibleInPhase(gamePhaseService) && 
                                                      spawn.IsVisibleInEvents(gameEventService);
@@ -283,14 +301,12 @@ public class SpawnViewer : IGameModule
         }
     }
 
-    public IEnumerator UnloadChunk(int chunkX, int chunkZ)
+    public async ValueTask UnloadChunk(int chunkX, int chunkZ)
     {
         foreach (var spawn in spawnsContainer.SpawnsPerChunk[chunkX, chunkZ]!)
         {
             if (spawn.IsSpawned)
                 spawn.Dispose();
         }
-
-        yield break;
     }
 }

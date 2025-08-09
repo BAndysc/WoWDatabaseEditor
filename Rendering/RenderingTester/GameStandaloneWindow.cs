@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using TheEngine;
+using TheEngine.Utils;
 using WDE.Common.Services;
 
 namespace RenderingTester;

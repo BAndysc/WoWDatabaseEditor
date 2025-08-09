@@ -6,8 +6,11 @@ using TheEngine.Coroutines;
 using TheEngine.ECS;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
+using TheEngine.Utils;
 using TheMaths;
+using WDE.MapRenderer.Inspectors;
 using WDE.MapRenderer.Managers;
+using WDE.MapRenderer.Managers.Entities;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
@@ -29,6 +32,7 @@ namespace WDE.MapRenderer
         private WoWTextureManager textureManager = null!;
         private ChunkManager chunkManager = null!;
         private ModuleManager moduleManager = null!;
+        private MainUi mainUi = null!;
         private MdxManager mdxManager = null!;
         private WmoManager wmoManager = null!;
         private CameraManager cameraManager = null!;
@@ -51,6 +55,7 @@ namespace WDE.MapRenderer
         public WoWTextureManager TextureManager => textureManager;
         public ChunkManager ChunkManager => chunkManager;
         public ModuleManager ModuleManager => moduleManager;
+        public MainUi MainUi => mainUi;
         public MdxManager MdxManager => mdxManager;
         public WmoManager WmoManager => wmoManager;
         public CameraManager CameraManager => cameraManager;
@@ -86,6 +91,7 @@ namespace WDE.MapRenderer
             IMeshManager engineMeshManager,
             IMaterialManager materialManager,
             IUIManager uiManager,
+            EntityInspector entityInspector,
             Archetypes archetypes)
         {
             this.containerProvider = containerProvider;
@@ -100,6 +106,9 @@ namespace WDE.MapRenderer
             UiManager = uiManager;
             Archetypes = archetypes;
             updateLoop = new UpdateManager();
+
+            entityInspector.RegisterInspectorDrawer(containerProvider.Resolve<MdxRendererInspector>());
+            entityInspector.RegisterInspectorDrawer(containerProvider.Resolve<M2Inspector>());
         }
         
         public bool Initialize()
@@ -135,6 +144,7 @@ namespace WDE.MapRenderer
             areaTriggerManager = ResolveOrCreate<AreaTriggerManager>();
             raycastSystem = ResolveOrCreate<RaycastSystem>();
             moduleManager = ResolveOrCreate<ModuleManager>();
+            mainUi = ResolveOrCreate<MainUi>();
             animationSystem = ResolveOrCreate<AnimationSystem>();
             lowDetailHeightMapManager = ResolveOrCreate<LowDetailHeightMapManager>();
             
@@ -148,11 +158,6 @@ namespace WDE.MapRenderer
             if (t is IDisposable disp)
                 disposables.Add(disp);
             return t;
-        }
-
-        public void StartCoroutine(IEnumerator coroutine)
-        {
-            coroutineManager.Start(coroutine);
         }
 
         public void Update(float delta)

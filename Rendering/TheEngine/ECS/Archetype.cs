@@ -12,13 +12,13 @@ namespace TheEngine.ECS
         public IList<IComponentTypeData> Components => components;
         private readonly List<IManagedComponentTypeData> managedComponents = new();
         public IList<IManagedComponentTypeData> ManagedComponents => managedComponents;
-        public IEntityManager EntityManager { get; }
+        internal EntityManager EntityManager { get; }
         public uint ComponentBitMask => (uint)usedComponents.Data;
         public uint ManagedComponentBitMask => (uint)usedManagedComponents.Data;
 
         public ulong Hash => ComponentBitMask | (ulong)ManagedComponentBitMask << 32;
         
-        internal Archetype(IEntityManager entityManager)
+        internal Archetype(EntityManager entityManager)
         {
             EntityManager = entityManager;
         }
@@ -37,6 +37,23 @@ namespace TheEngine.ECS
 
             EntityManager.InstallArchetype(n);
             
+            return n;
+        }
+
+        public Archetype WithManagedComponentData(Type t)
+        {
+            var n = new Archetype(EntityManager);
+            n.components.AddRange(components);
+            n.usedComponents = usedComponents;
+
+            n.managedComponents.AddRange(managedComponents);
+            var typeData = EntityManager.ManagedTypeData(t);
+            n.managedComponents.Add(typeData);
+            n.usedManagedComponents = usedManagedComponents;
+            n.usedManagedComponents[(int)typeData.Hash] = true;
+
+            EntityManager.InstallArchetype(n);
+
             return n;
         }
 

@@ -27,27 +27,27 @@ namespace WDE.MpqReader.Structures
     {
         public uint magic { get; init; }                                       // "MD20". Legion uses a chunked file format starting with MD21.
         public uint version { get; init; }
-        // public M2Array<char> name { get; init; }                                   // should be globally unique, used to reload by name in internal clients
+        public M2Array<char> name { get; init; }                                   // should be globally unique, used to reload by name in internal clients
         public M2Flags global_flags { get; init; }
-/*0x014*/  //public readonly M2Array<uint> global_loops;                        // Timestamps used in global looping animations.
+/*0x014*/  public readonly M2Array<uint> global_loops;                        // Timestamps used in global looping animations.
 /*0x01C*/  public readonly M2Array<M2Sequence> sequences;                       // Information about the animations in the model.
 /*0x024*/  public readonly M2Array<short> sequenceIdToAnimationId;               // Mapping of sequence IDs to the entries in the Animation sequences block.
            public readonly short[] sequenceIdToAnimationLookup; // custom lookup table, because the algorithm for sequenceIdToAnimationId is not always correct
 /*0x02C*/  public readonly M2CompBoneArray bones;                           // MAX_BONES = 0x100 => Creature\SlimeGiant\GiantSlime.M2 has 312 bones (Wrath)
-/*0x034*/  public readonly M2Array<ushort> boneIndicesById;                   //Lookup table for key skeletal bones. (alt. name: key_bone_lookup)
+/*0x034*/  public readonly M2Array<short> boneIndicesById;                   //Lookup table for key skeletal bones. (alt. name: key_bone_lookup)
 /*0x03C*/  public readonly M2Array<M2Vertex> vertices;
 /*0x044*/  public readonly uint num_skin_profiles;                           // Views (LOD) are now in .skins.
 /*0x048*/  public readonly M2Array<M2Color> colors;                             // Color and alpha animations definitions.
 /*0x050*/  public readonly M2Array<M2Texture> textures;
 /*0x058*/  public readonly M2Array<M2TextureWeight> textureWeights;            // Transparency of textures.
 /*0x060*/  public readonly M2Array<M2TextureTransform> texture_transforms;
-/*0x068*/  public readonly M2Array<ushort> textureIndicesById;                // (alt. name: replacable_texture_lookup)
+/*0x068*/  public readonly M2Array<short> textureIndicesById;                // (alt. name: replacable_texture_lookup)
 /*0x070*/  public readonly M2Array<M2Material> materials;                       // Blending modes / render flags.
-/*0x078*/  // public readonly M2Array<ushort> boneCombos;                        // (alt. name: bone_lookup_table)
-/*0x080*/  public readonly M2Array<short> textureLookupTable;                     // (alt. name: texture_lookup_table)
-/*0x088*/  public readonly M2Array<ushort> textureUnitLookupTable;           // (alt. name: tex_unit_lookup_table)
-/*0x090*/  public readonly M2Array<ushort> textureTransparencyLookupTable;               // (alt. name: transparency_lookup_table)
-/*0x098*/  public readonly M2Array<ushort> textureUVAnimationLookup;            // (alt. name: texture_transforms_lookup_table)
+/*0x078*/  public readonly M2Array<short> bone_lookup_table;                        // (alt. name: bone_lookup_table)
+/*0x080*/  public readonly M2Array<short> texture_lookup_table;                     // (alt. name: texture_lookup_table)
+/*0x088*/  public readonly M2Array<short> tex_unit_lookup_table;           // (alt. name: tex_unit_lookup_table)
+/*0x090*/  public readonly M2Array<short> transparency_lookup_table;               // (alt. name: transparency_lookup_table)
+/*0x098*/  public readonly M2Array<short> texture_transforms_lookup_table;            // (alt. name: texture_transforms_lookup_table)
 /*0x0A0*/  public readonly CAaBox bounding_box;                                 // min/max( [1].z, 2.0277779f ) - 0.16f seems to be the maximum camera height
 /*0x0B8*/  public readonly float bounding_sphere_radius;                         // detail doodad draw dist = clamp (bounding_sphere_radius * detailDoodadDensityFade * detailDoodadDist, …)
 /*0x0BC*/  public readonly CAaBox collision_box;
@@ -56,7 +56,7 @@ namespace WDE.MpqReader.Structures
 /*0x0E0*/  public readonly M2Array<Vector3> collisionPositions;                  // (alt. name: collision_vertices)
 /*0x0E8*/  public readonly M2Array<Vector3> collisionFaceNormals;                // (alt. name: collision_normals) 
 /*0x0F0*/  public readonly M2Array<M2Attachment> attachments;                     // position of equipped weapons or effects
-/*0x0F8*/  public readonly M2Array<ushort> attachmentIndicesById;               // (alt. name: attachment_lookup_table)
+/*0x0F8*/  public readonly M2Array<short> attachmentIndicesById;               // (alt. name: attachment_lookup_table)
 /*0x100*/  //public readonly M2Array<M2Event> events;                               // Used for playing sounds when dying and a lot else.
 /*0x108*/  //public readonly M2Array<M2Light> lights;                               // Lights are mainly used in loginscreens but in wands and some doodads too.
 /*0x110*/  //public readonly M2Array<M2Camera> cameras;                             // The cameras are present in most models for having a model in the character tab. 
@@ -65,6 +65,9 @@ namespace WDE.MpqReader.Structures
         ///*0x128*/  M2Array<M2Particleⁱ> particle_emitters { get; init; }
            public M2Array<ushort>? textureCombinerCombos { get; init; }
         public readonly FileId skinFileId;
+#if DEBUG
+        public FileId debugPath; // for debugging purposes, the path to the file that was read
+#endif
 
         public int? GetAnimationIndexByAnimationId(int anim_id)
         {
@@ -77,7 +80,8 @@ namespace WDE.MpqReader.Structures
             if (anim_id >= sequenceIdToAnimationLookup.Length)
                 return null;
 
-            return sequenceIdToAnimationLookup[anim_id];
+            var sequenceId = sequenceIdToAnimationLookup[anim_id];
+            return sequenceId == -1 ? null : sequenceId;
             
             // this algorithm doesn't always work, it needs to be researched more
             // int i = anim_id % sequenceIdToAnimationId.Length;
@@ -101,6 +105,9 @@ namespace WDE.MpqReader.Structures
 
         private M2(IBinaryReader reader, GameFilesVersion wowVersion, FileId path, Func<FileId, IBinaryReader?> opener)
         {
+#if DEBUG
+            debugPath = path;
+#endif
             Dictionary<(ushort, ushort), uint>? animSubAnimToFileId = null;
             FileId[]? boneFileIds = null;
             FileId? skelFileId = null;
@@ -162,14 +169,16 @@ namespace WDE.MpqReader.Structures
                 reader.Offset += 4;
             }
             version = reader.ReadUInt32();
-            reader.SkipM2Array(); // name = reader.ReadArray(r => (char)r.ReadByte());
+            name = reader.ReadArray(r => (char)r.ReadByte());
             global_flags = (M2Flags)reader.ReadUInt32();
-            reader.SkipM2Array(); // global_loops = reader.ReadArrayUInt32();
+            global_loops = reader.ReadArrayUInt32();
             sequences = reader.ReadArray(r => new M2Sequence(r));
             var maxAnimId = 0;
             for (int i = sequences.Length - 1; i >= 0; --i)
                 maxAnimId = (short)Math.Max(maxAnimId, sequences[i].id);
             sequenceIdToAnimationLookup = new short[maxAnimId + 1];
+            for (int i = 0; i < maxAnimId; i++)
+                sequenceIdToAnimationLookup[i] = -1;
             for (int i = sequences.Length - 1; i >= 0; --i)
                 sequenceIdToAnimationLookup[sequences[i].id] = (short)i;
             sequenceIdToAnimationId = reader.ReadArrayInt16();
@@ -208,20 +217,20 @@ namespace WDE.MpqReader.Structures
                 return contentReader;
             };
             bones = new M2CompBoneArray(reader, in sequences, openAnimFile);
-            boneIndicesById = reader.ReadArrayUInt16();
+            boneIndicesById = reader.ReadArrayInt16();
             vertices = reader.ReadArray(M2Vertex.Read);
             num_skin_profiles = reader.ReadUInt32();
             colors = reader.ReadArray(r => new M2Color(r));
             textures = reader.ReadArray(M2Texture.Read);
             textureWeights = reader.ReadArray(M2TextureWeight.Read);
             texture_transforms = reader.ReadArray(M2TextureTransform.Read);
-            textureIndicesById = reader.ReadArrayUInt16();
+            textureIndicesById = reader.ReadArrayInt16();
             materials = reader.ReadArray(M2Material.Read);
-            reader.SkipM2Array(); //boneCombos = reader.ReadArrayUInt16();
-            textureLookupTable = reader.ReadArrayInt16();
-            textureUnitLookupTable = reader.ReadArrayUInt16();
-            textureTransparencyLookupTable = reader.ReadArrayUInt16();
-            textureUVAnimationLookup = reader.ReadArrayUInt16();
+            bone_lookup_table = reader.ReadArrayInt16();
+            texture_lookup_table = reader.ReadArrayInt16();
+            tex_unit_lookup_table = reader.ReadArrayInt16();
+            transparency_lookup_table = reader.ReadArrayInt16();
+            texture_transforms_lookup_table = reader.ReadArrayInt16();
             bounding_box = CAaBox.Read(reader);
             bounding_sphere_radius = reader.ReadFloat();
             collision_box = CAaBox.Read(reader);
@@ -230,7 +239,7 @@ namespace WDE.MpqReader.Structures
             collisionPositions = reader.ReadArrayVector3();
             collisionFaceNormals = reader.ReadArrayVector3();
             attachments = reader.ReadArray(M2Attachment.Read);
-            attachmentIndicesById = reader.ReadArrayUInt16();
+            attachmentIndicesById = reader.ReadArrayInt16();
             reader.SkipM2Array(); // events = reader.ReadArray(M2Event.Read);
             reader.SkipM2Array(); // lights = reader.ReadArray(M2Light.Read);
             reader.SkipM2Array(); // cameras = reader.ReadArray(M2Camera.Read);
@@ -324,6 +333,8 @@ namespace WDE.MpqReader.Structures
         kinematic_bone = 0x400,       // MoP+: allow physics to influence this bone
         helmet_anim_scaled = 0x1000,  // set blend_modificator to helmetAnimScalingRec.m_amount for this bone
         something_sequence_id = 0x2000, // <=bfa+, parent_bone+submesh_id are a sequence id instead?!
+
+        ignoreParentTransformMask = ignoreParentTranslate | ignoreParentScale | ignoreParentRotation,
     }
 
     public enum M2AttachmentType
@@ -766,6 +777,12 @@ namespace WDE.MpqReader.Structures
     {
         private readonly ushort value;
         public float Value => (float)value / 0x7fff;
+
+        public static Fixed16 One => new Fixed16(0x7fff);
+
+        public static Fixed16 Zero => new Fixed16(0);
+
+        public static Fixed16 Lerp(Fixed16 a, Fixed16 b, float t) => new((ushort)(a.value + (b.value - a.value) * t));
 
         public Fixed16(ushort value)
         {
@@ -1308,6 +1325,17 @@ namespace WDE.MpqReader.Structures
         public ushort global_sequence { get; init; }
         public M2Array<M2Array<uint>> timestamps;
         public M2Array<M2Array<T>> values;
+        public int Length => values.Length;
+
+        public ref readonly M2Array<uint> Timestamps(int idx)
+        {
+            return ref timestamps[idx];
+        }
+
+        public ref readonly M2Array<T> Values(int idx)
+        {
+            return ref values[idx];
+        }
 
         public static M2Track<T> Read(IBinaryReader reader, Func<IBinaryReader, T> read)
         {

@@ -2,14 +2,16 @@ using OpenGLBindings;
 
 namespace TheAvaloniaOpenGL.Resources
 {
-    public abstract class TextureBase : ITexture
+    public abstract class TextureBase : INativeTexture
     {
         private readonly IDevice device;
         private readonly TextureTarget textureTarget;
         public int Width { get; }
         public int Height { get; }
+        public int SizeInBytes { get; protected set; }
+        public int NativeHandle => Handle;
 
-        internal readonly int Handle;
+        internal int Handle;
 
         protected static void ToInternalFormat(TextureFormat textureFormat, out PixelInternalFormat internalFormat, out PixelFormat pixelFormat, out PixelType pixelType)
         {
@@ -72,6 +74,10 @@ namespace TheAvaloniaOpenGL.Resources
 
         public void Activate(int slot)
         {
+            if (Handle == 0)
+            {
+                throw new InvalidOperationException("Cannot activate a texture that has not been disposed.");
+            }
             //if (activeTextures[slot] == this)
             //    return;
             //activeTextures[slot] = this;
@@ -113,10 +119,14 @@ namespace TheAvaloniaOpenGL.Resources
             device.TexParameteri(textureTarget, TextureParameterName.TextureWrapT, (int)openGlMode);
             UnbindTexture();
         }
-    
+
         public void Dispose()
         {
-            device.DeleteTexture(Handle);
+             if (Handle != 0)
+             {
+                 device.DeleteTexture(Handle);
+                 Handle = 0;
+             }
         }
     }
 }

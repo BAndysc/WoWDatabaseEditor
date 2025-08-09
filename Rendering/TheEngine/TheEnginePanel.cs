@@ -207,6 +207,7 @@ namespace TheEngine
                 engine.inputManager.Update(delta);
                 engine.renderManager.BeginFrame();
                 engine.UpdateGui(delta / 1000.0f);
+                engine.EngineUi.BeginFrame(delta);
                 Tick(delta);
                 engine.statsManager.Counters.FrameTime.Add(delta);
                 sw.Restart();
@@ -225,6 +226,8 @@ namespace TheEngine
                 engine.renderManager.RenderTransparent(fb);
                 game?.RenderTransparent(delta);
                 engine.renderManager.RenderPostProcess();
+                engine.Render3DGUI();
+                engine.renderManager.PrepareRenderGui(delta);
                 game?.RenderGUI(delta);
                 engine.RenderGUI();
                 engine.renderManager.FinalizeRendering(fb);

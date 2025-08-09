@@ -106,29 +106,29 @@ namespace TheAvaloniaOpenGL
         }
 
         // Safe multithread call
-        public Texture CreateTexture(int width, int height, Rgba32[][] pixels, bool generateMips)
+        public Texture2D CreateTexture(int width, int height, Rgba32[][] pixels, bool generateMips)
         {
-            return new Texture(device, pixels, width, height, generateMips);
+            return new Texture2D(device, pixels, width, height, generateMips);
         }
         
-        public unsafe Texture CreateTexture(int width, int height, Rgba32* pixels, bool generateMips)
+        public unsafe Texture2D CreateTexture(int width, int height, Rgba32* pixels, bool generateMips)
         {
-            return new Texture(device, pixels, width, height, generateMips);
+            return new Texture2D(device, pixels, width, height, generateMips);
         }
         
-        public Texture CreateTexture(int width, int height, Vector4[] pixels)
+        public Texture2D CreateTexture(int width, int height, Vector4[] pixels)
         {
-            return new Texture(device, pixels, width, height);
+            return new Texture2D(device, pixels, width, height);
         }
         
-        public Texture CreateTexture(int width, int height, float[] pixels)
+        public Texture2D CreateTexture(int width, int height, float[] pixels)
         {
-            return new Texture(device, pixels, width, height);
+            return new Texture2D(device, pixels, width, height);
         }
         
-        public Texture CreateTexture(int width, int height, uint[]? pixels, TextureFormat format = TextureFormat.R8G8B8A8)
+        public Texture2D CreateTexture(int width, int height, uint[]? pixels, TextureFormat format = TextureFormat.R8G8B8A8)
         {
-            return new Texture(device, pixels, width, height, format);
+            return new Texture2D(device, pixels, width, height, format);
         }
 
         // Safe multithread call
@@ -150,15 +150,15 @@ namespace TheAvaloniaOpenGL
         }
 
         // Safe multithread call
-        internal RenderTexture CreateRenderTexture(int width, int height, int colorAttachments = 1, Texture? depthTexture = null)
+        internal RenderTexture CreateRenderTexture(int width, int height, int colorAttachments = 1, Texture2D? depthTexture = null)
         {
             return new RenderTexture(device, width, height, colorAttachments, depthTexture);
         }
 
         // Safe multithread call
-        internal RenderTexture CreateRenderTexture(Texture colorAttachment, Texture depthTexture)
+        internal RenderTexture CreateRenderTexture(Texture2D colorAttachment, Texture2D depthTexture, Texture2D? colorAttachment1 = null)
         {
-            return new RenderTexture(device, colorAttachment, depthTexture);
+            return new RenderTexture(device, colorAttachment, depthTexture, colorAttachment1);
         }
 
         // Safe multithread call

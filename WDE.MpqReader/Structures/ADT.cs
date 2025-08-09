@@ -21,6 +21,11 @@ namespace WDE.MpqReader.Structures
         private readonly int id;
 
         public WmoId(int id) => this.id = id;
+
+        public override string ToString()
+        {
+            return $"WMO[{id}]";
+        }
     }
 
     public readonly struct WorldMapObjectPlacementData
@@ -68,6 +73,11 @@ namespace WDE.MpqReader.Structures
         private readonly int id;
 
         public M2Id(int id) => this.id = id;
+
+        public override string ToString()
+        {
+            return $"M2[{id}]";
+        }
     }
 
     public readonly struct M2PlacementData

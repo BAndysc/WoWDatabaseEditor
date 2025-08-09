@@ -134,21 +134,30 @@ layout (std140) uniform ObjectData
 	mat4 _model;
 	mat4 _inverseModel;
 	uint _objectIndex;
+	int _drawDataX;
+	int _drawDataY;
+	int _drawDataZ;
+	int _drawDataW;
 #else
 	mat4 model;
 	mat4 inverseModel;
 	uint objectIndex;
+	int drawDataX;
+	int drawDataY;
+	int drawDataZ;
+	int drawDataW;
 #endif
 };
 
 #ifdef Instancing
 uniform samplerBuffer InstancingModels;
 uniform samplerBuffer InstancingInverseModels;
+uniform isamplerBuffer DrawData;
 #endif
 
 
 #ifdef Instancing
-#define VERTEX_SETUP_INSTANCING mat4 model = mat4(texelFetch(InstancingModels, gl_InstanceID * 4), texelFetch(InstancingModels, gl_InstanceID * 4 + 1), texelFetch(InstancingModels, gl_InstanceID * 4 + 2), texelFetch(InstancingModels, gl_InstanceID * 4 + 3)); mat4 inverseModel = mat4(texelFetch(InstancingInverseModels, gl_InstanceID * 4), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 1), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 2), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 3)); 
+#define VERTEX_SETUP_INSTANCING mat4 model = mat4(texelFetch(InstancingModels, gl_InstanceID * 4), texelFetch(InstancingModels, gl_InstanceID * 4 + 1), texelFetch(InstancingModels, gl_InstanceID * 4 + 2), texelFetch(InstancingModels, gl_InstanceID * 4 + 3)); mat4 inverseModel = mat4(texelFetch(InstancingInverseModels, gl_InstanceID * 4), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 1), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 2), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 3)); vec4 drawDataVector = texelFetch(DrawData, gl_InstanceID); int drawDataX = int(drawDataVector.x); int drawDataY = int(drawDataVector.y); int drawDataZ = int(drawDataVector.z); int drawDataW = int(drawDataVector.w);
 #else
 #define VERTEX_SETUP_INSTANCING ;
 #endif
@@ -164,19 +173,28 @@ layout (std140) uniform ObjectData
 	mat4 _model;
 	mat4 _inverseModel;
 	uint _objectIndex;
+	int _drawDataX;
+	int _drawDataY;
+	int _drawDataZ;
+	int _drawDataW;
 #else
 	mat4 model;
 	mat4 inverseModel;
 	uint objectIndex;
+	int drawDataX;
+	int drawDataY;
+	int drawDataZ;
+	int drawDataW;
 #endif
 };
 
 #ifdef Instancing
 uniform usamplerBuffer ObjectIndices;
+uniform isamplerBuffer DrawData;
 #endif
 
 #ifdef Instancing
-#define PIXEL_SETUP_INSTANCING(T) uint objectIndex = uint(texelFetch(ObjectIndices, T).r); 
+#define PIXEL_SETUP_INSTANCING(T) uint objectIndex = uint(texelFetch(ObjectIndices, T).r);  vec4 drawDataVector = texelFetch(DrawData, T);  int drawDataX = int(drawDataVector.x); int drawDataY = int(drawDataVector.y); int drawDataZ = int(drawDataVector.z); int drawDataW = int(drawDataVector.w);
 #else
 #define PIXEL_SETUP_INSTANCING(T) ;
 #endif

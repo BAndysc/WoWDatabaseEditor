@@ -40,10 +40,6 @@ namespace WDE.MapRenderer
             enginePanel.ContextMenu = null;
         }
 
-        private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-        }
-
         private bool canShowContextMenu = true;
         private Point initialTouch;
 

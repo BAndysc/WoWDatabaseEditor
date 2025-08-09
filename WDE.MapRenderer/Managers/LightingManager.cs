@@ -22,7 +22,7 @@ namespace WDE.MapRenderer.Managers
         private readonly TimeManager timeManager;
         private IMesh skySphereMesh;
         private Material skyMaterial;
-        private TextureHandle noiseTexture;
+        private ITexture noiseTexture;
 
         public LightingManager(IGameContext gameContext,
             IGameProperties gameProperties,

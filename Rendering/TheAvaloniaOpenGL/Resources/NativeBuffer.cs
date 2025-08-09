@@ -1,4 +1,7 @@
-﻿using OpenGLBindings;
+﻿#define DEBUG_CREATE_CALLSTACK
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using OpenGLBindings;
 using TheMaths;
 
 namespace TheAvaloniaOpenGL.Resources
@@ -28,7 +31,17 @@ namespace TheAvaloniaOpenGL.Resources
         void Activate(int slot);
     }
 
-    public sealed class NativeBuffer<T> : INativeBuffer where T : unmanaged
+    public abstract class NativeBufferBase : INativeBuffer
+    {
+        public int BufferHandle { get; protected set; }
+        public abstract void Dispose();
+        public abstract void Activate(int slot);
+#if DEBUG_CREATE_CALLSTACK
+        internal StackTrace AllocationStackTrace { get; } = new StackTrace(2, true);
+#endif
+    }
+
+    public sealed class NativeBuffer<T> : NativeBufferBase where T : unmanaged
     {
         private static bool UseStorageBuffer = false;
         
@@ -39,12 +52,12 @@ namespace TheAvaloniaOpenGL.Resources
 
         public int Length { get; private set; }
 
-        internal int BufferHandle { get; private set; }
-        
         internal int TextureBufferHandle { get; private set; }
         
         internal BufferTarget GlBufferType { get; }
-        
+
+        internal int SizeOfT;
+
         internal NativeBuffer(IDevice device, BufferTypeEnum bufferType, int length, BufferInternalFormat internalFormat)
         {
             this.device = device;
@@ -52,6 +65,7 @@ namespace TheAvaloniaOpenGL.Resources
             this.BufferType = bufferType;
             GlBufferType = BufferTypeToBindFlags(bufferType);
             CreateBuffer();
+            SizeOfT = Unsafe.SizeOf<T>();
         }
 
         internal NativeBuffer(IDevice device, BufferTypeEnum bufferType, ReadOnlySpan<T> data, BufferInternalFormat internalFormat)
@@ -60,6 +74,7 @@ namespace TheAvaloniaOpenGL.Resources
             this.internalFormat = internalFormat;
             this.BufferType = bufferType;
             GlBufferType = BufferTypeToBindFlags(bufferType);
+            SizeOfT = Unsafe.SizeOf<T>();
             CreateBufferWithData(data);
         }
 
@@ -67,7 +82,7 @@ namespace TheAvaloniaOpenGL.Resources
         {
             if (BufferHandle != -1)
             {
-                Console.WriteLine("Native buffer leaked!");
+                device.AddToDispose(this);
             }
         }
 
@@ -96,6 +111,10 @@ namespace TheAvaloniaOpenGL.Resources
         private void CreateBuffer()
         {
             BufferHandle = device.GenBuffer();
+            if (BufferHandle <= 0)
+            {
+                throw new Exception("Failed to create buffer");
+            }
             device.BindBuffer(GlBufferType, BufferHandle);
             if (IsStructuredBuffer && internalFormat == BufferInternalFormat.None)
                 throw new Exception("You need to specify internal format for TextureBuffer");
@@ -113,9 +132,10 @@ namespace TheAvaloniaOpenGL.Resources
             Length = data.Length;
             device.BindBuffer(GlBufferType, BufferHandle);
             fixed (void* pdata = data)
-                device.BufferData(GlBufferType, new IntPtr(data.Length * Utilities.SizeOf<T>()), new IntPtr(pdata), UsageHint);
+                device.BufferData(GlBufferType, new IntPtr(data.Length * SizeOfT), new IntPtr(pdata), UsageHint);
             
             device.BindBuffer(GlBufferType, 0);
+            device.TotalBufferBytes += Length * SizeOfT;
         }
 
         private BufferUsageHint UsageHint =>
@@ -124,31 +144,35 @@ namespace TheAvaloniaOpenGL.Resources
         public unsafe void UpdateBuffer(Span<T> newData)
         {
             device.BindBuffer(GlBufferType, BufferHandle);
+            var oldLength = Length;
             if (true || Length < newData.Length)
             {
                 fixed (void* pdata = newData)
-                    device.BufferData(GlBufferType, new IntPtr(newData.Length * Utilities.SizeOf<T>()), new IntPtr(pdata), UsageHint);
+                    device.BufferData(GlBufferType, new IntPtr(newData.Length * SizeOfT), new IntPtr(pdata), UsageHint);
                 Length = newData.Length;
             }
             else
             {
                 fixed (void* pdata = newData)
-                    device.BufferSubData(GlBufferType, IntPtr.Zero, new IntPtr(newData.Length * Utilities.SizeOf<T>()), new IntPtr(pdata));
+                    device.BufferSubData(GlBufferType, IntPtr.Zero, new IntPtr(newData.Length * SizeOfT), new IntPtr(pdata));
             }
+            device.TotalBufferBytes += (Length - oldLength) * SizeOfT;
         }
         
         public unsafe void UpdateBuffer(ref T newData)
         {
             device.BindBuffer(GlBufferType, BufferHandle);
+            var oldLength = Length;
             if (true || Length < 1)
             {
                 fixed (void* pdata = &newData)
-                    device.BufferData(GlBufferType, new IntPtr(Utilities.SizeOf<T>()), new IntPtr(pdata), UsageHint);
+                    device.BufferData(GlBufferType, SizeOfT, new IntPtr(pdata), UsageHint);
                 Length = 1;
             }    
             else
                 fixed (void* pdata = &newData)
-                    device.BufferSubData(GlBufferType, IntPtr.Zero, new IntPtr(Utilities.SizeOf<T>()), new IntPtr(pdata));
+                    device.BufferSubData(GlBufferType, IntPtr.Zero, SizeOfT, new IntPtr(pdata));
+            device.TotalBufferBytes += (Length - oldLength) * SizeOfT;
         }
 
         private static BufferTarget BufferTypeToBindFlags(BufferTypeEnum bufferType)
@@ -177,8 +201,12 @@ namespace TheAvaloniaOpenGL.Resources
             }
         }
 
-        public void Activate(int slot)
+        public override void Activate(int slot)
         {
+            if (BufferHandle <= -1)
+            {
+                throw new Exception("Trying to activate that has been disposed!!!1!");
+            }
             if (BufferType == BufferTypeEnum.Vertex)
             {
                 device.BindBuffer(BufferTarget.ArrayBuffer, BufferHandle);
@@ -211,12 +239,15 @@ namespace TheAvaloniaOpenGL.Resources
             }
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
-            if (IsUsingBufferTexture)
-                device.DeleteTexture(TextureBufferHandle);
-            device.DeleteBuffer(BufferHandle);
-            BufferHandle = -1;
+             if (BufferHandle <= -1)
+                 return;
+             if (IsUsingBufferTexture)
+                 device.DeleteTexture(TextureBufferHandle);
+             device.DeleteBuffer(BufferHandle);
+             device.TotalBufferBytes -= Length * SizeOfT;
+             BufferHandle = -1;
         }
     }
 }

@@ -33,8 +33,8 @@ namespace WDE.MapRenderer.Managers
             }
         }
 
-        private Dictionary<FileId, WmoInstance?> meshes = new();
-        private Dictionary<FileId, Task> meshesCurrentlyLoaded = new();
+        private Dictionary<FileId, WeakReference<WmoInstance>?> meshes = new();
+        private Dictionary<FileId, Task<WmoInstance?>> meshesCurrentlyLoaded = new();
 
         public WmoManager(IGameFiles gameFiles,
             IMeshManager meshManager,
@@ -49,37 +49,34 @@ namespace WDE.MapRenderer.Managers
             this.woWMeshManager = woWMeshManager;
         }
 
-        public IEnumerator LoadWorldMapObject(FileId path, TaskCompletionSource<WmoInstance?> result)
+        public async ValueTask<WmoInstance?> LoadWorldMapObject(FileId path)
         {
-            if (meshes.ContainsKey(path))
+            if (meshes.TryGetValue(path, out var mesh))
             {
-                result.SetResult(meshes[path]);
-                yield break;
+                if (mesh.TryGetTarget(out var target))
+                    return target;
+                meshes.Remove(path);
             }
 
             if (meshesCurrentlyLoaded.TryGetValue(path, out var loadInProgress))
             {
-                yield return loadInProgress;
-                result.SetResult(meshes[path]);
-                yield break;
+                return await loadInProgress;
             }
 
             var completion = new TaskCompletionSource<WmoInstance?>();
             meshesCurrentlyLoaded[path] = completion.Task;
 
-            var bytes = gameFiles.ReadFile(path);
-            yield return bytes;
-            if (bytes.Result == null)
+            var bytes = await gameFiles.ReadFile(path);
+            if (bytes == null)
             {
                 meshes[path] = null;
                 meshesCurrentlyLoaded.Remove(path);
                 completion.SetResult(null);
-                result.SetResult(null);
-                yield break;
+                return null;
             }
 
-            var wmo = WMO.Read(new MemoryBinaryReader(bytes.Result), gameFiles.WoWVersion);
-            bytes.Result.Dispose();
+            var wmo = WMO.Read(new MemoryBinaryReader(bytes), gameFiles.WoWVersion);
+            bytes.Dispose();
 
             List<WorldMapObjectGroup> groups = new();
             for (int i = 0; i < wmo.Header.nGroups; ++i)
@@ -90,13 +87,12 @@ namespace WDE.MapRenderer.Managers
                 else
                     groupFile = path.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo", StringComparison.OrdinalIgnoreCase);
                 
-                var bytesGroup = gameFiles.ReadFile(groupFile);
-                yield return bytesGroup;
-                if (bytesGroup.Result == null)
+                var bytesGroup = await gameFiles.ReadFile(groupFile);
+                if (bytesGroup == null)
                     continue;
 
-                var group = new WorldMapObjectGroup(new MemoryBinaryReader(bytesGroup.Result), in wmo.Header);
-                bytesGroup.Result.Dispose();
+                var group = new WorldMapObjectGroup(new MemoryBinaryReader(bytesGroup), in wmo.Header);
+                bytesGroup.Dispose();
                 // bazaarfacade03 and cathy_facade01 - LODs for stormwind used by portal culling,
                 // but gives poor results without portal culling
                 if (group.Header.uniqueID is 2625 or 2624)
@@ -133,15 +129,11 @@ namespace WDE.MapRenderer.Managers
                     
                     if (tex1 != null)
                     {
-                        var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return textureManager.GetTexture(tex1, tcs);
-                        mat.SetTexture("texture1", tcs.Task.Result);
+                        mat.SetTexture("texture1", await textureManager.GetTexture(tex1));
                     }
                     if (tex2 != null)
                     {
-                        var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return textureManager.GetTexture(tex2, tcs);
-                        mat.SetTexture("texture2", tcs.Task.Result);
+                        mat.SetTexture("texture2", await textureManager.GetTexture(tex2));
                     }
 
                     materials[j - 1] = mat;
@@ -165,10 +157,10 @@ namespace WDE.MapRenderer.Managers
                 group.Dispose();
             }
 
-            meshes.Add(path, wmoInstance);
+            meshes.Add(path, new WeakReference<WmoInstance>(wmoInstance));
             completion.SetResult(wmoInstance);
             meshesCurrentlyLoaded.Remove(path);
-            result.SetResult(wmoInstance);
+            return wmoInstance;
         }
 
         private Material CreateMaterial(WMO wmo, WorldMapObjectGroup group, int materialId, out string? tex1, out string? tex2, out string? tex3)
@@ -251,7 +243,11 @@ namespace WDE.MapRenderer.Managers
         public void Dispose()
         {
             foreach (var wmo in meshes.Values)
-                wmo?.Dispose(meshManager);
+            {
+                if (wmo.TryGetTarget(out var target))
+                    target.Dispose(meshManager);
+            }
+            meshes.Clear();
         }
     }
 }

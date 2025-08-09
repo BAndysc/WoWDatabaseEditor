@@ -18,13 +18,11 @@ namespace TheEngine;
 public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
 {
     protected Engine? engine;
+    protected GameRunner? gameRunner;
     private Stopwatch sw = new Stopwatch();
     private Stopwatch renderStopwatch = new Stopwatch();
     private Stopwatch updateStopwatch = new();
     private int frame = 0;
-    public float FrameRate => 1000.0f / framerate.Average;
-    
-    public static readonly DirectProperty<NativeTheEnginePanel, float> FrameRateProperty = AvaloniaProperty.RegisterDirect<NativeTheEnginePanel, float>("FrameRate", o => o.FrameRate);
 
     private RollingAverage framerate = new();
     private void Tick(float delta)
@@ -47,6 +45,10 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
+        if (e.Key == Key.P && (e.KeyModifiers & KeyModifiers.Control) != 0)
+        {
+            innerControl.ToggleProfiling();
+        }
         engine?.inputManager.keyboard.KeyDown(e.Key);
         //if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
         //    e.Handled = true;
@@ -150,7 +152,7 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
         sw.Stop();
     }
 
-    protected virtual void Update(float delta)
+    protected void InitializeGame()
     {
         if (!gameInitialized && game != null)
         {
@@ -162,8 +164,6 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
                 game = null;
             }
         }
-        game?.Update(delta);
-        engine?.renderManager.UpdateTransforms();
     }
 
     private bool disposed;
@@ -196,8 +196,11 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
     public NativeTheEnginePanel()
     {
         Focusable = true;
-        Children.Add(new InnerControl(this));
+        innerControl = new InnerControl(this);
+        Children.Add(innerControl);
     }
+
+    private InnerControl innerControl;
 
     private class InnerControl : NativeOpenGlControlBase
     {
@@ -223,6 +226,7 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
                 device = new DebugDevice(device);
     #endif
                 parent.engine = new Engine(device, new Configuration(), parent, false);
+                parent.gameRunner = new GameRunner(parent.engine);
             }
             catch (Exception e)
             {
@@ -252,6 +256,7 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
                 return;
 
             var engine = parent.engine;
+            var gameRunner = parent.gameRunner;
             
             engine.statsManager.PixelSize = new Vector2(PixelSize.Item1, PixelSize.Item2);
             engine.statsManager.Counters.PresentTime.Add(PresentTime);
@@ -260,46 +265,12 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
                 engine.Device.device.CheckError("start OnOpenGlRender");
                 engine.Device.device.Begin();
 
+                parent.InitializeGame();
+
                 var delta = (float)parent.sw.Elapsed.TotalMilliseconds;
-                engine.inputManager.Update(delta);
-                engine.renderManager.BeginFrame();
-                engine.UpdateGui(delta / 1000.0f);
-                parent.Tick(delta);
-                engine.statsManager.Counters.FrameTime.Add(delta);
                 parent.sw.Restart();
-                Dispatcher.UIThread.Post(() => RaisePropertyChanged<float>(FrameRateProperty, 0, parent.FrameRate), DispatcherPriority.Render);
-
-                parent.updateStopwatch.Restart();
-                parent.Update(delta);
-                parent.updateStopwatch.Stop();
-                engine.statsManager.Counters.UpdateTime.Add(parent.updateStopwatch.Elapsed.TotalMilliseconds);
-
-                // render pass
-                parent.renderStopwatch.Restart();
-                engine.renderManager.PrepareRendering(fb);
-                engine.renderManager.RenderOpaque(fb);
-                parent.game?.Render(delta);
-                engine.renderManager.RenderTransparent(fb);
-                parent.game?.RenderTransparent(delta);
-                engine.renderManager.RenderPostProcess();
-                parent.game?.RenderGUI(delta);
-                engine.RenderGUI();
-                engine.renderManager.FinalizeRendering(fb);
-                //engine.Device.device.Flush();
-                //engine.Device.device.Finish();
-                parent.renderStopwatch.Stop();
-                engine.statsManager.Counters.TotalRender.Add(parent.renderStopwatch.Elapsed.Milliseconds);
-                
-                if (engine.inputManager.Keyboard.JustPressed(Key.R))
-                {
-                    if (engine.Device.device is DebugDevice debug)
-                    {
-                        var file = new FileInfo("render_debug.txt");
-                        File.WriteAllLines(file.FullName, debug.commands);
-                        Console.WriteLine("Log written to " + file.FullName);
-                    }
-                }
-                engine.inputManager.PostUpdate();
+                gameRunner.NextFrame(delta / 1000.0f, parent.game);
+                parent.Tick(delta);
             }
             catch (Exception e)
             {

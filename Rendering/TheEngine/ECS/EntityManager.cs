@@ -3,6 +3,7 @@
 using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
+using TheEngine.Components;
 #if DEBUG_ENTITY_CREATE_CALLSTACK
 using System.Diagnostics;
 #endif
@@ -17,7 +18,7 @@ namespace TheEngine.ECS
 
     internal class EntityManager : IEntityManager, System.IDisposable
     {
-        private readonly EntityDataManager dataManager = new();
+        private readonly EntityDataManager dataManager;
         private readonly List<Entity> freeEntities = new();
         private Entity[] entities = new Entity[1];
         private ulong[] entitiesArchetype = new ulong[1];
@@ -26,13 +27,19 @@ namespace TheEngine.ECS
         #endif
         private uint used;
         private readonly Dictionary<System.Type, int> typeToIndexMapping = new();
+        private readonly Dictionary<System.Type, IComponentTypeData> typeToTypeDataMapping = new();
         private readonly Dictionary<System.Type, int> typeToManagedIndexMapping = new();
         private readonly Dictionary<ulong, Archetype> archetypes = new();
 
         internal EntityDataManager DataManager => dataManager;
         internal IEnumerable<Type> KnownTypes => typeToIndexMapping.Keys;
         internal IEnumerable<Type> KnownManagedTypes => typeToManagedIndexMapping.Keys;
-        
+
+        public EntityManager(Engine engine)
+        {
+            dataManager = new(engine);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResizeIfNeeded()
         {
@@ -45,8 +52,33 @@ namespace TheEngine.ECS
 #endif
             }
         }
-        
+
+        public Entity CreateEntity(Archetype archetype, string name)
+        {
+            var entity = CreateEntityInternal(archetype);
+            GetComponent<EntityName>(entity) = name;
+            return entity;
+        }
+
+        public Entity CreateEntity(Archetype archetype, ReadOnlySpan<byte> nameUtf8)
+        {
+            var entity = CreateEntityInternal(archetype);
+            GetComponent<EntityName>(entity) = nameUtf8;
+            return entity;
+        }
+
         public Entity CreateEntity(Archetype archetype)
+        {
+            var entity = CreateEntityInternal(archetype);
+            ref var name = ref GetComponent<EntityName>(entity);
+            Span<byte> nameBuffer = stackalloc byte[31];
+            entity.TryFormat(nameBuffer, out var bytesWritten, "", null);
+            nameBuffer[bytesWritten] = 0;
+            name = (ReadOnlySpan<byte>)nameBuffer.Slice(0, bytesWritten + 1);
+            return entity;
+        }
+
+        private Entity CreateEntityInternal(Archetype archetype)
         {
             Entity newEntity;
             if (freeEntities.Count > 0)
@@ -71,13 +103,16 @@ namespace TheEngine.ECS
 
         public void AddComponent<T>(Entity entity, in T component) where T : unmanaged, IComponentData
         {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
             ulong currentArchetypeHash = entitiesArchetype[entity.Id];
             var componentTypeData = TypeData<T>();
 
             var entityAlreadyHasComponent = (currentArchetypeHash & componentTypeData.GlobalHash) != 0;
             if (entityAlreadyHasComponent)
             {
-                Console.WriteLine("The entity has already the component, consider using GetComponent<T>() = value for more performance");
+                Console.WriteLine($"The entity has already the component, consider using GetComponent<{typeof(T)}>() = value for more performance");
             }
             else
             {
@@ -91,6 +126,9 @@ namespace TheEngine.ECS
         
         public void AddManagedComponent<T>(Entity entity, T component) where T : class, IManagedComponentData
         {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
             ulong currentArchetypeHash = entitiesArchetype[entity.Id];
             var componentTypeData = ManagedTypeData<T>();
 
@@ -114,7 +152,7 @@ namespace TheEngine.ECS
             if (entities[entity.Id].Version != entity.Version)
                 throw new Exception("Double remove entity, that's not allowed!");
             var archetypeHash = entitiesArchetype[entity.Id];
-            dataManager.RemoveEntity(entity, archetypeHash);
+            dataManager.RemoveEntity(entity, archetypeHash, true);
             freeEntities.Add(entity);
             entities[entity.Id] = Entity.Empty;
 #if DEBUG_ENTITY_CREATE_CALLSTACK
@@ -125,11 +163,20 @@ namespace TheEngine.ECS
 
         public bool Exist(Entity entity)
         {
-            return entities.Length > entity.Id && entities[entity.Id] == entity;
+            return entity != Entity.Empty && entities.Length > entity.Id && entities[entity.Id] == entity;
+        }
+
+        private void VerifyEntity(Entity entity)
+        {
+            if (!Exist(entity))
+                throw new Exception("Entity does not exist or is empty, cannot get managed component");
         }
 
         public ComponentDataAccess<T> GetDataAccessByEntity<T>(Entity entity) where T : unmanaged, IComponentData
         {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
             return dataManager[entitiesArchetype[entity.Id]].DataAccess<T>();
         }
         
@@ -140,17 +187,26 @@ namespace TheEngine.ECS
 
         public T GetManagedComponent<T>(Entity entity) where T : IManagedComponentData
         {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
             return dataManager[entitiesArchetype[entity.Id]].ManagedDataAccess<T>()[entity];
         }
         
         public T SetManagedComponent<T>(Entity entity, T value) where T : IManagedComponentData
         {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
             dataManager[entitiesArchetype[entity.Id]].ManagedDataAccess<T>()[entity] = value;
             return value;
         }
 
         public bool Is(Entity entity, Archetype archetype)
         {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
             return (entitiesArchetype[entity.Id] & archetype.Hash) == archetype.Hash;
         }
 
@@ -161,11 +217,17 @@ namespace TheEngine.ECS
 
         public bool HasComponent<T>(Entity entity) where T : unmanaged, IComponentData
         {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
             return (entitiesArchetype[entity.Id] & TypeData<T>().GlobalHash) != 0;
         }
 
         public bool HasManagedComponent<T>(Entity entity) where T : class, IManagedComponentData
         {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
             return (entitiesArchetype[entity.Id] & ManagedTypeData<T>().GlobalHash) != 0;
         }
 
@@ -173,34 +235,38 @@ namespace TheEngine.ECS
 
         public IComponentTypeData TypeData<T>() where T : unmanaged, IComponentData
         {
-            if (!typeToIndexMapping.TryGetValue(typeof(T), out var index))
-                index = typeToIndexMapping[typeof(T)] = typeToIndexMapping.Count;
-            if (index >= 32)
-                throw new Exception("Currently there is limit of 32 different component datas. If you need more, change BitVector32 to BitVector64 or BitArray");
-            return ComponentTypeData.Create<T>(index);
+            return TypeData(typeof(T));
         }
         
         public IComponentTypeData TypeData(System.Type t)
         {
+            if (typeToTypeDataMapping.TryGetValue(t, out var typeData))
+                return typeData;
             if (!typeToIndexMapping.TryGetValue(t, out var index))
                 index = typeToIndexMapping[t] = typeToIndexMapping.Count;
             if (index >= 32)
                 throw new Exception("Currently there is limit of 32 different component datas. If you need more, change BitVector32 to BitVector64 or BitArray");
-            return new ComponentTypeData(t, index);
+            return typeToTypeDataMapping[t] = (IComponentTypeData)Activator.CreateInstance(typeof(ComponentTypeData<>).MakeGenericType(t), index)!;
         }
 
         public IManagedComponentTypeData ManagedTypeData<T>() where T : class, IManagedComponentData
         {
-            if (!typeToManagedIndexMapping.TryGetValue(typeof(T), out var index))
-                index = typeToManagedIndexMapping[typeof(T)] = typeToManagedIndexMapping.Count;
+            return ManagedTypeData(typeof(T));
+        }
+
+        public IManagedComponentTypeData ManagedTypeData(System.Type t)
+        {
+            if (!typeToManagedIndexMapping.TryGetValue(t, out var index))
+                index = typeToManagedIndexMapping[t] = typeToManagedIndexMapping.Count;
             if (index >= 32)
                 throw new Exception("Currently there is limit of 32 different component datas. If you need more, change BitVector32 to BitVector64 or BitArray");
-            return new ManagedComponentTypeData<T>(index);
+            return (IManagedComponentTypeData)Activator.CreateInstance(typeof(ManagedComponentTypeData<>).MakeGenericType(t), index)!;
         }
 
         public Archetype NewArchetype()
         {
-            return new Archetype(this);
+            return new Archetype(this)
+                .WithComponentData<EntityName>();
         }
 
         public void Dispose()
@@ -223,11 +289,17 @@ namespace TheEngine.ECS
         
         internal Archetype GetArchetypeByEntity(Entity entity)
         {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
             return archetypes[entitiesArchetype[entity.Id]];
         }
         
         internal ChunkDataManager GetEntityDataManagerByEntity(Entity entity)
         {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
             return dataManager[entitiesArchetype[entity.Id]];
         }
     }

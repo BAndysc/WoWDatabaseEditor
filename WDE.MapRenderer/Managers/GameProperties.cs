@@ -17,6 +17,7 @@ public interface IGameProperties
     int TextureQuality { get; set; }
     float DynamicResolution { get; set; }
     bool RenderGui { get; set; }
+    bool LoadWorld { get; }
 }
 
 [AutoRegister]
@@ -38,4 +39,5 @@ public class GameProperties : IGameProperties
     public bool ShowAreaTriggers { get; set; }
     public float DynamicResolution { get; set; } = 1;
     public bool RenderGui { get; set; } = true;
+    public bool LoadWorld => true;
 }

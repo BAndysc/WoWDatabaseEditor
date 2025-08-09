@@ -51,5 +51,6 @@ namespace TheEngine.Structures
         public Matrix WorldMatrix;
         public Matrix InverseWorldMatrix;
         public uint ObjectIndex;
+        public Int4 DrawData;
     }
 }

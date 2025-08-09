@@ -4,6 +4,7 @@ using TheEngine.Data;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
+using TheEngine.Structures;
 using TheMaths;
 
 namespace TheEngine.Interfaces
@@ -24,7 +25,7 @@ namespace TheEngine.Interfaces
         void Render(IMesh mesh, Material material, int submesh, Vector3 position);
         void RenderFullscreenPlane(Material material);
         void ActivateDefaultRenderTexture();
-        void ActivateRenderTexture(TextureHandle rt, Color4? color = null);
+        void ActivateRenderTexture(ITexture rt, Color4? color = null);
         void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count, Matrix localToWorld, Matrix? worldToLocal = null);
         void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count);
         float ViewDistanceModifier { get; set; }
@@ -34,8 +35,12 @@ namespace TheEngine.Interfaces
         void SetDynamicResolutionScale(float scale);
         void DrawSphere(Vector3 center, float radius, Vector4 color);
         Entity PickObject(Vector2 normalizedScreenPosition);
-        TextureHandle DepthTexture { get; }
-        TextureHandle OpaqueTexture { get; }
+        ITexture DepthTexture { get; }
+        ITexture OpaqueTexture { get; }
+        RenderLayer RegisterRenderLayer(string layerName);
+        void UnregisterRenderLayer(RenderLayer layer);
+        void ToggleRenderLayer(RenderLayer layer, bool enable);
+        IReadOnlyList<RenderLayerData> RenderLayers { get; }
     }
 
     public static class RenderManagerExtensions

@@ -14,7 +14,7 @@ namespace WDE.MapRenderer.Managers
 {
     public interface IGameFiles
     {
-        Task<PooledArray<byte>?> ReadFile(FileId fileId, bool silent = false, int? maxReadBytes = null);
+        ValueTask<PooledArray<byte>?> ReadFile(FileId fileId, bool silent = false, int? maxReadBytes = null);
         PooledArray<byte>? ReadFileSyncPool(FileId fileId);
         byte[]? ReadFileSync(FileId fileId);
         byte[]? ReadFileSyncLocked(FileId fileId, bool silent = false);
@@ -34,7 +34,6 @@ namespace WDE.MapRenderer.Managers
         event Action<int>? ChangedMap;
         Map CurrentMap { get; }
         void SetMap(int id, Vector3? position = null);
-        void StartCoroutine(IEnumerator coroutine);
         
         CoroutineManager CoroutineManager { get; }
         NotificationsCenter NotificationsCenter { get; }

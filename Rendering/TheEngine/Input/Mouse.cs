@@ -24,13 +24,41 @@ namespace TheEngine.Input
         public Vector2 Delta { get; private set; }
 
         public Vector2 WheelDelta => mouseWheelDelta;
-        public Vector2 NormalizedPosition { get; private set; }
+        public Vector2 RawNormalizedPosition { get; private set; }
+
+        public Vector2 NormalizedPosition
+        {
+            get
+            {
+                var rawScreenPoint = RawScreenPoint;
+                var gameRect = engine.gameView.ViewRect;
+                if (gameRect.Contains(rawScreenPoint))
+                {
+                    var relativeX = (rawScreenPoint.X - gameRect.X) / gameRect.Width;
+                    var relativeY = (rawScreenPoint.Y - gameRect.Y) / gameRect.Height;
+                    return new Vector2(relativeX, 1 - relativeY); // Invert Y to match the coordinate system
+                }
+                else
+                {
+                    return default;
+                }
+            }
+        }
         public Vector2 ScreenPoint
         {
             get
             {
                 var zeroOne = new Vector2(NormalizedPosition.X, 1 - NormalizedPosition.Y);
-                return new Vector2(engine.WindowHost.WindowWidth * zeroOne.X, engine.WindowHost.WindowHeight * zeroOne.Y);
+                var gameRect = engine.gameView.ViewRect;
+                return new Vector2(gameRect.Width * zeroOne.X, gameRect.Height * zeroOne.Y);
+            }
+        }
+        public Vector2 RawScreenPoint
+        {
+            get
+            {
+                var zeroOne = new Vector2(RawNormalizedPosition.X, 1 - RawNormalizedPosition.Y);
+                return new Vector2(engine.WindowHost.WindowWidth * zeroOne.X / engine.WindowHost.DpiScaling, engine.WindowHost.WindowHeight * zeroOne.Y / engine.WindowHost.DpiScaling);
             }
         }
         public Vector2 LastClickScreenPosition
@@ -111,23 +139,29 @@ namespace TheEngine.Input
             rightDown = ((button & MouseButton.Right) != 0);
         }
 
-        public bool IsMouseDown(MouseButton button)
+        public bool IsMouseDown(MouseButton button) => RawIsMouseDown(button) && engine.gameView.HasFocus;
+
+        public bool RawIsMouseDown(MouseButton button)
         {
             if (((int)button & (int)MouseButton.Left) > 0)
                 return leftDown;
 
             return rightDown;
         }
-        
-        public bool HasJustClicked(MouseButton button)
+
+        public bool HasJustClicked(MouseButton button) => RawHasJustClicked(button) && engine.gameView.HasFocus;
+
+        public bool RawHasJustClicked(MouseButton button)
         {
             if (((int)button & (int)MouseButton.Left) > 0)
                 return leftJustDown;
 
             return rightJustDown;
         }
+
+        public bool HasJustReleased(MouseButton button) => RawHasJustReleased(button) && engine.gameView.HasFocus;
         
-        public bool HasJustReleased(MouseButton button)
+        public bool RawHasJustReleased(MouseButton button)
         {
             if (((int)button & (int)MouseButton.Left) > 0)
                 return leftJustUp;
@@ -138,7 +172,7 @@ namespace TheEngine.Input
         public void PointerMoved(double x, double y, double width, double height)
         {
             Position = new Vector2((float)x, (float)y);
-            NormalizedPosition = new Vector2((float)(x / width), 1 - (float)(y / height));
+            RawNormalizedPosition = new Vector2((float)(x / width), 1 - (float)(y / height));
         }
 
         public void PostUpdate()

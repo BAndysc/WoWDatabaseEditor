@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using OpenGLBindings;
 using TheAvaloniaOpenGL;
 using TheAvaloniaOpenGL.Resources;
@@ -35,7 +36,12 @@ namespace TheEngine.Entities
         public BoundingBox Bounds => bounds;
         
         public IndexType IndexType => bigIndices != null ? IndexType.Int : IndexType.Short;
-        
+
+        ~Mesh()
+        {
+            engine.meshManager.AddToDisposeList(this);
+        }
+
         public void Activate()
         {
             Debug.Assert(!managedOnly);
@@ -67,7 +73,31 @@ namespace TheEngine.Entities
         }
 
         public MeshHandle Handle { get; }
-        
+
+        public void SaveToObj(string path)
+        {
+            StringBuilder debug = new();
+            foreach (var pos in positions)
+            {
+                debug.AppendLine($"v {pos.X} {pos.Y} {pos.Z}");
+            }
+            for (int submesh = 0; submesh < SubmeshCount; ++submesh)
+            {
+                var indexStart = IndexStart(submesh);
+                var indexCount = IndexCount(submesh);
+                debug.AppendLine($"g mesh{submesh}");
+                for (int i = indexStart; i + 2 < indexStart + indexCount; i += 3)
+                {
+                    uint f1 = shortIndices != null ? shortIndices[i] : bigIndices![i];
+                    uint f2 = shortIndices != null ? shortIndices[i+1] : bigIndices![i+1];
+                    uint f3 = shortIndices != null ? shortIndices[i+2] : bigIndices![i+2];
+
+                    debug.AppendLine($"f {f1+1} {f2+1} {f3+1}");
+                }
+            }
+            File.WriteAllText(path, debug.ToString());
+        }
+
         public IEnumerable<(Vector4, Vector4, Vector4)> GetFaces(int submesh)
         {
             if (disposed)
@@ -126,13 +156,15 @@ namespace TheEngine.Entities
             }
         }
 
-        private void SetupDeviceBuffers(Engine engine)
+        private unsafe void SetupDeviceBuffers(Engine engine)
         {
             VertexArrayObject = engine.Device.device.GenVertexArray();
             engine.Device.device.BindVertexArray(VertexArrayObject);
             VerticesBuffer.Activate(0);
             IndicesBuffer.Activate(0);
-            int stride = 3 * 4 + 3 * 4 + 2 * 4 + 2 * 4 + 4 + 4; // 4 * 4 * 3 + 2 * 4 * 2;
+            int stride = 3 * sizeof(float) + 3 * sizeof(float) + 2 * sizeof(float) + 2 * sizeof(float) + 4 * sizeof(byte) + 4 * sizeof(byte); // 4 * 4 * 3 + 2 * 4 * 2;
+            if (sizeof(UniversalVertex) != stride)
+                throw new Exception($"UniversalVertex size is {sizeof(UniversalVertex)}, but stride is {stride}, they should be equal!");
             engine.Device.device.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride, new IntPtr(0));
             engine.Device.device.EnableVertexAttribArray(0);
 
@@ -346,12 +378,9 @@ namespace TheEngine.Entities
         public void Dispose()
         {
             disposed = true;
-            if (!IsManagedOnly)
-            {
-                VerticesBuffer?.Dispose();
-                IndicesBuffer?.Dispose();
-            }
-            
+            VerticesBuffer?.Dispose();
+            IndicesBuffer?.Dispose();
+
             VerticesBuffer = null;
             IndicesBuffer = null;
         }

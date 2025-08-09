@@ -112,7 +112,7 @@ namespace WDE.MapRenderer.Managers
                     renderManager.Render(sphereMesh, wireframeBehind, 0, t);
                 }
                 
-                uiManager.DrawWorldText("calibri", new Vector2(0.5f, 1f), "Areatrigger " + areaTrigger.Id, 2.5f, Utilities.TRS(t.Position + Vectors.Up * height, Quaternion.Identity, Vector3.One));
+                uiManager.DrawWorldText("calibri", new Vector2(0.5f, 1f), "Areatrigger " + areaTrigger.Id, 2.5f, Utilities.TRS(t.Position + Vectors.Up * height, Quaternion.Identity, Vector3.One), Vector4.One);
             }
         }
     }

@@ -1,18 +1,16 @@
 <#@ template language="C#" #>
-<#@ import namespace="System.Text" #>
 <#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Collections.Generic" #>
 <#@ assembly name="System.Core" #>
 
 namespace TheEngine.ECS;
 
 public static partial class EntityExtensions
 {
-
+private static IChunkDataIterator? cachedItr;
 <#
     for (int UNMANAGED = 0; UNMANAGED <= 6; UNMANAGED++)
     {
-        for (int MANAGED = 0; MANAGED <= 3; MANAGED++)
+        for (int MANAGED = 0; MANAGED <= 2; MANAGED++)
         {
             for (int UNMANAGED_OPTIONAL = 0; UNMANAGED_OPTIONAL <= 3; UNMANAGED_OPTIONAL++)
             {
@@ -21,9 +19,13 @@ public static partial class EntityExtensions
                     if (UNMANAGED + MANAGED == 0)
                         continue;
 
-                    for (int mode = 0; mode <= 1; ++mode)
+                    if (UNMANAGED + MANAGED + UNMANAGED_OPTIONAL + MANAGED_OPTIONAL > 11)
+                        continue;
+
+                    for (int mode = 0; mode <= 3; ++mode)
                     {
-                        bool parallel = mode == 1;
+                        bool parallel = mode >= 2;
+                        bool withState = mode % 2 == 1;
                         var suffix = "";
                         if (UNMANAGED_OPTIONAL + MANAGED_OPTIONAL > 0)
                         {
@@ -31,21 +33,25 @@ public static partial class EntityExtensions
                                 Enumerable.Range(0, UNMANAGED + MANAGED).Select(i => "R").Concat(
                                     Enumerable.Range(0, MANAGED_OPTIONAL + UNMANAGED_OPTIONAL).Select(i => "O")));
                         }
+                        if (withState)
+                            suffix += "State";
 #>
 
         public static void <#=
-                            parallel ? "ParallelForEach" + suffix : "ForEach" + suffix #><<#=
+                            parallel ? "ParallelForEach" + suffix : "ForEach" + suffix #><<#= withState ? "S, " : "" #><#=
                             string.Join(", ",
                                 Enumerable.Range(0, UNMANAGED).Select(i => "T" + i).Concat(
                                     Enumerable.Range(0, MANAGED).Select(i => "N" + i).Concat(
                                         Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(i => "T" + (i + UNMANAGED)).Concat(
-                                            Enumerable.Range(0, MANAGED_OPTIONAL).Select(i => "N" + (i + MANAGED)))))) #>>(this Archetype archetype, 
-            Action<IChunkDataIterator, int, int, <#=
-                            string.Join(", ",
-                                Enumerable.Range(0, UNMANAGED).Select(i => $"ComponentDataAccess<T{i}>").Concat(
-                                    Enumerable.Range(0, MANAGED).Select(i => $"ManagedComponentDataAccess<N{i}>").Concat(
-                                        Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(i => $"ComponentDataAccess<T{i + UNMANAGED}>?").Concat(
-                                            Enumerable.Range(0, MANAGED_OPTIONAL).Select(i => $"ManagedComponentDataAccess<N{i + MANAGED}>?"))))) #>> process)<#=
+                                            Enumerable.Range(0, MANAGED_OPTIONAL).Select(i => "N" + (i + MANAGED)))))) #>>(this Archetype archetype, <#= withState ? "S state, " :"" #>
+<#
+                        string actionType = "Action<" + (withState ? "S, " : "") + "IChunkDataIterator, int, int, int, " + string.Join(", ",
+                            Enumerable.Range(0, UNMANAGED).Select(i => $"ComponentDataAccess<T{i}>").Concat(
+                                Enumerable.Range(0, MANAGED).Select(i => $"ManagedComponentDataAccess<N{i}>").Concat(
+                                    Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(i => $"ComponentDataAccess<T{i + UNMANAGED}>?").Concat(
+                                        Enumerable.Range(0, MANAGED_OPTIONAL).Select(i => $"ManagedComponentDataAccess<N{i + MANAGED}>?"))))) + ">";
+#>
+            <#= actionType #> process)<#=
                             string.Join("\n",
                                 Enumerable.Range(0, UNMANAGED).Select(i => $"where T{i} : unmanaged, IComponentData")
                                     .Concat
@@ -59,27 +65,27 @@ public static partial class EntityExtensions
             var iterator = entityManager.ArchetypeIterator(archetype);
             while (iterator.MoveNext())
             {
-                var itr = iterator.Current;
+                cachedItr = iterator.Current;
 <#
                         if (parallel)
                         {
 #>
-                    RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
+                    RunThreads(0, cachedItr.Length, process, <#= withState ? "state" : "null" #>, (process, state, thread, s, e) => ((<#= actionType #>)process!)(<#= withState ? "(S)state, " : "" #>cachedItr, thread, s, e,
 <#
                         }
                         else
                         {
 #>
-                    process(itr, 0, itr.Length, 
+                    process(<#= withState ? "state, " : "" #>cachedItr, 0, 0, cachedItr.Length,
 <#
                         }
 #>
 <#=
                             string.Join(", ",
-                                Enumerable.Range(0, UNMANAGED).Select(i => $"itr.DataAccess<T{i}>()").Concat(
-                                    Enumerable.Range(0, MANAGED).Select(i => $"itr.ManagedDataAccess<N{i}>()")).Concat(
-                                        Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(i => $"itr.OptionalDataAccess<T{i + UNMANAGED}>()")).Concat(
-                                            Enumerable.Range(0, MANAGED_OPTIONAL).Select(i => $"itr.OptionalManagedDataAccess<N{i + MANAGED}>()"))) #>
+                                Enumerable.Range(0, UNMANAGED).Select(i => $"cachedItr.DataAccess<T{i}>()").Concat(
+                                    Enumerable.Range(0, MANAGED).Select(i => $"cachedItr.ManagedDataAccess<N{i}>()")).Concat(
+                                        Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(i => $"cachedItr.OptionalDataAccess<T{i + UNMANAGED}>()")).Concat(
+                                            Enumerable.Range(0, MANAGED_OPTIONAL).Select(i => $"cachedItr.OptionalManagedDataAccess<N{i + MANAGED}>()"))) #>
 <#
                         if (parallel)
                         {

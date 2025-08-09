@@ -16,15 +16,18 @@ namespace TheEngine.Managers
     {
         private readonly Engine engine;
 
-        private List<Mesh> meshes;
-        
+        private List<WeakReference<Mesh>> meshes;
+
+        private int disposeIndex = 0;
+        private List<Mesh>[] disposeLists = [new(), new()];
+
         #if TRACK_ALLOCATIONS
         private List<System.Diagnostics.StackTrace> allocations = new();
         #endif
 
         internal MeshManager(Engine engine)
         {
-            meshes = new List<Mesh>();
+            meshes = new List<WeakReference<Mesh>>();
             this.engine = engine;
         }
 
@@ -38,7 +41,7 @@ namespace TheEngine.Managers
             mesh.SetIndices(indices, 0);
             mesh.RebuildIndices();
 
-            meshes.Add(mesh);
+            meshes.Add(new WeakReference<Mesh>(mesh));
             #if TRACK_ALLOCATIONS
             allocations.Add(new System.Diagnostics.StackTrace(2));
             #endif
@@ -56,7 +59,7 @@ namespace TheEngine.Managers
             mesh.SetIndices(indices, 0);
             mesh.RebuildIndices();
 
-            meshes.Add(mesh);
+            meshes.Add(new WeakReference<Mesh>(mesh));
             #if TRACK_ALLOCATIONS
             allocations.Add(new System.Diagnostics.StackTrace(2));
             #endif
@@ -85,7 +88,7 @@ namespace TheEngine.Managers
             
             var mesh = new Mesh(engine, handle, vertices, meshData.Indices, meshData.IndicesCount, true, false);
             //ArrayPool<UniversalVertex>.Shared.Return(vertices);
-            meshes.Add(mesh);
+            meshes.Add(new WeakReference<Mesh>(mesh));
 
 #if TRACK_ALLOCATIONS
             allocations.Add(new System.Diagnostics.StackTrace(2));
@@ -95,11 +98,14 @@ namespace TheEngine.Managers
         
         public void DisposeMesh(IMesh mesh)
         {
-            var index = meshes.IndexOf((Mesh)mesh);
+            if (!meshes[mesh.Handle.Handle].TryGetTarget(out var storedMesh))
+                throw new Exception("Invalid handle to dispose!");
+            if (storedMesh != mesh)
+                throw new Exception("Invalid handle to dispose 2!");
             ((Mesh)mesh).Dispose();
-            meshes[index] = null!;
+            meshes[mesh.Handle.Handle] = null!;
 #if TRACK_ALLOCATIONS
-            allocations[index] = null!;
+            allocations[mesh.Handle.Handle] = null!;
 #endif
         }
 
@@ -112,7 +118,7 @@ namespace TheEngine.Managers
             mesh.SetIndices(indices, 0);
             mesh.BuildBoundingBox();
 
-            meshes.Add(mesh);
+            meshes.Add(new WeakReference<Mesh>(mesh));
             #if TRACK_ALLOCATIONS
             allocations.Add(null!);
             #endif
@@ -124,7 +130,9 @@ namespace TheEngine.Managers
         {
             for (var index = 0; index < meshes.Count; index++)
             {
-                var mesh = meshes[index];
+                var meshRef = meshes[index];
+                if (meshRef == null || !meshRef.TryGetTarget(out var mesh))
+                    continue;
                 if (mesh == null || mesh.IsManagedOnly)
                     continue;
 #if TRACK_ALLOCATIONS
@@ -141,7 +149,37 @@ namespace TheEngine.Managers
 
         internal Mesh GetMeshByHandle(MeshHandle mesh)
         {
-            return meshes[mesh.Handle];
+            if (meshes[mesh.Handle].TryGetTarget(out var meshInstane))
+                return meshInstane;
+            return null;
+        }
+
+        internal void Update()
+        {
+            List<Mesh> toDispose;
+            lock (this)
+            {
+                toDispose = disposeLists[disposeIndex];
+                disposeIndex = 1 - disposeIndex;
+            }
+
+            foreach (var mesh in toDispose)
+            {
+                if (mesh.IsManagedOnly)
+                    continue;
+
+                meshes[mesh.Handle.Handle] = null!;
+                mesh.Dispose();
+            }
+            toDispose.Clear();
+        }
+
+        internal void AddToDisposeList(Mesh mesh)
+        {
+            lock (this)
+            {
+                disposeLists[disposeIndex].Add(mesh);
+            }
         }
     }
 }

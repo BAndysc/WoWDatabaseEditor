@@ -5,6 +5,8 @@ namespace TheEngine.ECS
     public interface IEntityManager
     {
         Entity CreateEntity(Archetype archetype);
+        Entity CreateEntity(Archetype archetype, string name);
+        Entity CreateEntity(Archetype archetype, ReadOnlySpan<byte> nameUtf8);
         /**
          * Adds a component to entity, even if the component is NOT in the archetype
          * this will move the entity to a new archetype, which is an expensive operation

@@ -11,6 +11,7 @@ using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheEngine.Managers;
 using TheEngine.PhysicsSystem;
+using TheEngine.Utils;
 using TheMaths;
 using WDE.MapRenderer.Managers.Entities;
 using WDE.MapRenderer.StaticData;
@@ -25,8 +26,8 @@ namespace WDE.MapRenderer.Managers
     {
         public int X { get; }
         public int Z { get; }
-        public TextureHandle splatMapTex;
-        public TextureHandle holesMapTex;
+        public ITexture splatMapTex;
+        public ITexture holesMapTex;
         public NativeBuffer<VectorByte4>? chunkToSplatBuffer;
         public NativeBuffer<Vector4>? heightsNormalBuffer;
         public float[,] heights;
@@ -40,8 +41,10 @@ namespace WDE.MapRenderer.Managers
         public List<StaticRenderHandle> renderHandles = new();
         public List<Entity> entities = new();
         public List<IMesh> meshes = new();
-        public List<NativeBuffer<Matrix>> animationBuffers = new();
-        
+        public List<INativeBuffer> animationBuffers = new();
+        public List<MdxManager.MdxInstance> mdx = new();
+        public List<WmoManager.WmoInstance> wmos = new();
+
         public ChunkInstance(int x, int z)
         {
             X = x;
@@ -223,13 +226,13 @@ namespace WDE.MapRenderer.Managers
             this.engine = engine;
         }
 
-        public IEnumerator LoadChunk(int y, int x, bool now)
+        public async ValueTask LoadChunk(int y, int x, bool now)
         {
             if (y < 0 || y >= 64 || x < 0 || x >= 64)
-                yield break;
+                return;
             
             if (!loadedChunks.Add((y, x)))
-                yield break;
+                return;
             
             ChunkInstance chunk = new(y, x);
             var cancelationToken = chunk.loading.Token;
@@ -244,20 +247,16 @@ namespace WDE.MapRenderer.Managers
             var fullNameTex0 = gameFiles.AdtTex0(gameContext.CurrentMap.Directory, x, y);
             var fullNameObj0 = gameFiles.AdtObj0(gameContext.CurrentMap.Directory, x, y);
             var fullNameLod = gameFiles.AdtLod0(gameContext.CurrentMap.Directory, x, y);
-            var file = gameFiles.ReadFile(fullName);
-            var fileTex0 = gameFiles.ReadFile(fullNameTex0, true);
-            var fileObj0 = gameFiles.ReadFile(fullNameObj0, true);
-            var fileLod = gameFiles.ReadFile(fullNameLod, true);
-            yield return file;
-            yield return fileTex0;
-            yield return fileObj0;
-            yield return fileLod;
-            if (file.Result == null)
+            var file = await gameFiles.ReadFile(fullName);
+            var fileTex0 = await gameFiles.ReadFile(fullNameTex0, true);
+            var fileObj0 = await gameFiles.ReadFile(fullNameObj0, true);
+            var fileLod = await gameFiles.ReadFile(fullNameLod, true);
+            if (file == null)
             {
                 tasksource.SetResult();
-                yield return LoadModules(chunk, cancelationToken);
+                await LoadModules(chunk, cancelationToken);
                 chunk.loading = null;
-                yield break;
+                return;
             }
 
             chunk.heights = new float[Constants.ChunksInBlockX * 9, Constants.ChunksInBlockY * 9];
@@ -270,36 +269,39 @@ namespace WDE.MapRenderer.Managers
             Dictionary<string, int> textureToSlot = null!;
             ADT adt = null!;
 
-            yield return Task.Run(() =>
-            {
-                heightsNormal = new Vector4[1 * Constants.VerticesInChunk * Constants.ChunksInBlock];
-                chunkToSplatIdx = new VectorByte4[Constants.ChunksInBlock];
-                textureToSlot = new();
+            await engine.EnterThreadPool;
+            heightsNormal = new Vector4[1 * Constants.VerticesInChunk * Constants.ChunksInBlock];
+            chunkToSplatIdx = new VectorByte4[Constants.ChunksInBlock];
+            textureToSlot = new();
 
-                try
-                {
-                    adt = new ADT( gameFiles.WoWVersion, new MemoryBinaryReader(file.Result), 
-                        fileTex0.Result == null ? null : new MemoryBinaryReader(fileTex0.Result),
-                        fileObj0.Result == null ? null : new MemoryBinaryReader(fileObj0.Result),
-                        fileLod.Result == null ? null : new MemoryBinaryReader(fileLod.Result), WDTflag,
-                        dbcManager.LiquidObjectStore, dbcManager.LiquidTypeStore, dbcManager.LiquidMaterialStore);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Exception while loading ADT " + fullName);
-                    Console.WriteLine(e);
-                    adt = null;
-                    throw;
-                }
-            });
-            file.Result.Dispose();
-            fileTex0.Result?.Dispose();
-            fileObj0.Result?.Dispose();
-            fileLod.Result?.Dispose();
+            try
+            {
+                adt = new ADT(gameFiles.WoWVersion, new MemoryBinaryReader(file),
+                    fileTex0 == null ? null : new MemoryBinaryReader(fileTex0),
+                    fileObj0 == null ? null : new MemoryBinaryReader(fileObj0),
+                    fileLod == null ? null : new MemoryBinaryReader(fileLod), WDTflag,
+                    dbcManager.LiquidObjectStore, dbcManager.LiquidTypeStore, dbcManager.LiquidMaterialStore);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception while loading ADT " + fullName);
+                Console.WriteLine(e);
+                adt = null;
+                throw;
+            }
+            finally
+            {
+                file.Dispose();
+                fileTex0?.Dispose();
+                fileObj0?.Dispose();
+                fileLod?.Dispose();
+            }
 
             if (adt == null)
-                yield break;
-            
+                return;
+
+            await engine.EnterGameLoop;
+
             float minHeight = float.MaxValue;
             float maxHeight = float.MinValue;
             int k = 0;
@@ -391,11 +393,11 @@ namespace WDE.MapRenderer.Managers
                     var subChunkMesh = meshManager.CreateManagedOnlyMesh(subVertices.AsSpan(0, 145), indices.AsSpan(0, 4 * 8 * 8 * 4));
                     ArrayPool<Vector3>.Shared.Return(subVertices);
                     ArrayPool<ushort>.Shared.Return(indices);
-                    var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype);
+                    var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype, "Terrain collider"u8);
                     entityManager.GetComponent<Collider>(entity).CollisionMask = Collisions.COLLISION_MASK_TERRAIN;
                     entityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
                     entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = 0;
-                    entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = subChunkMesh.Handle;
+                    entityManager.GetComponent<MeshRenderer>(entity).Mesh = subChunkMesh;
                     entityManager.GetComponent<WorldMeshBounds>(entity) = (WorldMeshBounds)subChunkMesh.Bounds;
                     chunk.entities.Add(entity);
 
@@ -440,7 +442,7 @@ namespace WDE.MapRenderer.Managers
             {
                 tasksource.SetResult();
                 chunk.loading = null;
-                yield break;
+                return;
             }
         
             int chnk = 0;
@@ -489,9 +491,7 @@ namespace WDE.MapRenderer.Managers
                         var texturePath = adt.Textures[(int)splat.TextureId];
                         if (!textureToSlot.ContainsKey(texturePath))
                         {
-                            var tcs = new TaskCompletionSource<TextureHandle>();
-                            yield return woWTextureManager.GetTexture(texturePath, tcs);
-                            var splatTex = tcs.Task.Result;
+                            var splatTex = await woWTextureManager.GetTexture(texturePath);
                             if (textureToSlot.Count <= 13)
                                 material.SetTexture("_tex" + (textureToSlot.Count), splatTex);
                             textureToSlot[texturePath] = textureToSlot.Count;
@@ -529,11 +529,11 @@ namespace WDE.MapRenderer.Managers
 
             //chunk.terrainHandle = renderManager.RegisterDynamicRenderer(chunkMesh.Handle, material, 0, t);
             
-            var terrainEntity = entityManager.CreateEntity(archetypes.TerrainEntityArchetype);
+            var terrainEntity = entityManager.CreateEntity(archetypes.TerrainEntityArchetype, "Terrain renderer"u8);
             entityManager.GetComponent<LocalToWorld>(terrainEntity).Matrix = t.LocalToWorldMatrix;
             entityManager.GetComponent<MeshRenderer>(terrainEntity).SubMeshId = 0;
-            entityManager.GetComponent<MeshRenderer>(terrainEntity).MaterialHandle = material.Handle;
-            entityManager.GetComponent<MeshRenderer>(terrainEntity).MeshHandle = chunkMesh.Handle; 
+            entityManager.GetComponent<MeshRenderer>(terrainEntity).Material = material;
+            entityManager.GetComponent<MeshRenderer>(terrainEntity).Mesh = chunkMesh;
             entityManager.GetComponent<MeshRenderer>(terrainEntity).Opaque = !material.BlendingEnabled; 
             var localBounds = new BoundingBox(
                 new Vector3(chunkMesh.Bounds.Minimum.X, chunkMesh.Bounds.Minimum.Y, minHeight),
@@ -610,12 +610,12 @@ namespace WDE.MapRenderer.Managers
                 }
 
                 var trsMatrix = Utilities.TRS(meshPosition, Quaternion.Identity, Vectors.One);
-                var waterEntity = entityManager.CreateEntity(archetypes.TerrainEntityArchetype);
+                var waterEntity = entityManager.CreateEntity(archetypes.TerrainEntityArchetype, "Water renderer"u8);
                 entityManager.GetComponent<LocalToWorld>(waterEntity).Matrix = trsMatrix;
                             
                 entityManager.GetComponent<MeshRenderer>(waterEntity).SubMeshId = 0;
-                entityManager.GetComponent<MeshRenderer>(waterEntity).MaterialHandle = woWMeshManager.WaterMaterial.Handle;
-                entityManager.GetComponent<MeshRenderer>(waterEntity).MeshHandle = waterMesh.Handle;
+                entityManager.GetComponent<MeshRenderer>(waterEntity).Material = woWMeshManager.WaterMaterial;
+                entityManager.GetComponent<MeshRenderer>(waterEntity).Mesh = waterMesh;
                 entityManager.GetComponent<MeshRenderer>(waterEntity).Opaque = false;
                 localBounds = waterMesh.Bounds;
                 localBounds = localBounds.WithSize(localBounds.Size with { Z = Math.Max(localBounds.Size.Z, 10) });
@@ -633,64 +633,79 @@ namespace WDE.MapRenderer.Managers
             {
                 tasksource.SetResult();
                 chunk.loading = null;
-                yield break;
+                return;
             }
             
-            yield return LoadObjects(adt, chunk, cancelationToken);
+            await LoadObjects(adt, chunk, cancelationToken);
 
-            yield return LoadModules(chunk, cancelationToken);
+            await LoadModules(chunk, cancelationToken);
             
             tasksource.SetResult();
             chunk.loading = null; 
         }
 
-        private IEnumerator LoadModules(ChunkInstance chunk, CancellationToken cancellationToken)
+        private async ValueTask LoadModules(ChunkInstance chunk, CancellationToken cancellationToken)
         {
-            IEnumerator LoadModuleChunk(IGameModule arg)
+            ValueTask LoadModuleChunk(IGameModule arg)
             {
-                yield return arg.LoadChunk(gameContext.CurrentMap.Id, chunk.X, chunk.Z, cancellationToken);
+                return arg.LoadChunk(gameContext.CurrentMap.Id, chunk.X, chunk.Z, cancellationToken);
             }
-            
-            yield return moduleManager.ForEach(LoadModuleChunk);
+
+            await moduleManager.ForEach(LoadModuleChunk);
         }
 
-        private IEnumerator LoadObjects(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
+        private async ValueTask LoadObjects(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
         {
-            yield return LoadWorldMapObjects(adt, chunk, cancellationToken);
+            await LoadWorldMapObjects(adt, chunk, cancellationToken);
 
-            yield return LoadM2(adt, chunk, cancellationToken);
+            await LoadM2(adt, chunk, cancellationToken);
         }
 
-        private IEnumerator LoadM2(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
+        public struct Adt_M2Object : IComponentData
+        {
+            public Vector3 AbsolutePosition;
+            public Vector3 Rotation;
+            public float Scale;
+            public MDDFFlags Flags;
+            public M2Id Id;
+        }
+
+        private async ValueTask LoadM2(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
         {
             int index = 0;
             foreach (var m2 in adt.M2Objects)
             {
                 if (cancellationToken.IsCancellationRequested)
-                    yield break;
+                    return;
 
-                TaskCompletionSource<MdxManager.MdxInstance?> result = new();
-                
-                yield return mdxManager.LoadM2Mesh(m2.M2Path, result);
-                if (result.Task.Result == null)
+                var m = await mdxManager.LoadM2Mesh(m2.M2Path);
+                if (m == null)
                 {
                     Console.WriteLine(m2.M2Path + " is null");
                     continue;
                 }
-                var m = result.Task.Result;
+                chunk.mdx.Add(m);
 
                 var t = new Transform();
                 t.Position = new Vector3(32 * Constants.BlockSize - m2.AbsolutePosition.Z, (32 * Constants.BlockSize - m2.AbsolutePosition.X), m2.AbsolutePosition.Y);
                 t.Scale = Vector3.One * m2.Scale;
                 t.Rotation = Utilities.FromEuler(m2.Rotation.X, m2.Rotation.Y + 180,  m2.Rotation.Z);
 
-                Entity entity;
+                Entity entity = Entity.Empty;
                 NativeBuffer<Matrix>? bones = null;
+                NativeBuffer<Vector4>? colors = null;
+                NativeBuffer<Matrix>? textureTransforms = null;
                 if (m.HasAnimations)
                 {
                     bones = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
-                    bones.UpdateBuffer(AnimationSystem.IdentityBones(m.model.bones.Length).Span);
+                    bones.UpdateBuffer(AnimationSystem.IdentityMatrix(m.model.bones.Length).Span);
                     chunk.animationBuffers.Add(bones);
+                    colors = engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
+                    colors.UpdateBuffer(AnimationSystem.IdentityColors(m.model.colors.Length).Span);
+                    chunk.animationBuffers.Add(colors);
+                    textureTransforms = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
+                    textureTransforms.UpdateBuffer(AnimationSystem.IdentityMatrix(m.model.texture_transforms.Length + 1).Span);
+                    chunk.animationBuffers.Add(textureTransforms);
                 }
 
                 bool first = true;
@@ -699,22 +714,27 @@ namespace WDE.MapRenderer.Managers
                 {
                     if (m.HasAnimations)
                     {
-                        entity = entityManager.CreateEntity(first ? archetypes.StaticM2WorldObjectAnimatedMasterArchetype : archetypes.StaticM2WorldObjectAnimatedArchetype);
+                        entity = entityManager.CreateEntity(first ? archetypes.StaticM2WorldObjectAnimatedMasterArchetype : archetypes.StaticM2WorldObjectAnimatedArchetype, m2.Id.ToString());
                         // only one renderer has to update the animation, because the animation is the same among all renderers
                         if (first)
                         {
                             entityManager.SetManagedComponent(entity, new M2AnimationComponentData(m.model)
                             {
                                 SetNewAnimation = 0,
-                                _buffer = bones!
+                                _buffer = bones!,
+                                _colors = colors!,
+                                _textureTransforms = textureTransforms!
                             });
                         }
                         var instanceRenderer = new MaterialInstanceRenderData();
                         instanceRenderer.SetBuffer(material.material, "boneMatrices", bones!);
+                        instanceRenderer.SetBuffer(material.material, "vertexColors", colors!);
+                        instanceRenderer.SetBuffer(material.material, "textureTransforms", textureTransforms!);
+                        instanceRenderer.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
                         entityManager.SetManagedComponent(entity, instanceRenderer);
                     }
                     else
-                        entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectArchetype);
+                        entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectArchetype, m2.Id.ToString());
                     
                     renderManager.SetupRendererEntity(entity, m.mesh.Handle, material.material, material.submesh, t.LocalToWorldMatrix);
                     
@@ -722,32 +742,46 @@ namespace WDE.MapRenderer.Managers
                     first = false;
                 }
 
+                if (entity != Entity.Empty)
+                {
+                    entityManager.AddManagedComponent(entity, new MdxRenderer(m){});
+                    entityManager.AddComponent(entity, new Adt_M2Object()
+                    {
+                        AbsolutePosition = m2.AbsolutePosition,
+                        Rotation = m2.Rotation,
+                        Scale = m2.Scale,
+                        Flags = m2.Flags,
+                        Id = m2.Id
+                    });
+                }
+
                 index++;
-                
+
                 if (index % 10 == 0)
-                    yield return null;
+                    await engine.NextFrame;
             }
         }
 
-        private IEnumerator LoadWorldMapObjects(ADT adt, ChunkInstance chunk,
+        private async ValueTask LoadWorldMapObjects(ADT adt, ChunkInstance chunk,
             CancellationToken cancellationToken)
         {
             int index = 0;
             foreach (var wmoReference in adt.WorldMapObjects)
             {
                 if (cancellationToken.IsCancellationRequested)
-                    yield break;
+                    return;
                 
                 var wmoTransform = new Transform();
                 wmoTransform.Position = new Vector3((32 * Constants.BlockSize - wmoReference.AbsolutePosition.Z), (32 * Constants.BlockSize - wmoReference.AbsolutePosition.X), wmoReference.AbsolutePosition.Y);
                 wmoTransform.Rotation = Utilities.FromEuler(wmoReference.Rotation.X,  wmoReference.Rotation.Y + 180, wmoReference.Rotation.Z);
 
-                var tcs = new TaskCompletionSource<WmoManager.WmoInstance?>();
-                yield return wmoManager.LoadWorldMapObject(wmoReference.WmoPath, tcs);
-                if (tcs.Task.Result == null)
+                var wmoInstance = await wmoManager.LoadWorldMapObject(wmoReference.WmoPath);
+                if (wmoInstance == null)
                     continue;
 
-                foreach (var mesh in tcs.Task.Result.Meshes)
+                chunk.wmos.Add(wmoInstance);
+
+                foreach (var mesh in wmoInstance.Meshes)
                 {
                     int i = 0;
                     foreach (var material in mesh.Item2)
@@ -756,11 +790,11 @@ namespace WDE.MapRenderer.Managers
 
                         if (!material.BlendingEnabled)
                         {
-                            var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype);
+                            var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype, $"{wmoReference.Id} collider");
                             entityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
                             entityManager.GetComponent<Collider>(entity).CollisionMask = Collisions.COLLISION_MASK_WMO;
                             entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
-                            entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
+                            entityManager.GetComponent<MeshRenderer>(entity).Mesh = mesh.Item1;
                             entityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });   
                             chunk.entities.Add(entity);
                         }
@@ -768,9 +802,9 @@ namespace WDE.MapRenderer.Managers
                 }
                 
                 index++;
-                
+
                 if (index % 10 == 0)
-                    yield return null;
+                    await engine.NextFrame;
             }
         }
 
@@ -784,7 +818,10 @@ namespace WDE.MapRenderer.Managers
         {
             if (loadingManager.Value.EssentialLoadingInProgress)
                 return;
-            
+
+            if (!gameProperties.LoadWorld)
+                return;
+
             RenderGrid = gameProperties.ShowGrid;
             
             int D = 1;
@@ -792,7 +829,9 @@ namespace WDE.MapRenderer.Managers
             for (int i = -D; i <= D; ++i)
             {
                 for (int j = -D; j <= D; ++j)
-                    gameContext.StartCoroutine(LoadChunk(chunk.x + i, chunk.y + j, false));
+                {
+                    LoadChunk(chunk.x + i, chunk.y + j, false);
+                }
             }
             
             UnloadChunks();
@@ -810,25 +849,25 @@ namespace WDE.MapRenderer.Managers
                     chunksXY.Remove((c.X, c.Z));
                     loadedChunks.Remove((c.X, c.Z));
                     chunks.Remove(c);
-                    gameContext.StartCoroutine(UnloadChunk(c));
+                    UnloadChunk(c).FireAndForget();
                 }
             }
         }
 
-        private IEnumerator UnloadChunk(ChunkInstance chunk)
+        private async ValueTask UnloadChunk(ChunkInstance chunk)
         {
             if (chunk.loading != null)
             {
                 chunk.loading.Cancel();
-                yield return chunk.chunkLoading;
+                await chunk.chunkLoading;
             }
             
-            IEnumerator UnloadModuleChunk(IGameModule arg)
+            async ValueTask UnloadModuleChunk(IGameModule arg)
             {
-                yield return arg.UnloadChunk(chunk.X, chunk.Z);
+                await arg.UnloadChunk(chunk.X, chunk.Z);
             }
             
-            yield return moduleManager.ForEach(UnloadModuleChunk);
+            await moduleManager.ForEach(UnloadModuleChunk);
             
             chunk.terrainEntity = Entity.Empty;
             foreach (var obj in chunk.renderHandles)
@@ -846,14 +885,13 @@ namespace WDE.MapRenderer.Managers
             chunk.Dispose(textureManager);
         }
 
-        public IEnumerator UnloadAllChunks()
+        public async ValueTask UnloadAllChunks()
         {
             var chunksCopy = chunks.ToList();
             chunks.Clear();
             loadedChunks.Clear();
             chunksXY.Clear();
-            foreach (var chunk in chunksCopy)
-                yield return UnloadChunk(chunk);
+            await Task.WhenAll(chunksCopy.Select(x => UnloadChunk(x).AsTask()).ToList());
         }
 
         public bool IsLoaded(int y, int x)

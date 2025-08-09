@@ -369,7 +369,7 @@ public class ProtobufSourceGenerator : ISourceGenerator
                 codeGenerator.OpenBlock("private static bool IsNormalized(long seconds, int nanoseconds)");
                 codeGenerator.AppendLine("return nanoseconds >= 0 && nanoseconds <= 999999999 && seconds >= -62135596800L && seconds <= 253402300799L;");
                 codeGenerator.CloseBlock();
-                codeGenerator.OpenBlock("public DateTime ToDateTime()");
+                codeGenerator.OpenBlock("public readonly DateTime ToDateTime()");
                 codeGenerator.AppendLine("if (!Timestamp.IsNormalized(this.Seconds, this.Nanos))");
                 codeGenerator.AppendLine("    throw new InvalidOperationException(\"Timestamp contains invalid values: Seconds={Seconds}; Nanos={Nanos}\");");
                 codeGenerator.AppendLine("return Timestamp.UnixEpoch.AddSeconds((double) this.Seconds).AddTicks((long) (this.Nanos / 100));");

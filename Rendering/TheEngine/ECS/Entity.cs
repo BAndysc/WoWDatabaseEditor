@@ -1,8 +1,9 @@
 using System;
+using System.Text.Unicode;
 
 namespace TheEngine.ECS
 {
-    public readonly struct Entity
+    public readonly struct Entity : IUtf8SpanFormattable, ISpanFormattable
     {
         public readonly uint Id;
         public readonly uint Version;
@@ -30,6 +31,26 @@ namespace TheEngine.ECS
         public override string ToString()
         {
             return $"Entity[{Id}, {Version}]";
+        }
+
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            FormattableString formattable = $"Entity[{Id}, {Version}]";
+            return formattable.ToString(formatProvider);
+        }
+
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format,
+            IFormatProvider? provider)
+        {
+            return destination.TryWrite(provider, $"Entity[{Id}, {Version}]",
+                out charsWritten);
+        }
+
+        public bool TryFormat(Span<byte> destination, out int bytesWritten, ReadOnlySpan<char> format,
+            IFormatProvider? provider)
+        {
+            return Utf8.TryWrite(destination, provider, $"Entity[{Id}, {Version}]",
+                out bytesWritten);
         }
     }
 }

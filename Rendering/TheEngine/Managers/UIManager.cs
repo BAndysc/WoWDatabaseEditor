@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using ImGuiNET;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
@@ -9,8 +6,6 @@ using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
-using TheEngine.Utils;
-using TheMaths;
 
 namespace TheEngine.Managers
 {
@@ -38,6 +33,8 @@ namespace TheEngine.Managers
             public string text;
             public float fontSize;
             public float visibilityDistanceSquare;
+            public Vector4 fontColor = Vector4.One;
+            public Vector4? backgroundColor = null;
         }
         
         private Archetype persistentTextArchetype;
@@ -50,6 +47,7 @@ namespace TheEngine.Managers
             persistentTextArchetype = entityManager.NewArchetype()
                 .WithManagedComponentData<DrawTextData>()
                 .WithComponentData<DisabledObjectBit>()
+                .WithComponentData<RenderEnabledBit>()
                 .WithComponentData<LocalToWorld>();
             textShader = engine.ShaderManager.LoadShader("internalShaders/sdf.json", false);
             worldMaterial = engine.MaterialManager.CreateMaterial("internalShaders/world_text.json");
@@ -89,10 +87,7 @@ namespace TheEngine.Managers
             worldMaterial.SetBuffer("glyphPositions", glyphPositionsBuffer);
 
             imGuiController = new ImGuiController(engine);
-            ei = new EntityInspector(engine);
         }
-
-        private EntityInspector ei;
 
         public void Dispose()
         {
@@ -102,30 +97,62 @@ namespace TheEngine.Managers
             imGuiController.Dispose();
         }
 
+        private void SetupDocking()
+        {
+            var viewport = ImGui.GetMainViewport();
+            ImGui.SetNextWindowPos(viewport.Pos);
+            ImGui.SetNextWindowSize(viewport.Size / ImGui.GetIO().DisplayFramebufferScale);
+            ImGui.SetNextWindowViewport(viewport.ID);
+
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, Vector2.Zero);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
+            ImGui.Begin("Root", ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoTitleBar |
+                                ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize |
+                                ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoNavFocus |
+                                ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.MenuBar);
+            ImGui.PopStyleVar(2);
+
+            ImGui.DockSpace(ImGui.GetID("3D Dockspace"), Vector2.Zero, ImGuiDockNodeFlags.PassthruCentralNode);
+
+            if (ImGui.BeginMenuBar())
+            {
+                OnMenuBarDraw?.Invoke();
+                ImGui.EndMenuBar();
+            }
+            ImGui.End();
+        }
+
         internal void UpdateGui(float delta)
         {
             imGuiController.UpdateImGui(delta);
+
+            SetupDocking();
         }
 
-        internal void Render()
+        internal void Render3D()
         {
-#if DEBUG
-            ei.Draw();
-#endif
             var cameraPos = cameraManager.MainCamera.Transform.Position;
-            persistentTextArchetype.ForEach<LocalToWorld, DisabledObjectBit, DrawTextData>((itr, start, end, matrices, disabledAccess, datas) =>
+            persistentTextArchetype.ForEach<LocalToWorld, DisabledObjectBit, RenderEnabledBit, DrawTextData>((itr, thread,
+                start, end, matrices, disabledAccess, renderEnabledBit, datas) =>
             {
                 for (int i = start; i < end; ++i)
                 {
                     if (disabledAccess[i])
                         continue;
+                    if (renderEnabledBit[i].Layer > 0 &&
+                        !engine.renderManager.IsRenderLayerEnabled(renderEnabledBit[i].Layer))
+                        continue;
                     var data = datas[i];
                     var matrix = matrices[i];
                     if ((matrix.Position - cameraPos).LengthSquared() < data.visibilityDistanceSquare)
-                        DrawWorldText(data.font, data.pivot, data.text, data.fontSize, matrix);
+                        DrawWorldText(data.font, data.pivot, data.text, data.fontSize, matrix, data.fontColor,
+                            data.backgroundColor);
                 }
             });
-            
+        }
+
+        internal void Render()
+        {
             // using var ui = BeginImmediateDrawRel(0, 1, 0, 1);
             // ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.5f), 2);
             // var em = engine.entityManager;
@@ -136,7 +163,7 @@ namespace TheEngine.Managers
             //     
             //     ui.Text("calibri", a.Archetype.ToString() +": " + a.Length, 10, Vector4.One);
             // }
-            
+
             imGuiController.Render();
         }
 
@@ -153,9 +180,10 @@ namespace TheEngine.Managers
             engine.RenderManager.RenderInstancedIndirect(quad, material, 0, 1);
         }
 
-        public Entity DrawPersistentWorldText(string font, Vector2 pivot, string text, float fontSize, Matrix localToWorld, float visibilityDistance)
+        public Entity DrawPersistentWorldText(string font, Vector2 pivot, string text, float fontSize, Matrix localToWorld, float visibilityDistance, Vector4? fontColor = null,
+            Vector4? backgroundColor = null)
         {
-            var entity = entityManager.CreateEntity(persistentTextArchetype);
+            var entity = entityManager.CreateEntity(persistentTextArchetype, text);
 
             entityManager.SetManagedComponent(entity, new DrawTextData()
             {
@@ -163,22 +191,45 @@ namespace TheEngine.Managers
                 fontSize = fontSize,
                 pivot = pivot,
                 text = text,
-                visibilityDistanceSquare = visibilityDistance * visibilityDistance
+                visibilityDistanceSquare = visibilityDistance * visibilityDistance,
+                fontColor = fontColor ?? Vector4.One,
+                backgroundColor = backgroundColor
             });
             entityManager.GetComponent<LocalToWorld>(entity).Matrix = localToWorld;
             
             return entity;
         }
 
-        public void DrawWorldText(string font, Vector2 pivot, ReadOnlySpan<char> text, float fontSize, Matrix localToWorld)
+        private void DrawWorldBox(Vector4 color, Vector2 size, Vector2 pivot, Matrix localToWorld)
+        {
+            worldMaterial.SetUniform("fillColor", color);
+            worldMaterial.SetUniformInt("mode", 0);
+            worldMaterial.SetTexture("font", engine.fontManager.GetTexture("calibri"));
+            float xPixel = -size.X * pivot.X;
+            float yPixel = -size.Y * pivot.Y;
+            Vector4 glyphUv = new Vector4(50 / 512.0f, 20/512.0f, 1/512.0f, 1/512.0f); /* todo: find a better way to find white pixel UVs (instead of hardcoding) */
+            Vector4 glyphPosition = new Vector4(xPixel, yPixel, size.X, -size.Y);
+
+            glyphUVs[0] = glyphUv;
+            glyphPositions[0]  = glyphPosition;
+
+            glyphPositionsBuffer.UpdateBuffer(glyphPositions);
+            glyphUVsBuffer.UpdateBuffer(glyphUVs);
+            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, 0, 1, localToWorld);
+        }
+
+        public void DrawWorldText(string font, Vector2 pivot, ReadOnlySpan<char> text, float fontSize, Matrix localToWorld, Vector4 foreColor, Vector4? backgroundColor)
         {
             var fontDef = engine.fontManager.GetFont(font);
-            worldMaterial.SetUniform("fillColor", Vector4.One);
+            var measurement = MeasureText(font, text, fontSize);
+
+            if (backgroundColor.HasValue)
+                DrawWorldBox(backgroundColor.Value, measurement, pivot, localToWorld);
+
+            worldMaterial.SetUniform("fillColor", foreColor);
             worldMaterial.SetUniformInt("mode", 0);
             worldMaterial.SetTexture("font", engine.fontManager.GetTexture(font));
 
-            var measurement = MeasureText(font, text, fontSize);
-            
             fontSize = fontSize / fontDef.BaseSize;
 
             int glyphsCount = 0;
@@ -483,6 +534,8 @@ namespace TheEngine.Managers
             return new TheImGui(this, new Vector2(x, y), true, new Vector2(pivotX, pivotY));
         }
 
+        public event Action? OnMenuBarDraw;
+
         internal class TheImGui : IImGui
         {
             private readonly UIManager uiManager;
@@ -574,6 +627,5 @@ namespace TheEngine.Managers
                 root.Draw(posX, posY, measure.X, measure.Y);
             }
         }
-
     }
 }

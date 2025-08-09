@@ -4,6 +4,8 @@
         <DirectoryBuildPropsPath>$(MSBuildThisFileDirectory)..\</DirectoryBuildPropsPath>
         <DirectoryBuildPropsFilePath>$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(DirectoryBuildPropsPath)'))</DirectoryBuildPropsFilePath>
         <DirectoryBuildPropsExists Condition="Exists('$(DirectoryBuildPropsFilePath)')">true</DirectoryBuildPropsExists>
+<!--        <PROFILE_RENDERING>true</PROFILE_RENDERING>-->
+<!--        <ENGINE_RELEASE>true</ENGINE_RELEASE>-->
     </PropertyGroup>
     
     <Import Project="$(DirectoryBuildPropsFilePath)" Condition="'$(DirectoryBuildPropsExists)' == 'true'" />

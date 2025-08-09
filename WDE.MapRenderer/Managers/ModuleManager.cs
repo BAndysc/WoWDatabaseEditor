@@ -36,12 +36,12 @@ namespace WDE.MapRenderer.Managers
                 action(mod.Item2);
         }
         
-        public IEnumerator ForEach(Func<IGameModule, IEnumerator> action)
+        public async ValueTask ForEach(Func<IGameModule, ValueTask> action)
         {
             for (var index = 0; index < modules.Count; index++)
             {
                 var mod = modules[index];
-                yield return action(mod.Item2);
+                await action(mod.Item2);
             }
         }
         

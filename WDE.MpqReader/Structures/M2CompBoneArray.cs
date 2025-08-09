@@ -6,7 +6,7 @@ namespace WDE.MpqReader.Structures;
 
 public class M2CompBoneArray
 {
-    private readonly M2CompBone[] array;
+    public readonly M2Array<M2CompBone> array;
     private readonly Func<int, IBinaryReader?> externalAnimOpener;
     private readonly BitArray loadedAnims;
     public int Length => array.Length;
@@ -78,7 +78,7 @@ public class M2CompBoneArray
             loadedAnims[i] = sequences[i].flags.HasFlagFast(M2SequenceFlags.HasEmbeddedAnimationData);
         
         reader.Offset = offset;
-        array = new M2CompBone[size];
+        var array = new M2CompBone[size];
 
         for (int i = 0; i < size; ++i)
         {
@@ -86,6 +86,7 @@ public class M2CompBoneArray
         }
 
         reader.Offset = currentOffset;
+        this.array = new M2Array<M2CompBone>(array.Length, 0, array);
     }
 
     public ref readonly M2CompBone this[int boneIndex] => ref array[boneIndex];

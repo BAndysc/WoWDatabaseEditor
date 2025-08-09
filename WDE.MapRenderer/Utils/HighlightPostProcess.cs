@@ -45,7 +45,7 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
         RT.Update();
         RT_downscaled.Update();
         var entityManager = engine.EntityManager;
-        engine.RenderManager.ActivateRenderTexture(RT, Color4.TransparentBlack);
+        engine.RenderManager.ActivateRenderTexture(RT.Texure, Color4.TransparentBlack);
 
         if (renderers != null)
         {
@@ -75,14 +75,14 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
             }
         }
         
-        engine.TextureManager.BlitRenderTextures(RT, RT_downscaled);
+        engine.TextureManager.BlitRenderTextures(RT.Texure, RT_downscaled.Texure);
         engine.RenderManager.ActivateDefaultRenderTexture();
     }
 
-    public void RenderPostprocess(IRenderManager context, TextureHandle currentImage)
+    public void RenderPostprocess(IRenderManager context, ITexture currentImage)
     {
-        outlineMaterial.SetTexture("outlineTex", RT_downscaled);
-        outlineMaterial.SetTexture("outlineTexUnBlurred", RT);
+        outlineMaterial.SetTexture("outlineTex", RT_downscaled.Texure);
+        outlineMaterial.SetTexture("outlineTexUnBlurred", RT.Texure);
         outlineMaterial.SetTexture("_MainTex", currentImage);
         context.RenderFullscreenPlane(outlineMaterial);
     }

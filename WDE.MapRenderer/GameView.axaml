@@ -15,25 +15,12 @@
         <!--<KeyBinding Gesture="M" Command="{CompiledBinding ToggleMapVisibilityCommand}" />
         <KeyBinding Gesture="B" Command="{CompiledBinding ToggleStatsVisibilityCommand}" />-->
     </UserControl.KeyBindings>
-    <DockPanel LastChildFill="True">
-        <Panel>
-            <theEngine:NativeTheEnginePanel Name="TheEnginePanel" Game="{CompiledBinding  CurrentGame}"
-                                      PointerPressed="TheEnginePanel_OnPointerPressed"
-                                      PointerReleased="TheEnginePanel_OnPointerReleased"
-                                      PointerMoved="TheEnginePanel_OnPointerMoved"
-                                      ContextRequested="TheEnginePanel_OnContextRequested">
-                <theEngine:NativeTheEnginePanel.ContextMenu>
-                </theEngine:NativeTheEnginePanel.ContextMenu>
-            </theEngine:NativeTheEnginePanel>
-            <Border Margin="100,40" IsVisible="{CompiledBinding IsMapVisible}" BorderThickness="10" BorderBrush="DarkGray">
-                <worldMap:WoWMapViewer MapViewModel="{CompiledBinding   }"
-                                       MapsPath="{CompiledBinding MapData.Path}"
-                                       Map="{CompiledBinding SelectedMap.MapPath}">
-                    <mapRenderer:MiniMapRenderer Context2="{Binding .}" PointerPressed="InputElement_OnPointerPressed"/>
-                </worldMap:WoWMapViewer>
-            </Border>
-            <TextBlock Text="{Binding #TheEnginePanel.FrameRate, StringFormat={}{0:0}}" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
-            <TextBlock IsVisible="{CompiledBinding DisplayStats}" Text="{CompiledBinding Stats}" Padding="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
-        </Panel>
-    </DockPanel>
+    <theEngine:NativeTheEnginePanel Name="TheEnginePanel" Game="{CompiledBinding  CurrentGame}"
+                                    PointerPressed="TheEnginePanel_OnPointerPressed"
+                                    PointerReleased="TheEnginePanel_OnPointerReleased"
+                                    PointerMoved="TheEnginePanel_OnPointerMoved"
+                                    ContextRequested="TheEnginePanel_OnContextRequested">
+        <theEngine:NativeTheEnginePanel.ContextMenu>
+        </theEngine:NativeTheEnginePanel.ContextMenu>
+    </theEngine:NativeTheEnginePanel>
 </UserControl>

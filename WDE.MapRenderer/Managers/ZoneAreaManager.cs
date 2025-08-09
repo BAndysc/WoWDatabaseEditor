@@ -3,6 +3,7 @@ using System.Diagnostics;
 using ImGuiNET;
 using WDE.Common.Services;
 using WDE.MapRenderer.StaticData;
+using WDE.MpqReader;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
@@ -92,10 +93,10 @@ public class ZoneAreaManager
         ImGui.End();
     }
 
-    public IEnumerator Load()
+    public async ValueTask Load()
     {
         if (loaded)
-            yield break;
+            return;
         
         Stopwatch sw = new();
         var cacheFile = CachePath;
@@ -105,7 +106,7 @@ public class ZoneAreaManager
         if (File.Exists(cacheFile.FullName))
         {
             LoadCached(cacheFile.FullName);
-            yield break;
+            return;
         }
 
         var tempFile = Path.GetTempFileName();
@@ -117,23 +118,23 @@ public class ZoneAreaManager
         {
             Total = mapStore.Count * 64 * 64
         };
-        
+
         foreach (var map in mapStore)
         {
             progress.Current = map.Name + " (" + map.Id + ")";
 
             var fullName = gameFiles.Wdt(map.Directory);
-            var wdtBytesTask = gameFiles.ReadFile(fullName);
-            yield return wdtBytesTask;
-
-            if (wdtBytesTask.IsFaulted)
+            PooledArray<byte>? wdtBytes;
+            try
+            {
+                wdtBytes = await gameFiles.ReadFile(fullName);
+            }
+            catch (Exception e)
             {
                 Console.WriteLine("Couldn't load file: " + fullName);
                 progress.Done += 64 * 64;
                 continue;
             }
-            
-            using var wdtBytes = wdtBytesTask.Result;
 
             if (wdtBytes == null)
             {
@@ -145,6 +146,7 @@ public class ZoneAreaManager
             areaTables[map.Id] = areas;
             
             var currentWdt = new FastWDTChunks(new MemoryBinaryReader(wdtBytes!));
+            wdtBytes.Dispose();
 
             binWriter.Write(map.Id);
             var fileOffsetForCount = file.Position;
@@ -158,10 +160,7 @@ public class ZoneAreaManager
                     progress.Done++;
                     if (currentWdt.Chunks[y][x])
                     {
-                        var adtBytesTask = gameFiles.ReadFile(gameFiles.Adt(map.Directory, x, y));
-                        yield return adtBytesTask;
-                
-                        using var adtBytes = adtBytesTask.Result;
+                        using var adtBytes = await gameFiles.ReadFile(gameFiles.Adt(map.Directory, x, y));
                         if (adtBytes != null)
                         {
                             var adt = new FastAdtAreaTable(new MemoryBinaryReader(adtBytes));

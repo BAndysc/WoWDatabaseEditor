@@ -4,24 +4,30 @@ namespace TheEngine.ECS
 {
     internal class EntityDataManager : System.IDisposable
     {
+        private readonly Engine engine;
         private readonly Dictionary<ulong, int> archetypeToDataIndex = new();
         private readonly List<ChunkDataManager> data = new();
+
+        public EntityDataManager(Engine engine)
+        {
+            this.engine = engine;
+        }
 
         internal void AddEntity(Entity entity, Archetype archetype)
         {
             var hash = archetype.Hash;
             if (!archetypeToDataIndex.TryGetValue(hash, out var dataIndex))
             {
-                data.Add(new ChunkDataManager(archetype));
+                data.Add(new ChunkDataManager(archetype, engine));
                 dataIndex = data.Count - 1;
                 archetypeToDataIndex[hash] = dataIndex;
             }
             data[dataIndex].AddEntity(entity);
         }
 
-        internal void RemoveEntity(Entity entity, ulong archetypeBitMask)
+        internal void RemoveEntity(Entity entity, ulong archetypeBitMask, bool isDestroyed)
         {
-            data[archetypeToDataIndex[archetypeBitMask]].RemoveEntity(entity);
+            data[archetypeToDataIndex[archetypeBitMask]].RemoveEntity(entity, isDestroyed);
         }
 
         public void MoveEntity(Entity entity, Archetype oldArchetype, Archetype newArchetype)
@@ -37,7 +43,7 @@ namespace TheEngine.ECS
             foreach (var component in oldArchetype.ManagedComponents)
                 newData.UnsafeCopy(entity, oldData, component);
             
-            RemoveEntity(entity, oldArchetype.Hash);
+            RemoveEntity(entity, oldArchetype.Hash, false);
         }
 
         internal ArchetypeIterator Archetypes => new ArchetypeIterator(this);

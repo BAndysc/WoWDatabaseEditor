@@ -45,6 +45,8 @@ namespace WDE.MapRenderer.Managers
         public LiquidObjectStore LiquidObjectStore { get; }
         public LiquidMaterialStore LiquidMaterialStore { get; }
         public WorldMapAreaStore WorldMapAreaStore { get; }
+        public VehicleStore VehicleStore { get; }
+        public VehicleSeatStore VehicleSeatStore { get; }
 
         private IEnumerable<object> OpenDbc(string name)
         {
@@ -139,6 +141,16 @@ namespace WDE.MapRenderer.Managers
             LightParamStore = new (gameFiles.WoWVersion, (dynamic)OpenDbc("LightParams"), LightIntParamStore, LightFloatParamStore, LightDataStore);
             LightStore = new ((dynamic)OpenDbc("Light"), LightParamStore);
             WorldMapAreaStore = new((dynamic)OpenDbc("WorldMapArea"), gameFiles.WoWVersion);
+            if (gameFiles.WoWVersion >= GameFilesVersion.Wrath_3_3_5a)
+            {
+                VehicleStore = new((dynamic)OpenDbc("Vehicle"), gameFiles.WoWVersion);
+                VehicleSeatStore = new((dynamic)OpenDbc("VehicleSeat"), gameFiles.WoWVersion);
+            }
+            else
+            {
+                VehicleStore = new();
+                VehicleSeatStore = new();
+            }
         }
 
         public IEnumerable<(System.Type, object)> Stores()

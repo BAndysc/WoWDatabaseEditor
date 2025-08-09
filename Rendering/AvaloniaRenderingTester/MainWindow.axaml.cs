@@ -33,6 +33,7 @@ using WDE.QueryGenerators;
 using WDE.SqlInterpreter;
 using WDE.Trinity;
 using WDE.TrinityMySqlDatabase;
+using WoWDatabaseEditorCore.Services.LoadingEvents;
 
 namespace AvaloniaRenderingTester
 {
@@ -96,6 +97,7 @@ namespace AvaloniaRenderingTester
             registry.RegisterInstance<IContainerProvider>(provider);
             registry.RegisterInstance<IContainerRegistry>(registry);
 
+            registry.Register<ILoadingEventAggregator, LoadingEventAggregator>();
             registry.Register<IGameView, DummyGameView>();
             registry.Register<IStatusBar, DummyStatusBar>();
             registry.Register<IGameProperties, DummyGameProperties>();

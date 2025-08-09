@@ -10,7 +10,7 @@ namespace TheEngine.Managers
     internal class MaterialManager : IMaterialManager, IDisposable
     {
         private Engine engine;
-        private List<Material> materials = new();
+        private List<WeakReference<Material>> materials = new();
         private NativeBuffer<Vector4> smallEmptyBuffer;
 
         public MaterialManager(Engine engine)
@@ -44,7 +44,7 @@ namespace TheEngine.Managers
                     m.SetBuffer(uniform.Key, smallEmptyBuffer);
             }
             
-            materials.Add(m);
+            materials.Add(new WeakReference<Material>(m));
             return m;
         }
 
@@ -66,14 +66,19 @@ namespace TheEngine.Managers
 
         public Material GetMaterialByHandle(MaterialHandle handle)
         {
-            return materials[handle.Handle];
+            if (materials[handle.Handle].TryGetTarget(out var material))
+            {
+                return material;
+            }
+            return null;
         }
 
         public void InvalidateShaderCache()
         {
             foreach (var material in materials)
             {
-                material.InvalidateShaderCache();
+                if (material.TryGetTarget(out var target))
+                    target.InvalidateShaderCache();
             }
         }
     }

@@ -24,13 +24,13 @@ namespace WDE.MapRenderer
         void Render(float delta) { }
         void RenderTransparent() { }
         void RenderGUI() { }
-        IEnumerator LoadChunk(int mapId, int chunkX, int chunkZ, CancellationToken cancellationToken)
+        ValueTask LoadChunk(int mapId, int chunkX, int chunkZ, CancellationToken cancellationToken)
         {
-            yield break;
+            return ValueTask.CompletedTask;
         }
-        IEnumerator UnloadChunk(int chunkX, int chunkZ)
+        ValueTask UnloadChunk(int chunkX, int chunkZ)
         {
-            yield break;
+            return ValueTask.CompletedTask;
         }
 
         IEnumerable<(string, ICommand, object?)>? GenerateContextMenu() => null;

@@ -1,4 +1,5 @@
 using System.Collections;
+using TheEngine;
 using TheMaths;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader.DBC;
@@ -15,6 +16,8 @@ public class WorldManager : System.IDisposable
     private readonly NotificationsCenter notificationsCenter;
     private readonly ZoneAreaManager zoneAreaManager;
     private readonly AreaTableStore areaTableStore;
+    private readonly Engine engine;
+    private readonly IGameProperties gameProperties;
     private AdtChunkType[,] presentChunks = new AdtChunkType[64, 64];
     private Vector3? teleportPosition;
     
@@ -23,7 +26,9 @@ public class WorldManager : System.IDisposable
         CameraManager cameraManager,
         NotificationsCenter notificationsCenter,
         ZoneAreaManager zoneAreaManager,
-        AreaTableStore areaTableStore)
+        AreaTableStore areaTableStore,
+        Engine engine,
+        IGameProperties gameProperties)
     {
         this.gameFiles = gameFiles;
         this.gameContext = gameContext;
@@ -31,6 +36,8 @@ public class WorldManager : System.IDisposable
         this.notificationsCenter = notificationsCenter;
         this.zoneAreaManager = zoneAreaManager;
         this.areaTableStore = areaTableStore;
+        this.engine = engine;
+        this.gameProperties = gameProperties;
     }
     
     public WDT? CurrentWdt { get; private set; }
@@ -39,6 +46,10 @@ public class WorldManager : System.IDisposable
     private int? prevAreaId;
     public void Update(float delta)
     {
+        if (!gameProperties.LoadWorld)
+        {
+            return;
+        }
         var areaId = zoneAreaManager.GetAreaId(gameContext.CurrentMap.Id, cameraManager.Position);
         if (areaId != prevAreaId)
         {
@@ -54,35 +65,37 @@ public class WorldManager : System.IDisposable
         }
     }
 
-    public IEnumerator LoadOptionals(CancellationToken cancel)
+    public async ValueTask LoadOptionals(CancellationToken cancel)
     {
-        yield break;
     }
     
-    public IEnumerator LoadMap(CancellationToken cancel)
+    public async ValueTask LoadMap(CancellationToken cancel)
     {
         var wdtPath = gameFiles.Wdt(gameContext.CurrentMap.Directory);
         var wdlPath = gameFiles.Wdl(gameContext.CurrentMap.Directory);
-        var wdtBytesTask = gameFiles.ReadFile(wdtPath);
-        var wdlBytesTask = gameFiles.ReadFile(wdlPath);
-        yield return wdtBytesTask;
-        yield return wdlBytesTask;
-
-        using var wdtBytes = wdtBytesTask.Result;
-        using var wdlBytes = wdlBytesTask.Result;
+        var wdtBytes = await gameFiles.ReadFile(wdtPath);
+        var wdlBytes = await gameFiles.ReadFile(wdlPath);
         if (wdtBytes == null)
         {
+            CurrentWdt = null;
+            CurrentWdl = null;
             Console.WriteLine("Couldn't load map " + wdtPath + ". This is quite fatal...");
-            yield break;
+            return;
         }
         
         ClearData();
-        
-        CurrentWdt = new WDT(new MemoryBinaryReader(wdtBytes), gameFiles.WoWVersion);
+
+        WDL? wdl = null;
+        await engine.EnterThreadPool;
+        var wdt = new WDT(new MemoryBinaryReader(wdtBytes), gameFiles.WoWVersion);
         if (wdlBytes != null)
-            CurrentWdl = new WDL(new MemoryBinaryReader(wdlBytes));
-        else
-            CurrentWdl = null;
+        {
+            wdl = new WDL(new MemoryBinaryReader(wdlBytes));
+        }
+
+        await engine.EnterGameLoop;
+        CurrentWdt = wdt;
+        CurrentWdl = wdl;
 
         Vector3 middlePosSum = Vector3.Zero;
         int chunks = 0;

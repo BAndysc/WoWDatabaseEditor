@@ -150,6 +150,8 @@ namespace TheAvaloniaOpenGL.Resources
         private Dictionary<string, ShaderVariableType> uniformTypes;
         private Dictionary<int, ShaderVariableType> uniformTypesByLocation;
 
+        public string ShaderFile => shaderFile;
+
         /*public class ShaderInclude : Include
         {
             private readonly string[] incPaths;

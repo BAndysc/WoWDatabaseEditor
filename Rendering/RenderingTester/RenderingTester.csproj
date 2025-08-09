@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
+      <PackageReference Include="ImGui.NET" Version="1.91.6.1" />
       <PackageReference Include="JetBrains.Profiler.Api" Version="1.4.2" />
     </ItemGroup>
 

@@ -32,5 +32,8 @@ namespace TheEngine.Interfaces
         public ref PerformanceCounters Counters { get; }
         public Vector2 PixelSize { get; }
         public ref RenderStats RenderStats { get; }
+        public ulong TextureBytes { get; }
+        public ulong EntitiesUnmanagedBytes { get; }
+        public long BufferBytes { get; }
     }
 }

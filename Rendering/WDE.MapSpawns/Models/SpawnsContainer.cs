@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using WDE.Common.Database;
 using WDE.Common.Utils;
 using WDE.MapRenderer.Managers;
+using WDE.MapRenderer.StaticData;
 using WDE.MapSpawns.Rendering;
 using WDE.MapSpawns.ViewModels;
 using WDE.Module.Attributes;
@@ -53,6 +54,20 @@ public class SpawnsContainer : ISpawnsContainer
     
     public void Clear()
     {
+        for (int chunkX = 0; chunkX < Constants.Blocks; chunkX++)
+        {
+            for (int chunkZ = 0; chunkZ < Constants.Blocks; chunkZ++)
+            {
+                var list = spawnsPerChunk[(chunkX, chunkZ)];
+                if (list != null)
+                {
+                    foreach (var spawn in list)
+                    {
+                        spawn.Dispose();
+                    }
+                }
+            }
+        }
         entries.Clear();
         spawnsPerChunk.Clear();
         LoadedMap = null;

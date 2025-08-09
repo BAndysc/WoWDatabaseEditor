@@ -14,7 +14,7 @@ namespace TheEngine.Input
         internal InputManager(Engine engine)
         {
             Mouse = mouse = new Mouse(engine);
-            Keyboard = keyboard = new Keyboard();
+            Keyboard = keyboard = new Keyboard(engine);
         }
 
         internal void Update(float deltaMs)

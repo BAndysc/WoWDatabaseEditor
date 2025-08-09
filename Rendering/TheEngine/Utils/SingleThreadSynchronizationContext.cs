@@ -1,5 +1,5 @@
 
-namespace RenderingTester;
+namespace TheEngine.Utils;
 
 public sealed class SingleThreadSynchronizationContext : SynchronizationContext
 {

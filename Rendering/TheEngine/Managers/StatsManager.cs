@@ -12,5 +12,11 @@ namespace TheEngine.Managers
         public Vector2 PixelSize { get; internal set; }
 
         public ref RenderStats RenderStats => ref renderStats;
+
+        public ulong TextureBytes { get; internal set; }
+
+        public ulong EntitiesUnmanagedBytes { get; internal set; }
+
+        public long BufferBytes { get; internal set; }
     }
 }

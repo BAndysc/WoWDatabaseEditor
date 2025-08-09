@@ -9,6 +9,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using TheAvaloniaOpenGL;
 using TheEngine.Config;
 using TheEngine.Utils;
+using WDE.Common.Utils;
 using MouseButton = OpenTK.Windowing.GraphicsLibraryFramework.MouseButton;
 using TextInputEventArgs = OpenTK.Windowing.Common.TextInputEventArgs;
 
@@ -18,9 +19,9 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 {
     private readonly IGame game;
     private Engine engine = null!;
-    private Stopwatch updateStopwatch = new();
-    private Stopwatch renderStopwatch = new Stopwatch();
     private bool isMacOS;
+    private Stopwatch presentStopwatch = new();
+    private GameRunner gameRunner = null!;
 
     public TheEngineOpenTkWindow(GameWindowSettings gameWindowSettings,
         NativeWindowSettings nativeWindowSettings,
@@ -28,6 +29,8 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     {
         isMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         this.game = game;
+        UpdateFrequency = 0;
+        VSync = VSyncMode.Off;
     }
 
     protected override void OnLoad()
@@ -38,6 +41,12 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 #endif
         engine = new Engine(device, new Configuration(), this, false);
         game.Initialize(engine);
+        gameRunner = new GameRunner(engine);
+        gameRunner.SyncInputState += () =>
+        {
+            UpdateKeyboard();
+            UpdateMouse();
+        };
         base.OnLoad();
     }
 
@@ -50,40 +59,11 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 
     protected override void OnRenderFrame(FrameEventArgs args)
     {
-        engine.TotalTime += args.Time * 1000;
-        VSync = VSyncMode.Off;
-        engine.statsManager.Counters.FrameTime.Add(args.Time * 1000);
-        renderStopwatch.Restart();
-        engine.Device.device.Begin();
-        engine.renderManager.BeginFrame();
-        engine.renderManager.PrepareRendering(0);
-        engine.renderManager.RenderOpaque(0);
-        engine.Device.device.Debug("  Rendering Game custom");
-        game.Render((float)args.Time * 1000);
-        engine.renderManager.RenderTransparent(0);
-        engine.Device.device.Debug("  Rendering Game custom translucent");
-        game.RenderTransparent((float)args.Time * 1000);
-        engine.renderManager.RenderPostProcess();
-        engine.Device.device.Debug("  Rendering Game custom GUI");
-        game.RenderGUI((float)args.Time * 1000);
-        engine.RenderGUI();
-        engine.Device.device.Debug("  Finalize rendering");
-        engine.renderManager.FinalizeRendering(0);
-        base.OnRenderFrame(args);
-        renderStopwatch.Stop();
-        engine.statsManager.Counters.TotalRender.Add(renderStopwatch.Elapsed.Milliseconds);
-        renderStopwatch.Restart();
+        presentStopwatch.Restart();
         GL.Finish();
         SwapBuffers();
-        renderStopwatch.Stop();
-        engine.statsManager.Counters.PresentTime.Add(renderStopwatch.Elapsed.Milliseconds);
-        if (stopMeasure)
-        {
-            MeasureProfiler.StopCollectingData();
-            MeasureProfiler.SaveData();
-            measure = false;
-            stopMeasure = false;
-        }
+        presentStopwatch.Stop();
+        engine.statsManager.Counters.PresentTime.Add(presentStopwatch.Elapsed.Milliseconds);
     }
 
     private KeyboardState? previousState;
@@ -210,42 +190,17 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         { Keys.Menu, Key.DbeNoCodeInput },
     };
 
-    private bool measure;
-    private bool stopMeasure;
+    private int frame = 0;
     protected override void OnUpdateFrame(FrameEventArgs args)
     {
-        if (measure && engine.inputManager.keyboard.JustReleased(Key.H))
-            stopMeasure = true;
-        if (engine.inputManager.keyboard.JustPressed(Key.H))
-        {
-            MeasureProfiler.StartCollectingData();
-            measure = true;
-            if (!engine.inputManager.keyboard.IsDown(Key.LeftCtrl))
-                stopMeasure = true;
-        }
-        updateStopwatch.Restart();
-        engine.inputManager.PostUpdate();
-        engine.inputManager.Update((float)args.Time * 1000);
-        UpdateKeyboard();
-        UpdateMouse();
-        
-        if (engine.inputManager.Keyboard.JustPressed(Key.R))
-        {
-            if (engine.Device.device is DebugDevice debug)
-            {
-                var file = new FileInfo("render_debug.txt");
-                File.WriteAllLines(file.FullName, debug.commands);
-                Console.WriteLine("Log written to " + file.FullName);
-            }
-        }
-        
-        engine.UpdateGui((float)args.Time);
-        game?.Update((float)args.Time * 1000);
-        engine.renderManager.UpdateTransforms();
-            
-        base.OnUpdateFrame(args);
-        updateStopwatch.Stop();
-        engine.statsManager.Counters.UpdateTime.Add(updateStopwatch.Elapsed.TotalMilliseconds);
+        //if (frame++ == 0)
+        //    DotnetProfiler.Profiler.Enable();
+        gameRunner.NextFrame((float)args.Time, game);
+        //if (frame == 130)
+        //{
+        //    DotnetProfiler.Profiler.Disable();
+        //    DotnetProfiler.Profiler.SaveTrace("trace.bin");
+        //}
     }
 
     private bool wasLeftDown = false;
@@ -255,16 +210,28 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         mouseState = MouseState;
         var isLeftDown = mouseState.IsButtonDown(MouseButton.Left);
         var isRightDown = mouseState.IsButtonDown(MouseButton.Right);
-        if (isLeftDown && !wasLeftDown)
+        if (pendingLeftMouseDown)
+        {
             engine.inputManager.mouse.MouseDown(Input.MouseButton.Left);
-        if (!isLeftDown && wasLeftDown)
+            pendingLeftMouseDown = false;
+        }
+        else if (pendingLeftMouseUp)
+        {
             engine.inputManager.mouse.MouseUp(isRightDown ? Input.MouseButton.Right : Input.MouseButton.None);
-        
-        if (isRightDown && !wasRightDown)
+            pendingLeftMouseUp = false;
+        }
+
+        if (pendingRightMouseDown)
+        {
             engine.inputManager.mouse.MouseDown(Input.MouseButton.Right);
-        if (!isRightDown && wasRightDown)
+            pendingRightMouseDown = false;
+        }
+        else if (pendingRightMouseUp)
+        {
             engine.inputManager.mouse.MouseUp(isLeftDown ? Input.MouseButton.Left : Input.MouseButton.None);
-        
+            pendingRightMouseUp = false;
+        }
+
         engine.inputManager.mouse.MouseWheel(new Vector2(mouseState.ScrollDelta.X, mouseState.ScrollDelta.Y));
 
         if (isMacOS)
@@ -274,6 +241,37 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 
         wasLeftDown = isLeftDown;
         wasRightDown = isRightDown;
+    }
+
+    private bool pendingLeftMouseDown;
+    private bool pendingRightMouseDown;
+    private bool pendingLeftMouseUp;
+    private bool pendingRightMouseUp;
+
+    protected override void OnMouseDown(MouseButtonEventArgs e)
+    {
+        base.OnMouseDown(e);
+        if (e.Button == MouseButton.Left)
+        {
+            pendingLeftMouseDown = true;
+        }
+        else if (e.Button == MouseButton.Right)
+        {
+            pendingRightMouseDown = true;
+        }
+    }
+
+    protected override void OnMouseUp(MouseButtonEventArgs e)
+    {
+        base.OnMouseUp(e);
+        if (e.Button == MouseButton.Left)
+        {
+            pendingLeftMouseUp = true;
+        }
+        else if (e.Button == MouseButton.Right)
+        {
+            pendingRightMouseUp = true;
+        }
     }
 
     private static Keys[] StaticCachedKeys = Enum.GetValues<Keys>();
@@ -337,4 +335,6 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     public float WindowWidth { get; private set; }
     public float WindowHeight { get; private set; }
     public float DpiScaling { get; private set; }
+
+
 }

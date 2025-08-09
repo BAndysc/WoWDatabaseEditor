@@ -8,8 +8,8 @@ public class ChrRaces
     // public readonly int Flags;
     // public readonly int FactionID;
     // public readonly int ExplorationSoundID;
-    // public readonly int MaleDisplayId;
-    // public readonly int FemaleDisplayId;
+    public readonly int MaleDisplayId;
+    public readonly int FemaleDisplayId;
     public readonly string ClientPrefix;
     // public readonly int BaseLanguage;
     // public readonly int CreatureType;
@@ -32,8 +32,8 @@ public class ChrRaces
         // Flags = dbcIterator.GetInt(1);
         // FactionID = dbcIterator.GetInt(2);
         // ExplorationSoundID = dbcIterator.GetInt(3);
-        // MaleDisplayId = dbcIterator.GetInt(4);
-        // FemaleDisplayId = dbcIterator.GetInt(5);
+        MaleDisplayId = dbcIterator.GetInt(4);
+        FemaleDisplayId = dbcIterator.GetInt(5);
         ClientPrefix = dbcIterator.GetString(6);
         // BaseLanguage = dbcIterator.GetInt(7);
         // CreatureType = dbcIterator.GetInt(8);
@@ -55,6 +55,8 @@ public class ChrRaces
     {
         Id = (uint)dbcIterator.Id;
         ClientPrefix = dbcIterator.GetString("ClientPrefix");
+        MaleDisplayId = dbcIterator.GetInt("MaleDisplayID");
+        FemaleDisplayId = dbcIterator.GetInt("FemaleDisplayID");
     }
 
     private ChrRaces()
@@ -63,8 +65,8 @@ public class ChrRaces
         // Flags = 0;
         // FactionID = 0;
         // ExplorationSoundID = 0;
-        // MaleDisplayId = 0;
-        // FemaleDisplayId = 0;
+        MaleDisplayId = 0;
+        FemaleDisplayId = 0;
         ClientPrefix = "";
         // BaseLanguage = 0;
         // CreatureType = 0;

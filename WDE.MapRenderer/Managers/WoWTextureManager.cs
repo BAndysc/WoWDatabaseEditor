@@ -1,9 +1,10 @@
-using System.Collections;
 using System.Diagnostics;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
+using TheEngine;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
+using TheEngine.Utils;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers
@@ -13,68 +14,76 @@ namespace WDE.MapRenderer.Managers
         private readonly ITextureManager textureManager;
         private readonly IGameFiles gameFiles;
         private readonly IGameContext gameContext;
-        private Dictionary<FileId, TextureHandle> texts = new();
+        private readonly Engine engine;
+        private Dictionary<FileId, WeakReference<ITexture>?> texts = new();
+        private Dictionary<FileId, Task<ITexture>> loadingTasks = new();
 
-        public TextureHandle EmptyTexture { get; }
+        public ITexture EmptyTexture { get; }
         
-        public WoWTextureManager(ITextureManager textureManager, IGameFiles gameFiles, IGameContext gameContext)
+        public WoWTextureManager(ITextureManager textureManager,
+            IGameFiles gameFiles,
+            IGameContext gameContext,
+            Engine engine)
         {
             this.textureManager = textureManager;
             this.gameFiles = gameFiles;
             this.gameContext = gameContext;
+            this.engine = engine;
             EmptyTexture = textureManager.CreateTexture(
                     new[] { new Rgba32[] { new(255, 0, 0, 255) } }, 1, 1, false);
         }
 
-        public IEnumerator GetTexture(FileId? texturePath, TaskCompletionSource<TextureHandle> result)
+        public async ValueTask<ITexture> GetTexture(FileId? texturePath)
         {
             if (!texturePath.HasValue)
             {
-                result.SetResult(EmptyTexture);
-                yield break;
+                return EmptyTexture;
             }
             
             if (texts.TryGetValue(texturePath.Value, out var t))
             {
-                result.SetResult(t);
-                yield break;
+                if (t.TryGetTarget(out var target))
+                    return target;
+                texts.Remove(texturePath.Value);
             }
 
-            var dummy = textureManager.CreateDummyHandle();
+            var tcs = new TaskCompletionSource<ITexture>();
+            loadingTasks[texturePath.Value] = tcs.Task;
 
-            texts[texturePath.Value] = dummy;
-            
-            gameContext.StartCoroutine(InternalLoadTexture(dummy, texturePath.Value));
-            
-            result.SetResult(dummy);
+            var text = await InternalLoadTexture(texturePath.Value) ?? EmptyTexture;
+
+            texts[texturePath.Value] = new WeakReference<ITexture>(text);
+            loadingTasks.Remove(texturePath.Value);
+
+            return text;
         }
 
-        private IEnumerator InternalLoadTexture(TextureHandle handle, FileId texturePath)
+        private async ValueTask<ITexture?> InternalLoadTexture(FileId texturePath)
         {
-            var bytes = gameFiles.ReadFile(texturePath);
-            yield return bytes;
-            if (bytes.Result == null)
-                yield break;
+            var bytes = await gameFiles.ReadFile(texturePath);
+            if (bytes == null)
+                return null;
 
             BLP blp = null!;
-            yield return Task.Run(() =>
-            {
-                blp = new BLP(bytes.Result.AsArray(), 0, bytes.Result.Length, maxSize);
-            });
-            bytes.Result.Dispose();
-        
-            Debug.Assert(texts[texturePath] == handle);
+            await engine.EnterThreadPool;
+            blp = new BLP(bytes.AsArray(), 0, bytes.Length, maxSize);
+            bytes.Dispose();
+            await engine.EnterGameLoop;
+
             var generateMips = blp.Header.Mips == BLP.MipmapLevelAndFlagType.MipsNone;
             var actualHandle = textureManager.CreateTexture(blp.Data, (int)blp.RealWidth, (int)blp.RealHeight, generateMips);
-            textureManager.SetFiltering(texts[texturePath], FilteringMode.Linear);
-            textureManager.ReplaceHandles(handle, actualHandle);
+            textureManager.SetFiltering(actualHandle, FilteringMode.Linear);
+            return actualHandle;
         }
 
         public void Dispose()
         {
             textureManager.DisposeTexture(EmptyTexture);
             foreach (var tex in texts.Values)
-                textureManager.DisposeTexture(tex);
+            {
+                if (tex.TryGetTarget(out var target))
+                    textureManager.DisposeTexture(target);
+            }
             texts.Clear();
         }
 

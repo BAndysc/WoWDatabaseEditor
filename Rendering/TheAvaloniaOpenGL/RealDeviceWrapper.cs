@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using OpenGLBindings;
+using TheAvaloniaOpenGL.Resources;
 
 namespace TheAvaloniaOpenGL
 {
@@ -431,5 +432,37 @@ namespace TheAvaloniaOpenGL
         {
             
         }
+
+        private List<INativeBuffer>[] buffersToDispose = [new(), new()];
+        private int currentBufferDisposeIndex = 0;
+
+        public void AddToDispose(INativeBuffer nativeBuffer)
+        {
+            lock (this)
+            {
+                buffersToDispose[currentBufferDisposeIndex].Add(nativeBuffer);
+            }
+        }
+
+        public void DisposeBuffers()
+        {
+            List<INativeBuffer> toDispose;
+            lock (this)
+            {
+                toDispose = buffersToDispose[currentBufferDisposeIndex];
+                currentBufferDisposeIndex = 1 - currentBufferDisposeIndex;
+            }
+            foreach (var buffer in toDispose)
+            {
+                if (buffer is NativeBufferBase bufferBase && bufferBase.BufferHandle != -1)
+                {
+                    Console.WriteLine("Buffer not disposed! Allocated here: " + bufferBase.AllocationStackTrace);
+                }
+                buffer.Dispose();
+            }
+            toDispose.Clear();
+        }
+
+        public long TotalBufferBytes { get; set; }
     }
 }

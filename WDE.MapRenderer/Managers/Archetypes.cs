@@ -1,7 +1,12 @@
+using ImGuiNET;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
 using TheEngine.ECS;
+using TheEngine.Interfaces;
+using TheEngine.Utils;
 using TheMaths;
+using WDE.MapRenderer.Managers.Entities;
+using WDE.Module.Attributes;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
@@ -13,14 +18,19 @@ public class M2AnimationComponentData : IManagedComponentData
     public M2AnimationComponentData? AttachedTo;
     public AnimationDataFlags Flags = AnimationDataFlags.None;
 
+    public AnimationDataFlags OneShotFlags = AnimationDataFlags.None;
+    public int SetNewOneShotAnimation;
     public int SetNewAnimation;
     public M2AttachmentType? AttachmentType;
+    public float SpeedModifier = 1;
     // don't touch those fields outside of animation system
     public int _currentAnimation;
     public uint _length;
     public int _animInternalIndex;
     public float _time;
     public NativeBuffer<Matrix> _buffer = null!;
+    public NativeBuffer<Vector4> _colors = null!;
+    public NativeBuffer<Matrix> _textureTransforms = null!;
 
     public M2AnimationComponentData(M2 model, M2AnimationComponentData? attachedTo = null, M2AttachmentType? attachmentType = null)
     {
@@ -119,7 +129,8 @@ public class Archetypes
             .WithComponentData<LocalToWorld>();
 
         AnimatedWorldObjectArchetype = WorldObjectArchetype
-            .WithManagedComponentData<M2AnimationComponentData>();
+            .WithManagedComponentData<M2AnimationComponentData>()
+            .WithManagedComponentData<MdxRenderer>();
         
         AttachmentsAnimationRootArchetype = entityManager.NewArchetype()
             .Includes(CullingArchetype)
@@ -135,5 +146,46 @@ public class Archetypes
             .Includes(RenderEntityArchetype)
             .Includes(StaticM2WorldObjectAnimatedArchetype)
             .WithComponentData<CopyParentTransform>();
+    }
+}
+
+
+[AutoRegister]
+public class M2AnimationComponentInspector : IInspectorDrawer<M2AnimationComponentData>
+{
+    private readonly IEntityManager entityManager;
+
+    public M2AnimationComponentInspector(IEntityManager entityManager)
+    {
+        this.entityManager = entityManager;
+    }
+
+    public void Draw(M2AnimationComponentData component)
+    {
+        ImGui.TextUnformatted("Internal anim index: " + component._animInternalIndex);
+        ImGui.TextUnformatted("Current anim: " + component._currentAnimation);
+        ImGui.TextUnformatted("Time: " + component._time);
+        ImGui.TextUnformatted("Length: " + component._length);
+        ImGui.TextUnformatted("Speed modifier: " + component.SpeedModifier);
+        ImGui.TextUnformatted("Flags: " + component.Flags);
+
+        var lookup = component.Model.sequenceIdToAnimationLookup;
+        List<int> validAnimationIds = new List<int>();
+        List<string> validAnimationNames = new List<string>();
+        for (int animId = 0; animId < lookup.Length; ++animId)
+        {
+            if (lookup[animId] != -1)
+            {
+                validAnimationIds.Add(animId);
+                var name = Enum.GetName(typeof(M2AnimationType), animId) ?? $"Anim {animId}";
+                validAnimationNames.Add(name);
+            }
+        }
+
+        int animIndex = 0;
+        if (ImGui.Combo("Set Animation", ref animIndex, validAnimationNames.ToArray(), validAnimationNames.Count))
+        {
+            component.SetNewAnimation = validAnimationIds[animIndex];
+        }
     }
 }

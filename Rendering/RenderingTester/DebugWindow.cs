@@ -55,6 +55,10 @@ public class DebugWindow : IGameModule
         if (ImGui.Checkbox("Render terrain", ref renderTerrain))
             chunkManager.RenderTerrain = renderTerrain;
 
+        float viewDistance = (float)gameProperties.ViewDistanceModifier;
+        if (ImGui.SliderFloat("View Distance", ref viewDistance, 1, 32))
+            gameProperties.ViewDistanceModifier = viewDistance;
+
         bool pausedTime = gameProperties.DisableTimeFlow;
         if (ImGui.Checkbox("Pause time", ref pausedTime))
             gameProperties.DisableTimeFlow = pausedTime;

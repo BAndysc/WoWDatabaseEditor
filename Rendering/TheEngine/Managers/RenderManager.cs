@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Avalonia.Input;
+using ImGuiNET;
 using OpenGLBindings;
 using TheAvaloniaOpenGL;
 using TheAvaloniaOpenGL.Resources;
@@ -28,6 +29,7 @@ namespace TheEngine.Managers
         private NativeBuffer<Matrix> instancesBuffer;
         private NativeBuffer<Matrix> instancesInverseBuffer;
         private NativeBuffer<uint> instancesObjectIndicesBuffer;
+        private NativeBuffer<Int4> instancesObjectDataBuffer;
         private MaterialInstanceRenderData instancingRenderData = new();
 
         private ObjectBuffer objectData;
@@ -36,6 +38,7 @@ namespace TheEngine.Managers
         private Matrix[] instancesArray;
         private Matrix[] inverseInstancesArray;
         private uint[] instancesObjectInddicesArray;
+        private Int4[] instancesObjectDataArray;
 
         private ICameraManager cameraManager;
         
@@ -52,13 +55,25 @@ namespace TheEngine.Managers
 
         private int currentBackBufferWidth = -1;
         private int currentBackBufferHeight = -1;
-        private TextureHandle opaqueTexture2D;
-        private TextureHandle depthTexture2D;
-        private TextureHandle opaqueRenderTexture;
-        private TextureHandle mainObjectBuffer;
-        private TextureHandle[] backBuffers = new TextureHandle[2];
+        private int currentSceneViewWidth = -1;
+        private int currentSceneViewHeight = -1;
+        private int currentGuiWidth = -1;
+        private int currentGuiHeight = -1;
+        private ITexture opaqueTexture2D;
+        private ITexture depthTexture2D;
+        internal ITexture sceneViewOpaqueTexture2D;
+        private ITexture sceneViewDepthTexture2D;
+        private ITexture opaqueRenderTexture;
+        private ITexture mainObjectBuffer;
+        private ITexture mainObjectDepthTexture;
+        private ITexture mainObjectColorTexture;
+        private ITexture mainObjectColor1Texture;
+        private ITexture guiTexture;
+        private ITexture sceneViewColor1Texture;
+        private ITexture sceneViewTexture;
+        private ITexture[] backBuffers = new ITexture[2];
         private int currentBackBufferIndex = -1;
-        private TextureHandle CurrentBackBuffer
+        internal ITexture CurrentBackBuffer
         {
             get
             {
@@ -68,7 +83,7 @@ namespace TheEngine.Managers
             }
         }
 
-        private TextureHandle OtherBackBuffer
+        private ITexture OtherBackBuffer
         {
             get
             {
@@ -120,13 +135,21 @@ namespace TheEngine.Managers
 
         private Archetype dynamicParentedEntitiesArchetype;
 
-        public TextureHandle DepthTexture => depthTexture2D;
-        public TextureHandle OpaqueTexture => opaqueTexture2D;
-        
+        public ITexture DepthTexture => depthTexture2D;
+        public ITexture OpaqueTexture => opaqueTexture2D;
+
+        private RenderLayerData[] layers = Enumerable.Range(0, RenderLayer.MAX_LAYERS)
+            .Select(layer => new RenderLayerData(){Layer = new RenderLayer((byte)layer, 0), Name = $"Unused {layer}"})
+            .ToArray();
+        private List<RenderLayer> freeLayers;
+
         internal RenderManager(Engine engine, bool flipY)
         {
             this.engine = engine;
             this.flipY = flipY;
+
+            layers[0].Name = "(default)";
+            freeLayers = layers.Skip(1).Reverse().Select(x => x.Layer).ToList();
 
             cameraManager = engine.CameraManager;
 
@@ -180,6 +203,7 @@ namespace TheEngine.Managers
             objectBuffer = engine.Device.CreateBuffer<ObjectBuffer>(BufferTypeEnum.ConstVertex, 1);
             //pixelShaderSceneBuffer = engine.Device.CreateBuffer<PixelShaderSceneBuffer>(BufferTypeEnum.ConstPixel, 1);
             instancesObjectIndicesBuffer = engine.Device.CreateBuffer<uint>(BufferTypeEnum.StructuredBufferPixelOnly, 1, BufferInternalFormat.UInt);
+            instancesObjectDataBuffer = engine.Device.CreateBuffer<Int4>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Int4);
             instancesBuffer = engine.Device.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
             instancesInverseBuffer = engine.Device.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
             engine.Device.device.CheckError("created buffers");
@@ -195,12 +219,6 @@ namespace TheEngine.Managers
             depthStencilZWrite = engine.Device.CreateDepthStencilState(true);
             depthStencilNoZWrite = engine.Device.CreateDepthStencilState(false);
             engine.Device.device.CheckError("create depth stencil");
-
-            mainObjectBuffer = engine.textureManager.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, 2);
-            opaqueRenderTexture = engine.textureManager.CreateRenderTextureWithColorAndDepth((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, out opaqueTexture2D, out depthTexture2D);
-            for (int i = 0; i < backBuffers.Length; ++i)
-                backBuffers[i] = engine.textureManager.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, 1);
-            engine.Device.device.CheckError("create render tex");
 
             planeMesh = engine.MeshManager.CreateMesh(in ScreenPlane.Instance);
             engine.Device.device.CheckError("create mesh");
@@ -218,7 +236,7 @@ namespace TheEngine.Managers
 
             unlitMaterial = engine.MaterialManager.CreateMaterial("internalShaders/unlit.json");
             unlitMaterial.ZWrite = false;
-            unlitMaterial.DepthTesting = DepthCompare.Always;
+            unlitMaterial.DepthTesting = DepthCompare.Lequal; // Always to render above the meshes
             
             // utils
             sphereMesh = engine.meshManager.CreateMesh(ObjParser.LoadObj("meshes/sphere.obj").MeshData);
@@ -236,7 +254,15 @@ namespace TheEngine.Managers
             //outlineTexture.Dispose();
             engine.meshManager.DisposeMesh(lineMesh);
             engine.meshManager.DisposeMesh(planeMesh);
+            engine.textureManager.DisposeTexture(mainObjectDepthTexture);
+            engine.textureManager.DisposeTexture(mainObjectColorTexture);
+            engine.textureManager.DisposeTexture(mainObjectColor1Texture);
             engine.textureManager.DisposeTexture(mainObjectBuffer);
+            engine.textureManager.DisposeTexture(guiTexture);
+            engine.textureManager.DisposeTexture(sceneViewOpaqueTexture2D);
+            engine.textureManager.DisposeTexture(sceneViewDepthTexture2D);
+            engine.textureManager.DisposeTexture(sceneViewColor1Texture);
+            engine.textureManager.DisposeTexture(sceneViewTexture);
             foreach (var t in backBuffers)
                 engine.textureManager.DisposeTexture(t);
 
@@ -246,11 +272,68 @@ namespace TheEngine.Managers
             instancesInverseBuffer.Dispose();
             instancesBuffer.Dispose();
             instancesObjectIndicesBuffer.Dispose();
+            instancesObjectDataBuffer.Dispose();
             //pixelShaderSceneBuffer.Dispose();
             objectBuffer.Dispose();
             sceneBuffer.Dispose();
         }
-        
+
+        public RenderLayer RegisterRenderLayer(string layerName)
+        {
+            if (freeLayers.Count == 0)
+            {
+                throw new Exception("All layers are taken!");
+            }
+            var freeLayer = freeLayers[^1];
+            freeLayers.RemoveAt(freeLayers.Count - 1);
+            var newLayer = new RenderLayer(freeLayer.Layer, freeLayer.Version + 1);
+            ref var layerData = ref layers[newLayer.Layer];
+            layerData.Name = layerName;
+            layerData.IsDisabled = false;
+            layerData.IsUsed = true;
+            layerData.Layer = newLayer;
+
+            return newLayer;
+        }
+
+        public void UnregisterRenderLayer(RenderLayer layer)
+        {
+            ref var layerData = ref layers[layer.Layer];
+            if (layerData.Layer.Version != layer.Version)
+            {
+                throw new Exception("Trying to unregister an old layer");
+            }
+
+            layerData.IsUsed = false;
+            freeLayers.Add(layer);
+        }
+
+        public void ToggleRenderLayer(RenderLayer layer, bool enable)
+        {
+            ref var layerData = ref layers[layer.Layer];
+            if (layerData.Layer.Version != layer.Version)
+            {
+                throw new Exception("Trying to toggle an old layer");
+            }
+
+            if (enable)
+            {
+                layerData.IsDisabled = false;
+            }
+            else
+            {
+                layerData.IsDisabled = true;
+            }
+        }
+
+        public IReadOnlyList<RenderLayerData> RenderLayers => layers;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsRenderLayerEnabled(byte layer)
+        {
+            return !layers[layer].IsDisabled;
+        }
+
         private void SetBlending(bool enabled, Blending source, Blending dest)
         {
             if (currentBlending.HasValue && currentBlending.Value.enabled == enabled &&
@@ -340,7 +423,8 @@ namespace TheEngine.Managers
             currentDepthTest = null;
             currentDepthTest = null;
             currentBlending = null;
-            cameraManager.MainCamera.Aspect = engine.WindowHost.Aspect;
+            cameraManager.MainCamera.Aspect = engine.gameView.Aspect;
+            cameraManager.SceneViewCamera.Aspect = engine.sceneView.Aspect;
         }
 
         public void ScreenshotCurrentBuffer(string filename, int colorAttachment = 0)
@@ -348,22 +432,46 @@ namespace TheEngine.Managers
             engine.textureManager.ScreenshotRenderTexture(mainObjectBuffer, filename, colorAttachment);
         }
 
-        public Entity PickObject(Vector2 normalizedScreenPoint)
+        private Entity PickObject(Vector2 normalizedScreenPoint, ITexture renderTexture)
         {
-            var rt = engine.textureManager.GetTextureByHandle(mainObjectBuffer) as RenderTexture;
+            if (renderTexture == null)
+                return Entity.Empty;
+            var rt = engine.textureManager.GetTextureByHandle(renderTexture.Handle) as RenderTexture;
+            if (rt == null)
+            {
+                return Entity.Empty;
+            }
             rt.ActivateSourceFrameBuffer(1);
             Span<uint> buf = stackalloc uint[1];
-            int x = (int)(normalizedScreenPoint.X * engine.WindowHost.WindowWidth * dynamicScale);
-            int y = (int)(normalizedScreenPoint.Y * engine.WindowHost.WindowHeight * dynamicScale);
+            int x = (int)(normalizedScreenPoint.X * rt.Width * dynamicScale);
+            int y = (int)(normalizedScreenPoint.Y * rt.Height * dynamicScale);
             engine.Device.device.ReadPixels(x, y, 1, 1, PixelFormat.RedInteger, PixelType.UnsignedInt, buf);
             var index = buf[0];
             if (index == 0)
                 return Entity.Empty;
             if (index <= totalToDraw)
-                return renderersData[index - 1].Item3;
+            {
+                var entity = renderersData[index - 1].Item3;
+                if (engine.entityManager.Exist(entity)) // it could be removed after rendering
+                    return entity;
+            }
             return Entity.Empty;
         }
-        
+
+        public Entity PickObject(Vector2 normalizedScreenPoint) => PickObject(normalizedScreenPoint, mainObjectBuffer);
+
+        public Entity PickSceneViewObject()
+        {
+            var screenPoint = engine.inputManager.mouse.RawScreenPoint;
+            if (!engine.sceneView.ViewRect.Contains(screenPoint))
+            {
+                return Entity.Empty;
+            }
+            var normalized = new Vector2((screenPoint.X - engine.sceneView.ViewRect.X) / engine.sceneView.ViewRect.Width,
+                1 - (screenPoint.Y - engine.sceneView.ViewRect.Y) / engine.sceneView.ViewRect.Height);
+            return PickObject(normalized, sceneViewTexture);
+        }
+
         private bool inRenderingLoop = false;
         private bool inCoreRenderingLoop = false;
         private int currentFrameBuffer;
@@ -388,22 +496,53 @@ namespace TheEngine.Managers
             Stats = default;
             engine.Device.device.CheckError("Render begin");
 
-            if (currentBackBufferWidth != (int)engine.WindowHost.WindowWidth ||
-                currentBackBufferHeight != (int)engine.WindowHost.WindowHeight)
+            if (currentBackBufferWidth != (int)engine.gameView.ViewRect.Width ||
+                currentBackBufferHeight != (int)engine.gameView.ViewRect.Height)
             {
-                currentBackBufferWidth = (int)engine.WindowHost.WindowWidth;
-                currentBackBufferHeight = (int)engine.WindowHost.WindowHeight;
+                currentBackBufferWidth = (int)engine.gameView.ViewRect.Width;
+                currentBackBufferHeight = (int)engine.gameView.ViewRect.Height;
+                engine.textureManager.DisposeTexture(mainObjectDepthTexture);
+                engine.textureManager.DisposeTexture(mainObjectColorTexture);
+                engine.textureManager.DisposeTexture(mainObjectColor1Texture);
                 engine.textureManager.DisposeTexture(mainObjectBuffer);
                 engine.textureManager.DisposeTexture(opaqueRenderTexture);
                 engine.textureManager.DisposeTexture(opaqueTexture2D);
                 engine.textureManager.DisposeTexture(depthTexture2D);
-                mainObjectBuffer = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight, 2);
-                opaqueRenderTexture = engine.textureManager.CreateRenderTextureWithColorAndDepth((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, out opaqueTexture2D, out depthTexture2D);
+
+                mainObjectDepthTexture = engine.textureManager.CreateTexture(null, currentBackBufferWidth, currentBackBufferHeight, TextureFormat.DepthComponent);
+                mainObjectColorTexture = engine.textureManager.CreateTexture(null, currentBackBufferWidth, currentBackBufferHeight, TextureFormat.R8G8B8A8);
+                mainObjectColor1Texture = engine.textureManager.CreateTexture(null, currentBackBufferWidth, currentBackBufferHeight, TextureFormat.R32ui);
+                mainObjectBuffer = engine.textureManager.CreateRenderTexture(mainObjectColorTexture, mainObjectDepthTexture, mainObjectColor1Texture);
+                opaqueRenderTexture = engine.textureManager.CreateRenderTextureWithColorAndDepth(currentBackBufferWidth, currentBackBufferHeight, out opaqueTexture2D, out depthTexture2D);
                 for (var index = 0; index < backBuffers.Length; index++)
                 {
                     engine.textureManager.DisposeTexture(backBuffers[index]);
-                    backBuffers[index] = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight, 1);
+                    backBuffers[index] = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight);
                 }
+            }
+            if (currentSceneViewWidth != (int)engine.sceneView.ViewRect.Width ||
+                currentSceneViewHeight != (int)engine.sceneView.ViewRect.Height)
+            {
+                currentSceneViewWidth = (int)engine.sceneView.ViewRect.Width;
+                currentSceneViewHeight = (int)engine.sceneView.ViewRect.Height;
+                engine.textureManager.DisposeTexture(sceneViewOpaqueTexture2D);
+                engine.textureManager.DisposeTexture(sceneViewDepthTexture2D);
+                engine.textureManager.DisposeTexture(sceneViewColor1Texture);
+                engine.textureManager.DisposeTexture(sceneViewTexture);
+
+                sceneViewDepthTexture2D = engine.textureManager.CreateTexture(null, currentSceneViewWidth, currentSceneViewHeight, TextureFormat.DepthComponent);
+                sceneViewOpaqueTexture2D = engine.textureManager.CreateTexture(null, currentSceneViewWidth, currentSceneViewHeight, TextureFormat.R8G8B8A8);
+                sceneViewColor1Texture = engine.textureManager.CreateTexture(null, currentSceneViewWidth, currentSceneViewHeight, TextureFormat.R32ui);
+                sceneViewTexture = engine.textureManager.CreateRenderTexture(sceneViewOpaqueTexture2D, sceneViewDepthTexture2D, sceneViewColor1Texture);
+            }
+
+            if (currentGuiWidth != (int)engine.WindowHost.WindowWidth ||
+                currentGuiHeight != (int)engine.WindowHost.WindowHeight)
+            {
+                currentGuiWidth = (int)engine.WindowHost.WindowWidth;
+                currentGuiHeight = (int)engine.WindowHost.WindowHeight;
+                engine.textureManager.DisposeTexture(guiTexture);
+                guiTexture = engine.textureManager.CreateRenderTexture(currentGuiWidth, currentGuiHeight);
             }
 
             if (pendingDynamicScale.HasValue)
@@ -422,8 +561,10 @@ namespace TheEngine.Managers
 
             inCoreRenderingLoop = true;
             currentBackBufferIndex = -1;
-            
-            ActivateRenderTexture(CurrentBackBuffer, Color4.White);
+
+            engine.Device.device.CheckError("Before set CurrentBackBuffer");
+
+            ActivateRenderTexture(CurrentBackBuffer, new Color4(15/255f,52/255f,97/255f, 1));
 
             sceneBuffer.UpdateBuffer(ref sceneData);
             sceneBuffer.Activate(Constants.SCENE_BUFFER_INDEX);
@@ -436,17 +577,23 @@ namespace TheEngine.Managers
             engine.Device.device.BlendEquation(BlendEquationMode.FuncAdd);
         }
 
+        public void PrepareRenderGui(float delta)
+        {
+            engine.Device.device.CheckError("PrepareRenderGui");
+            ActivateRenderTexture(guiTexture, new Color4(0, 0, 0, 0));
+        }
+
         private bool useDynamicScale = true;
         private float dynamicScale = 1;
         private float? pendingDynamicScale;
         private int DynamicWidth => useDynamicScale ? Math.Max(1, (int)(currentBackBufferWidth * dynamicScale)) : currentBackBufferWidth;
         private int DynamicHeight => useDynamicScale ? Math.Max(1, (int)(currentBackBufferHeight * dynamicScale)) : currentBackBufferHeight;
 
-        public void ActivateRenderTexture(TextureHandle rt, Color4? color = null)
+        public void ActivateRenderTexture(ITexture rt, Color4? color = null)
         {
             if (inRenderingLoop)
             {
-                var tex = engine.textureManager.GetTextureByHandle(rt) as RenderTexture;
+                var tex = engine.textureManager.GetTextureByHandle(rt.Handle) as RenderTexture;
                 tex!.ActivateFrameBuffer(inCoreRenderingLoop && rt == mainObjectBuffer && useDynamicScale ? dynamicScale : 1);
                 if (color.HasValue)
                     tex!.Clear(color.Value.Red, color.Value.Green, color.Value.Blue, color.Value.Alpha);
@@ -491,11 +638,13 @@ namespace TheEngine.Managers
             engine.Device.device.Viewport(0, 0, (int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
             
             engine.Device.device.CheckError("Blitz");
-            blitMaterial.SetTexture("texture1", CurrentBackBuffer);
+            blitMaterial.SetTexture("texture1", guiTexture);
             RenderFullscreenPlane(blitMaterial);
             
             inRenderingLoop = false;
             engine.statsManager.RenderStats = Stats;
+
+            engine.Device.device.CheckError("Post rendering");
         }
 
         private RenderStats Stats;
@@ -566,7 +715,7 @@ namespace TheEngine.Managers
         public void UpdateTransforms()
         {
             var entityManager = engine.entityManager;
-            dynamicParentedEntitiesArchetype.ParallelForEach<CopyParentTransform, LocalToWorld, DirtyPosition>((itr, start, end, parents, localToWorld, dirtyPosition) =>
+            dynamicParentedEntitiesArchetype.ParallelForEach<CopyParentTransform, LocalToWorld, DirtyPosition>((itr, thread, start, end, parents, localToWorld, dirtyPosition) =>
             {
                 CachedComponentDataAccess<DirtyPosition> cachedDirtPosition = new CachedComponentDataAccess<DirtyPosition>(entityManager);
                 CachedComponentDataAccess<LocalToWorld> cacheLocalToWorld = new CachedComponentDataAccess<LocalToWorld>(entityManager);
@@ -585,7 +734,7 @@ namespace TheEngine.Managers
         
         private void ClearDirtyEntityBit()
         {
-            dirtEntities.ParallelForEach<DirtyPosition>((itr, start, end, dirty) =>
+            dirtEntities.ParallelForEach<DirtyPosition>((itr, thread, start, end, dirty) =>
             {
                 for (int i = start; i < end; ++i)
                     dirty[i].Disable();
@@ -668,7 +817,7 @@ namespace TheEngine.Managers
             var entityManager = engine.EntityManager;
 
             boundsUpdate.Restart();
-            updateWorldBoundsArchetype.ParallelForEach<LocalToWorld, MeshBounds, WorldMeshBounds, DirtyPosition>((itr, start, end, l2w, meshBounds, worldMeshBounds, dirtyBit) =>
+            updateWorldBoundsArchetype.ParallelForEach<LocalToWorld, MeshBounds, WorldMeshBounds, DirtyPosition>((itr, thread, start, end, l2w, meshBounds, worldMeshBounds, dirtyBit) =>
             {
                 Span<Vector3> corners = stackalloc Vector3[8];
                 for (int i = start; i < end; ++i)
@@ -684,11 +833,14 @@ namespace TheEngine.Managers
             
             culler.Restart();
             float mod = viewDistanceModifier * viewDistanceModifier;
-            toCullArchetype.ParallelForEach<LocalToWorld, PerformCullingBit, RenderEnabledBit, WorldMeshBounds>((itr, start, end, l2w, _ , bits, worldMeshBounds) =>
+            toCullArchetype.ParallelForEach<LocalToWorld, PerformCullingBit, RenderEnabledBit, WorldMeshBounds>((itr, thread, start, end, l2w, _ , bits, worldMeshBounds) =>
             {
                 for (int i = start; i < end; ++i)
                 {
                     if (bits[i].IsForceDisabled())
+                        continue;
+
+                    if (bits[i].Layer > 0 && layers[bits[i].Layer].IsDisabled)
                         continue;
                     
                     ref var boundingBox = ref worldMeshBounds[i].box;
@@ -699,37 +851,44 @@ namespace TheEngine.Managers
                     bool doRender = (pos - cameraPosition).LengthSquared() < (size) * (size) * (size) * mod;
                     if (doRender)
                     {
-                        bits[i] = (RenderEnabledBit)(frustum.Contains(ref boundingBox) != ContainmentType.Disjoint);
+                        bits[i].IsCulled = frustum.Contains(ref boundingBox) == ContainmentType.Disjoint;
                     }
                     else
-                        bits[i] = (RenderEnabledBit)false;
+                        bits[i].IsCulled = true;
                 }
             });
-            dynamicParentedEntitiesArchetype.WithComponentData<RenderEnabledBit>().ParallelForEach<RenderEnabledBit, CopyParentTransform>((itr, start, end, renderBit, cpt) =>
+            dynamicParentedEntitiesArchetype.WithComponentData<RenderEnabledBit>().ParallelForEach<RenderEnabledBit, CopyParentTransform>((itr, thread, start, end, renderBit, cpt) =>
             {
                 CachedComponentDataAccess<RenderEnabledBit> cache = new CachedComponentDataAccess<RenderEnabledBit>(entityManager);
                 for (int i = start; i < end; ++i)
                 {
                     var parent = cpt[i];
                     if (parent.Parent != Entity.Empty)
+                    {
+                        var forceDisabled = renderBit[i].IsForceDisabled();
                         renderBit[i] = cache[parent.Parent];
+                        if (forceDisabled)
+                            renderBit[i].SetDisabled(true);
+                    }
                 }
             });
             entitiesSharingRenderingArchetype.ParallelForEach<RenderEnabledBit, ShareRenderEnabledBit>(
-                (itr, start, end, renderBits, shareRenderBits) =>
+                (itr, thread, start, end, renderBits, shareRenderBits) =>
                 {
                     CachedComponentDataAccess<RenderEnabledBit> cache = new CachedComponentDataAccess<RenderEnabledBit>(entityManager);
                     for (int i = start; i < end; ++i)
                     {
-                        if (!renderBits[i])
+                        if (!renderBits[i] && shareRenderBits[i].OtherEntity != Entity.Empty)
+                        {
                             renderBits[i] = cache[shareRenderBits[i].OtherEntity];
+                        }
                     }
                 });
             culler.Stop();
             engine.statsManager.Counters.Culling.Add(culler.Elapsed.TotalMilliseconds);
 
             ThreadLocal<(int opaque, int transparent)> count = new(true);
-            toRenderArchetype.ParallelForEach<RenderEnabledBit, MeshRenderer>((itr, start, end, renderBit, renderers) =>
+            toRenderArchetype.ParallelForEach<RenderEnabledBit, MeshRenderer>((itr, thread, start, end, renderBit, renderers) =>
             {
                 int opaque = 0;
                 int transparent = 0;
@@ -737,7 +896,10 @@ namespace TheEngine.Managers
                 {
                     if (!renderBit[i])
                         continue;
-                    
+
+                    if (renderBit[i].Layer > 0 && layers[renderBit[i].Layer].IsDisabled)
+                        continue;
+
                     if (renderers[i].Opaque)
                         opaque++;
                     else
@@ -759,13 +921,16 @@ namespace TheEngine.Managers
             }
             int opaqueIndex = 0;
             int transparentIndex = opaque;
-            toRenderArchetype.ForEachRRRO<LocalToWorld, RenderEnabledBit, MeshRenderer, MaterialInstanceRenderData>((itr, start, end, l2w, render, meshRenderer, materialData) =>
+            toRenderArchetype.ForEachRRRO<LocalToWorld, RenderEnabledBit, MeshRenderer, MaterialInstanceRenderData>((itr, thread, start, end, l2w, render, meshRenderer, materialData) =>
             {
                 for (int i = start; i < end; ++i)
                 {
                     if (!render[i])
                         continue;
-                    
+
+                    if (render[i].Layer > 0 && layers[render[i].Layer].IsDisabled)
+                        continue;
+
                     var renderer = meshRenderer[i];
 
                     if (renderer.Opaque)
@@ -789,7 +954,20 @@ namespace TheEngine.Managers
             sorting.Stop();
             engine.statsManager.Counters.Sorting.Add(sorting.Elapsed.TotalMilliseconds);
 
-            Render(0, opaque, false);
+            if (engine.gameView.IsVisible)
+            {
+                Render(0, opaque, false);
+            }
+
+            if (engine.sceneView.IsVisible)
+            {
+                ActivateScene(new SceneData(cameraManager.SceneViewCamera, new FogSettings(){Enabled = false}, engine.lightManager.MainLight, engine.lightManager.SecondaryLight));
+                ActivateRenderTexture(sceneViewTexture, new Color4(15/255f,52/255f,97/255f, 1));
+                Render(0, opaque, false);
+                // restore current back buffer and scene
+                ActivateScene(null);
+                ActivateRenderTexture(CurrentBackBuffer);
+            }
         }
 
         private void SortRenderersByMesh(int start, int end)
@@ -812,7 +990,24 @@ namespace TheEngine.Managers
         {
             engine.textureManager.BlitFramebuffers(mainObjectBuffer, opaqueRenderTexture, 0, 0, currentBackBufferWidth, currentBackBufferHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
             ActivateDefaultRenderTexture();
-            Render(opaque, totalToDraw, true);
+
+            if (engine.gameView.IsVisible)
+            {
+                Render(opaque, totalToDraw, true);
+            }
+
+            if (engine.sceneView.IsVisible)
+            {
+                ActivateScene(new SceneData(cameraManager.SceneViewCamera, new FogSettings(){Enabled = false}, engine.lightManager.MainLight, engine.lightManager.SecondaryLight));
+                ActivateRenderTexture(sceneViewTexture, null);
+                Render(opaque, totalToDraw, true);
+                var mainCamFrustum = new BoundingFrustum(cameraManager.MainCamera.ViewMatrix * cameraManager.MainCamera.ProjectionMatrix);
+                this.DrawFrustum(mainCamFrustum, Vector4.One);
+                engine.sceneView.OnSceneViewRender();
+                // restore current back buffer and scene
+                ActivateScene(null);
+                ActivateRenderTexture(CurrentBackBuffer);
+            }
         }
 
         private bool enableInstancing = true;
@@ -859,6 +1054,7 @@ namespace TheEngine.Managers
                     objectData.WorldMatrix = renderersData[i].Item1;
                     objectData.InverseWorldMatrix = renderersData[i].Item1.Inverse;
                     objectData.ObjectIndex = (uint)i + 1;
+                    objectData.DrawData = renderersData[i].Item2?.InstanceData ?? new Int4(-1, -1, -1, -1);
                     objectBuffer.UpdateBuffer(ref objectData);
                     //buffertimer.Stop();
 #if DEBUG
@@ -885,6 +1081,7 @@ namespace TheEngine.Managers
                         instancesArray = new Matrix[toBatch + 1];
                         inverseInstancesArray = new Matrix[toBatch + 1];
                         instancesObjectInddicesArray = new uint[toBatch + 1];
+                        instancesObjectDataArray = new Int4[toBatch + 1];
                     }
                     
                     for (int k = 0; k < toBatch + 1; ++k)
@@ -892,6 +1089,7 @@ namespace TheEngine.Managers
                         instancesArray[k] = renderersData[i + k].Item1.Matrix;
                         inverseInstancesArray[k] = renderersData[i + k].Item1.Inverse;
                         instancesObjectInddicesArray[k] = (uint)(i + k);
+                        instancesObjectDataArray[k] = renderersData[i + k].Item2?.InstanceData ?? new Int4(-1, -1, -1, -1);
                     }
 
                     //buffertimer.Start();
@@ -902,6 +1100,7 @@ namespace TheEngine.Managers
                     instancesBuffer.UpdateBuffer(instancesArray.AsSpan(0, toBatch + 1));
                     instancesInverseBuffer.UpdateBuffer(inverseInstancesArray.AsSpan(0, toBatch + 1));
                     instancesObjectIndicesBuffer.UpdateBuffer(instancesObjectInddicesArray.AsSpan(0, toBatch + 1));
+                    instancesObjectDataBuffer.UpdateBuffer(instancesObjectDataArray.AsSpan(0, toBatch + 1));
                     //buffertimer.Stop();
 
                     shader = material.InstancedShader!;
@@ -916,6 +1115,9 @@ namespace TheEngine.Managers
                     instancingRenderData.SetInstancedBuffer(material, "InstancingInverseModels", instancesInverseBuffer);
                     if (material.HasInstanceUniform("ObjectIndices"))
                         instancingRenderData.SetInstancedBuffer(material, "ObjectIndices", instancesObjectIndicesBuffer);
+                    if (material.HasInstanceUniform("DrawData"))
+                        instancingRenderData.SetInstancedBuffer(material, "DrawData", instancesObjectDataBuffer);
+
                     EnableMaterial(material, true, instancingRenderData);
                     //materialtimer.Stop();
                     
@@ -1053,7 +1255,10 @@ namespace TheEngine.Managers
 
         public void ActivateScene(in SceneData? scene)
         {
-            var data = scene ?? new SceneData(engine.cameraManger.MainCamera, engine.lightManager.Fog, engine.lightManager.MainLight, engine.lightManager.SecondaryLight);
+            var data = scene ?? new SceneData(engine.cameraManger.MainCamera,
+                engine.lightManager.Fog,
+                engine.lightManager.MainLight,
+                engine.lightManager.SecondaryLight);
             UpdateSceneBuffer(in data);
             sceneBuffer.UpdateBuffer(ref sceneData);
             sceneBuffer.Activate(Constants.SCENE_BUFFER_INDEX);
@@ -1087,8 +1292,8 @@ namespace TheEngine.Managers
             sceneData.Time = (float)engine.TotalTime;
             sceneData.ZNear = camera.NearClip;
             sceneData.ZFar = camera.FarClip;
-            sceneData.ScreenWidth = engine.WindowHost.WindowWidth;
-            sceneData.ScreenHeight = engine.WindowHost.WindowHeight;
+            sceneData.ScreenWidth = engine.gameView.ViewRect.Width;
+            sceneData.ScreenHeight = engine.gameView.ViewRect.Height;
         }
 
         public StaticRenderHandle RegisterStaticRenderer(MeshHandle mesh, Material material, int subMesh, Transform t)
@@ -1102,8 +1307,8 @@ namespace TheEngine.Managers
             var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
             engine.EntityManager.GetComponent<LocalToWorld>(entity) = l2w;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = subMesh;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = meshHandle;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).Material = material;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).Mesh = mesh;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).Opaque = !material.BlendingEnabled;
             engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = LocalToWorld((MeshBounds)mesh.Bounds, l2w);
             if (engine.EntityManager.HasComponent<MeshBounds>(entity))
@@ -1134,8 +1339,8 @@ namespace TheEngine.Managers
             var entity = engine.EntityManager.CreateEntity(dynamicRendererArchetype);
             engine.EntityManager.GetComponent<LocalToWorld>(entity) = l2w;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = subMesh;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = meshHandle;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).Material = material;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).Mesh = mesh;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).Opaque = !material.BlendingEnabled;
             engine.EntityManager.GetComponent<DirtyPosition>(entity).Enable();
             engine.EntityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)mesh.Bounds;

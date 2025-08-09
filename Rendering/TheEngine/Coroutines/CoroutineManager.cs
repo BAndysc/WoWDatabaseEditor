@@ -29,9 +29,25 @@ namespace TheEngine.Coroutines
             public Exception? NestedException;
             public bool IgnoreNestedExceptions;
             public Task? WaitingForTask;
+            public TaskCompletionSource? TaskCompletionSource;
         }
 
         public int PendingCoroutines => coroutines.Count;
+
+        public Task AwaitStart(IEnumerator coroutine)
+        {
+            var tcs = new TaskCompletionSource();
+            var state = new CoroutineState()
+            {
+                Coroutine = coroutine,
+                Active = true,
+                Parent = null,
+                TaskCompletionSource = tcs
+            };
+            if (CoroutineStep(state))
+                coroutines.Add(state);
+            return tcs.Task;
+        }
 
         public void Start(IEnumerator coroutine)
         {
@@ -106,10 +122,10 @@ namespace TheEngine.Coroutines
                             continue; // return CoroutineStep(state);
                         }
                     }
-                    else if (cur is WaitForTask || cur is Task)
+                    else if (cur is WaitForTask || cur is Task || cur is ValueTask)
                     {
                         state.Active = false;
-                        Task task = cur is WaitForTask w ? w.Task : (Task)cur;
+                        Task task = cur is WaitForTask w ? w.Task : (cur is Task ? (Task)cur : ((ValueTask)cur).AsTask());
                         state.WaitingForTask = task;
                         if (task.IsCompleted)
                         {
@@ -141,6 +157,7 @@ namespace TheEngine.Coroutines
                 {
                     if (state.Parent != null)
                         state.Parent.Active = true;
+                    state.TaskCompletionSource?.SetResult();
                     return false;
                 }
             }

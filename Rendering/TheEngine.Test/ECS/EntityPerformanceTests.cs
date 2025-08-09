@@ -122,7 +122,7 @@ namespace TheEngine.Test.ECS
                 for (int i = start; i < end; ++i)
                     positions[i].position += velocities[i].velocity;
             });
-            archetype.ParallelForEach<Position, Velocity>((itr, start, end, positions, velocities) =>
+            archetype.ParallelForEach<Position, Velocity>((itr, thread, start, end, positions, velocities) =>
             {
                 for (int i = start; i < end; ++i)
                     positions[i].position += velocities[i].velocity;
@@ -138,7 +138,7 @@ namespace TheEngine.Test.ECS
             var sequential = stopWatch.Elapsed.TotalSeconds;
             
             stopWatch.Restart();
-            archetype.ParallelForEach<Position, Velocity>((itr, start, end, positions, velocities) =>
+            archetype.ParallelForEach<Position, Velocity>((itr, thread, start, end, positions, velocities) =>
             {
                 for (int i = start; i < end; ++i)
                     positions[i].position += velocities[i].velocity;

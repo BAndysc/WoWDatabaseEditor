@@ -6,6 +6,7 @@ in vec2 TexCoord2;
 in vec4 WorldPos;
 in vec4 SplatId;
 in vec3 Normal;
+in vec4 VertexColor;
 flat in int instanceID;
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out uint ObjectIndexOutputBuffer;
@@ -114,6 +115,11 @@ vec4 ShadeCModel(int pixelId, vec4 texture1, vec4 texture2, vec4 texture3)
         //specular = texture2.rgb * (1.0 - texture1.a);
     } else if (pixelId == 22) { //Combiners_Opaque_ModNA_Alpha
         result.rgb = diffuseColor.rgb * mix(texture1.rgb * texture2.rgb, texture1.rgb, vec3(texture1.a));
+    }
+    else if (pixelId == 33) //Combiners_Mod_Depth
+    {
+        result.rgb = diffuseColor.rgb * 2 * texture1.rgb;
+        result.a = texture1.a;
     }
     else if (pixelId == 50)
     {
@@ -253,7 +259,7 @@ void main()
     vec4 tex2 = texture(texture2, TexCoord2.xy);
     vec4 tex3 = texture(texture3, TexCoord2.xy);
 
-    vec4 color = ShadeCModel(pixel_shader, tex1, tex2, tex3);
+    vec4 color = ShadeCModel(pixel_shader, tex1, tex2, tex3) * VertexColor;
 
     if (color.a < alphaTest)
         discard;

@@ -23,6 +23,12 @@ public class NativeOpenGlControlBase : NativeControlHost
     private IRenderingWindow? window;
     private IRenderingOpenGlContext? context;
     private IDisposable? timer;
+    private SingleThreadSynchronizationContext synchronizationContext;
+
+    public NativeOpenGlControlBase()
+    {
+        synchronizationContext = new(Environment.CurrentManagedThreadId);
+    }
 
     private IRenderingOpenGlContext CreateContext()
     {
@@ -112,16 +118,60 @@ public class NativeOpenGlControlBase : NativeControlHost
         }, TimeSpan.FromMilliseconds(1));*/
     }
 
+    private bool profiling = false;
+    private bool toggleProfiling = false;
+
+    public void ToggleProfiling()
+    {
+        Console.WriteLine("Toggling profiling");
+        toggleProfiling = true;
+    }
+
     private void Render()
     {
-        sw.Restart();
-        context.MakeCurrentContext(window);
-        OnOpenGlRender(null, 0);
-        window?.SwapBuffers();
-        context?.MakeCurrentContext(null);
-        sw.Stop();
-        PresentTime = (uint)sw.Elapsed.TotalMilliseconds;
-        //compositor.RequestCompositionUpdate(Render);
+        if (profiling)
+        {
+        }
+
+        if (toggleProfiling)
+        {
+            if (!profiling)
+            {
+                profiling = true;
+            }
+            else
+            {
+                profiling = false;
+                var fileName = $"trace-{DateTime.Now:yyyy-MM-dd-HH-mm-ss}.bin";
+                //Profiler.SaveTrace(fileName);
+                Console.WriteLine($"Profiler trace saved to {fileName}");
+            }
+            toggleProfiling = false;
+        }
+
+        var oldSc = SynchronizationContext.Current;
+        try
+        {
+            SynchronizationContext.SetSynchronizationContext(synchronizationContext);
+            sw.Restart();
+            context.MakeCurrentContext(window);
+            OnOpenGlRender(null, 0);
+            window?.SwapBuffers();
+            synchronizationContext.ExecuteTasks();
+            context?.MakeCurrentContext(null);
+            sw.Stop();
+            PresentTime = (uint)sw.Elapsed.TotalMilliseconds;
+            if (profiling)
+            {
+                //   Profiler.Start("Wait for render"u8);
+            }
+            // Tracy.PInvoke.TracyEmitFrameMark(null);
+            //compositor.RequestCompositionUpdate(Render);
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(oldSc);
+        }
     }
 
     private void OnEmbeddedPointerPressed(long x, long y, bool isLeft, bool isRight)

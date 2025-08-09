@@ -3,15 +3,18 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace TheAvaloniaOpenGL.Resources
 {
-    public sealed class Texture : TextureBase
+    public sealed class Texture2D : TextureBase
     {
         private static byte[] tempBufferEmptyZeroBytes = new byte[0];
         
-        internal unsafe Texture(IDevice device, uint[]? pixels, int width, int height, TextureFormat textureFormat = TextureFormat.R8G8B8A8)
+        internal unsafe Texture2D(IDevice device, uint[]? pixels, int width, int height, TextureFormat textureFormat = TextureFormat.R8G8B8A8)
             : base(device, width, height, TextureTarget.Texture2D)
         {
+            if (width <= 0 || height <= 0)
+                throw new ArgumentException("Width and height must be greater than zero.");
             ToInternalFormat(textureFormat, out var internalFormat, out var pixelFormat, out var pixelType);
             var expectedSize = width * height * SizeOf(pixelType) * ComponentsCount(pixelFormat);
+            SizeInBytes = expectedSize;
             if (pixels == null)
             {
                 if (tempBufferEmptyZeroBytes.Length < expectedSize)
@@ -35,9 +38,10 @@ namespace TheAvaloniaOpenGL.Resources
             UnbindTexture();
         }
 
-        internal unsafe Texture(IDevice device, Rgba32[][]? pixels, int width, int height, bool generateMips)
+        internal unsafe Texture2D(IDevice device, Rgba32[][]? pixels, int width, int height, bool generateMips)
             :base(device, width, height, TextureTarget.Texture2D)
         {
+            SizeInBytes = width * height * 4;
             if (pixels == null)
             {
                 device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, new IntPtr(0));
@@ -65,9 +69,10 @@ namespace TheAvaloniaOpenGL.Resources
             UnbindTexture();
         }
         
-        internal unsafe Texture(IDevice device, Rgba32* pixels, int width, int height, bool generateMips)
+        internal unsafe Texture2D(IDevice device, Rgba32* pixels, int width, int height, bool generateMips)
             :base(device, width, height, TextureTarget.Texture2D)
         {
+            SizeInBytes = width * height * 4;
             if (pixels == null)
             {
                 device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, new IntPtr(0));
@@ -86,9 +91,10 @@ namespace TheAvaloniaOpenGL.Resources
             UnbindTexture();
         }
         
-        internal unsafe Texture(IDevice device, float[]? pixels, int width, int height)
+        internal unsafe Texture2D(IDevice device, float[]? pixels, int width, int height)
             :base (device, width, height, TextureTarget.Texture2D)
         {
+            SizeInBytes = width * height * 4;
             if (pixels == null)
             {
                 device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R32f, width, height, 0, PixelFormat.Red, PixelType.Float, new IntPtr(0));
@@ -106,9 +112,10 @@ namespace TheAvaloniaOpenGL.Resources
             UnbindTexture();
         }
         
-        internal unsafe Texture(IDevice device, Vector4[]? pixels, int width, int height)
+        internal unsafe Texture2D(IDevice device, Vector4[]? pixels, int width, int height)
         :base (device, width, height, TextureTarget.Texture2D)
         {
+            SizeInBytes = width * height * 4 * 4;
             if (pixels == null)
             {
                 device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba32f, width, height, 0, PixelFormat.Rgba, PixelType.Float, new IntPtr(0));

@@ -83,5 +83,15 @@ namespace WDE.PacketViewer.Utils
                 Z = a.Z + (b.Z - a.Z) * t,
             };
         }
+
+        public static Vector3 ToVector3(this Vec3 vec)
+        {
+            return new Vector3(vec.X, vec.Y, vec.Z);
+        }
+
+        public static Vector4 ToVector4(this Vec4 vec)
+        {
+            return new Vector4(vec.X, vec.Y, vec.Z, vec.O);
+        }
     }
 }

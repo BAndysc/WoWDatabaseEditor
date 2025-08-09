@@ -7,6 +7,7 @@ using TheAvaloniaOpenGL;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Entities;
 using TheEngine.Handles;
+using TheEngine.Interfaces;
 using MouseButton = TheEngine.Input.MouseButton;
 
 namespace TheEngine.Managers;
@@ -146,7 +147,7 @@ public class ImGuiController : IDisposable
     private readonly int vertexArrayObject;
     private readonly ShaderHandle shaderHandle;
     private readonly Material material;
-    private readonly TextureHandle fontTexture;
+    private readonly ITexture fontTexture;
     private ImDrawVert[] verts = Array.Empty<ImDrawVert>();
     private ushort[] indices = Array.Empty<ushort>();
 
@@ -157,7 +158,9 @@ public class ImGuiController : IDisposable
         
         imGuiContext = ImGui.CreateContext();
         ImGui.SetCurrentContext(imGuiContext);
-        var io = ImGui.GetIO();        
+        var io = ImGui.GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+        io.DisplaySize = new Vector2(1, 1); // init to something non zero
         var fonts = io.Fonts;
 
         // default font
@@ -191,8 +194,7 @@ public class ImGuiController : IDisposable
 
         // do not generate mips for fonts
         fontTexture = engine.textureManager.CreateTexture((Rgba32*)pixels, width, height,  false);
-        fonts.SetTexID(new IntPtr(fontTexture.Handle));
-        ImGui.NewFrame();
+        fonts.SetTexID(new IntPtr(fontTexture.Handle.Handle));
     }
 
     public void UpdateImGui(float delta)
@@ -203,9 +205,9 @@ public class ImGuiController : IDisposable
         io.DisplayFramebufferScale = new Vector2(engine.WindowHost.DpiScaling, engine.WindowHost.DpiScaling);
         io.DeltaTime = delta; // DeltaTime is in seconds.
 
-        io.MousePos = engine.inputManager.mouse.ScreenPoint / engine.WindowHost.DpiScaling;
-        io.MouseDown[0] = engine.inputManager.mouse.IsMouseDown(MouseButton.Left);
-        io.MouseDown[1] = engine.inputManager.mouse.IsMouseDown(MouseButton.Right);
+        io.MousePos = engine.inputManager.mouse.RawScreenPoint;
+        io.MouseDown[0] = engine.inputManager.mouse.RawIsMouseDown(MouseButton.Left);
+        io.MouseDown[1] = engine.inputManager.mouse.RawIsMouseDown(MouseButton.Right);
         io.MouseWheel = engine.inputManager.mouse.WheelDelta.Y;
         io.MouseWheelH = engine.inputManager.mouse.WheelDelta.X;
 
@@ -239,11 +241,11 @@ public class ImGuiController : IDisposable
             }
         }
 
-        io.KeyShift = engine.inputManager.Keyboard.IsDown(Key.LeftShift);
-        io.KeyAlt = engine.inputManager.Keyboard.IsDown(Key.LeftAlt);
-        io.KeyCtrl = engine.inputManager.Keyboard.IsDown(Key.LeftCtrl);
+        io.KeyShift = engine.inputManager.keyboard.RawIsDown(Key.LeftShift);
+        io.KeyAlt = engine.inputManager.keyboard.RawIsDown(Key.LeftAlt);
+        io.KeyCtrl = engine.inputManager.keyboard.RawIsDown(Key.LeftCtrl);
 
-        if (io.WantCaptureMouse)
+        if (io.WantCaptureMouse && !engine.gameView.IsHovered && !engine.sceneView.IsHovered)
             engine.inputManager.mouse.PostUpdate();
 
         if (io.WantCaptureKeyboard)
@@ -275,7 +277,7 @@ public class ImGuiController : IDisposable
 
         for (int i = 0; i < drawData.CmdListsCount; i++)
         {
-            ImDrawListPtr cmdList = drawData.CmdListsRange[i];
+            ImDrawListPtr cmdList = drawData.CmdLists[i];
 
             fixed (void* ptr = verts)
                 Unsafe.CopyBlock((byte*)ptr + vertexOffsetInBytes, (void*)cmdList.VtxBuffer.Data, (uint)(cmdList.VtxBuffer.Size * sizeof(ImDrawVert)));
@@ -331,7 +333,7 @@ public class ImGuiController : IDisposable
         TextureHandle? prevHandle = null;
         for (int n = 0; n < drawData.CmdListsCount; n++)
         {
-            ImDrawListPtr cmdList = drawData.CmdListsRange[n];
+            ImDrawListPtr cmdList = drawData.CmdLists[n];
             for (int cmdI = 0; cmdI < cmdList.CmdBuffer.Size; cmdI++)
             {
                 ImDrawCmdPtr pcmd = cmdList.CmdBuffer[cmdI];
@@ -346,7 +348,7 @@ public class ImGuiController : IDisposable
                         var handle = TextureHandle.FromIntPtr(pcmd.TextureId);
                         if (prevHandle != handle)
                         {
-                            material.SetTexture("FontTexture", handle);
+                            material.SetTexture("FontTexture", engine.textureManager[handle]);
                             material.ActivateUniforms(false);
                             prevHandle = handle;
                         }

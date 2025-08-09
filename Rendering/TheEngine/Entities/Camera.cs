@@ -1,9 +1,10 @@
-﻿using TheEngine.Interfaces;
+﻿using TheEngine.ECS;
+using TheEngine.Interfaces;
 using TheMaths;
 
 namespace TheEngine.Entities
 {
-    public class Camera : ICamera
+    public class Camera : ICamera, IManagedComponentData
     {
         public Transform Transform { get; }
 
@@ -20,7 +21,7 @@ namespace TheEngine.Entities
             Transform = new Transform();
             FOV = 60;
             NearClip = 1f;
-            FarClip = 36600f;
+            FarClip = 3660f;
         }
     }
 }

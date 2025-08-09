@@ -1,4 +1,5 @@
 using OpenGLBindings;
+using TheAvaloniaOpenGL.Resources;
 
 namespace TheAvaloniaOpenGL
 {
@@ -97,6 +98,9 @@ namespace TheAvaloniaOpenGL
         void Flush();
         void Finish();
         void Debug(string msg);
+        void AddToDispose(INativeBuffer nativeBuffer);
+        void DisposeBuffers();
+        long TotalBufferBytes { get; set; }
     }
 
     public static class DeviceExtensions

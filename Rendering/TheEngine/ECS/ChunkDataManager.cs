@@ -12,6 +12,7 @@ namespace TheEngine.ECS
         private unsafe byte*[] componentData;
         private object?[][] managedComponentData;
         public Archetype Archetype;
+        private readonly Engine engine;
         private int capacity;
         private int used;
         private readonly int componentsCount;
@@ -20,9 +21,10 @@ namespace TheEngine.ECS
         private Entity[] entityMapping;
         private int[] sparseReverseEntityMapping = new int[1];
 
-        public unsafe ChunkDataManager(Archetype archetype)
+        public unsafe ChunkDataManager(Archetype archetype, Engine engine)
         {
             Archetype = archetype;
+            this.engine = engine;
             componentsCount = archetype.Components.Count;
             managedComponentsCount = archetype.ManagedComponents.Count;
             //componentData = new byte[archetype.Components.Count][];
@@ -126,11 +128,16 @@ namespace TheEngine.ECS
         {
             if (capacity <= used)
             {
+                var oldCapacity = capacity;
                 capacity = capacity * 2 + 1;
                 Array.Resize(ref entityMapping, capacity);
                 for (int i = 0; i < componentsCount; ++i)
                 {
-                    AllocOrRealloc(ref componentData[i], (ulong)capacity * (ulong)Archetype.Components[i].SizeBytes);
+                    var oldSize = (ulong)oldCapacity * (ulong)Archetype.Components[i].SizeBytes;
+                    var newSize = (ulong)capacity * (ulong)Archetype.Components[i].SizeBytes;
+                    var delta = newSize - oldSize;
+                    engine.statsManager.EntitiesUnmanagedBytes += delta;
+                    AllocOrRealloc(ref componentData[i], newSize);
                     //Array.Resize(ref componentData[i], capacity * Archetype.Components[i].SizeBytes);
                 }
                 for (int i = 0; i < managedComponentsCount; ++i)
@@ -203,7 +210,7 @@ namespace TheEngine.ECS
             used++;
         }
 
-        public unsafe void RemoveEntity(Entity entity)
+        public unsafe void RemoveEntity(Entity entity, bool isDestroyed)
         {
             var index = sparseReverseEntityMapping[entity.Id] - 1;
             var swapWith = used - 1;
@@ -217,6 +224,10 @@ namespace TheEngine.ECS
             foreach (var c in Archetype.Components)
             {
                 var array = componentData[i];
+                if (isDestroyed && c.FreeAction != null)
+                {
+                    c.FreeAction(engine, new Span<byte>(array + index * c.SizeBytes, c.SizeBytes));
+                }
                 for (int j = 0; j < c.SizeBytes; ++j)
                     array[index * c.SizeBytes + j] = array[swapWith * c.SizeBytes + j];
                 i++;
@@ -227,6 +238,7 @@ namespace TheEngine.ECS
             {
                 var array = managedComponentData[i];
                 array[index] = array[swapWith];
+                array[swapWith] = null; // free the reference to let GC collect it
                 i++;
             }
             
@@ -241,7 +253,9 @@ namespace TheEngine.ECS
                 var c = Archetype.ManagedComponents[j];
                 if (c.DataType == type.DataType)
                 {
-                    var index = sparseReverseEntityMapping[entity.Id];
+                    var index = sparseReverseEntityMapping[entity.Id] - 1;
+                    if (index >= managedComponentData[j].Length)
+                        return null;
                     return managedComponentData[j][index];
                 }
             }
@@ -249,7 +263,7 @@ namespace TheEngine.ECS
             return null;
         }
         
-        internal unsafe object? UnsafeDebugGetComponent(Entity entity, IComponentTypeData type)
+        internal unsafe byte* UnsafeDebugGetComponent(Entity entity, IComponentTypeData type)
         {
             for (int j = 0; j < componentsCount; ++j)
             {
@@ -257,7 +271,7 @@ namespace TheEngine.ECS
                 if (c.DataType == type.DataType)
                 {
                     var index = sparseReverseEntityMapping[entity.Id];
-                    return Marshal.PtrToStructure(new IntPtr(componentData[j] + index * c.SizeBytes), c.DataType);
+                    return componentData[j] + (index - 1) * c.SizeBytes;
                 }
             }
 

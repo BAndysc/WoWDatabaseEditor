@@ -17,6 +17,7 @@ public class LowDetailHeightMapManager : IDisposable
     private readonly WorldManager worldManager;
     private readonly ChunkManager chunkManager;
     private readonly CameraManager cameraManager;
+    private readonly IGameContext gameContext;
     private IMesh? lowLevelMesh;
     private Material material;
     private WDL? currentWdl;
@@ -26,7 +27,8 @@ public class LowDetailHeightMapManager : IDisposable
         IRenderManager renderManager,
         WorldManager worldManager,
         ChunkManager chunkManager,
-        CameraManager cameraManager)
+        CameraManager cameraManager,
+        IGameContext gameContext)
     {
         this.meshManager = meshManager;
         this.materialManager = materialManager;
@@ -34,6 +36,7 @@ public class LowDetailHeightMapManager : IDisposable
         this.worldManager = worldManager;
         this.chunkManager = chunkManager;
         this.cameraManager = cameraManager;
+        this.gameContext = gameContext;
 
         material = materialManager.CreateMaterial("data/wdl.json");
     }
@@ -52,7 +55,10 @@ public class LowDetailHeightMapManager : IDisposable
 
         var currentChunk = cameraManager.Position.WoWPositionToChunk();
         var currentPosChunk = currentChunk.ChunkToWoWPosition();
-        
+
+        var camera = gameContext.Engine.CameraManager.MainCamera;
+        var frustum = new BoundingFrustum(camera.ViewMatrix * camera.ProjectionMatrix);
+
         for (int y = 0; y < 64; ++y)
         {
             for (int x = 0; x < 64; ++x)
@@ -63,6 +69,10 @@ public class LowDetailHeightMapManager : IDisposable
                 subMesh++;
 
                 if (chunkManager.IsTerrainLoaded(y, x))
+                    continue;
+
+                var bounds = lowLevelMesh.Bounds;
+                if (frustum.Contains(ref bounds) == ContainmentType.Disjoint)
                     continue;
 
                 renderManager.Render(lowLevelMesh, material, subMesh - 1, Matrix4x4.Identity);

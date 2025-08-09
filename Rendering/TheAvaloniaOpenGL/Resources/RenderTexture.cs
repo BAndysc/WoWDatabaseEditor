@@ -4,47 +4,55 @@ using OpenGLBindings;
 [assembly: InternalsVisibleTo("TheEngine")]
 namespace TheAvaloniaOpenGL.Resources
 {
-    internal class RenderTexture : IDisposable, ITexture
+    internal class RenderTexture : IDisposable, INativeTexture
     {
-        private Texture? underlyingTexture;
-        private Texture[]? nextTextures;
+        private Texture2D? underlyingTexture;
+        private bool ownsColorTexture;
+        private Texture2D[]? nextTextures;
 
         private int handle;
         private int depthHandle = -1;
 
         private readonly IDevice device;
         
-        internal RenderTexture(IDevice device, Texture colorAttachment, Texture depthTexture)
+        internal RenderTexture(IDevice device, Texture2D colorAttachment, Texture2D depthTexture, Texture2D? colorAttachment1)
         {
+            underlyingTexture = colorAttachment;
             handle = device.GenFramebuffer();
             device.BindFramebuffer(FramebufferTarget.Framebuffer, handle);
 
             device.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, colorAttachment.Handle, 0);
             device.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, depthTexture.Handle, 0);
+            if (colorAttachment1 != null)
+            {
+                nextTextures = [colorAttachment1];
+                device.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment1, TextureTarget.Texture2D, colorAttachment1.Handle, 0);
+            }
 
             device.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             this.device = device;
         }
         
-        internal RenderTexture(IDevice device, int width, int height, int colorAttachments = 1, Texture? depthTexture = null)
+        internal RenderTexture(IDevice device, int width, int height, int colorAttachments = 1, Texture2D? depthTexture = null)
         {
             if (colorAttachments < 0 || colorAttachments >= 5)
                 throw new ArgumentOutOfRangeException(nameof(colorAttachments));
             handle = device.GenFramebuffer();
             device.BindFramebuffer(FramebufferTarget.Framebuffer, handle);
+            ownsColorTexture = true;
 
             if (colorAttachments >= 1)
             {
-                underlyingTexture = new Texture(device, (uint[])null, width, height);
+                underlyingTexture = new Texture2D(device, (uint[])null, width, height);
                 device.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, underlyingTexture.Handle, 0);
             }
 
             if (colorAttachments > 1)
             {
-                nextTextures = new Texture[colorAttachments - 1];
+                nextTextures = new Texture2D[colorAttachments - 1];
                 for (int i = 0; i < nextTextures.Length; i++)
                 {
-                    nextTextures[i] = new Texture(device, (uint[])null, width, height, TextureFormat.R32ui);
+                    nextTextures[i] = new Texture2D(device, (uint[])null, width, height, TextureFormat.R32ui);
                     device.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0 + i + 1, TextureTarget.Texture2D, nextTextures[i].Handle, 0);
                 }
             }
@@ -71,7 +79,9 @@ namespace TheAvaloniaOpenGL.Resources
         public int Width => underlyingTexture.Width;
 
         public int Height => underlyingTexture.Height;
-        
+
+        public int NativeHandle => handle;
+
         public void Activate(int slot)
         {
             if (underlyingTexture == null)
@@ -94,6 +104,8 @@ namespace TheAvaloniaOpenGL.Resources
                 foreach (var t in nextTextures)
                     t.SetWrapping(mode);
         }
+
+        public int SizeInBytes => 0;
 
         public void Clear(float r, float g, float b, float a)
         {
@@ -130,17 +142,25 @@ namespace TheAvaloniaOpenGL.Resources
 
         public void Dispose()
         {
-            device.DeleteFramebuffer(handle);
-            if (depthHandle != -1)
-                device.DeleteRenderbuffer(depthHandle);
-            //TargetView.Dispose();
-            underlyingTexture?.Dispose();
-            if (nextTextures != null)
+            if (handle != 0)
             {
-                for (var index = 0; index < nextTextures.Length; index++)
+                device.DeleteFramebuffer(handle);
+                if (depthHandle != -1)
+                    device.DeleteRenderbuffer(depthHandle);
+                handle = 0;
+                depthHandle = -1;
+            }
+            //TargetView.Dispose();
+            if (ownsColorTexture)
+            {
+                underlyingTexture?.Dispose();
+                if (nextTextures != null)
                 {
-                    var texture = nextTextures[index];
-                    texture.Dispose();
+                    for (var index = 0; index < nextTextures.Length; index++)
+                    {
+                        var texture = nextTextures[index];
+                        texture.Dispose();
+                    }
                 }
             }
         }
@@ -150,7 +170,7 @@ namespace TheAvaloniaOpenGL.Resources
             GetTexture(colorAttachmentIndex).Activate(slot);
         }
 
-        public Texture GetTexture(int colorAttachmentIndex)
+        public Texture2D GetTexture(int colorAttachmentIndex)
         {
             if (colorAttachmentIndex == 0)
                 return underlyingTexture;

@@ -11,6 +11,7 @@ public class AnimationDataStore : BaseDbcStore<uint, AnimationData>
         {
             var o = new AnimationData(row, version);
             store[o.Id] = o;
+            MaxId = Math.Max(MaxId, o.Id);
         }
     }
     
@@ -20,6 +21,9 @@ public class AnimationDataStore : BaseDbcStore<uint, AnimationData>
         {
             var o = new AnimationData(row, version);
             store[o.Id] = o;
+            MaxId = Math.Max(MaxId, o.Id);
         }
     }
+
+    public uint MaxId { get; private set; }
 }

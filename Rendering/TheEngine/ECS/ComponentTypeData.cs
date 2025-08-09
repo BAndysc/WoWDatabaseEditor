@@ -1,29 +1,46 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using TheEngine.Components;
 
 namespace TheEngine.ECS
 {
-    public class ComponentTypeData : IComponentTypeData
+    public class ComponentTypeData<T> : IComponentTypeData where T : unmanaged, IComponentData
     {
-        public ComponentTypeData(System.Type type, int index)
+        public delegate void FreeDelegate(Engine engine, ref T component);
+
+        public ComponentTypeData(int index)
         {
             Index = index;
-            DataType = type;
-            SizeBytes = Marshal.SizeOf(type);
-        }
-
-        public static ComponentTypeData Create<T>(int index)
-        {
-            return new ComponentTypeData(typeof(T), index);
+            DataType = typeof(T);
+            SizeBytes = Marshal.SizeOf(typeof(T));
+            // todo: more generic way to specify FreeAction
+            if (typeof(T) == typeof(MeshRenderer))
+            {
+                FreeAction = (engine, bytes) =>
+                {
+                    var meshRenderer = MemoryMarshal.Cast<byte, MeshRenderer>(bytes);
+                    if (meshRenderer[0].meshGcHandle != default)
+                    {
+                        meshRenderer[0].meshGcHandle.Free();
+                    }
+                    if (meshRenderer[0].materialGcHandle != default)
+                    {
+                        meshRenderer[0].materialGcHandle.Free();
+                    }
+                };
+            }
         }
 
         public int Index { get; }
         public ulong Hash => (ulong)(1 << Index);
         public ulong GlobalHash => Hash;
+        public IComponentTypeData.FreeActionDelegate? FreeAction { get; set; }
         public Type DataType { get; }
         public int SizeBytes { get; }
+        public FreeDelegate? Free { get; }
 
-        protected bool Equals(ComponentTypeData other)
+        protected bool Equals(ComponentTypeData<T> other)
         {
             return Index == other.Index && DataType == other.DataType;
         }
@@ -33,7 +50,7 @@ namespace TheEngine.ECS
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((ComponentTypeData)obj);
+            return Equals((ComponentTypeData<T>)obj);
         }
 
         public override int GetHashCode()
@@ -41,12 +58,12 @@ namespace TheEngine.ECS
             return HashCode.Combine(Index, DataType);
         }
 
-        public static bool operator ==(ComponentTypeData? left, ComponentTypeData? right)
+        public static bool operator ==(ComponentTypeData<T>? left, ComponentTypeData<T>? right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(ComponentTypeData? left, ComponentTypeData? right)
+        public static bool operator !=(ComponentTypeData<T>? left, ComponentTypeData<T>? right)
         {
             return !Equals(left, right);
         }

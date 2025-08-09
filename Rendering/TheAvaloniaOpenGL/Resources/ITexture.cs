@@ -22,13 +22,15 @@
         MirroredRepeat
     }
 
-    public interface ITexture : IDisposable
+    public interface INativeTexture : IDisposable
     {
         int Width { get; }
         int Height { get; }
+        int NativeHandle { get; }
 
         void Activate(int slot);
         void SetFiltering(FilteringMode mode);
         void SetWrapping(WrapMode mode);
+        int SizeInBytes { get; }
     }
 }

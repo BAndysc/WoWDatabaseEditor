@@ -1,6 +1,8 @@
 using ImGuiNET;
 using System.Collections;
+using TheEngine;
 using TheEngine.Interfaces;
+using TheEngine.Utils;
 using TheEngine.Utils.ImGuiHelper;
 using TheMaths;
 
@@ -39,6 +41,8 @@ public class LoadingManager : IDisposable
     private readonly LowDetailHeightMapManager lowDetailHeightMapManager;
     private readonly ZoneAreaManager zoneAreaManager;
     private readonly WorldManager worldManager;
+    private readonly Engine engine;
+    private readonly IGameProperties gameProperties;
     private int? currentLoadedMap;
     private LoadingToken? loadingToken;
     private SimpleBox loadingNotificationBox;
@@ -51,7 +55,9 @@ public class LoadingManager : IDisposable
         GlobalWorldMapObjectManager globalWorldMapObjectManager,
         LowDetailHeightMapManager lowDetailHeightMapManager,
         ZoneAreaManager zoneAreaManager,
-        WorldManager worldManager)
+        WorldManager worldManager,
+        Engine engine,
+        IGameProperties gameProperties)
     {
         this.gameContext = gameContext;
         this.uiManager = uiManager;
@@ -60,49 +66,55 @@ public class LoadingManager : IDisposable
         this.lowDetailHeightMapManager = lowDetailHeightMapManager;
         this.zoneAreaManager = zoneAreaManager;
         this.worldManager = worldManager;
+        this.engine = engine;
+        this.gameProperties = gameProperties;
 
         this.loadingNotificationBox = new SimpleBox(BoxPlacement.BottomCenter);
     }
 
     public void Update(float delta)
     {
+        if (!gameProperties.LoadWorld)
+        {
+            return;
+        }
         if (currentLoadedMap != gameContext.CurrentMap.Id)
         {
             currentLoadedMap = gameContext.CurrentMap.Id;
             var oldLoadingToken = loadingToken;
             loadingToken = new LoadingToken();
-            gameContext.StartCoroutine(LoadingCoroutine(currentLoadedMap.Value, oldLoadingToken, loadingToken));
+            LoadingCoroutine(currentLoadedMap.Value, oldLoadingToken, loadingToken).FireAndForget();
         }
     }
 
-    private IEnumerator LoadingCoroutine(int map, LoadingToken? old, LoadingToken newToken)
+    private async ValueTask LoadingCoroutine(int map, LoadingToken? old, LoadingToken newToken)
     {
         EssentialLoadingInProgress = true;
         if (old != null)
         {
             old.Cancel();
             while (!old.Loaded)
-                yield return null; // wait for previous loading to finish
+                await engine.NextFrame; // wait for previous loading to finish
         }
         
-        yield return globalWorldMapObjectManager.Unload();
+        await globalWorldMapObjectManager.Unload();
         
-        yield return chunkManager.UnloadAllChunks();
+        await chunkManager.UnloadAllChunks();
 
         lowDetailHeightMapManager.Unload();
         
-        yield return zoneAreaManager.Load();
+        await zoneAreaManager.Load();
         
-        yield return worldManager.LoadMap(newToken.CancellationToken);
+        await worldManager.LoadMap(newToken.CancellationToken);
 
         if (loadingToken == newToken)
             EssentialLoadingInProgress = false;
 
         lowDetailHeightMapManager.Load();
         
-        yield return globalWorldMapObjectManager.Load();
+        await globalWorldMapObjectManager.Load();
         
-        yield return worldManager.LoadOptionals(newToken.CancellationToken);
+        await worldManager.LoadOptionals(newToken.CancellationToken);
 
         newToken.MarkAsLoaded();
         

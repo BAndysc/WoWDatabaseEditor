@@ -4,8 +4,14 @@
         <Using Include="System.Numerics" />
         <Using Include="System.Numerics.Matrix4x4" Alias="Matrix" />
 
-        <PackageReference Include="OpenTK.Core" Version="4.8.2" />
-        <PackageReference Include="OpenTK" Version="4.8.2" />
-        <PackageReference Include="OpenTK.Mathematics" Version="4.8.2" />
+        <PackageReference Include="OpenTK.Core" Version="4.9.4" />
+        <PackageReference Include="OpenTK" Version="4.9.4" />
+        <PackageReference Include="OpenTK.Mathematics" Version="4.9.4" />
+    </ItemGroup>
+    <PropertyGroup Condition=" '$(ENGINE_RELEASE)' == 'true' ">
+        <DefineConstants>$(DefineConstants);ENGINE_RELEASE</DefineConstants>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProfileThisAssembly Condition="'$(PROFILE_RENDERING)' == 'true'" Include="PROFILED DLL" MinimumMethodSize="15" />
     </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@ using OpenGLBindings;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
 using TheEngine.Handles;
+using TheEngine.Interfaces;
 using TheMaths;
 
 namespace TheEngine.Entities
@@ -74,7 +75,7 @@ namespace TheEngine.Entities
         public MaterialHandle Handle { get; }
         public ShaderHandle ShaderHandle => shaderHandle;
 
-        internal Dictionary<int, TextureHandle> textureHandles { get; } = new();
+        internal Dictionary<int, ITexture> textures { get; } = new();
         internal Dictionary<int, INativeBuffer> structuredBuffers { get; } = new();
         internal Dictionary<int, int> intUniforms { get; } = new();
         internal Dictionary<int, float> floatUniforms { get; } = new();
@@ -82,7 +83,7 @@ namespace TheEngine.Entities
         internal Dictionary<int, Vector3> vector3Uniforms { get; } = new();
         internal Dictionary<int, Matrix> matrixUniforms { get; } = new();
         
-        internal Dictionary<int, TextureHandle> instancedTextureHandles { get; } = new();
+        internal Dictionary<int, ITexture> instancedTextureHandles { get; } = new();
         internal Dictionary<int, INativeBuffer> instancedStructuredBuffers { get; } = new();
         internal Dictionary<int, int> instancedIntUniforms { get; } = new();
         internal Dictionary<int, float> instancedFloatUniforms { get; } = new();
@@ -195,14 +196,14 @@ namespace TheEngine.Entities
             Set(matrixUniforms, instancedMatrixUniforms, name, value);
         }
         
-        public void SetTexture(string name, TextureHandle texture)
+        public void SetTexture(string name, ITexture texture)
         {
-            Set(textureHandles, instancedTextureHandles, name, texture);
+            Set(textures, instancedTextureHandles, name, texture);
         }
         
-        public TextureHandle GetTexture(string name)
+        public ITexture GetTexture(string name)
         {
-            return textureHandles[GetUniformLocation(name)];
+            return textures[GetUniformLocation(name)];
         }
         
         public INativeBuffer GetBuffer(string name)
@@ -234,7 +235,7 @@ namespace TheEngine.Entities
                 }
                 foreach (var pair in instancedTextureHandles)
                 {
-                    var texture = engine.textureManager.GetTextureByHandle(pair.Value);
+                    var texture = engine.textureManager.GetTextureByHandle(pair.Value.Handle);
                     texture.Activate(slot);
                     instancedShader!.SetUniformInt(pair.Key, slot);
                     slot++;
@@ -276,10 +277,20 @@ namespace TheEngine.Entities
                     shader.SetUniformInt(buffer.Key, slot);
                     slot++;
                 }
-                foreach (var pair in textureHandles)
+                foreach (var pair in textures)
                 {
-                    var texture = engine.textureManager.GetTextureByHandle(pair.Value);
-                    texture.Activate(slot);
+                    if (pair.Value != null)
+                    {
+                        var texture = engine.textureManager.GetTextureByHandle(pair.Value.Handle);
+                        if (texture == null)
+                            texture = engine.textureManager.GetTextureByHandle(engine.textureManager.EmptyTexture.Handle);
+                        texture.Activate(slot);
+                    }
+                    else
+                    {
+                        var texture = engine.textureManager.GetTextureByHandle(engine.textureManager.EmptyTexture.Handle);
+                        texture.Activate(slot);
+                    }
                     shader.SetUniformInt(pair.Key, slot);
                     slot++;
                 }

@@ -6,6 +6,7 @@ using Prism.Ioc;
 using Prism.Modularity;
 using RenderingTester;
 using TheEngine;
+using TheEngine.Utils;
 using TheMaths;
 using Unity;
 using WDE.AzerothCore;
@@ -13,6 +14,7 @@ using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Database.Counters;
 using WDE.Common.DBC;
+using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
@@ -24,6 +26,7 @@ using WDE.DbcStore.FastReader;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
 using WDE.MapSpawns;
+using WDE.MapSpawns.Rendering;
 using WDE.Module;
 using WDE.MPQ;
 using WDE.Parameters;
@@ -32,6 +35,7 @@ using WDE.SqlInterpreter;
 using WDE.Trinity;
 using WDE.TrinityMySqlDatabase;
 using WoWDatabaseEditorCore;
+using WoWDatabaseEditorCore.Services.LoadingEvents;
 
 var nativeWindowSettings = new NativeWindowSettings()
 {
@@ -52,9 +56,12 @@ registry.RegisterInstance<IScopedContainer>(scopedContainer);
 registry.RegisterInstance<IContainerProvider>(provider);
 registry.RegisterInstance<IContainerRegistry>(registry);
 
-registry.Register<IGameView, DummyGameView>();
+var gameProperties = new DummyGameProperties();
+var gameView = new DummyGameView();
+registry.Register<ILoadingEventAggregator, LoadingEventAggregator>();
+registry.RegisterInstance<IGameView>(gameView);
 registry.Register<IStatusBar, DummyStatusBar>();
-registry.Register<IGameProperties, DummyGameProperties>();
+registry.RegisterInstance<IGameProperties>(gameProperties);
 registry.Register<IMessageBoxService, DummyMessageBox>();
 registry.Register<IDatabaseClientFileOpener, DatabaseClientFileOpener>();
 registry.Register<ITableEditorPickerService, DummyTableEditorPickerService>();
@@ -89,6 +96,9 @@ void SetupModules(params ModuleBase[] modules)
 SynchronizationContext.SetSynchronizationContext(context);
 
 var game = provider.Resolve<Game>();
+// gameView.AddModule<TestModule>();
+gameProperties.LoadWorld = true;
+
 using var window = new GameStandaloneWindow(GameWindowSettings.Default, nativeWindowSettings, game, mainThread, context);
 registry.RegisterInstance<IClipboardService>(window);
 window.Run();

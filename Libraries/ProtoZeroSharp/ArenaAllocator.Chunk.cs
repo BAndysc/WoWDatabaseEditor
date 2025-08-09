@@ -57,6 +57,7 @@ public unsafe partial struct ArenaAllocator
                 src.CopyTo(dst);
                 Used -= eraseLength;
             }
+            new Span<byte>(data + Used, length - Used).Clear();
         }
 
         /// <summary>
@@ -71,6 +72,7 @@ public unsafe partial struct ArenaAllocator
             chunk->Next = null;
             chunk->length = length;
             chunk->data = (byte*)chunk + sizeof(Chunk);
+            new Span<byte>(chunk->data, chunk->length).Clear();
             return chunk;
         }
 

@@ -23,5 +23,6 @@ namespace TheEngine.Interfaces
         MeshHandle Handle { get; }
         IndexType IndexType { get; }
         IEnumerable<(Vector4, Vector4, Vector4)> GetFaces(int submesh);
+        void SaveToObj(string path);
     }
 }

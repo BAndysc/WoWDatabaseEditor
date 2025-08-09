@@ -1,5 +1,7 @@
 using TheEngine.Components;
 using TheEngine.ECS;
+using TheEngine.Interfaces;
+using TheEngine.Structures;
 using TheMaths;
 
 namespace WDE.MapRenderer.Managers.Entities;
@@ -10,13 +12,17 @@ public abstract class WorldObjectInstance : System.IDisposable
     protected List<Entity> handles = new();
     protected List<Entity> renderers = new();
     protected List<Entity> colliders = new();
+    protected List<MdxManager.MdxInstance> mdxInstances = new();
+    protected List<WmoManager.WmoInstance> wmoInstances = new();
+    protected readonly RenderLayer renderLayer;
     public IReadOnlyList<Entity> Renderers => renderers;
     
     public abstract void Dispose();
 
-    public WorldObjectInstance(IGameContext gameContext)
+    public WorldObjectInstance(IGameContext gameContext, RenderLayer renderLayer)
     {
         this.gameContext = gameContext;
+        this.renderLayer = renderLayer;
     }
     
     public Vector3 Position
@@ -36,14 +42,10 @@ public abstract class WorldObjectInstance : System.IDisposable
         {
             isRenderingEnabled = value;
             WorldObjectEntity.SetForceDisabledRendering(gameContext.EntityManager, !value);
-            foreach (var renderer in renderers)
-                renderer.SetForceDisabledRendering(gameContext.EntityManager, !value);
-            foreach (var collider in colliders)
-                collider.SetDisabledObject(gameContext.EntityManager, !value);
             textEntity.SetDisabledObject(gameContext.EntityManager, !value);
         }
     }
-    
+
     protected Entity objectEntity;
     protected Entity textEntity;
     

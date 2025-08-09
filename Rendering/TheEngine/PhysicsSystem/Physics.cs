@@ -52,7 +52,7 @@ namespace TheEngine.PhysicsSystem
         public void RaycastAll(Ray ray, Vector3? customOrigin, List<(Entity, Vector3)> destinationList, uint collisionMask = 0)
         {
             ThreadLocal<List<(Entity, Vector3)>?> localEntities = new ThreadLocal<List<(Entity, Vector3)>?>(true);
-            colliders.ParallelForEachRRRRO<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld, DisabledObjectBit>((itr, start, end, colliders, meshBounds, renderer, localToWorld, disableAccess) =>
+            colliders.ParallelForEachRRRRO<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld, DisabledObjectBit>((itr, thread, start, end, colliders, meshBounds, renderer, localToWorld, disableAccess) =>
             {
                 List<(Entity, Vector3)>? result = null;
                 for (int i = start; i < end; ++i)
@@ -104,7 +104,7 @@ namespace TheEngine.PhysicsSystem
         public (Entity, Vector3)? Raycast(Ray ray, Vector3? customOrigin, bool onlyRendered = false, uint collisionMask = 0)
         {
             ThreadLocal<(Entity, float, Vector3)> localEntities = new ThreadLocal<(Entity, float, Vector3)>(true);
-            colliders.ParallelForEachRRRROO<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld, RenderEnabledBit, DisabledObjectBit>((itr, start, end, colliders, meshBounds, renderer, localToWorld, renderEnabledAccess, disabledAccess) =>
+            colliders.ParallelForEachRRRROO<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld, RenderEnabledBit, DisabledObjectBit>((itr, thread, start, end, colliders, meshBounds, renderer, localToWorld, renderEnabledAccess, disabledAccess) =>
             {
                 Entity? touchEntity = null;
                 float minDist = float.MaxValue;
@@ -197,7 +197,7 @@ namespace TheEngine.PhysicsSystem
             int index = 1;
             StringBuilder vertices = new();
             StringBuilder indices = new();
-            colliders.ForEach<Collider, MeshRenderer, LocalToWorld>((itr, start, end, colliders, renderer, localToWorld) =>
+            colliders.ForEach<Collider, MeshRenderer, LocalToWorld>((itr, thread, start, end, colliders, renderer, localToWorld) =>
             {
                 for (int i = start; i < end; ++i)
                 {

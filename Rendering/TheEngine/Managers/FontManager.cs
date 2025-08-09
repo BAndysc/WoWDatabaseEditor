@@ -13,7 +13,7 @@ namespace TheEngine.Managers
     {
         private readonly Engine engine;
         private readonly Dictionary<string, FontDefinition> fontDefinitions = new();
-        private readonly Dictionary<string, TextureHandle> textures = new();
+        private readonly Dictionary<string, ITexture> textures = new();
 
         public FontManager(Engine engine)
         {
@@ -71,7 +71,7 @@ namespace TheEngine.Managers
             return new Vector2(maxX, yPixel);
         }
 
-        internal TextureHandle GetTexture(string font)
+        internal ITexture GetTexture(string font)
         {
             return textures[font];
         }

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Nito.AsyncEx;
+using TheEngine;
 using WDE.Common.MPQ;
 using WDE.Common.Services.MessageBox;
 using WDE.MpqReader;
@@ -12,6 +13,7 @@ public class GameFiles : IGameFiles, IDisposable
     private static SemaphoreSlim semaphore = null!;
     private readonly IMpqService mpqService;
     private readonly IMessageBoxService messageBoxService;
+    private readonly Engine engine;
     private IMpqArchive mpqSync;
     
     private List<IMpqArchive> mpqPool = new List<IMpqArchive>();
@@ -19,10 +21,12 @@ public class GameFiles : IGameFiles, IDisposable
     public GameFilesVersion WoWVersion { get; private set; }
     
     public GameFiles(IMpqService mpqService,
-        IMessageBoxService messageBoxService)
+        IMessageBoxService messageBoxService,
+        Engine engine)
     {
         this.mpqService = mpqService;
         this.messageBoxService = messageBoxService;
+        this.engine = engine;
     }
 
     public bool Initialize()
@@ -59,9 +63,11 @@ public class GameFiles : IGameFiles, IDisposable
         }
     }
 
-    public async Task<PooledArray<byte>?> ReadFile(FileId fileId, bool silent = false, int? maxReadBytes = null)
+    public async ValueTask<PooledArray<byte>?> ReadFile(FileId fileId, bool silent = false, int? maxReadBytes = null)
     {
-        lock (mpqSync)
+        // uncomment to make loading faster, but laggier
+        // hard to decide if it's worth it
+        /*lock (mpqSync)
         {
             var size = mpqSync.GetFileSize(fileId.ToString());
             if (!size.HasValue)
@@ -76,13 +82,14 @@ public class GameFiles : IGameFiles, IDisposable
                 var b = mpqSync.ReadFilePool(fileId, maxReadBytes: maxReadBytes);
                 return b;
             }
-        }
-
+        }*/
         await semaphore.WaitAsync();
         Debug.Assert(mpqPool.Count > 0);
         IMpqArchive archive = mpqPool[^1];
         mpqPool.RemoveAt(mpqPool.Count - 1);
-        var bytes = await Task.Run(() => archive.ReadFilePool(fileId, maxReadBytes: maxReadBytes));
+        await engine.EnterThreadPool;
+        var bytes = archive.ReadFilePool(fileId, maxReadBytes: maxReadBytes);
+        await engine.EnterGameLoop;
         mpqPool.Add(archive);
         semaphore.Release();
         

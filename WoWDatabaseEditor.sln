@@ -61,6 +61,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solutio
 		Directory.Build.props = Directory.Build.props
 		README.md = README.md
 		build.sh = build.sh
+		Rendering\lib3d.props = Rendering\lib3d.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WoWDatabaseEditorCore.Avalonia", "WoWDatabaseEditorCore.Avalonia\WoWDatabaseEditorCore.Avalonia.csproj", "{D38826BA-F862-4895-80DB-32CB5821ED67}"
