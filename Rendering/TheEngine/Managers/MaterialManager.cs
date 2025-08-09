@@ -26,24 +26,29 @@ namespace TheEngine.Managers
 
             foreach (var uniform in shader.Uniforms)
             {
-                if (uniform.Value == ShaderVariableType.Int)
-                    m.SetUniformInt(uniform.Key, 0);
-                else if (uniform.Value == ShaderVariableType.Float)
-                    m.SetUniform(uniform.Key, 0);
-                else if (uniform.Value == ShaderVariableType.Float2)
-                    throw new Exception("Float2 not supported");
-                else if (uniform.Value == ShaderVariableType.Float3)
-                    m.SetUniform(uniform.Key, Vector3.Zero);
-                else if (uniform.Value == ShaderVariableType.Float4)
-                    m.SetUniform(uniform.Key, Vector4.Zero);
-                else if (uniform.Value == ShaderVariableType.Matrix)
-                    m.SetUniform(uniform.Key, Matrix.Identity);
-                else if (uniform.Value == ShaderVariableType.Sampler2D)
+                if (uniform.Value == ShaderVariableType.Sampler2D)
                     m.SetTexture(uniform.Key, engine.textureManager.EmptyTexture);
                 else if (uniform.Value == ShaderVariableType.SamplerBuffer)
                     m.SetBuffer(uniform.Key, smallEmptyBuffer);
             }
             
+            materials.Add(new WeakReference<Material>(m));
+            return m;
+        }
+
+        public Material<T> CreateMaterial<T>(ShaderHandle shaderHandle, ShaderHandle? instancedShader) where T : unmanaged
+        {
+            var m = new Material<T>(engine, shaderHandle, instancedShader, new MaterialHandle(materials.Count));
+            var shader = engine.shaderManager.GetShaderByHandle(shaderHandle);
+
+            foreach (var uniform in shader.Uniforms)
+            {
+                if (uniform.Value == ShaderVariableType.Sampler2D)
+                    m.SetTexture(uniform.Key, engine.textureManager.EmptyTexture);
+                else if (uniform.Value == ShaderVariableType.SamplerBuffer)
+                    m.SetBuffer(uniform.Key, smallEmptyBuffer);
+            }
+
             materials.Add(new WeakReference<Material>(m));
             return m;
         }
@@ -55,6 +60,15 @@ namespace TheEngine.Managers
             if (!engine.shaderManager.GetShaderByHandle(instanced.Value).Instancing)
                 instanced = null;
             return CreateMaterial(shader, instanced);
+        }
+
+        public Material<T> CreateMaterial<T>(string shaderPath) where T : unmanaged
+        {
+            var shader = engine.ShaderManager.LoadShader(shaderPath, false);
+            ShaderHandle? instanced = engine.ShaderManager.LoadShader(shaderPath, true);
+            if (!engine.shaderManager.GetShaderByHandle(instanced.Value).Instancing)
+                instanced = null;
+            return CreateMaterial<T>(shader, instanced);
         }
 
         public void Dispose()

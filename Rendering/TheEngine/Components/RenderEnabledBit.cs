@@ -10,8 +10,8 @@ namespace TheEngine.Components
     public class MaterialInstanceRenderData : IManagedComponentData
     {
         public Dictionary<string, INativeBuffer>? bufferByName { get; private set; }
-        public Dictionary<int, int>? ints { get; private set; }
-        public Dictionary<int, int>? instancedInts { get; private set; }
+        // public Dictionary<int, int>? ints { get; private set; }
+        // public Dictionary<int, int>? instancedInts { get; private set; }
         public Dictionary<int, INativeBuffer>? structuredBuffers { get; private set; }
         public Dictionary<int, INativeBuffer>? instancedStructuredBuffers { get; private set; }
         public Int4 InstanceData { get; set; }
@@ -45,31 +45,31 @@ namespace TheEngine.Components
             }
         }
 
-        public void SetInt(Material material, string name, int value)
-        {
-            var loc = material.GetUniformLocation(name);
-            var instancedLoc = material.GetInstancedUniformLocation(name);
-            if (loc != -1)
-            {
-                ints ??= new();
-                ints[loc] = value;
-            }
-            if (instancedLoc.HasValue && instancedLoc != -1)
-            {
-                instancedInts ??= new();
-                instancedInts[instancedLoc.Value] = value;
-            }
-        }
+        // public void SetInt(Material material, string name, int value)
+        // {
+        //     var loc = material.GetUniformLocation(name);
+        //     var instancedLoc = material.GetInstancedUniformLocation(name);
+        //     if (loc != -1)
+        //     {
+        //         ints ??= new();
+        //         ints[loc] = value;
+        //     }
+        //     if (instancedLoc.HasValue && instancedLoc != -1)
+        //     {
+        //         instancedInts ??= new();
+        //         instancedInts[instancedLoc.Value] = value;
+        //     }
+        // }
         
         public void Activate(Material material, bool instanced, int slot)
         {
             if (instanced)
             {
-                if (instancedInts != null)
-                {
-                    foreach (var i in instancedInts)
-                        material.Shader.SetUniformInt(i.Key, i.Value);
-                }
+                // if (instancedInts != null)
+                // {
+                //     foreach (var i in instancedInts)
+                //         material.Shader.SetUniformInt(i.Key, i.Value);
+                // }
 
                 if (instancedStructuredBuffers != null)
                 {
@@ -78,17 +78,17 @@ namespace TheEngine.Components
                         buffer.Value.Activate(slot);
                         material.Shader.SetUniformInt(buffer.Key, slot);
                         slot++;
-                    }   
+                    }
                 }
             }
             else
             {
-                if (ints != null)
-                {
-                    foreach (var i in ints)
-                        material.Shader.SetUniformInt(i.Key, i.Value);
-                }
-                
+                // if (ints != null)
+                // {
+                //     foreach (var i in ints)
+                //         material.Shader.SetUniformInt(i.Key, i.Value);
+                // }
+
                 if (structuredBuffers != null)
                 {
                     foreach (var buffer in structuredBuffers)
@@ -103,8 +103,8 @@ namespace TheEngine.Components
 
         public void Clear()
         {
-            ints?.Clear();
-            instancedInts?.Clear();
+            // ints?.Clear();
+            // instancedInts?.Clear();
             instancedStructuredBuffers?.Clear();
             structuredBuffers?.Clear();
             bufferByName?.Clear();

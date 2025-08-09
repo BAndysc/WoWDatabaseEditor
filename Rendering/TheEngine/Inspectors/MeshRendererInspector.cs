@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using ImGuiNET;
 using TheEngine.Components;
 using TheEngine.ECS;
@@ -15,7 +16,7 @@ public class MeshRendererInspector : IRefInspectorDrawer<MeshRenderer>
         this.engine = engine;
     }
 
-    public void Draw(Entity entity, ref MeshRenderer component)
+    public unsafe void Draw(Entity entity, ref MeshRenderer component)
     {
         var mesh = engine.meshManager.GetMeshByHandle(component.MeshHandle);
         var material = engine.materialManager.GetMaterialByHandle(component.MaterialHandle);
@@ -117,84 +118,45 @@ public class MeshRendererInspector : IRefInspectorDrawer<MeshRenderer>
         ImGui.NextColumn();
 
         // Display all uniforms
-        // Int uniforms
-        foreach (var uniform in material.intUniforms)
+        if (material.thisUniformData != null)
         {
-            var uniformName = material.Shader.GetUniformName(uniform.Key);
-            if (uniformName != null)
+            var bytes = material.MaterialDataBytes;
+            foreach (var uniform in material.thisUniformData)
             {
-                ImGui.TextUnformatted($"{uniformName} (int)");
+                var slotBytes = bytes.Slice((int)uniform.offset, uniform.size);
+                ImGui.TextUnformatted($"{uniform.name} ({uniform.type})");
                 ImGui.NextColumn();
-                var value = uniform.Value;
-                if (ImGui.InputInt($"##{uniformName}_int", ref value))
+                fixed (byte* ptr = slotBytes)
                 {
-                    material.SetUniformInt(uniformName, value);
+                    if (uniform.type == typeof(int))
+                    {
+                        ref var value = ref Unsafe.AsRef<int>(ptr);
+                        ImGui.InputInt($"##{uniform.name}_int", ref value);
+                    }
+                    else if (uniform.type == typeof(float))
+                    {
+                        ref var value = ref Unsafe.AsRef<float>(ptr);
+                        ImGui.InputFloat($"##{uniform.name}_float", ref value);
+                    }
+                    else if (uniform.type == typeof(Vector3))
+                    {
+                        ref var value = ref Unsafe.AsRef<Vector3>(ptr);
+                        ImGui.InputFloat3($"##{uniform.name}_float3", ref value);
+                    }
+                    else if (uniform.type == typeof(Vector4))
+                    {
+                        ref var value = ref Unsafe.AsRef<Vector4>(ptr);
+                        ImGui.InputFloat4($"##{uniform.name}_float4", ref value);
+                    }
+                    else if (uniform.type == typeof(Matrix))
+                    {
+                        ref var value = ref Unsafe.AsRef<Matrix>(ptr);
+                        ImGui.TextUnformatted("Matrix (read-only)");
+                    }
+                    else
+                        throw new Exception("Unknown type " + uniform.type);
+                    ImGui.NextColumn();
                 }
-                ImGui.NextColumn();
-            }
-        }
-
-        // Float uniforms
-        foreach (var uniform in material.floatUniforms)
-        {
-            var uniformName = material.Shader.GetUniformName(uniform.Key);
-            if (uniformName != null)
-            {
-                ImGui.TextUnformatted($"{uniformName} (float)");
-                ImGui.NextColumn();
-                var value = uniform.Value;
-                if (ImGui.InputFloat($"##{uniformName}_float", ref value))
-                {
-                    material.SetUniform(uniformName, value);
-                }
-                ImGui.NextColumn();
-            }
-        }
-
-        // Vector3 uniforms
-        foreach (var uniform in material.vector3Uniforms)
-        {
-            var uniformName = material.Shader.GetUniformName(uniform.Key);
-            if (uniformName != null)
-            {
-                ImGui.TextUnformatted($"{uniformName} (vec3)");
-                ImGui.NextColumn();
-                var value = uniform.Value;
-                if (ImGui.InputFloat3($"##{uniformName}_vec3", ref value))
-                {
-                    material.SetUniform(uniformName, value);
-                }
-                ImGui.NextColumn();
-            }
-        }
-
-        // Vector4 uniforms
-        foreach (var uniform in material.vector4Uniforms)
-        {
-            var uniformName = material.Shader.GetUniformName(uniform.Key);
-            if (uniformName != null)
-            {
-                ImGui.TextUnformatted($"{uniformName} (vec4)");
-                ImGui.NextColumn();
-                var value = uniform.Value;
-                if (ImGui.InputFloat4($"##{uniformName}_vec4", ref value))
-                {
-                    material.SetUniform(uniformName, value);
-                }
-                ImGui.NextColumn();
-            }
-        }
-
-        // Matrix uniforms (display as read-only for now due to complexity)
-        foreach (var uniform in material.matrixUniforms)
-        {
-            var uniformName = material.Shader.GetUniformName(uniform.Key);
-            if (uniformName != null)
-            {
-                ImGui.TextUnformatted($"{uniformName} (matrix)");
-                ImGui.NextColumn();
-                ImGui.TextUnformatted("Matrix (read-only)");
-                ImGui.NextColumn();
             }
         }
 

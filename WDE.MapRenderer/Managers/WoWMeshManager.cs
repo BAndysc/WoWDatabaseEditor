@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using TheEngine.Entities;
 using TheEngine.Interfaces;
 using WDE.MapRenderer.StaticData;
@@ -16,6 +17,14 @@ namespace WDE.MapRenderer.Managers
         private readonly LiquidTypeStore liquidTypeStore;
         private readonly LiquidMaterialStore liquidMaterialStore;
         private IMesh chunkMesh;
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct water_material_data_t
+        {
+            public Vector4 color;
+            public Vector4 deepColor;
+            public Vector4 shallowColor;
+        };
 
         public WoWMeshManager(IMeshManager meshManager,
             IRenderManager renderManager,
@@ -36,14 +45,13 @@ namespace WDE.MapRenderer.Managers
             this.liquidMaterialStore = liquidMaterialStore;
             chunkMesh = meshManager.CreateMesh(ChunkMesh.Create());
             
-            WaterMaterial = materialManager.CreateMaterial("data/water.json");
+            WaterMaterial = materialManager.CreateMaterial<water_material_data_t>("data/water.json");
             WaterMaterial.Culling = CullingMode.Off;
             WaterMaterial.ZWrite = false;
             WaterMaterial.SourceBlending = Blending.SrcAlpha;
             WaterMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
             WaterMaterial.BlendingEnabled = true;
             WaterMaterial.SetTexture("_WaterTexture", textureManager.LoadTexture("textures/water.png"));
-            WaterMaterial.SetUniform("color", new Vector4(0.28f, 1, 0.95f, 0.4f));
         }
 
         public void Render()
@@ -57,12 +65,15 @@ namespace WDE.MapRenderer.Managers
                 var oceanDeep = light.NormalWeather.GetLightParameter(LightIntParamType.OceanDeep).GetColorAtTime(time);
                 //var riverShallow = light.NormalWeather.GetLightParameter(LightIntParamType.RiverShallow).GetColorAtTime(time);
                 //var riverDeep = light.NormalWeather.GetLightParameter(LightIntParamType.RiverDeep).GetColorAtTime(time);
-                WaterMaterial.SetUniform("deepColor", oceanDeep.ToRgbaVector() with {W=0.55f});
-                WaterMaterial.SetUniform("shallowColor", oceanShallow.ToRgbaVector() with {W=0.85f});
+                water_material_data_t data = default;
+                data.color = new Vector4(0.28f, 1, 0.95f, 0.4f);
+                data.deepColor = oceanDeep.ToRgbaVector() with { W = 0.55f };
+                data.shallowColor = oceanShallow.ToRgbaVector() with { W = 0.85f };
+                WaterMaterial.SetMaterialData(ref data);
             }
         }
         
-        public Material WaterMaterial { get; }
+        public Material<water_material_data_t> WaterMaterial { get; }
 
         public IMesh MeshOfChunk => chunkMesh;
 

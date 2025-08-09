@@ -1,8 +1,10 @@
 ﻿using TheEngine.Data;
 using TheEngine.Entities;
 using TheEngine.Interfaces;
+using TheEngine.Managers;
 using TheMaths;
 using WDE.MapRenderer.StaticData;
+using WDE.MapRenderer.Utils;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
@@ -19,8 +21,8 @@ namespace WDE.MapRenderer.Managers
         private readonly CameraManager cameraManager;
         private IMesh boxMesh;
         private IMesh sphereMesh;
-        private Material transcluentMaterial;
-        private Material wireframe, wireframeBehind;
+        private Material<Gizmo.material_data_t> transcluentMaterial;
+        private Material<RenderManager.WireframeMaterialData_t> wireframe, wireframeBehind;
         private Transform t = new Transform();
 
         public static float AreaTriggerVisibilityDistanceSquare = 900 * 900;
@@ -44,28 +46,34 @@ namespace WDE.MapRenderer.Managers
             boxMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
             sphereMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/sphere.obj").MeshData);
             
-            wireframe = materialManager.CreateMaterial("data/wireframe.json");
-            wireframe.SetUniform("Width", 1);
-            wireframe.SetUniform("Color", Vector4.One);
+            wireframe = materialManager.CreateMaterial<RenderManager.WireframeMaterialData_t>("data/wireframe.json");
+            RenderManager.WireframeMaterialData_t wireframeMaterialData = new RenderManager.WireframeMaterialData_t()
+            {
+                width = 1,
+                color = Vector4.One
+            };
+            wireframe.SetMaterialData(ref wireframeMaterialData);
             wireframe.ZWrite = false;
             wireframe.DepthTesting = DepthCompare.Lequal;
             
-            wireframeBehind = materialManager.CreateMaterial("data/wireframe.json");
-            wireframeBehind.SetUniform("Width", 0.5f);
-            wireframeBehind.SetUniform("Color", new Vector4(1, 1, 1, 0.1f));
+            wireframeBehind = materialManager.CreateMaterial<RenderManager.WireframeMaterialData_t>("data/wireframe.json");
+            wireframeMaterialData.width = 0.5f;
+            wireframeMaterialData.color = new Vector4(1, 1, 1, 0.1f);
+            wireframeBehind.SetMaterialData(ref wireframeMaterialData);
             wireframeBehind.ZWrite = false;
             wireframeBehind.DepthTesting = DepthCompare.Greater;
             wireframeBehind.BlendingEnabled = true;
             wireframeBehind.SourceBlending = Blending.SrcAlpha;
             wireframeBehind.DestinationBlending = Blending.OneMinusSrcAlpha;
 
-            transcluentMaterial = materialManager.CreateMaterial("data/gizmo.json");
+            transcluentMaterial = materialManager.CreateMaterial<Gizmo.material_data_t>("data/gizmo.json");
             transcluentMaterial.BlendingEnabled = true;
             transcluentMaterial.SourceBlending = Blending.SrcAlpha;
             transcluentMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
             transcluentMaterial.DepthTesting = DepthCompare.Lequal;
             transcluentMaterial.ZWrite = false;
-            transcluentMaterial.SetUniform("objectColor", new Vector4(0.2f, 0.4f, 1f, 0.3f));
+            Gizmo.material_data_t data = new() { objectColor = new Vector4(0.2f, 0.4f, 1f, 0.3f) };
+            transcluentMaterial.SetMaterialData(ref data);
         }
 
         public void Dispose()

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Avalonia.Input;
 using ImGuiNET;
 using OpenGLBindings;
@@ -109,13 +110,13 @@ namespace TheEngine.Managers
 
         private ShaderHandle blitShader;
 
-        private Material blitMaterial;
+        private Material<BlitMaterialData_t> blitMaterial;
 
-        private Material unlitMaterial;
+        private Material<UnlitMaterialData_t> unlitMaterial;
         
         // utils
         private IMesh sphereMesh = null!;
-        private Material wireframe = null!;
+        private Material<WireframeMaterialData_t> wireframe = null!;
         // end utils
 
         private Mesh? currentMesh = null;
@@ -142,6 +143,31 @@ namespace TheEngine.Managers
             .Select(layer => new RenderLayerData(){Layer = new RenderLayer((byte)layer, 0), Name = $"Unused {layer}"})
             .ToArray();
         private List<RenderLayer> freeLayers;
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct BlitMaterialData_t
+        {
+            public int flipY;
+            public int padding1;
+            public int padding2;
+            public int padding3;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct WireframeMaterialData_t
+        {
+            public Vector4 color;
+            public float width;
+            public int padding1;
+            public int padding2;
+            public int padding3;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct UnlitMaterialData_t
+        {
+            public Vector4 color;
+        }
 
         internal RenderManager(Engine engine, bool flipY)
         {
@@ -227,23 +253,24 @@ namespace TheEngine.Managers
 
             blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json", false);
             engine.Device.device.CheckError("load shader");
-            blitMaterial = engine.MaterialManager.CreateMaterial(blitShader, null);
+            blitMaterial = engine.MaterialManager.CreateMaterial<BlitMaterialData_t>(blitShader, null);
             blitMaterial.SourceBlending = Blending.One;
             blitMaterial.DestinationBlending = Blending.Zero;
             blitMaterial.ZWrite = true;
             blitMaterial.DepthTesting = DepthCompare.Always;
-            blitMaterial.SetUniformInt("flipY", flipY ? 1 : 0);
+            BlitMaterialData_t data = new() { flipY = flipY ? 1 : 0 };
+            blitMaterial.SetMaterialData(ref data);
 
-            unlitMaterial = engine.MaterialManager.CreateMaterial("internalShaders/unlit.json");
+            unlitMaterial = engine.MaterialManager.CreateMaterial<UnlitMaterialData_t>("internalShaders/unlit.json");
             unlitMaterial.ZWrite = false;
             unlitMaterial.DepthTesting = DepthCompare.Lequal; // Always to render above the meshes
             
             // utils
             sphereMesh = engine.meshManager.CreateMesh(ObjParser.LoadObj("meshes/sphere.obj").MeshData);
         
-            wireframe = engine.MaterialManager.CreateMaterial("data/wireframe.json");
-            wireframe.SetUniform("Width", 1);
-            wireframe.SetUniform("Color", new Vector4(1, 1, 1, 1));
+            wireframe = engine.MaterialManager.CreateMaterial<WireframeMaterialData_t>("data/wireframe.json");
+            WireframeMaterialData_t wireframeData = new() { width = 1, color = new Vector4(1, 1, 1, 1) };
+            wireframe.SetMaterialData(ref wireframeData);
             wireframe.ZWrite = false;
             wireframe.DepthTesting = DepthCompare.Always;
         }
@@ -618,7 +645,8 @@ namespace TheEngine.Managers
 
         public void DrawSphere(Vector3 center, float radius, Vector4 color)
         {
-            wireframe.SetUniform("Color", color);
+            WireframeMaterialData_t data = new() { width = 1, color = color };
+            wireframe.SetMaterialData(ref data);
             Render(sphereMesh, wireframe, 0, Utilities.TRS(center, Quaternion.Identity, Vector3.One * radius));
         }
 
@@ -1195,7 +1223,8 @@ namespace TheEngine.Managers
             lineMesh.SetVertices(start, end);
             lineMesh.RebuildIndices();
             SetShader(unlitMaterial.Shader);
-            unlitMaterial.SetUniform("color", color);
+            UnlitMaterialData_t data = new() { color = color };
+            unlitMaterial.SetMaterialData(ref data);
             EnableMaterial(unlitMaterial, false);
             SetMesh(lineMesh);
             objectData.WorldMatrix = Matrix.Identity;

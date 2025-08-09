@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Collections;
+using System.Runtime.InteropServices;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine;
@@ -31,7 +32,7 @@ namespace WDE.MapRenderer.Managers
         public NativeBuffer<VectorByte4>? chunkToSplatBuffer;
         public NativeBuffer<Vector4>? heightsNormalBuffer;
         public float[,] heights;
-        public Material? material;
+        public Material<ChunkManager.LitMaterialData_t>? material;
         public bool terrainLoaded;
         public CancellationTokenSource? loading = new CancellationTokenSource();
         public uint[,] areaIds = new uint[16,16];
@@ -111,7 +112,10 @@ namespace WDE.MapRenderer.Managers
                 
                 renderGrid = value;
                 foreach (var chunk in chunks)
-                    chunk.material?.SetUniformInt("showGrid", value ? 1 : 0);
+                {
+                    LitMaterialData_t data = new() { showGrid = value ? 1 : 0 };
+                    chunk.material?.SetMaterialData(ref data);
+                }
             }
         }
 
@@ -225,6 +229,15 @@ namespace WDE.MapRenderer.Managers
             this.dbcManager = dbcManager;
             this.engine = engine;
         }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct LitMaterialData_t
+        {
+            public int showGrid;
+            public int padding1;
+            public int padding2;
+            public int padding3;
+        };
 
         public async ValueTask LoadChunk(int y, int x, bool now)
         {
@@ -446,9 +459,10 @@ namespace WDE.MapRenderer.Managers
             }
         
             int chnk = 0;
-            var material = materialManager.CreateMaterial("data/lit.json");
+            var material = materialManager.CreateMaterial<LitMaterialData_t>("data/lit.json");
             chunk.material = material;
-            material.SetUniformInt("showGrid", gameProperties.ShowGrid ? 1 : 0);
+            LitMaterialData_t data = new() { showGrid = gameProperties.ShowGrid ? 1 : 0 };
+            material.SetMaterialData(ref data);
 
             using var chunksEnumerator = ((IEnumerable<AdtChunk>)adt.Chunks).GetEnumerator();
             chunksEnumerator.MoveNext();

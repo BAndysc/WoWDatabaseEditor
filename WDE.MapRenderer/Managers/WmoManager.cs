@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.InteropServices;
 using TheEngine.Data;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -15,6 +16,19 @@ namespace WDE.MapRenderer.Managers
         private readonly WoWTextureManager textureManager;
         private readonly IMaterialManager materialManager;
         private readonly WoWMeshManager woWMeshManager;
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct WmoMaterialData
+        {
+            public float alphaTest;
+            public float notSupported;
+            public int shader_id;
+            public int unlit;
+            public int brightAtNight;
+            public int interior;
+            public int translucent;
+            public int padding;
+        };
 
         public class WmoInstance
         {
@@ -163,13 +177,16 @@ namespace WDE.MapRenderer.Managers
             return wmoInstance;
         }
 
-        private Material CreateMaterial(WMO wmo, WorldMapObjectGroup group, int materialId, out string? tex1, out string? tex2, out string? tex3)
+        private Material<WmoMaterialData> CreateMaterial(WMO wmo, WorldMapObjectGroup group, int materialId, out string? tex1, out string? tex2, out string? tex3)
         {
             ref readonly var materialDef = ref wmo.Materials[materialId];
-            var mat = materialManager.CreateMaterial("data/wmo.json");
+            var mat = materialManager.CreateMaterial<WmoMaterialData>("data/wmo.json");
 
-            mat.SetUniformInt("shader_id", (int)materialDef.shader);
-            mat.SetUniformInt("translucent", 0);
+            WmoMaterialData data = new WmoMaterialData()
+            {
+                shader_id = (int)materialDef.shader,
+                translucent = 0,
+            };
             //mat.SetUniform("notSupported", 0.0f);
             float alphaTest = 0.003921568f; // 1/255
 
@@ -221,12 +238,12 @@ namespace WDE.MapRenderer.Managers
             }
 
             mat.ZWrite = !mat.BlendingEnabled;
-            mat.SetUniform("alphaTest", alphaTest);
-            mat.SetUniformInt("unlit", materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unlit) ? 1 : 0);
-            mat.SetUniformInt("brightAtNight",
-                materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.brightAtNight) ? 1 : 0);
-            mat.SetUniformInt("interior",
-                group.Header.flags.HasFlagFast(WorldMapObjectGroupFlags.Interior) && group.VertexColors != null ? 1 : 0);
+            data.alphaTest = alphaTest;
+            data.unlit = materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unlit) ? 1 : 0;
+            data.brightAtNight =
+                materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.brightAtNight) ? 1 : 0;
+            data.interior =
+                group.Header.flags.HasFlagFast(WorldMapObjectGroupFlags.Interior) && group.VertexColors != null ? 1 : 0;
 
             if (materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unculled))
                 mat.Culling = CullingMode.Off;
@@ -236,7 +253,8 @@ namespace WDE.MapRenderer.Managers
             tex3 = materialDef.texture3Name;
             mat.SetTexture("texture1", textureManager.EmptyTexture);
             mat.SetTexture("texture2", textureManager.EmptyTexture);
-            
+
+            mat.SetMaterialData(ref data);
             return mat;
         }
 

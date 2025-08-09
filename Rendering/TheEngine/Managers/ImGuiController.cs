@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Avalonia.Input;
 using ImGuiNET;
 using OpenGLBindings;
@@ -146,10 +147,16 @@ public class ImGuiController : IDisposable
     private readonly IntPtr imGuiContext;
     private readonly int vertexArrayObject;
     private readonly ShaderHandle shaderHandle;
-    private readonly Material material;
+    private readonly Material<ImGuiMaterialData_t> material;
     private readonly ITexture fontTexture;
     private ImDrawVert[] verts = Array.Empty<ImDrawVert>();
     private ushort[] indices = Array.Empty<ushort>();
+
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    private struct ImGuiMaterialData_t
+    {
+        public Matrix projection_matrix;
+    }
 
     public unsafe ImGuiController(Engine engine)
     {
@@ -189,7 +196,7 @@ public class ImGuiController : IDisposable
         device.BindVertexArray(0);
 
         shaderHandle = engine.shaderManager.LoadShader("internalShaders/imgui.json", false);
-        material = engine.materialManager.CreateMaterial(shaderHandle, null);
+        material = engine.materialManager.CreateMaterial<ImGuiMaterialData_t>(shaderHandle, null);
         fonts.GetTexDataAsRGBA32(out IntPtr pixels, out int width, out int height, out int bytesPerPixel);
 
         // do not generate mips for fonts
@@ -313,8 +320,9 @@ public class ImGuiController : IDisposable
 
         var shader = engine.shaderManager.GetShaderByHandle(shaderHandle);
         shader.Activate();
-        
-        material.SetUniform("projection_matrix", mvp);
+
+        ImGuiMaterialData_t data = new ImGuiMaterialData_t() { projection_matrix = mvp };
+        material.SetMaterialData(ref data);
         material.ActivateUniforms(false);
 
         device.Enable(EnableCap.Blend);

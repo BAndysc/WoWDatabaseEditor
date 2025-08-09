@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Runtime.InteropServices;
 using System.Text;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine;
@@ -121,6 +122,20 @@ namespace WDE.MapRenderer.Managers
     
     public class MdxManager : System.IDisposable
     {
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct MdxMaterialData
+        {
+            public Vector4 mesh_color;
+            public float alphaTest;
+            public float notSupported;
+            public float highlight;
+            public int unlit;
+            public int pixel_shader;
+            public int translucent;
+            public int padding0;
+            public int padding1;
+        };
+
         public class MdxInstance
         {
             public IMesh mesh;
@@ -854,10 +869,10 @@ namespace WDE.MapRenderer.Managers
             return mdx;
         }
 
-        private Material CreateMaterial(M2 m2, in M2Batch batch, ITexture? textureHandle1, ITexture? textureHandle2, ITexture? textureHandle3)
+        private Material<MdxMaterialData> CreateMaterial(M2 m2, in M2Batch batch, ITexture? textureHandle1, ITexture? textureHandle2, ITexture? textureHandle3)
         {
             ref readonly var materialDef = ref m2.materials[batch.materialIndex];
-            var material = materialManager.CreateMaterial("data/m2.json");
+            var material = materialManager.CreateMaterial<MdxMaterialData>("data/m2.json");
 
             material.SetBuffer("boneMatrices", identityBonesBuffer);
             material.SetTexture("texture1", textureHandle1 ?? textureManager.EmptyTexture);
@@ -882,81 +897,82 @@ namespace WDE.MapRenderer.Managers
             }
 
             Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, trans);
+            MdxMaterialData data = default;
 
-            material.SetUniform("mesh_color", mesh_color);
-            material.SetUniformInt("translucent", 0);
+            data.mesh_color = mesh_color;
+            data.translucent = 0;
             if (gameFiles.WoWVersion == GameFilesVersion.Wrath_3_3_5a)
             {
                 var shaderId = ResolveShaderID1(batch.shaderId, m2, in batch, (m2.global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0, (int)materialDef.blending_mode);
                 var shaders = ConvertShaderIDs(m2, in batch, shaderId);
-                material.SetUniformInt("pixel_shader", (int)shaders.Item2);
+                data.pixel_shader = (int)shaders.Item2;
             }
             else
             {
-                material.SetUniformInt("pixel_shader", (int)GetNewPixelShaderID((short)batch.shaderId, batch.textureCount));
+                data.pixel_shader = (int)GetNewPixelShaderID((short)batch.shaderId, batch.textureCount);
             }
             //Console.WriteLine(path + " INDEX: " + j + " Pixel shader: " + M2GetPixelShaderID(batch.textureCount, batch.shader_id) + " tex count: " + batch.textureCount + " shader id: " + batch.shader_id + " blend: " + materialDef.blending_mode + " priority " + batch.priorityPlane + " start ");
 
-            material.SetUniform("highlight", 0);
-            material.SetUniform("notSupported", 0);
+            data.highlight = 0;
+            data.notSupported = 0;
             if (materialDef.blending_mode == M2Blend.M2BlendOpaque)
             {
                 material.BlendingEnabled = false;
-                material.SetUniform("alphaTest", 1.0f / 255.0f);
+                data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendAlphaKey)
             {
                 material.BlendingEnabled = false;
                 //material.SourceBlending = Blending.One;
                 //material.DestinationBlending = Blending.Zero;
-                material.SetUniform("alphaTest", 224.0f / 255.0f);
+                data.alphaTest = 224.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendAlpha)
             {
                 material.BlendingEnabled = true;
                 material.SourceBlending = Blending.SrcAlpha;
                 material.DestinationBlending = Blending.OneMinusSrcAlpha;
-                material.SetUniform("alphaTest", 1.0f / 255.0f);
+                data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendNoAlphaAdd)
             {
                 material.BlendingEnabled = true;
                 material.SourceBlending = Blending.One;
                 material.DestinationBlending = Blending.One;
-                material.SetUniform("alphaTest", 1.0f / 255.0f);
+                data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendAdd)
             {
                 material.BlendingEnabled = true;
                 material.SourceBlending = Blending.SrcAlpha;
                 material.DestinationBlending = Blending.One;
-                material.SetUniform("alphaTest", 1.0f / 255.0f);
+                data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendMod)
             {
                 material.BlendingEnabled = true;
                 material.SourceBlending = Blending.DstColor;
                 material.DestinationBlending = Blending.Zero;
-                material.SetUniform("alphaTest", 1.0f / 255.0f);
+                data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendMod2X)
             {
                 material.BlendingEnabled = true;
                 material.SourceBlending = Blending.DstColor;
                 material.DestinationBlending = Blending.SrcColor;
-                material.SetUniform("alphaTest", 1.0f / 255.0f);
+                data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendBlendAdd)
             {
                 material.BlendingEnabled = true;
                 material.SourceBlending = Blending.One;
                 material.DestinationBlending = Blending.OneMinusSrcAlpha;
-                material.SetUniform("alphaTest", 1.0f / 255.0f);
+                data.alphaTest = 1.0f / 255.0f;
             }
             else
             {
                 Console.WriteLine("Unspported blend mode " + materialDef.blending_mode);
-                material.SetUniform("notSupported", 1);
+                data.notSupported= 1;
             }
 
             material.ZWrite = !material.BlendingEnabled;
@@ -964,7 +980,8 @@ namespace WDE.MapRenderer.Managers
 
             if (materialDef.flags.HasFlagFast(M2MaterialFlags.TwoSided))
                 material.Culling = CullingMode.Off;
-            material.SetUniformInt("unlit", materialDef.flags.HasFlagFast(M2MaterialFlags.Unlit) ? 1 : 0);
+            data.unlit = materialDef.flags.HasFlagFast(M2MaterialFlags.Unlit) ? 1 : 0;
+            material.SetMaterialData(ref data);
             return material;
         }
 

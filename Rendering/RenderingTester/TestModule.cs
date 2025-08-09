@@ -244,18 +244,29 @@ public class TestModule : IGameModule
 //         await instance.LoadMount(17694);
     }
 
+    private async ValueTask LoadCreatureAndModel(CreatureInstance instance)
+    {
+        await instance.Load();
+//         await instance.LoadMount(17694);
+    }
+
     public void Update(float delta)
     {
-        if (gameObjectInstance == null)
-        {
-            gameObjectInstance = new GameObjectInstance(gameContext, null, 474, RenderLayer.Default);
-            LoadCreatureAndModel(gameObjectInstance).FireAndForget();
-        }
-
-        // if (creatureInstance != null && creatureInstance.WorldObjectEntity != Entity.Empty)
+        // if (gameObjectInstance == null)
         // {
-        //     gameContext.Engine.EntityInspector.InspectEntity(creatureInstance.WorldObjectEntity);
+        //     gameObjectInstance = new GameObjectInstance(gameContext, null, 474, RenderLayer.Default);
+        //     LoadCreatureAndModel(gameObjectInstance).FireAndForget();
         // }
+
+        if (creatureInstance == null)
+        {
+            creatureInstance = new CreatureInstance(gameContext,"aa", 474, RenderLayer.Default);
+            LoadCreatureAndModel(creatureInstance).FireAndForget();
+        }
+        if (creatureInstance != null && creatureInstance.WorldObjectEntity != Entity.Empty)
+        {
+            gameContext.Engine.EntityInspector.InspectEntity(creatureInstance.WorldObjectEntity);
+        }
 
         if (!loadAllModels)
         {

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using ImGuiNET;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
@@ -15,8 +16,8 @@ namespace TheEngine.Managers
         private readonly ICameraManager cameraManager;
         private readonly IEntityManager entityManager;
         private readonly ShaderHandle textShader;
-        private readonly Material material;
-        private readonly Material worldMaterial;
+        private readonly Material<SdfMaterialData_t> material;
+        private readonly Material<SdfMaterialData_t> worldMaterial;
         private readonly IMesh quad;
         private readonly NativeBuffer<Vector4> glyphUVsBuffer;
         private readonly NativeBuffer<Vector4> glyphPositionsBuffer;
@@ -38,7 +39,17 @@ namespace TheEngine.Managers
         }
         
         private Archetype persistentTextArchetype;
-        
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct SdfMaterialData_t
+        {
+            public Vector4 fillColor;
+            public int mode;
+            public int padding1;
+            public int padding2;
+            public int padding3;
+        }
+
         public UIManager(Engine engine)
         {
             this.engine = engine;
@@ -50,7 +61,7 @@ namespace TheEngine.Managers
                 .WithComponentData<RenderEnabledBit>()
                 .WithComponentData<LocalToWorld>();
             textShader = engine.ShaderManager.LoadShader("internalShaders/sdf.json", false);
-            worldMaterial = engine.MaterialManager.CreateMaterial("internalShaders/world_text.json");
+            worldMaterial = engine.MaterialManager.CreateMaterial<SdfMaterialData_t>("internalShaders/world_text.json");
             worldMaterial.BlendingEnabled = true;
             worldMaterial.SourceBlending = Blending.SrcAlpha;
             worldMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
@@ -58,7 +69,7 @@ namespace TheEngine.Managers
             worldMaterial.ZWrite = false;
             worldMaterial.DepthTesting = DepthCompare.Always;
 
-            material = engine.MaterialManager.CreateMaterial(textShader, null);
+            material = engine.MaterialManager.CreateMaterial<SdfMaterialData_t>(textShader, null);
             material.BlendingEnabled = true;
             material.SourceBlending = Blending.One;
             material.DestinationBlending = Blending.OneMinusSrcAlpha;
@@ -169,8 +180,8 @@ namespace TheEngine.Managers
 
         public void DrawBox(float x, float y, float w, float h, Vector4 color)
         {
-            material.SetUniform("fillColor", color);
-            material.SetUniformInt("mode", 1);
+            SdfMaterialData_t data = new() { fillColor = color, mode = 1 };
+            material.SetMaterialData(ref data);
             material.SetTexture("font", engine.TextureManager.EmptyTexture);
             
             glyphPositions[0] = new Vector4(x, y + h, w, h);
@@ -202,8 +213,8 @@ namespace TheEngine.Managers
 
         private void DrawWorldBox(Vector4 color, Vector2 size, Vector2 pivot, Matrix localToWorld)
         {
-            worldMaterial.SetUniform("fillColor", color);
-            worldMaterial.SetUniformInt("mode", 0);
+            SdfMaterialData_t data = new() { fillColor = color, mode = 0 };
+            worldMaterial.SetMaterialData(ref data);
             worldMaterial.SetTexture("font", engine.fontManager.GetTexture("calibri"));
             float xPixel = -size.X * pivot.X;
             float yPixel = -size.Y * pivot.Y;
@@ -226,8 +237,8 @@ namespace TheEngine.Managers
             if (backgroundColor.HasValue)
                 DrawWorldBox(backgroundColor.Value, measurement, pivot, localToWorld);
 
-            worldMaterial.SetUniform("fillColor", foreColor);
-            worldMaterial.SetUniformInt("mode", 0);
+            SdfMaterialData_t data = new() { fillColor = foreColor, mode = 0 };
+            worldMaterial.SetMaterialData(ref data);
             worldMaterial.SetTexture("font", engine.fontManager.GetTexture(font));
 
             fontSize = fontSize / fontDef.BaseSize;
@@ -273,8 +284,8 @@ namespace TheEngine.Managers
         public void DrawText(string font, ReadOnlySpan<char> text, float fontSize, float x, float y, float? maxWidth, Vector4 color)
         {
             var fontDef = engine.fontManager.GetFont(font);
-            material.SetUniform("fillColor", color);
-            material.SetUniformInt("mode", 0);
+            SdfMaterialData_t data = new() { fillColor = color, mode = 0 };
+            material.SetMaterialData(ref data);
             material.SetTexture("font", engine.fontManager.GetTexture(font));
 
             fontSize = fontSize / fontDef.BaseSize;

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Avalonia.Input;
 using Avalonia.Threading;
 using TheEngine;
@@ -18,16 +19,22 @@ namespace WDE.MapRenderer.Utils
         public readonly Transform position = new();
         private readonly IMesh arrowMesh;
         private readonly IMesh dragPlaneMesh;
-        private readonly Material material;
+        private readonly Material<material_data_t> material;
         private readonly Transform t = new Transform();
         private bool ownsMeshes;
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct material_data_t
+        {
+            public Vector4 objectColor;
+        };
 
         public Gizmo(IMeshManager meshManager, IMaterialManager materialManager)
         {
             this.meshManager = meshManager;
             arrowMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/arrow.obj").MeshData);
             dragPlaneMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/dragPlane.obj").MeshData);
-            this.material = materialManager.CreateMaterial("data/gizmo.json");
+            this.material = materialManager.CreateMaterial<material_data_t>("data/gizmo.json");
             ownsMeshes = true;
         }
 
@@ -41,7 +48,7 @@ namespace WDE.MapRenderer.Utils
             }
         }
 
-        public Gizmo(IMesh arrowMesh, IMesh dragPlaneMesh, Material material)
+        public Gizmo(IMesh arrowMesh, IMesh dragPlaneMesh, Material<material_data_t> material)
         {
             this.arrowMesh = arrowMesh;
             this.dragPlaneMesh = dragPlaneMesh;
@@ -134,7 +141,8 @@ namespace WDE.MapRenderer.Utils
             t.Scale = Vector3.One * (float)Math.Sqrt(Math.Clamp(dist, 0.5f, 500) / 15);
             // +X (wow)
             t.Rotation = ArrowX;
-            material.SetUniform("objectColor", new Vector4(0, 0, 1, transparent ? 0.5f : 1f));
+            material_data_t data = new() { objectColor = new Vector4(0, 0, 1, transparent ? 0.5f : 1f) };
+            material.SetMaterialData(ref data);
             renderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneX;
             renderManager.Render(dragPlaneMesh, material, 0, t);
@@ -142,14 +150,16 @@ namespace WDE.MapRenderer.Utils
 
             // +Y (wow)
             t.Rotation = ArrowY;
-            material.SetUniform("objectColor", new Vector4(0, 1, 0, transparent ? 0.5f : 1f));
+            data = new() { objectColor = new Vector4(0, 1, 0, transparent ? 0.5f : 1f) };
+            material.SetMaterialData(ref data);
             renderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneY;
             renderManager.Render(dragPlaneMesh, material, 0, t);
                 
             // +Z (wow)
             t.Rotation = ArrowZ;
-            material.SetUniform("objectColor", new Vector4(1, 0, 0, transparent ? 0.5f : 1f));
+            data = new() { objectColor = new Vector4(1, 0, 0, transparent ? 0.5f : 1f) };
+            material.SetMaterialData(ref data);
             renderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneZ;
             renderManager.Render(dragPlaneMesh, material, 0, t);

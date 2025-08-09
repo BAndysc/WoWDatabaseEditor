@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using OpenGLBindings;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
@@ -54,9 +57,98 @@ namespace TheEngine.Entities
         One = 1
     }
 
+    public class Material<T> : Material where T : unmanaged
+    {
+        private static List<UniformSlotInfo> uniformData;
+
+        internal unsafe Material(Engine engine,
+            ShaderHandle shaderHandle,
+            ShaderHandle? instancedShaderHandle,
+            MaterialHandle materialHandle) : base(engine, shaderHandle, instancedShaderHandle, materialHandle)
+        {
+            var size = sizeof(T);
+            if ((size % 16) != 0)
+                throw new Exception("Material data size must be multiple of 16");
+
+            materialDataBytes = new byte[sizeof(T)];
+
+            if (uniformData == null)
+            {
+                uniformData = new();
+                var fields = typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                foreach (var field in fields)
+                {
+                    if (field.Name.Contains("padding", StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    var offset = Marshal.OffsetOf(typeof(T), field.Name);
+                    var location = GetUniformLocation(field.Name);
+                    var instancedLocation = GetInstancedUniformLocation(field.Name);
+                    var sizeOf = Marshal.SizeOf(field.FieldType);
+                    uniformData.Add(new UniformSlotInfo(field.Name, location, instancedLocation, offset, sizeOf, field.FieldType));
+                }
+            }
+
+            thisUniformData = uniformData;
+        }
+
+        public void SetMaterialData(ref T materialData)
+        {
+            Span<T> materialDataSpan = MemoryMarshal.CreateSpan(ref materialData, 1);
+            var bytesSpan = MemoryMarshal.Cast<T, byte>(materialDataSpan);
+
+            bytesSpan.CopyTo(this.materialDataBytes);
+        }
+
+        public override unsafe void ActivateUniforms(bool instanced, MaterialInstanceRenderData? instanceData = null)
+        {
+            base.ActivateUniforms(instanced, instanceData);
+            foreach (var uniform in uniformData)
+            {
+                var data = materialDataBytes.AsSpan((int)uniform.offset, uniform.size);
+                var loc = (instanced ? uniform.instancedLocation : uniform.location) ?? throw new Exception("Unknown variable");
+                var shader = (instanced ? InstancedShader : Shader) ?? throw new Exception("Unknown shader");
+                fixed (byte* ptr = data)
+                {
+                    if (uniform.type == typeof(int))
+                    {
+                        ref var value = ref Unsafe.AsRef<int>(ptr);
+                        shader.SetUniformInt(loc, value);
+                    }
+                    else if (uniform.type == typeof(float))
+                    {
+                        ref var value = ref Unsafe.AsRef<float>(ptr);
+                        shader.SetUniform(loc, value);
+                    }
+                    else if (uniform.type == typeof(Vector3))
+                    {
+                        ref var value = ref Unsafe.AsRef<Vector3>(ptr);
+                        shader.SetUniform(loc, value.X, value.Y, value.Z);
+                    }
+                    else if (uniform.type == typeof(Vector4))
+                    {
+                        ref var value = ref Unsafe.AsRef<Vector4>(ptr);
+                        shader.SetUniform(loc, value.X, value.Y, value.Z, value.W);
+                    }
+                    else if (uniform.type == typeof(Matrix))
+                    {
+                        ref var value = ref Unsafe.AsRef<Matrix>(ptr);
+                        shader.SetUniform(loc, value);
+                    }
+                    else
+                        throw new Exception("Unknown type " + uniform.type);
+                }
+            }
+        }
+
+        public ref T MaterialData => ref MemoryMarshal.Cast<byte, T>(materialDataBytes)[0];
+    }
+
     public class Material
     {
-        private readonly Engine engine;
+        internal record UniformSlotInfo(string name, int location, int? instancedLocation, IntPtr offset, int size, Type type);
+        internal IReadOnlyList<UniformSlotInfo> thisUniformData;
+
+        protected readonly Engine engine;
         private readonly ShaderHandle shaderHandle;
         private readonly ShaderHandle? instancedShaderHandle;
 
@@ -75,22 +167,14 @@ namespace TheEngine.Entities
         public MaterialHandle Handle { get; }
         public ShaderHandle ShaderHandle => shaderHandle;
 
+        protected byte[] materialDataBytes = Array.Empty<byte>();
         internal Dictionary<int, ITexture> textures { get; } = new();
         internal Dictionary<int, INativeBuffer> structuredBuffers { get; } = new();
-        internal Dictionary<int, int> intUniforms { get; } = new();
-        internal Dictionary<int, float> floatUniforms { get; } = new();
-        internal Dictionary<int, Vector4> vector4Uniforms { get; } = new();
-        internal Dictionary<int, Vector3> vector3Uniforms { get; } = new();
-        internal Dictionary<int, Matrix> matrixUniforms { get; } = new();
-        
         internal Dictionary<int, ITexture> instancedTextureHandles { get; } = new();
         internal Dictionary<int, INativeBuffer> instancedStructuredBuffers { get; } = new();
-        internal Dictionary<int, int> instancedIntUniforms { get; } = new();
-        internal Dictionary<int, float> instancedFloatUniforms { get; } = new();
-        internal Dictionary<int, Vector4> instancedVector4Uniforms { get; } = new();
-        internal Dictionary<int, Vector3> instancedVector3Uniforms { get; } = new();
-        internal Dictionary<int, Matrix> instancedMatrixUniforms { get; } = new();
-        
+
+        public Span<byte> MaterialDataBytes => materialDataBytes;
+
         internal Material(Engine engine, ShaderHandle shaderHandle, ShaderHandle? instancedShaderHandle, MaterialHandle materialHandle)
         {
             this.engine = engine;
@@ -170,32 +254,7 @@ namespace TheEngine.Entities
         {
             Set(structuredBuffers, instancedStructuredBuffers, name, buffer);
         }
-        
-        public void SetUniformInt(string name, int value)
-        {
-            Set(intUniforms, instancedIntUniforms, name, value);
-        }
 
-        public void SetUniform(string name, float value)
-        {
-            Set(floatUniforms, instancedFloatUniforms, name, value);
-        }
-        
-        public void SetUniform(string name, Vector3 value)
-        {
-            Set(vector3Uniforms, instancedVector3Uniforms, name, value);
-        }
-        
-        public void SetUniform(string name, Vector4 value)
-        {
-            Set(vector4Uniforms, instancedVector4Uniforms, name, value);
-        }
-        
-        public void SetUniform(string name, Matrix value)
-        {
-            Set(matrixUniforms, instancedMatrixUniforms, name, value);
-        }
-        
         public void SetTexture(string name, ITexture texture)
         {
             Set(textures, instancedTextureHandles, name, texture);
@@ -211,12 +270,7 @@ namespace TheEngine.Entities
             return structuredBuffers[GetUniformLocation(name)];
         }
 
-        public float GetUniformFloat(string name)
-        {
-            return floatUniforms[GetUniformLocation(name)];
-        }
-        
-        public void ActivateUniforms(bool instanced, MaterialInstanceRenderData? instanceData = null)
+        public virtual void ActivateUniforms(bool instanced, MaterialInstanceRenderData? instanceData = null)
         {
             int slot = 0;
             // done in RenderManager
@@ -239,31 +293,6 @@ namespace TheEngine.Entities
                     texture.Activate(slot);
                     instancedShader!.SetUniformInt(pair.Key, slot);
                     slot++;
-                }
-                
-                foreach (var floats in instancedFloatUniforms)
-                {
-                    instancedShader!.SetUniform(floats.Key, floats.Value);
-                }
-            
-                foreach (var ints in instancedIntUniforms)
-                {
-                    instancedShader!.SetUniformInt(ints.Key, ints.Value);
-                }
-            
-                foreach (var vector in instancedVector4Uniforms)
-                {
-                    instancedShader!.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z, vector.Value.W);
-                }
-            
-                foreach (var vector in instancedVector3Uniforms)
-                {
-                    instancedShader!.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z);
-                }
-                
-                foreach (var vector in instancedMatrixUniforms)
-                {
-                    instancedShader!.SetUniform(vector.Key, vector.Value);
                 }
             }
             else
@@ -294,33 +323,8 @@ namespace TheEngine.Entities
                     shader.SetUniformInt(pair.Key, slot);
                     slot++;
                 }
-                foreach (var floats in floatUniforms)
-                {
-                    shader.SetUniform(floats.Key, floats.Value);
-                }
-            
-                foreach (var ints in intUniforms)
-                {
-                    shader.SetUniformInt(ints.Key, ints.Value);
-                }
-            
-                foreach (var vector in vector4Uniforms)
-                {
-                    shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z, vector.Value.W);
-                }
-            
-                foreach (var vector in vector3Uniforms)
-                {
-                    shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z);
-                }
-                
-                foreach (var vector in matrixUniforms)
-                {
-                    shader.SetUniform(vector.Key, vector.Value);
-                }
             }
-            
-            
+
             instanceData?.Activate(this, instanced, slot);
         }
         

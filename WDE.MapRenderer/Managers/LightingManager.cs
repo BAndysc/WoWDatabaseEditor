@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using TheEngine.Data;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -21,8 +22,25 @@ namespace WDE.MapRenderer.Managers
         private readonly ILightManager lightManager;
         private readonly TimeManager timeManager;
         private IMesh skySphereMesh;
-        private Material skyMaterial;
+        private Material<material_data_t> skyMaterial;
         private ITexture noiseTexture;
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        struct material_data_t
+        {
+            public Vector4 top;
+            public Vector4 middle;
+            public Vector4 towardsHorizon;
+            public Vector4 horizon;
+            public Vector4 justAboveHorizon;
+            public Vector4 sunColor;
+
+            public Vector4 cloudsColor1;
+            public float timeOfDay; // 0 - midnight, 0.5 - noon, 1 - midnight
+            public float timeOfDayHalf; // 0 - noon, 0.5 - midnight, 1 - noon
+            public float cloudsDensity;
+            public float padding;
+        };
 
         public LightingManager(IGameContext gameContext,
             IGameProperties gameProperties,
@@ -45,7 +63,7 @@ namespace WDE.MapRenderer.Managers
             this.lightManager = lightManager;
             this.timeManager = timeManager;
             skySphereMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/skysphere.obj").MeshData);
-            skyMaterial = materialManager.CreateMaterial("data/skybox.json");
+            skyMaterial = materialManager.CreateMaterial<material_data_t>("data/skybox.json");
             noiseTexture = textureManager.LoadTexture("textures/noise_512.png");
             
             skyMaterial.SetTexture("cloudsTex", noiseTexture);
@@ -169,16 +187,20 @@ namespace WDE.MapRenderer.Managers
                 skyMaterial.BlendingEnabled = true;
                 skyMaterial.SourceBlending = Blending.SrcAlpha;
                 skyMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
-                skyMaterial.SetUniform("top", top.ToRgbaVector());
-                skyMaterial.SetUniform("middle", middle.ToRgbaVector());
-                skyMaterial.SetUniform("horizon", horizon.ToRgbaVector());
-                skyMaterial.SetUniform("towardsHorizon", towardsHorizon.ToRgbaVector());
-                skyMaterial.SetUniform("justAboveHorizon", justAboveHorizon.ToRgbaVector());
-                skyMaterial.SetUniform("sunColor", sunColor.ToRgbaVector());
-                skyMaterial.SetUniform("cloudsColor1", cloudsColor1.ToRgbaVector());
-                skyMaterial.SetUniform("timeOfDay", timeOfDay);
-                skyMaterial.SetUniform("timeOfDayHalf", timeOfDayHalf);
-                skyMaterial.SetUniform("cloudsDensity", cloudsDensity);
+                material_data_t data = new material_data_t()
+                {
+                    top = top.ToRgbaVector(),
+                    middle = middle.ToRgbaVector(),
+                    horizon = horizon.ToRgbaVector(),
+                    towardsHorizon = towardsHorizon.ToRgbaVector(),
+                    justAboveHorizon = justAboveHorizon.ToRgbaVector(),
+                    sunColor = sunColor.ToRgbaVector(),
+                    cloudsColor1 = cloudsColor1.ToRgbaVector(),
+                    timeOfDay = timeOfDay,
+                    timeOfDayHalf = timeOfDayHalf,
+                    cloudsDensity = cloudsDensity,
+                };
+                skyMaterial.SetMaterialData(ref data);
                 
                 var t = new Transform();
                 t.Scale = Vector3.One * 10000f;
