@@ -27,6 +27,8 @@ internal class PhaseMaskGameObjectQueryProvider : BaseInsertQueryProvider<GameOb
             rotation1 = t.Rotation1,
             rotation2 = t.Rotation2,
             rotation3 = t.Rotation3,
+            animprogress = t.AnimProgress,
+            t.__comment
         };
     }
 

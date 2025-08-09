@@ -117,6 +117,8 @@ namespace WowPacketParser.Proto.Processing
                     return Process(in packet.BaseData, in packet.InitWorldStates);
                 case PacketHolder.KindOneofCase.UpdateWorldState:
                     return Process(in packet.BaseData, in packet.UpdateWorldState);
+                case PacketHolder.KindOneofCase.Dismount:
+                    return Process(in packet.BaseData, in packet.Dismount);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -169,5 +171,6 @@ namespace WowPacketParser.Proto.Processing
         protected virtual T? Process(ref readonly PacketBase basePacket, ref readonly PacketAIReaction packet) => default;
         protected virtual T? Process(ref readonly PacketBase basePacket, ref readonly PacketInitWorldStates packet) => default;
         protected virtual T? Process(ref readonly PacketBase basePacket, ref readonly PacketUpdateWorldState packet) => default;
+        protected virtual T? Process(ref readonly PacketBase basePacket, ref readonly PacketDismount packet) => default;
     }
 }

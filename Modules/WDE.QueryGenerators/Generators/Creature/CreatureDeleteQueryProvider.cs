@@ -7,7 +7,7 @@ using WDE.SqlQueryGenerator;
 namespace WDE.QueryGenerators.Generators.Creature;
 
 [AutoRegister]
-[RequiresCore("TrinityMaster", "CMaNGOS-TBC", "CMaNGOS-Classic", "TrinityCata", "CMaNGOS-WoTLK", "Azeroth", "TrinityWrath")]
+[RequiresCore("TrinityMaster", "CMaNGOS-TBC", "CMaNGOS-Classic", "TrinityCata", "CMaNGOS-WoTLK", "Azeroth", "TrinityWrath", "TrinityCata", "TrinityMaster")]
 internal class CreatureDeleteQueryProvider : IDeleteQueryProvider<CreatureSpawnModelEssentials>
 {
     public IQuery Delete(CreatureSpawnModelEssentials t)

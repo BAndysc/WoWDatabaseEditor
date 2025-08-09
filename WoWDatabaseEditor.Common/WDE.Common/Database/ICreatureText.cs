@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace WDE.Common.Database
 {
     public enum CreatureTextType
@@ -60,5 +62,22 @@ namespace WDE.Common.Database
         public CreatureTextRange TextRange { get; set; }
         public string? Comment { get; set; }
         public string? __comment { get; set; }
+    }
+
+    public static class CreatureTextExtensions
+    {
+        public static Vector4 GetTextColor(this CreatureTextType textType)
+        {
+            return textType switch
+            {
+                CreatureTextType.Say => new Vector4(255 / 255.0f, 251 / 255.0f, 159 / 255.0f, 1),
+                CreatureTextType.Whisper => new Vector4(255/ 255.0f, 178/ 255.0f, 235/ 255.0f, 1),
+                CreatureTextType.Yell => new Vector4(255 / 255.0f, 63 / 255.0f, 64 / 255.0f, 1),
+                CreatureTextType.Emote => new Vector4(255 / 255.0f, 221 / 255.0f, 0 / 255.0f, 1),
+                CreatureTextType.BossEmote => new Vector4(255 / 255.0f, 221 / 255.0f, 0 / 255.0f, 1),
+                CreatureTextType.BossWhisper => new Vector4(255 / 255.0f, 221 / 255.0f, 0 / 255.0f, 1),
+                _ => Vector4.One
+            };
+        }
     }
 }

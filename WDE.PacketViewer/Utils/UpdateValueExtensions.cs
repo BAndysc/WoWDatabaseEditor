@@ -32,6 +32,16 @@ public static unsafe class UpdateValueExtensions
             }
         }
 
+        if (fields.Gameobject != null)
+        {
+            foreach (var getter in gameObjectIntGetters)
+            {
+                var pair = getter(ref *fields.Gameobject);
+                if (pair.Item1 == field)
+                    return pair.Item2;
+            }
+        }
+
         return null;
     }
     
@@ -116,6 +126,21 @@ public static unsafe class UpdateValueExtensions
     {
         fields => ("OBJECT_DYNAMIC_FLAGS", Unpack(fields.DynamicFlags)),
         fields => ("OBJECT_FIELD_ENTRY", Unpack(fields.EntryID))
+    };
+
+    public delegate (string, long?) IntGameObjectGetterType(ref UpdateValuesGameObjectDataFields fields);
+
+    private static IEnumerable<IntGameObjectGetterType> gameObjectIntGetters = new IntGameObjectGetterType[]
+    {
+        (ref UpdateValuesGameObjectDataFields fields) =>
+        {
+            var typeId = (byte)(Unpack(fields.TypeID) ?? (byte)0);
+            var state = (byte)(Unpack(fields.State) ?? (byte)0);
+            var artKit = (byte)(Unpack(fields.ArtKit) ?? (byte)0);
+            var animProgress = (byte)(Unpack(fields.PercentHealth) ?? (byte)0);
+            var total = (state) | (typeId << 8) | (artKit << 16) | (animProgress << 24);
+            return ("GAMEOBJECT_BYTES_1", total);
+        }
     };
 
     public delegate (string, long?) IntGetterType(ref UpdateValuesUnitDataFields fields);
@@ -227,6 +252,16 @@ public static unsafe class UpdateValueExtensions
             foreach (var getter in intGetters)
             {
                 var pair = getter(ref *fields.Unit);
+                if (pair.Item2.HasValue)
+                    result.Add(new KeyValuePair<string, long>(pair.Item1, pair.Item2.Value));
+            }
+        }
+
+        if (fields.Gameobject != null)
+        {
+            foreach (var getter in gameObjectIntGetters)
+            {
+                var pair = getter(ref *fields.Gameobject);
                 if (pair.Item2.HasValue)
                     result.Add(new KeyValuePair<string, long>(pair.Item1, pair.Item2.Value));
             }

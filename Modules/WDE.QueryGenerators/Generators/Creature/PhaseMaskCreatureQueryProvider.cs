@@ -23,6 +23,7 @@ internal class PhaseMaskCreatureQueryProvider : BaseInsertQueryProvider<Creature
             position_y = t.Y,
             position_z = t.Z,
             orientation = t.O,
+            t.__comment
         };
     }
 
@@ -47,6 +48,7 @@ internal class AzerothCreatureQueryProvider : BaseInsertQueryProvider<CreatureSp
             position_y = t.Y,
             position_z = t.Z,
             orientation = t.O,
+            t.__comment
         };
     }
 

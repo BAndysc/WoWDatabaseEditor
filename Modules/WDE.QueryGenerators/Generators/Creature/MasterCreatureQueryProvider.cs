@@ -22,6 +22,7 @@ internal class MasterCreatureQueryProvider : BaseInsertQueryProvider<CreatureSpa
             position_y = t.Y,
             position_z = t.Z,
             orientation = t.O,
+            t.__comment
         };
     }
 

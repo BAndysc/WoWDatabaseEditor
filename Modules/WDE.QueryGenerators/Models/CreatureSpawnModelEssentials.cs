@@ -14,4 +14,5 @@ public struct CreatureSpawnModelEssentials
     public float Y { get; set; }
     public float Z { get; set; }
     public float O { get; set; }
+    public string? __comment { get; set; } // Optional comment field for additional information
 }

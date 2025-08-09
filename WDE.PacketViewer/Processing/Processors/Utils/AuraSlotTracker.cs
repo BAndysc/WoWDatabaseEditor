@@ -8,6 +8,7 @@ namespace WDE.PacketViewer.Processing.Processors
     public interface IAuraSlotTracker : IPacketProcessor<bool>
     {
         uint? GetSpellForAuraSlot(UniversalGuid guid, int slot);
+        IReadOnlyCollection<uint> GetAuras(UniversalGuid guid);
     }
     
     [AutoRegister]
@@ -38,6 +39,13 @@ namespace WDE.PacketViewer.Processing.Processors
             if (state.SlotToSpell.TryGetValue(slot, out var spell))
                 return spell;
             return null;
+        }
+
+        public IReadOnlyCollection<uint> GetAuras(UniversalGuid guid)
+        {
+            if (!states.TryGetValue(guid, out var state))
+                return [];
+            return state.SlotToSpell.Values;
         }
 
         private void ProcessUpdate(ref readonly PacketBase basePacket, ref readonly PacketUpdateObject packet)

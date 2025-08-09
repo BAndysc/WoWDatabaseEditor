@@ -18,4 +18,6 @@ public struct GameObjectSpawnModelEssentials
     public float Rotation2 { get; set; }
     public float Rotation3 { get; set; }
     public uint State { get; set; }
+    public byte AnimProgress { get; set; }
+    public string? __comment { get; set; } // Optional comment field for additional information
 }

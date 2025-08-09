@@ -16,7 +16,13 @@ namespace WDE.Spells
     public class SpellsModule : ModuleBase
     {
         private IContainerProvider containerProvider = null!;
-        
+
+        public override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            base.RegisterTypes(containerRegistry);
+            containerRegistry.RegisterSingleton<IDatabaseSpellService, DatabaseSpellService>();
+        }
+
         public override void OnInitialized(IContainerProvider containerProvider)
         {
             this.containerProvider = containerProvider;

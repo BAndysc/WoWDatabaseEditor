@@ -85,6 +85,7 @@ message PacketHolder {
     PacketAIReaction aiReaction = 46;
     PacketInitWorldStates initWorldStates = 47;
     PacketUpdateWorldState updateWorldState = 48;
+    PacketDismount dismount = 49;
   }
 }
 
@@ -919,4 +920,8 @@ message PacketUpdateWorldState {
 message WorldState {
   int32 id = 1;
   int32 value = 2;
+}
+
+message PacketDismount {
+  UniversalGuid unit = 1;
 }

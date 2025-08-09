@@ -9,7 +9,6 @@ using WDE.Module.Attributes;
 
 namespace WDE.Spells;
 
-[AutoRegister]
 [SingleInstance]
 public class DatabaseSpellService : IDatabaseSpellService
 {
