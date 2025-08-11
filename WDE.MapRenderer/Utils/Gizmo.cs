@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using Avalonia.Input;
 using Avalonia.Threading;
+using TheAvaloniaOpenGL.Resources;
 using TheEngine;
 using TheEngine.Data;
 using TheEngine.ECS;
@@ -8,6 +9,7 @@ using TheEngine.Entities;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
 using TheMaths;
+using Veldrid;
 using IInputManager = TheEngine.Interfaces.IInputManager;
 using MouseButton = TheEngine.Input.MouseButton;
 
@@ -15,11 +17,16 @@ namespace WDE.MapRenderer.Utils
 {
     public class Gizmo : System.IDisposable
     {
+        private const int axisX = 0;
+        private const int axisY = 1;
+        private const int axisZ = 2;
+
         private readonly IMeshManager meshManager;
         public readonly Transform position = new();
         private readonly IMesh arrowMesh;
         private readonly IMesh dragPlaneMesh;
-        private readonly Material<material_data_t> material;
+        private readonly Material<material_data_t>[] opaqueMaterials = new Material<material_data_t>[3];
+        private readonly Material<material_data_t>[] transparentMaterials = new Material<material_data_t>[3];
         private readonly Transform t = new Transform();
         private bool ownsMeshes;
 
@@ -29,12 +36,46 @@ namespace WDE.MapRenderer.Utils
             public Vector4 objectColor;
         };
 
-        public Gizmo(IMeshManager meshManager, IMaterialManager materialManager)
+        public Gizmo(Engine engine, IMeshManager meshManager, IMaterialManager materialManager)
         {
             this.meshManager = meshManager;
             arrowMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/arrow.obj").MeshData);
             dragPlaneMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/dragPlane.obj").MeshData);
-            this.material = materialManager.CreateMaterial<material_data_t>("data/gizmo.json");
+
+            var gizmoShader = engine.ShaderManager.LoadShader("data/gizmo.json");
+            var gizmoOpaquePipeline = engine.PipelineManager.CreatePipeline(gizmoShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = BlendStateDescription.SingleDisabled,
+                DepthStencilState = new DepthStencilStateDescription(
+                    depthTestEnabled: true,
+                    depthWriteEnabled: true,
+                    comparisonKind: ComparisonKind.LessEqual),
+                RasterizerState = new RasterizerStateDescription(FaceCullMode.Front, PolygonFillMode.Solid, FrontFace.Clockwise, true, false)
+            }, false);
+
+            var gizmoTransparentPipeline = engine.PipelineManager.CreatePipeline(gizmoShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = BlendStateDescription.SingleAlphaBlend,
+                DepthStencilState = new DepthStencilStateDescription(
+                    depthTestEnabled: true,
+                    depthWriteEnabled: false,
+                    comparisonKind: ComparisonKind.Greater),
+                RasterizerState = new RasterizerStateDescription(FaceCullMode.Front, PolygonFillMode.Solid, FrontFace.Clockwise, true, false)
+            }, false);
+
+            Span<material_data_t> colors = stackalloc material_data_t[3];
+            colors[axisX].objectColor = new Vector4(0, 0, 1, 1);
+            colors[axisY].objectColor = new Vector4(0, 1, 0, 1);
+            colors[axisZ].objectColor = new Vector4(1, 0, 0, 1);
+            for (int i = 0; i < 3; ++i)
+            {
+                opaqueMaterials[i] = engine.MaterialManager.CreateMaterial<material_data_t>(gizmoOpaquePipeline);
+                transparentMaterials[i] = engine.MaterialManager.CreateMaterial<material_data_t>(gizmoTransparentPipeline);
+                colors[i].objectColor.W = 1;
+                opaqueMaterials[i].SetMaterialData(ref colors[i]);
+                colors[i].objectColor.W = 0.5f;
+                transparentMaterials[i].SetMaterialData(ref colors[i]);
+            }
             ownsMeshes = true;
         }
 
@@ -46,13 +87,6 @@ namespace WDE.MapRenderer.Utils
                 meshManager.DisposeMesh(dragPlaneMesh);
                 ownsMeshes = false;
             }
-        }
-
-        public Gizmo(IMesh arrowMesh, IMesh dragPlaneMesh, Material<material_data_t> material)
-        {
-            this.arrowMesh = arrowMesh;
-            this.dragPlaneMesh = dragPlaneMesh;
-            this.material = material;
         }
 
         private static readonly Quaternion ArrowX = Utilities.LookRotation(Vectors.Left, Vectors.Up);
@@ -121,48 +155,26 @@ namespace WDE.MapRenderer.Utils
 
         private void InternalRender(ICameraManager cameraManager, IRenderManager renderManager, bool transparent)
         {
-            if (transparent)
-            {
-                material.BlendingEnabled = true;
-                material.SourceBlending = Blending.SrcAlpha;
-                material.DestinationBlending = Blending.OneMinusSrcAlpha;
-                material.DepthTesting = DepthCompare.Greater;
-                material.ZWrite = false;
-            }
-            else
-            {
-                material.BlendingEnabled = false;
-                material.DepthTesting = DepthCompare.Lequal;
-                material.ZWrite = true;
-            }
-            
             var dist = (position.Position - cameraManager.MainCamera.Transform.Position).Length();
             t.Position = position.Position;
             t.Scale = Vector3.One * (float)Math.Sqrt(Math.Clamp(dist, 0.5f, 500) / 15);
             // +X (wow)
             t.Rotation = ArrowX;
-            material_data_t data = new() { objectColor = new Vector4(0, 0, 1, transparent ? 0.5f : 1f) };
-            material.SetMaterialData(ref data);
-            renderManager.Render(arrowMesh, material, 0, t);
+            renderManager.Render(arrowMesh, transparent ? transparentMaterials[axisX] : opaqueMaterials[axisX], ShaderPassType.Forward, 0, t);
             t.Rotation = PlaneX;
-            renderManager.Render(dragPlaneMesh, material, 0, t);
-                
+            renderManager.Render(dragPlaneMesh, transparent ? transparentMaterials[axisX] : opaqueMaterials[axisX], ShaderPassType.Forward, 0, t);
 
             // +Y (wow)
             t.Rotation = ArrowY;
-            data = new() { objectColor = new Vector4(0, 1, 0, transparent ? 0.5f : 1f) };
-            material.SetMaterialData(ref data);
-            renderManager.Render(arrowMesh, material, 0, t);
+            renderManager.Render(arrowMesh, transparent ? transparentMaterials[axisY] : opaqueMaterials[axisY], ShaderPassType.Forward, 0, t);
             t.Rotation = PlaneY;
-            renderManager.Render(dragPlaneMesh, material, 0, t);
+            renderManager.Render(dragPlaneMesh, transparent ? transparentMaterials[axisY] : opaqueMaterials[axisY], ShaderPassType.Forward, 0, t);
                 
             // +Z (wow)
             t.Rotation = ArrowZ;
-            data = new() { objectColor = new Vector4(1, 0, 0, transparent ? 0.5f : 1f) };
-            material.SetMaterialData(ref data);
-            renderManager.Render(arrowMesh, material, 0, t);
+            renderManager.Render(arrowMesh, transparent ? transparentMaterials[axisZ] : opaqueMaterials[axisZ], ShaderPassType.Forward, 0, t);
             t.Rotation = PlaneZ;
-            renderManager.Render(dragPlaneMesh, material, 0, t);
+            renderManager.Render(dragPlaneMesh, transparent ? transparentMaterials[axisZ] : opaqueMaterials[axisZ], ShaderPassType.Forward, 0, t);
         }
     }
     
@@ -184,6 +196,7 @@ namespace WDE.MapRenderer.Utils
     
     public abstract class Dragger<T>
     {
+        private readonly Engine engine;
         private readonly IMeshManager meshManager;
         private readonly IMaterialManager materialManager;
         private readonly ICameraManager cameraManager;
@@ -208,7 +221,8 @@ namespace WDE.MapRenderer.Utils
         public RotationLockType RotationLock { get; set; }
         public Vector3 GizmoPosition { get; set; }
         
-        public Dragger(IMeshManager meshManager,
+        public Dragger(Engine engine,
+            IMeshManager meshManager,
             IMaterialManager materialManager,
             ICameraManager cameraManager,
             IRenderManager renderManager,
@@ -216,6 +230,7 @@ namespace WDE.MapRenderer.Utils
             IInputManager inputManager,
             uint collisionMask)
         {
+            this.engine = engine;
             this.meshManager = meshManager;
             this.materialManager = materialManager;
             this.cameraManager = cameraManager;
@@ -233,7 +248,7 @@ namespace WDE.MapRenderer.Utils
         
         public void Initialize()
         {
-            gizmo = new Gizmo(meshManager, materialManager);
+            gizmo = new Gizmo(engine, meshManager, materialManager);
         }
 
         public void Render()

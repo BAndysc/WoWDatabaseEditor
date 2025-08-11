@@ -9,6 +9,7 @@ using TheAvaloniaOpenGL.Resources;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
+using Veldrid;
 using MouseButton = TheEngine.Input.MouseButton;
 
 namespace TheEngine.Managers;
@@ -146,7 +147,6 @@ public class ImGuiController : IDisposable
     private readonly Engine engine;
     private readonly IntPtr imGuiContext;
     private readonly int vertexArrayObject;
-    private readonly ShaderHandle shaderHandle;
     private readonly Material<ImGuiMaterialData_t> material;
     private readonly ITexture fontTexture;
     private ImDrawVert[] verts = Array.Empty<ImDrawVert>();
@@ -195,8 +195,22 @@ public class ImGuiController : IDisposable
         device.EnableVertexAttribArray(2);
         device.BindVertexArray(0);
 
-        shaderHandle = engine.shaderManager.LoadShader("internalShaders/imgui.json", false);
-        material = engine.materialManager.CreateMaterial<ImGuiMaterialData_t>(shaderHandle, null);
+        var shaderHandle = engine.shaderManager.LoadShader("internalShaders/imgui.json");
+        var desc = new GraphicsPipelineDescription()
+        {
+            BlendState = new BlendStateDescription(RgbaFloat.Clear)
+            {AttachmentStates = new[]
+                {
+                    new BlendAttachmentDescription(true, BlendFactor.SourceAlpha, BlendFactor.InverseSourceAlpha,BlendFunction.Add, BlendFactor.One, BlendFactor.InverseSourceAlpha, BlendFunction.Add),
+                }
+
+            },
+            DepthStencilState = new DepthStencilStateDescription(false, false, ComparisonKind.Always, false, default, default, default, default, default),
+            RasterizerState = new RasterizerStateDescription(FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise, true, true),
+        };
+        var pipeline = engine.pipelineManager.CreatePipeline(shaderHandle, PrimitiveTopology.TriangleList, desc, true);
+
+        material = engine.materialManager.CreateMaterial<ImGuiMaterialData_t>(pipeline);
         fonts.GetTexDataAsRGBA32(out IntPtr pixels, out int width, out int height, out int bytesPerPixel);
 
         // do not generate mips for fonts
@@ -318,12 +332,12 @@ public class ImGuiController : IDisposable
         verticesBuffer.Activate(0);
         indicesBuffer.Activate(0);
 
-        var shader = engine.shaderManager.GetShaderByHandle(shaderHandle);
-        shader.Activate();
+        var shader = material.Pipeline.Shader;
+        shader.ForwardPass.Activate();
 
         ImGuiMaterialData_t data = new ImGuiMaterialData_t() { projection_matrix = mvp };
         material.SetMaterialData(ref data);
-        material.ActivateUniforms(false);
+        material.ActivateUniforms(ShaderPassType.Forward, false, null);
 
         device.Enable(EnableCap.Blend);
         device.BlendEquation(BlendEquationMode.FuncAdd);
@@ -357,7 +371,7 @@ public class ImGuiController : IDisposable
                         if (prevHandle != handle)
                         {
                             material.SetTexture("FontTexture", engine.textureManager[handle]);
-                            material.ActivateUniforms(false);
+                            material.ActivateUniforms(ShaderPassType.Forward, false, null);
                             prevHandle = handle;
                         }
                     }

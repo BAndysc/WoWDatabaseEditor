@@ -255,9 +255,9 @@ public class CreatureInstance : WorldObjectInstance
             foreach (var material in value.materials)
             {
                 MaterialInstanceRenderData itemMaterialInstanceRenderData = new MaterialInstanceRenderData();
-                itemMaterialInstanceRenderData.SetBuffer(value.materials[0].material, "boneMatrices", mountData.boneMatricesBuffer);
-                itemMaterialInstanceRenderData.SetBuffer(value.materials[0].material, "vertexColors", mountData.colorBuffer);
-                itemMaterialInstanceRenderData.SetBuffer(value.materials[0].material, "textureTransforms", mountData.textureTransformsBuffer);
+                itemMaterialInstanceRenderData.SetBuffer("boneMatrices", mountData.boneMatricesBuffer);
+                itemMaterialInstanceRenderData.SetBuffer("vertexColors", mountData.colorBuffer);
+                itemMaterialInstanceRenderData.SetBuffer("textureTransforms", mountData.textureTransformsBuffer);
                 itemMaterialInstanceRenderData.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
 
                 var mountRenderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype, "Mount renderer"u8);
@@ -339,9 +339,9 @@ public class CreatureInstance : WorldObjectInstance
         foreach (var material in instance.materials)
         {
             materialInstanceRenderData = new MaterialInstanceRenderData();
-            materialInstanceRenderData.SetBuffer(BaseMaterial, "boneMatrices", boneMatricesBuffer);
-            materialInstanceRenderData.SetBuffer(BaseMaterial, "vertexColors", colorBuffer);
-            materialInstanceRenderData.SetBuffer(BaseMaterial, "textureTransforms", textureTransformsBuffer);
+            materialInstanceRenderData.SetBuffer("boneMatrices", boneMatricesBuffer);
+            materialInstanceRenderData.SetBuffer("vertexColors", colorBuffer);
+            materialInstanceRenderData.SetBuffer("textureTransforms", textureTransformsBuffer);
             materialInstanceRenderData.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
 
             var renderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype, $"Renderer of {unitName}");
@@ -461,9 +461,9 @@ public class CreatureInstance : WorldObjectInstance
         foreach (var material in itemModel.materials)
         {
             MaterialInstanceRenderData itemMaterialInstanceRenderData = new MaterialInstanceRenderData();
-            itemMaterialInstanceRenderData.SetBuffer(itemModel.materials[0].material, "boneMatrices", itemBoneMatricesBuffer);
-            itemMaterialInstanceRenderData.SetBuffer(itemModel.materials[0].material, "vertexColors", itemColorBuffer);
-            itemMaterialInstanceRenderData.SetBuffer(itemModel.materials[0].material, "textureTransforms", itemTextureTransformsBuffer);
+            itemMaterialInstanceRenderData.SetBuffer("boneMatrices", itemBoneMatricesBuffer);
+            itemMaterialInstanceRenderData.SetBuffer("vertexColors", itemColorBuffer);
+            itemMaterialInstanceRenderData.SetBuffer("textureTransforms", itemTextureTransformsBuffer);
             itemMaterialInstanceRenderData.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
 
             var itemRenderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype, $"Item renderer of {unitName}");

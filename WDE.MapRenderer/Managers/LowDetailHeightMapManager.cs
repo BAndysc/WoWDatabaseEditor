@@ -1,9 +1,11 @@
 using System.Buffers;
 using System.Collections;
+using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
 using TheEngine.Entities;
 using TheEngine.Interfaces;
 using TheMaths;
+using Veldrid;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader.Structures;
 
@@ -28,7 +30,9 @@ public class LowDetailHeightMapManager : IDisposable
         WorldManager worldManager,
         ChunkManager chunkManager,
         CameraManager cameraManager,
-        IGameContext gameContext)
+        IGameContext gameContext,
+        IShaderManager shaderManager,
+        IPipelineManager pipelineManager)
     {
         this.meshManager = meshManager;
         this.materialManager = materialManager;
@@ -38,7 +42,21 @@ public class LowDetailHeightMapManager : IDisposable
         this.cameraManager = cameraManager;
         this.gameContext = gameContext;
 
-        material = materialManager.CreateMaterial("data/wdl.json");
+        var shaderHandle = shaderManager.LoadShader("data/wdl.json");
+        var pipeline = pipelineManager.CreatePipeline(shaderHandle, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+        {
+            BlendState = BlendStateDescription.SingleDisabled,
+            DepthStencilState = DepthStencilStateDescription.DepthOnlyLessEqual,
+            RasterizerState = new RasterizerStateDescription
+            {
+                CullMode = FaceCullMode.Front,
+                FillMode = PolygonFillMode.Solid,
+                FrontFace = FrontFace.Clockwise,
+                DepthClipEnabled = true,
+                ScissorTestEnabled = false,
+            }
+        }, false);
+        material = materialManager.CreateMaterial(pipeline);
     }
         
     public void Dispose()
@@ -75,7 +93,7 @@ public class LowDetailHeightMapManager : IDisposable
                 if (frustum.Contains(ref bounds) == ContainmentType.Disjoint)
                     continue;
 
-                renderManager.Render(lowLevelMesh, material, subMesh - 1, Matrix4x4.Identity);
+                renderManager.Render(lowLevelMesh, material, ShaderPassType.Forward, subMesh - 1, Matrix4x4.Identity);
             }
         }   
     }

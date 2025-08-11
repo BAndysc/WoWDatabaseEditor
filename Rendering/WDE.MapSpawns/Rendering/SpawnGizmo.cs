@@ -1,4 +1,5 @@
 using Prism.Ioc;
+using TheEngine;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
 using TheMaths;
@@ -53,14 +54,15 @@ public class SpawnGizmo : Dragger<SpawnInstance>
 {
     private readonly ISpawnSelectionService spawnSelectionService;
 
-    public SpawnGizmo(IMeshManager meshManager,
+    public SpawnGizmo(Engine engine,
+        IMeshManager meshManager,
         IMaterialManager materialManager, 
         ICameraManager cameraManager, 
         IRenderManager renderManager, 
         RaycastSystem raycastSystem, 
         IInputManager inputManager,
         ISpawnSelectionService spawnSelectionService,
-        uint collisionMask) : base(meshManager, materialManager, cameraManager, renderManager, raycastSystem, inputManager, collisionMask)
+        uint collisionMask) : base(engine, meshManager, materialManager, cameraManager, renderManager, raycastSystem, inputManager, collisionMask)
     {
         this.spawnSelectionService = spawnSelectionService;
     }

@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using TheAvaloniaOpenGL.Resources;
 using TheEngine;
 using TheEngine.Components;
 using TheEngine.ECS;
@@ -7,6 +8,7 @@ using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheEngine.Utils;
 using TheMaths;
+using Veldrid;
 using WDE.MapRenderer.Managers;
 using WDE.Module.Attributes;
 
@@ -16,8 +18,8 @@ namespace WDE.MapRenderer.Utils;
 public class HighlightPostProcess : IPostProcess, System.IDisposable
 {
     private readonly Engine engine;
-    private Material<ReplacementMaterialData_t> replacementMaterialM2 = null!;
-    private Material<ReplacementMaterialData_t> replacementMaterialWmo = null!;
+    private Material<ReplacementMaterialData_t>[] replacementMaterialM2 = new Material<ReplacementMaterialData_t>[(int)FaceCullMode.None + 1];
+    private Material<ReplacementMaterialData_t>[] replacementMaterialWmo = new Material<ReplacementMaterialData_t>[(int)FaceCullMode.None + 1];
     private Material<OutlineMaterialData_t> outlineMaterial = null!;
 
     private ScreenRenderTexture RT;
@@ -42,20 +44,61 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
     public HighlightPostProcess(Engine engine, Color outlineColor)
     {
         this.engine = engine;
-        outlineMaterial = engine.MaterialManager.CreateMaterial<OutlineMaterialData_t>("data/outline.json");
-        outlineMaterial.BlendingEnabled = false;
-        outlineMaterial.SourceBlending = Blending.One;
-        outlineMaterial.DestinationBlending = Blending.Zero;
-        outlineMaterial.DepthTesting = DepthCompare.Always;
+
+        var m2ReplacementShader = engine.ShaderManager.LoadShader("data/unlit_flat_m2.json");
+        var wmoReplacementShader = engine.ShaderManager.LoadShader("data/unlit_flat_wmo.json");
+        var outlineShader = engine.ShaderManager.LoadShader("data/outline.json");
+        var blitDownscaleShader = engine.ShaderManager.LoadShader("internalShaders/blit.json");
+
+        foreach (var cullMode in new[] { FaceCullMode.Back, FaceCullMode.Front, FaceCullMode.None })
+        {
+            var m2Pipeline = this.engine.PipelineManager.CreatePipeline(m2ReplacementShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = BlendStateDescription.SingleOverrideBlend,
+                DepthStencilState = DepthStencilStateDescription.DepthOnlyLessEqual,
+                RasterizerState = new RasterizerStateDescription()
+                {
+                    CullMode = cullMode,
+                    DepthClipEnabled = true
+                },
+            }, false);
+
+            var wmoPipeline = this.engine.PipelineManager.CreatePipeline(wmoReplacementShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = BlendStateDescription.SingleOverrideBlend,
+                DepthStencilState = DepthStencilStateDescription.DepthOnlyLessEqual,
+                RasterizerState = new RasterizerStateDescription()
+                {
+                    CullMode = cullMode,
+                    DepthClipEnabled = true
+                }
+            }, false);
+
+            replacementMaterialM2[(int)cullMode] = engine.MaterialManager.CreateMaterial<ReplacementMaterialData_t>(m2Pipeline);
+            replacementMaterialWmo[(int)cullMode] = engine.MaterialManager.CreateMaterial<ReplacementMaterialData_t>(wmoPipeline);
+        }
+
+        var outlinePipeline = this.engine.PipelineManager.CreatePipeline(outlineShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+        {
+            BlendState = BlendStateDescription.SingleDisabled,
+            DepthStencilState = DepthStencilStateDescription.Disabled, // DepthCompare.Always;
+            RasterizerState = RasterizerStateDescription.CullNone,
+        }, false);
+
+        var blitDownscaledPipeline = this.engine.PipelineManager.CreatePipeline(blitDownscaleShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+        {
+            BlendState = BlendStateDescription.SingleDisabled,
+            DepthStencilState = DepthStencilStateDescription.Disabled,
+            RasterizerState = RasterizerStateDescription.CullNone,
+        }, false);
+
+        outlineMaterial = engine.MaterialManager.CreateMaterial<OutlineMaterialData_t>(outlinePipeline);
         OutlineMaterialData_t data = default;
         data.outlineColor = outlineColor.ToVector4();
         outlineMaterial.SetMaterialData(ref data);
 
         RT = new ScreenRenderTexture(engine);
         RT_downscaled = new ScreenRenderTexture(engine, 0.25f);
-        
-        replacementMaterialM2 = engine.MaterialManager.CreateMaterial<ReplacementMaterialData_t>("data/unlit_flat_m2.json");
-        replacementMaterialWmo = engine.MaterialManager.CreateMaterial<ReplacementMaterialData_t>("data/unlit_flat_wmo.json");
     }
 
     public void Render(IReadOnlyList<Entity>? renderers)
@@ -74,30 +117,31 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
                 var instanceData = entityManager.GetManagedComponent<MaterialInstanceRenderData>(entity);
 
                 var oldMaterial = engine.MaterialManager.GetMaterialByHandle(renderer.MaterialHandle);
+                var oldCullMode = oldMaterial.Pipeline.Description.RasterizerState.CullMode;
+
                 var bones = instanceData.GetBuffer("boneMatrices");
                 Material<ReplacementMaterialData_t> material;
                 ReplacementMaterialData_t replacementData = default;
                 replacementData.mesh_color = new Vector4(1, 0, 0, 1);
                 if (oldMaterial is Material<WmoManager.WmoMaterialData> wmoMaterial)
                 {
-                    material = replacementMaterialWmo;
+                    material = replacementMaterialWmo[(int)oldCullMode];
                     replacementData.alphaTest = wmoMaterial.MaterialData.alphaTest;
                     material.SetTexture("texture1", oldMaterial.GetTexture("texture1"));
                 }
                 else if (oldMaterial is Material<MdxManager.MdxMaterialData> m2Material)
                 {
-                    material = replacementMaterialM2;
+                    material = replacementMaterialM2[(int)oldCullMode];
                     replacementData.alphaTest = m2Material.MaterialData.alphaTest;
-                    replacementMaterialM2.SetBuffer("boneMatrices", bones);
+                    material.SetBuffer("boneMatrices", bones);
                     material.SetTexture("texture1", oldMaterial.GetTexture("texture1"));
                 }
                 else
                     throw new Exception("Unknown material type");
 
-                material.Culling = oldMaterial.Culling;
                 material.SetMaterialData(ref replacementData);
 
-                engine.RenderManager.Render(renderer.MeshHandle, material.Handle, renderer.SubMeshId, localToWorld.Matrix, localToWorld.Inverse);
+                engine.RenderManager.Render(renderer.MeshHandle, material.Handle, ShaderPassType.Forward, renderer.SubMeshId, localToWorld.Matrix, localToWorld.Inverse);
             }
         }
         

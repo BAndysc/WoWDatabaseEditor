@@ -9,11 +9,13 @@ using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheMaths;
+using Veldrid;
 using WDE.Common.MPQ;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
 using IInputManager = TheEngine.Interfaces.IInputManager;
+using Pipeline = TheEngine.Resources.Pipeline;
 
 // ReSharper disable InconsistentNaming
 
@@ -274,8 +276,13 @@ namespace WDE.MapRenderer.Managers
         private readonly IGameContext gameContext;
         private readonly IInputManager inputManager;
         private readonly IUIManager uiManager;
+        private readonly IPipelineManager pipelineManager;
 
         private NativeBuffer<Matrix> identityBonesBuffer;
+
+        private ShaderHandle m2shader;
+
+        private Dictionary<(M2Blend, bool twoSided), Pipeline> pipelines = new Dictionary<(M2Blend, bool twoSided), Pipeline>();
 
         public MdxManager(IGameFiles gameFiles, 
             IMeshManager meshManager, 
@@ -296,7 +303,8 @@ namespace WDE.MapRenderer.Managers
             Engine engine,
             IGameContext gameContext,
             IInputManager inputManager,
-            IUIManager uiManager)
+            IUIManager uiManager,
+            IPipelineManager pipelineManager)
         {
             this.gameFiles = gameFiles;
             this.meshManager = meshManager;
@@ -318,8 +326,89 @@ namespace WDE.MapRenderer.Managers
             this.gameContext = gameContext;
             this.inputManager = inputManager;
             this.uiManager = uiManager;
+            this.pipelineManager = pipelineManager;
             identityBonesBuffer = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, AnimationSystem.MAX_BONES, BufferInternalFormat.Float4);
             identityBonesBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(AnimationSystem.MAX_BONES).Span);
+
+            m2shader = engine.ShaderManager.LoadShader("data/m2.json");
+            foreach (var skinned in new[] { true, false })
+            {
+                foreach (var twoSided in new[] { true, false })
+                {
+                    foreach (var blend in Enum.GetValues<M2Blend>())
+                    {
+                        pipelines[(blend, twoSided)] = CreatePipeline(blend, twoSided, skinned);
+                    }
+                }
+            }
+        }
+
+        private Pipeline GetPipeline(M2Blend blend, bool twoSided, bool skinned)
+        {
+            return pipelines[(blend, twoSided)];
+        }
+
+        private Pipeline CreatePipeline(M2Blend blend, bool twoSided, bool skinned)
+        {
+            var blending = new BlendAttachmentDescription() { };
+
+            if (blend == M2Blend.M2BlendOpaque)
+            {
+                blending.BlendEnabled = false;
+            }
+            else if (blend == M2Blend.M2BlendAlphaKey)
+            {
+                blending.BlendEnabled = false;
+                //blending.SourceColorFactor = BlendFactor.One;
+                //blending.DestinationColorFactor = BlendFactor.Zero;
+            }
+            else if (blend == M2Blend.M2BlendAlpha)
+            {
+                blending.BlendEnabled = true;
+                blending.SourceColorFactor = BlendFactor.SourceAlpha;
+                blending.DestinationColorFactor = BlendFactor.InverseSourceAlpha;
+            }
+            else if (blend == M2Blend.M2BlendNoAlphaAdd)
+            {
+                blending.BlendEnabled = true;
+                blending.SourceColorFactor = BlendFactor.One;
+                blending.DestinationColorFactor = BlendFactor.One;
+            }
+            else if (blend == M2Blend.M2BlendAdd)
+            {
+                blending.BlendEnabled = true;
+                blending.SourceColorFactor = BlendFactor.SourceAlpha;
+                blending.DestinationColorFactor = BlendFactor.One;
+            }
+            else if (blend == M2Blend.M2BlendMod)
+            {
+                blending.BlendEnabled = true;
+                blending.SourceColorFactor = BlendFactor.DestinationColor;
+                blending.DestinationColorFactor = BlendFactor.Zero;
+            }
+            else if (blend == M2Blend.M2BlendMod2X)
+            {
+                blending.BlendEnabled = true;
+                blending.SourceColorFactor = BlendFactor.DestinationColor;
+                blending.DestinationColorFactor = BlendFactor.SourceColor;
+            }
+            else if (blend == M2Blend.M2BlendBlendAdd)
+            {
+                blending.BlendEnabled = true;
+                blending.SourceColorFactor = BlendFactor.One;
+                blending.DestinationColorFactor = BlendFactor.InverseSourceAlpha;
+            }
+            else
+            {
+                Console.WriteLine("Unspported blend mode " + blend);
+            }
+
+            return pipelineManager.CreatePipeline(m2shader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = new BlendStateDescription(){AttachmentStates = new BlendAttachmentDescription[]{blending}},
+                DepthStencilState = DepthStencilStateDescription.DepthOnlyLessEqual with { DepthWriteEnabled = !blending.BlendEnabled },
+                RasterizerState = RasterizerStateDescription.Front with {CullMode = twoSided ? FaceCullMode.None : FaceCullMode.Front},
+            }, false);
         }
 
         // Sources : wowdev.wiki/DB/ItemDisplayInfo#Geoset_Group_Field_Meaning and wowdev.wiki/Character_Customization#Geosets
@@ -872,7 +961,11 @@ namespace WDE.MapRenderer.Managers
         private Material<MdxMaterialData> CreateMaterial(M2 m2, in M2Batch batch, ITexture? textureHandle1, ITexture? textureHandle2, ITexture? textureHandle3)
         {
             ref readonly var materialDef = ref m2.materials[batch.materialIndex];
-            var material = materialManager.CreateMaterial<MdxMaterialData>("data/m2.json");
+            var skinned = !(m2.bones.Length == 0 || m2.bones.Length == 1 && m2.bones[0].flags == 0);
+            // @TODO, overriding skinned to true, because in order to render attachments, we need to have bones
+            //        this is poor way, there should be a way to dynamcially set skinned or not, but atm there is not, so this is a workaround
+            skinned = true;
+            var material = materialManager.CreateMaterial<MdxMaterialData>(GetPipeline(materialDef.blending_mode, materialDef.flags.HasFlagFast(M2MaterialFlags.TwoSided), skinned));
 
             material.SetBuffer("boneMatrices", identityBonesBuffer);
             material.SetTexture("texture1", textureHandle1 ?? textureManager.EmptyTexture);
@@ -917,56 +1010,34 @@ namespace WDE.MapRenderer.Managers
             data.notSupported = 0;
             if (materialDef.blending_mode == M2Blend.M2BlendOpaque)
             {
-                material.BlendingEnabled = false;
                 data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendAlphaKey)
             {
-                material.BlendingEnabled = false;
-                //material.SourceBlending = Blending.One;
-                //material.DestinationBlending = Blending.Zero;
                 data.alphaTest = 224.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendAlpha)
             {
-                material.BlendingEnabled = true;
-                material.SourceBlending = Blending.SrcAlpha;
-                material.DestinationBlending = Blending.OneMinusSrcAlpha;
                 data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendNoAlphaAdd)
             {
-                material.BlendingEnabled = true;
-                material.SourceBlending = Blending.One;
-                material.DestinationBlending = Blending.One;
                 data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendAdd)
             {
-                material.BlendingEnabled = true;
-                material.SourceBlending = Blending.SrcAlpha;
-                material.DestinationBlending = Blending.One;
                 data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendMod)
             {
-                material.BlendingEnabled = true;
-                material.SourceBlending = Blending.DstColor;
-                material.DestinationBlending = Blending.Zero;
                 data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendMod2X)
             {
-                material.BlendingEnabled = true;
-                material.SourceBlending = Blending.DstColor;
-                material.DestinationBlending = Blending.SrcColor;
                 data.alphaTest = 1.0f / 255.0f;
             }
             else if (materialDef.blending_mode == M2Blend.M2BlendBlendAdd)
             {
-                material.BlendingEnabled = true;
-                material.SourceBlending = Blending.One;
-                material.DestinationBlending = Blending.OneMinusSrcAlpha;
                 data.alphaTest = 1.0f / 255.0f;
             }
             else
@@ -975,11 +1046,8 @@ namespace WDE.MapRenderer.Managers
                 data.notSupported= 1;
             }
 
-            material.ZWrite = !material.BlendingEnabled;
             //material.DepthTesting = materialDef.flags.HasFlagFast(M2MaterialFlags.DepthTest); // produces wrong results :thonk:
 
-            if (materialDef.flags.HasFlagFast(M2MaterialFlags.TwoSided))
-                material.Culling = CullingMode.Off;
             data.unlit = materialDef.flags.HasFlagFast(M2MaterialFlags.Unlit) ? 1 : 0;
             material.SetMaterialData(ref data);
             return material;

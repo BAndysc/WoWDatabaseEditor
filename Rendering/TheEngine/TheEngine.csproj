@@ -11,6 +11,7 @@
     <ItemGroup>
       <ProjectReference Include="..\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />
       <ProjectReference Include="..\TheMaths\TheMaths.csproj" />
+      <ProjectReference Include="..\veldrid\src\Veldrid\Veldrid.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -47,6 +48,9 @@
       <None Update="ECS\EntityExtensionsCodeGen.tt">
         <Generator>TextTemplatingFileGenerator</Generator>
         <LastGenOutput>EntityExtensionsCodeGen.cs</LastGenOutput>
+      </None>
+      <None Update="meshes\sphere.obj">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
     

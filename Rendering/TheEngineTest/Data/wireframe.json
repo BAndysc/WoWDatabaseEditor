@@ -1,0 +1,20 @@
+{
+  "Pixel": {
+    "Path": "data/wireframe.frag"
+  },
+  "Geometry": {
+    "Path": "data/wireframe.hull"
+  },
+  "ZWrite": true,
+  "Instancing": false,
+  "Vertex": {
+    "Path": "data/wireframe.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

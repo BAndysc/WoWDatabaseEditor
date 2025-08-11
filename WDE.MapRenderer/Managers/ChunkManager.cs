@@ -14,12 +14,14 @@ using TheEngine.Managers;
 using TheEngine.PhysicsSystem;
 using TheEngine.Utils;
 using TheMaths;
+using Veldrid;
 using WDE.MapRenderer.Managers.Entities;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
+using Pipeline = TheEngine.Resources.Pipeline;
 
 namespace WDE.MapRenderer.Managers
 {
@@ -186,7 +188,10 @@ namespace WDE.MapRenderer.Managers
 
             return c.heights[xIndex, yIndex];
         }
-        
+
+        private ShaderHandle shader;
+        private Pipeline pipeline;
+
         public ChunkManager(IEntityManager entityManager,
             IGameProperties gameProperties,
             ITextureManager textureManager,
@@ -228,6 +233,14 @@ namespace WDE.MapRenderer.Managers
             this.raycastSystem = raycastSystem;
             this.dbcManager = dbcManager;
             this.engine = engine;
+
+            shader = engine.ShaderManager.LoadShader("data/lit.json");
+            pipeline = engine.PipelineManager.CreatePipeline(shader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = BlendStateDescription.SingleDisabled,
+                DepthStencilState = DepthStencilStateDescription.DepthOnlyLessEqual,
+                RasterizerState = RasterizerStateDescription.Front
+            }, false);
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
@@ -459,7 +472,7 @@ namespace WDE.MapRenderer.Managers
             }
         
             int chnk = 0;
-            var material = materialManager.CreateMaterial<LitMaterialData_t>("data/lit.json");
+            var material = materialManager.CreateMaterial<LitMaterialData_t>(pipeline);
             chunk.material = material;
             LitMaterialData_t data = new() { showGrid = gameProperties.ShowGrid ? 1 : 0 };
             material.SetMaterialData(ref data);
@@ -741,9 +754,9 @@ namespace WDE.MapRenderer.Managers
                             });
                         }
                         var instanceRenderer = new MaterialInstanceRenderData();
-                        instanceRenderer.SetBuffer(material.material, "boneMatrices", bones!);
-                        instanceRenderer.SetBuffer(material.material, "vertexColors", colors!);
-                        instanceRenderer.SetBuffer(material.material, "textureTransforms", textureTransforms!);
+                        instanceRenderer.SetBuffer("boneMatrices", bones!);
+                        instanceRenderer.SetBuffer("vertexColors", colors!);
+                        instanceRenderer.SetBuffer("textureTransforms", textureTransforms!);
                         instanceRenderer.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
                         entityManager.SetManagedComponent(entity, instanceRenderer);
                     }

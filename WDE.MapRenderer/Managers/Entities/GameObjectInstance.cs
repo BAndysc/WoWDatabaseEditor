@@ -90,9 +90,9 @@ public class GameObjectInstance : WorldObjectInstance
             foreach (var material in m2Instance.materials)
             {
                 var materialInstanceRenderData = new MaterialInstanceRenderData();
-                materialInstanceRenderData.SetBuffer(BaseMaterial, "boneMatrices", boneMatricesBuffer);
-                materialInstanceRenderData.SetBuffer(BaseMaterial, "vertexColors", colorBuffer);
-                materialInstanceRenderData.SetBuffer(BaseMaterial, "textureTransforms", textureTransformsBuffer);
+                materialInstanceRenderData.SetBuffer("boneMatrices", boneMatricesBuffer);
+                materialInstanceRenderData.SetBuffer("vertexColors", colorBuffer);
+                materialInstanceRenderData.SetBuffer("textureTransforms", textureTransformsBuffer);
                 materialInstanceRenderData.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
 
                 var renderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype, $"Renderer of {gameObjectTemplate?.Name}");

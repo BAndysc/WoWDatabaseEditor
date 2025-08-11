@@ -4,8 +4,10 @@ using TheEngine.Data;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
+using Veldrid;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
+using Pipeline = TheEngine.Resources.Pipeline;
 
 namespace WDE.MapRenderer.Managers
 {
@@ -16,6 +18,7 @@ namespace WDE.MapRenderer.Managers
         private readonly WoWTextureManager textureManager;
         private readonly IMaterialManager materialManager;
         private readonly WoWMeshManager woWMeshManager;
+        private readonly IPipelineManager pipelineManager;
 
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
         public struct WmoMaterialData
@@ -50,17 +53,112 @@ namespace WDE.MapRenderer.Managers
         private Dictionary<FileId, WeakReference<WmoInstance>?> meshes = new();
         private Dictionary<FileId, Task<WmoInstance?>> meshesCurrentlyLoaded = new();
 
+        private Dictionary<(GxBlendMode mode, bool unculled), Pipeline> pipelines = new Dictionary<(GxBlendMode mode, bool unculled), Pipeline>();
+
+        private ShaderHandle wmoShader;
+
         public WmoManager(IGameFiles gameFiles,
             IMeshManager meshManager,
             WoWTextureManager textureManager,
             IMaterialManager materialManager,
-            WoWMeshManager woWMeshManager)
+            WoWMeshManager woWMeshManager,
+            IShaderManager shaderManager,
+            IPipelineManager pipelineManager)
         {
             this.gameFiles = gameFiles;
             this.meshManager = meshManager;
             this.textureManager = textureManager;
             this.materialManager = materialManager;
             this.woWMeshManager = woWMeshManager;
+            this.pipelineManager = pipelineManager;
+
+            wmoShader = shaderManager.LoadShader("data/wmo.json");
+
+            Span<bool> trueFalse = stackalloc bool[2];
+            trueFalse[0] = false;
+            trueFalse[1] = true;
+            foreach (var blendMode in Enum.GetValues<GxBlendMode>())
+                foreach (bool unculled in trueFalse)
+                    CreatePipeline(blendMode, unculled);
+        }
+
+        private void CreatePipeline(GxBlendMode blendMode, bool unculled)
+        {
+            var blending = new BlendAttachmentDescription();
+            if (blendMode == GxBlendMode.GxBlend_Opaque)
+            {
+                //alphaTest = -1.0f;
+                blending.BlendEnabled = false;
+            }
+            else if (blendMode == GxBlendMode.GxBlend_AlphaKey)
+            {
+                blending.BlendEnabled = false;
+                //alphaTest = 0.878431372f; // 224/255
+            }
+            else if (blendMode == GxBlendMode.GxBlend_Alpha)
+            {
+                blending.BlendEnabled = true;
+                blending.SourceColorFactor = BlendFactor.SourceAlpha;
+                blending.DestinationColorFactor = BlendFactor.InverseSourceAlpha;
+            }
+            else if (blendMode == GxBlendMode.GxBlend_Add)
+            {
+                blending.BlendEnabled= true;
+                blending.SourceColorFactor = BlendFactor.SourceAlpha;
+                blending.DestinationColorFactor = BlendFactor.One;
+            }
+            else if (blendMode == GxBlendMode.GxBlend_Mod)
+            {
+                blending.BlendEnabled = true;
+                blending.SourceColorFactor = BlendFactor.DestinationColor;
+                blending.DestinationColorFactor = BlendFactor.Zero;
+            }
+            else if (blendMode == GxBlendMode.GxBlend_Mod2x)
+            {
+                blending.BlendEnabled = true;
+                blending.SourceColorFactor = BlendFactor.DestinationColor;
+                blending.DestinationColorFactor = BlendFactor.SourceColor;
+            }
+            else if (blendMode == GxBlendMode.GxBlend_ModAdd)
+            {
+                blending.BlendEnabled = true;
+                blending.SourceColorFactor = BlendFactor.DestinationColor;
+                blending.DestinationColorFactor = BlendFactor.One;
+            }
+            else
+            {
+                //alphaTest = -1.0f;
+                blending.BlendEnabled = false;
+                //mat.SetUniform("notSupported", 1);
+            }
+
+            pipelines[(blendMode, unculled)] = pipelineManager.CreatePipeline(wmoShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                DepthStencilState = DepthStencilStateDescription.DepthOnlyLessEqual with {DepthWriteEnabled = !blending.BlendEnabled },
+                RasterizerState = new RasterizerStateDescription()
+                {
+                    CullMode = unculled ? FaceCullMode.None : FaceCullMode.Front,
+                    FillMode = PolygonFillMode.Solid,
+                    FrontFace = FrontFace.Clockwise,
+                    DepthClipEnabled = true,
+                    ScissorTestEnabled = false,
+                },
+                BlendState = new BlendStateDescription()
+                {
+                    AttachmentStates = new BlendAttachmentDescription[]
+                    {
+                        blending
+                    }
+                }
+            }, false);
+        }
+
+        private Pipeline GetPipeline(GxBlendMode blendMode, bool unculled)
+        {
+            if (pipelines.TryGetValue((blendMode, unculled), out var pipeline))
+                return pipeline;
+
+            throw new Exception($"Pipeline for {blendMode}, {unculled} not found");
         }
 
         public async ValueTask<WmoInstance?> LoadWorldMapObject(FileId path)
@@ -180,7 +278,8 @@ namespace WDE.MapRenderer.Managers
         private Material<WmoMaterialData> CreateMaterial(WMO wmo, WorldMapObjectGroup group, int materialId, out string? tex1, out string? tex2, out string? tex3)
         {
             ref readonly var materialDef = ref wmo.Materials[materialId];
-            var mat = materialManager.CreateMaterial<WmoMaterialData>("data/wmo.json");
+            var pipeline = GetPipeline(materialDef.blendMode,materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unculled));
+            var mat = materialManager.CreateMaterial<WmoMaterialData>(pipeline);
 
             WmoMaterialData data = new WmoMaterialData()
             {
@@ -193,60 +292,38 @@ namespace WDE.MapRenderer.Managers
             if (materialDef.blendMode == GxBlendMode.GxBlend_Opaque)
             {
                 alphaTest = -1.0f;
-                mat.BlendingEnabled = false;
             }
             else if (materialDef.blendMode == GxBlendMode.GxBlend_AlphaKey)
             {
-                mat.BlendingEnabled = false;
                 alphaTest = 0.878431372f; // 224/255
             }
             else if (materialDef.blendMode == GxBlendMode.GxBlend_Alpha)
             {
-                mat.BlendingEnabled = true;
-                mat.SourceBlending = Blending.SrcAlpha;
-                mat.DestinationBlending = Blending.OneMinusSrcAlpha;
             }
             else if (materialDef.blendMode == GxBlendMode.GxBlend_Add)
             {
-                mat.BlendingEnabled = true;
-                mat.SourceBlending = Blending.SrcAlpha;
-                mat.DestinationBlending = Blending.One;
             }
             else if (materialDef.blendMode == GxBlendMode.GxBlend_Mod)
             {
-                mat.BlendingEnabled = true;
-                mat.SourceBlending = Blending.DstColor;
-                mat.DestinationBlending = Blending.Zero;
             }
             else if (materialDef.blendMode == GxBlendMode.GxBlend_Mod2x)
             {
-                mat.BlendingEnabled = true;
-                mat.SourceBlending = Blending.DstColor;
-                mat.DestinationBlending = Blending.SrcColor;
             }
             else if (materialDef.blendMode == GxBlendMode.GxBlend_ModAdd)
             {
-                mat.BlendingEnabled = true;
-                mat.SourceBlending = Blending.DstColor;
-                mat.DestinationBlending = Blending.One;
             }
             else
             {
                 alphaTest = -1.0f;
-                mat.BlendingEnabled = false;
                 //mat.SetUniform("notSupported", 1);
             }
 
-            mat.ZWrite = !mat.BlendingEnabled;
             data.alphaTest = alphaTest;
             data.unlit = materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unlit) ? 1 : 0;
             data.brightAtNight =
                 materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.brightAtNight) ? 1 : 0;
             data.interior =
                 group.Header.flags.HasFlagFast(WorldMapObjectGroupFlags.Interior) && group.VertexColors != null ? 1 : 0;
-
-            if (materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unculled))
-                mat.Culling = CullingMode.Off;
 
             tex1 = materialDef.texture1Name;
             tex2 = materialDef.texture2Name;

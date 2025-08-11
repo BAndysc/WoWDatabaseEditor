@@ -32,90 +32,90 @@ public class MeshRendererInspector : IRefInspectorDrawer<MeshRenderer>
         ImGui.Checkbox("##opaque", ref component.Opaque);
         ImGui.NextColumn();
 
-        ImGuiEx.TextUnformatted("Blending enabled\0"u8);
-        ImGui.NextColumn();
-        ImGui.Checkbox("##blending_enabled", ref material.BlendingEnabled);
-        ImGui.NextColumn();
-
-        ImGuiEx.TextUnformatted("Z-Write\0"u8);
-        ImGui.NextColumn();
-        ImGui.Checkbox("##z_write", ref material.ZWrite);
-        ImGui.NextColumn();
+        // ImGuiEx.TextUnformatted("Blending enabled\0"u8);
+        // ImGui.NextColumn();
+        // ImGui.Checkbox("##blending_enabled", ref material.BlendingEnabled);
+        // ImGui.NextColumn();
+        //
+        // ImGuiEx.TextUnformatted("Z-Write\0"u8);
+        // ImGui.NextColumn();
+        // ImGui.Checkbox("##z_write", ref material.ZWrite);
+        // ImGui.NextColumn();
 
         // Shader file display
         ImGuiEx.TextUnformatted("Shader\0"u8);
         ImGui.NextColumn();
-        ImGui.TextUnformatted(material.Shader.ShaderFile);
+        ImGui.TextUnformatted(material.Pipeline.Shader.ShaderFile);
         ImGui.NextColumn();
 
         // Culling mode combo box
-        ImGuiEx.TextUnformatted("Culling\0"u8);
-        ImGui.NextColumn();
-        if (ImGui.BeginCombo("##culling", material.Culling.ToString()))
-        {
-            var cullingValues = new[] { CullingMode.Front, CullingMode.Back, CullingMode.Off };
-            foreach (var culling in cullingValues)
-            {
-                bool isSelected = material.Culling == culling;
-                if (ImGui.Selectable(culling.ToString(), isSelected))
-                {
-                    material.Culling = culling;
-                }
-                if (isSelected)
-                    ImGui.SetItemDefaultFocus();
-            }
-            ImGui.EndCombo();
-        }
-        ImGui.NextColumn();
+        // ImGuiEx.TextUnformatted("Culling\0"u8);
+        // ImGui.NextColumn();
+        // if (ImGui.BeginCombo("##culling", material.Culling.ToString()))
+        // {
+        //     var cullingValues = new[] { CullingMode.Front, CullingMode.Back, CullingMode.Off };
+        //     foreach (var culling in cullingValues)
+        //     {
+        //         bool isSelected = material.Culling == culling;
+        //         if (ImGui.Selectable(culling.ToString(), isSelected))
+        //         {
+        //             material.Culling = culling;
+        //         }
+        //         if (isSelected)
+        //             ImGui.SetItemDefaultFocus();
+        //     }
+        //     ImGui.EndCombo();
+        // }
+        // ImGui.NextColumn();
 
         // Depth testing combo box
-        ImGuiEx.TextUnformatted("Depth Testing\0"u8);
-        ImGui.NextColumn();
-        if (ImGui.BeginCombo("##depth_testing", material.DepthTesting.ToString()))
-        {
-            var depthValues = new[] {
-                DepthCompare.Never, DepthCompare.Less, DepthCompare.Equal, DepthCompare.Lequal,
-                DepthCompare.Greater, DepthCompare.Notequal, DepthCompare.Gequal, DepthCompare.Always
-            };
-            foreach (var depth in depthValues)
-            {
-                bool isSelected = material.DepthTesting == depth;
-                if (ImGui.Selectable(depth.ToString(), isSelected))
-                {
-                    material.DepthTesting = depth;
-                }
-                if (isSelected)
-                    ImGui.SetItemDefaultFocus();
-            }
-            ImGui.EndCombo();
-        }
-        ImGui.NextColumn();
+        // ImGuiEx.TextUnformatted("Depth Testing\0"u8);
+        // ImGui.NextColumn();
+        // if (ImGui.BeginCombo("##depth_testing", material.DepthTesting.ToString()))
+        // {
+        //     var depthValues = new[] {
+        //         DepthCompare.Never, DepthCompare.Less, DepthCompare.Equal, DepthCompare.Lequal,
+        //         DepthCompare.Greater, DepthCompare.Notequal, DepthCompare.Gequal, DepthCompare.Always
+        //     };
+        //     foreach (var depth in depthValues)
+        //     {
+        //         bool isSelected = material.DepthTesting == depth;
+        //         if (ImGui.Selectable(depth.ToString(), isSelected))
+        //         {
+        //             material.DepthTesting = depth;
+        //         }
+        //         if (isSelected)
+        //             ImGui.SetItemDefaultFocus();
+        //     }
+        //     ImGui.EndCombo();
+        // }
+        // ImGui.NextColumn();
 
         // Destination blending combo box
-        ImGuiEx.TextUnformatted("Destination Blending\0"u8);
-        ImGui.NextColumn();
-        if (ImGui.BeginCombo("##destination_blending", material.DestinationBlending.ToString()))
-        {
-            var blendingValues = new[] {
-                Blending.Zero, Blending.One, Blending.SrcColor, Blending.OneMinusSrcColor,
-                Blending.SrcAlpha, Blending.OneMinusSrcAlpha, Blending.DstAlpha, Blending.OneMinusDstAlpha,
-                Blending.DstColor, Blending.OneMinusDstColor, Blending.SrcAlphaSaturate, Blending.ConstantColor,
-                Blending.OneMinusConstantColor, Blending.ConstantAlpha, Blending.OneMinusConstantAlpha,
-                Blending.Src1Alpha, Blending.Src1Color, Blending.OneMinusSrc1Color, Blending.OneMinusSrc1Alpha
-            };
-            foreach (var blending in blendingValues)
-            {
-                bool isSelected = material.DestinationBlending == blending;
-                if (ImGui.Selectable(blending.ToString(), isSelected))
-                {
-                    material.DestinationBlending = blending;
-                }
-                if (isSelected)
-                    ImGui.SetItemDefaultFocus();
-            }
-            ImGui.EndCombo();
-        }
-        ImGui.NextColumn();
+        // ImGuiEx.TextUnformatted("Destination Blending\0"u8);
+        // ImGui.NextColumn();
+        // if (ImGui.BeginCombo("##destination_blending", material.DestinationBlending.ToString()))
+        // {
+        //     var blendingValues = new[] {
+        //         Blending.Zero, Blending.One, Blending.SrcColor, Blending.OneMinusSrcColor,
+        //         Blending.SrcAlpha, Blending.OneMinusSrcAlpha, Blending.DstAlpha, Blending.OneMinusDstAlpha,
+        //         Blending.DstColor, Blending.OneMinusDstColor, Blending.SrcAlphaSaturate, Blending.ConstantColor,
+        //         Blending.OneMinusConstantColor, Blending.ConstantAlpha, Blending.OneMinusConstantAlpha,
+        //         Blending.Src1Alpha, Blending.Src1Color, Blending.OneMinusSrc1Color, Blending.OneMinusSrc1Alpha
+        //     };
+        //     foreach (var blending in blendingValues)
+        //     {
+        //         bool isSelected = material.DestinationBlending == blending;
+        //         if (ImGui.Selectable(blending.ToString(), isSelected))
+        //         {
+        //             material.DestinationBlending = blending;
+        //         }
+        //         if (isSelected)
+        //             ImGui.SetItemDefaultFocus();
+        //     }
+        //     ImGui.EndCombo();
+        // }
+        // ImGui.NextColumn();
 
         // Display all uniforms
         if (material.thisUniformData != null)
@@ -163,7 +163,7 @@ public class MeshRendererInspector : IRefInspectorDrawer<MeshRenderer>
         // Texture uniforms
         foreach (var textureUniform in material.textures)
         {
-            var uniformName = material.Shader.GetUniformName(textureUniform.Key);
+            var uniformName = Material.GetUniformName(textureUniform.Key);
             if (uniformName != null)
             {
                 var texture = textureUniform.Value;

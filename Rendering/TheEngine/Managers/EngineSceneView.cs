@@ -1,8 +1,10 @@
 using Avalonia.Input;
 using ImGuiNET;
+using TheAvaloniaOpenGL.Resources;
 using TheEngine.Entities;
 using TheEngine.Interfaces;
 using TheMaths;
+using Veldrid;
 using MouseButton = TheEngine.Input.MouseButton;
 
 namespace TheEngine.Managers;
@@ -91,13 +93,25 @@ internal class EngineSceneView : BaseBaseView
                 },
                 new ushort[]{0, 1, 2, 3, 4, 5});
 
-            material = engine.materialManager.CreateMaterial("internalShaders/grid_plane.json");
-            material.Culling = CullingMode.Off;
-            material.DepthTesting = DepthCompare.Lequal;
-            material.BlendingEnabled = true;
-            material.SourceBlending = Blending.SrcAlpha;
-            material.DestinationBlending = Blending.OneMinusSrcAlpha;
+            var shader = engine.shaderManager.LoadShader("internalShaders/grid_plane.json");
+
+            var pipeline = engine.pipelineManager.CreatePipeline(shader, PrimitiveTopology.TriangleList,
+                new GraphicsPipelineDescription()
+                {
+                    RasterizerState = RasterizerStateDescription.CullNone,
+                    DepthStencilState = DepthStencilStateDescription.DepthOnlyLessEqual,
+                    BlendState = BlendStateDescription.Empty with
+                    {
+                        AttachmentStates = [new BlendAttachmentDescription()
+                        {
+                            BlendEnabled = true,
+                            SourceAlphaFactor = BlendFactor.SourceAlpha,
+                            DestinationAlphaFactor = BlendFactor.InverseSourceAlpha,
+                        }]
+                    }
+                }, false);
+            material = engine.materialManager.CreateMaterial(pipeline);
         }
-        engine.renderManager.Render(gridPlane, material, 0, Vector3.Zero);
+        engine.renderManager.Render(gridPlane, material, ShaderPassType.Forward,  0, Vector3.Zero);
     }
 }

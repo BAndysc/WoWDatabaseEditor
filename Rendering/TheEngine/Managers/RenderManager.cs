@@ -15,7 +15,12 @@ using TheEngine.Interfaces;
 using TheEngine.Primitives;
 using TheEngine.Structures;
 using TheMaths;
+using Veldrid;
 using MouseButton = TheEngine.Input.MouseButton;
+using Pipeline = TheEngine.Resources.Pipeline;
+using PixelFormat = OpenGLBindings.PixelFormat;
+using Sampler = TheAvaloniaOpenGL.Resources.Sampler;
+using Shader = TheAvaloniaOpenGL.Resources.Shader;
 
 namespace TheEngine.Managers
 {
@@ -47,12 +52,6 @@ namespace TheEngine.Managers
 
         private DepthStencil depthStencilZWrite;
         private DepthStencil depthStencilNoZWrite;
-
-        private DepthCompare? currentDepthTest;
-        private bool? currentZwrite;
-        private bool? currentDepthTestEnabled;
-        private CullingMode? currentCulling;
-        private (bool enabled, Blending? source, Blending? dest)? currentBlending;
 
         private int currentBackBufferWidth = -1;
         private int currentBackBufferHeight = -1;
@@ -108,8 +107,6 @@ namespace TheEngine.Managers
 
         private IMesh planeMesh;
 
-        private ShaderHandle blitShader;
-
         private Material<BlitMaterialData_t> blitMaterial;
 
         private Material<UnlitMaterialData_t> unlitMaterial;
@@ -121,9 +118,16 @@ namespace TheEngine.Managers
 
         private Mesh? currentMesh = null;
 
+        private PipelineHandle currentPipeline;
+
         private Mesh? lineMesh = null;
         
-        private Shader? currentShader = null;
+        private ShaderPass? currentShader = null;
+        private DepthCompare? currentDepthTest;
+        private bool? currentZwrite;
+        private bool? currentDepthTestEnabled;
+        private CullingMode? currentCulling;
+        private (bool enabled, Blending? source, Blending? dest)? currentBlending;
 
         private Archetype toCullArchetype;
         private Archetype entitiesSharingRenderingArchetype;
@@ -251,28 +255,54 @@ namespace TheEngine.Managers
 
             lineMesh = (Mesh)engine.MeshManager.CreateMesh(new Vector3[2]{Vector3.Zero, Vector3.Zero}, new ushort[]{});
 
-            blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json", false);
-            engine.Device.device.CheckError("load shader");
-            blitMaterial = engine.MaterialManager.CreateMaterial<BlitMaterialData_t>(blitShader, null);
-            blitMaterial.SourceBlending = Blending.One;
-            blitMaterial.DestinationBlending = Blending.Zero;
-            blitMaterial.ZWrite = true;
-            blitMaterial.DepthTesting = DepthCompare.Always;
+            var blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json");
+            // var blitDepthShader = engine.ShaderManager.LoadShader("internalShaders/blit_depth.json");
+            var unlitShader = engine.ShaderManager.LoadShader("internalShaders/unlit.json");
+
+            var blitPipeline = this.engine.pipelineManager.CreatePipeline(blitShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = new BlendStateDescription(
+                    RgbaFloat.Clear,
+                    BlendAttachmentDescription.OverrideBlend),
+                DepthStencilState = new DepthStencilStateDescription(false, true, ComparisonKind.Always),
+                RasterizerState = new RasterizerStateDescription(FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise, false, false)
+            }, false);// todo veldrid, SwapChainOutput);
+
+            blitMaterial = engine.MaterialManager.CreateMaterial<BlitMaterialData_t>(blitPipeline);
+            // blitMaterial.SourceBlending = Blending.One;
+            // blitMaterial.DestinationBlending = Blending.Zero;
+            // blitMaterial.ZWrite = true;
+            // blitMaterial.DepthTesting = DepthCompare.Always;
             BlitMaterialData_t data = new() { flipY = flipY ? 1 : 0 };
             blitMaterial.SetMaterialData(ref data);
 
-            unlitMaterial = engine.MaterialManager.CreateMaterial<UnlitMaterialData_t>("internalShaders/unlit.json");
-            unlitMaterial.ZWrite = false;
-            unlitMaterial.DepthTesting = DepthCompare.Lequal; // Always to render above the meshes
+            var unlitPipeline = engine.pipelineManager.CreatePipeline(unlitShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = BlendStateDescription.SingleDisabled,
+                RasterizerState = RasterizerStateDescription.CullNone with {FillMode = PolygonFillMode.Wireframe},
+                DepthStencilState = new DepthStencilStateDescription(true, false, ComparisonKind.LessEqual)
+            }, false);
+
+            unlitMaterial = engine.MaterialManager.CreateMaterial<UnlitMaterialData_t>(unlitPipeline);
+            // unlitMaterial.ZWrite = false;
+            // unlitMaterial.DepthTesting = DepthCompare.Lequal; // Always to render above the meshes
             
             // utils
             sphereMesh = engine.meshManager.CreateMesh(ObjParser.LoadObj("meshes/sphere.obj").MeshData);
-        
-            wireframe = engine.MaterialManager.CreateMaterial<WireframeMaterialData_t>("data/wireframe.json");
+
+            var wireframeShader = engine.shaderManager.LoadShader("data/wireframe.json");
+            var wireframePipeline = engine.pipelineManager.CreatePipeline(wireframeShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = BlendStateDescription.SingleDisabled,
+                RasterizerState = RasterizerStateDescription.CullNone with {FillMode = PolygonFillMode.Wireframe},
+                DepthStencilState = new DepthStencilStateDescription(true, false, ComparisonKind.Always)
+            }, false);
+
+            wireframe = engine.MaterialManager.CreateMaterial<WireframeMaterialData_t>(wireframePipeline);
             WireframeMaterialData_t wireframeData = new() { width = 1, color = new Vector4(1, 1, 1, 1) };
             wireframe.SetMaterialData(ref wireframeData);
-            wireframe.ZWrite = false;
-            wireframe.DepthTesting = DepthCompare.Always;
+            // wireframe.ZWrite = false;
+            // wireframe.DepthTesting = DepthCompare.Always;
         }
 
         public void Dispose()
@@ -361,10 +391,11 @@ namespace TheEngine.Managers
             return !layers[layer].IsDisabled;
         }
 
+
         private void SetBlending(bool enabled, Blending source, Blending dest)
         {
             if (currentBlending.HasValue && currentBlending.Value.enabled == enabled &&
-                currentBlending.Value.source == source && currentBlending.Value.dest == dest) 
+                currentBlending.Value.source == source && currentBlending.Value.dest == dest)
                 return;
 
             if (currentBlending.HasValue && currentBlending.Value.enabled == enabled)
@@ -402,7 +433,7 @@ namespace TheEngine.Managers
                 currentCulling = culling;
             }
         }
-        
+
         private void SetDepth(bool zwrite, DepthCompare depthCompare)
         {
             if (zwrite == false && depthCompare == DepthCompare.Always)
@@ -422,7 +453,7 @@ namespace TheEngine.Managers
                     engine.Device.device.Enable(EnableCap.DepthTest);
                     currentDepthTestEnabled = true;
                 }
-                
+
                 if (!currentZwrite.HasValue || currentZwrite.Value != zwrite)
                 {
                     if (zwrite)
@@ -431,7 +462,7 @@ namespace TheEngine.Managers
                         engine.Device.device.DepthMask(false);
                     currentZwrite = zwrite;
                 }
-                
+
                 if (!currentDepthTest.HasValue || currentDepthTest.Value != depthCompare)
                 {
                     engine.Device.device.DepthFunction((DepthFunction)depthCompare);
@@ -440,10 +471,122 @@ namespace TheEngine.Managers
             }
         }
 
+        private void ActivatePipeline(Pipeline pipeline)
+        {
+            //engine.Device.device.Enable(EnableCap.DepthTest);
+            // engine.Device.device.Enable(EnableCap.CullFace);
+            // engine.Device.device.Enable(EnableCap.Blend);
+            // engine.Device.device.Disable(EnableCap.Blend);
+            // engine.Device.device.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            // engine.Device.device.DepthMask(true);
+            //engine.Device.device.DepthFunction(DepthFunction.Lequal);
+
+            if (currentPipeline == pipeline.Handle)
+                return;
+            currentPipeline = pipeline.Handle;
+            var d = pipeline.Description;
+            // depth testing
+
+            if (d.DepthStencilState.DepthTestEnabled)
+            {
+                engine.Device.device.Enable(EnableCap.DepthTest);
+            }
+            else
+            {
+                engine.Device.device.Disable(EnableCap.DepthTest);
+            }
+
+            if (d.DepthStencilState.DepthWriteEnabled)
+                engine.Device.device.DepthMask(true);
+            else
+                engine.Device.device.DepthMask(false);
+
+            engine.Device.device.DepthFunction(d.DepthStencilState.DepthComparison switch
+            {
+                ComparisonKind.Never => DepthFunction.Never,
+                ComparisonKind.Less => DepthFunction.Less,
+                ComparisonKind.Equal => DepthFunction.Equal,
+                ComparisonKind.LessEqual => DepthFunction.Lequal,
+                ComparisonKind.Greater => DepthFunction.Greater,
+                ComparisonKind.NotEqual => DepthFunction.Notequal,
+                ComparisonKind.GreaterEqual => DepthFunction.Gequal,
+                ComparisonKind.Always => DepthFunction.Always,
+                _ => throw new ArgumentOutOfRangeException()
+            });
+
+            // return;
+
+            // culling
+
+            if (d.RasterizerState.CullMode == FaceCullMode.None)
+            {
+                engine.Device.device.Disable(EnableCap.CullFace);
+            }
+            else
+            {
+                engine.Device.device.Enable(EnableCap.CullFace);
+                // yeah, it is reversed, counterclockwise vs clockwise?
+                engine.Device.device.CullFace(d.RasterizerState.CullMode == FaceCullMode.Front ? CullFaceMode.Back : CullFaceMode.Front);
+            }
+
+            // blending
+
+            if (d.BlendState.AttachmentStates[0].BlendEnabled)
+            {
+                engine.Device.device.Enable(EnableCap.Blend);
+                var source = d.BlendState.AttachmentStates[0].SourceAlphaFactor switch
+                {
+                    BlendFactor.Zero => BlendingFactorSrc.Zero,
+                    BlendFactor.One => BlendingFactorSrc.One,
+                    BlendFactor.SourceAlpha => BlendingFactorSrc.SrcAlpha,
+                    BlendFactor.InverseSourceAlpha => BlendingFactorSrc.OneMinusSrcAlpha,
+                    BlendFactor.DestinationAlpha => BlendingFactorSrc.DstAlpha,
+                    BlendFactor.InverseDestinationAlpha => BlendingFactorSrc.OneMinusDstAlpha,
+                    BlendFactor.SourceColor => BlendingFactorSrc.SrcColor,
+                    BlendFactor.InverseSourceColor => BlendingFactorSrc.OneMinusSrcColor,
+                    BlendFactor.DestinationColor => BlendingFactorSrc.DstColor,
+                    BlendFactor.InverseDestinationColor => BlendingFactorSrc.OneMinusSrcColor,
+                    BlendFactor.BlendFactor => throw new NotImplementedException(),
+                    BlendFactor.InverseBlendFactor => throw new NotImplementedException(),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                var dst = d.BlendState.AttachmentStates[0].DestinationAlphaFactor switch
+                {
+                    BlendFactor.Zero => BlendingFactorDest.Zero,
+                    BlendFactor.One => BlendingFactorDest.One,
+                    BlendFactor.SourceAlpha => BlendingFactorDest.SrcAlpha,
+                    BlendFactor.InverseSourceAlpha => BlendingFactorDest.OneMinusSrcAlpha,
+                    BlendFactor.DestinationAlpha => BlendingFactorDest.DstAlpha,
+                    BlendFactor.InverseDestinationAlpha => BlendingFactorDest.OneMinusDstAlpha,
+                    BlendFactor.SourceColor => BlendingFactorDest.SrcColor,
+                    BlendFactor.InverseSourceColor => BlendingFactorDest.OneMinusSrcColor,
+                    BlendFactor.DestinationColor => BlendingFactorDest.DstColor,
+                    BlendFactor.InverseDestinationColor => BlendingFactorDest.OneMinusSrcColor,
+                    BlendFactor.BlendFactor => throw new NotImplementedException(),
+                    BlendFactor.InverseBlendFactor => throw new NotImplementedException(),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                engine.Device.device.BlendFunc(source, dst);
+            }
+            else
+            {
+                engine.Device.device.Disable(EnableCap.Blend);
+            }
+        }
+
+        private void DeviceEnableOrDisable(EnableCap enableCap, bool enable)
+        {
+            if (enable)
+                engine.Device.device.Enable(enableCap);
+            else
+                engine.Device.device.Disable(enableCap);
+        }
+
         public void BeginFrame()
         {
             // better not assume state was saved from the previous frame...
             currentMesh = null;
+            currentPipeline = PipelineHandle.Empty;
             currentShader = null;
             currentCulling = null;
             currentZwrite = null;
@@ -647,13 +790,13 @@ namespace TheEngine.Managers
         {
             WireframeMaterialData_t data = new() { width = 1, color = color };
             wireframe.SetMaterialData(ref data);
-            Render(sphereMesh, wireframe, 0, Utilities.TRS(center, Quaternion.Identity, Vector3.One * radius));
+            Render(sphereMesh, wireframe, ShaderPassType.Forward, 0, Utilities.TRS(center, Quaternion.Identity, Vector3.One * radius));
         }
 
         public void RenderFullscreenPlane(Material material)
         {
-            SetShader(material.Shader);
-            EnableMaterial(material, false, null);
+            SetShader(material.GetShaderPass(ShaderPassType.Forward, false));
+            EnableMaterial(material, ShaderPassType.Forward, false, null);
             SetMesh((Mesh)planeMesh);
             engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0, planeMesh.IndexType);
         }
@@ -769,12 +912,10 @@ namespace TheEngine.Managers
             });
         }
 
-        private void EnableMaterial(Material material, bool instancing, MaterialInstanceRenderData? instanceData = null)
+        private void EnableMaterial(Material material, ShaderPassType type, bool instancing, MaterialInstanceRenderData? instanceData = null)
         {
-            SetDepth(material.ZWrite, material.DepthTesting);
-            SetCulling(material.Culling);
-            SetBlending(material.BlendingEnabled, material.SourceBlending, material.DestinationBlending);
-            material.ActivateUniforms(instancing, instanceData);
+            ActivatePipeline(material.Pipeline);
+            material.ActivateUniforms(type, instancing, instanceData);
             Stats.MaterialActivations++;
         }
 
@@ -984,14 +1125,14 @@ namespace TheEngine.Managers
 
             if (engine.gameView.IsVisible)
             {
-                Render(0, opaque, false);
+                Render(ShaderPassType.Forward, 0, opaque, false);
             }
 
             if (engine.sceneView.IsVisible)
             {
                 ActivateScene(new SceneData(cameraManager.SceneViewCamera, new FogSettings(){Enabled = false}, engine.lightManager.MainLight, engine.lightManager.SecondaryLight));
                 ActivateRenderTexture(sceneViewTexture, new Color4(15/255f,52/255f,97/255f, 1));
-                Render(0, opaque, false);
+                Render(ShaderPassType.Forward, 0, opaque, false);
                 // restore current back buffer and scene
                 ActivateScene(null);
                 ActivateRenderTexture(CurrentBackBuffer);
@@ -1004,6 +1145,10 @@ namespace TheEngine.Managers
                 return;
             Array.Sort(renderers, renderersData, start, end - start, Comparer<MeshRenderer>.Create((a, b) =>
             {
+                if (a.PipelineHandle != b.PipelineHandle)
+                {
+                    return a.PipelineHandle.Handle.CompareTo(b.PipelineHandle.Handle);
+                }
                 if (a.MeshHandle == b.MeshHandle)
                 {
                     if (a.SubMeshId == b.SubMeshId)
@@ -1021,14 +1166,14 @@ namespace TheEngine.Managers
 
             if (engine.gameView.IsVisible)
             {
-                Render(opaque, totalToDraw, true);
+                Render(ShaderPassType.Forward, opaque, totalToDraw, true);
             }
 
             if (engine.sceneView.IsVisible)
             {
                 ActivateScene(new SceneData(cameraManager.SceneViewCamera, new FogSettings(){Enabled = false}, engine.lightManager.MainLight, engine.lightManager.SecondaryLight));
                 ActivateRenderTexture(sceneViewTexture, null);
-                Render(opaque, totalToDraw, true);
+                Render(ShaderPassType.Forward, opaque, totalToDraw, true);
                 var mainCamFrustum = new BoundingFrustum(cameraManager.MainCamera.ViewMatrix * cameraManager.MainCamera.ProjectionMatrix);
                 this.DrawFrustum(mainCamFrustum, Vector4.One);
                 engine.sceneView.OnSceneViewRender();
@@ -1040,7 +1185,7 @@ namespace TheEngine.Managers
 
         private bool enableInstancing = true;
 
-        private void Render(int start, int end, bool transparent)
+        private void Render(ShaderPassType shaderPassType, int start, int end, bool transparent)
         {
             engine.Device.device.Debug(transparent ? "  Rendering translucent" : "  Rendering opaque");
             sw.Restart();
@@ -1049,12 +1194,13 @@ namespace TheEngine.Managers
             {
                 var mr = renderers[i];
                 var material = engine.materialManager.GetMaterialByHandle(mr.MaterialHandle);
-                var shader = material.Shader;
+                var shader = material.GetShaderPass(shaderPassType, false);
+                var shaderInstanced = material.GetShaderPass(shaderPassType, true);
                 var mesh = engine.meshManager.GetMeshByHandle(mr.MeshHandle);
                 var meshId = mr.SubMeshId;
 
                 var toBatch = 0;
-                if (material.InstancedShader != null && // shader supports instancing
+                if (shaderInstanced != null && // shader supports instancing
                     enableInstancing &&                 // instancing is enabled
                     renderersData[i].Item2 == null)     // no material per instance data
                 {
@@ -1075,7 +1221,7 @@ namespace TheEngine.Managers
                     SetMesh(mesh);
                 
                     //materialtimer.Start();
-                    EnableMaterial(material, false, renderersData[i].Item2);
+                    EnableMaterial(material, ShaderPassType.Forward, false, renderersData[i].Item2);
                     //materialtimer.Stop();
                     
                     //buffertimer.Start();
@@ -1111,7 +1257,7 @@ namespace TheEngine.Managers
                         instancesObjectInddicesArray = new uint[toBatch + 1];
                         instancesObjectDataArray = new Int4[toBatch + 1];
                     }
-                    
+
                     for (int k = 0; k < toBatch + 1; ++k)
                     {
                         instancesArray[k] = renderersData[i + k].Item1.Matrix;
@@ -1131,24 +1277,22 @@ namespace TheEngine.Managers
                     instancesObjectDataBuffer.UpdateBuffer(instancesObjectDataArray.AsSpan(0, toBatch + 1));
                     //buffertimer.Stop();
 
-                    shader = material.InstancedShader!;
-                    
+                    shader = shaderInstanced;
+
                     SetShader(shader);
 
                     SetMesh(mesh);
-                
+
                     //materialtimer.Start();
                     instancingRenderData.Clear();
-                    instancingRenderData.SetInstancedBuffer(material, "InstancingModels", instancesBuffer);
-                    instancingRenderData.SetInstancedBuffer(material, "InstancingInverseModels", instancesInverseBuffer);
-                    if (material.HasInstanceUniform("ObjectIndices"))
-                        instancingRenderData.SetInstancedBuffer(material, "ObjectIndices", instancesObjectIndicesBuffer);
-                    if (material.HasInstanceUniform("DrawData"))
-                        instancingRenderData.SetInstancedBuffer(material, "DrawData", instancesObjectDataBuffer);
+                    instancingRenderData.SetBuffer("InstancingModels", instancesBuffer);
+                    instancingRenderData.SetBuffer("InstancingInverseModels", instancesInverseBuffer);
+                    instancingRenderData.SetBuffer("ObjectIndices", instancesObjectIndicesBuffer);
+                    instancingRenderData.SetBuffer("DrawData", instancesObjectDataBuffer);
 
-                    EnableMaterial(material, true, instancingRenderData);
+                    EnableMaterial(material, ShaderPassType.Forward,  true, instancingRenderData);
                     //materialtimer.Stop();
-                    
+
 #if DEBUG
                     currentShader.Validate();
 #endif
@@ -1158,7 +1302,7 @@ namespace TheEngine.Managers
                     Stats.TrianglesDrawn += (indicesCount / 3) * (toBatch + 1);
                     Stats.InstancedDraws++;
                     engine.Device.DrawIndexedInstanced(indicesCount,  toBatch + 1, mesh.IndexStart(meshId), 0, 0, mesh.IndexType);
-                    
+
                     i += toBatch;
                 }
             }
@@ -1167,7 +1311,7 @@ namespace TheEngine.Managers
             Stats.InstancedDrawSaved += savedByInstancing;
         }
 
-        private void SetShader(Shader shader)
+        private void SetShader(ShaderPass shader)
         {
             if (currentShader != shader)
             {
@@ -1191,14 +1335,14 @@ namespace TheEngine.Managers
             }
         }
 
-        public void Render(MeshHandle meshHandle, MaterialHandle materialHandle, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
+        public void Render(MeshHandle meshHandle, MaterialHandle materialHandle, ShaderPassType shaderPassType, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
         {
             var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
             var material = engine.materialManager.GetMaterialByHandle(materialHandle);
-            Render(mesh, material, submesh, localToWorld, worldToLocal, instanceData);
+            Render(mesh, material, shaderPassType, submesh, localToWorld, worldToLocal, instanceData);
         }
         
-        public void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
+        public void Render(IMesh mesh, Material material, ShaderPassType shaderPass, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
         {
             if (worldToLocal == null)
             {
@@ -1207,8 +1351,8 @@ namespace TheEngine.Managers
             }
             
             Debug.Assert(inRenderingLoop);
-            SetShader(material.Shader);
-            EnableMaterial(material, false, instanceData);
+            SetShader(material.GetShaderPass(shaderPass, false));
+            EnableMaterial(material, shaderPass, false, instanceData);
             SetMesh((Mesh)mesh);
             objectData.WorldMatrix = localToWorld;
             objectData.InverseWorldMatrix = worldToLocal.Value;
@@ -1222,10 +1366,10 @@ namespace TheEngine.Managers
         {
             lineMesh.SetVertices(start, end);
             lineMesh.RebuildIndices();
-            SetShader(unlitMaterial.Shader);
+            SetShader(unlitMaterial.GetShaderPass(ShaderPassType.Forward, false));
             UnlitMaterialData_t data = new() { color = color };
             unlitMaterial.SetMaterialData(ref data);
-            EnableMaterial(unlitMaterial, false);
+            EnableMaterial(unlitMaterial, ShaderPassType.Forward, false);
             SetMesh(lineMesh);
             objectData.WorldMatrix = Matrix.Identity;
             objectData.InverseWorldMatrix = Matrix.Identity;
@@ -1233,26 +1377,26 @@ namespace TheEngine.Managers
             engine.Device.DrawLineMesh(2, 0);
         }
 
-        public void Render(IMesh mesh, Material material, int submesh, Transform transform)
+        public void Render(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, Transform transform)
         {
-            Render(mesh, material, submesh, transform.LocalToWorldMatrix, transform.WorldToLocalMatrix);
+            Render(mesh, material, shaderPassType, submesh, transform.LocalToWorldMatrix, transform.WorldToLocalMatrix);
         }
 
-        public void Render(IMesh mesh, Material material, int submesh, Vector3 position)
+        public void Render(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, Vector3 position)
         {
             var matrix = Matrix.CreateTranslation(position);
-            Render(mesh, material, submesh, matrix);
+            Render(mesh, material, shaderPassType, submesh, matrix);
         }
 
-        public void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int instancesCount, Matrix localToWorld, Matrix? worldToLocal = null)
+        public void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int instancesCount, Matrix localToWorld, Matrix? worldToLocal = null)
         {
             if (!worldToLocal.HasValue)
             {
                 Matrix.Invert(localToWorld, out var worldToLocal_);
                 worldToLocal = worldToLocal_;
             }
-            SetShader(material.Shader);
-            EnableMaterial(material, false);
+            SetShader(material.GetShaderPass(shaderPassType, false));
+            EnableMaterial(material, shaderPassType, false);
             objectData.WorldMatrix = localToWorld;
             objectData.InverseWorldMatrix = worldToLocal.Value;
             objectBuffer.UpdateBuffer(ref objectData);
@@ -1262,10 +1406,10 @@ namespace TheEngine.Managers
             engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0, mesh.IndexType);
         }
 
-        public void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int instancesCount)
+        public void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int instancesCount)
         {
-            SetShader(material.Shader);
-            EnableMaterial(material, false);
+            SetShader(material.GetShaderPass(shaderPassType, false));
+            EnableMaterial(material, shaderPassType, false);
             SetMesh((Mesh)mesh);
             var start = mesh.IndexStart(submesh);
             var count = mesh.IndexCount(submesh);

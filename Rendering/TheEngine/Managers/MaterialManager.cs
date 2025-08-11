@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using TheAvaloniaOpenGL.Resources;
+﻿using TheAvaloniaOpenGL.Resources;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
+using TheEngine.Resources;
 
 namespace TheEngine.Managers
 {
@@ -19,10 +18,10 @@ namespace TheEngine.Managers
             smallEmptyBuffer = engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBuffer, 4, BufferInternalFormat.Float4);
         }
         
-        public Material CreateMaterial(ShaderHandle shaderHandle, ShaderHandle? instancedShader)
+        public Material CreateMaterial(Pipeline pipeline)
         {
-            var m = new Material(engine, shaderHandle, instancedShader, new MaterialHandle(materials.Count));
-            var shader = engine.shaderManager.GetShaderByHandle(shaderHandle);
+            var m = new Material(engine, pipeline, new MaterialHandle(materials.Count));
+            var shader = pipeline.Shader;
 
             foreach (var uniform in shader.Uniforms)
             {
@@ -36,10 +35,10 @@ namespace TheEngine.Managers
             return m;
         }
 
-        public Material<T> CreateMaterial<T>(ShaderHandle shaderHandle, ShaderHandle? instancedShader) where T : unmanaged
+        public Material<T> CreateMaterial<T>(Pipeline pipeline) where T : unmanaged
         {
-            var m = new Material<T>(engine, shaderHandle, instancedShader, new MaterialHandle(materials.Count));
-            var shader = engine.shaderManager.GetShaderByHandle(shaderHandle);
+            var m = new Material<T>(engine, pipeline, new MaterialHandle(materials.Count));
+            var shader = pipeline.Shader;
 
             foreach (var uniform in shader.Uniforms)
             {
@@ -51,24 +50,6 @@ namespace TheEngine.Managers
 
             materials.Add(new WeakReference<Material>(m));
             return m;
-        }
-
-        public Material CreateMaterial(string shaderPath)
-        {
-            var shader = engine.ShaderManager.LoadShader(shaderPath, false);
-            ShaderHandle? instanced = engine.ShaderManager.LoadShader(shaderPath, true);
-            if (!engine.shaderManager.GetShaderByHandle(instanced.Value).Instancing)
-                instanced = null;
-            return CreateMaterial(shader, instanced);
-        }
-
-        public Material<T> CreateMaterial<T>(string shaderPath) where T : unmanaged
-        {
-            var shader = engine.ShaderManager.LoadShader(shaderPath, false);
-            ShaderHandle? instanced = engine.ShaderManager.LoadShader(shaderPath, true);
-            if (!engine.shaderManager.GetShaderByHandle(instanced.Value).Instancing)
-                instanced = null;
-            return CreateMaterial<T>(shader, instanced);
         }
 
         public void Dispose()

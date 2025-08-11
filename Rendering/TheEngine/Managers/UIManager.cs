@@ -7,6 +7,7 @@ using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
+using Veldrid;
 
 namespace TheEngine.Managers
 {
@@ -15,7 +16,6 @@ namespace TheEngine.Managers
         private readonly Engine engine;
         private readonly ICameraManager cameraManager;
         private readonly IEntityManager entityManager;
-        private readonly ShaderHandle textShader;
         private readonly Material<SdfMaterialData_t> material;
         private readonly Material<SdfMaterialData_t> worldMaterial;
         private readonly IMesh quad;
@@ -26,6 +26,9 @@ namespace TheEngine.Managers
         private ImGuiController imGuiController;
 
         private float Scaling => engine.WindowHost.DpiScaling;
+
+        private Resources.Pipeline worldPipeline;
+        private Resources.Pipeline uiPipeline;
 
         public class DrawTextData : IManagedComponentData
         {
@@ -60,22 +63,52 @@ namespace TheEngine.Managers
                 .WithComponentData<DisabledObjectBit>()
                 .WithComponentData<RenderEnabledBit>()
                 .WithComponentData<LocalToWorld>();
-            textShader = engine.ShaderManager.LoadShader("internalShaders/sdf.json", false);
-            worldMaterial = engine.MaterialManager.CreateMaterial<SdfMaterialData_t>("internalShaders/world_text.json");
-            worldMaterial.BlendingEnabled = true;
-            worldMaterial.SourceBlending = Blending.SrcAlpha;
-            worldMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
-            worldMaterial.Culling = CullingMode.Off;
-            worldMaterial.ZWrite = false;
-            worldMaterial.DepthTesting = DepthCompare.Always;
 
-            material = engine.MaterialManager.CreateMaterial<SdfMaterialData_t>(textShader, null);
-            material.BlendingEnabled = true;
-            material.SourceBlending = Blending.One;
-            material.DestinationBlending = Blending.OneMinusSrcAlpha;
-            material.Culling = CullingMode.Off;
-            material.ZWrite = false;
-            material.DepthTesting = DepthCompare.Always;
+            var worldTextShader = engine.ShaderManager.LoadShader("internalShaders/world_text.json");
+
+            worldPipeline = this.engine.pipelineManager.CreatePipeline(worldTextShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = new BlendStateDescription()
+                {
+                    AttachmentStates = new []
+                    {
+                        new BlendAttachmentDescription(true, BlendFactor.SourceAlpha, BlendFactor.InverseSourceAlpha, BlendFunction.Add, BlendFactor.SourceAlpha, BlendFactor.InverseSourceAlpha, BlendFunction.Add)
+                    }
+                },
+                DepthStencilState = DepthStencilStateDescription.Disabled,
+                RasterizerState = RasterizerStateDescription.CullNone
+            }, false);
+
+            var textShader = engine.ShaderManager.LoadShader("internalShaders/sdf.json");
+
+            uiPipeline = this.engine.pipelineManager.CreatePipeline(textShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = new BlendStateDescription()
+                {
+                    AttachmentStates = new []
+                    {
+                        new BlendAttachmentDescription(true, BlendFactor.One, BlendFactor.InverseSourceAlpha, BlendFunction.Add, BlendFactor.One, BlendFactor.InverseSourceAlpha, BlendFunction.Add)
+                    }
+                },
+                DepthStencilState = DepthStencilStateDescription.Disabled,
+                RasterizerState = RasterizerStateDescription.CullNone
+            }, false);
+
+            worldMaterial = engine.MaterialManager.CreateMaterial<SdfMaterialData_t>(worldPipeline);
+            // worldMaterial.BlendingEnabled = true;
+            // worldMaterial.SourceBlending = Blending.SrcAlpha;
+            // worldMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
+            // worldMaterial.Culling = CullingMode.Off;
+            // worldMaterial.ZWrite = false;
+            // worldMaterial.DepthTesting = DepthCompare.Always;
+
+            material = engine.MaterialManager.CreateMaterial<SdfMaterialData_t>(uiPipeline);
+            // material.BlendingEnabled = true;
+            // material.SourceBlending = Blending.One;
+            // material.DestinationBlending = Blending.OneMinusSrcAlpha;
+            // material.Culling = CullingMode.Off;
+            // material.ZWrite = false;
+            // material.DepthTesting = DepthCompare.Always;
             quad = engine.MeshManager.CreateMesh(new MeshData(new Vector3[]
             {
                 new(0, 0, 0),
@@ -188,7 +221,7 @@ namespace TheEngine.Managers
             glyphUVs[0] = new Vector4(0);
             glyphPositionsBuffer.UpdateBuffer(glyphPositions);
             glyphUVsBuffer.UpdateBuffer(glyphUVs);
-            engine.RenderManager.RenderInstancedIndirect(quad, material, 0, 1);
+            engine.RenderManager.RenderInstancedIndirect(quad, material, ShaderPassType.Forward, 0, 1);
         }
 
         public Entity DrawPersistentWorldText(string font, Vector2 pivot, string text, float fontSize, Matrix localToWorld, float visibilityDistance, Vector4? fontColor = null,
@@ -226,7 +259,7 @@ namespace TheEngine.Managers
 
             glyphPositionsBuffer.UpdateBuffer(glyphPositions);
             glyphUVsBuffer.UpdateBuffer(glyphUVs);
-            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, 0, 1, localToWorld);
+            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, ShaderPassType.Forward, 0, 1, localToWorld);
         }
 
         public void DrawWorldText(string font, Vector2 pivot, ReadOnlySpan<char> text, float fontSize, Matrix localToWorld, Vector4 foreColor, Vector4? backgroundColor)
@@ -278,7 +311,7 @@ namespace TheEngine.Managers
             
             glyphPositionsBuffer.UpdateBuffer(glyphPositions);
             glyphUVsBuffer.UpdateBuffer(glyphUVs);
-            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, 0, glyphsCount, localToWorld);
+            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, ShaderPassType.Forward, 0, glyphsCount, localToWorld);
         }
 
         public void DrawText(string font, ReadOnlySpan<char> text, float fontSize, float x, float y, float? maxWidth, Vector4 color)
@@ -325,8 +358,8 @@ namespace TheEngine.Managers
             
             glyphPositionsBuffer.UpdateBuffer(glyphPositions);
             glyphUVsBuffer.UpdateBuffer(glyphUVs);
-            engine.RenderManager.RenderInstancedIndirect(quad, material, 0, glyphsCount);
-            engine.RenderManager.Render(quad, material, 0,  Matrix.Identity);
+            engine.RenderManager.RenderInstancedIndirect(quad, material, ShaderPassType.Forward, 0, glyphsCount);
+            engine.RenderManager.Render(quad, material, ShaderPassType.Forward, 0,  Matrix.Identity);
         }
 
         public Vector2 MeasureText(string font, ReadOnlySpan<char> text, float fontSize)

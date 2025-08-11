@@ -47,6 +47,10 @@ namespace TheEngine
 
         internal MaterialManager materialManager { get; }
         public IMaterialManager MaterialManager => materialManager;
+
+        internal PipelineManager pipelineManager { get; }
+        public IPipelineManager PipelineManager => pipelineManager;
+
         public IWindowHost WindowHost { get; }
 
         internal EntityManager entityManager { get; }
@@ -100,6 +104,7 @@ namespace TheEngine
             inputManager = new InputManager(this);
             cameraManger = new CameraManager(this);
 
+            pipelineManager = new PipelineManager(this);
             materialManager = new MaterialManager(this);
             shaderManager = new ShaderManager(this);
             meshManager = new MeshManager(this);

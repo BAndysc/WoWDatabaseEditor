@@ -144,12 +144,6 @@ namespace TheAvaloniaOpenGL
         }
 
         // Safe multithread call
-        public Shader CreateShader(string path, string[] includePaths, bool instanced)
-        {
-            return new Shader(device, path, includePaths, instanced);
-        }
-
-        // Safe multithread call
         internal RenderTexture CreateRenderTexture(int width, int height, int colorAttachments = 1, Texture2D? depthTexture = null)
         {
             return new RenderTexture(device, width, height, colorAttachments, depthTexture);

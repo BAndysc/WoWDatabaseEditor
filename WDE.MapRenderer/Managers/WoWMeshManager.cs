@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using TheEngine.Entities;
 using TheEngine.Interfaces;
+using Veldrid;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
@@ -28,6 +29,8 @@ namespace WDE.MapRenderer.Managers
 
         public WoWMeshManager(IMeshManager meshManager,
             IRenderManager renderManager,
+            IShaderManager shaderManager,
+            IPipelineManager pipelineManager,
             ITextureManager textureManager, 
             IMaterialManager materialManager,
             LightingManager lightingManager,
@@ -44,13 +47,25 @@ namespace WDE.MapRenderer.Managers
             this.liquidTypeStore = liquidTypeStore;
             this.liquidMaterialStore = liquidMaterialStore;
             chunkMesh = meshManager.CreateMesh(ChunkMesh.Create());
-            
-            WaterMaterial = materialManager.CreateMaterial<water_material_data_t>("data/water.json");
-            WaterMaterial.Culling = CullingMode.Off;
-            WaterMaterial.ZWrite = false;
-            WaterMaterial.SourceBlending = Blending.SrcAlpha;
-            WaterMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
-            WaterMaterial.BlendingEnabled = true;
+
+            var shader = shaderManager.LoadShader("data/water.json");
+            var pipeline = pipelineManager.CreatePipeline(shader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = BlendStateDescription.SingleDisabled,
+                RasterizerState = RasterizerStateDescription.CullNone,
+                DepthStencilState = new DepthStencilStateDescription()
+                {
+                    DepthWriteEnabled = false,
+                    DepthComparison = ComparisonKind.LessEqual,
+                    DepthTestEnabled = true
+                }
+            }, false);
+            WaterMaterial = materialManager.CreateMaterial<water_material_data_t>(pipeline);
+            // WaterMaterial.Culling = CullingMode.Off;
+            // WaterMaterial.ZWrite = false;
+            // WaterMaterial.SourceBlending = Blending.SrcAlpha;
+            // WaterMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
+            // WaterMaterial.BlendingEnabled = true;
             WaterMaterial.SetTexture("_WaterTexture", textureManager.LoadTexture("textures/water.png"));
         }
 

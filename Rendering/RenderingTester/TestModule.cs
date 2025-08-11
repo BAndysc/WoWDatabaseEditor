@@ -360,9 +360,9 @@ public class TestModule : IGameModule
                     });
                 }
                 var instanceRenderer = new MaterialInstanceRenderData();
-                instanceRenderer.SetBuffer(material.material, "boneMatrices", bones!);
-                instanceRenderer.SetBuffer(material.material, "vertexColors", colors!);
-                instanceRenderer.SetBuffer(material.material, "textureTransforms", textureTransforms!);
+                instanceRenderer.SetBuffer("boneMatrices", bones!);
+                instanceRenderer.SetBuffer("vertexColors", colors!);
+                instanceRenderer.SetBuffer("textureTransforms", textureTransforms!);
                 instanceRenderer.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
                 entityManager.SetManagedComponent(entity, instanceRenderer);
             }

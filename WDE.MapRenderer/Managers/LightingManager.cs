@@ -1,9 +1,11 @@
 using System.Runtime.InteropServices;
+using TheAvaloniaOpenGL.Resources;
 using TheEngine.Data;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheMaths;
+using Veldrid;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
@@ -51,7 +53,9 @@ namespace WDE.MapRenderer.Managers
             CameraManager cameraManager,
             LightStore lightStore,
             ILightManager lightManager,
-            TimeManager timeManager)
+            TimeManager timeManager,
+            IPipelineManager pipelineManager,
+            IShaderManager shaderManager)
         {
             this.gameContext = gameContext;
             this.gameProperties = gameProperties;
@@ -63,7 +67,13 @@ namespace WDE.MapRenderer.Managers
             this.lightManager = lightManager;
             this.timeManager = timeManager;
             skySphereMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/skysphere.obj").MeshData);
-            skyMaterial = materialManager.CreateMaterial<material_data_t>("data/skybox.json");
+            var skyPipeline = pipelineManager.CreatePipeline(shaderManager.LoadShader("data/skybox.json"), PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                RasterizerState = RasterizerStateDescription.CullNone,
+                DepthStencilState = DepthStencilStateDescription.DepthOnlyLessEqualRead,
+                BlendState = BlendStateDescription.SingleDisabled
+            }, false);
+            skyMaterial = materialManager.CreateMaterial<material_data_t>(skyPipeline);
             noiseTexture = textureManager.LoadTexture("textures/noise_512.png");
             
             skyMaterial.SetTexture("cloudsTex", noiseTexture);
@@ -184,9 +194,6 @@ namespace WDE.MapRenderer.Managers
                 var sunColor = BestLight.NormalWeather.GetLightParameter(LightIntParamType.SunColor).GetColorAtTime(time);
                 var cloudsColor1 = BestLight.NormalWeather.GetLightParameter(LightIntParamType.Clouds1).GetColorAtTime(time);
                 var cloudsDensity = BestLight.NormalWeather.GetLightParameter(LightFloatParamType.CloudDensity).GetAtTime(time);
-                skyMaterial.BlendingEnabled = true;
-                skyMaterial.SourceBlending = Blending.SrcAlpha;
-                skyMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
                 material_data_t data = new material_data_t()
                 {
                     top = top.ToRgbaVector(),
@@ -203,8 +210,8 @@ namespace WDE.MapRenderer.Managers
                 skyMaterial.SetMaterialData(ref data);
                 
                 var t = new Transform();
-                t.Scale = Vector3.One * 10000f;
-                renderManager.Render(skySphereMesh, skyMaterial, 0, t);
+                t.Scale = Vector3.One * gameContext.Engine.CameraManager.MainCamera.FarClip;
+                renderManager.Render(skySphereMesh, skyMaterial, ShaderPassType.Forward, 0, t);
             }
         }
     }

@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using OpenGLBindings;
+using TheEngine.Entities;
 
 namespace TheAvaloniaOpenGL.Resources
 {
@@ -122,35 +123,291 @@ namespace TheAvaloniaOpenGL.Resources
             return final.ToString();
         }
     }
-    
-    public class Shader : IDisposable
+
+    public enum ShaderPassType
+    {
+        None,
+        Forward,
+        Depth,
+        Shadow
+    }
+
+    public class ShaderPass : IDisposable
     {
         private readonly IDevice device;
         private readonly string shaderFile;
-
         internal int VertexShader { get; }
         internal int PixelShader { get; }
         internal int GeometryShader { get; }
         internal int ProgramHandle { get; }
-        
+
         public bool Instancing { get; }
 
         public bool ZWrite { get; }
-        
+
         public DepthFunction DepthTest { get; }
 
         public bool WriteMask { get; }
-        
-        private Dictionary<int, float> uniformFloatValues = new();
-        private Dictionary<int, Vector4> uniformVectorValues = new();
-        private Dictionary<int, int> uniformIntValues = new();
+
+        private Dictionary<GlobalUniformHandle, float> uniformFloatValues = new();
+        private Dictionary<GlobalUniformHandle, Vector4> uniformVectorValues = new();
+        private Dictionary<GlobalUniformHandle, int> uniformIntValues = new();
         private Dictionary<string, int> uniformToLocation = new();
 
         private HashSet<string> unusedUniforms;
         private Dictionary<string, ShaderVariableType> uniformTypes;
         private Dictionary<int, ShaderVariableType> uniformTypesByLocation;
 
+        internal string ShaderPassDefine;
+        internal string ShaderName;
+
+        internal ShaderPass(IDevice device, bool instanced, ShaderData shaderData, string shaderFile, string[] includePaths, string shaderPassDefine)
+        {
+            this.device = device;
+            this.shaderFile = shaderFile;
+            ZWrite = shaderData.ZWrite;
+            DepthTest = shaderData.DepthTest ?? DepthFunction.Lequal;
+            Instancing = shaderData.Instancing && instanced;
+            var defines = new List<string>() { "VERTEX_SHADER", shaderPassDefine };
+            if (Instancing)
+            {
+                defines.Add("Instancing");
+            }
+
+            ShaderName = Path.GetFileNameWithoutExtension(shaderFile);
+            ShaderPassDefine = shaderPassDefine;
+
+            VertexShader = device.CreateShader(ShaderType.VertexShader);
+            var vertexSource = ShaderSource.ParseShader(shaderData.Vertex.Path, true, defines.ToArray());
+            var vertexUniforms = ShaderSource.ParseUniforms(vertexSource);
+            var result = device.CompileShaderAndGetError(VertexShader, vertexSource);
+            if (!string.IsNullOrEmpty(result))
+            {
+                int o = 0;
+                foreach (var line in vertexSource.Split('\n'))
+                {
+                    o++;
+                    Console.WriteLine($"{o.ToString():-5}: {line}");
+                }
+                Console.WriteLine("Error while compiling " + shaderData.Vertex.Path);
+                Console.WriteLine(result);
+            }
+
+            PixelShader = device.CreateShader(ShaderType.FragmentShader);
+            defines = new List<string>() { "PIXEL_SHADER", shaderPassDefine };
+            if (Instancing)
+            {
+                defines.Add("Instancing");
+            }
+            var fragmentSource = ShaderSource.ParseShader(shaderData.Pixel.Path, true, defines.ToArray());
+            var fragmentUniforms = ShaderSource.ParseUniforms(fragmentSource);
+            result = device.CompileShaderAndGetError(PixelShader, fragmentSource);
+            if (!string.IsNullOrEmpty(result))
+            {
+                Console.WriteLine("Error while compiling " + shaderData.Pixel.Path);
+                Console.WriteLine(result);
+            }
+
+            if (shaderData.Geometry != null)
+            {
+                GeometryShader = device.CreateShader(ShaderType.GeometryShader);
+                defines = new List<string>() { "GEOMETRY_SHADER", shaderPassDefine };
+                var geometrySource = ShaderSource.ParseShader(shaderData.Geometry.Path, true, defines.ToArray());
+                result = device.CompileShaderAndGetError(GeometryShader, geometrySource);
+                if (!string.IsNullOrEmpty(result))
+                {
+                    Console.WriteLine("Error while compiling " + shaderData.Geometry.Path);
+                    Console.WriteLine(result);
+                }
+            }
+
+            ProgramHandle = device.CreateProgram();
+
+            device.AttachShader(ProgramHandle, VertexShader);
+            device.AttachShader(ProgramHandle, PixelShader);
+            if (GeometryShader > 0)
+                device.AttachShader(ProgramHandle, GeometryShader);
+
+            var error = device.LinkProgramAndGetError(ProgramHandle);
+            if (error != null && error.Trim().Length > 0)
+            {
+                throw new Exception(error);
+            }
+            device.UseProgram(ProgramHandle);
+
+            var idx = device.GetUniformBlockIndex(ProgramHandle, "SceneData");
+            if (idx != -1)
+                device.UniformBlockBinding(ProgramHandle, idx, Constants.SCENE_BUFFER_INDEX);
+            idx = device.GetUniformBlockIndex(ProgramHandle, "ObjectData");
+            if (idx != -1)
+                device.UniformBlockBinding(ProgramHandle, idx, Constants.OBJECT_BUFFER_INDEX);
+            idx = device.GetUniformBlockIndex(ProgramHandle, "PixelData");
+            if (idx != -1)
+                device.UniformBlockBinding(ProgramHandle, idx, Constants.PIXEL_SCENE_BUFFER_INDEX);
+
+            int count = device.GetProgramParameter(ProgramHandle, GetProgramParameterName.ActiveUniforms);
+            for (int i = 0; i < count; i++)
+            {
+                var uniformName = device.GetActiveUniform(ProgramHandle, i, 256, out _, out _, out var type);
+                int location = device.GetUniformLocation(ProgramHandle, uniformName);
+                uniformToLocation[uniformName] = location;
+            }
+
+            var uniforms = vertexUniforms.Concat(fragmentUniforms).DistinctBy(x => x.name).ToList();
+            uniformTypes = uniforms
+                .Where(x => uniformToLocation.ContainsKey(x.name))
+                .ToDictionary(x => x.name, x => x.type);
+            uniformTypesByLocation = uniformTypes.ToDictionary(x => uniformToLocation[x.Key], x => x.Value);
+            unusedUniforms = uniforms.Select(x => x.name).Where(x => !uniformToLocation.ContainsKey(x)).ToHashSet();
+
+            foreach (var (uniformName, uniformLocation) in uniformToLocation)
+            {
+                var globalLocation = Material.GetUniformLocation(uniformName);
+                if (globalToLocal == null || globalToLocal.Length <= globalLocation.Handle)
+                    Array.Resize(ref globalToLocal, globalLocation.Handle + 1);
+                globalToLocal[globalLocation.Handle] = uniformLocation + 1;
+            }
+        }
+
+        // public int? GetUniformLocation(string name)
+        // {
+        //     if (uniformToLocation.TryGetValue(name, out var loc))
+        //         return loc;
+        //     if (unusedUniforms.Contains(name))
+        //         return -1;
+        //     return null;
+        // }
+        //
+        // public string? GetUniformName(int location)
+        // {
+        //     return uniformToLocation.FirstOrDefault(p => p.Value == location).Key;
+        // }
+
+        public void Validate()
+        {
+            device.ValidateProgram(ProgramHandle);
+            int ret = device.GetProgramParameter(ProgramHandle, GetProgramParameterName.ValidateStatus);
+            if (ret == 0)
+            {
+                var problem = "In shader: " + shaderFile + "\n\n" + device.GetProgramInfoLog(ProgramHandle);
+                Console.WriteLine(problem);
+                throw new Exception(problem);
+            }
+        }
+
+        public void Activate()
+        {
+            device.UseProgram(ProgramHandle);
+        }
+
+        public void Dispose()
+        {
+            device.DeleteProgram(ProgramHandle);
+            //PixelShader.Dispose();
+            //VertexShader.Dispose();
+            //ShaderInputLayout.Dispose();
+        }
+
+        public void SetUniform(GlobalUniformHandle loc, float f)
+        {
+            if (!uniformFloatValues.TryGetValue(loc, out var curVal) || Math.Abs(curVal - f) > float.Epsilon)
+            {
+                device.Uniform1f(GetUniformLocationFromGlobal(loc), f);
+                uniformFloatValues[loc] = f;
+            }
+        }
+
+        public void SetUniform(GlobalUniformHandle loc, Matrix m)
+        {
+            device.UniformMatrix4f(GetUniformLocationFromGlobal(loc), ref m, false);
+        }
+
+        public void SetUniformInt(GlobalUniformHandle loc, int val)
+        {
+            if (!uniformIntValues.TryGetValue(loc, out var curVal) || curVal != val)
+            {
+                device.Uniform1I(GetUniformLocationFromGlobal(loc), val);
+                uniformIntValues[loc] = val;
+            }
+        }
+
+        public void SetUniform(GlobalUniformHandle loc, float x, float y, float z)
+        {
+            if (!uniformVectorValues.TryGetValue(loc, out var curVal) ||
+                Math.Abs(curVal.X - x) > float.Epsilon ||
+                Math.Abs(curVal.Y - y) > float.Epsilon ||
+                Math.Abs(curVal.Z - z) > float.Epsilon)
+            {
+                device.Uniform3f(GetUniformLocationFromGlobal(loc), x, y, z);
+                uniformVectorValues[loc] = new Vector4(x, y, z, 0);
+            }
+        }
+
+        public void SetUniform(GlobalUniformHandle loc, float x, float y, float z, float w)
+        {
+            if (!uniformVectorValues.TryGetValue(loc, out var curVal) ||
+                Math.Abs(curVal.X - x) > float.Epsilon ||
+                Math.Abs(curVal.Y - y) > float.Epsilon ||
+                Math.Abs(curVal.Z - z) > float.Epsilon ||
+                Math.Abs(curVal.W - w) > float.Epsilon)
+            {
+                device.Uniform4f(GetUniformLocationFromGlobal(loc), x, y, z, w);
+                uniformVectorValues[loc] = new Vector4(x, y, z, w);
+            }
+        }
+
+        internal IReadOnlyDictionary<string, ShaderVariableType> Uniforms => uniformTypes;
+        internal IReadOnlyDictionary<int, ShaderVariableType> UniformsByLocation => uniformTypesByLocation;
+
+        public int GetUniformLocationFromGlobal(GlobalUniformHandle uniformGlobalLocation)
+        {
+            if (globalToLocal == null || globalToLocal.Length <= uniformGlobalLocation.Handle)
+                throw new Exception("Uniform location " + uniformGlobalLocation + " is not valid in shader " + shaderFile);
+            return globalToLocal[uniformGlobalLocation.Handle] - 1;
+        }
+
+        private int[] globalToLocal;
+
+        public bool HasGlobalUniform(GlobalUniformHandle globalId)
+        {
+            if (globalToLocal == null || globalToLocal.Length <= globalId.Handle)
+            {
+                return false;
+            }
+
+            if (globalToLocal[globalId.Handle] != 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public class Shader : IDisposable
+    {
+        private ShaderData shaderData;
+        private readonly IDevice device;
+        private readonly string shaderFile;
+
+        private ShaderPass forwardPass;
+        //private ShaderPass depthPass;
+        private ShaderPass? shadowPass;
+        private ShaderPass? forwardInstancedPass;
+        //private ShaderPass? depthInstancedPass;
+        private ShaderPass? shadowInstancedPass;
+
+        public ShaderPass ForwardPass => forwardPass;
+        //public ShaderPass DepthPass => depthPass;
+        public ShaderPass? ShadowPass => shadowPass;
+
+        public ShaderPass? ForwardInstancedPass => forwardInstancedPass;
+        //public ShaderPass? DepthInstancedPass => depthInstancedPass;
+        public ShaderPass? ShadowInstancedPass => shadowInstancedPass;
+
         public string ShaderFile => shaderFile;
+
+        private Dictionary<string, ShaderVariableType> uniformTypes;
 
         /*public class ShaderInclude : Include
         {
@@ -185,105 +442,27 @@ namespace TheAvaloniaOpenGL.Resources
         }
 */
         
-        internal Shader(IDevice device, string shaderFile, string[] includePaths, bool instanced)
+        internal Shader(IDevice device, string shaderFile, string[] includePaths)
         {
             var shaderContent = File.ReadAllText(shaderFile);
-            var shaderData = JsonConvert.DeserializeObject<ShaderData>(shaderContent);
+            shaderData = JsonConvert.DeserializeObject<ShaderData>(shaderContent) ?? throw new Exception("Failed to deserialize shader data from " + shaderFile);
+            var pixelShader = File.ReadAllText(shaderData.Pixel.Path);
 
-            var shaderDir = Path.GetDirectoryName(shaderFile);
+            forwardPass = new ShaderPass(device, false, shaderData, shaderFile, includePaths, "FORWARD_PASS");
+            forwardInstancedPass = new ShaderPass(device, true, shaderData, shaderFile, includePaths, "FORWARD_PASS");
+            //depthPass = new ShaderPass(device, false, shaderData, shaderFile, includePaths, "DEPTH_PASS", "main");
+            //depthInstancedPass = new ShaderPass(device, true, shaderData, shaderFile, includePaths, "DEPTH_PASS", "main");
+            if (pixelShader.Contains("#ifdef SHADOW_PASS"))
+            {
+                shadowPass = new ShaderPass(device, false, shaderData, shaderFile, includePaths, "SHADOW_PASS");
+                shadowInstancedPass = new ShaderPass(device, true, shaderData, shaderFile, includePaths, "SHADOW_PASS");
 
-            ZWrite = shaderData.ZWrite;
-            DepthTest = shaderData.DepthTest ?? DepthFunction.Lequal;
-            Instancing = shaderData.Instancing && instanced;
-            var defines = new List<string>() { "VERTEX_SHADER" };
-            if (Instancing)
-            {
-                defines.Add("Instancing");
-            }
-            
-            VertexShader = device.CreateShader(ShaderType.VertexShader);
-            var vertexSource = ShaderSource.ParseShader(shaderData.Vertex.Path, true, defines.ToArray());
-            var vertexUniforms = ShaderSource.ParseUniforms(vertexSource);
-            var result = device.CompileShaderAndGetError(VertexShader, vertexSource);
-            if (!string.IsNullOrEmpty(result))
-            {
-                int o = 0;
-                foreach (var line in vertexSource.Split('\n'))
-                {
-                    o++;
-                    Console.WriteLine($"{o.ToString():-5}: {line}");
-                }
-                Console.WriteLine("Error while compiling " + shaderData.Vertex.Path);
-                Console.WriteLine(result);
-            }
-            
-            PixelShader = device.CreateShader(ShaderType.FragmentShader);
-            defines = new List<string>() { "PIXEL_SHADER" };
-            if (Instancing)
-            {
-                defines.Add("Instancing");
-            }
-            var fragmentSource = ShaderSource.ParseShader(shaderData.Pixel.Path, true, defines.ToArray());
-            var fragmentUniforms = ShaderSource.ParseUniforms(fragmentSource);
-            result = device.CompileShaderAndGetError(PixelShader, fragmentSource);
-            if (!string.IsNullOrEmpty(result))
-            {
-                Console.WriteLine("Error while compiling " + shaderData.Pixel.Path);
-                Console.WriteLine(result);
+                if (!shadowInstancedPass.Instancing)
+                    shadowInstancedPass = null;
             }
 
-            if (shaderData.Geometry != null)
-            {
-                GeometryShader = device.CreateShader(ShaderType.GeometryShader);
-                defines = new List<string>() { "GEOMETRY_SHADER" };
-                var geometrySource = ShaderSource.ParseShader(shaderData.Geometry.Path, true, defines.ToArray());
-                result = device.CompileShaderAndGetError(GeometryShader, geometrySource);
-                if (!string.IsNullOrEmpty(result))
-                {
-                    Console.WriteLine("Error while compiling " + shaderData.Geometry.Path);
-                    Console.WriteLine(result);
-                }
-            }
-
-            ProgramHandle = device.CreateProgram();
-
-            device.AttachShader(ProgramHandle, VertexShader);
-            device.AttachShader(ProgramHandle, PixelShader);
-            if (GeometryShader > 0)
-                device.AttachShader(ProgramHandle, GeometryShader);
-
-            var error = device.LinkProgramAndGetError(ProgramHandle);
-            if (error != null && error.Trim().Length > 0)
-            {
-                throw new Exception(error);
-            }
-            device.UseProgram(ProgramHandle);
-
-            var idx = device.GetUniformBlockIndex(ProgramHandle, "SceneData");
-            if (idx != -1)
-                device.UniformBlockBinding(ProgramHandle, idx, Constants.SCENE_BUFFER_INDEX);
-            idx = device.GetUniformBlockIndex(ProgramHandle, "ObjectData");
-            if (idx != -1)
-                device.UniformBlockBinding(ProgramHandle, idx, Constants.OBJECT_BUFFER_INDEX);
-            idx = device.GetUniformBlockIndex(ProgramHandle, "PixelData");
-            if (idx != -1)
-                device.UniformBlockBinding(ProgramHandle, idx, Constants.PIXEL_SCENE_BUFFER_INDEX);
-            
-            int count = device.GetProgramParameter(ProgramHandle, GetProgramParameterName.ActiveUniforms);
-            for (int i = 0; i < count; i++)
-            {
-                var uniformName = device.GetActiveUniform(ProgramHandle, i, 256, out _, out _, out var type);
-                int location = device.GetUniformLocation(ProgramHandle, uniformName);
-                uniformToLocation[uniformName] = location;
-            }
-            
-            var uniforms = vertexUniforms.Concat(fragmentUniforms).DistinctBy(x => x.name).ToList();
-            uniformTypes = uniforms
-                .Where(x => uniformToLocation.ContainsKey(x.name))
-                .ToDictionary(x => x.name, x => x.type);
-            uniformTypesByLocation = uniformTypes.ToDictionary(x => uniformToLocation[x.Key], x => x.Value);
-            unusedUniforms = uniforms.Select(x => x.name).Where(x => !uniformToLocation.ContainsKey(x)).ToHashSet();
-
+            if (!forwardInstancedPass.Instancing)
+                forwardInstancedPass = null;
             
             /*var shaderInclude = new ShaderInclude(includePaths);
 
@@ -311,7 +490,14 @@ namespace TheAvaloniaOpenGL.Resources
             pixelShaderByteCode.Dispose();*/
             this.device = device;
             this.shaderFile = shaderFile;
+
+            var allPasses = new[] { ForwardPass, forwardInstancedPass, ShadowPass, shadowInstancedPass };
+            uniformTypes = allPasses.Where(x => x != null).SelectMany(x => x.Uniforms)
+                .DistinctBy(x => x.Key)
+                .ToDictionary();
         }
+
+        internal IReadOnlyDictionary<string, ShaderVariableType> Uniforms => uniformTypes;
 
         private static int TypeToSize(ShaderData.ShaderInputType type)
         {
@@ -337,95 +523,13 @@ namespace TheAvaloniaOpenGL.Resources
             return size;
         }
 
-        public int? GetUniformLocation(string name)
-        {
-            if (uniformToLocation.TryGetValue(name, out var loc))
-                return loc;
-            if (unusedUniforms.Contains(name))
-                return -1;
-            return null;
-        }
-
-        public string? GetUniformName(int location)
-        {
-            return uniformToLocation.FirstOrDefault(p => p.Value == location).Key;
-        }
-
-        public void Validate()
-        {
-            device.ValidateProgram(ProgramHandle);
-            int ret = device.GetProgramParameter(ProgramHandle, GetProgramParameterName.ValidateStatus);
-            if (ret == 0)
-            {
-                var problem = "In shader: " + shaderFile + "\n\n" + device.GetProgramInfoLog(ProgramHandle);
-                Console.WriteLine(problem);
-                throw new Exception(problem);
-            }
-        }
-        
-        public void Activate()
-        {
-            device.UseProgram(ProgramHandle);
-        }
-
         public void Dispose()
         {
-            device.DeleteProgram(ProgramHandle);
-            //PixelShader.Dispose();
-            //VertexShader.Dispose();
-            //ShaderInputLayout.Dispose();
+            forwardPass.Dispose();
+            shadowPass?.Dispose();
+            forwardInstancedPass?.Dispose();
+            shadowInstancedPass?.Dispose();
         }
-
-        public void SetUniform(int loc, float f)
-        {
-            if (!uniformFloatValues.TryGetValue(loc, out var curVal) || Math.Abs(curVal - f) > float.Epsilon)
-            {
-                device.Uniform1f(loc, f);
-                uniformFloatValues[loc] = f;
-            }
-        }
-        
-        public void SetUniform(int loc, Matrix m)
-        {
-            device.UniformMatrix4f(loc, ref m, false);
-        }
-
-        public void SetUniformInt(int loc, int val)
-        {
-            if (!uniformIntValues.TryGetValue(loc, out var curVal) || curVal != val)
-            {
-                device.Uniform1I(loc, val);
-                uniformIntValues[loc] = val;
-            }
-        }
-
-        public void SetUniform(int loc, float x, float y, float z)
-        {
-            if (!uniformVectorValues.TryGetValue(loc, out var curVal) || 
-                Math.Abs(curVal.X - x) > float.Epsilon ||
-                Math.Abs(curVal.Y - y) > float.Epsilon ||
-                Math.Abs(curVal.Z - z) > float.Epsilon)
-            {
-                device.Uniform3f(loc, x, y, z);
-                uniformVectorValues[loc] = new Vector4(x, y, z, 0);
-            }
-        }
-
-        public void SetUniform(int loc, float x, float y, float z, float w)
-        {
-            if (!uniformVectorValues.TryGetValue(loc, out var curVal) || 
-                Math.Abs(curVal.X - x) > float.Epsilon ||
-                Math.Abs(curVal.Y - y) > float.Epsilon ||
-                Math.Abs(curVal.Z - z) > float.Epsilon ||
-                Math.Abs(curVal.W - w) > float.Epsilon)
-            {
-                device.Uniform4f(loc, x, y, z, w);
-                uniformVectorValues[loc] = new Vector4(x, y, z, w);
-            }
-        }
-
-        internal IReadOnlyDictionary<string, ShaderVariableType> Uniforms => uniformTypes;
-        internal IReadOnlyDictionary<int, ShaderVariableType> UniformsByLocation => uniformTypesByLocation;
     }
     
     internal class ShaderData

@@ -16,6 +16,8 @@ namespace TheEngine.Components
         private MaterialHandle materialHandle;
         internal GCHandle materialGcHandle;
         public MaterialHandle MaterialHandle => materialHandle;
+        private PipelineHandle pipelineHandle;
+        public PipelineHandle PipelineHandle => pipelineHandle;
 
         public IMesh Mesh
         {
@@ -40,6 +42,7 @@ namespace TheEngine.Components
                 }
                 materialHandle = value.Handle;
                 materialGcHandle = GCHandle.Alloc(value);
+                pipelineHandle = value.Pipeline.Handle;
                 Opaque = !value.BlendingEnabled;
             }
         }

@@ -72,6 +72,7 @@ public class Game : IGame
         registry.RegisterInstance(typeof(IMaterialManager), engine.MaterialManager);
         registry.RegisterInstance(typeof(IMeshManager), engine.MeshManager);
         registry.RegisterInstance(typeof(IRenderManager), engine.RenderManager);
+        registry.RegisterInstance(typeof(IPipelineManager), engine.PipelineManager);
         registry.RegisterInstance(typeof(IShaderManager), engine.ShaderManager);
         registry.RegisterInstance(typeof(IStatsManager), engine.StatsManager);
         registry.RegisterInstance(typeof(ITextureManager), engine.TextureManager);

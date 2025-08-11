@@ -6,6 +6,7 @@ using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Structures;
 using TheMaths;
+using Veldrid;
 
 namespace TheEngine.Interfaces
 {
@@ -19,15 +20,15 @@ namespace TheEngine.Interfaces
         DynamicRenderHandle RegisterDynamicRenderer(MeshHandle mesh, Material material, int subMesh, Matrix localToWorld);
         void UnregisterDynamicRenderer(DynamicRenderHandle staticRenderHandle);
         void DrawLine(Vector3 start, Vector3 end, Vector4 color);
-        void Render(IMesh mesh, Material material, int submesh, Transform transform);
-        void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null);
-        void Render(MeshHandle mesh, MaterialHandle material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null);
-        void Render(IMesh mesh, Material material, int submesh, Vector3 position);
+        void Render(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, Transform transform);
+        void Render(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null);
+        void Render(MeshHandle mesh, MaterialHandle material, ShaderPassType shaderPassType, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null);
+        void Render(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, Vector3 position);
         void RenderFullscreenPlane(Material material);
         void ActivateDefaultRenderTexture();
         void ActivateRenderTexture(ITexture rt, Color4? color = null);
-        void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count, Matrix localToWorld, Matrix? worldToLocal = null);
-        void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count);
+        void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int count, Matrix localToWorld, Matrix? worldToLocal = null);
+        void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int count);
         float ViewDistanceModifier { get; set; }
         void ActivateScene(in SceneData? scene);
         void AddPostprocess(IPostProcess postProcess);
@@ -41,6 +42,9 @@ namespace TheEngine.Interfaces
         void UnregisterRenderLayer(RenderLayer layer);
         void ToggleRenderLayer(RenderLayer layer, bool enable);
         IReadOnlyList<RenderLayerData> RenderLayers { get; }
+
+        public static OutputDescription ShadowPassOutput => new OutputDescription(new OutputAttachmentDescription(PixelFormat.R32_Float));
+        public static OutputDescription DefaultOutput => new OutputDescription(new OutputAttachmentDescription(PixelFormat.R32_Float), new OutputAttachmentDescription(PixelFormat.R16_G16_B16_A16_Float), new OutputAttachmentDescription(PixelFormat.R32_UInt));
     }
 
     public static class RenderManagerExtensions

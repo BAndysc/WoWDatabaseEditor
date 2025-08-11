@@ -28,3 +28,6 @@
 [submodule "Libraries/Avalonia.Controls.DataGrid"]
 	path = Libraries/Avalonia.Controls.DataGrid
 	url = https://github.com/BAndysc/Avalonia.Controls.DataGrid
+[submodule "Rendering/veldrid"]
+	path = Rendering/veldrid
+	url = https://github.com/bandysc/veldrid/
