@@ -1406,19 +1406,95 @@
 		"name": "Gameobject flags",
 		"isflag": true,
 		"quickaccess": "Full",
-		"prefix": "GO_FLAG_",
-		"values": {
-			"0": {"name": "none"},
-			"1": {"name": "IN_USE", "description": "Gameobject in use - Disables interaction while being animated"},
-			"2": {"name": "LOCKED", "description": "Makes the Gameobject Locked. Requires a key, spell, or event to be opened. \"Locked\" appears in tooltip"},
-			"4": {"name": "INTERACT_COND", "description": "Untargetable, cannot interact"},
-			"8": {"name": "TRANSPORT", "description": "Gameobject can transport (boat, elevator, car)"},
-			"16": {"name": "NOT_SELECTABLE", "description": "Not selectable (Not even in GM-mode)"},
-			"32": {"name": "NODESPAWN", "description": "Never despawns. Typical for gameobjects with on/off state (doors for example)"},
-			"64": {"name": "TRIGGERED", "description": "typically, summoned objects. Triggered by spell or other events"},
-			"512": {"name": "DAMAGED", "description": "Gameobject has been siege damaged"},
-			"1024": {"name": "DESTROYED", "description": "Gameobject has been destroyed"}
-		}
+        "values": {
+            "0x00000001": {
+                "name" : "IN_USE",
+                "description": "disables interaction while animated"
+            },
+            "0x00000002": {
+                "name" : "LOCKED",
+                "description": "require key, spell, event, etc to be opened. Makes 'Locked' appear in tooltip"
+            },
+            "0x00000004": {
+                "name" : "INTERACT_COND",
+                "description": "cannot interact (condition to interact)"
+            },
+            "0x00000008": {
+                "name" : "TRANSPORT",
+                "description": "any kind of transport? Object can transport (elevator, boat, car)"
+            },
+            "0x00000010": {
+                "name" : "NOT_SELECTABLE",
+                "description": "not selectable even in GM mode"
+            },
+            "0x00000020": {
+                "name" : "NODESPAWN",
+                "description": "never despawn, typically for doors, they just change state"
+            },
+            "0x00000040": {
+                "name" : "AI_OBSTACLE",
+                "description": "makes the client register the object in something called AIObstacleMgr, unknown what it does"
+            },
+            "0x00000080": {
+                 "name" : "FREEZE_ANIMATION" 
+            },
+            "0x00000100": {
+                "name" : "UNK_9",
+                "description": "? Seen on type 33, possible meaning 'destruct in progress' used as WMOAreaTable::NameSetID"
+            },
+            "0x00000200": {
+                "name" : "DAMAGED",
+                "description": "? Seen on type 33 used as WMOAreaTable::NameSetID"
+            },
+            "0x00000400": {
+                "name" : "DESTROYED",
+                "description": "? Seen on type 33, possibly meaning 'destructed' used as WMOAreaTable::NameSetID"
+            },
+            "0x00000800": {
+                "name" : "UNK_12",
+                "description": "used as WMOAreaTable::NameSetID"
+            },
+            "0x00001000": {
+                "name" : "UNK_13"
+            },
+            "0x00002000": {
+                "name" : "UNK_14"
+            },
+            "0x00004000": {
+                "name" : "IGNORE_CURRENT_STATE_FOR_USE_SPELL",
+                "description": "Allows casting use spell without checking current state (opening open gameobjects, unlocking unlocked gameobjects and closing closed gameobjects)"
+            },
+            "0x00008000": {
+                "name" : "INTERACT_DISTANCE_IGNORES_MODEL",
+                "description": "Client completely ignores model bounds for interaction distance check"
+            },
+            "0x00010000": {
+                "name" : "UNK_17"
+            },
+            "0x00020000": {
+                "name" : "UNK_18"
+            },
+            "0x00040000": {
+                "name" : "IGNORE_CURRENT_STATE_FOR_USE_SPELL_EXCEPT_UNLOCKED",
+                "description": "Allows casting use spell without checking current state except unlocking unlocked gamobjets (opening open gameobjects and closing closed gameobjects)"
+            },
+            "0x00080000": {
+                "name" : "INTERACT_DISTANCE_USES_TEMPLATE_MODEL",
+                "description": "client checks interaction distance from model sent in SMSG_QUERY_GAMEOBJECT_RESPONSE instead of GAMEOBJECT_DISPLAYID"
+            },
+            "0x00100000": {
+                "name" : "MAP_OBJECT",
+                "description": "pre-7.0 model loading used to be controlled by file extension (wmo vs m2)"
+            },
+            "0x00200000": {
+                "name" : "IN_MULTI_USE",
+                "description": "IN_USE equivalent for objects usable by multiple players"
+            },
+            "0x04000000": {
+                "name" : "LOW_PRIORITY_SELECTION",
+                "description": "client will give lower cursor priority to this object when multiple objects overlap"
+            }
+        }
 	},
 	"GenderParameter": {
 		"name": "Gender",
