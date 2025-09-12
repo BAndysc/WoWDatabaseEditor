@@ -21,7 +21,7 @@ namespace WDE.WoWHeadConnector.Test
         public async Task TestMurlocMaster()
         {
             var abilities = await headService.FetchNpcAbilities(HeadSourceType.Master, 46);
-            CollectionAssert.AreEquivalent(new uint[]{3368}, abilities.Select(a => a.SpellId));
+            CollectionAssert.AreEquivalent(new uint[]{3368, 317898}, abilities.Select(a => a.SpellId));
         }
 
         [Test]
