@@ -518,12 +518,12 @@
           "db_column_name": "RewardMoneyDifficulty",
           "value_type": "MoneyParameter"
         },
-        {
+        /*{
           "name": "Reward bonus money",
           "db_column_name": "RewardBonusMoney",
           "value_type": "MoneyParameter",
           "help": "The money a character at level 80 would get when they complete this quest."
-        },
+        },*/
         {
           "name": "Reward display spell",
           "db_column_name": "RewardDisplaySpell",
