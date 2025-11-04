@@ -8,7 +8,7 @@ public class EditorHeaderPanel : Panel
 {
     protected override Size MeasureOverride(Size availableSize)
     {
-        if (Children.Count != 4)
+        if (Children.Count != 5)
             return default;
 
         double width = 0;
@@ -24,16 +24,17 @@ public class EditorHeaderPanel : Panel
 
     protected override Size ArrangeOverride(Size finalSize)
     {
-        if (Children.Count != 4)
+        if (Children.Count != 5)
             return default;
 
         var id = Children[0];
         var name = Children[1];
-        var toolbar = Children[2];
-        var rightbar = Children[3];
+        var subname = Children[2];
+        var toolbar = Children[3];
+        var rightbar = Children[4];
 
         var requiredWidth = id.DesiredSize.Width + toolbar.DesiredSize.Width + rightbar.DesiredSize.Width;
-        var desiredWidth = requiredWidth + name.DesiredSize.Width;
+        var desiredWidth = requiredWidth + name.DesiredSize.Width + subname.DesiredSize.Width;
 
         if (finalSize.Width >= desiredWidth)
         {
@@ -42,6 +43,8 @@ public class EditorHeaderPanel : Panel
             x += id.DesiredSize.Width;
             name.Arrange(new Rect(x, 0, name.DesiredSize.Width, finalSize.Height));
             x += name.DesiredSize.Width;
+            subname.Arrange(new Rect(x, 0, subname.DesiredSize.Width, finalSize.Height));
+            x += subname.DesiredSize.Width;
             toolbar.Arrange(new Rect(x, 0, toolbar.DesiredSize.Width, finalSize.Height));
             rightbar.Arrange(new Rect(finalSize.Width - rightbar.DesiredSize.Width, 0, rightbar.DesiredSize.Width, finalSize.Height));
         }
@@ -56,6 +59,7 @@ public class EditorHeaderPanel : Panel
 
             var leftWidth = finalSize.Width - requiredWidth;
             name.Arrange(new Rect(id.DesiredSize.Width, 0, leftWidth, finalSize.Height));
+            subname.Arrange(new Rect(id.DesiredSize.Width + name.DesiredSize.Width, 0, leftWidth, finalSize.Height));
         }
         else
         {

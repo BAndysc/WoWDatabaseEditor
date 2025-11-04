@@ -48,5 +48,6 @@ namespace WDE.HttpDatabase.Models
         }
         
         public uint DataCount => 2;
+        public ushort Faction => 0;
     }
 }

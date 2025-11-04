@@ -33,5 +33,6 @@ namespace WDE.CMMySqlDatabase.Models.TBC
         
         // not implemented in cmangos
         public string AIName { get; set; } = null!;
+        public ushort Faction => 0;
     }
 }
