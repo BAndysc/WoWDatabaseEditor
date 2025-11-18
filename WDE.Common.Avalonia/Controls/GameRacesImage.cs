@@ -206,7 +206,7 @@ public class GameRacesImage : BaseGameEnumImage
         if (allyImage == null)
         {
             var coreVersion = ViewBind.ResolveViewModel<ICurrentCoreVersion>().Current;
-            cachedAllSupportedRaces = coreVersion.GameVersionFeatures.AllRaces;
+            cachedAllSupportedRaces = coreVersion.GameVersionFeatures.AllRaces &~ CharacterRaces.Pandaren;
             cachedAllyRaces = cachedAllSupportedRaces & CharacterRaces.AllAlliance;
             cachedHordeRaces = cachedAllSupportedRaces & CharacterRaces.AllHorde;
         }

@@ -34,7 +34,7 @@ public enum CharacterRaces : uint
     DracthyrAlliance = 65536,
     DracthyrHorde = 32768,
     All = Human | Orc | Dwarf | NightElf | Undead | Tauren | Gnome | Troll | Goblin | BloodElf | Draenei |
-          Worgen | Pandaren | PandarenAlliance | PandarenHorde | Nightborne | HighmountainTauren | VoidElf | LightforgedDraenei | 
+          Worgen | PandarenAlliance | PandarenHorde | Nightborne | HighmountainTauren | VoidElf | LightforgedDraenei | 
           ZandalariTroll | KulTiran | DarkIronDwarf | Vulpera | MagharOrc | Mechagnome | DracthyrAlliance | DracthyrHorde,
     AllHorde = Orc | Undead | Tauren | Troll | Goblin | BloodElf | PandarenHorde | Nightborne | HighmountainTauren | ZandalariTroll | Vulpera | MagharOrc | DracthyrHorde,
     AllAlliance = Human | Dwarf | NightElf | Gnome | Draenei | Worgen | PandarenAlliance | VoidElf | LightforgedDraenei | KulTiran | DarkIronDwarf | Mechagnome | DracthyrAlliance,
@@ -42,7 +42,7 @@ public enum CharacterRaces : uint
     AllTbc = AllVanilla | Draenei | BloodElf,
     AllWrath = AllTbc,
     AllCatataclysm = AllWrath | Worgen | Goblin,
-    AllMoP = AllCatataclysm | Pandaren | PandarenAlliance | PandarenHorde,
+    AllMoP = AllCatataclysm | PandarenAlliance | PandarenHorde | Pandaren,
     AllWoD = AllMoP,
     AllLegion = AllWoD | Nightborne | HighmountainTauren | VoidElf | LightforgedDraenei,
     AllBfA = AllLegion | ZandalariTroll | KulTiran | DarkIronDwarf | Vulpera | MagharOrc | Mechagnome,
