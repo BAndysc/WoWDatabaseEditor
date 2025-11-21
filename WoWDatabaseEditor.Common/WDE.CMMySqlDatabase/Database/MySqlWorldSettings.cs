@@ -42,10 +42,10 @@ namespace WDE.CMMySqlDatabase.Database
         public bool IsEmpty => string.IsNullOrEmpty(authAccess.Host) || string.IsNullOrEmpty(authAccess.Database) || string.IsNullOrEmpty(authAccess.User);
         
         public string ConnectionString =>
-            $"Server={worldAccess.Host};Port={worldAccess.Port ?? 3306};Database={worldAccess.Database};Uid={worldAccess.User};Pwd={worldAccess.Password};AllowUserVariables=True;TreatTinyAsBoolean=False";
+            $"Server={worldAccess.Host};Port={worldAccess.Port ?? 3306};Database={worldAccess.Database};Uid={worldAccess.User};Pwd=\"{worldAccess.Password}\";AllowUserVariables=True;TreatTinyAsBoolean=False";
 
         public string AuthConnectionString =>
-            $"Server={authAccess.Host};Port={authAccess.Port ?? 3306};Database={authAccess.Database};Uid={authAccess.User};Pwd={authAccess.Password};AllowUserVariables=True;TreatTinyAsBoolean=False";
+            $"Server={authAccess.Host};Port={authAccess.Port ?? 3306};Database={authAccess.Database};Uid={authAccess.User};Pwd=\"{authAccess.Password}\";AllowUserVariables=True;TreatTinyAsBoolean=False";
 
         public string DatabaseName { get; }
     }

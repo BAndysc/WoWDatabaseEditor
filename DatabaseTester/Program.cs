@@ -140,7 +140,7 @@ public class Program
 
         var databaseConn = Substitute.For<IMySqlWorldConnectionStringProvider>();
         var databaseName = dbSettings.Settings.Database;
-        var connString = $"Server={dbSettings.Settings.Host};Port={dbSettings.Settings.Port ?? 3306};Database={dbSettings.Settings.Database};Uid={dbSettings.Settings.User};Pwd={dbSettings.Settings.Password};AllowUserVariables=True;TreatTinyAsBoolean=False";
+        var connString = $"Server={dbSettings.Settings.Host};Port={dbSettings.Settings.Port ?? 3306};Database={dbSettings.Settings.Database};Uid={dbSettings.Settings.User};Pwd=\"{dbSettings.Settings.Password}\";AllowUserVariables=True;TreatTinyAsBoolean=False";
         databaseConn.ConnectionString.ReturnsForAnyArgs(connString);
         databaseConn.DatabaseName.ReturnsForAnyArgs(databaseName);
         
