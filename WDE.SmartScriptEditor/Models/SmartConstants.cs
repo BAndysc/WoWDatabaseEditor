@@ -48,6 +48,7 @@
         public const int ConditionOr = -1;
         public const int MovementTypePointMotionType = 8;
         public const int EventFlagNotRepeatable = 1;
+        public const int EventFlagResetRunOnce = 1024;
         public const int EventGroupBegin = -2;
         public const int EventGroupEnd = -3;
         public const string BeginGroupSeparator = " -//- ";

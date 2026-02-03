@@ -2806,10 +2806,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                                     continue;
 
                                 var value = e.GetParameter(repeatMaximum).Value;
-                                if (value == 0)
-                                    e.Flags.Value |= SmartConstants.EventFlagNotRepeatable;
-                                else
-                                    e.Flags.Value &= ~SmartConstants.EventFlagNotRepeatable;   
+                                if ((e.Flags.Value & SmartConstants.EventFlagResetRunOnce) == 0)
+                                {
+                                    if (value == 0)
+                                        e.Flags.Value |= SmartConstants.EventFlagNotRepeatable;
+                                    else
+                                        e.Flags.Value &= ~SmartConstants.EventFlagNotRepeatable;
+                                }
                             }
                         }
                         if (!editOriginal && modifiedConditions)
