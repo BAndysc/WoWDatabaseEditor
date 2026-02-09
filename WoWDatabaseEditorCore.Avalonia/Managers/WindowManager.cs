@@ -332,13 +332,29 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                     {
                         WeakReference<IInputElement>? focusedElement = null;
                         var parentWindow = GetFocusedWindow();
+
+                        var lifetime = Application.Current!.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
+                        if (lifetime != null && !lifetime.Windows.Contains(parentWindow))
+                        {
+                            parentWindow = mainWindowHolder.RootWindow;
+                        }
+
                         if (TopLevel.GetTopLevel(parentWindow)?.FocusManager?.GetFocusedElement() is
                             { } focusedElement_)
                         {
                             focusedElement = new WeakReference<IInputElement>(focusedElement_);
                         }
 
-                        var result = await view.ShowDialog<bool>(parentWindow);
+                        bool result;
+                        try
+                        {
+                            result = await view.ShowDialog<bool>(parentWindow);
+                        }
+                        catch (InvalidOperationException ex) when (ex.Message.Contains("closed owner"))
+                        {
+                            parentWindow = mainWindowHolder.RootWindow;
+                            result = await view.ShowDialog<bool>(parentWindow);
+                        }
 
                         Dispatcher.UIThread.Post(() =>
                         {
