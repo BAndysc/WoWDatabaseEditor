@@ -130,6 +130,8 @@
         <BetterKeyBinding Gesture="Cmd+A" CustomCommand="{CompiledBinding SetQuestAllianceOnlyCommand}" />
         <BetterKeyBinding Gesture="Ctrl+F" CustomCommand="{CompiledBinding ToggleSearchBoxCommand}" />
         <BetterKeyBinding Gesture="Cmd+F" CustomCommand="{CompiledBinding ToggleSearchBoxCommand}" />
+        <BetterKeyBinding Gesture="Ctrl+T" CustomCommand="{CompiledBinding CopyTitle}" />
+        <BetterKeyBinding Gesture="Cmd+T" CustomCommand="{CompiledBinding CopyTitle}" />
     </UserControl.KeyBindings>
     <Panel>
         <Panel.Resources>
@@ -503,6 +505,7 @@
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).Copy}" />
 
                             <MenuItem Header="Copy title"
+                                      InputGesture="Ctrl+T"
                                       utils:MenuBind.Icon="Icons/icon_duplicate.png"
                                       Command="{CompiledBinding $parent[nodify:NodifyEditor].((viewModels:QuestChainDocumentViewModel)DataContext).CopyTitle}" />
 
