@@ -75,6 +75,8 @@ namespace WDE.SmartScriptEditor
                     return new ImageUri("Icons/document_battle_pet.png");
                 case SmartScriptType.Conversation:
                     return new ImageUri("Icons/document_conversation.png");
+                case SmartScriptType.Movie:
+                    return new ImageUri("Icons/document_movie.png");
                 default:
                     return new ImageUri("Icons/document.png");
             }
