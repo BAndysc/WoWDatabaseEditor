@@ -25,6 +25,7 @@ namespace WDE.Common.Database
         StaticSpell,
         BattlePet,
         Conversation,
+        Movie,
         END,
         
         ActionList,  // can be any id, do not delete
@@ -62,6 +63,7 @@ namespace WDE.Common.Database
         BattlePet = 1 << SmartScriptType.BattlePet,
         Conversation = 1 << SmartScriptType.Conversation,
         ActionList = 1 << SmartScriptType.ActionList,  // can be any id, do not delete
+        Movie = 1 << SmartScriptType.Movie,
     }
     
     public enum AnimTier : byte
