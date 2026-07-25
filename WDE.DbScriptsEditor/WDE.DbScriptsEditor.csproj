@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Configurations>Debug;Release</Configurations>
+    <Platforms>AnyCPU</Platforms>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>$(WarningsAsErrors),nullable</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+      <OutputPath>..\bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <Import Project="..\Module.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
+    <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
+    <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="DbScriptData\*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DynamicData">
+      <Version>9.4.31</Version>
+    </PackageReference>
+    <PackageReference Include="FuzzySharp">
+      <Version>2.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="SmartFormat.NET">
+      <Version>2.7.3</Version>
+    </PackageReference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,119 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.DbScriptsEditor.Editor.ViewModels;assembly=WDE.DbScriptsEditor"
+             xmlns:controls="clr-namespace:WDE.DbScriptsEditor.Avalonia.Editor.UserControls"
+             xmlns:commonControls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="820" d:DesignHeight="640"
+             x:DataType="viewModels:DbScriptEditorViewModel"
+             x:Name="Root"
+             x:Class="WDE.DbScriptsEditor.Avalonia.Editor.Views.DbScriptEditorView">
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelected}" />
+        <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelected}" />
+        <KeyBinding Gesture="Ctrl+D" Command="{CompiledBinding DuplicateSelected}" />
+        <KeyBinding Gesture="Alt+Up" Command="{CompiledBinding MoveSelectedUp}" />
+        <KeyBinding Gesture="Alt+Down" Command="{CompiledBinding MoveSelectedDown}" />
+    </UserControl.KeyBindings>
+
+    <Grid Background="{DynamicResource DbScripts.Background}">
+        <Grid.ContextMenu>
+            <commonControls:FixedContextMenu>
+                <MenuItem Header="Edit action" Command="{CompiledBinding EditSelected}" />
+                <MenuItem Header="Edit condition" Command="{CompiledBinding EditSelectedCondition}" />
+                <MenuItem Header="Remove condition" Command="{CompiledBinding RemoveSelectedCondition}" />
+                <Separator />
+                <MenuItem Header="Add action" Command="{CompiledBinding AddStep}" />
+                <MenuItem Header="Add wait" Command="{CompiledBinding AddWait}" />
+                <MenuItem Header="Add comment" Command="{CompiledBinding AddComment}" />
+                <Separator />
+                <MenuItem Header="Copy" InputGesture="Ctrl+C" Command="{CompiledBinding Copy}" />
+                <MenuItem Header="Cut" InputGesture="Ctrl+X" Command="{CompiledBinding Cut}" />
+                <MenuItem Header="Paste" InputGesture="Ctrl+V" Command="{CompiledBinding Paste}" />
+                <Separator />
+                <MenuItem Header="Duplicate" InputGesture="Ctrl+D" Command="{CompiledBinding DuplicateSelected}" />
+                <MenuItem Header="Delete" InputGesture="Delete" Command="{CompiledBinding DeleteSelected}" />
+            </commonControls:FixedContextMenu>
+        </Grid.ContextMenu>
+
+        <!-- action list -->
+        <ScrollViewer>
+            <StackPanel Spacing="0" Margin="7,6,7,20"
+                        DragDrop.AllowDrop="True"
+                        x:Name="ListRoot">
+                <ItemsControl x:Name="TimelineItems" ItemsSource="{CompiledBinding Rows}">
+                    <ItemsControl.DataTemplates>
+                        <!-- "if <condition>" row (equal entity: select / drag / double-click or
+                             click the text to edit the condition tree) -->
+                        <DataTemplate DataType="viewModels:DbScriptIfViewModel">
+                            <controls:DbScriptIfView
+                                Margin="0,3,0,0"
+                                IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Root}"
+                                RangeSelectRequest="{Binding DataContext.RangeSelectTo, ElementName=Root}"
+                                EditCommand="{Binding DataContext.EditIf, ElementName=Root}"
+                                DirectEditParameter="{Binding DataContext.EditContextLink, ElementName=Root}"
+                                ToolTip.Tip="Double-click to edit the condition, drag to move" />
+                        </DataTemplate>
+                        <!-- action row -->
+                        <DataTemplate DataType="viewModels:DbScriptStepViewModel">
+                            <DockPanel Margin="0,1">
+                                <Panel DockPanel.Dock="Left" Width="18" IsVisible="{CompiledBinding InConditionBlock}">
+                                    <Border Width="2" HorizontalAlignment="Left" Margin="6,0,0,0"
+                                            Background="{DynamicResource DbScripts.Action.Border}" />
+                                </Panel>
+                                <controls:DbScriptActionView
+                                    IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                    DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Root}"
+                                    RangeSelectRequest="{Binding DataContext.RangeSelectTo, ElementName=Root}"
+                                    EditActionCommand="{Binding DataContext.EditAction, ElementName=Root}"
+                                    DirectEditParameter="{Binding DataContext.EditContextLink, ElementName=Root}" />
+                            </DockPanel>
+                        </DataTemplate>
+                        <!-- wait row (equal entity: select / drag / double-click to edit) -->
+                        <DataTemplate DataType="viewModels:DbScriptWaitViewModel">
+                            <DockPanel Margin="0,1">
+                                <Panel DockPanel.Dock="Left" Width="18" IsVisible="{CompiledBinding InConditionBlock}">
+                                    <Border Width="2" HorizontalAlignment="Left" Margin="6,0,0,0"
+                                            Background="{DynamicResource DbScripts.Action.Border}" />
+                                </Panel>
+                                <controls:DbScriptWaitView
+                                    IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                    DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Root}"
+                                    RangeSelectRequest="{Binding DataContext.RangeSelectTo, ElementName=Root}"
+                                    EditCommand="{Binding DataContext.EditWait, ElementName=Root}"
+                                    ToolTip.Tip="Double-click to edit, drag to move" />
+                            </DockPanel>
+                        </DataTemplate>
+                        <!-- comment row (equal entity: select / drag / double-click to edit) -->
+                        <DataTemplate DataType="viewModels:DbScriptCommentViewModel">
+                            <DockPanel Margin="0,1">
+                                <Panel DockPanel.Dock="Left" Width="18" IsVisible="{CompiledBinding InConditionBlock}">
+                                    <Border Width="2" HorizontalAlignment="Left" Margin="6,0,0,0"
+                                            Background="{DynamicResource DbScripts.Action.Border}" />
+                                </Panel>
+                                <controls:DbScriptCommentView
+                                    IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                    DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Root}"
+                                    RangeSelectRequest="{Binding DataContext.RangeSelectTo, ElementName=Root}"
+                                    EditCommand="{Binding DataContext.EditComment, ElementName=Root}"
+                                    ToolTip.Tip="Double-click to edit, drag to move" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.DataTemplates>
+                </ItemsControl>
+
+                <Button HorizontalAlignment="Left" Margin="2,6,0,0"
+                        Background="Transparent" BorderThickness="0" Opacity="0.6"
+                        Content="＋ Add action" Command="{CompiledBinding AddStep}" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- drop-position indicator (SmartScript-style gray insertion line) -->
+        <Canvas x:Name="DropOverlay" IsHitTestVisible="False">
+            <Border x:Name="DropIndicator" Height="3" Background="Gray"
+                    IsVisible="False" />
+        </Canvas>
+    </Grid>
+</UserControl>

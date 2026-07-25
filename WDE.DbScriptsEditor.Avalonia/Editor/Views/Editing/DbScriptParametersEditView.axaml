@@ -1,0 +1,47 @@
+<UserControl x:Class="WDE.DbScriptsEditor.Avalonia.Editor.Views.Editing.DbScriptParametersEditView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mvvm="http://prismlibrary.com/"
+             xmlns:editing="clr-namespace:WDE.DbScriptsEditor.Avalonia.Editor.Views.Editing"
+             xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:WDE.DbScriptsEditor.Editor.ViewModels.Editing;assembly=WDE.DbScriptsEditor"
+             x:DataType="viewModels:DbScriptParametersEditViewModel"
+             mvvm:ViewModelLocator.AutoWireViewModel="False">
+
+    <Grid Margin="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <controls:FormattedTextBlock
+            IsHitTestVisible="False"
+            Text="{CompiledBinding Readable}"
+            Margin="0,0,0,10" />
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Grid.Row="1">
+            <ItemsControl Focusable="False" KeyboardNavigation.TabNavigation="Continue" ItemsSource="{CompiledBinding FilteredParameters}" x:Name="Parameters">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Key}" FontWeight="Thin" FontSize="17" />
+                            <ItemsControl KeyboardNavigation.TabNavigation="Continue" ItemsSource="{Binding}" Margin="10,0,0,16">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <editing:ParameterEditorView utils:FocusUtils.FocusFirst="{Binding FocusFirst}"
+                                                                     Margin="0,0,0,5" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <controls:OkCancelButtons Grid.Row="2" IsVisible="{CompiledBinding ShowCloseButtons}"
+                                  AcceptCommand="{CompiledBinding Accept}"
+                                  CancelCommand="{CompiledBinding Cancel}" />
+    </Grid>
+</UserControl>

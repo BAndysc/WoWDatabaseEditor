@@ -1,0 +1,14 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Styles.Resources>
+        <SolidColorBrush x:Key="DbScripts.Background" Color="#F5F6FC" />
+
+        <SolidColorBrush x:Key="DbScripts.Action.Background" Color="#E9EFFB" />
+        <SolidColorBrush x:Key="DbScripts.Action.Border" Color="#E9EFFB" />
+        <SolidColorBrush x:Key="DbScripts.Action.Selected.Border" Color="#F5C61F" />
+        <SolidColorBrush x:Key="DbScripts.Action.Selected.Background" Color="#FFF2BF" />
+
+        <SolidColorBrush x:Key="DbScripts.Delay.Foreground" Color="#7F707880" />
+        <SolidColorBrush x:Key="DbScripts.Comment.Foreground" Color="#2E7D32" />
+    </Styles.Resources>
+</Styles>

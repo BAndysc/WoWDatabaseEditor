@@ -1,0 +1,165 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:extendedTextBlock="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+        xmlns:controls="clr-namespace:WDE.DbScriptsEditor.Avalonia.Editor.UserControls"
+        xmlns:editing="clr-namespace:WDE.DbScriptsEditor.Avalonia.Editor.Views.Editing"
+        xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+        xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+        xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles">
+
+    <styles:StyleIncludeColorAware DarkSource="avares://WDE.DbScriptsEditor.Avalonia/Themes/ColorsDark.axaml"
+                                   LightSource="avares://WDE.DbScriptsEditor.Avalonia/Themes/ColorsLight.axaml"/>
+
+    <!-- One dbscript step, rendered as an EventAI/SmartScript-style action row. -->
+    <Style Selector="controls|DbScriptActionView">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="1"
+                        CornerRadius="3"
+                        Background="{DynamicResource DbScripts.Action.Background}"
+                        BorderBrush="{DynamicResource DbScripts.Action.Border}">
+                    <extendedTextBlock:FormattedTextBlock
+                        ContextArray="{Binding ReadableContext}"
+                        IsSelected="{Binding IsSelected}"
+                        Padding="5,3"
+                        Text="{Binding FormattedReadable}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="controls|DbScriptActionView:selected /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource DbScripts.Action.Selected.Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DbScripts.Action.Selected.Border}" />
+    </Style>
+    <Style Selector="controls|DbScriptActionView:selected /template/ extendedTextBlock|FormattedTextBlock">
+        <Setter Property="Background" Value="{DynamicResource DbScripts.Action.Selected.Background}" />
+    </Style>
+    <Style Selector="controls|DbScriptActionView /template/ extendedTextBlock|FormattedTextBlock:overlink">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <!-- "if <condition>" row — an equal row entity: select / drag / double-click to edit; the
+         condition text is one clickable span opening the condition tree editor. -->
+    <Style Selector="controls|DbScriptIfView">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="1" CornerRadius="3"
+                        Background="Transparent" BorderBrush="Transparent"
+                        Padding="4,3,4,1">
+                    <extendedTextBlock:FormattedTextBlock
+                        Opacity="0.85"
+                        ContextArray="{Binding Context}"
+                        IsSelected="{Binding IsSelected}"
+                        Text="{Binding FormattedText}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|DbScriptIfView:selected /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource DbScripts.Action.Selected.Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DbScripts.Action.Selected.Border}" />
+    </Style>
+    <Style Selector="controls|DbScriptIfView /template/ extendedTextBlock|FormattedTextBlock:overlink">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <!-- "⏱ wait" row — an equal row entity: select / drag / double-click to edit. -->
+    <Style Selector="controls|DbScriptWaitView">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="1" CornerRadius="3"
+                        Background="Transparent" BorderBrush="Transparent"
+                        Padding="4,4,4,2">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding Label}" FontWeight="Bold" FontSize="11"
+                                   Foreground="{DynamicResource DbScripts.Delay.Foreground}" />
+                        <TextBlock Text="{Binding AbsoluteLabel}" FontSize="11" Opacity="0.4" />
+                        <Border VerticalAlignment="Center" Height="1" Width="120"
+                                Background="{DynamicResource DbScripts.Delay.Foreground}" Opacity="0.4" />
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|DbScriptWaitView:selected /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource DbScripts.Action.Selected.Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DbScripts.Action.Selected.Border}" />
+    </Style>
+
+    <!-- "// comment" row — an equal row entity: select / drag / double-click to edit. -->
+    <Style Selector="controls|DbScriptCommentView">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="1" CornerRadius="3"
+                        Background="Transparent" BorderBrush="Transparent"
+                        Padding="4,3,4,1">
+                    <TextBlock Text="{Binding Text}" FontStyle="Italic" Opacity="0.8"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource DbScripts.Comment.Foreground}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|DbScriptCommentView:selected /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource DbScripts.Action.Selected.Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DbScripts.Action.Selected.Border}" />
+    </Style>
+
+    <!-- One parameter row of the edit-action dialog (copy-adapted from the EventAI editor):
+         completion combo box for enumerated parameters, flags combo for flag parameters,
+         checkbox for bools, plain value editor + picker button otherwise. -->
+    <Style Selector="editing|ParameterEditorView">
+        <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <DockPanel>
+                        <TextBlock Margin="4" Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   TextWrapping="Wrap" Text="{Binding Name, Mode=OneWay}" />
+                        <ContentPresenter Content="{Binding}">
+                            <ContentPresenter.DataTemplates>
+                                <editing:ParameterDataTemplateSelector>
+                                    <editing:ParameterDataTemplateSelector.Generic>
+                                        <DataTemplate>
+                                            <extendedTextBlock:ParameterValueHolderView
+                                                DataContext="{Binding Parameter}"
+                                                SpecialCopying="{Binding DataContext.SpecialCopying, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}, FallbackValue=False}"
+                                                PickCommand="{Binding DataContext.SelectItemAction, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}}" />
+                                        </DataTemplate>
+                                    </editing:ParameterDataTemplateSelector.Generic>
+                                    <editing:ParameterDataTemplateSelector.BoolParameter>
+                                        <DataTemplate>
+                                            <CheckBox Focusable="True" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"
+                                                      DataContext="{Binding Parameter}"
+                                                      IsChecked="{Binding Value, Converter={x:Static converters:CommonConverters.LongToBoolConverter}}" />
+                                        </DataTemplate>
+                                    </editing:ParameterDataTemplateSelector.BoolParameter>
+                                    <editing:ParameterDataTemplateSelector.FlagParameter>
+                                        <DataTemplate>
+                                            <extendedTextBlock:FlagComboBox SelectedItem="{Binding Parameter.String}" SelectedValue="{Binding Parameter.Value}" Flags="{Binding Parameter.Items}" />
+                                        </DataTemplate>
+                                    </editing:ParameterDataTemplateSelector.FlagParameter>
+                                    <editing:ParameterDataTemplateSelector.ItemsParameter>
+                                        <DataTemplate>
+                                            <controls1:CompletionComboBox editing:ParameterEditorView.OnEnterPressed="true" SelectedItem="{Binding OptionValue}" Items="{Binding Items}" />
+                                        </DataTemplate>
+                                    </editing:ParameterDataTemplateSelector.ItemsParameter>
+                                    <editing:ParameterDataTemplateSelector.ButtonParameter>
+                                        <DataTemplate>
+                                            <Button Command="{Binding Command}" Content="{Binding ActionName}" />
+                                        </DataTemplate>
+                                    </editing:ParameterDataTemplateSelector.ButtonParameter>
+                                </editing:ParameterDataTemplateSelector>
+                            </ContentPresenter.DataTemplates>
+                        </ContentPresenter>
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</Styles>

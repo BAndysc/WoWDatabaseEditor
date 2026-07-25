@@ -1,0 +1,11 @@
+[
+  { "name": "Texts & Emotes", "group_members": [] },
+  { "name": "Spells & Auras", "group_members": [] },
+  { "name": "Movement", "group_members": [] },
+  { "name": "Spawning & Despawning", "group_members": [] },
+  { "name": "GameObjects", "group_members": [] },
+  { "name": "Quests & Players", "group_members": [] },
+  { "name": "Unit State & Flags", "group_members": [] },
+  { "name": "Script Flow", "group_members": [] },
+  { "name": "Advanced/Raw", "group_members": [] }
+]
