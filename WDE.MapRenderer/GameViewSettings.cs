@@ -22,7 +22,7 @@ namespace WDE.MapRenderer
                 TimeSpeedMultiplier = 3,
                 ShowGrid = true,
                 CurrentTime = 360,
-                ViewDistanceModifier = 6
+                ViewDistanceModifier = 32
             });
         }
         
@@ -32,6 +32,26 @@ namespace WDE.MapRenderer
             set
             {
                 current.OverrideLighting = value;
+                settings.Update(current);
+            }
+        }
+
+        public bool DisableShadows
+        {
+            get => current.DisableShadows;
+            set
+            {
+                current.DisableShadows = value;
+                settings.Update(current);
+            }
+        }
+
+        public bool DontLoadDoodads
+        {
+            get => current.DontLoadDoodads;
+            set
+            {
+                current.DontLoadDoodads = value;
                 settings.Update(current);
             }
         }
@@ -151,6 +171,9 @@ namespace WDE.MapRenderer
         public struct Data : ISettings
         {
             public bool OverrideLighting;
+            public bool DisableShadows;
+            // skip loading WMO interior doodads (applied when a 3D view opens)
+            public bool DontLoadDoodads;
             public bool DisableTimeFlow;
             public int TimeSpeedMultiplier;
             public bool ShowGrid;

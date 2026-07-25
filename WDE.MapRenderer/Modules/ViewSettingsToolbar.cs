@@ -39,6 +39,7 @@ public class ViewSettingsToolbar : IGameModule
     public static float LastStripBottom { get; private set; }
 
     private bool textureQualityChanged;
+    private bool dontLoadDoodadsChanged;
 
     public ViewSettingsToolbar(Engine engine, IGameProperties properties)
     {
@@ -177,12 +178,16 @@ public class ViewSettingsToolbar : IGameModule
         if (ImGui.Checkbox("Disable lighting", ref overrideLighting))
             properties.OverrideLighting = overrideLighting;
 
+        bool disableShadows = properties.DisableShadows;
+        if (ImGui.Checkbox("Disable shadows", ref disableShadows))
+            properties.DisableShadows = disableShadows;
+
         ImGui.Spacing();
         ImGui.Separator();
         ImGui.TextDisabled("Display");
 
         float viewDistance = properties.ViewDistanceModifier;
-        if (ImGui.SliderFloat("View distance", ref viewDistance, 1, 24, "%.1f"))
+        if (ImGui.SliderFloat("View distance", ref viewDistance, 1, 64, "%.1f"))
             properties.ViewDistanceModifier = viewDistance;
 
         float dynamicResolution = properties.DynamicResolution;
@@ -209,7 +214,15 @@ public class ViewSettingsToolbar : IGameModule
             properties.TextureQuality = quality;
             textureQualityChanged = true;
         }
-        if (textureQualityChanged)
+
+        bool dontLoadDoodads = properties.DontLoadDoodads;
+        if (ImGui.Checkbox("Don't load WMO doodads", ref dontLoadDoodads))
+        {
+            properties.DontLoadDoodads = dontLoadDoodads;
+            dontLoadDoodadsChanged = true;
+        }
+
+        if (textureQualityChanged || dontLoadDoodadsChanged)
             ImGui.TextDisabled("Restart the game view to apply the change");
 
         ImGui.PopItemWidth();

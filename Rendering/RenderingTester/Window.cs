@@ -95,6 +95,8 @@ public class DummyGameProperties : IGameProperties
     public uint StatusIconsHiddenMask { get; set; } = 0;
     public int TextureQuality { get; set; } = 3;
     public bool VSync { get; set; } = false;
+    public bool DontLoadDoodads { get; set; } = false;
+    public bool DisableShadows { get; set; } = false;
     public float DynamicResolution { get; set; } = 1;
     public bool RenderGui { get; set; } = true;
     public bool LoadWorld { get; set; } = true;

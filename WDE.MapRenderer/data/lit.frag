@@ -76,18 +76,24 @@ void main()
     vec4 col4 = sampleSplat(SplatId.a);
     FragColor = vec4((1.0-colSplat.r-colSplat.g-colSplat.b) * col1.rgb + colSplat.r * col2.rgb + colSplat.g * col3.rgb + colSplat.b * col4.rgb, 1.0);
 
-    float shadow = 0.0;
-    for (int x = -3; x <= 3; ++x)
+    // prebaked ADT (MCSH) shadow, stored in the splat atlas alpha; only when dynamic cascaded
+    // shadows are off (cascadeCount <= 0), otherwise lighting() already darkens these areas and
+    // the terrain would be shadowed twice.
+    if (cascadeCount <= 0)
     {
-        for (int y = -3; y <= 3; ++y)
+        float shadow = 0.0;
+        for (int x = -3; x <= 3; ++x)
         {
-            vec4 sampled = SAMPLE_BINDLESS(M(splatTexIndex), atlasUV(vec2(TexCoord.x - x / 64.0, TexCoord.y - y / 64.0), ChunkId, 64.0));
-            shadow += sampled.a;
+            for (int y = -3; y <= 3; ++y)
+            {
+                vec4 sampled = SAMPLE_BINDLESS(M(splatTexIndex), atlasUV(vec2(TexCoord.x - x / 64.0, TexCoord.y - y / 64.0), ChunkId, 64.0));
+                shadow += sampled.a;
+            }
         }
+        shadow /= 81.0;
+        vec4 shadowed = vec4(FragColor.rgb * 0.5, 1.0);
+        FragColor = mix(FragColor, shadowed, shadow * lightIntensity);
     }
-    shadow /= 81.0;
-    vec4 shadowed = vec4(FragColor.rgb * 0.5, 1.0);
-    FragColor = mix(FragColor, shadowed, shadow * lightIntensity);
 
     uint decalPickId;
     FragColor = vec4(lighting(ApplyDecals(FragColor.rgb, Normal.xyz, WorldPos.xyz, decalPickId), Normal.xyz, WorldPos.xyz), 1.0);

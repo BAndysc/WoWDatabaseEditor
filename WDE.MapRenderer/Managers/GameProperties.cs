@@ -9,6 +9,12 @@ namespace WDE.MapRenderer.Managers;
 public interface IGameProperties
 {
     bool OverrideLighting { get; set; }
+    /// <summary>Turns off the directional-light cascaded shadow maps (LightingManager pushes this
+    /// into the CascadeShadowMap entity's Disabled flag).</summary>
+    bool DisableShadows { get; set; }
+    /// <summary>Skip loading WMO interior doodads (ADT M2 placements always load). ChunkManager
+    /// snapshots this when a 3D view opens, so changing it requires reopening the view.</summary>
+    bool DontLoadDoodads { get; set; }
     bool DisableTimeFlow { get; set;}
     int TimeSpeedMultiplier { get; set; }
     bool ShowGrid { get; set; }
@@ -36,6 +42,8 @@ public class GameProperties : IGameProperties
     private readonly IMainThread mainThread;
 
     private bool overrideLighting;
+    private bool disableShadows;
+    private bool dontLoadDoodads;
     private bool disableTimeFlow;
     private int timeSpeedMultiplier;
     private bool showGrid;
@@ -52,6 +60,8 @@ public class GameProperties : IGameProperties
         this.settings = settings;
         this.mainThread = mainThread;
         overrideLighting = settings.OverrideLighting;
+        disableShadows = settings.DisableShadows;
+        dontLoadDoodads = settings.DontLoadDoodads;
         disableTimeFlow = settings.DisableTimeFlow;
         timeSpeedMultiplier = settings.TimeSpeedMultiplier;
         showGrid = settings.ShowGrid;
@@ -75,6 +85,26 @@ public class GameProperties : IGameProperties
         {
             overrideLighting = value;
             Persist(() => settings.OverrideLighting = value);
+        }
+    }
+
+    public bool DisableShadows
+    {
+        get => disableShadows;
+        set
+        {
+            disableShadows = value;
+            Persist(() => settings.DisableShadows = value);
+        }
+    }
+
+    public bool DontLoadDoodads
+    {
+        get => dontLoadDoodads;
+        set
+        {
+            dontLoadDoodads = value;
+            Persist(() => settings.DontLoadDoodads = value);
         }
     }
 

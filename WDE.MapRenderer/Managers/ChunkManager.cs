@@ -106,6 +106,10 @@ namespace WDE.MapRenderer.Managers
     {
         private readonly IEntityManager entityManager;
         private readonly IGameProperties gameProperties;
+        // snapshot of IGameProperties.DontLoadDoodads (skips WMO interior doodads only; ADT M2
+        // placements always load) for this view session: chunks loaded before and after a
+        // mid-session toggle must agree, so the change applies when a 3D view reopens
+        private readonly bool dontLoadDoodads;
         private readonly ITextureManager textureManager;
         private readonly IMeshManager meshManager;
         private readonly WoWTextureManager woWTextureManager;
@@ -331,6 +335,7 @@ namespace WDE.MapRenderer.Managers
         {
             this.entityManager = entityManager;
             this.gameProperties = gameProperties;
+            dontLoadDoodads = gameProperties.DontLoadDoodads;
             this.textureManager = textureManager;
             this.meshManager = meshManager;
             this.woWTextureManager = woWTextureManager;
@@ -1261,7 +1266,8 @@ namespace WDE.MapRenderer.Managers
                     await engine.NextFrame;
 
                 // doodad set 0 (always-loaded), parented to the WMO entity so it cascade-destroys; no refcount
-                await LoadWmoDoodads(wmoInstance, wmoReference, entity, wmoMatrix, cancellationToken);
+                if (!dontLoadDoodads)
+                    await LoadWmoDoodads(wmoInstance, wmoReference, entity, wmoMatrix, cancellationToken);
             }
         }
 

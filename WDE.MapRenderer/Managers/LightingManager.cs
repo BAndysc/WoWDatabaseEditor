@@ -37,6 +37,7 @@ namespace WDE.MapRenderer.Managers
         // whose direction is their LocalToWorld forward (driven each frame from the day/night cycle).
         private Entity sunEntity;
         private Entity moonEntity;
+        private Entity shadowConfigEntity;
         private IMesh skySphereMesh;
         private Material<material_data_t> skyMaterial;
         private ITexture noiseTexture;
@@ -154,6 +155,9 @@ namespace WDE.MapRenderer.Managers
             }
             
             EnsureDirectionalLights();
+            // the toggle only flips Disabled, so the rest of the (inspector-editable) shadow
+            // settings survive turning shadows off and on
+            entityManager.GetComponent<CascadeShadowMap>(shadowConfigEntity).Disabled = gameProperties.DisableShadows;
             ref var sunLight = ref entityManager.GetComponent<Light>(sunEntity);
             ref var moonLight = ref entityManager.GetComponent<Light>(moonEntity);
 
@@ -245,8 +249,8 @@ namespace WDE.MapRenderer.Managers
             entityManager.GetComponent<Light>(sunEntity) = new Light { Type = LightType.Directional, CastShadows = true };
             entityManager.GetComponent<Light>(moonEntity) = new Light { Type = LightType.Directional, CastShadows = false };
 
-            // shadows render only while a CascadeShadowMap entity exists (see CascadeShadowMap).
-            var shadowConfigEntity = entityManager.CreateEntity(entityManager.NewArchetype()
+            // shadows render only while an enabled CascadeShadowMap entity exists (see CascadeShadowMap).
+            shadowConfigEntity = entityManager.CreateEntity(entityManager.NewArchetype()
                 .WithComponentData<CascadeShadowMap>(), "Shadow Config");
             entityManager.GetComponent<CascadeShadowMap>(shadowConfigEntity) = CascadeShadowMap.CreateDefault();
 
