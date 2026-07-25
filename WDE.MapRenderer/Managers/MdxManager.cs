@@ -1766,9 +1766,11 @@ namespace WDE.MapRenderer.Managers
 
             var completion = new TaskCompletionSource<InternalMesh?>();
             internalMeshesCurrentlyLoaded[path] = completion.Task;
+            try
+            {
 
             var m2FilePath = path;
-            
+
             var m2File = await LoadM2File(m2FilePath);
 
             if (!m2File.HasValue)
@@ -1832,10 +1834,21 @@ namespace WDE.MapRenderer.Managers
                 m2 = m2,
                 skin = skin
             };
-            internalMeshes.Add(path, new WeakReference<InternalMesh>(internalMesh_));
+            internalMeshes[path] = new WeakReference<InternalMesh>(internalMesh_);
             completion.SetResult(internalMesh_);
             internalMeshesCurrentlyLoaded.Remove(path);
             return internalMesh_;
+
+            }
+            catch (Exception e)
+            {
+                // a wedged completion here would hang every future load of this model
+                await engine.EnterGameLoop; // the throw may have happened on the thread pool
+                Console.WriteLine("Error while loading model " + path + ": " + e);
+                completion.SetResult(null);
+                internalMeshesCurrentlyLoaded.Remove(path);
+                return null;
+            }
         }
         
         public async ValueTask<(M2, M2Skin)?> LoadM2File(FileId path)
@@ -1845,6 +1858,8 @@ namespace WDE.MapRenderer.Managers
             
             if (m2s.TryGetValue(path, out var m2Data))
             {
+                if (m2Data == null)
+                    return null;
                 if (m2Data.TryGetTarget(out var target))
                     return (target.m2, target.skin);
                 m2s.Remove(path);
@@ -1858,18 +1873,20 @@ namespace WDE.MapRenderer.Managers
 
             var completion = new TaskCompletionSource<M2WithSkin?>();
             m2sCurrentlyLoaded[path] = completion.Task;
+            try
+            {
 
             var file = await gameFiles.ReadFile(path);
 
             if (file == null)
             {
                 Console.WriteLine("Cannot find model " + path);
-                meshes[path] = null;
+                m2s[path] = null;
                 completion.SetResult(null);
-                meshesCurrentlyLoaded.Remove(path);
+                m2sCurrentlyLoaded.Remove(path);
                 return null;
             }
-            
+
             M2 m2 = null!;
 
             await engine.EnterThreadPool;
@@ -1901,9 +1918,9 @@ namespace WDE.MapRenderer.Managers
             if (m2 == null)
             {
                 Console.WriteLine("Cannot load model " + path);
-                meshes[path] = null;
+                m2s[path] = null;
                 completion.SetResult(null);
-                meshesCurrentlyLoaded.Remove(path);
+                m2sCurrentlyLoaded.Remove(path);
                 return null;
             }
             
@@ -1922,9 +1939,9 @@ namespace WDE.MapRenderer.Managers
             if (skinFile == null)
             {
                 Console.WriteLine("Cannot find model " + path);
-                meshes[path] = null;
+                m2s[path] = null;
                 completion.SetResult(null);
-                meshesCurrentlyLoaded.Remove(path);
+                m2sCurrentlyLoaded.Remove(path);
                 return null;
             }
 
@@ -1942,10 +1959,21 @@ namespace WDE.MapRenderer.Managers
                 m2 = m2,
                 skin = skin
             };
-            m2s.Add(path, new WeakReference<M2WithSkin>(m2WithSkin));
+            m2s[path] = new WeakReference<M2WithSkin>(m2WithSkin);
             completion.SetResult(m2WithSkin);
             m2sCurrentlyLoaded.Remove(path);
             return (m2, skin);
+
+            }
+            catch (Exception e)
+            {
+                // a wedged completion here would hang every future load of this model
+                await engine.EnterGameLoop; // the throw may have happened on the thread pool
+                Console.WriteLine("Error while loading model " + path + ": " + e);
+                completion.SetResult(null);
+                m2sCurrentlyLoaded.Remove(path);
+                return null;
+            }
         }
         
         public void RenderGUI()
