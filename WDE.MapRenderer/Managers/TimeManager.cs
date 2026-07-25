@@ -1,4 +1,4 @@
-using ImGuiNET;
+using Hexa.NET.ImGui;
 using TheEngine;
 using TheEngine.Interfaces;
 using TheEngine.Utils.ImGuiHelper;
@@ -20,15 +20,12 @@ namespace WDE.MapRenderer.Managers
         public Time Time { get; private set; }
         public float MinuteFraction => minutes - Time.TotalMinutes;
 
-        private SimpleBox timeNotificationBox;
-
         public TimeManager(Engine engine,
             IUIManager uiManager,
             IGameProperties gameProperties)
         {
             this.uiManager = uiManager;
             this.gameProperties = gameProperties;
-            this.timeNotificationBox = new SimpleBox(engine, BoxPlacement.TopLeft);
         }
         
         private int TimeSpeedMultiplier
@@ -62,9 +59,5 @@ namespace WDE.MapRenderer.Managers
             gameProperties.CurrentTime = Time;
         }
 
-        public void RenderGUI()
-        {
-            timeNotificationBox.Draw($"{Time.Hour:00}:{Time.Minute:00}");
-        }
     }
 }

@@ -32,7 +32,11 @@ namespace WDE.MapRenderer.Managers
             public int brightAtNight;
             public int interior;
             public int translucent;
-            public int padding;
+            public BindlessTextureId texture1Index;
+            public BindlessTextureId texture2Index;
+            public int wmo_pad1;
+            public int wmo_pad2;
+            public int wmo_pad3;
         };
 
         public class WmoInstance
@@ -40,6 +44,12 @@ namespace WDE.MapRenderer.Managers
             public List<(IMesh, Material[])> meshes = new();
 
             public IEnumerable<(IMesh, Material[])> Meshes => meshes;
+
+            public WMO wmoData;
+
+            public WmoInstance()
+            {
+            }
 
             public void Dispose(IMeshManager meshManager)
             {
@@ -224,7 +234,10 @@ namespace WDE.MapRenderer.Managers
                 groups.Add(group);
             }
 
-            var wmoInstance = new WmoInstance();
+            var wmoInstance = new WmoInstance()
+            {
+                wmoData = wmo
+            };
 
             foreach (var group in groups)
             {
@@ -252,15 +265,21 @@ namespace WDE.MapRenderer.Managers
                 {
                     wmoMesh.SetSubmeshIndicesRange(j++, (int)batch.startIndex, batch.count);
                     var mat = CreateMaterial(wmo, group, batch.material_id, out var tex1, out var tex2, out var tex3);
-                    
+                    var data = mat.MaterialData;
+
                     if (tex1 != null)
                     {
-                        mat.SetTexture("texture1", await textureManager.GetTexture(tex1));
+                        var tex = await textureManager.GetTexture(tex1);
+                        mat.KeepAlive(tex); // sampled bindlessly via texture1Index
+                        data.texture1Index = engine.TextureManager.GetBindlessIndex(tex);
                     }
                     if (tex2 != null)
                     {
-                        mat.SetTexture("texture2", await textureManager.GetTexture(tex2));
+                        var tex = await textureManager.GetTexture(tex2);
+                        mat.KeepAlive(tex); // sampled bindlessly via texture2Index
+                        data.texture2Index = engine.TextureManager.GetBindlessIndex(tex);
                     }
+                    mat.SetMaterialData(ref data);
 
                     materials[j - 1] = mat;
                 }
@@ -342,8 +361,9 @@ namespace WDE.MapRenderer.Managers
             tex1 = materialDef.texture1Name;
             tex2 = materialDef.texture2Name;
             tex3 = materialDef.texture3Name;
-            mat.SetTexture("texture1", textureManager.EmptyTexture);
-            mat.SetTexture("texture2", textureManager.EmptyTexture);
+            mat.KeepAlive(textureManager.EmptyTexture); // sampled bindlessly via texture1Index/texture2Index
+            data.texture1Index = engine.TextureManager.GetBindlessIndex(textureManager.EmptyTexture);
+            data.texture2Index = data.texture1Index;
 
             mat.SetMaterialData(ref data);
             return mat;

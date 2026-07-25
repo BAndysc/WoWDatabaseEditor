@@ -26,10 +26,14 @@ public class GameEventService : IGameEventService, IGlobalAsyncInitializer
     public ObservableCollection<GameEventViewModel> GameEvents { get; private set; } = new();
     public ObservableCollection<GameEventViewModel> ActiveEvents { get; private set; } = new();
     public IObservable<IReadOnlyList<GameEventViewModel>> ActiveEventsObservable { get; set; }
-    
+
+    // IsEventActive is called from the game thread while Active toggles mutate ActiveEvents
+    // on the UI thread - the game thread must only read this immutable snapshot
+    private volatile GameEventViewModel[] activeEventsSnapshot = [];
+
     public bool IsEventActive(uint eventId)
     {
-        foreach (var ev in ActiveEvents)
+        foreach (var ev in activeEventsSnapshot)
             if (ev.Entry == eventId)
                 return true;
         return false;
@@ -39,9 +43,17 @@ public class GameEventService : IGameEventService, IGlobalAsyncInitializer
     {
         this.databaseProvider = databaseProvider;
         ActiveEventsObservable = FunctionalExtensions.Select(ActiveEvents.ToCountChangedObservable(), _ => ActiveEvents);
+    }
 
-        foreach (var e in GameEvents)
+    public async Task Initialize()
+    {
+        var gameEvents = await databaseProvider.GetGameEventsAsync();
+        // bind Active AFTER the events are loaded - the previous ctor-time binding ran over an
+        // empty collection, so toggling an event could never populate ActiveEvents
+        foreach (var ge in gameEvents)
         {
+            var e = new GameEventViewModel(ge);
+            GameEvents.Add(e);
             e.ToObservable(x => x.Active)
                 .Skip(1)
                 .SubscribeAction(@is =>
@@ -50,13 +62,8 @@ public class GameEventService : IGameEventService, IGlobalAsyncInitializer
                         ActiveEvents.Add(e);
                     else
                         ActiveEvents.Remove(e);
+                    activeEventsSnapshot = ActiveEvents.ToArray();
                 });
         }
-    }
-
-    public async Task Initialize()
-    {
-        var gameEvents = await databaseProvider.GetGameEventsAsync();
-        GameEvents.AddRange(gameEvents.Select(ge => new GameEventViewModel(ge)));
     }
 }

@@ -1,15 +1,23 @@
 using System.Buffers;
 using System.Collections;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine.Resources;
 using TheEngine.Components;
+using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Interfaces;
+using TheEngine.Structures;
 using TheMaths;
 using Veldrid;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers;
+
+public struct LowDetailData : IComponentData
+{
+    public byte y;
+    public byte x;
+}
 
 public class LowDetailHeightMapManager : IDisposable
 {
@@ -23,7 +31,9 @@ public class LowDetailHeightMapManager : IDisposable
     private IMesh? lowLevelMesh;
     private Material material;
     private WDL? currentWdl;
-    
+    private Entity[] wdlEntities = new Entity[64 * 64];
+    private RenderLayer renderLayer;
+
     public LowDetailHeightMapManager(IMeshManager meshManager,
         IMaterialManager materialManager,
         IRenderManager renderManager,
@@ -57,6 +67,31 @@ public class LowDetailHeightMapManager : IDisposable
             }
         }, false);
         material = materialManager.CreateMaterial(pipeline);
+
+        renderLayer = gameContext.Engine.RenderManager.RegisterRenderLayer("Low Level Detail Terrain");
+
+        var groupNode = gameContext.EntityManager.CreateEntity(gameContext.Archetypes.GroupArchetype, "Low Detail Terrain"u8);
+
+        for (int y = 0; y < Constants.Blocks; ++y)
+        {
+            for (int x = 0; x < Constants.Blocks; ++x)
+            {
+                var entity = wdlEntities[x * Constants.Blocks + y] = gameContext.EntityManager.CreateEntity(gameContext.Archetypes.LowLevelDetailArchetype);
+                gameContext.EntityManager.GetComponent<EntityName>(entity)
+                    = $"WDL[{y}, {x}]";
+                gameContext.EntityManager.SetParent(entity, groupNode);
+                ref var renderEnableBit = ref gameContext.EntityManager.GetComponent<RenderEnabledBit>(entity);
+                renderEnableBit.Layer = renderLayer.Layer;
+                renderEnableBit.ForceDisableCulling();
+                gameContext.EntityManager.GetComponent<LocalToWorld>(entity) = LocalToWorld.Identity;
+                gameContext.Engine.EntityManager.AddArrayComponent(entity, new MeshRenderer());
+                gameContext.EntityManager.GetComponent<LowDetailData>(entity) = new LowDetailData()
+                {
+                    y=(byte)y,
+                    x=(byte)x
+                };
+            }
+        }
     }
         
     public void Dispose()
@@ -64,44 +99,39 @@ public class LowDetailHeightMapManager : IDisposable
         Unload();
     }
 
-    public void Render()
+    // Scheduled from Update (not Render): each visible WDL chunk is queued via RenderOnce so the
+    // engine batches them into one shared instancing buffer (same mesh + material, only the submesh
+    // differs), keeping set=1 bound once instead of rebinding per chunk.
+    public void Update(float delta)
     {
-        if (currentWdl == null || lowLevelMesh == null)
-            return;
-
-        int subMesh = 0;
-
-        var currentChunk = cameraManager.Position.WoWPositionToChunk();
-        var currentPosChunk = currentChunk.ChunkToWoWPosition();
-
-        var camera = gameContext.Engine.CameraManager.MainCamera;
-        var frustum = new BoundingFrustum(camera.ViewMatrix * camera.ProjectionMatrix);
-
-        for (int y = 0; y < 64; ++y)
-        {
-            for (int x = 0; x < 64; ++x)
+        gameContext.Archetypes.LowLevelDetailArchetype.ParallelForEachState<LowDetailHeightMapManager, LowDetailData, RenderEnabledBit>(this,
+            static (state, itr, thread, start, end, lowDetails, renderEnableBits) =>
             {
-                if (!currentWdl.HasChunk(y, x))
-                    continue;
-
-                subMesh++;
-
-                if (chunkManager.IsTerrainLoaded(y, x))
-                    continue;
-
-                var bounds = lowLevelMesh.Bounds;
-                if (frustum.Contains(ref bounds) == ContainmentType.Disjoint)
-                    continue;
-
-                renderManager.Render(lowLevelMesh, material, ShaderPassType.Forward, subMesh - 1, Matrix4x4.Identity);
-            }
-        }   
+                for (int i = start; i < end; ++i)
+                {
+                    ref var lowDetail = ref lowDetails[i];
+                    renderEnableBits[i]
+                        .SetDisabled(state.currentWdl == null || !state.currentWdl.HasChunk(lowDetail.y, lowDetail.x) || state.chunkManager.IsTerrainLoaded(lowDetail.y, lowDetail.x));
+                }
+            });
     }
 
     public void Unload()
     {
         if (lowLevelMesh != null)
         {
+            foreach (var entity in wdlEntities)
+            {
+                if (entity.IsEmpty())
+                    continue;
+
+                gameContext.Engine.EntityManager.GetComponent<RenderEnabledBit>(entity)
+                    .SetDisabled(true);
+                gameContext.Engine.EntityManager.GetArrayComponents<MeshRenderer>(entity)
+                    [0].Mesh = null;
+                gameContext.Engine.EntityManager.GetArrayComponents<MeshRenderer>(entity)
+                    [0].SubMeshId = 0;
+            }
             meshManager.DisposeMesh(lowLevelMesh);
             lowLevelMesh = null;
         }
@@ -198,6 +228,26 @@ public class LowDetailHeightMapManager : IDisposable
         for (int i = 0; i < subMeshRanges.Count; ++i)
         {
             lowLevelMesh.SetSubmeshIndicesRange(i, subMeshRanges[i].indexStart, subMeshRanges[i].length);
+        }
+
+        var subMesh = 0;
+        for (int y = 0; y < Constants.Blocks; ++y)
+        {
+            for (int x = 0; x < Constants.Blocks; ++x)
+            {
+                var entity = wdlEntities[x * Constants.Blocks + y];
+
+                if (!currentWdl.HasChunk(y, x))
+                    continue;
+
+                subMesh++;
+
+                var meshRenderers = gameContext.Engine.EntityManager.GetArrayComponents<MeshRenderer>(entity);
+                meshRenderers[0].Mesh = lowLevelMesh;
+                meshRenderers[0].Material = material;
+                meshRenderers[0].SkipDraw = false;
+                meshRenderers[0].SubMeshId = subMesh - 1;
+            }
         }
     }
 }

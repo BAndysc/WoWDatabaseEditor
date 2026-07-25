@@ -3,7 +3,7 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC
 {
-    public class GameObjectDisplayInfo
+    public ref struct GameObjectDisplayInfo
     {
         public readonly uint Id;
         public readonly FileId ModelName;
@@ -36,7 +36,7 @@ namespace WDE.MpqReader.DBC
             ModelName = dbcIterator.GetUInt("FileDataID");
         }
 
-        private GameObjectDisplayInfo()
+        public GameObjectDisplayInfo()
         {
             Id = 0;
             ModelName = "";

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Text;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Avalonia;
@@ -7,6 +8,7 @@ using Avalonia.Threading;
 using Prism.Commands;
 using Prism.Ioc;
 using TheEngine.Interfaces;
+using TheEngine.Utils;
 using TheMaths;
 using WDE.Common.DBC;
 using WDE.Common.Disposables;
@@ -54,12 +56,34 @@ namespace WDE.MapRenderer
     }
     
     [AutoRegister]
-    public partial class GameViewModel : ObservableBase, IDocument, IMapContext<GameCameraViewModel>
+    // ISolutionItemManualUpdateSessionOnSave: the 3D editors register their own session items on
+    // save (via the bridge) - the generic post-save session hook must not add a duplicate
+    public partial class GameViewModel : ObservableBase, ISolutionItemDocument, ISolutionItemManualUpdateSessionOnSave, IMapContext<GameCameraViewModel>
     {
         private readonly Lazy<IDocumentManager> documentManager;
-        private readonly GameViewSettings settings;
         private readonly IMainThread mainThread;
         private Func<Game> gameCreator { get; }
+        /// <summary>Which host control GameView builds (settings "3D view" page).</summary>
+        public bool UseCompositionEnginePanel { get; }
+
+        // ISolutionItemDocument: lets the global "Generate query"/"Copy SQL" buttons work on the 3D
+        // document - the produced SQL is exactly what Save would execute (built by the game editors)
+        public WDE.Common.ISolutionItem SolutionItem { get; }
+        public bool ShowExportToolbarButtons => false;
+
+        public async Task<WDE.SqlQueryGenerator.IQuery> GenerateQuery() =>
+            WDE.SqlQueryGenerator.Queries.Raw(WDE.Common.Database.DataDatabaseType.World, await BuildPendingSaveSql());
+
+        private async Task<string> BuildPendingSaveSql()
+        {
+            if (currentGame is not { } game)
+                return "-- the 3D view is not running";
+            var changesManager = game.Resolve<IChangesManager>();
+            if (changesManager == null)
+                return "-- the 3D view is still loading";
+            return await changesManager.GenerateQuery();
+        }
+
         private Game? currentGame;
         public Game? CurrentGame
         {
@@ -68,11 +92,13 @@ namespace WDE.MapRenderer
             {
                 if (currentGame != null)
                 {
+                    currentGame.OnAfterDisposed -= CurrentGameOnOnAfterDisposed;
                     currentGame.OnFailedInitialize -= OnFailedGameInitialize;
                 }
                 SetProperty(ref currentGame, value);
                 if (value != null)
                 {
+                    value.OnAfterDisposed += CurrentGameOnOnAfterDisposed;
                     value.OnFailedInitialize += OnFailedGameInitialize;   
                 }
             }
@@ -102,20 +128,7 @@ namespace WDE.MapRenderer
             set => SetProperty(ref maps, value);
         }
         
-        private ObservableCollection<object> toolBars  = new();
-        public ObservableCollection<object> ToolBars
-        {
-            get => toolBars;
-            set
-            {
-                toolBars = value;
-                RaisePropertyChanged();
-            }
-        }
-
         public string Stats { get; private set; }
-        
-        private GameProperties Properties { get; }
 
         class GameProxy : IGameModule
         {
@@ -133,6 +146,15 @@ namespace WDE.MapRenderer
             private ObservableCollection<object>? registeredViewModels;
             private IDisposable? gameDisposable;
 
+            // stats overlay churns strings 4x/sec; a reused builder collapses the whole thing to a single
+            // ToString (needed for the Avalonia binding), and the raise delegate is cached so the
+            // Dispatcher.Post doesn't allocate a fresh closure each time
+            private readonly StringBuilder statsBuilder = new();
+            private readonly Action raiseStatsChanged;
+            // snapshot of ViewModels[0] taken on the game thread (the collection's owner),
+            // so that UI-thread handlers never touch the live collection
+            private volatile IDocument? firstModuleViewModel;
+
             public GameProxy(GameViewModel vm,
                 CameraManager cameraManager,
                 IStatsManager statsManager,
@@ -149,27 +171,31 @@ namespace WDE.MapRenderer
                 this.dbcManager = dbcManager;
                 this.timeManager = timeManager;
                 this.gameContext = gameContext;
-                gameDisposable = changesManager.IsModified.SubscribeAction(@is => vm.IsModified = @is);
+                raiseStatsChanged = () => vm.RaisePropertyChanged(nameof(Stats));
+                // raised from game-side editors; the INPC raise must happen on the UI thread
+                gameDisposable = changesManager.IsModified.SubscribeAction(@is => vm.mainThread.Dispatch(() => vm.IsModified = @is));
             }
             
+            // raised on the game thread (ViewModels is mutated by ModuleManager.Update/Dispose)
             private void RegisteredViewModelsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             {
-                if (vm.IsSelected)
+                var first = moduleManager.ViewModels.Count > 0 ? (IDocument)moduleManager.ViewModels[0] : null;
+                firstModuleViewModel = first;
+                Dispatcher.UIThread.Post(() =>
                 {
-                    if (moduleManager.ViewModels.Count > 0)
-                    {
-                        vm.documentManager.Value.ActivateDocumentInTheBackground((IDocument)moduleManager.ViewModels[0]);
-                    }
-                    else if (moduleManager.ViewModels.Count == 0)
+                    if (!vm.IsSelected)
+                        return;
+                    if (first != null)
+                        vm.documentManager.Value.ActivateDocumentInTheBackground(first);
+                    else
                         vm.documentManager.Value.ActiveDocument = null;
-                }
+                }, DispatcherPriority.Background);
             }
 
             public void Dispose()
             {
                 gameDisposable?.Dispose();
                 gameDisposable = null;
-                vm.ToolBars = new();
                 mapSub?.Dispose();
                 activationSub?.Dispose();
                 if (registeredViewModels != null)
@@ -178,79 +204,96 @@ namespace WDE.MapRenderer
 
             public object? ViewModel => null;
             
-            public void Initialize()
+            public unsafe void Initialize()
             {
                 vm.LoadMaps(dbcManager);
                 
                 registeredViewModels = moduleManager.ViewModels;
                 registeredViewModels.CollectionChanged += RegisteredViewModelsOnCollectionChanged;
-                
-                Dispatcher.UIThread.Post(() => vm.SelectedMap = vm.Maps?.FirstOrDefault(x => x.Id == gameContext.CurrentMap.Id), DispatcherPriority.Background);
+                firstModuleViewModel = registeredViewModels.Count > 0 ? (IDocument)registeredViewModels[0] : null;
+
+                // capture the map id here on the game thread, CurrentMap must not be dereferenced on the UI thread
+                uint? currentMapId = gameContext.CurrentMap != null ? (uint)gameContext.CurrentMap->Id : null;
+                Dispatcher.UIThread.Post(() => vm.SelectedMap = vm.Maps?.FirstOrDefault(x => currentMapId.HasValue && x.Id == currentMapId.Value), DispatcherPriority.Background);
                 gameContext.ChangedMap += newMapId =>
                 {
                     Dispatcher.UIThread.Post(() => vm.SelectedMap = vm.Maps.FirstOrDefault(x => x.Id == newMapId), DispatcherPriority.Background);
                 };
 
+                // the first emission happens inline here on the game thread, later ones on the UI thread
                 activationSub = vm.ToObservable(v => v.IsSelected)
                     .SubscribeAction(@is =>
                     {
-                        if (@is)
+                        if (!@is)
+                            return;
+                        Dispatcher.UIThread.Post(() =>
                         {
-                            if (moduleManager.ViewModels.Count > 0)
-                            {
-                                vm.documentManager.Value.ActivateDocumentInTheBackground((IDocument)moduleManager.ViewModels[0]);
-                            }
-                        }
+                            if (vm.IsSelected && firstModuleViewModel is { } doc)
+                                vm.documentManager.Value.ActivateDocumentInTheBackground(doc);
+                        }, DispatcherPriority.Background);
                     });
 
                 mapSub = vm
                     .ToObservable(i => i.SelectedMap)
                     .Where(map => map != null)
+                    .ObserveOnGameLoop()
                     .SubscribeAction(map =>
                     {
                         gameContext.SetMap((int)map!.Id);
                     });
-                vm.ToolBars = moduleManager.ToolBars;
             }
+
+            // the stats string is a large interpolated allocation; the numbers are rolling averages, so
+            // rebuilding it a few times a second (instead of every frame) is visually identical and
+            // avoids a per-frame string+PropertyChanged churn when the overlay is shown
+            private const float StatsRefreshInterval = 0.25f;
+            private float statsRefreshTimer;
 
             public void Update(float delta)
             {
                 var wowPos = cameraManager.Position;
                 vm.cameraViewModel.UpdatePosition(wowPos.X, wowPos.Y, wowPos.Z);
-                vm.RaisePropertyChanged(nameof(CurrentTime));
 
-                UpdateRenderStats();
+                statsRefreshTimer -= delta;
+                if (statsRefreshTimer <= 0)
+                {
+                    statsRefreshTimer = StatsRefreshInterval;
+                    UpdateRenderStats();
+                }
             }
 
             private void UpdateRenderStats()
             {
                 if (!vm.DisplayStats)
                     return;
-                
+
                 ref var counters = ref statsManager.Counters;
                 ref var stats = ref statsManager.RenderStats;
                 float w = statsManager.PixelSize.X;
                 float h = statsManager.PixelSize.Y;
-                vm.Stats =
-                    $@"[{w:0}x{h:0}]
-Total frame time: {counters.FrameTime.Average:0.00} ms
- - Update time: {counters.UpdateTime.Average:0.00} ms
- - Render time: {counters.TotalRender.Average:0.00} ms
-   - Bounds: {counters.BoundsCalc.Average:0.00}ms
-   - Culling: {counters.Culling.Average:0.00}ms
-   - Drawing: {counters.Drawing.Average:0.00}ms
-   - Present time: {counters.PresentTime.Average:0.00} ms";
 
-                vm.Stats += "\n" + @"Shaders: " + stats.ShaderSwitches + @"
-Materials: " + stats.MaterialActivations + @"
-Meshes: " + stats.MeshSwitches + @"
-Batches: " + (stats.NonInstancedDraws + stats.InstancedDraws) + @"
-Batches saved by instancing: " + stats.InstancedDrawSaved + @"
-Tris: " + stats.TrianglesDrawn;
-                Dispatcher.UIThread.Post(()=>
-                {
-                    vm.RaisePropertyChanged(nameof(Stats));
-                }, DispatcherPriority.Render);
+                // interpolation INTO a StringBuilder formats each float/int straight into its buffer via
+                // TryFormat - no intermediate strings, no boxing, no int.ToString. The reused builder
+                // means the only allocation is the final ToString the Avalonia binding requires.
+                var sb = statsBuilder;
+                sb.Clear();
+                sb.Append($"[{w:0}x{h:0}]\n");
+                sb.Append($"Total frame time: {counters.FrameTime.Average:0.00} ms\n");
+                sb.Append($" - Update time: {counters.UpdateTime.Average:0.00} ms\n");
+                sb.Append($" - Render time: {counters.TotalRender.Average:0.00} ms\n");
+                sb.Append($"   - Bounds: {counters.BoundsCalc.Average:0.00}ms\n");
+                sb.Append($"   - Culling: {counters.Culling.Average:0.00}ms\n");
+                sb.Append($"   - Drawing: {counters.Drawing.Average:0.00}ms\n");
+                sb.Append($"   - Present time: {counters.PresentTime.Average:0.00} ms\n");
+                sb.Append($"Shaders: {stats.ShaderSwitches}\n");
+                sb.Append($"Materials: {stats.MaterialActivations}\n");
+                sb.Append($"Meshes: {stats.MeshSwitches}\n");
+                sb.Append($"Batches: {stats.NonInstancedDraws + stats.InstancedDraws}\n");
+                sb.Append($"Batches saved by instancing: {stats.InstancedDrawSaved}\n");
+                sb.Append($"Tris: {stats.TrianglesDrawn}");
+                vm.Stats = sb.ToString();
+
+                Dispatcher.UIThread.Post(raiseStatsChanged, DispatcherPriority.Render);
             }
 
             public void Render(float delta)
@@ -263,33 +306,27 @@ Tris: " + stats.TrianglesDrawn;
         }
         
         public GameViewModel(IMpqService mpqService,
-            IMapDataProvider mapData, 
+            IMapDataProvider mapData,
             IMessageBoxService messageBoxService,
             IGameView gameView,
             Func<Game> gameCreator,
-            GameProperties gameProperties,
             Lazy<IDocumentManager> documentManager,
-            GameViewSettings settings,
-            IMainThread mainThread)
+            IMainThread mainThread,
+            GameViewSettings gameViewSettings)
         {
             this.documentManager = documentManager;
-            this.settings = settings;
             this.mainThread = mainThread;
             MapData = mapData;
             this.gameCreator = gameCreator;
-            Properties = gameProperties;
-            Properties.OverrideLighting = settings.OverrideLighting;
-            Properties.DisableTimeFlow = settings.DisableTimeFlow;
-            Properties.CurrentTime = Time.FromMinutes(settings.CurrentTime);
-            Properties.TimeSpeedMultiplier = settings.TimeSpeedMultiplier;
-            Properties.ShowGrid = settings.ShowGrid;
-            Properties.ViewDistanceModifier = settings.ViewDistanceModifier;
-            Properties.ShowAreaTriggers = settings.ShowAreaTriggers;
-            Properties.TextureQuality = settings.TextureQuality;
+            // latched at open: switching the host control requires reopening the 3D view
+            UseCompositionEnginePanel = gameViewSettings.UseCompositionPanel;
+            SolutionItem = new GameView3DSolutionItem(BuildPendingSaveSql);
 
             gameView.RegisterGameModule(container => container.Resolve<GameProxy>((typeof(GameViewModel), this)));
             gameView.RegisterGameModule(container => container.Resolve<DebugInfoGameModule>());
             gameView.RegisterGameModule(container => container.Resolve<WorldMapGameModule>());
+            gameView.RegisterGameModule(container => container.Resolve<ViewSettingsToolbar>());
+            gameView.RegisterGameModule(container => container.Resolve<UsageGameModule>());
 
             ToggleMapVisibilityCommand = new DelegateCommand(() => IsMapVisible = !IsMapVisible);
             ToggleStatsVisibilityCommand = new DelegateCommand(() => DisplayStats = !DisplayStats);
@@ -335,15 +372,21 @@ Tris: " + stats.TrianglesDrawn;
             });
         }
 
-        private void LoadMaps(DbcManager? dbcManager)
+        // Called from the game thread
+        private unsafe void LoadMaps(DbcManager? dbcManager)
         {
             if (dbcManager == null)
                 return;
-            
-            maps = dbcManager.MapStore
-                .Where(map => map.MapType != MapType.Transport)
-                .Select(map => new MapViewModel(map.Directory, map.Name, (uint)map.Id))
-                .OrderBy(map => // sort by main continents first
+
+            var _maps = new List<MapViewModel>();
+            foreach (var map in dbcManager.MapStore)
+            {
+                if (map->MapType == MapType.Transport)
+                    continue;
+                var vm = new MapViewModel(map->Directory, Encoding.UTF8.GetString(map->Name.AsSpan()), (uint)map->Id);
+                _maps.Add(vm);
+            }
+            maps = _maps.OrderBy(map => // sort by main continents first
                 {
                     if (map.Id is 0 or 1)
                         return map.Id;
@@ -354,7 +397,7 @@ Tris: " + stats.TrianglesDrawn;
                     return map.Id + 4;
                 })
                 .ToList();
-            RaisePropertyChanged(nameof(Maps));
+            mainThread.Dispatch(() => RaisePropertyChanged(nameof(Maps)));
         }
 
         private int state = 0;
@@ -365,8 +408,6 @@ Tris: " + stats.TrianglesDrawn;
             if (state == 1)
             {
                 currentGame?.DoDispose();
-                if (currentGame != null)
-                    currentGame.OnAfterDisposed += CurrentGameOnOnAfterDisposed;
                 state = 2;
                 return false;
             }
@@ -379,113 +420,12 @@ Tris: " + stats.TrianglesDrawn;
         {
             gameDisposedTask?.SetResult(true);
             game.OnAfterDisposed -= CurrentGameOnOnAfterDisposed;
-            mainThread.Delay(() =>
+            mainThread.Schedule(async () =>
             {
+                await Task.Delay(10);
                 Visibility = false;
                 CurrentGame = null;
-            }, TimeSpan.FromMilliseconds(10));
-        }
-
-        public bool OverrideLighting
-        {
-            get => Properties.OverrideLighting;
-            set
-            {
-                Properties.OverrideLighting = value;
-                settings.OverrideLighting = value;
-                RaisePropertyChanged(nameof(OverrideLighting));
-            }
-        }
-        
-        public bool DisableTimeFlow
-        {
-            get => Properties.DisableTimeFlow;
-            set
-            {
-                Properties.DisableTimeFlow = value;
-                settings.DisableTimeFlow = value;
-                RaisePropertyChanged(nameof(DisableTimeFlow));
-            }
-        }
-
-        public int TimeSpeedMultiplier
-        {
-            get => Properties.TimeSpeedMultiplier;
-            set
-            {
-                Properties.TimeSpeedMultiplier = value;
-                settings.TimeSpeedMultiplier = value;
-                RaisePropertyChanged(nameof(TimeSpeedMultiplier));
-            }
-        }
-
-        public bool ShowAreaTriggers
-        {
-            get => Properties.ShowAreaTriggers;
-            set
-            {
-                Properties.ShowAreaTriggers = value;
-                settings.ShowAreaTriggers = value;
-                RaisePropertyChanged(nameof(ShowAreaTriggers));
-            }
-        }
-        
-        public bool ShowGrid
-        {
-            get => Properties.ShowGrid;
-            set
-            {
-                Properties.ShowGrid = value;
-                settings.ShowGrid = value;
-                RaisePropertyChanged(nameof(ShowGrid));
-            }
-        }
-
-        public float ViewDistance
-        {
-            get => Properties.ViewDistanceModifier;
-            set
-            {
-                Properties.ViewDistanceModifier = value;
-                settings.ViewDistanceModifier = value;
-                RaisePropertyChanged(nameof(ViewDistance));
-            }
-        }
-        
-        public bool ShowTextureQualityWarning { get; set; }
-
-        public int TextureQuality
-        {
-            get => Properties.TextureQuality;
-            set
-            {
-                Properties.TextureQuality = value;
-                settings.TextureQuality = value;
-                ShowTextureQualityWarning = true;
-                RaisePropertyChanged(nameof(ShowTextureQualityWarning));
-                RaisePropertyChanged(nameof(TextureQuality));
-            }
-        }
-        
-        public float DynamicResolution
-        {
-            get => Properties.DynamicResolution;
-            set
-            {
-                Properties.DynamicResolution = value;
-                RaisePropertyChanged(nameof(DynamicResolution));
-            }
-        }
-        
-        public int CurrentTime
-        {
-            get => Properties.CurrentTime.TotalMinutes;
-            set
-            {
-                Properties.CurrentTime = Time.FromMinutes(value);
-                settings.CurrentTime = value;
-                RaisePropertyChanged(nameof(CurrentTime));
-            }
+            });
         }
 
         public bool DisplayStats
@@ -524,7 +464,7 @@ Tris: " + stats.TrianglesDrawn;
         }
 
         public string Title => "Game view";
-        public ImageUri? Icon { get; } = new ImageUri("Icons/icon_3d.png");
+        public ImageUri? Icon { get; } = new ImageUri("Icons/document_3d.png");
         public ICommand Copy => AlwaysDisabledCommand.Command;
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
@@ -575,7 +515,12 @@ Tris: " + stats.TrianglesDrawn;
         public ICommand Undo => AlwaysDisabledCommand.Command;
         public ICommand Redo => AlwaysDisabledCommand.Command;
         public IHistoryManager? History { get; set; }
-        public bool IsModified { get; set; }
+        public bool IsModified
+        {
+            get => isModified;
+            set => SetProperty(ref isModified, value);
+        }
+        private bool isModified;
     }
     
     public class MapViewModel

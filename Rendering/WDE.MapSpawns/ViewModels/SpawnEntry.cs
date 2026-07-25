@@ -15,14 +15,16 @@ public partial class SpawnEntry : IParentType
         Type = SpawnType.Creature;
         Name = creatureTemplate.Name;
         Header = creatureTemplate.Name + " (" + Entry + ")";
+        Spawns.CollectionChanged += (_, e) => ChildrenChanged?.Invoke(this, e);
     }
-    
+
     public SpawnEntry(IGameObjectTemplate gameObjectTemplate)
     {
         Entry = gameObjectTemplate.Entry;
         Type = SpawnType.GameObject;
         Name = gameObjectTemplate.Name;
         Header = gameObjectTemplate.Name + " (" + Entry + ")";
+        Spawns.CollectionChanged += (_, e) => ChildrenChanged?.Invoke(this, e);
     }
 
     [Notify] private bool isExpanded;
@@ -34,11 +36,9 @@ public partial class SpawnEntry : IParentType
     public override string ToString() => Name;
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    public event NotifyCollectionChangedEventHandler? ChildrenChanged
-    {
-        add => Spawns.CollectionChanged += value;
-        remove => Spawns.CollectionChanged -= value;
-    }
+    // re-raised with THIS as sender (not the inner ObservableCollection): FlatTreeList's
+    // OnChildrenChanged casts sender back to the parent node type.
+    public event NotifyCollectionChangedEventHandler? ChildrenChanged;
 
     public event NotifyCollectionChangedEventHandler? NestedParentsChanged;
 

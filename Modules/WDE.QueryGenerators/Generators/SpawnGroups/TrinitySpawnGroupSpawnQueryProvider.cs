@@ -7,7 +7,7 @@ namespace WDE.QueryGenerators.Generators.SpawnGroups;
 
 [AutoRegister]
 [RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath")]
-internal class TrinitySpawnGroupSpawnQueryProvider : IInsertQueryProvider<ISpawnGroupSpawn>, IDeleteQueryProvider<ISpawnGroupSpawn> 
+internal class TrinitySpawnGroupSpawnQueryProvider : IInsertQueryProvider<ISpawnGroupSpawn>, IDeleteQueryProvider<ISpawnGroupSpawn>, IDeleteAllQueryProvider<ISpawnGroupSpawn>
 {
     public IQuery Insert(ISpawnGroupSpawn spawn)
     {
@@ -46,6 +46,15 @@ internal class TrinitySpawnGroupSpawnQueryProvider : IInsertQueryProvider<ISpawn
             .Where(row => row.Column<uint>("groupId") == spawn.TemplateId &&
                           row.Column<uint>("spawnType") == (uint)spawn.Type &&
                           row.Column<uint>("spawnId") == spawn.Guid)
+            .Delete();
+    }
+
+    /// <summary>Deletes the whole group's membership (any spawn type) - for the idempotent
+    /// "rewrite the group" save/export shape (DELETE all, then bulk INSERT).</summary>
+    public IQuery DeleteAll(ISpawnGroupSpawn spawn)
+    {
+        return Queries.Table(TableName)
+            .Where(row => row.Column<uint>("groupId") == spawn.TemplateId)
             .Delete();
     }
 

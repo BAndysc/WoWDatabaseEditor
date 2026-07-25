@@ -2,23 +2,27 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class EmoteStore : BaseDbcStore<uint, Emote>
+public class EmoteStore : NativeBaseDbcStore<uint, Emote>
 {
-    public EmoteStore(IEnumerable<IDbcIterator> rows)
+    public EmoteStore(IDBC rows) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new Emote(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new Emote(row, ref allocator);
+            Set(o.Id, ref o);
         }
     }
-    
-    public EmoteStore(IEnumerable<IWdcIterator> rows)
+
+    public EmoteStore(IWDC rows) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new Emote(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new Emote(row, ref allocator);
+            Set(o.Id, ref o);
         }
     }
 }

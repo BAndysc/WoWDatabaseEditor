@@ -3,7 +3,6 @@
     "Path": "data/water.frag"
   },
   "ZWrite": true,
-  "Instancing": false,
   "Vertex": {
     "Path": "data/water.vert",
     "Input": [

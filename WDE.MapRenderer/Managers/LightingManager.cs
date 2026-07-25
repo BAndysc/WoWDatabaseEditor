@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine.Resources;
+using TheEngine.Components;
 using TheEngine.Data;
+using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
@@ -12,6 +14,13 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers
 {
+    public class AnimatedM2Light : IManagedComponentData
+    {
+        public M2 M2 { get; set; }
+        public M2Light M2Light { get; set; }
+        public float _time;
+    }
+
     public class LightingManager : System.IDisposable
     {
         private readonly IGameContext gameContext;
@@ -23,6 +32,11 @@ namespace WDE.MapRenderer.Managers
         private readonly LightStore lightStore;
         private readonly ILightManager lightManager;
         private readonly TimeManager timeManager;
+        private readonly IEntityManager entityManager;
+        // sun (primary, shadow-casting) and moon (secondary) directional lights, now ECS entities
+        // whose direction is their LocalToWorld forward (driven each frame from the day/night cycle).
+        private Entity sunEntity;
+        private Entity moonEntity;
         private IMesh skySphereMesh;
         private Material<material_data_t> skyMaterial;
         private ITexture noiseTexture;
@@ -41,7 +55,7 @@ namespace WDE.MapRenderer.Managers
             public float timeOfDay; // 0 - midnight, 0.5 - noon, 1 - midnight
             public float timeOfDayHalf; // 0 - noon, 0.5 - midnight, 1 - noon
             public float cloudsDensity;
-            public float padding;
+            public int cloudsTexIndex; // bindless slot of the clouds noise texture (was padding)
         };
 
         public LightingManager(IGameContext gameContext,
@@ -54,6 +68,7 @@ namespace WDE.MapRenderer.Managers
             LightStore lightStore,
             ILightManager lightManager,
             TimeManager timeManager,
+            IEntityManager entityManager,
             IPipelineManager pipelineManager,
             IShaderManager shaderManager)
         {
@@ -66,6 +81,8 @@ namespace WDE.MapRenderer.Managers
             this.lightStore = lightStore;
             this.lightManager = lightManager;
             this.timeManager = timeManager;
+            this.entityManager = entityManager;
+
             skySphereMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/skysphere.obj").MeshData);
             var skyPipeline = pipelineManager.CreatePipeline(shaderManager.LoadShader("data/skybox.json"), PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
             {
@@ -74,9 +91,9 @@ namespace WDE.MapRenderer.Managers
                 BlendState = BlendStateDescription.SingleDisabled
             }, false);
             skyMaterial = materialManager.CreateMaterial<material_data_t>(skyPipeline);
+            // noiseTexture is held by this field for its whole lifetime, so its bindless slot stays
+            // valid without a per-material texture binding (see cloudsTexIndex in material_data_t).
             noiseTexture = textureManager.LoadTexture("textures/noise_512.png");
-            
-            skyMaterial.SetTexture("cloudsTex", noiseTexture);
         }
 
         public void Dispose()
@@ -86,18 +103,21 @@ namespace WDE.MapRenderer.Managers
         }
 
         public CombinedLight? BestLight { get; private set; }
-        private Light? destLight = null;
-        private Light? previousLight = null;
+        private DbcLight? destLight = null;
+        private DbcLight? previousLight = null;
         private float t = 0;
-        
+
+        private float cachedDelta;
+
         public void Update(float delta)
         {
+            cachedDelta = delta;
             var position = cameraManager.Position;
             var bestDistance = float.MaxValue;
-            Light? newLight = null;
+            DbcLight? newLight = null;
             foreach (var lightning in lightStore)
             {
-                if (lightning.Continent != gameContext.CurrentMap.Id)
+                if (lightning.Continent != gameContext.CurrentMapId)
                     continue;
                 var pos = new Vector3(lightning.X, lightning.Y, lightning.Z);
                 var distance = (pos - position).Length();
@@ -133,30 +153,37 @@ namespace WDE.MapRenderer.Managers
                 BestLight.Mix = Math.Clamp(t, 0, 1);
             }
             
+            EnsureDirectionalLights();
+            ref var sunLight = ref entityManager.GetComponent<Light>(sunEntity);
+            ref var moonLight = ref entityManager.GetComponent<Light>(moonEntity);
+
             if (gameProperties.OverrideLighting)
             {
-                lightManager.MainLight.LightColor = Vector4.One;
-                lightManager.MainLight.LightIntensity = 0.8f;
-                lightManager.MainLight.AmbientColor = new Vector4(1, 1, 1, 0.4f);
-                
-                lightManager.SecondaryLight.LightColor = Vector4.One;
-                lightManager.SecondaryLight.LightIntensity = 0;
+                sunLight.Color = Vector4.One;
+                sunLight.AmbientColor = new Vector4(1, 1, 1, 0.4f);
+
+                moonLight.Color = Vector4.One;
             }
             else if (BestLight != null)
             {
                 var lightColor = BestLight.NormalWeather.GetLightParameter(LightIntParamType.GeneralLightning).GetColorAtTime(timeManager.Time);
                 var ambientLight = BestLight.NormalWeather.GetLightParameter(LightIntParamType.AmbientLight).GetColorAtTime(timeManager.Time);
 
-                lightManager.MainLight.LightColor = lightColor.ToRgbaVector();
-                lightManager.MainLight.AmbientColor = ambientLight.ToRgbaVector();
-                
-                lightManager.SecondaryLight.LightColor = lightColor.ToRgbaVector();
+                sunLight.Color = lightColor.ToRgbaVector();
+                sunLight.AmbientColor = ambientLight.ToRgbaVector();
 
-                lightManager.Fog.Color = BestLight.NormalWeather.GetLightParameter(LightIntParamType.FogInTheBackground).GetColorAtTime(timeManager.Time).ToRgbaVector();
-                lightManager.Fog.Enabled = true;
-                lightManager.Fog.End = Math.Max(BestLight.NormalWeather.GetLightParameter(LightFloatParamType.FogDistance).GetAtTime(timeManager.Time) / 36, 1000);
+                moonLight.Color = lightColor.ToRgbaVector();
+
+                // fog is now a per-camera property; drive the game view camera's fog from the sky.
+                var fogEnd = Math.Max(BestLight.NormalWeather.GetLightParameter(LightFloatParamType.FogDistance).GetAtTime(timeManager.Time) / 36, 1000);
                 var mult = Math.Max(BestLight.NormalWeather.GetLightParameter(LightFloatParamType.FogMultiplier).GetAtTime(timeManager.Time), 0.5f);
-                lightManager.Fog.Start = lightManager.Fog.End * mult;
+                gameContext.Engine.CameraManager.MainCamera.Fog = new FogSettings()
+                {
+                    Enabled = true,
+                    Color = BestLight.NormalWeather.GetLightParameter(LightIntParamType.FogInTheBackground).GetColorAtTime(timeManager.Time).ToRgbaVector(),
+                    End = fogEnd,
+                    Start = fogEnd * mult,
+                };
             }
 
             float timeOfDay = (timeManager.Time.TotalMinutes + timeManager.MinuteFraction) / 1440.0f;
@@ -167,12 +194,68 @@ namespace WDE.MapRenderer.Managers
             var sunForward = Vectors.Normalize(Vector3.Zero - sunPosition);
             var moonForward = -sunForward;
 
-            lightManager.MainLight.LightPosition = sunPosition;
-            lightManager.MainLight.LightRotation = Utilities.LookRotation(sunForward, Vectors.Up);
-            lightManager.MainLight.LightIntensity = Math.Max(Vector3.Dot(Vectors.Down, sunForward), 0);
-            
-            lightManager.SecondaryLight.LightRotation = Utilities.LookRotation(moonForward, Vectors.Up);
-            lightManager.SecondaryLight.LightIntensity = 0.5f * Math.Max(Vector3.Dot(Vectors.Down, moonForward), 0);
+            // keep type/shadow flags pinned, set per-frame intensity, and bake the direction into the
+            // entity transform (the engine derives light direction from LocalToWorld forward).
+            sunLight.Type = LightType.Directional;
+            sunLight.CastShadows = true;
+            sunLight.Intensity = Math.Max(Vector3.Dot(Vectors.Down, sunForward), 0);
+            moonLight.Type = LightType.Directional;
+            moonLight.CastShadows = false;
+            moonLight.Intensity = 0.5f * Math.Max(Vector3.Dot(Vectors.Down, moonForward), 0);
+
+            entityManager.GetComponent<LocalToWorld>(sunEntity).Matrix = Matrix.CreateFromQuaternion(Utilities.LookRotation(sunForward, Vectors.Up));
+            entityManager.GetComponent<LocalToWorld>(moonEntity).Matrix = Matrix.CreateFromQuaternion(Utilities.LookRotation(moonForward, Vectors.Up));
+
+            gameContext.Archetypes.M2PointLightsArchetype.ParallelForEachState<LightingManager, Light, AnimatedM2Light>(this, static (that, itr, thread, start, end,
+                lights, m2Lights) =>
+            {
+                for (int i = start; i < end; ++i)
+                {
+                    var length = m2Lights[i].M2.sequences[0].duration;
+                    ref var light = ref lights[i];
+                    ref var time = ref m2Lights[i]._time;
+                    light.Type = LightType.Point;
+                    light.AttenuationStart = AnimationSystem.Get(0, ref m2Lights[i].M2Light.attenuation_start, 0, time, Lerp);
+                    light.AttenuationEnd = AnimationSystem.Get(0, ref m2Lights[i].M2Light.attenuation_end, 0, time, Lerp) * 2 /* default barely affects anything, so *2 */;
+                    light.Intensity = AnimationSystem.Get(0, ref m2Lights[i].M2Light.diffuse_intensity, 0, time, Lerp) * 2 /* default barely affects anything, so *2 */;
+                    light.Color = new Vector4(AnimationSystem.Get<Vector3>(0, ref m2Lights[i].M2Light.diffuse_color, Vector3.Zero, time, Vector3.Lerp), 1);
+
+                    time += that.cachedDelta;
+                    if (time >= length)
+                    {
+                        time -= length;
+                    }
+                }
+            });
+        }
+
+        private bool directionalLightsCreated;
+
+        // Creates the sun/moon directional Light entities on first use (the direction is later baked
+        // into each entity's LocalToWorld forward in Update()).
+        private void EnsureDirectionalLights()
+        {
+            if (directionalLightsCreated)
+                return;
+            var directionalArchetype = entityManager.NewArchetype()
+                .WithComponentData<LocalToWorld>()
+                .WithComponentData<Light>();
+            sunEntity = entityManager.CreateEntity(directionalArchetype, "Sun");
+            moonEntity = entityManager.CreateEntity(directionalArchetype, "Moon");
+            entityManager.GetComponent<Light>(sunEntity) = new Light { Type = LightType.Directional, CastShadows = true };
+            entityManager.GetComponent<Light>(moonEntity) = new Light { Type = LightType.Directional, CastShadows = false };
+
+            // shadows render only while a CascadeShadowMap entity exists (see CascadeShadowMap).
+            var shadowConfigEntity = entityManager.CreateEntity(entityManager.NewArchetype()
+                .WithComponentData<CascadeShadowMap>(), "Shadow Config");
+            entityManager.GetComponent<CascadeShadowMap>(shadowConfigEntity) = CascadeShadowMap.CreateDefault();
+
+            directionalLightsCreated = true;
+        }
+
+        private static float Lerp(float value1, float value2, float amount)
+        {
+            return (value1 * (1.0f - amount)) + (value2 * amount);
         }
 
         public void Render()
@@ -206,12 +289,16 @@ namespace WDE.MapRenderer.Managers
                     timeOfDay = timeOfDay,
                     timeOfDayHalf = timeOfDayHalf,
                     cloudsDensity = cloudsDensity,
+                    cloudsTexIndex = textureManager.GetBindlessIndex(noiseTexture),
                 };
                 skyMaterial.SetMaterialData(ref data);
-                
-                var t = new Transform();
-                t.Scale = Vector3.One * gameContext.Engine.CameraManager.MainCamera.FarClip;
-                renderManager.Render(skySphereMesh, skyMaterial, ShaderPassType.Forward, 0, t);
+
+                var localToWorld = new LocalToWorld()
+                {
+                    Matrix = Utilities.TRS(Vector3.Zero, Quaternion.Identity,
+                        Vector3.One * gameContext.Engine.CameraManager.MainCamera.FarClip)
+                };
+                renderManager.Render(skySphereMesh, skyMaterial, ShaderPassType.Forward, 0, localToWorld.Matrix, localToWorld.Inverse);
             }
         }
     }

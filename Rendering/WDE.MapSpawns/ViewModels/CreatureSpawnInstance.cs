@@ -17,6 +17,7 @@ public class CreatureSpawnInstance : SpawnInstance
     public override WorldObjectInstance? WorldObject => Creature;
     public CreatureInstance? Creature { get; set; }
     public float Orientation => data.O;
+    public MovementType MovementType => data.MovementType;
     public List<IGameEventCreature>? GameEvents { get; set; }
     public IBaseCreatureAddon? Addon { get; set; }
     public IBaseEquipmentTemplate? Equipment { get; set; }

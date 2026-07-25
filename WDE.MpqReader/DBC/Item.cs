@@ -3,7 +3,7 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC;
 
-public readonly struct Item
+public ref struct Item
 {
     public readonly uint Id;
     public readonly FileId? InventoryIcon;
@@ -20,20 +20,20 @@ public readonly struct Item
         InventoryType = row.GetUInt(6);
         SheatheType = row.GetUInt(7);
     }
-    public Item(IWdcIterator row, ItemModifiedAppearanceStore itemModifiedAppearanceStore, ItemAppearanceStore appearanceStore)
+    public unsafe Item(IWdcIterator row, ItemModifiedAppearanceStore itemModifiedAppearanceStore, ItemAppearanceStore appearanceStore)
     {
         Id = (uint)row.Id;
         InventoryIcon = row.GetUInt("IconFileDataID");
         ClassId = row.GetByte("ClassID");
-        if (itemModifiedAppearanceStore.TryGetByItem(Id, out var modifiedAppearances) &&
-            modifiedAppearances.Count > 0)
+        if (itemModifiedAppearanceStore.TryGetByItem(Id, out var modifiedAppearancesId) &&
+            itemModifiedAppearanceStore.TryGetValue(modifiedAppearancesId, out var modifiedAppearances))
         {
-            if (appearanceStore.TryGetValue(modifiedAppearances[0].ItemAppearanceId, out var itemAppearance))
+            if (appearanceStore.TryGetValue(modifiedAppearances->ItemAppearanceId, out var itemAppearance))
             {
-                DisplayId = itemAppearance.DisplayId;
-                if (itemAppearance.InventoryIcon.HasValue &&
-                    itemAppearance.InventoryIcon.Value.FileDataId > 0)
-                    InventoryIcon = itemAppearance.InventoryIcon;
+                DisplayId = itemAppearance->DisplayId;
+                if (itemAppearance->InventoryIcon.HasValue &&
+                    itemAppearance->InventoryIcon.Value.FileDataId > 0)
+                    InventoryIcon = itemAppearance->InventoryIcon;
             }
         }
         InventoryType = row.GetByte("InventoryType");

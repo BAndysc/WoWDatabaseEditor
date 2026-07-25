@@ -3,7 +3,7 @@ using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class VehicleSeat
+public ref struct VehicleSeat
 {
     public readonly int Id;
     public readonly Vector3 AttachmentOffset;
@@ -25,7 +25,7 @@ public class VehicleSeat
         RideAnimationLoop = dbcIterator.GetShort("RideAnimLoop");
     }
 
-    private VehicleSeat()
+    public VehicleSeat()
     {
         Id = -1;
     }

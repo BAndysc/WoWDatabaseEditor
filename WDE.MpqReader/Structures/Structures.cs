@@ -58,7 +58,7 @@ namespace WDE.MpqReader.Structures
 /*0x0F0*/  public readonly M2Array<M2Attachment> attachments;                     // position of equipped weapons or effects
 /*0x0F8*/  public readonly M2Array<short> attachmentIndicesById;               // (alt. name: attachment_lookup_table)
 /*0x100*/  //public readonly M2Array<M2Event> events;                               // Used for playing sounds when dying and a lot else.
-/*0x108*/  //public readonly M2Array<M2Light> lights;                               // Lights are mainly used in loginscreens but in wands and some doodads too.
+/*0x108*/  public readonly M2Array<M2Light> lights;                               // Lights are mainly used in loginscreens but in wands and some doodads too.
 /*0x110*/  //public readonly M2Array<M2Camera> cameras;                             // The cameras are present in most models for having a model in the character tab. 
 /*0x118*/  //public readonly M2Array<ushort> cameraIndicesById;                   // (alt. name: camera_lookup_table)
 /*0x120*/  //public readonly M2Array<M2Ribbon> ribbon_emitters;                     // Things swirling around. See the CoT-entrance for light-trails.
@@ -241,7 +241,7 @@ namespace WDE.MpqReader.Structures
             attachments = reader.ReadArray(M2Attachment.Read);
             attachmentIndicesById = reader.ReadArrayInt16();
             reader.SkipM2Array(); // events = reader.ReadArray(M2Event.Read);
-            reader.SkipM2Array(); // lights = reader.ReadArray(M2Light.Read);
+            lights = reader.ReadArray(M2Light.Read);
             reader.SkipM2Array(); // cameras = reader.ReadArray(M2Camera.Read);
             reader.SkipM2Array(); // cameraIndicesById = reader.ReadArrayUInt16();
             reader.SkipM2Array(); // ribbon_emitters = reader.ReadArray(M2Ribbon.Read);
@@ -571,24 +571,30 @@ namespace WDE.MpqReader.Structures
 
     public class M2Light
     {
-        public ushort type { get; init; }                      // Types are listed below.
-        public short bone { get; init; }                       // -1 if not attached to a bone
-        public Vector3 position { get; init; }                 // relative to bone, if given
-        public M2Track<Vector3> ambient_color { get; init; }
-        public M2Track<float> ambient_intensity { get; init; }   // defaults to 1.0
-        public M2Track<Vector3> diffuse_color { get; init; }
-        public M2Track<float> diffuse_intensity { get; init; }   // defaults to 1.0
-        public M2Track<float> attenuation_start { get; init; }
-        public M2Track<float> attenuation_end { get; init; }
-        public M2Track<byte> visibility { get; init; }        // enabled?
+        public M2LightType type;                      // Types are listed below.
+        public short bone;                       // -1 if not attached to a bone
+        public Vector3 position;                 // relative to bone, if given
+        public M2Track<Vector3> ambient_color;
+        public M2Track<float> ambient_intensity;   // defaults to 1.0
+        public M2Track<Vector3> diffuse_color;
+        public M2Track<float> diffuse_intensity;   // defaults to 1.0
+        public M2Track<float> attenuation_start;
+        public M2Track<float> attenuation_end;
+        public M2Track<byte> visibility;        // enabled?
 
         private M2Light() {}
+
+        public enum M2LightType : ushort
+        {
+            Directional = 0,
+            Point = 1
+        }
 
         public static M2Light Read(IBinaryReader reader)
         {
             return new M2Light()
             {
-                type = reader.ReadUInt16(),
+                type = (M2LightType)reader.ReadUInt16(),
                 bone = reader.ReadInt16(),
                 position = reader.ReadVector3(),
                 ambient_color = M2Track<Vector3>.ReadVector3(reader),

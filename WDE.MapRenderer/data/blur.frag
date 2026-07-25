@@ -1,14 +1,21 @@
-#version 330 core
-out vec4 FragColor;
-  
-in vec2 TexCoords;
+#version 450
+#extension GL_EXT_nonuniform_qualifier : require
+layout(set = 2, binding = 0) uniform texture2D bindlessTextures[16384];
+layout(set = 2, binding = 1) uniform sampler bindlessSamplers[128];
+#define SAMPLE_BINDLESS(idx, uv) texture(sampler2D(bindlessTextures[nonuniformEXT(uint(idx) & 0xFFFFFu)], bindlessSamplers[nonuniformEXT(uint(idx) >> 20u)]), uv)
 
-uniform sampler2D _MainTex;
-uniform int horizontalPass; // 0 or 1 to indicate vertical or horizontal pass
-uniform float sigma;        // The sigma value for the gaussian function: higher value means more blur
-                            // A good value for 9x9 is around 3 to 5
-                            // A good value for 7x7 is around 2.5 to 4
-                            // A good value for 5x5 is around 2 to 3.5
+layout(location = 0) out vec4 FragColor;
+
+layout(location = 0) in vec2 TexCoords;
+
+layout(std140, set = 1, binding = 0) uniform MaterialData
+{
+    int horizontalPass;
+    float sigma;
+    float blurSize;
+    int mainTexIndex;
+    vec4 direction;
+};
 
 #define PI 3.14159265359
 #define E 2.71828182846
@@ -16,28 +23,20 @@ uniform float sigma;        // The sigma value for the gaussian function: higher
 const vec2 texOffset = vec2(1.0, 1.0);
 
 #define SAMPLES 20
-uniform float blurSize;
-uniform vec4 direction;
 #define _StandardDeviation 0.02
 
 void main()
-{    
+{
     vec4 col = vec4(0);
-    float sum = 0;
-    for (float index = 0; index < SAMPLES; index++){
-        //get the offset of the sample
+    float sum = 0.0;
+    for (float index = 0.0; index < SAMPLES; index++){
         float offset = (index/(SAMPLES-1) - 0.5) * blurSize;
-        //get uv coordinate of sample
         vec2 uv = TexCoords.xy + offset * direction.xy;
-        //calculate the result of the gaussian function
         float stDevSquared = _StandardDeviation*_StandardDeviation;
-        float gauss = (1 / sqrt(2*PI*stDevSquared)) * pow(E, -((offset*offset)/(2*stDevSquared)));
-        //add result to sum
+        float gauss = (1.0 / sqrt(2.0*PI*stDevSquared)) * pow(E, -((offset*offset)/(2.0*stDevSquared)));
         sum += gauss;
-        //multiply color with influence from gaussian function and add it to sum color
-        col += texture(_MainTex, uv) * gauss;
+        col += SAMPLE_BINDLESS(mainTexIndex, uv) * gauss;
     }
-    //divide the sum of values by the amount of samples
     col = col / sum;
     FragColor = col;
 }

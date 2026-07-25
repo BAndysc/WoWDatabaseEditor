@@ -11,7 +11,7 @@ public enum AnimationDataFlags
     FallbackHoldsLastFrame = 0x20	
 }
 
-public class AnimationData
+public ref struct AnimationData
 {
     public readonly uint Id;
     public readonly AnimationDataFlags Flags;

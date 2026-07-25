@@ -3,14 +3,14 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class LightStore : BaseDbcStore<uint, Light>
+public class LightStore : BaseDbcStore<uint, DbcLight>
 {
     public LightStore(IEnumerable<IDbcIterator> rows, LightParamStore lightParamStore)
     {
         foreach (var row in rows)
         {
-            var o = new Light(row, lightParamStore);
-            store[o.Id] = o;
+            var o = new DbcLight(row, lightParamStore);
+            Set(o.Id, o);
         }
     }
     
@@ -18,8 +18,8 @@ public class LightStore : BaseDbcStore<uint, Light>
     {
         foreach (var row in rows)
         {
-            var o = new Light(row, lightParamStore);
-            store[o.Id] = o;
+            var o = new DbcLight(row, lightParamStore);
+            Set(o.Id, o);
         }
     }
 }

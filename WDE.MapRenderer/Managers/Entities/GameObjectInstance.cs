@@ -1,5 +1,4 @@
 using System.Collections;
-using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
 using TheEngine.ECS;
 using TheEngine.Entities;
@@ -15,7 +14,6 @@ public class GameObjectInstance : WorldObjectInstance
 {
     private readonly IGameObjectTemplate gameObjectTemplate;
     private readonly uint gameObjectDisplayId;
-    private List<INativeBuffer> bonesBuffers = new();
 
     public GameObjectInstance(IGameContext gameContext,
         IGameObjectTemplate gameObjectTemplate,
@@ -62,41 +60,33 @@ public class GameObjectInstance : WorldObjectInstance
         if (m2Instance != null)
         {
             mdxInstances.Add(m2Instance);
-            var boneMatricesBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
-            bonesBuffers.Add(boneMatricesBuffer);
-            boneMatricesBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(m2Instance.model.bones.Length).Span);
+            var animSystem = gameContext.AnimationSystem;
+            var m2Model = m2Instance.model;
+            var (boneBase, colorBase, texBase) = animSystem.AllocateAnimationSlots(m2Model);
 
-            var colorBuffer = gameContext.Engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
-            bonesBuffers.Add(colorBuffer);
-            colorBuffer.UpdateBuffer(AnimationSystem.IdentityColors(m2Instance.model.colors.Length).Span);
-
-            var textureTransformsBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferPixelOnly, 1, BufferInternalFormat.Float4);
-            bonesBuffers.Add(textureTransformsBuffer);
-            textureTransformsBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(m2Instance.model.texture_transforms.Length + 1).Span);
-
-            var masterAnimation = new M2AnimationComponentData(m2Instance.model)
+            var masterAnimation = new M2AnimationComponentData(m2Model)
             {
                 SetNewAnimation = 0,
-                _buffer = boneMatricesBuffer,
-                _colors = colorBuffer,
-                _textureTransforms = textureTransformsBuffer
+                BoneBase = boneBase,
+                ColorBase = colorBase,
+                TexTransformBase = texBase,
+                _boneCache = AnimationSystem.IdentityMatrix(m2Model.bones.Length).ToArray(),
+                _colorCache = AnimationSystem.IdentityColors(m2Model.colors.Length).ToArray(),
+                _texTransformCache = AnimationSystem.IdentityMatrix(m2Model.texture_transforms.Length + 1).ToArray(),
             };
             entityManager.SetManagedComponent(objectEntity, masterAnimation);
             entityManager.SetManagedComponent(objectEntity, new MdxRenderer(m2Instance) { Owner = objectEntity });
 
-            // optimization here, we can share the render data, because we know all the materials will be the same shader
-            BaseMaterial = m2Instance.materials[0].material;
-
-            var materialInstanceRenderData = new MaterialInstanceRenderData();
-            materialInstanceRenderData.SetBuffer("boneMatrices", boneMatricesBuffer);
-            materialInstanceRenderData.SetBuffer("vertexColors", colorBuffer);
-            materialInstanceRenderData.SetBuffer("textureTransforms", textureTransformsBuffer);
-            entityManager.SetManagedComponent(objectEntity, materialInstanceRenderData);
-
             foreach (var material in m2Instance.materials)
             {
-                objectEntity.SetRenderer(entityManager, m2Instance.mesh, material.submesh, material.material,
-                    new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0));
+                var ownMaterial = OwnMaterial(material.material); // per-instance copy (dither etc. must not leak onto shared model materials)
+                BaseMaterial ??= ownMaterial;
+                objectEntity.SetRenderer(entityManager, m2Instance.mesh, material.submesh, ownMaterial,
+                    new Int4(
+                        material.batch.colorIndex < 0 ? -1 : colorBase + material.batch.colorIndex,
+                        material.batch.textureTransformIndex < 0 ? -1 : texBase + material.batch.textureTransformIndex,
+                        material.batch.textureTransformIndex2 < 0 ? -1 : texBase + material.batch.textureTransformIndex2,
+                        boneBase));
             }
         }
         else if (wmoInstance != null)
@@ -106,49 +96,35 @@ public class GameObjectInstance : WorldObjectInstance
             {
                 for (var index = 0; index < batch.Item2.Length; index++)
                 {
-                    var material = batch.Item2[index];
-                    // optimization here, we can share the render data, because we know all the materials will be the same shader
-                    BaseMaterial = material;
+                    var ownMaterial = OwnMaterial(batch.Item2[index]);
+                    BaseMaterial ??= ownMaterial;
 
-                    objectEntity.SetRenderer(entityManager, batch.Item1, index, material);
+                    objectEntity.SetRenderer(entityManager, batch.Item1, index, ownMaterial);
                 }
             }
         }
 
         textEntity = gameContext.UiManager.DrawPersistentWorldText("calibri", new Vector2(0.5f, 0.5f), gameObjectTemplate?.Name ?? "", 0.25f, Matrix.Identity, 50);
+        entityManager.SetParent(textEntity, objectEntity);
         entityManager.AddComponent(textEntity, new CopyParentTransform(){Parent = objectEntity});
         entityManager.AddComponent(textEntity, new DirtyPosition(true));
         textEntity.SetRenderLayer(entityManager, renderLayer);
-        handles.Add(textEntity);
     }
-    
+
     public override void Dispose()
     {
         if (objectEntity == Entity.Empty)
         {
             throw new Exception("Double dispose!");
         }
-        
-        var entityManager = gameContext.EntityManager;
-        
-        foreach (var entity in handles)
-            entityManager.DestroyEntity(entity);
 
-        foreach (var collider in colliders)
-            entityManager.DestroyEntity(collider);
-        
-        colliders.Clear();
-        handles.Clear();
-        
-        foreach (var buf in bonesBuffers)
-        {
-            buf.Dispose();
-        }
-        
-        bonesBuffers.Clear();
-        
+        var entityManager = gameContext.EntityManager;
+
+        // textEntity (and any other attachment) is parented to objectEntity, so destroying it cascades
         entityManager.DestroyEntity(objectEntity);
         objectEntity = Entity.Empty;
+
+        DisposeOwnedMaterials();
     }
 
     public float Orientation

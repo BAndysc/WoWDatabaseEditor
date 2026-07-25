@@ -1,26 +1,29 @@
-using System.Collections;
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class CharHairGeosetsStore : BaseDbcStore<uint, CharHairGeosets>
+public class CharHairGeosetsStore : NativeBaseDbcStore<uint, CharHairGeosets>
 {
-    public CharHairGeosetsStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version)
+    public CharHairGeosetsStore(IDBC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new CharHairGeosets(row, version);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new CharHairGeosets(row, version);
+            Set(o.Id, ref o);
         }
     }
 
-    public CharHairGeosetsStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version)
+    public CharHairGeosetsStore(IWDC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new CharHairGeosets(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new CharHairGeosets(row);
+            Set(o.Id, ref o);
         }
     }
 }

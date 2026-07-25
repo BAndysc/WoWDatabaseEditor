@@ -9,7 +9,7 @@ public class LightIntParamStore : BaseDbcStore<uint, LightIntParam>
         foreach (var row in rows)
         {
             var o = new LightIntParam(row);
-            store[o.Id] = o;
+            Set(o.Id, o);
         }
     }
     

@@ -2,7 +2,7 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class ItemModifiedAppearance
+public ref struct ItemModifiedAppearance
 {
     public readonly uint Id;
     public readonly uint ItemId;

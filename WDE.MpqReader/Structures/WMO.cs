@@ -46,9 +46,11 @@ namespace WDE.MpqReader.Structures
         public readonly string[] ModelNames;
         public readonly string[] GroupNames;
         public readonly SmoDoodadDef[] DoodadsDefinition;
+        public readonly SmoDoodadSet[] DoodadSets;
         public readonly WorldMapObjectMaterial[] Materials;
         public readonly Vector3[] PortalVertices;
         public readonly WmoPortal[] Portals;
+        public readonly WmoLight[]? Lights;
         public readonly uint[,]? GroupFileDataIdsPerLods;
 
         public WMO(IBinaryReader reader, GameFilesVersion version)
@@ -69,6 +71,8 @@ namespace WDE.MpqReader.Structures
                     Header = WMOHeader.Read(partialReader, version);
                 else if (chunkName == "MOTX")
                     Textures = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out textureOffsets);
+                else if (chunkName == "MODS")
+                    DoodadSets = ReadDoodadSets(partialReader, size);
                 else if (chunkName == "MODD")
                     DoodadsDefinition = ReadDoodads(partialReader, offsets, size);
                 else if (chunkName == "MODN")
@@ -83,6 +87,8 @@ namespace WDE.MpqReader.Structures
                     Portals = ReadPortals(partialReader);
                 else if (chunkName == "GFID")
                     GroupFileDataIdsPerLods = ReadGroupFileIds(partialReader);
+                else if (chunkName == "MOLT")
+                    Lights = ReadLights(partialReader);
             
                 reader.Offset = offset + size;
             }
@@ -106,6 +112,20 @@ namespace WDE.MpqReader.Structures
         public static WMO Read(IBinaryReader reader, GameFilesVersion version)
         {
             return new WMO(reader, version);
+        }
+
+        private WmoLight[]? ReadLights(LimitedReader reader)
+        {
+            if (reader.Size == 0)
+                return null;
+            var lights = new WmoLight[reader.Size / 48];
+            int i = 0;
+            while (!reader.IsFinished())
+            {
+                lights[i++] = new WmoLight(reader);
+            }
+
+            return lights;
         }
 
         private WmoPortal[] ReadPortals(LimitedReader reader)
@@ -145,6 +165,15 @@ namespace WDE.MpqReader.Structures
             return materials;
         }
 
+        private static SmoDoodadSet[] ReadDoodadSets(LimitedReader reader, int size)
+        {
+            int count = size / 32;
+            SmoDoodadSet[] array = new SmoDoodadSet[count];
+            for (int i = 0; i < count; ++i)
+                array[i] = new SmoDoodadSet(reader);
+            return array;
+        }
+
         private static SmoDoodadDef[] ReadDoodads(LimitedReader partialReader, Dictionary<int, string> nameOffsets, int size)
         {
             int count = size / 40;
@@ -155,6 +184,47 @@ namespace WDE.MpqReader.Structures
             }
             Debug.Assert(partialReader.IsFinished());
             return array;
+        }
+    }
+
+    public struct WmoLight
+    {
+        public enum LightType : byte
+        {
+            OMNI_LGT = 0,
+            SPOT_LGT = 1,
+            DIRECT_LGT = 2,
+            AMBIENT_LGT = 3,
+        }
+
+        public enum LightFlags : byte
+        {
+            UseAttenuation = 1
+        }
+
+        public readonly LightType type;
+        public readonly LightFlags useAtten;
+        public readonly byte pad0;      // not padding as of v16
+        public readonly byte pad1;      // not padding as of v16
+        public readonly CImVector color;
+        public readonly Vector3 position;
+        public readonly float intensity;
+        public readonly Quaternion rotation;     // not needed by omni lights or ambient lights, but is likely used by spot and direct lights.
+        public readonly float attenStart;
+        public readonly float attenEnd;
+
+        public WmoLight(IBinaryReader reader)
+        {
+            type = (LightType)reader.ReadByte();
+            useAtten = (LightFlags)reader.ReadByte();
+            pad0 = reader.ReadByte();
+            pad1 = reader.ReadByte();
+            color = new CImVector(reader);
+            position = reader.ReadVector3();
+            intensity = reader.ReadFloat();
+            rotation = reader.ReadQuaternion();
+            attenStart = reader.ReadFloat();
+            attenEnd = reader.ReadFloat();
         }
     }
 
@@ -334,6 +404,25 @@ namespace WDE.MpqReader.Structures
             a = reader.ReadByte();
         }
     };
+
+    public readonly struct SmoDoodadSet
+    {
+        public readonly string Name;             // set name, 20 byte fixed buffer
+        public readonly uint FirstInstanceIndex; // index of first doodad in DoodadsDefinition belonging to this set
+        public readonly uint Count;              // number of doodads in this set
+
+        public SmoDoodadSet(IBinaryReader reader)
+        {
+            Span<byte> name = stackalloc byte[20];
+            var bytes = reader.ReadBytes(20).Span;
+            bytes.CopyTo(name);
+            int len = name.IndexOf((byte)0);
+            Name = System.Text.Encoding.ASCII.GetString(name.Slice(0, len < 0 ? 20 : len));
+            FirstInstanceIndex = reader.ReadUInt32();
+            Count = reader.ReadUInt32();
+            reader.ReadUInt32(); // unused / padding
+        }
+    }
 
     public readonly struct SmoDoodadDef
     {

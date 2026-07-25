@@ -609,7 +609,7 @@ namespace WDE.MpqReader.Structures
         // public readonly float[] Depth = new float[9 * 9];
         // public readonly Vector2[] TexCoords = new Vector2[9 * 9];
 
-        public MH2OLiquidInstance(IBinaryReader reader, LiquidObjectStore liquidObjectStore, LiquidTypeStore liquidTypeStore, LiquidMaterialStore liquidMaterialStore)
+        public unsafe MH2OLiquidInstance(IBinaryReader reader, LiquidObjectStore liquidObjectStore, LiquidTypeStore liquidTypeStore, LiquidMaterialStore liquidMaterialStore)
         {
             LiquidTypeId = reader.ReadUInt16();
             LiquidVertexFormat = reader.ReadUInt16();
@@ -630,9 +630,9 @@ namespace WDE.MpqReader.Structures
                     throw new Exception("Unknown water format: " + LiquidVertexFormat);
                 }
 
-                if (!liquidTypeStore.TryGetValue(liquidObject.LiquidTypeId, out var liquidType))
+                if (!liquidTypeStore.TryGetValue(liquidObject->LiquidTypeId, out var liquidType))
                 {
-                    throw new Exception("Unknown liquid type id: " + liquidObject.LiquidTypeId);
+                    throw new Exception("Unknown liquid type id: " + liquidObject->LiquidTypeId);
                 }
 
                 if (!liquidMaterialStore.TryGetValue((int)liquidType.MaterialId, out var liquidMaterial))
@@ -640,7 +640,7 @@ namespace WDE.MpqReader.Structures
                     throw new Exception("Unknown liquid material id: " + liquidType.MaterialId);
                 }
 
-                LiquidVertexFormat = (ushort)liquidMaterial.LVF;
+                LiquidVertexFormat = (ushort)liquidMaterial->LVF;
             }
             else if (LiquidVertexFormat == 42)
                 LiquidVertexFormat = 2;

@@ -1,7 +1,7 @@
-using ImGuiNET;
-using TheAvaloniaOpenGL.Resources;
+using Hexa.NET.ImGui;
 using TheEngine.Components;
 using TheEngine.ECS;
+using TheEngine.Entities;
 using TheEngine.Interfaces;
 using TheEngine.Utils;
 using TheMaths;
@@ -28,9 +28,14 @@ public class M2AnimationComponentData : IManagedComponentData
     public uint _length;
     public int _animInternalIndex;
     public float _time;
-    public INativeBuffer<Matrix> _buffer = null!;
-    public INativeBuffer<Vector4> _colors = null!;
-    public INativeBuffer<Matrix> _textureTransforms = null!;
+    // global buffer offsets (assigned once at entity creation via AnimationSystem.AllocateAnimationSlots)
+    public int BoneBase;
+    public int ColorBase;
+    public int TexTransformBase;
+    // per-entity CPU caches (written by Update, uploaded to global buffer by UploadToGpu)
+    public Matrix[]? _boneCache;
+    public Vector4[]? _colorCache;
+    public Matrix[]? _texTransformCache;
 
     public M2AnimationComponentData(M2 model, M2AnimationComponentData? attachedTo = null, M2AttachmentType? attachmentType = null)
     {
@@ -61,7 +66,13 @@ public class Archetypes
     public Archetype AttachmentArchetype;
     public Archetype WorldObjectMeshRendererArchetype;
 
-    
+    public Archetype PointLightsArchetype;
+    public Archetype M2PointLightsArchetype;
+
+    public Archetype LowLevelDetailArchetype;
+
+    public Archetype GroupArchetype; // purely organizational entity used as a hierarchy node (no transform/render data)
+
     public Archetypes(IEntityManager entityManager)
     {
         this.entityManager = entityManager;
@@ -81,12 +92,11 @@ public class Archetypes
             .WithManagedComponentData<MdxRenderer>();
 
         StaticM2WorldObjectAnimatedArchetype = StaticM2WorldObjectArchetype
-            .WithManagedComponentData<MaterialInstanceRenderData>()
             .WithManagedComponentData<M2AnimationComponentData>();
 
         CollisionOnlyArchetype = entityManager.NewArchetype()
             .WithComponentData<LocalToWorld>()
-            .WithComponentData<Collider>()
+            .WithComponentData<LegacyCollider>()
             .WithComponentData<WorldMeshBounds>()
             .WithComponentData<MeshRenderer>();
             
@@ -126,8 +136,7 @@ public class Archetypes
             .WithComponentData<PerformCullingBit>()
             .WithComponentData<WorldMeshBounds>()
             .WithComponentData<LocalToWorld>()
-            .WithComponentData<MeshRenderer>()
-            .WithManagedComponentData<MaterialInstanceRenderData>();
+            .WithComponentData<MeshRenderer>();
 
         AnimatedWorldObjectArchetype = WorldObjectArchetype
             .WithManagedComponentData<M2AnimationComponentData>()
@@ -140,7 +149,6 @@ public class Archetypes
             .WithComponentData<LocalToWorld>()
             .WithComponentData<CopyParentTransform>()
             .WithComponentData<MeshBounds>()
-            .WithManagedComponentData<MaterialInstanceRenderData>()
             .WithManagedComponentData<M2AnimationComponentData>();
 
         // Creature/attachment per-renderer child entities no longer use this archetype (renderers are array
@@ -150,8 +158,21 @@ public class Archetypes
             .Includes(CullingArchetype)
             .Includes(RenderEntityArchetype)
             .Includes(StaticM2WorldObjectArchetype)
+            .WithComponentData<CopyParentTransform>();
+
+        PointLightsArchetype = entityManager.NewArchetype()
+            .WithComponentData<LocalToWorld>()
+            .WithComponentData<Light>();
+
+        M2PointLightsArchetype = PointLightsArchetype
+            .WithManagedComponentData<AnimatedM2Light>()
             .WithComponentData<CopyParentTransform>()
-            .WithManagedComponentData<MaterialInstanceRenderData>();
+            .WithComponentData<DirtyPosition>();
+
+        LowLevelDetailArchetype = RenderEntityArchetype
+            .WithComponentData<LowDetailData>();
+
+        GroupArchetype = entityManager.NewArchetype();
     }
 }
 

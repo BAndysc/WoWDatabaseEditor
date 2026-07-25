@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -18,14 +18,15 @@
     <Import Project="..\Rendering\lib3d.props" />
     
     <ItemGroup>
+        <ProjectReference Include="..\Rendering\TheEngine.SourceGenerator\TheEngine.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+        <ProjectReference Include="..\Rendering\TheEngineAvalonia\TheEngineAvalonia.csproj" />
         <ProjectReference Include="..\WDE.WorldMap\WDE.WorldMap.csproj" />
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
         <ProjectReference Include="..\WDE.MpqReader\WDE.MpqReader.csproj" />
+        <ProjectReference Include="..\WDE.MPQ\WDE.MPQ.csproj" />
         <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
         <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
-        <ProjectReference Include="..\Rendering\OpenGLBindings\OpenGLBindings.csproj" />
-        <ProjectReference Include="..\Rendering\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />
         <ProjectReference Include="..\Rendering\TheEngine\TheEngine.csproj" />
         <ProjectReference Include="..\Rendering\TheMaths\TheMaths.csproj" />
     </ItemGroup>

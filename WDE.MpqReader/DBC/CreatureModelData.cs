@@ -3,7 +3,7 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC;
 
-public class CreatureModelData
+public ref struct CreatureModelData
 {
     public readonly uint Id;
 //    public readonly int Flags;
@@ -72,7 +72,7 @@ public class CreatureModelData
         ModelName = dbcIterator.GetUInt("FileDataID");
     }
 
-    private CreatureModelData()
+    public CreatureModelData()
     {
         Id = 0;
         //Flags = 0;

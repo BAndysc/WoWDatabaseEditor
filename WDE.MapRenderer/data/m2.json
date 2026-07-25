@@ -3,7 +3,6 @@
     "Path": "data/m2.frag"
   },
   "ZWrite": true,
-  "Instancing": true,
   "Vertex": {
     "Path": "data/m2.vert",
     "Input": [

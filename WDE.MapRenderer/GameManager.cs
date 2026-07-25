@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Windows.Input;
+using Hexa.NET.ImGui;
 using Prism.Ioc;
 using TheEngine;
 using TheEngine.Coroutines;
@@ -46,6 +47,7 @@ namespace WDE.MapRenderer
         private ZoneAreaManager zoneAreaManager = null!;
         private AnimationSystem animationSystem = null!;
         private LowDetailHeightMapManager lowDetailHeightMapManager = null!;
+        private StatusIconsManager statusIconsManager = null!;
 
         public CoroutineManager CoroutineManager => coroutineManager;
         public NotificationsCenter NotificationsCenter => notificationsCenter;
@@ -68,6 +70,7 @@ namespace WDE.MapRenderer
         public LoadingManager LoadingManager => loadingManager;
         public AnimationSystem AnimationSystem => animationSystem;
         public ZoneAreaManager ZoneAreaManager => zoneAreaManager;
+        public StatusIconsManager StatusIconsManager => statusIconsManager;
         public Engine Engine { get; }
         public IEntityManager EntityManager { get; }
         public ITextureManager EngineTextureManager { get; }
@@ -78,7 +81,8 @@ namespace WDE.MapRenderer
 
         public float Delta { get; private set; }
         public event Action<int>? ChangedMap;
-        public Map CurrentMap { get; private set; } = Map.Empty;
+        public unsafe Map* CurrentMap { get; private set; } = null;
+        public unsafe int CurrentMapId => CurrentMap == null ? -1 : CurrentMap->Id;
         public bool IsInitialized { get; private set; }
         
         public GameManager(IContainerProvider containerProvider, 
@@ -147,11 +151,40 @@ namespace WDE.MapRenderer
             mainUi = ResolveOrCreate<MainUi>();
             animationSystem = ResolveOrCreate<AnimationSystem>();
             lowDetailHeightMapManager = ResolveOrCreate<LowDetailHeightMapManager>();
-            
+            statusIconsManager = ResolveOrCreate<StatusIconsManager>();
+
+            UiManager.OnMenuBarDraw += OnDrawMenuBar;
+
             IsInitialized = true;
             return true;
         }
-        
+
+        private bool enableAnimationSystem = true;
+        private bool enableCameraManager = true;
+        private bool enableLightingManager = true;
+        private bool enableScreenSpaceSelector = true;
+        private bool enableUpdateLoop = true;
+        private bool enableChunkManager = true;
+        private bool enableModuleManager = true;
+        private bool enableLowDetailManager = true;
+
+        private void OnDrawMenuBar()
+        {
+            if (ImGui.BeginMenu("Systems\0"u8))
+            {
+                ImGui.MenuItem("Animations\0"u8, Span<byte>.Empty, ref enableAnimationSystem);
+                ImGui.MenuItem("Camera\0"u8, Span<byte>.Empty, ref enableCameraManager);
+                ImGui.MenuItem("Lighting\0"u8, Span<byte>.Empty, ref enableLightingManager);
+                ImGui.MenuItem("Screen space selector\0"u8, Span<byte>.Empty, ref enableScreenSpaceSelector);
+                ImGui.MenuItem("Update loop\0"u8, Span<byte>.Empty, ref enableUpdateLoop);
+                ImGui.MenuItem("Chunk Manager\0"u8, Span<byte>.Empty, ref enableChunkManager);
+                ImGui.MenuItem("Module Manager\0"u8, Span<byte>.Empty, ref enableModuleManager);
+                ImGui.MenuItem("Low Detail Terrain\0"u8, Span<byte>.Empty, ref enableLowDetailManager);
+
+                ImGui.EndMenu();
+            }
+        }
+
         private T ResolveOrCreate<T>()
         {
             var t = containerProvider.Resolve<T>();
@@ -175,16 +208,32 @@ namespace WDE.MapRenderer
 
             timeManager.Update(delta);
             worldManager.Update(delta);
-            
-            animationSystem.Update(delta);
-            
-            cameraManager.Update(delta);
-            lightingManager.Update(delta);
-            
-            screenSpaceSelector.Update(delta);
-            updateLoop.Update(delta);
-            chunkManager.Update(delta);
-            moduleManager.Update(delta);
+
+            if (enableAnimationSystem)
+                animationSystem.Update(delta);
+
+            if (enableCameraManager)
+                cameraManager.Update(delta);
+
+            if (enableLightingManager)
+                lightingManager.Update(delta);
+
+            if (enableScreenSpaceSelector)
+                screenSpaceSelector.Update(delta);
+
+            if (enableUpdateLoop)
+                updateLoop.Update(delta);
+
+            if (enableChunkManager)
+                chunkManager.Update(delta);
+
+            if (enableModuleManager)
+                moduleManager.Update(delta);
+
+            if (enableLowDetailManager)
+                lowDetailHeightMapManager.Update(delta);
+
+            statusIconsManager.Update(delta);
         }
 
         public void Render(float delta)
@@ -195,9 +244,11 @@ namespace WDE.MapRenderer
                 return;
             }
 
-            lowDetailHeightMapManager.Render();
+            // post-fence: safe to write animation caches to the global GPU buffers
+            animationSystem.UploadToGpu();
+
             meshManager.Render();
-            renderManager.ViewDistanceModifier = gameProperties.ViewDistanceModifier;
+            Engine.CameraManager.MainCamera.ViewDistanceModifier = gameProperties.ViewDistanceModifier;
             renderManager.SetDynamicResolutionScale(gameProperties.DynamicResolution);
             moduleManager.Render(delta);
             lightingManager.Render();
@@ -206,6 +257,7 @@ namespace WDE.MapRenderer
         public void RenderTransparent(float delta)
         {
             areaTriggerManager.Render();
+            statusIconsManager.Render();
             moduleManager.RenderTransparent();
         }
 
@@ -218,21 +270,22 @@ namespace WDE.MapRenderer
             screenSpaceSelector.Render();
             cameraManager.RenderGUI();
             loadingManager.RenderGUI();
-            timeManager.RenderGUI();
             mdxManager.RenderGUI();
             zoneAreaManager.RenderGUI();
         }
 
-        public void SetMap(int mapId, Vector3? position = null)
+        public unsafe void SetMap(int mapId, Vector3? position = null)
         {
-            if (dbcManager.MapStore.Contains(mapId) && CurrentMap.Id != mapId)
+            if (dbcManager.MapStore.TryGetValue(mapId, out var map) && (CurrentMap == null || CurrentMap->Id != mapId))
             {
-                CurrentMap = dbcManager.MapStore[mapId];
+                CurrentMap = map;
                 worldManager?.SetNextTeleportPosition(position);
                 ChangedMap?.Invoke(mapId);
             }
-            else if (CurrentMap.Id == mapId && position.HasValue)
-                cameraManager.Relocate(position.Value);
+            else if (CurrentMap != null && CurrentMap->Id == mapId && position.HasValue)
+                // same map already loaded -> this is a "fly camera here" action: frame it (stand back)
+                // and glide if it's close
+                cameraManager.Relocate(position.Value, flyHere: true);
         }
 
         public void DisposeGame()

@@ -3,7 +3,7 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC;
 
-public class CharSections
+public ref struct CharSections
 {
     public readonly uint Id;
     public readonly int RaceID;
@@ -30,7 +30,7 @@ public class CharSections
         ColorIndex = dbcIterator.GetInt(9);
     }
 
-    public CharSections(IWdcIterator dbcIterator, TextureFileDataStore textureFileDataStore)
+    public unsafe CharSections(IWdcIterator dbcIterator, TextureFileDataStore textureFileDataStore)
     {
         Id = (uint)dbcIterator.Id;
         RaceID = dbcIterator.GetByte("RaceID");
@@ -40,17 +40,17 @@ public class CharSections
         var textureId2 = dbcIterator.GetInt("MaterialResourcesID", 1);
         var textureId3 = dbcIterator.GetInt("MaterialResourcesID", 2);
         if (textureId1 > 0 && textureFileDataStore.TryGetValue(textureId1, out var textureFileData))
-            TextureName1 = textureFileData.FileData;
+            TextureName1 = textureFileData->FileData;
         if (textureId2 > 0 && textureFileDataStore.TryGetValue(textureId2, out textureFileData))
-            TextureName2 = textureFileData.FileData;
+            TextureName2 = textureFileData->FileData;
         if (textureId3 > 0 && textureFileDataStore.TryGetValue(textureId3, out textureFileData))
-            TextureName3 = textureFileData.FileData;
+            TextureName3 = textureFileData->FileData;
         Flags = dbcIterator.GetShort("Flags");
         VariationIndex = dbcIterator.GetByte("VariationIndex");
         ColorIndex = dbcIterator.GetByte("ColorIndex");
     }
 
-    private CharSections()
+    public CharSections()
     {
         Id = 0;
         RaceID = 0;

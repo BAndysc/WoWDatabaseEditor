@@ -105,7 +105,49 @@ namespace WDE.MapRenderer
                 settings.Update(current);
             }
         }
-        
+
+        public bool ShowStatusIcons
+        {
+            get => current.ShowStatusIcons;
+            set
+            {
+                current.ShowStatusIcons = value;
+                settings.Update(current);
+            }
+        }
+
+        public uint StatusIconsHiddenMask
+        {
+            get => current.StatusIconsHiddenMask;
+            set
+            {
+                current.StatusIconsHiddenMask = value;
+                settings.Update(current);
+            }
+        }
+
+        public bool VSync
+        {
+            get => current.VSync;
+            set
+            {
+                current.VSync = value;
+                settings.Update(current);
+            }
+        }
+
+        /// <summary>true = ProperTheEnginePanel (renders through the Avalonia compositor);
+        /// false = NativeTheEnginePanel (a native child window). Read when a 3D view opens.</summary>
+        public bool UseCompositionPanel
+        {
+            get => current.UseCompositionPanel;
+            set
+            {
+                current.UseCompositionPanel = value;
+                settings.Update(current);
+            }
+        }
+
         public struct Data : ISettings
         {
             public bool OverrideLighting;
@@ -115,10 +157,23 @@ namespace WDE.MapRenderer
             public int TextureQuality;
             public int CurrentTime;
             public float ViewDistanceModifier;
-            
+
             [DefaultValue(true)]
             [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
             public bool ShowAreaTriggers;
+
+            [DefaultValue(true)]
+            [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+            public bool ShowStatusIcons;
+
+            // the HIDDEN icon set (default 0 = everything visible, incl. icons added in the future)
+            public uint StatusIconsHiddenMask;
+
+            public bool UseCompositionPanel;
+
+            // only honored by the native panel (a real Vulkan swapchain: Fifo vs Immediate);
+            // the composition panel is compositor-paced, i.e. always vsynced
+            public bool VSync;
         }
     }
 }

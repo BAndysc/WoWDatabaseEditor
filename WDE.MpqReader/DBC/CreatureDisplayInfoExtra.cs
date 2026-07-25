@@ -3,7 +3,7 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC;
 
-public class CreatureDisplayInfoExtra
+public ref struct CreatureDisplayInfoExtra
 {
     public readonly uint Id;
     public readonly uint Race;
@@ -80,7 +80,7 @@ public class CreatureDisplayInfoExtra
         Texture = dbcIterator.GetInt("BakeMaterialResourcesID");
     }
     
-    private CreatureDisplayInfoExtra()
+    public CreatureDisplayInfoExtra()
     {
         Id = 0;
         Race = 0;

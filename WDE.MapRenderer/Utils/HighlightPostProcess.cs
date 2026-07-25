@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine.Resources;
 using TheEngine;
 using TheEngine.Components;
 using TheEngine.ECS;
@@ -25,10 +25,16 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
     private ScreenRenderTexture RT;
     private ScreenRenderTexture RT_downscaled;
 
+    private Vector4 outlineColorVec;
+
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     private struct OutlineMaterialData_t
     {
         public Vector4 outlineColor;
+        public BindlessTextureId outlineTexIndex;          // bindless index of the blurred outline RT
+        public BindlessTextureId outlineTexUnBlurredIndex; // bindless index of the sharp outline RT
+        public BindlessTextureId mainTexIndex;             // bindless index of the scene image being post-processed
+        public int padding0;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
@@ -36,7 +42,7 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
     {
         public Vector4 mesh_color;
         public float alphaTest;
-        public int padding0;
+        public BindlessTextureId texture1Index;
         public int padding1;
         public int padding2;
     };
@@ -93,15 +99,13 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
         }, false);
 
         outlineMaterial = engine.MaterialManager.CreateMaterial<OutlineMaterialData_t>(outlinePipeline);
-        OutlineMaterialData_t data = default;
-        data.outlineColor = outlineColor.ToVector4();
-        outlineMaterial.SetMaterialData(ref data);
+        outlineColorVec = outlineColor.ToVector4(); // the three texture indices are filled per frame in RenderPostprocess
 
         RT = new ScreenRenderTexture(engine);
         RT_downscaled = new ScreenRenderTexture(engine, 0.25f);
     }
 
-    public void Render(IReadOnlyList<Entity?> renderers)
+    public void Render(List<Entity?> renderers)
     {
         RT.Update();
         RT_downscaled.Update();
@@ -112,54 +116,81 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
         {
             if (maybeEntity is not { } entity)
                 continue;
-            var localToWorld = entityManager.GetComponent<LocalToWorld>(entity);
-            var renderers_ = entityManager.GetArrayComponents<MeshRenderer>(entity);
-            var instanceData = entityManager.GetManagedComponent<MaterialInstanceRenderData>(entity);
-
-            for (int j = 0; j < renderers_.Length; ++j)
-            {
-                ref var renderer = ref renderers_[j];
-                var oldMaterial = engine.MaterialManager.GetMaterialByHandle(renderer.MaterialHandle);
-                var oldCullMode = oldMaterial.Pipeline.Description.RasterizerState.CullMode;
-
-                var bones = instanceData.GetBuffer("boneMatrices");
-                Material<ReplacementMaterialData_t> material;
-                ReplacementMaterialData_t replacementData = default;
-                replacementData.mesh_color = new Vector4(1, 0, 0, 1);
-                if (oldMaterial is Material<WmoManager.WmoMaterialData> wmoMaterial)
-                {
-                    material = replacementMaterialWmo[(int)oldCullMode];
-                    replacementData.alphaTest = wmoMaterial.MaterialData.alphaTest;
-                    material.SetTexture("texture1", oldMaterial.GetTexture("texture1"));
-                }
-                else if (oldMaterial is Material<MdxManager.MdxMaterialData> m2Material)
-                {
-                    material = replacementMaterialM2[(int)oldCullMode];
-                    replacementData.alphaTest = m2Material.MaterialData.alphaTest;
-                    material.SetBuffer("boneMatrices", bones);
-                    material.SetTexture("texture1", oldMaterial.GetTexture("texture1"));
-                }
-                else
-                    throw new Exception("Unknown material type");
-
-                material.SetMaterialData(ref replacementData);
-
-                engine.RenderManager.Render(renderer.MeshHandle, material.Handle, ShaderPassType.Forward, renderer.SubMeshId, localToWorld.Matrix, localToWorld.Inverse, instanceInt: renderer.InstanceData);
-
-            }
+            RenderRecursive(entityManager, entity);
         }
-        
+
         // through the render manager, so the blit is recorded in order with the draws above
         // (the texture-manager blit executes immediately and would copy last frame's content)
         engine.RenderManager.BlitRenderTextures(RT.Texure, RT_downscaled.Texure);
         engine.RenderManager.ActivateDefaultRenderTexture();
     }
 
+    // Draws the entity's own mesh renderers, then the whole hierarchy below it (Relationship
+    // component): mounts, item attachments etc. are child entities with their own renderers
+    // and must glow together with the selected object.
+    private void RenderRecursive(IEntityManager entityManager, Entity entity)
+    {
+        RenderEntityRenderers(entityManager, entity);
+        var relationship = entityManager.GetComponent<Relationship>(entity);
+        for (var child = relationship.FirstChild; child != Entity.Empty;
+             child = entityManager.GetComponent<Relationship>(child).NextSibling)
+            RenderRecursive(entityManager, child);
+    }
+
+    private void RenderEntityRenderers(IEntityManager entityManager, Entity entity)
+    {
+        // empty when the entity has no MeshRenderer array at all (text labels, group nodes, ...)
+        var renderers_ = entityManager.GetArrayComponents<MeshRenderer>(entity);
+        if (renderers_.Length == 0)
+            return;
+
+        var localToWorld = entityManager.GetComponent<LocalToWorld>(entity);
+        for (int j = 0; j < renderers_.Length; ++j)
+        {
+            ref var renderer = ref renderers_[j];
+            if (renderer.Hidden) // inactive geosets aren't on screen, so they must not glow either
+                continue;
+            var oldMaterial = engine.MaterialManager.GetMaterialByHandle(renderer.MaterialHandle);
+            var oldCullMode = oldMaterial.Pipeline.Description.RasterizerState.CullMode;
+
+            Material<ReplacementMaterialData_t> material;
+            ReplacementMaterialData_t replacementData = default;
+            replacementData.mesh_color = new Vector4(1, 0, 0, 1);
+            if (oldMaterial is Material<WmoManager.WmoMaterialData> wmoMaterial)
+            {
+                material = replacementMaterialWmo[(int)oldCullMode];
+                replacementData.alphaTest = wmoMaterial.MaterialData.alphaTest;
+                // texture1 is sampled bindlessly; copy the slot index straight from the source material.
+                replacementData.texture1Index = wmoMaterial.MaterialData.texture1Index;
+            }
+            else if (oldMaterial is Material<MdxManager.MdxMaterialData> m2Material)
+            {
+                material = replacementMaterialM2[(int)oldCullMode];
+                replacementData.alphaTest = m2Material.MaterialData.alphaTest;
+                // texture1 is sampled bindlessly; copy the slot index straight from the source material.
+                replacementData.texture1Index = m2Material.MaterialData.texture1Index;
+            }
+            else
+                continue; // a child with a foreign material type (water, decals, ...) - just skip it
+
+            material.SetMaterialData(ref replacementData);
+
+            engine.RenderManager.Render(renderer.MeshHandle, material.Handle, ShaderPassType.Forward, renderer.SubMeshId, localToWorld.Matrix, localToWorld.Inverse, instanceInt: renderer.InstanceData);
+        }
+    }
+
     public void RenderPostprocess(IRenderManager context, ITexture currentImage)
     {
-        outlineMaterial.SetTexture("outlineTex", RT_downscaled.Texure);
-        outlineMaterial.SetTexture("outlineTexUnBlurred", RT.Texure);
-        outlineMaterial.SetTexture("_MainTex", currentImage);
+        // RT / RT_downscaled are left in ShaderRead by BlitRenderTextures (see Render), currentImage
+        // is barriered to ShaderRead by the postprocess loop - so all three are safe to sample bindlessly.
+        OutlineMaterialData_t data = new()
+        {
+            outlineColor = outlineColorVec,
+            outlineTexIndex = engine.TextureManager.GetBindlessIndex(RT_downscaled.Texure),
+            outlineTexUnBlurredIndex = engine.TextureManager.GetBindlessIndex(RT.Texure),
+            mainTexIndex = engine.TextureManager.GetBindlessIndex(currentImage),
+        };
+        outlineMaterial.SetMaterialData(ref data);
         context.RenderFullscreenPlane(outlineMaterial);
     }
 

@@ -44,22 +44,21 @@ public class WorldManager : System.IDisposable
     public WDL? CurrentWdl { get; private set; }
 
     private int? prevAreaId;
-    public void Update(float delta)
+    public unsafe void Update(float delta)
     {
         if (!gameProperties.LoadWorld)
         {
             return;
         }
-        var areaId = zoneAreaManager.GetAreaId(gameContext.CurrentMap.Id, cameraManager.Position);
+        var areaId = zoneAreaManager.GetAreaId(gameContext.CurrentMapId, cameraManager.Position);
         if (areaId != prevAreaId)
         {
             prevAreaId = areaId;
             if (areaId.HasValue)
             {
-                if (areaTableStore.Contains((uint)areaId.Value))
+                if (areaTableStore.TryGetValue((uint)areaId.Value, out var zone))
                 {
-                    var areaName = areaTableStore[(uint)areaId.Value];
-                    notificationsCenter.ShowMessage(areaName.Name);
+                    notificationsCenter.ShowMessage(zone->Name);
                 }
             }
         }
@@ -71,8 +70,14 @@ public class WorldManager : System.IDisposable
     
     public async ValueTask LoadMap(CancellationToken cancel)
     {
-        var wdtPath = gameFiles.Wdt(gameContext.CurrentMap.Directory);
-        var wdlPath = gameFiles.Wdl(gameContext.CurrentMap.Directory);
+        string wdtPath, wdlPath;
+        unsafe
+        {
+            if (gameContext.CurrentMap == null)
+                throw new Exception();
+            wdtPath = gameFiles.Wdt(gameContext.CurrentMap->Directory);
+            wdlPath = gameFiles.Wdl(gameContext.CurrentMap->Directory);
+        }
         var wdtBytes = await gameFiles.ReadFile(wdtPath);
         var wdlBytes = await gameFiles.ReadFile(wdlPath);
         if (wdtBytes == null)
@@ -117,7 +122,7 @@ public class WorldManager : System.IDisposable
         else if (chunks > 0)
         {
             var avg = middlePosSum / chunks;
-            if (gameContext.CurrentMap.Id == 1)
+            if (gameContext.CurrentMapId == 1)
             {
                 // this is just for debugging
                 // since the beginning this was the initial position in Kalimdor

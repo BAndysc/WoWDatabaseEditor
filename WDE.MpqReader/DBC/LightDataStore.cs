@@ -10,7 +10,7 @@ public class LightDataStore : BaseDbcStore<uint, LightData>
         foreach (var iterator in wdcIterators)
         {
             var data = new LightData(iterator);
-            store[data.Id] = data;
+            Set(data.Id, data);
             if (!storeByLightParamId.TryGetValue(data.LightParamID, out var list))
                 list = storeByLightParamId[data.LightParamID] = new List<LightData>();
             list.Add(data);
@@ -21,7 +21,7 @@ public class LightDataStore : BaseDbcStore<uint, LightData>
         foreach (var row in iterators)
         {
             var data = new LightData(row);
-            store[data.Id] = data;
+            Set(data.Id, data);
             if (!storeByLightParamId.TryGetValue(data.LightParamID, out var list))
                 list = storeByLightParamId[data.LightParamID] = new List<LightData>();
             list.Add(data);

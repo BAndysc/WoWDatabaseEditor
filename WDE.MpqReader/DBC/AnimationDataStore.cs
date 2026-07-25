@@ -1,26 +1,32 @@
+using System;
+using System.Collections.Generic;
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class AnimationDataStore : BaseDbcStore<uint, AnimationData>
+public class AnimationDataStore : NativeBaseDbcStore<uint, AnimationData>
 {
-    public AnimationDataStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version)
+    public AnimationDataStore(IDBC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new AnimationData(row, version);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new AnimationData(row, version);
+            Set(o.Id, ref o);
             MaxId = Math.Max(MaxId, o.Id);
         }
     }
     
-    public AnimationDataStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version)
+    public AnimationDataStore(IWDC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new AnimationData(row, version);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new AnimationData(row, version);
+            Set(o.Id, ref o);
             MaxId = Math.Max(MaxId, o.Id);
         }
     }

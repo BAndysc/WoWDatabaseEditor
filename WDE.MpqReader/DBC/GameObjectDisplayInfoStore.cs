@@ -1,25 +1,28 @@
-using System.Collections;
 using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class GameObjectDisplayInfoStore : BaseDbcStore<uint, GameObjectDisplayInfo>
+public class GameObjectDisplayInfoStore : NativeBaseDbcStore<uint, GameObjectDisplayInfo>
 {
-    public GameObjectDisplayInfoStore(IEnumerable<IDbcIterator> rows)
+    public GameObjectDisplayInfoStore(IDBC rows) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new GameObjectDisplayInfo(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new GameObjectDisplayInfo(row);
+            Set(o.Id, ref o);
         }
     }
-    
-    public GameObjectDisplayInfoStore(IEnumerable<IWdcIterator> rows)
+
+    public GameObjectDisplayInfoStore(IWDC rows) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new GameObjectDisplayInfo(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new GameObjectDisplayInfo(row);
+            Set(o.Id, ref o);
         }
     }
 }

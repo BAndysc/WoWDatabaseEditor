@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:WDE.MapSpawns.Bridge.ViewModels"
+             xmlns:db="clr-namespace:WDE.Common.Database;assembly=WDE.Common"
+             mc:Ignorable="d" d:DesignWidth="750" d:DesignHeight="450"
+             x:DataType="vm:WaypointsDocumentViewModel"
+             x:Class="WDE.MapSpawns.Bridge.Views.WaypointsDocumentView">
+    <DockPanel Margin="10">
+        <Border DockPanel.Dock="Top" Background="#334090E0" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+            <TextBlock TextWrapping="Wrap"
+                       Text="Read-only preview showing the paths' current database rows. Waypoints are edited in the 3D map view: open the map and pick the Waypoint tool." />
+        </Border>
+
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{CompiledBinding Paths}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:WaypointPathViewModel">
+                        <Expander Header="{CompiledBinding Header}" IsExpanded="True" Margin="0,0,0,6" HorizontalAlignment="Stretch">
+                            <StackPanel>
+                                <Grid ColumnDefinitions="60,90,90,90,80,80" Margin="4,2">
+                                    <TextBlock Grid.Column="0" Text="#" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="1" Text="X" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="2" Text="Y" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="3" Text="Z" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="4" Text="Delay" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="5" Text="Orient." FontWeight="Bold" />
+                                </Grid>
+                                <ItemsControl ItemsSource="{CompiledBinding Points}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="db:UniversalWaypoint">
+                                            <Grid ColumnDefinitions="60,90,90,90,80,80" Margin="4,1">
+                                                <TextBlock Grid.Column="0" Text="{CompiledBinding PointId}" />
+                                                <TextBlock Grid.Column="1" Text="{CompiledBinding X, StringFormat={}{0:0.##}}" />
+                                                <TextBlock Grid.Column="2" Text="{CompiledBinding Y, StringFormat={}{0:0.##}}" />
+                                                <TextBlock Grid.Column="3" Text="{CompiledBinding Z, StringFormat={}{0:0.##}}" />
+                                                <TextBlock Grid.Column="4" Text="{CompiledBinding Delay}" />
+                                                <TextBlock Grid.Column="5" Text="{CompiledBinding Orientation, StringFormat={}{0:0.##}}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

@@ -1,25 +1,28 @@
-using System.Collections;
 using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class ChrRacesStore : BaseDbcStore<uint, ChrRaces>
+public class ChrRacesStore : NativeBaseDbcStore<uint, ChrRaces>
 {
-    public ChrRacesStore(IEnumerable<IDbcIterator> rows)
+    public ChrRacesStore(IDBC rows) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new ChrRaces(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new ChrRaces(row, ref allocator);
+            Set(o.Id, ref o);
         }
     }
-    
-    public ChrRacesStore(IEnumerable<IWdcIterator> rows)
+
+    public ChrRacesStore(IWDC rows) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new ChrRaces(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new ChrRaces(row, ref allocator);
+            Set(o.Id, ref o);
         }
     }
 }

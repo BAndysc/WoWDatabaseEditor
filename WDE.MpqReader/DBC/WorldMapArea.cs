@@ -3,7 +3,7 @@ using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class WorldMapArea
+public ref struct WorldMapArea
 {
     public readonly uint Id;
     public readonly uint ZoneId;

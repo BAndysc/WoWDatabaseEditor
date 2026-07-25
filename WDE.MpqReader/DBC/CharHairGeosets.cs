@@ -3,7 +3,7 @@ using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class CharHairGeosets
+public ref struct CharHairGeosets
 {
     public readonly uint Id;
     public readonly int RaceID;
@@ -46,7 +46,7 @@ public class CharHairGeosets
         ShowScalp = dbcIterator.GetByte("Showscalp");
     }
 
-    private CharHairGeosets()
+    public CharHairGeosets()
     {
         Id = 0;
         RaceID = 0;

@@ -12,6 +12,7 @@ namespace WDE.MapRenderer.Managers
     {
         private readonly IMeshManager meshManager;
         private readonly IRenderManager renderManager;
+        private readonly ITextureManager textureManager;
         private readonly LightingManager lightingManager;
         private readonly TimeManager timeManager;
         private readonly LiquidObjectStore liquidObjectStore;
@@ -19,12 +20,20 @@ namespace WDE.MapRenderer.Managers
         private readonly LiquidMaterialStore liquidMaterialStore;
         private IMesh chunkMesh;
 
+        // water.png, owned for this manager's lifetime so its bindless slot (waterTexIndex) stays valid.
+        private readonly ITexture waterTexture;
+
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
         public struct water_material_data_t
         {
             public Vector4 color;
             public Vector4 deepColor;
             public Vector4 shallowColor;
+            // bindless slots: x = water normal/offset texture, y = scene color RT, z = scene depth RT
+            public int waterTexIndex;
+            public int sceneColorIndex;
+            public int depthTexIndex;
+            public int pad;
         };
 
         public WoWMeshManager(IMeshManager meshManager,
@@ -41,6 +50,7 @@ namespace WDE.MapRenderer.Managers
         {
             this.meshManager = meshManager;
             this.renderManager = renderManager;
+            this.textureManager = textureManager;
             this.lightingManager = lightingManager;
             this.timeManager = timeManager;
             this.liquidObjectStore = liquidObjectStore;
@@ -66,13 +76,11 @@ namespace WDE.MapRenderer.Managers
             // WaterMaterial.SourceBlending = Blending.SrcAlpha;
             // WaterMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
             // WaterMaterial.BlendingEnabled = true;
-            WaterMaterial.SetTexture("_WaterTexture", textureManager.LoadTexture("textures/water.png"));
+            waterTexture = textureManager.LoadTexture("textures/water.png");
         }
 
         public void Render()
         {
-            WaterMaterial.SetTexture("_DepthTexture", renderManager.DepthTexture);
-            WaterMaterial.SetTexture("_SceneColor", renderManager.OpaqueTexture);
             if (lightingManager.BestLight is { } light)
             {
                 var time = timeManager.Time;
@@ -84,6 +92,9 @@ namespace WDE.MapRenderer.Managers
                 data.color = new Vector4(0.28f, 1, 0.95f, 0.4f);
                 data.deepColor = oceanDeep.ToRgbaVector() with { W = 0.55f };
                 data.shallowColor = oceanShallow.ToRgbaVector() with { W = 0.85f };
+                data.waterTexIndex = textureManager.GetBindlessIndex(waterTexture);
+                data.sceneColorIndex = renderManager.OpaqueTextureBindlessIndex;
+                data.depthTexIndex = renderManager.DepthTextureBindlessIndex;
                 WaterMaterial.SetMaterialData(ref data);
             }
         }

@@ -1,3 +1,4 @@
+using ProtoZeroSharp;
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
 
@@ -10,40 +11,40 @@ public enum MapType
     Transport = 3
 }
 
-public class Map
+public ref struct Map
 {
     public readonly int Id;
-    public readonly string Directory;
-    public readonly string Name;
+    public readonly ManagedString Directory;
+    public readonly Utf8NativeString Name;
     public readonly MapType MapType;
 
-    public Map(IDbcIterator dbcIterator, GameFilesVersion version)
+    public Map(IDbcIterator dbcIterator, GameFilesVersion version, ref ArenaAllocator allocator)
     {
         Id = dbcIterator.GetInt(0);
-        Directory = dbcIterator.GetString(1);
+        Directory = ManagedString.Create(dbcIterator.GetString(1));
         if (version == GameFilesVersion.Mop_5_4_8)
         {
             MapType = (MapType)dbcIterator.GetUInt(4);
-            Name = dbcIterator.GetString(5);
+            Name = allocator.AllocString(dbcIterator.GetUtf8String(5));
         }
         else if (version == GameFilesVersion.Cataclysm_4_3_4)
         {
             MapType = (MapType)dbcIterator.GetUInt(4);
-            Name = dbcIterator.GetString(6);
+            Name = allocator.AllocString(dbcIterator.GetUtf8String(6));
         }
         else
         {
-            Name = dbcIterator.GetString(5);
+            Name = allocator.AllocString(dbcIterator.GetUtf8String(5));
             MapType = IsWrathTransportMap(Id) ? MapType.Transport : MapType.Unknown1;
         }
     }
 
-    public Map(IWdcIterator dbcIterator, GameFilesVersion version)
+    public Map(IWdcIterator dbcIterator, GameFilesVersion version, ref ArenaAllocator allocator)
     {
         Id = dbcIterator.Id;
-        Directory = dbcIterator.GetString("Directory");
+        Directory = ManagedString.Create(dbcIterator.GetString("Directory"));
         MapType = (MapType)dbcIterator.GetByte("MapType");
-        Name = dbcIterator.GetString("MapName_lang");
+        Name = allocator.AllocString(dbcIterator.GetString("MapName_lang"));
     }
 
     private static bool IsWrathTransportMap(int mapId)
@@ -83,12 +84,12 @@ public class Map
                 return false;
         }
     }
-    
-    private Map()
+
+    public Map()
     {
         Id = -1;
-        Directory = "";
-        Name = "(null)";
+        Directory = ManagedString.Empty;
+        Name = Utf8NativeString.Null;
     }
 
     public static Map Empty => new Map();

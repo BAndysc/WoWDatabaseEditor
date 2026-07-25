@@ -1,26 +1,29 @@
-using System.Collections;
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class ItemDisplayInfoStore : BaseDbcStore<uint, ItemDisplayInfo>
+public class ItemDisplayInfoStore : NativeBaseDbcStore<uint, ItemDisplayInfo>
 {
-    public ItemDisplayInfoStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version, ModelFileDataStore modelFileDataStore, TextureFileDataStore textureFileDataStore)
+    public ItemDisplayInfoStore(IDBC rows, GameFilesVersion version, ModelFileDataStore modelFileDataStore, TextureFileDataStore textureFileDataStore) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new ItemDisplayInfo(row, version);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new ItemDisplayInfo(row, version);
+            Set(o.Id, ref o);
         }
     }
-    
-    public ItemDisplayInfoStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version, ModelFileDataStore modelFileDataStore, TextureFileDataStore textureFileDataStore)
+
+    public ItemDisplayInfoStore(IWDC rows, GameFilesVersion version, ModelFileDataStore modelFileDataStore, TextureFileDataStore textureFileDataStore) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new ItemDisplayInfo(row, version, modelFileDataStore, textureFileDataStore);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new ItemDisplayInfo(row, version, modelFileDataStore, textureFileDataStore);
+            Set(o.Id, ref o);
         }
     }
 }

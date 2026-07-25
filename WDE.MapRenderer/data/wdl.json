@@ -3,7 +3,6 @@
     "Path": "data/wdl.frag"
   },
   "ZWrite": true,
-  "Instancing": true,
   "Vertex": {
     "Path": "data/wdl.vert",
     "Input": [

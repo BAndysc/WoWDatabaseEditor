@@ -1,26 +1,29 @@
-using System.Collections;
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC
 {
-    public class MapStore : BaseDbcStore<int, Map>
+    public class MapStore : NativeBaseDbcStore<int, Map>
     {
-        public MapStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version)
+        public MapStore(IDBC rows, GameFilesVersion version) : base(rows.RecordCount)
         {
+            int index = 0;
             foreach (var row in rows)
             {
-                var o = new Map(row, version);
-                store[o.Id] = o;
+                ref var o = ref this.ElementAt(index++);
+                o = new Map(row, version, ref allocator);
+                Set(o.Id, ref o);
             }
         }
-        
-        public MapStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version)
+
+        public MapStore(IWDC rows, GameFilesVersion version) : base(rows.RecordCount)
         {
+            int index = 0;
             foreach (var row in rows)
             {
-                var o = new Map(row, version);
-                store[o.Id] = o;
+                ref var o = ref this.ElementAt(index++);
+                o = new Map(row, version, ref allocator);
+                Set(o.Id, ref o);
             }
         }
     }

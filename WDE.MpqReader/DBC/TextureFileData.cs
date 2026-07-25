@@ -2,7 +2,7 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public readonly struct TextureFileData
+public ref struct TextureFileData
 {
     public readonly int FileData;
     public readonly int MaterialId;

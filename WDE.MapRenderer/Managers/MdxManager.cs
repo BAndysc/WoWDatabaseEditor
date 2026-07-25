@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Runtime.InteropServices;
 using System.Text;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine.Resources;
 using TheEngine;
 using TheEngine.Coroutines;
 using TheEngine.Data;
@@ -127,15 +127,23 @@ namespace WDE.MapRenderer.Managers
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
         public struct MdxMaterialData
         {
-            public Vector4 mesh_color;
+            // NOTE: field order MUST match struct MaterialData in m2.frag/m2.vert.
+            // Under Vulkan the struct is uploaded as a raw byte blob, so the GPU reads
+            // each field by byte offset, not by name. mesh_color (vec4) is declared LAST
+            // in the shader, so it must be last here too.
             public float alphaTest;
             public float notSupported;
             public float highlight;
             public int unlit;
             public int pixel_shader;
             public int translucent;
-            public int padding0;
-            public int padding1;
+            public BindlessTextureId texture1Index;
+            public BindlessTextureId texture2Index;
+            public BindlessTextureId texture3Index;
+            public int m2_pad1;
+            public int m2_pad2;
+            public int m2_pad3;
+            public Vector4 mesh_color;
         };
 
         public class MdxInstance
@@ -278,8 +286,6 @@ namespace WDE.MapRenderer.Managers
         private readonly IUIManager uiManager;
         private readonly IPipelineManager pipelineManager;
 
-        private INativeBuffer<Matrix> identityBonesBuffer;
-
         private ShaderHandle m2shader;
 
         private Dictionary<(M2Blend, bool twoSided), Pipeline> pipelines = new Dictionary<(M2Blend, bool twoSided), Pipeline>();
@@ -327,9 +333,6 @@ namespace WDE.MapRenderer.Managers
             this.inputManager = inputManager;
             this.uiManager = uiManager;
             this.pipelineManager = pipelineManager;
-            identityBonesBuffer = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, AnimationSystem.MAX_BONES, BufferInternalFormat.Float4);
-            identityBonesBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(AnimationSystem.MAX_BONES).Span);
-
             m2shader = engine.ShaderManager.LoadShader("data/m2.json");
             foreach (var skinned in new[] { true, false })
             {
@@ -477,17 +480,24 @@ namespace WDE.MapRenderer.Managers
             var completion = new TaskCompletionSource<MdxInstance?>();
             creatureMeshesCurrentlyLoaded[displayid] = completion.Task;
 
-            if (!creatureDisplayInfoStore.TryGetValue(displayid, out var creatureDisplayInfo) ||
-                !creatureModelDataStore.TryGetValue((uint)creatureDisplayInfo.ModelId, out var modelData))
+            FileId m2FilePath;
+            uint extendedDisplayInfoId;
+            float creatureModelScale;
+            unsafe
             {
-                Console.WriteLine("Cannot find model " + displayid);
-                creaturemeshes[displayid] = null;
-                completion.SetResult(null);
-                creatureMeshesCurrentlyLoaded.Remove(displayid);
-                return null;
+                if (!creatureDisplayInfoStore.TryGetValue(displayid, out var creatureDisplayInfo) ||
+                    !creatureModelDataStore.TryGetValue((uint)creatureDisplayInfo->ModelId, out var modelData))
+                {
+                    Console.WriteLine("Cannot find model " + displayid);
+                    creaturemeshes[displayid] = null;
+                    completion.SetResult(null);
+                    creatureMeshesCurrentlyLoaded.Remove(displayid);
+                    return null;
+                }
+                m2FilePath = modelData->ModelName;
+                extendedDisplayInfoId = creatureDisplayInfo->ExtendedDisplayInfoID;
+                creatureModelScale = creatureDisplayInfo->CreatureModelScale;
             }
-
-            var m2FilePath = modelData.ModelName;
             var m2File = await InternalLoadM2Mesh(m2FilePath);
 
             if (m2File == null)
@@ -510,9 +520,20 @@ namespace WDE.MapRenderer.Managers
             
             List<(M2AttachmentType, MdxInstance)>? attachments = null;
             
-            if (creatureDisplayInfo.ExtendedDisplayInfoID > 0)
+            if (extendedDisplayInfoId > 0)
             {
-                if (creatureDisplayInfoExtraStore.TryGetValue(creatureDisplayInfo.ExtendedDisplayInfoID, out var displayinfoextra))
+                bool hasDisplayInfoExtra;
+                (uint Race, uint Gender, int HairStyle, int BeardStyle, uint Helm, uint Shoulder, uint Shirt, uint Cuirass, uint Legs, uint Boots, uint Gloves, uint Cape, uint Tabard, uint Belt) displayinfoextra = default;
+                unsafe
+                {
+                    hasDisplayInfoExtra = creatureDisplayInfoExtraStore.TryGetValue(extendedDisplayInfoId, out var dei);
+                    if (hasDisplayInfoExtra)
+                    {
+                        displayinfoextra = (dei->Race, dei->Gender, dei->HairStyle, dei->BeardStyle, dei->Helm, dei->Shoulder,
+                            dei->Shirt, dei->Cuirass, dei->Legs, dei->Boots, dei->Gloves, dei->Cape, dei->Tabard, dei->Belt);
+                    }
+                }
+                if (hasDisplayInfoExtra)
                 {
                     attachments = new();
 
@@ -549,24 +570,36 @@ namespace WDE.MapRenderer.Managers
                     int geosetUNK28 = 2801; // {0: No Geoset; 1: Default}
 
                     // hair
-                    CharHairGeosets hairstyle = charHairGeosetsStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId == displayinfoextra.HairStyle); // maybe +1 like beards ?
-                    if (hairstyle != null)
+                    unsafe
                     {
-                        if (hairstyle.ShowScalp != 0 && hairstyle.GeosetId == 0)
+                        CharHairGeosets* hairstyle = null;
+                        foreach (var charHair in charHairGeosetsStore)
                         {
-                            // looks like scalp geoset is 1?
-                            geosetHair = 1;
+                            if (charHair->RaceID == displayinfoextra.Race && charHair->SexId == displayinfoextra.Gender &&
+                                charHair->VariationId == displayinfoextra.HairStyle)// maybe +1 like beards ?
+                            {
+                                hairstyle = charHair;
+                                break;
+                            }
+                        }
+                        if (hairstyle != null)
+                        {
+                            if (hairstyle->ShowScalp != 0 && hairstyle->GeosetId == 0)
+                            {
+                                // looks like scalp geoset is 1?
+                                geosetHair = 1;
+                            }
+                            else
+                            {
+                                geosetHair += hairstyle->GeosetId;
+                            }
+                            // use CharHairGeosetsStore.ShowScalp (bald) or is it only some client stuff ?
+                            // showscalp seems to be used for some races like goblins that don't use normal variations, but how ?
                         }
                         else
                         {
-                            geosetHair += hairstyle.GeosetId;
+                            geosetHair = 1; // scalp?
                         }
-                        // use CharHairGeosetsStore.ShowScalp (bald) or is it only some client stuff ?
-                        // showscalp seems to be used for some races like goblins that don't use normal variations, but how ?
-                    }
-                    else
-                    {
-                        geosetHair = 1; // scalp?
                     }
                     //else Console.WriteLine("invalid hairstyle id for display id " + creatureDisplayInfo.Id + " race " + displayinfoextra.Race + " gender " + displayinfoextra.Gender);
                     // goblin males require to always lookup hairstyle even with default because their scalp geoset is an edditional geoset defined in charHairGeosetsStore variation 0
@@ -575,22 +608,47 @@ namespace WDE.MapRenderer.Managers
 
                     // facial hair
                     // using first of default because it seems some NPCs use invalid variation id
-                    CharacterFacialHairStyles facialhairstyle = characterFacialHairStylesStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId == displayinfoextra.BeardStyle); // maybe variation +1
-                    if (facialhairstyle != null)
+                    unsafe
                     {
-                        geosetFacial1 += facialhairstyle.Geoset1;
-                        geosetFacial2 += facialhairstyle.Geoset2; // apparently this is group 3 ? verify in game.
-                        geosetFacial3 += facialhairstyle.Geoset3;
-                        geosetNoseEarrings += facialhairstyle.Geoset4;
-                        geosetEyeglows += facialhairstyle.Geoset5;
+                        CharacterFacialHairStyles* facialhairstyle = null;
+                        foreach (var x in characterFacialHairStylesStore)
+                        {
+                            if (x->RaceID == displayinfoextra.Race && x->SexId == displayinfoextra.Gender &&
+                                x->VariationId == displayinfoextra.BeardStyle) // maybe variation +1
+                            {
+                                facialhairstyle = x;
+                                break;
+                            }
+                        }
+                        if (facialhairstyle != null)
+                        {
+                            geosetFacial1 += facialhairstyle->Geoset1;
+                            geosetFacial2 += facialhairstyle->Geoset2; // apparently this is group 3 ? verify in game.
+                            geosetFacial3 += facialhairstyle->Geoset3;
+                            geosetNoseEarrings += facialhairstyle->Geoset4;
+                            geosetEyeglows += facialhairstyle->Geoset5;
+                        }
                     }
                     // else Console.WriteLine("invalid facialhairstyle id for display id " + creatureDisplayInfo.Id + " race " + displayinfoextra.Race + " gender " + displayinfoextra.Gender);
 
                     if (displayinfoextra.Helm > 0)
                     {
-                        ItemDisplayInfo helmDisplayInfo = itemDisplayInfoStore[displayinfoextra.Helm];
+                        bool hasHelmDisplayInfo;
+                        int helmGeosetGroup1 = 0, helmVisFemale = 0, helmVisMale = 0;
+                        unsafe
+                        {
+                            hasHelmDisplayInfo = itemDisplayInfoStore.TryGetValue(displayinfoextra.Helm, out var helmDisplayInfo);
+                            if (hasHelmDisplayInfo)
+                            {
+                                helmGeosetGroup1 = helmDisplayInfo->geosetGroup1;
+                                helmVisFemale = helmDisplayInfo->helmetGeosetVisFemale;
+                                helmVisMale = helmDisplayInfo->helmetGeosetVisMale;
+                            }
+                        }
+                        if (hasHelmDisplayInfo)
+                        {
                         // geoset group 2 ? some enable/disable 2100 (head) ?
-                        geosetHelm = 2702 + helmDisplayInfo.geosetGroup1;
+                        geosetHelm = 2702 + helmGeosetGroup1;
                         var itemModel = await LoadItemMesh(displayinfoextra.Helm, false, displayinfoextra.Race, displayinfoextra.Gender);
                         if (itemModel != null)
                         {
@@ -602,59 +660,70 @@ namespace WDE.MapRenderer.Managers
                             int helmetGeosetVisDataId = 0;
 
                             if (displayinfoextra.Gender == 1) // female
-                                    helmetGeosetVisDataId = helmDisplayInfo.helmetGeosetVisFemale;
+                                    helmetGeosetVisDataId = helmVisFemale;
                             else // male
-                                    helmetGeosetVisDataId = helmDisplayInfo.helmetGeosetVisMale;
+                                    helmetGeosetVisDataId = helmVisMale;
 
                             if (helmetGeosetVisDataId > 0)
                             {
-                                HelmetGeosetVisData helmetGeosetVisData = helmetGeosetVisDataStore[(uint)helmetGeosetVisDataId];
-                                for (int i = 0; i < 32; i++)
+                                unsafe
                                 {
-                                    uint maskPow = (uint)Math.Pow(2, i-1);
-                                    // if the current set hair geoset is this flag
-                                    if (geosetHair == i)
-                                    { // check if this flag is set to be hidden in helmetGeosetVisData
-                                        if ((helmetGeosetVisData.HairFlags & maskPow) != 0)
-                                            geosetHair = 1;
-                                    }
-                                    if ((geosetEars - 700) == i) // ears
+                                    if (!helmetGeosetVisDataStore.TryGetValue((uint)helmetGeosetVisDataId, out var helmetGeosetVisData))
+                                        throw new Exception("Not expected");
+                                    for (int i = 0; i < 32; i++)
                                     {
-                                        if ((helmetGeosetVisData.EarsFlags & maskPow) != 0)
-                                            geosetEars = 701; // no ears. maybe 700(don't render at all)
-                                    }
-                                    if ((geosetFacial1 - 100) == i) // facial1
-                                        if ((helmetGeosetVisData.Facial1Flags & maskPow) != 0)
-                                            geosetFacial1 = 101;
-                                    if ((geosetFacial2 - 200) == i) // facial2
-                                    {
-                                        if ((helmetGeosetVisData.Facial2Flags & maskPow) != 0)
-                                            geosetFacial2 = 201;
-                                    }
-                                    if ((geosetFacial3 - 300) == i) // facial3
-                                    {
-                                        if ((helmetGeosetVisData.Facial3Flags & maskPow) != 0)
-                                            geosetFacial3 = 301;
-                                    }
-                                    if ((geosetEyeglows - 1700) == i) // eyes
-                                    {
-                                        if ((helmetGeosetVisData.EyesFlags & maskPow) != 0)
-                                            geosetEyeglows = 1700;
-                                    }
-                                    // guessed MiscFlags is geosetNoseEarrings, could be wrong, no documentation available.
-                                    if ((geosetNoseEarrings - 1600) == i) // eyes
-                                    {
-                                        if ((helmetGeosetVisData.MiscFlags & maskPow) != 0)
-                                            geosetNoseEarrings = 1600;
+                                        uint maskPow = (uint)Math.Pow(2, i-1);
+                                        // if the current set hair geoset is this flag
+                                        if (geosetHair == i)
+                                        { // check if this flag is set to be hidden in helmetGeosetVisData
+                                            if ((helmetGeosetVisData->HairFlags & maskPow) != 0)
+                                                geosetHair = 1;
+                                        }
+                                        if ((geosetEars - 700) == i) // ears
+                                        {
+                                            if ((helmetGeosetVisData->EarsFlags & maskPow) != 0)
+                                                geosetEars = 701; // no ears. maybe 700(don't render at all)
+                                        }
+                                        if ((geosetFacial1 - 100) == i) // facial1
+                                            if ((helmetGeosetVisData->Facial1Flags & maskPow) != 0)
+                                                geosetFacial1 = 101;
+                                        if ((geosetFacial2 - 200) == i) // facial2
+                                        {
+                                            if ((helmetGeosetVisData->Facial2Flags & maskPow) != 0)
+                                                geosetFacial2 = 201;
+                                        }
+                                        if ((geosetFacial3 - 300) == i) // facial3
+                                        {
+                                            if ((helmetGeosetVisData->Facial3Flags & maskPow) != 0)
+                                                geosetFacial3 = 301;
+                                        }
+                                        if ((geosetEyeglows - 1700) == i) // eyes
+                                        {
+                                            if ((helmetGeosetVisData->EyesFlags & maskPow) != 0)
+                                                geosetEyeglows = 1700;
+                                        }
+                                        // guessed MiscFlags is geosetNoseEarrings, could be wrong, no documentation available.
+                                        if ((geosetNoseEarrings - 1600) == i) // eyes
+                                        {
+                                            if ((helmetGeosetVisData->MiscFlags & maskPow) != 0)
+                                                geosetNoseEarrings = 1600;
+                                        }
                                     }
                                 }
                             }
+                        }
                         }
                     }
 
                     if (displayinfoextra.Shoulder > 0)
                     {
-                        geosetShoulders = 2601 + itemDisplayInfoStore[(uint)displayinfoextra.Shoulder].geosetGroup1;
+                        int shoulderGeosetGroup1 = 0;
+                        unsafe
+                        {
+                            if (itemDisplayInfoStore.TryGetValue((uint)displayinfoextra.Shoulder, out var shoulderInfo))
+                                shoulderGeosetGroup1 = shoulderInfo->geosetGroup1;
+                        }
+                        geosetShoulders = 2601 + shoulderGeosetGroup1;
                         var shoulderLeft = await LoadItemMesh(displayinfoextra.Shoulder, false, 0, 0);
                         if (shoulderLeft != null)
                             attachments.Add((M2AttachmentType.ShoulderLeft, shoulderLeft));
@@ -664,58 +733,79 @@ namespace WDE.MapRenderer.Managers
                             attachments.Add((M2AttachmentType.ShoulderRight, shoulderRight));
                     }
 
-                    if (displayinfoextra.Shirt > 0)
+                    unsafe
                     {
-                        geosetSleeves = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup1;
-                        geosetChest = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup2;
-                    }
-                    if (displayinfoextra.Cuirass > 0)
-                    {
-                        geosetSleeves = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup1;
-                        geosetChest = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup2;
-                        // 1301 trousers set below
-                        // in later expensions, geoset group 4 and 5 ?
-                    }
-
-                    if (displayinfoextra.Legs > 0)
-                    {
-                        geosetpants = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup1;
-                        geosetlegcuffs = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup2;
-                        geosetTrousers = 1301 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup3;
-
-                        // Chest Robes set legs trousers in priority
-                        // Priority : Chest geosetGroup[2] (1301 set) > Pants geosetGroup[2] (1301 set)
+                        if (displayinfoextra.Shirt > 0)
+                        {
+                            if (itemDisplayInfoStore.TryGetValue((uint)displayinfoextra.Shirt, out var shirtInfo))
+                            {
+                                geosetSleeves = 801 + shirtInfo->geosetGroup1;
+                                geosetChest = 1001 + shirtInfo->geosetGroup2;
+                            }
+                        }
                         if (displayinfoextra.Cuirass > 0)
-                            if (itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup3 > 0)
-                                geosetTrousers = 1301 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup3;
+                        {
+                            if (itemDisplayInfoStore.TryGetValue((uint)displayinfoextra.Cuirass, out var cuirassInfo))
+                            {
+                                geosetSleeves = 801 + cuirassInfo->geosetGroup1;
+                                geosetChest = 1001 + cuirassInfo->geosetGroup2;
+                                // 1301 trousers set below
+                                // in later expensions, geoset group 4 and 5 ?
+                            }
+                        }
 
-                    }
+                        if (displayinfoextra.Legs > 0)
+                        {
+                            if (itemDisplayInfoStore.TryGetValue((uint)displayinfoextra.Legs, out var legsInfo))
+                            {
+                                geosetpants = 801 + legsInfo->geosetGroup1;
+                                geosetlegcuffs = 1001 + legsInfo->geosetGroup2;
+                                geosetTrousers = 1301 + legsInfo->geosetGroup3;
+                            }
 
-                    if (displayinfoextra.Boots > 0)
-                    {
-                        geosetBoots = 501 + itemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup1;
-                        geosetFeet = 2002 + itemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup2;
-                    }
+                            // Chest Robes set legs trousers in priority
+                            // Priority : Chest geosetGroup[2] (1301 set) > Pants geosetGroup[2] (1301 set)
+                            if (displayinfoextra.Cuirass > 0)
+                                if (itemDisplayInfoStore.TryGetValue((uint)displayinfoextra.Cuirass, out var cuirassInfo2) && cuirassInfo2->geosetGroup3 > 0)
+                                    geosetTrousers = 1301 + cuirassInfo2->geosetGroup3;
 
-                    if (displayinfoextra.Gloves > 0)
-                    {
-                        geosetGlove = 401 + itemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup1;
-                        geosetHandsAttachments = 2301 + itemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup2;
-                    }
+                        }
 
-                    if (displayinfoextra.Cape > 0)
-                    {
-                        geosetCloak = 1501 + itemDisplayInfoStore[(uint)displayinfoextra.Cape].geosetGroup1;
-                    }
+                        if (displayinfoextra.Boots > 0)
+                        {
+                            if (itemDisplayInfoStore.TryGetValue((uint)displayinfoextra.Boots, out var bootsInfo))
+                            {
+                                geosetBoots = 501 + bootsInfo->geosetGroup1;
+                                geosetFeet = 2002 + bootsInfo->geosetGroup2;
+                            }
+                        }
 
-                    if (displayinfoextra.Tabard > 0)
-                    {
-                        geosetTabard = 1201 + itemDisplayInfoStore[(uint)displayinfoextra.Tabard].geosetGroup1;
-                    }
+                        if (displayinfoextra.Gloves > 0)
+                        {
+                            if (itemDisplayInfoStore.TryGetValue((uint)displayinfoextra.Gloves, out var glovesInfo))
+                            {
+                                geosetGlove = 401 + glovesInfo->geosetGroup1;
+                                geosetHandsAttachments = 2301 + glovesInfo->geosetGroup2;
+                            }
+                        }
 
-                    if (displayinfoextra.Belt > 0) // priority : belt > tabard
-                    {
-                        geosetBelt = 1801 + itemDisplayInfoStore[(uint)displayinfoextra.Belt].geosetGroup1;
+                        if (displayinfoextra.Cape > 0)
+                        {
+                            if (itemDisplayInfoStore.TryGetValue((uint)displayinfoextra.Cape, out var capeInfo))
+                                geosetCloak = 1501 + capeInfo->geosetGroup1;
+                        }
+
+                        if (displayinfoextra.Tabard > 0)
+                        {
+                            if (itemDisplayInfoStore.TryGetValue((uint)displayinfoextra.Tabard, out var tabardInfo))
+                                geosetTabard = 1201 + tabardInfo->geosetGroup1;
+                        }
+
+                        if (displayinfoextra.Belt > 0) // priority : belt > tabard
+                        {
+                            if (itemDisplayInfoStore.TryGetValue((uint)displayinfoextra.Belt, out var beltInfo))
+                                geosetBelt = 1801 + beltInfo->geosetGroup1;
+                        }
                     }
                     // Priority : Chest geosetGroup[2] (1301 set) > Pants geosetGroup[2] (1301 set) > Boots geosetGroup[0] (501 set) > Pants geosetGroup[1] (901 set)
                     
@@ -788,15 +878,16 @@ namespace WDE.MapRenderer.Managers
                         // character models
                         else if (isCharacterModel) // doesn't have a CreatureDisplayInfoExtra entry
                         {
-                            CreatureDisplayInfoExtra displayinfoextra = creatureDisplayInfoExtraStore[
-                                creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID];
-
+                            unsafe
+                            {
+                            if (creatureDisplayInfoExtraStore.TryGetValue(extendedDisplayInfoId, out var displayinfoextra))
+                            {
                             if (textureDefType == M2Texture.TextureType.TEX_COMPONENT_SKIN) // character skin
                             {
                                 // This is for player characters... Creatures always come with a baked texture.
                                 // texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race
                                 // && x.BaseSection == 0 && x.ColorIndex == displayinfoextra.SkinColor).TextureName1;
-                                texFile = displayinfoextra.Texture.FileType == FileId.Type.FileName ? "textures\\BakedNpcTextures\\" + displayinfoextra.Texture.FileName : textureFileDataStore.TryGetValue((int)displayinfoextra.Texture.FileDataId, out var data) ? data.FileData : null;
+                                texFile = displayinfoextra->Texture.FileType == FileId.Type.FileName ? "textures\\BakedNpcTextures\\" + displayinfoextra->Texture.FileName.ToString() : textureFileDataStore.TryGetValue((int)displayinfoextra->Texture.FileDataId, out var data) ? data->FileData : null;
                             }
 
                             // only seen for tauren female facial features
@@ -804,8 +895,18 @@ namespace WDE.MapRenderer.Managers
                             {
                                 // Console.WriteLine("skin extra extdisp id : " + displayinfoextra.Id);
                                 // use skin color or hair color ?
-                                texFile = charSectionsStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
-                                && x.ColorIndex == displayinfoextra.SkinColor && x.BaseSection == 0)?.TextureName2;
+                                texFile = null;
+                                foreach (var x in charSectionsStore)
+                                {
+                                    if (x->RaceID == displayinfoextra->Race && x->SexId == displayinfoextra->Gender
+                                                                          && x->ColorIndex ==
+                                                                          displayinfoextra->SkinColor &&
+                                                                          x->BaseSection == 0)
+                                    {
+                                        texFile = x->TextureName2;
+                                        break;
+                                    }
+                                }
                             }
 
                             // mostly used for cloaks
@@ -814,11 +915,19 @@ namespace WDE.MapRenderer.Managers
                                 // cloak
                                 if (1500 <= sectionSkinSectionId && sectionSkinSectionId <= 1599)
                                 {
-                                    var capedisplayinfo = itemDisplayInfoStore.FirstOrDefault(x => x.Id == displayinfoextra.Cape);
+                                    ItemDisplayInfo* capedisplayinfo = null;
+                                    foreach (var x in itemDisplayInfoStore)
+                                    {
+                                        if (x->Id == displayinfoextra->Cape)
+                                        {
+                                            capedisplayinfo = x;
+                                            break;
+                                        }
+                                    }
                                     if (capedisplayinfo != null)
-                                        texFile = "Item\\ObjectComponents\\Cape\\" + capedisplayinfo.LeftModelTexture + ".blp";
+                                        texFile = "Item\\ObjectComponents\\Cape\\" + capedisplayinfo->LeftModelTexture.ToString() + ".blp";
                                     if (texFile == default)
-                                        Console.WriteLine("Couldn't get Cape texture from displayextra : " + displayinfoextra);
+                                        Console.WriteLine("Couldn't get Cape texture from displayextra, cape id : " + displayinfoextra->Cape);
                                 }
                                 else
                                 {
@@ -832,14 +941,14 @@ namespace WDE.MapRenderer.Managers
                                 // CharHairTextures or charsection ?
                                 // 1st version, it's awful.
                                 // string hairid = displayinfoextra.HairColor.ToString();
-                                // 
+                                //
                                 // if (displayinfoextra.HairColor < 10)
                                 //     hairid = "0" + hairid;
-                                // 
+                                //
                                 // var pathsplit = m2FilePath.Split('\\');
                                 // texFile = pathsplit[0] + "\\" + pathsplit[1] + "\\Hair00_" + hairid + ".blp";
 
-                                
+
                                 if (sectionSkinSectionId >= 100) // facial hair :: 100-400
                                 {
                                     // https://wowdev.wiki/DB/CharSections#Field_Descriptions
@@ -850,53 +959,85 @@ namespace WDE.MapRenderer.Managers
                                     // && x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.BeardStyle && x.BaseSection == 2).TextureName2;
 
                                     // this makes no sense but it works, use the hair section but use beard style to get the variation
-                                    texFile = charSectionsStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
-                                    && x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.BeardStyle && x.BaseSection == 3)?.TextureName1;
+                                    texFile = null;
+                                    foreach (var x in charSectionsStore)
+                                    {
+                                        if (x->RaceID == displayinfoextra->Race && x->SexId == displayinfoextra->Gender
+                                                                              && x->ColorIndex ==
+                                                                              displayinfoextra->HairColor &&
+                                                                              x->VariationIndex ==
+                                                                              displayinfoextra->BeardStyle &&
+                                                                              x->BaseSection == 3)
+                                        {
+                                            texFile = x->TextureName1;
+                                            break;
+                                        }
+                                    }
 
                                 }
                                 else // hair < 100
                                 {
-                                    texFile = charSectionsStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
-                                    &&  x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.HairStyle && x.BaseSection == 3)?.TextureName1;
+                                    texFile = null;
+
+                                    foreach (var x in charSectionsStore)
+                                    {
+                                        if (x->RaceID == displayinfoextra->Race && x->SexId == displayinfoextra->Gender
+                                                                              &&  x->ColorIndex == displayinfoextra->HairColor && x->VariationIndex == displayinfoextra->HairStyle && x->BaseSection == 3)
+                                        {
+                                            texFile = x->TextureName1;
+                                            break;
+                                        }
+                                    }
                                 }
 
+                            }
+                            }
                             }
                         }
 
                         // TITI, set creature texture
                         else if (textureDefType == M2Texture.TextureType.TEX_COMPONENT_MONSTER_1) // creature skin1
                         {
-                            if (creatureDisplayInfoStore.Contains(displayid))
+                            unsafe
                             {
-                                if (creatureDisplayInfoStore[displayid].TextureVariation1.FileType == FileId.Type.FileId)
-                                    texFile = creatureDisplayInfoStore[displayid].TextureVariation1;
-                                else
-                                    texFile = m2FilePath.FileName.Replace(m2FilePath.FileName.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation1.FileName
-                                        + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                                if (creatureDisplayInfoStore.TryGetValue(displayid, out var cdiForTex))
+                                {
+                                    if (cdiForTex->TextureVariation1.FileType == FileId.Type.FileId)
+                                        texFile = cdiForTex->TextureVariation1;
+                                    else
+                                        texFile = ((string)m2FilePath.FileName).Replace(((string)m2FilePath.FileName).Split('\\').Last(), cdiForTex->TextureVariation1.FileName.ToString()
+                                            + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                                }
                             }
                         }
 
                         else if (textureDefType == M2Texture.TextureType.TEX_COMPONENT_MONSTER_2) // creature skin2
                         {
-                            if (creatureDisplayInfoStore.Contains(displayid))
+                            unsafe
                             {
-                                if (creatureDisplayInfoStore[displayid].TextureVariation2.FileType == FileId.Type.FileId)
-                                    texFile = creatureDisplayInfoStore[displayid].TextureVariation2;
-                                else
-                                    texFile = m2FilePath.FileName.Replace(m2FilePath.FileName.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation2.FileName
-                                        + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                                if (creatureDisplayInfoStore.TryGetValue(displayid, out var cdiForTex))
+                                {
+                                    if (cdiForTex->TextureVariation2.FileType == FileId.Type.FileId)
+                                        texFile = cdiForTex->TextureVariation2;
+                                    else
+                                        texFile = ((string)m2FilePath.FileName).Replace(((string)m2FilePath.FileName).Split('\\').Last(), cdiForTex->TextureVariation2.FileName.ToString()
+                                            + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                                }
                             }
                         }
 
                         else if (textureDefType == M2Texture.TextureType.TEX_COMPONENT_MONSTER_3) // creature skin3
                         {
-                            if (creatureDisplayInfoStore.Contains(displayid))
+                            unsafe
                             {
-                                if (creatureDisplayInfoStore[displayid].TextureVariation3.FileType == FileId.Type.FileId)
-                                    texFile = creatureDisplayInfoStore[displayid].TextureVariation3;
-                                else
-                                    texFile = m2FilePath.FileName.Replace(m2FilePath.FileName.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation3.FileName
-                                        + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                                if (creatureDisplayInfoStore.TryGetValue(displayid, out var cdiForTex))
+                                {
+                                    if (cdiForTex->TextureVariation3.FileType == FileId.Type.FileId)
+                                        texFile = cdiForTex->TextureVariation3;
+                                    else
+                                        texFile = ((string)m2FilePath.FileName).Replace(((string)m2FilePath.FileName).Split('\\').Last(), cdiForTex->TextureVariation3.FileName.ToString()
+                                            + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                                }
                             }
                         }
 
@@ -910,7 +1051,7 @@ namespace WDE.MapRenderer.Managers
                         // var texFile = textureDef.filename.AsString();
                         if (texFile == default)
                         {
-                            Console.WriteLine("texture path is empty for display id : " + displayid + " dispextra : " + creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID);
+                            Console.WriteLine("texture path is empty for display id : " + displayid + " dispextra : " + extendedDisplayInfoId);
                             Console.WriteLine("texture type : " + textureDefType);
                             Console.WriteLine("skin section id : " + sectionSkinSectionId);
                         }
@@ -955,7 +1096,7 @@ namespace WDE.MapRenderer.Managers
                 materials = materials.AsSpan(0, j).ToArray(),
                 model = m2,
                 attachments = attachments,
-                scale = creatureDisplayInfo.CreatureModelScale,
+                scale = creatureModelScale,
                 fileId = m2FilePath,
                 displayId = displayid
             };
@@ -974,10 +1115,13 @@ namespace WDE.MapRenderer.Managers
             skinned = true;
             var material = materialManager.CreateMaterial<MdxMaterialData>(GetPipeline(materialDef.blending_mode, materialDef.flags.HasFlagFast(M2MaterialFlags.TwoSided), skinned));
 
-            material.SetBuffer("boneMatrices", identityBonesBuffer);
-            material.SetTexture("texture1", textureHandle1 ?? textureManager.EmptyTexture);
-            material.SetTexture("texture2", textureHandle2 ?? textureManager.EmptyTexture);
-            material.SetTexture("texture3", textureHandle3 ?? textureManager.EmptyTexture);
+            var tex1 = textureHandle1 ?? textureManager.EmptyTexture;
+            var tex2 = textureHandle2 ?? textureManager.EmptyTexture;
+            var tex3 = textureHandle3 ?? textureManager.EmptyTexture;
+            // textures are sampled bindlessly (texture1Index..texture3Index below); keep them alive only
+            material.KeepAlive(tex1);
+            material.KeepAlive(tex2);
+            material.KeepAlive(tex3);
 
             var trans = 1.0f;
             if (batch.colorIndex != -1 && m2.colors.Length < batch.colorIndex)
@@ -1000,6 +1144,9 @@ namespace WDE.MapRenderer.Managers
             MdxMaterialData data = default;
 
             data.mesh_color = mesh_color;
+            data.texture1Index = engine.TextureManager.GetBindlessIndex(tex1);
+            data.texture2Index = engine.TextureManager.GetBindlessIndex(tex2);
+            data.texture3Index = engine.TextureManager.GetBindlessIndex(tex3);
             data.translucent = 0;
             if (gameFiles.WoWVersion == GameFilesVersion.Wrath_3_3_5a)
             {
@@ -1088,46 +1235,53 @@ namespace WDE.MapRenderer.Managers
             var completion = new TaskCompletionSource<MdxInstance?>();
             itemMeshesCurrentlyLoaded[key] = completion.Task;
 
-            if (!itemDisplayInfoStore.TryGetValue(displayid, out var displayInfo))
+            FileId model, texture;
+            unsafe
             {
-                Console.WriteLine("Cannot find item display id " + displayid);
-                itemMeshes[key] = null;
-                completion.SetResult(null);
-                itemMeshesCurrentlyLoaded.Remove(key);
-                return null;
-            }
+                if (!itemDisplayInfoStore.TryGetValue(displayid, out var displayInfo))
+                {
+                    Console.WriteLine("Cannot find item display id " + displayid);
+                    itemMeshes[key] = null;
+                    completion.SetResult(null);
+                    itemMeshesCurrentlyLoaded.Remove(key);
+                    return null;
+                }
 
-            if ((displayInfo.LeftModel == default && !right) ||
-                (displayInfo.RightModel == default && right))
-            {
-                itemMeshes[key] = null;
-                completion.SetResult(null);
-                itemMeshesCurrentlyLoaded.Remove(key);
-                return null;
-            }
+                if ((displayInfo->LeftModel == default && !right) ||
+                    (displayInfo->RightModel == default && right))
+                {
+                    itemMeshes[key] = null;
+                    completion.SetResult(null);
+                    itemMeshesCurrentlyLoaded.Remove(key);
+                    return null;
+                }
 
-            var model = (right ? displayInfo.RightModel : displayInfo.LeftModel);
-            var texture = right ? displayInfo.RightModelTexture : displayInfo.LeftModelTexture;
+                model = (right ? displayInfo->RightModel : displayInfo->LeftModel);
+                texture = right ? displayInfo->RightModelTexture : displayInfo->LeftModelTexture;
+            }
 
             if (model.FileType == FileId.Type.FileName)
             {
                 // don't know what is the right way to determine the folder name
                 // that works for 3.3.5 tho
                 var folderPath = "ITEM\\OBJECTCOMPONENTS\\";
-                var modelFileName = model.FileName.ToLower();
+                var modelFileName = ((string)model.FileName).ToLower();
                 if (modelFileName.StartsWith("arrow") || modelFileName.StartsWith("bullet"))
                     folderPath += "AMMO\\";
                 else if (modelFileName.StartsWith("helm"))
                 {
                     folderPath += "HEAD\\";
-                    if (racesStore.TryGetValue(race, out var raceInfo))
+                    unsafe
                     {
-                        model = Path.ChangeExtension(model.FileName, null) + "_" + raceInfo.ClientPrefix + (gender == 0 ? "M" : "F") + ".M2";
-                    }
-                    else
-                    {
-                        model = Path.ChangeExtension(model.FileName, null) + "_m.M2";
-                        Console.WriteLine("Trying to load a helm, without race!");
+                        if (racesStore.TryGetValue(race, out var raceInfo))
+                        {
+                            model = Path.ChangeExtension((string)model.FileName, null) + "_" + raceInfo->ClientPrefix.ToString() + (gender == 0 ? "M" : "F") + ".M2";
+                        }
+                        else
+                        {
+                            model = Path.ChangeExtension((string)model.FileName, null) + "_m.M2";
+                            Console.WriteLine("Trying to load a helm, without race!");
+                        }
                     }
                 }
                 else if (modelFileName.StartsWith("pouch"))
@@ -1292,24 +1446,29 @@ namespace WDE.MapRenderer.Managers
             var completion = new TaskCompletionSource<(MdxInstance?, WmoManager.WmoInstance?)?>();
             gameObjectMeshesCurrentlyLoaded[gameObjectDisplayId] = completion.Task;
 
-            if (!gameObjectDisplayInfoStore.TryGetValue(gameObjectDisplayId, out var displayInfo))
+            FileId modelName;
+            unsafe
             {
-                Console.WriteLine("Cannot find model " + gameObjectDisplayId);
-                gameObjectmeshes[gameObjectDisplayId] = null;
-                completion.SetResult(null);
-                gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
-                return null;
+                if (!gameObjectDisplayInfoStore.TryGetValue(gameObjectDisplayId, out var displayInfo))
+                {
+                    Console.WriteLine("Cannot find model " + gameObjectDisplayId);
+                    gameObjectmeshes[gameObjectDisplayId] = null;
+                    completion.SetResult(null);
+                    gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
+                    return null;
+                }
+                modelName = displayInfo->ModelName;
             }
 
             bool isWmo = false;
-            if (displayInfo.ModelName.FileType == FileId.Type.FileName &&
-                displayInfo.ModelName.FileName.EndsWith("wmo", StringComparison.InvariantCultureIgnoreCase))
+            if (modelName.FileType == FileId.Type.FileName &&
+                ((string)modelName.FileName).EndsWith("wmo", StringComparison.InvariantCultureIgnoreCase))
             {
                 isWmo = true;
             }
-            else if (displayInfo.ModelName.FileType == FileId.Type.FileId)
+            else if (modelName.FileType == FileId.Type.FileId)
             {
-                var header = await gameFiles.ReadFile(displayInfo.ModelName, maxReadBytes: 4);
+                var header = await gameFiles.ReadFile(modelName, maxReadBytes: 4);
 
                 if (header == null)
                 {
@@ -1324,10 +1483,10 @@ namespace WDE.MapRenderer.Managers
                     isWmo = true;
                 header.Dispose();
             }
-            
+
             if (isWmo)
             {
-                var wmoInstance = await wmoManager.LoadWorldMapObject(displayInfo.ModelName);
+                var wmoInstance = await wmoManager.LoadWorldMapObject(modelName);
                 if (wmoInstance == null)
                 {
                     gameObjectmeshes[gameObjectDisplayId] = null;
@@ -1341,13 +1500,13 @@ namespace WDE.MapRenderer.Managers
                 return (null, wmoInstance);
             }
 
-            var m2FilePath = displayInfo.ModelName;
-            
+            var m2FilePath = modelName;
+
             var m2File = await InternalLoadM2Mesh(m2FilePath);
 
             if (m2File == null)
             {
-                Console.WriteLine("Cannot find path " + displayInfo.ModelName);
+                Console.WriteLine("Cannot find path " + modelName);
                 gameObjectmeshes[gameObjectDisplayId] = null;
                 completion.SetResult(null);
                 gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
@@ -1441,7 +1600,7 @@ namespace WDE.MapRenderer.Managers
                 mesh = mesh,
                 materials = materials.AsSpan(0, j).ToArray(),
                 model = m2,
-                fileId = displayInfo.ModelName,
+                fileId = modelName,
                 displayId = gameObjectDisplayId
             };
             gameObjectmeshes.Add(gameObjectDisplayId, (new WeakReference<MdxInstance>(mdx), null));
@@ -2176,8 +2335,6 @@ namespace WDE.MapRenderer.Managers
         
         public void Dispose()
         {
-            identityBonesBuffer.Dispose();
-            
             foreach (var mesh in internalMeshes.Values)
                 if (mesh != null && mesh.TryGetTarget(out var target))
                     meshManager.DisposeMesh(target.mesh);

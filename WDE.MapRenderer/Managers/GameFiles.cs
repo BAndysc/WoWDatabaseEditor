@@ -1,8 +1,9 @@
-using System.Diagnostics;
 using Nito.AsyncEx;
 using TheEngine;
 using WDE.Common.MPQ;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.MpqReader;
 using WDE.MpqReader.Structures;
 
@@ -13,51 +14,59 @@ public class GameFiles : IGameFiles, IDisposable
     private static SemaphoreSlim semaphore = null!;
     private readonly IMpqService mpqService;
     private readonly IMessageBoxService messageBoxService;
+    private readonly IMainThread mainThread;
     private readonly Engine engine;
     private IMpqArchive mpqSync;
-    
-    private List<IMpqArchive> mpqPool = new List<IMpqArchive>();
+
+    // Reads run concurrently on separate cloned archive handles (thread-safe across distinct handles),
+    // cloned lazily up to maxArchives so we only pay the archive-open cost for concurrency actually used.
+    private int maxArchives;
+    private readonly Stack<IMpqArchive> availableArchives = new();
+    private readonly List<IMpqArchive> allArchives = new(); // every clone, for disposal
+    private readonly object archivePoolLock = new();
+    private readonly object cloneLock = new();
 
     public GameFilesVersion WoWVersion { get; private set; }
     
     public GameFiles(IMpqService mpqService,
         IMessageBoxService messageBoxService,
+        IMainThread mainThread,
         Engine engine)
     {
         this.mpqService = mpqService;
         this.messageBoxService = messageBoxService;
+        this.mainThread = mainThread;
         this.engine = engine;
     }
 
     public bool Initialize()
     {
-        return TryOpenMpq(mpqPool, out mpqSync);
+        return TryOpenMpq(out mpqSync);
     }
 
-    private bool TryOpenMpq(List<IMpqArchive> archives, out IMpqArchive syncArchive)
+    private bool TryOpenMpq(out IMpqArchive syncArchive)
     {
         syncArchive = null!;
         try
         {
             syncArchive = mpqService.Open();
             WoWVersion = mpqService.Version ?? GameFilesVersion.Wrath_3_3_5a;
-            int asyncCount = syncArchive.Library == MpqLibrary.Managed ? 20 : 1;
-            semaphore = new SemaphoreSlim(asyncCount);
-            for (int i = 0; i < asyncCount; ++i)
-                archives.Add(syncArchive.Clone());
+            // mpqSync stays out of the async pool (ReadFileSyncLocked uses it under lock); clones are lazy
+            maxArchives = syncArchive.Library == MpqLibrary.Managed ? 20 : 8;
+            semaphore = new SemaphoreSlim(maxArchives);
             return true;
         }
         catch (Exception e)
         {
-            messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+            var message = e.Message;
+            // TryOpenMpq runs on the game thread, dialogs must be created on the UI thread
+            mainThread.Dispatch(() => messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                 .SetTitle("Invalid MPQ")
                 .SetMainInstruction("Couldn't parse game MPQ.")
-                .SetContent(e.Message + "\n\nAre you using modified game files?")
+                .SetContent(message + "\n\nAre you using modified game files?")
                 .WithButton("Ok", false)
-                .Build());
-            foreach (var arch in archives)
-                arch.Dispose();
-            archives.Clear();
+                .Build()).ListenErrors());
+            syncArchive?.Dispose();
             syncArchive = null!;
             return false;
         }
@@ -84,15 +93,28 @@ public class GameFiles : IGameFiles, IDisposable
             }
         }*/
         await semaphore.WaitAsync();
-        Debug.Assert(mpqPool.Count > 0);
-        IMpqArchive archive = mpqPool[^1];
-        mpqPool.RemoveAt(mpqPool.Count - 1);
         await engine.EnterThreadPool;
+
+        // free clone, or lazily create one (serialized; the semaphore caps total clones at maxArchives)
+        IMpqArchive archive;
+        lock (archivePoolLock)
+            archive = availableArchives.Count > 0 ? availableArchives.Pop() : null!;
+        if (archive == null)
+        {
+            lock (cloneLock)
+                archive = mpqSync.Clone();
+            lock (archivePoolLock)
+                allArchives.Add(archive);
+        }
+
         var bytes = archive.ReadFilePool(fileId, maxReadBytes: maxReadBytes);
-        await engine.EnterGameLoop;
-        mpqPool.Add(archive);
+
+        lock (archivePoolLock)
+            availableArchives.Push(archive);
         semaphore.Release();
-        
+
+        await engine.EnterGameLoop;
+
         if (bytes == null && !silent)
             Console.WriteLine("File " + fileId + " is unreadable");
         return bytes;
@@ -140,9 +162,13 @@ public class GameFiles : IGameFiles, IDisposable
 
     public void Dispose()
     {
-        foreach (var arch in mpqPool)
-            arch.Dispose();
-        mpqPool.Clear();
+        lock (archivePoolLock)
+        {
+            foreach (var arch in allArchives) // lazily-created async clones
+                arch.Dispose();
+            allArchives.Clear();
+            availableArchives.Clear();
+        }
         mpqSync.Dispose();
     }
 }

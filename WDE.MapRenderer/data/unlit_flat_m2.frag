@@ -1,23 +1,31 @@
-#version 330 core
+#version 450
 #include "../internalShaders/theengine.cginc"
-in vec4 Color;
-in vec2 TexCoord;
-in vec2 TexCoord2;
-in vec4 WorldPos;
-in vec4 SplatId;
-in vec3 Normal;
-out vec4 FragColor;
 
-uniform sampler2D texture1;
-uniform vec4 mesh_color;
-uniform float alphaTest;
+layout(location = 0) in vec4 Color;
+layout(location = 1) in vec2 TexCoord;
+layout(location = 2) in vec2 TexCoord2;
+layout(location = 3) in vec4 WorldPos;
+layout(location = 4) in vec4 SplatId;
+layout(location = 5) in vec3 Normal;
+layout(location = 0) out vec4 FragColor;
+
+struct MaterialData
+{
+    vec4 mesh_color;
+    float alphaTest;
+    int texture1Index;
+    int ufm2_pad1;
+    int ufm2_pad2;
+};
+layout(std430, set = 1, binding = 0) readonly buffer MaterialDataArray { MaterialData materials[]; };
+#define M(field) materials[MATERIAL_INDEX].field
 
 void main()
 {
-    vec4 tex1 = texture(texture1, TexCoord.xy);
+    vec4 tex1 = SAMPLE_BINDLESS(M(texture1Index), TexCoord.xy);
 
-    if (tex1.a < alphaTest) 
+    if (tex1.a < M(alphaTest))
         discard;
-    
-    FragColor = mesh_color;
+
+    FragColor = M(mesh_color);
 }

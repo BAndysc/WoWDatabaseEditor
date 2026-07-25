@@ -3,23 +3,27 @@ using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class CreatureDisplayInfoStore : BaseDbcStore<uint, CreatureDisplayInfo>
+public class CreatureDisplayInfoStore : NativeBaseDbcStore<uint, CreatureDisplayInfo>
 {
-    public CreatureDisplayInfoStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version)
+    public CreatureDisplayInfoStore(IDBC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new CreatureDisplayInfo(row, version);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new CreatureDisplayInfo(row, version);
+            Set(o.Id, ref o);
         }
     }
-    
-    public CreatureDisplayInfoStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version)
+
+    public CreatureDisplayInfoStore(IWDC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new CreatureDisplayInfo(row, version);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new CreatureDisplayInfo(row, version);
+            Set(o.Id, ref o);
         }
     }
 }

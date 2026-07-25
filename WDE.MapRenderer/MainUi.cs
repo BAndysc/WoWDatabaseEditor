@@ -1,5 +1,5 @@
 using TheEngine.Interfaces;
-using ImGuiNET;
+using Hexa.NET.ImGui;
 using TheEngine;
 
 namespace WDE.MapRenderer;
@@ -26,7 +26,7 @@ public class MainUi
                 if (!layer.IsUsed)
                     continue;
                 bool enabled = !layer.IsDisabled;
-                if (ImGuiEx.MenuItem(layer.Name, null, ref enabled))
+                if (ImGui.MenuItem(layer.Name, (string)null, ref enabled))
                 {
                     renderManager.ToggleRenderLayer(layer.Layer, enabled);
                 }

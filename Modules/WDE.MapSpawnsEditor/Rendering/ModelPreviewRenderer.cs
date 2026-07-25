@@ -29,7 +29,6 @@ public class ModelPreviewRenderer
     private TextureHandle rt;
     private SceneData sceneData;
 
-    private MaterialInstanceRenderData? materialInstanceData;
     private M2AnimationComponentData? animationComponentData;
     private MdxManager.MdxInstance? currentModelInstance;
     private WmoManager.WmoInstance? currentWmoInstance;
@@ -57,22 +56,19 @@ public class ModelPreviewRenderer
         previewCamera.Transform.Position = Vector3.Zero;
         previewCamera.Transform.Rotation = Utilities.FromEuler(180, 0, 90 + 15);
 
-        var mainLight = new DirectionalLight
+        var mainLight = new DirectionalLightData
         {
-            LightRotation = Utilities.FromEuler(0, 90, 0),
-            LightIntensity = 1,
-            LightColor = new Vector4(1, 1, 1, 1),
+            Exists = true,
+            Direction = Vectors.Normalize(Vectors.Forward.Multiply(Utilities.FromEuler(0, 90, 0))),
+            Intensity = 1,
+            Color = new Vector3(1, 1, 1),
             AmbientColor = new Vector4(0.6f, 0.6f, 0.6f, 1),
-            LightPosition = Vector3.Zero
+            CastShadows = false,
         };
 
-        var secondaryLight = new DirectionalLight
-        {
-            LightIntensity = 0,
-            AmbientColor = Vector4.Zero
-        };
+        var secondaryLight = new DirectionalLightData { Exists = false };
 
-        sceneData = new SceneData(previewCamera, new FogSettings(){Enabled = false}, mainLight, secondaryLight);
+        sceneData = new SceneData(previewCamera, mainLight, secondaryLight);
         bonesMatrix = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
     }
 
@@ -103,7 +99,6 @@ public class ModelPreviewRenderer
                 rotation = (float)Math.PI / 2;
                 currentModelInstance = mdx.Task.Result;
                 currentWmoInstance = null;
-                materialInstanceData = null;
                 animationComponentData = currentModelInstance == null ? null : new M2AnimationComponentData(currentModelInstance.model)
                 {
                     SetNewAnimation = (int)M2AnimationType.Stand,
@@ -120,7 +115,6 @@ public class ModelPreviewRenderer
                 rotation = (float)Math.PI / 2;
                 currentModelInstance = mdx.Task.Result?.Item1;
                 currentWmoInstance = mdx.Task.Result?.Item2;
-                materialInstanceData = null;
                 animationComponentData = null;
             }
         }
@@ -143,15 +137,9 @@ public class ModelPreviewRenderer
                 - new Vector3(0, 0, currentModelInstance.mesh.Bounds.Size.Z / 2),
                 Quaternion.CreateFromAxisAngle(Vectors.Down, rotation), Vector3.One);
             
-            if (materialInstanceData == null)
-            {
-                materialInstanceData = new MaterialInstanceRenderData();
-                materialInstanceData.SetBuffer(currentModelInstance.materials[0].material, "boneMatrices", bonesMatrix);
-            }
-    
             foreach (var batch in currentModelInstance.materials)
             {
-                renderManager.Render(currentModelInstance.mesh, batch.material, batch.submesh, localToWorld, null, materialInstanceData);
+                renderManager.Render(currentModelInstance.mesh, batch.material, ShaderPassType.Forward, batch.submesh, localToWorld);
             }
         }
         else if (currentWmoInstance != null && currentWmoInstance.meshes.Count > 0)
@@ -170,7 +158,7 @@ public class ModelPreviewRenderer
                 for (var index = 0; index < batch.Item2.Length; index++)
                 {
                     var material = batch.Item2[index];
-                    renderManager.Render(batch.Item1, material, index, localToWorld);
+                    renderManager.Render(batch.Item1, material, ShaderPassType.Forward, index, localToWorld);
                 }
             }
         }

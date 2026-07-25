@@ -1,4 +1,4 @@
-﻿using TheAvaloniaOpenGL.Resources;
+﻿using TheEngine.Resources;
 using TheEngine.Data;
 using TheEngine.Entities;
 using TheEngine.Interfaces;
@@ -107,17 +107,18 @@ namespace WDE.MapRenderer.Managers
             meshManager.DisposeMesh(sphereMesh);
         }
         
-        public void Render()
+        public unsafe void Render()
         {
             if (!gameProperties.ShowAreaTriggers)
                 return;
             
             foreach (var areaTrigger in areaTriggerStore)
             {
-                if (areaTrigger.ContinentId != gameContext.CurrentMap.Id)
+                if (gameContext.CurrentMap == null
+                    || areaTrigger->ContinentId != gameContext.CurrentMap->Id)
                     continue;
 
-                var areaTriggerPosition = new Vector3(areaTrigger.X, areaTrigger.Y, areaTrigger.Z);
+                var areaTriggerPosition = new Vector3(areaTrigger->X, areaTrigger->Y, areaTrigger->Z);
 
                 if ((cameraManager.Position - areaTriggerPosition).LengthSquared() > AreaTriggerVisibilityDistanceSquare)
                     continue;
@@ -125,27 +126,27 @@ namespace WDE.MapRenderer.Managers
                 t.Position = areaTriggerPosition;
                 float height = 0;
                 
-                if (areaTrigger.Shape == AreaTriggerShape.Box)
+                if (areaTrigger->Shape == AreaTriggerShape.Box)
                 {
-                    height = areaTrigger.BoxHeight / 2;
-                    t.Scale = new Vector3( areaTrigger.BoxLength / 2, areaTrigger.BoxWidth / 2, areaTrigger.BoxHeight/2);
-                    t.Rotation = Utilities.FromEuler(0, MathUtil.RadiansToDegrees(areaTrigger.BoxYaw), 0.0f);
+                    height = areaTrigger->BoxHeight / 2;
+                    t.Scale = new Vector3( areaTrigger->BoxLength / 2, areaTrigger->BoxWidth / 2, areaTrigger->BoxHeight/2);
+                    t.Rotation = Utilities.FromEuler(0, MathUtil.RadiansToDegrees(areaTrigger->BoxYaw), 0.0f);
                     
                     renderManager.Render(boxMesh, transcluentMaterial, ShaderPassType.Forward, 0, t);
                     renderManager.Render(boxMesh, wireframe, ShaderPassType.Forward, 0, t);
                     renderManager.Render(boxMesh, wireframeBehind, ShaderPassType.Forward, 0, t);
                 }
-                else if (areaTrigger.Shape == AreaTriggerShape.Sphere)
+                else if (areaTrigger->Shape == AreaTriggerShape.Sphere)
                 {
-                    t.Scale = new Vector3(areaTrigger.Radius);
-                    height = areaTrigger.Radius;
+                    t.Scale = new Vector3(areaTrigger->Radius);
+                    height = areaTrigger->Radius;
 
                     renderManager.Render(sphereMesh, transcluentMaterial, ShaderPassType.Forward, 0, t);
                     renderManager.Render(sphereMesh, wireframe, ShaderPassType.Forward, 0, t);
                     renderManager.Render(sphereMesh, wireframeBehind, ShaderPassType.Forward, 0, t);
                 }
                 
-                uiManager.DrawWorldText("calibri", new Vector2(0.5f, 1f), "Areatrigger " + areaTrigger.Id, 2.5f, Utilities.TRS(t.Position + Vectors.Up * height, Quaternion.Identity, Vector3.One), Vector4.One);
+                uiManager.DrawWorldText("calibri", new Vector2(0.5f, 1f), "Areatrigger " + areaTrigger->Id, 2.5f, Utilities.TRS(t.Position + Vectors.Up * height, Quaternion.Identity, Vector3.One), Vector4.One);
             }
         }
     }

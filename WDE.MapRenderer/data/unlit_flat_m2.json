@@ -3,7 +3,6 @@
     "Path": "data/unlit_flat_m2.frag"
   },
   "ZWrite": true,
-  "Instancing": true,
   "Vertex": {
     "Path": "data/unlit_flat_m2.vert",
     "Input": [

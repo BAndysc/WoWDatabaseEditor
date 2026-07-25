@@ -1,0 +1,16 @@
+{
+  "Pixel": {
+    "Path": "data/waypoint_path.frag"
+  },
+  "ZWrite": false,
+  "Vertex": {
+    "Path": "data/waypoint_path.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

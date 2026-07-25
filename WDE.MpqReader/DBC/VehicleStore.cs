@@ -3,27 +3,31 @@ using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class VehicleStore : BaseDbcStore<int, Vehicle>
+public class VehicleStore : NativeBaseDbcStore<int, Vehicle>
 {
-    public VehicleStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version)
+    public VehicleStore(IDBC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new Vehicle(row, version);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new Vehicle(row, version);
+            Set(o.Id, ref o);
         }
     }
 
-    public VehicleStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version)
+    public VehicleStore(IWDC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new Vehicle(row, version);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new Vehicle(row, version);
+            Set(o.Id, ref o);
         }
     }
 
-    public VehicleStore()
+    public VehicleStore() : base(0)
     {
     }
 }

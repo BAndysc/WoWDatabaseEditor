@@ -9,7 +9,7 @@ public class LightFloatParamStore : BaseDbcStore<uint, LightFloatParam>
         foreach (var row in rows)
         {
             var o = new LightFloatParam(row);
-            store[o.Id] = o;
+            Set(o.Id, o);
         }
     }
     

@@ -4,23 +4,27 @@ using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class AreaTriggerStore : BaseDbcStore<int, AreaTrigger>
+public class AreaTriggerStore : NativeBaseDbcStore<int, AreaTrigger>
 {
-    public AreaTriggerStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version)
+    public AreaTriggerStore(IDBC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new AreaTrigger(row, version);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new AreaTrigger(row, version);
+            Set(o.Id, ref o);
         }
     }
     
-    public AreaTriggerStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version)
+    public AreaTriggerStore(IWDC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new AreaTrigger(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new AreaTrigger(row);
+            Set(o.Id, ref o);
         }
     }
 }

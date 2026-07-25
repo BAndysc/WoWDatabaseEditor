@@ -1,8 +1,9 @@
+using ProtoZeroSharp;
 using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class ChrRaces
+public ref struct ChrRaces
 {
     public readonly uint Id;
     // public readonly int Flags;
@@ -10,7 +11,7 @@ public class ChrRaces
     // public readonly int ExplorationSoundID;
     public readonly int MaleDisplayId;
     public readonly int FemaleDisplayId;
-    public readonly string ClientPrefix;
+    public readonly ManagedString ClientPrefix;
     // public readonly int BaseLanguage;
     // public readonly int CreatureType;
     // public readonly int ResSicknessSpellID;
@@ -26,7 +27,7 @@ public class ChrRaces
     // public readonly string HairCustomization;
     // public readonly int Required_Expansion;
 
-    public ChrRaces(IDbcIterator dbcIterator)
+    public ChrRaces(IDbcIterator dbcIterator, ref ArenaAllocator allocator)
     {
         Id = dbcIterator.GetUInt(0);
         // Flags = dbcIterator.GetInt(1);
@@ -34,7 +35,7 @@ public class ChrRaces
         // ExplorationSoundID = dbcIterator.GetInt(3);
         MaleDisplayId = dbcIterator.GetInt(4);
         FemaleDisplayId = dbcIterator.GetInt(5);
-        ClientPrefix = dbcIterator.GetString(6);
+        ClientPrefix = ManagedString.Create(dbcIterator.GetString(6));
         // BaseLanguage = dbcIterator.GetInt(7);
         // CreatureType = dbcIterator.GetInt(8);
         // ResSicknessSpellID = dbcIterator.GetInt(9);
@@ -50,16 +51,16 @@ public class ChrRaces
         // TODO : HairCustomization = dbcIterator.GetString(1);
         // TODO : Required_Expansion = dbcIterator.GetInt(1);
     }
-    
-    public ChrRaces(IWdcIterator dbcIterator)
+
+    public ChrRaces(IWdcIterator dbcIterator, ref ArenaAllocator allocator)
     {
         Id = (uint)dbcIterator.Id;
-        ClientPrefix = dbcIterator.GetString("ClientPrefix");
+        ClientPrefix = ManagedString.Create(dbcIterator.GetString("ClientPrefix"));
         MaleDisplayId = dbcIterator.GetInt("MaleDisplayID");
         FemaleDisplayId = dbcIterator.GetInt("FemaleDisplayID");
     }
 
-    private ChrRaces()
+    public ChrRaces()
     {
         Id = 0;
         // Flags = 0;
@@ -67,7 +68,7 @@ public class ChrRaces
         // ExplorationSoundID = 0;
         MaleDisplayId = 0;
         FemaleDisplayId = 0;
-        ClientPrefix = "";
+        ClientPrefix = ManagedString.Empty;
         // BaseLanguage = 0;
         // CreatureType = 0;
         // ResSicknessSpellID = 0;

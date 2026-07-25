@@ -1,8 +1,7 @@
-using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using ImGuiNET;
-using TheAvaloniaOpenGL.Resources;
+using Hexa.NET.ImGui;
+using TheEngine;
 using TheEngine.Components;
 using TheEngine.ECS;
 using TheEngine.Interfaces;
@@ -17,7 +16,7 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers;
 
-public class AnimationSystem
+public partial class AnimationSystem
 {
     private Stopwatch sw = new();
     public static int MAX_BONES = 8192; // Creature\SlimeGiant\GiantSlime.M2 has 312 bones, but CREATURE\DRUIDTREEFORM\DRUIDTREEFORM.M2 is 723. Not sure what is max now. Let's use some really high value for now.
@@ -26,13 +25,19 @@ public class AnimationSystem
     private readonly EmoteStore emoteStore;
     private readonly AnimationDataStore animationDataStore;
 
-    // private readonly ThreadLocal<Matrix[]> bones = new ThreadLocal<Matrix[]>(() =>
-    // {
-    //     var b = new Matrix[MAX_BONES];
-    //     for (int i = 0; i < MAX_BONES; ++i)
-    //         b[i] = Matrix.Identity;
-    //     return b;
-    // });
+    // identity prefix sizes in the global buffers (static entities use offset 0)
+    internal static readonly int IdentityBoneCount = MAX_BONES;
+    private const int IdentityColorCount = 256;
+    private const int IdentityTexTransformCount = 256;
+
+    // monotonically growing offsets into the global buffers (never reclaimed on entity destruction)
+    private int _nextBoneOffset = IdentityBoneCount;
+    private int _nextColorOffset = IdentityColorCount;
+    private int _nextTexTransformOffset = IdentityTexTransformCount;
+
+    private readonly IGlobalBuffer<Matrix> _globalBoneBuffer;
+    private readonly IGlobalBuffer<Vector4> _globalColorBuffer;
+    private readonly IGlobalBuffer<Matrix> _globalTexTransformBuffer;
 
     private static Matrix[] staticIdentityBones = new Matrix[MAX_BONES];
     private static Vector4[] staticIdentityColors = new Vector4[MAX_BONES];
@@ -48,23 +53,48 @@ public class AnimationSystem
     public static Memory<Vector4> IdentityColors(int count) => staticIdentityColors.AsMemory(0, count);
 
     public static Memory<Matrix> IdentityMatrix(int count) => staticIdentityBones.AsMemory(0, count);
-    
+
+    /// <summary>
+    /// Allocates a contiguous range in each global buffer for one M2 entity.
+    /// Thread-safe; call at entity creation time. Slots are never reclaimed.
+    /// Static entities (no call here) use BoneBase=0 (identity prefix).
+    /// </summary>
+    public (int boneBase, int colorBase, int texBase) AllocateAnimationSlots(M2 model)
+    {
+        int boneCount = model.bones.Length;
+        int boneBase = boneCount == 0 ? 0 : Interlocked.Add(ref _nextBoneOffset, boneCount) - boneCount;
+
+        int colorCount = model.colors.Length;
+        int colorBase = colorCount == 0 ? 0 : Interlocked.Add(ref _nextColorOffset, colorCount) - colorCount;
+
+        // always 1 extra identity slot at the end of the tex-transform range
+        int texCount = model.texture_transforms.Length + 1;
+        int texBase = Interlocked.Add(ref _nextTexTransformOffset, texCount) - texCount;
+
+        return (boneBase, colorBase, texBase);
+    }
+
     public AnimationSystem(Archetypes archetypes,
         ICameraManager cameraManager,
         EmoteStore emoteStore,
         AnimationDataStore animationDataStore,
         IUIManager uiManager,
         EntityInspector entityInspector,
-        M2AnimationComponentInspector m2Inspector)
+        M2AnimationComponentInspector m2Inspector,
+        Engine engine)
     {
         this.archetypes = archetypes;
         this.cameraManager = cameraManager;
         this.emoteStore = emoteStore;
         this.animationDataStore = animationDataStore;
         entityInspector.RegisterInspectorDrawer(m2Inspector);
+        // set-3 bindings must match m2.vert: 0 = boneMatrices, 1 = vertexColors, 2 = textureTransforms.
+        _globalBoneBuffer = engine.CreateGlobalBuffer<Matrix>(0, IdentityBoneCount + 1024);
+        _globalColorBuffer = engine.CreateGlobalBuffer<Vector4>(1, IdentityColorCount + 256);
+        _globalTexTransformBuffer = engine.CreateGlobalBuffer<Matrix>(2, IdentityTexTransformCount + 256);
     }
 
-    private static T Get<T>(int IDX, ref readonly M2Track<T> track, T @default, float t, Func<T, T, float, T> lerp)
+    public static T Get<T>(int IDX, ref readonly M2Track<T> track, T @default, float t, Func<T, T, float, T> lerp)
     {
         if (track.Length <= IDX)
             return @default;
@@ -90,7 +120,7 @@ public class AnimationSystem
         return lerp(prev, nextValue, pct);
     }
     
-    private static T GetFirstOrDefault<T>(int IDX, MutableM2Track<T> track, T def, float t, Func<T, T, float, T> lerp)
+    public static T GetFirstOrDefault<T>(int IDX, MutableM2Track<T> track, T def, float t, Func<T, T, float, T> lerp)
     {
         if (track.Length == 0)
             return def;
@@ -514,107 +544,149 @@ public class AnimationSystem
     public static bool ManualAnimationStep(float delta, M2AnimationComponentData animationData, ref readonly LocalToWorld objectMatrix, ref readonly Matrix cameraViewMatrix)
     {
         UpdateAnimationData(animationData);
-        if (!AnimationTickTime(delta, animationData)) 
+        if (!AnimationTickTime(delta, animationData))
             return false;
-        
+
         var bonesLength = animationData.Model.bones.Length;
-        var localBones = ArrayPool<Matrix>.Shared.Rent(bonesLength);
-        
-        AnimationCalculateBones(bonesLength, animationData, localBones, in objectMatrix, in cameraViewMatrix);
-        animationData._buffer.UpdateBuffer(localBones.AsSpan(0, bonesLength));
-        ArrayPool<Matrix>.Shared.Return(localBones);
-        
+        var cache = animationData._boneCache;
+        if (cache == null || cache.Length < bonesLength)
+            animationData._boneCache = cache = new Matrix[bonesLength];
+
+        AnimationCalculateBones(bonesLength, animationData, cache, in objectMatrix, in cameraViewMatrix);
         return true;
     }
+
+    private float cachedDelta;
 
     public void Update(float delta)
     {
         sw.Restart();
+        cachedDelta = delta;
 
-        ThreadLocal<long> counter = new(true);
-        var cameraPosition = cameraManager.MainCamera.Transform.Position;
-        ThreadLocal<List<(INativeBuffer<Matrix>, int, Matrix[])>> updates = new ThreadLocal<List<(INativeBuffer<Matrix>, int, Matrix[])>>(() => new(), true);
-        ThreadLocal<List<(INativeBuffer<Vector4>, int, Vector4[])>> updateColors = new ThreadLocal<List<(INativeBuffer<Vector4>, int, Vector4[])>>(() => new(), true);
-
-        var cameraViewMatrix = cameraManager.MainCamera.ViewMatrix;
-
-        archetypes.AnimatedEntityArchetype.ParallelForEachRRROOO<RenderEnabledBit, LocalToWorld, M2AnimationComponentData, MeshBounds, DirtyPosition, WorldMeshBounds>((itr, thread, start, end, renderEnabledAccess, localToWorldAccess, animationAccess, meshBoundsAccess, dirtPositionAccess, worldMeshBounds) =>
+        archetypes.AnimatedEntityArchetype.ParallelForEachRRROOOState<AnimationSystem, RenderEnabledBit, LocalToWorld, M2AnimationComponentData, MeshBounds, DirtyPosition, WorldMeshBounds>(this, static (self, itr, thread, start, end, renderEnabledAccess, localToWorldAccess, animationAccess, meshBoundsAccess, dirtPositionAccess, worldMeshBounds) =>
         {
-            int sum = 0;
+            float delta = self.cachedDelta;
+            var cameraPosition = self.cameraManager.MainCamera.Transform.Position;
+            var cameraViewMatrix = self.cameraManager.MainCamera.ViewMatrix;
+
             for (int i = start; i < end; ++i)
             {
                 if (!renderEnabledAccess[i] || Vector3.Distance(cameraPosition, localToWorldAccess[i].Position) > 100)
                      continue;
-                sum++;
+
                 var animationData = animationAccess[i];
 
                 if (UpdateAnimationData(animationData))
                 {
                     var bounds = animationData.Model.sequences[animationData._animInternalIndex].bounds;
                     var bb = new BoundingBox(bounds.extent.min, bounds.extent.max);
-                    
+
                     if (meshBoundsAccess.HasValue)
                         meshBoundsAccess.Value[i].box = bb;
 
                     if (worldMeshBounds.HasValue)
                         worldMeshBounds.Value[i].box = RenderManager.LocalToWorld((MeshBounds)bb, in localToWorldAccess[i]);
-                
+
                     if (dirtPositionAccess.HasValue)
                         dirtPositionAccess.Value[i].Enable();
                 }
 
-                if (!AnimationTickTime(delta, animationData)) 
+                if (!AnimationTickTime(delta, animationData))
                     continue;
-
-                var bonesLength = animationData.Model.bones.Length;
-                var localBones = ArrayPool<Matrix>.Shared.Rent(bonesLength);
 
                 ref var objectMatrix = ref localToWorldAccess[i];
 
-                AnimationCalculateBones(bonesLength, animationData, localBones, in objectMatrix, in cameraViewMatrix);
+                // bones — write directly into per-entity cache
+                var bonesLength = animationData.Model.bones.Length;
+                var bonesCache = animationData._boneCache;
+                if (bonesCache == null || bonesCache.Length < bonesLength)
+                    animationData._boneCache = bonesCache = new Matrix[bonesLength];
+                AnimationCalculateBones(bonesLength, animationData, bonesCache, in objectMatrix, in cameraViewMatrix);
 
-                updates.Value!.Add((animationData._buffer, bonesLength, localBones));
-                //animationData._buffer.UpdateBuffer(localBones.AsSpan(0, bonesLength));
-
-                var localColors = ArrayPool<Vector4>.Shared.Rent(animationData.Model.colors.Length);
-                for (int colorIndex = 0; colorIndex < animationData.Model.colors.Length; ++colorIndex)
+                // colors — write directly into per-entity cache
+                var colorCount = animationData.Model.colors.Length;
+                var colorCache = animationData._colorCache;
+                if (colorCache == null || colorCache.Length < colorCount)
+                    animationData._colorCache = colorCache = new Vector4[colorCount];
+                for (int colorIndex = 0; colorIndex < colorCount; ++colorIndex)
                 {
                     var color = Get(animationData._animInternalIndex, in animationData.Model.colors[colorIndex].color, Vector3.One, animationData._time, Vector3.Lerp);
                     var alpha = Get(animationData._animInternalIndex, in animationData.Model.colors[colorIndex].alpha, Fixed16.One, animationData._time, Fixed16.Lerp);
-                    localColors[colorIndex] = new Vector4(color.X, color.Y, color.Z, alpha.Value);
+                    colorCache[colorIndex] = new Vector4(color.X, color.Y, color.Z, alpha.Value);
                 }
 
-                updateColors.Value!.Add((animationData._colors, animationData.Model.colors.Length, localColors));
-                var textureTransforms = ArrayPool<Matrix>.Shared.Rent(animationData.Model.texture_transforms.Length + 1);
+                // tex transforms — write directly into per-entity cache
+                var texCount = animationData.Model.texture_transforms.Length + 1;
+                var texCache = animationData._texTransformCache;
+                if (texCache == null || texCache.Length < texCount)
+                    animationData._texTransformCache = texCache = new Matrix[texCount];
                 for (int transformIndex = 0; transformIndex < animationData.Model.texture_transforms.Length; ++transformIndex)
-                {
-                    textureTransforms[transformIndex] = AnimationTextureTransform(animationData._animInternalIndex, animationData._time,
-                        in animationData.Model.texture_transforms[transformIndex]);
-                }
-                textureTransforms[animationData.Model.texture_transforms.Length] = Matrix.Identity; // last one is always identity
-                updates.Value!.Add((animationData._textureTransforms, animationData.Model.texture_transforms.Length + 1, textureTransforms));
+                    texCache[transformIndex] = AnimationTextureTransform(animationData._animInternalIndex, animationData._time, in animationData.Model.texture_transforms[transformIndex]);
+                texCache[animationData.Model.texture_transforms.Length] = Matrix.Identity;
             }
-            counter.Value += sum;
         });
-        foreach (var tuple in updates.Values.SelectMany(x => x))
-        {
-            tuple.Item1.UpdateBuffer(tuple.Item3.AsSpan(0, tuple.Item2));
-            ArrayPool<Matrix>.Shared.Return(tuple.Item3);
-        }
-        foreach (var tuple in updateColors.Values.SelectMany(x => x))
-        {
-            tuple.Item1.UpdateBuffer(tuple.Item3.AsSpan(0, tuple.Item2));
-            ArrayPool<Vector4>.Shared.Return(tuple.Item3);
-        }
         sw.Stop();
     }
 
-    public M2AnimationType? GetAnimationType(M2? model, uint? emoteState, uint? standState, AnimTier? animTier)
+    /// <summary>
+    /// Copies all per-entity animation caches to the frame-global GPU buffers.
+    /// Must be called post-fence (i.e. from the render phase after BeginFrame).
+    /// </summary>
+    private ref partial struct UploadToGpuJob : IJob
+    {
+        public Span<Matrix> bonesSpan;
+        public Span<Vector4> colorsSpan;
+        public Span<Matrix> texSpan;
+
+        private IChunkDataIterator itr;
+        private ManagedComponentDataAccess<M2AnimationComponentData> animations;
+
+        public void Execute(int start, int end)
+        {
+            for (int i = start; i < end; i++)
+            {
+                var a = animations[i];
+                // the managed component is null for entities whose model hasn't loaded yet (they're
+                // not render-enabled, so the Update pass skips them too); don't upload those.
+                if (a == null)
+                    continue;
+
+                if (a._boneCache != null && a.BoneBase >= IdentityBoneCount)
+                    a._boneCache.AsSpan().CopyTo(bonesSpan.Slice(a.BoneBase, a._boneCache.Length));
+                if (a._colorCache != null && a.ColorBase >= IdentityColorCount)
+                    a._colorCache.AsSpan().CopyTo(colorsSpan.Slice(a.ColorBase, a._colorCache.Length));
+                if (a._texTransformCache != null && a.TexTransformBase >= IdentityTexTransformCount)
+                    a._texTransformCache.AsSpan().CopyTo(texSpan.Slice(a.TexTransformBase, a._texTransformCache.Length));
+            }
+        }
+    }
+    public void UploadToGpu()
+    {
+        var bonesSpan = _globalBoneBuffer.BeginWrite(_nextBoneOffset);
+        var colorsSpan = _globalColorBuffer.BeginWrite(_nextColorOffset);
+        var texSpan = _globalTexTransformBuffer.BeginWrite(_nextTexTransformOffset);
+
+        // fill identity prefixes — static entities (BoneBase=0) read from here
+        for (int i = 0; i < IdentityBoneCount; i++) bonesSpan[i] = Matrix.Identity;
+        for (int i = 0; i < IdentityColorCount; i++) colorsSpan[i] = Vector4.One;
+        for (int i = 0; i < IdentityTexTransformCount; i++) texSpan[i] = Matrix.Identity;
+
+        var job = new UploadToGpuJob()
+        {
+            bonesSpan = bonesSpan,
+            colorsSpan = colorsSpan,
+            texSpan = texSpan
+        };
+
+        job.Run(archetypes.AnimatedEntityArchetype);
+    }
+
+    public unsafe M2AnimationType? GetAnimationType(M2? model, uint? emoteState, uint? standState, AnimTier? animTier)
     {
         M2AnimationType? animationId = null;
         if (emoteState.HasValue && emoteState.Value != 0 && emoteStore.TryGetValue(emoteState.Value, out var emote))
         {
-            animationId = (M2AnimationType)emote.AnimId;
+            animationId = (M2AnimationType)emote->AnimId;
         }
         else if (standState.HasValue)
         {

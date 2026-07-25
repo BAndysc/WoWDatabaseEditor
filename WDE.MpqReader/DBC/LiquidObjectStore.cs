@@ -2,25 +2,29 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class LiquidObjectStore : BaseDbcStore<int, LiquidObject>
+public class LiquidObjectStore : NativeBaseDbcStore<int, LiquidObject>
 {
-    public LiquidObjectStore() {}
+    public LiquidObjectStore() : base(0) {}
 
-    public LiquidObjectStore(IEnumerable<IDbcIterator> dbcIterator)
+    public LiquidObjectStore(IDBC dbcIterator) : base(dbcIterator.RecordCount)
     {
+        int index = 0;
         foreach (var iterator in dbcIterator)
         {
-            var liquidObject = new LiquidObject(iterator);
-            store[liquidObject.Id] = liquidObject;
+            ref var liquidObject = ref this.ElementAt(index++);
+            liquidObject = new LiquidObject(iterator);
+            Set(liquidObject.Id, ref liquidObject);
         }
     }
-    
-    public LiquidObjectStore(IEnumerable<IWdcIterator> dbcIterator)
+
+    public LiquidObjectStore(IWDC dbcIterator) : base(dbcIterator.RecordCount)
     {
+        int index = 0;
         foreach (var iterator in dbcIterator)
         {
-            var liquidObject = new LiquidObject(iterator);
-            store[liquidObject.Id] = liquidObject;
+            ref var liquidObject = ref this.ElementAt(index++);
+            liquidObject = new LiquidObject(iterator);
+            Set(liquidObject.Id, ref liquidObject);
         }
     }
 }

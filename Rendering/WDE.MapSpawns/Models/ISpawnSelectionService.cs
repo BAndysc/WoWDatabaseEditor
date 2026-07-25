@@ -11,8 +11,6 @@ public interface ISpawnSelectionService
     bool IsSelected(SpawnInstance spawnInstance);
 }
 
-[SingleInstance]
-[AutoRegister]
 public class SpawnSelectionService : ISpawnSelectionService
 {
     public ReactiveProperty<SpawnInstance?> SelectedSpawn { get; } = new(null);

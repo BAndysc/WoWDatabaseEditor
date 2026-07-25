@@ -3,7 +3,6 @@
     "Path": "data/skybox.frag"
   },
   "ZWrite": true,
-  "Instancing": false,
   "Vertex": {
     "Path": "data/skybox.vert",
     "Input": [

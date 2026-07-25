@@ -3,7 +3,7 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC;
 
-public readonly struct CurrencyType
+public ref struct CurrencyType
 {
     public readonly uint Id;
     public readonly FileId? InventoryIcon;

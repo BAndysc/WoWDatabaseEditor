@@ -32,7 +32,8 @@ namespace WDE.MapRenderer.Managers
     {
         float Delta { get; }
         event Action<int>? ChangedMap;
-        Map CurrentMap { get; }
+        unsafe Map* CurrentMap { get; }
+        int CurrentMapId { get; }
         void SetMap(int id, Vector3? position = null);
         
         CoroutineManager CoroutineManager { get; }
@@ -55,6 +56,7 @@ namespace WDE.MapRenderer.Managers
         LoadingManager LoadingManager { get; }
         ZoneAreaManager ZoneAreaManager { get; }
         AnimationSystem AnimationSystem { get; }
+        StatusIconsManager StatusIconsManager { get; }
         IEntityManager EntityManager { get; }
         ITextureManager EngineTextureManager { get; }
         IMeshManager EngineMeshManager { get; }

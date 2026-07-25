@@ -137,7 +137,7 @@ namespace WDE.MpqReader.DBC
 
         public float Mix { get; set; }
 
-        public CombinedLight(Light a, Light b)
+        public CombinedLight(DbcLight a, DbcLight b)
         {
             if (a.LightParams.Length != b.LightParams.Length)
                 throw new Exception("Light params count mismatch");
@@ -233,7 +233,7 @@ namespace WDE.MpqReader.DBC
         }
     }
     
-    public class Light
+    public class DbcLight
     {
         private static readonly float YardToInch = 36;
         
@@ -249,7 +249,7 @@ namespace WDE.MpqReader.DBC
 
         public LightParam NormalWeather => LightParams[0];
 
-        public Light(IDbcIterator row, LightParamStore lightParamStore)
+        public DbcLight(IDbcIterator row, LightParamStore lightParamStore)
         {
             int i = 0;
             Id = row.GetUInt(i++);
@@ -271,7 +271,7 @@ namespace WDE.MpqReader.DBC
             }
         }
         
-        public Light(IWdcIterator row, LightParamStore lightParamStore)
+        public DbcLight(IWdcIterator row, LightParamStore lightParamStore)
         {
             Id = (uint)row.Id;
             Continent = (ushort)row.GetShort("ContinentID");

@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:WDE.MapSpawns.Bridge.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="450"
+             x:DataType="vm:FormationsDocumentViewModel"
+             x:Class="WDE.MapSpawns.Bridge.Views.FormationsDocumentView">
+    <DockPanel Margin="10">
+        <Border DockPanel.Dock="Top" Background="#334090E0" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+            <TextBlock TextWrapping="Wrap"
+                       Text="Read-only preview. Formations are edited in the 3D map view: open the map, pick the Formation tool and drag a creature onto its leader." />
+        </Border>
+
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{CompiledBinding Groups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:FormationGroupViewModel">
+                        <Expander Header="{CompiledBinding Header}" IsExpanded="True" Margin="0,0,0,6" HorizontalAlignment="Stretch">
+                            <StackPanel>
+                                <Grid ColumnDefinitions="100,80,80,80,80,80" Margin="4,2">
+                                    <TextBlock Grid.Column="0" Text="Member" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="1" Text="Dist" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="2" Text="Angle" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="3" Text="Group AI" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="4" Text="Point 1" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="5" Text="Point 2" FontWeight="Bold" />
+                                </Grid>
+                                <ItemsControl ItemsSource="{CompiledBinding Members}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:FormationMemberRowViewModel">
+                                            <Grid ColumnDefinitions="100,80,80,80,80,80" Margin="4,1">
+                                                <TextBlock Grid.Column="0" Text="{CompiledBinding MemberGuid}" />
+                                                <TextBlock Grid.Column="1" Text="{CompiledBinding Dist, StringFormat={}{0:0.##}}" />
+                                                <TextBlock Grid.Column="2" Text="{CompiledBinding Angle, StringFormat={}{0:0.##}}" />
+                                                <TextBlock Grid.Column="3" Text="{CompiledBinding GroupAi}" />
+                                                <TextBlock Grid.Column="4" Text="{CompiledBinding Point1}" />
+                                                <TextBlock Grid.Column="5" Text="{CompiledBinding Point2}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

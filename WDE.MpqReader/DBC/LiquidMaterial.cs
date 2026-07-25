@@ -2,7 +2,7 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class LiquidMaterial
+public ref struct LiquidMaterial
 {
     public readonly int Id;
     public readonly int LVF;

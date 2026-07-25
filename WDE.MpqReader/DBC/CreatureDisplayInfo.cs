@@ -4,7 +4,7 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC
 {
-    public class CreatureDisplayInfo
+    public ref struct CreatureDisplayInfo
     {
         public readonly uint Id;
         public readonly int ModelId;
@@ -64,7 +64,7 @@ namespace WDE.MpqReader.DBC
             ObjectEffectPackageID = dbcIterator.GetUShort("ObjectEffectPackageID");
         }
 
-        private CreatureDisplayInfo()
+        public CreatureDisplayInfo()
         {
             Id = 0;
             ModelId = 0;

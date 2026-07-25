@@ -10,7 +10,7 @@ public class LightParamStore : BaseDbcStore<uint, LightParam>
         foreach (var row in rows)
         {
             var o = new LightParam(wowVersion, row, lightIntParamStore, floatParamStore, lightDataStore);
-            store[o.Id] = o;
+            Set(o.Id, o);
         }
     }
     
@@ -19,7 +19,7 @@ public class LightParamStore : BaseDbcStore<uint, LightParam>
         foreach (var row in rows)
         {
             var o = new LightParam(wowVersion, row, lightDataStore);
-            store[o.Id] = o;
+            Set(o.Id, o);
         }
     }
 }

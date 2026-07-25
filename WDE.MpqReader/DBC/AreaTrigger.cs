@@ -3,7 +3,7 @@ using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC
 {
-    public class AreaTrigger
+    public ref struct AreaTrigger
     {
         public readonly int Id;
         public readonly int ContinentId;
@@ -59,7 +59,7 @@ namespace WDE.MpqReader.DBC
             BoxYaw = dbcIterator.GetFloat("Box_yaw");
         }
         
-        private AreaTrigger()
+        public AreaTrigger()
         {
             Id = -1;
             ContinentId = -1;

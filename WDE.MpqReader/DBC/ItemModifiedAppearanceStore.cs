@@ -1,42 +1,40 @@
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class ItemModifiedAppearanceStore : BaseDbcStore<uint, ItemModifiedAppearance>
+public unsafe class ItemModifiedAppearanceStore : NativeBaseDbcStore<uint, ItemModifiedAppearance>
 {
-    private Dictionary<uint, List<ItemModifiedAppearance>> byItems = new();
-    
-    public ItemModifiedAppearanceStore(IEnumerable<IDbcIterator> rows)
+    private Dictionary<uint, uint> byItems = new();
+
+    public ItemModifiedAppearanceStore(IDBC rows) : base(0)
     {
-        
+
     }
-    
-    public ItemModifiedAppearanceStore(IEnumerable<IWdcIterator> rows)
+
+    public ItemModifiedAppearanceStore(IWDC rows) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new ItemModifiedAppearance(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new ItemModifiedAppearance(row);
+            Set(o.Id, ref o);
             if (!byItems.TryGetValue(o.ItemId, out var list))
-                list = byItems[o.ItemId] = new List<ItemModifiedAppearance>();
-            list.Add(o);
+            {
+                list = byItems[o.ItemId] = o.Id;
+            }
         }
     }
-    
-    public bool TryGetByItem(uint itemId, out IReadOnlyList<ItemModifiedAppearance> list)
-    {
-        if (byItems.TryGetValue(itemId, out var list2))
-        {
-            list = list2;
-            return true;
-        }
 
-        list = Array.Empty<ItemModifiedAppearance>();
-        return false;
+    public bool TryGetByItem(uint itemId, out uint firstId)
+    {
+        return byItems.TryGetValue(itemId, out firstId);
     }
 
-    public ItemModifiedAppearanceStore()
+    public ItemModifiedAppearanceStore() : base(0)
     {
-        
+
     }
 }

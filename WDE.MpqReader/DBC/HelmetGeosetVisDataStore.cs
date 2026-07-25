@@ -1,25 +1,28 @@
-﻿using System.Collections;
 using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class HelmetGeosetVisDataStore : BaseDbcStore<uint, HelmetGeosetVisData>
+public class HelmetGeosetVisDataStore : NativeBaseDbcStore<uint, HelmetGeosetVisData>
 {
-    public HelmetGeosetVisDataStore(IEnumerable<IDbcIterator> rows)
+    public HelmetGeosetVisDataStore(IDBC rows) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new HelmetGeosetVisData(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new HelmetGeosetVisData(row);
+            Set(o.Id, ref o);
         }
     }
-    
-    public HelmetGeosetVisDataStore(IEnumerable<IWdcIterator> rows)
+
+    public HelmetGeosetVisDataStore(IWDC rows) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new HelmetGeosetVisData(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new HelmetGeosetVisData(row);
+            Set(o.Id, ref o);
         }
     }
 }

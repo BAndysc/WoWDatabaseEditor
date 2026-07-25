@@ -11,6 +11,7 @@ using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.MapRenderer.Managers;
 using WDE.Module;
@@ -25,9 +26,11 @@ public class Game : IGame
     private readonly IGameView gameView;
     private readonly IGameProperties gameProperties;
     private readonly IMessageBoxService messageBoxService;
+    private readonly IMainThread mainThread;
     private readonly IDatabaseClientFileOpener databaseClientFileOpener;
     private readonly IDatabaseProvider databaseProvider;
     private readonly IScopedContainer scopedContainer;
+    private readonly IEnumerable<IGameScopeRegistrar> scopeRegistrars;
     private GameManager? manager;
     public GameManager? Manager => manager; 
         
@@ -41,18 +44,22 @@ public class Game : IGame
         IGameView gameView,
         IGameProperties gameProperties,
         IMessageBoxService messageBoxService,
+        IMainThread mainThread,
         IDatabaseClientFileOpener databaseClientFileOpener,
         IDatabaseProvider databaseProvider,
-        IScopedContainer scopedContainer)
+        IScopedContainer scopedContainer,
+        IEnumerable<IGameScopeRegistrar> scopeRegistrars)
     {
         this.mpqService = mpqService;
         this.gameView = gameView;
         this.gameProperties = gameProperties;
         this.messageBoxService = messageBoxService;
+        this.mainThread = mainThread;
         this.databaseClientFileOpener = databaseClientFileOpener;
         this.databaseProvider = databaseProvider;
         this.scopedContainer = scopedContainer;
-    } 
+        this.scopeRegistrars = scopeRegistrars;
+    }
 
     public bool Initialize(Engine engine)
     {
@@ -92,6 +99,11 @@ public class Game : IGame
         registry.RegisterSingleton<WoWTextureManager>();
         registry.RegisterSingleton<WoWMeshManager>();
         registry.RegisterSingleton<MdxManager>();
+        // AnimationSystem owns the engine-global m2 bone/color/texTransform buffers (set-3 bindings
+        // 0/1/2) and per-frame allocation state, so it must be a single shared instance - both
+        // GameManager and SpawnViewer depend on it, and two instances would double-register those
+        // bindings (and double-write the buffers).
+        registry.RegisterSingleton<AnimationSystem>();
         registry.RegisterSingleton<WmoManager>();
         registry.RegisterSingleton<WorldManager>();
         registry.RegisterSingleton<LowDetailHeightMapManager>();
@@ -100,12 +112,19 @@ public class Game : IGame
         registry.RegisterSingleton<CameraManager>();
         registry.RegisterSingleton<LightingManager>();
         registry.RegisterSingleton<AreaTriggerManager>();
+        registry.RegisterSingleton<StatusIconsManager>();
         registry.RegisterSingleton<RaycastSystem>();
         registry.RegisterSingleton<ModuleManager>();
         registry.RegisterSingleton<CoroutineManager>();
         registry.RegisterSingleton<IGameFiles, GameFiles>();
         registry.RegisterSingleton<IChangesManager, ChangesManager>();
-        
+        registry.RegisterSingleton<IWorldInteractionService, WorldInteractionService>();
+
+        // other modules' 3D-only services (the spawn editors etc.) go into the game scope here,
+        // so they live and die with this game session instead of the global container
+        foreach (var registrar in scopeRegistrars)
+            registrar.RegisterScopedTypes(registry);
+
         manager = (GameManager)provider.Resolve(typeof(GameManager));
         registry.RegisterInstance<IGameContext>(manager);
 
@@ -117,7 +136,9 @@ public class Game : IGame
         catch (Exception e)
         {
             Console.WriteLine(e);
-            messageBoxService.SimpleDialog("Error", "Couldn't initialize the 3D view", "Details: " + e.InnerException?.InnerException?.Message ?? e.Message + "\n\nPlease report to the developer.").ListenErrors();
+            var details = "Details: " + e.InnerException?.InnerException?.Message ?? e.Message + "\n\nPlease report to the developer.";
+            // Initialize runs on the game thread, dialogs must be created on the UI thread
+            mainThread.Dispatch(() => messageBoxService.SimpleDialog("Error", "Couldn't initialize the 3D view", details).ListenErrors());
             success = false;
         }
         if (!success)

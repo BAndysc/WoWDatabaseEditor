@@ -51,7 +51,7 @@ public class LiquidTypeStore : BaseDbcStore<int, LiquidType>
         foreach (var row in rows)
         {
             var o = new LiquidType(row);
-            store[o.Id] = o;
+            Set(o.Id, o);
         }
     }
     
@@ -60,7 +60,7 @@ public class LiquidTypeStore : BaseDbcStore<int, LiquidType>
         foreach (var row in rows)
         {
             var o = new LiquidType(row);
-            store[o.Id] = o;
+            Set(o.Id, o);
         }
     }
 }

@@ -3,24 +3,26 @@ using WDE.Common.DBC.Structs;
 
 namespace WDE.MpqReader.DBC;
 
-public class ItemAppearanceStore : BaseDbcStore<uint, ItemAppearance>
+public class ItemAppearanceStore : NativeBaseDbcStore<uint, ItemAppearance>
 {
-    public ItemAppearanceStore(IEnumerable<IDbcIterator> rows)
+    public ItemAppearanceStore(IDBC rows) : base(0)
     {
-        
+
     }
-    
-    public ItemAppearanceStore(IEnumerable<IWdcIterator> rows)
+
+    public ItemAppearanceStore(IWDC rows) : base(rows.RecordCount)
     {
+        int index = 0;
         foreach (var row in rows)
         {
-            var o = new ItemAppearance(row);
-            store[o.Id] = o;
+            ref var o = ref this.ElementAt(index++);
+            o = new ItemAppearance(row);
+            Set(o.Id, ref o);
         }
     }
 
-    public ItemAppearanceStore()
+    public ItemAppearanceStore() : base(0)
     {
-        
+
     }
 }

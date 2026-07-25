@@ -2,7 +2,7 @@
 
 namespace WDE.MpqReader.DBC;
 
-public class HelmetGeosetVisData
+public ref struct HelmetGeosetVisData
 {
     public readonly uint Id;
     public readonly uint HairFlags;
@@ -37,7 +37,7 @@ public class HelmetGeosetVisData
         EyesFlags = (uint)dbcIterator.GetInt("HideGeoset", 6);
     }
 
-    private HelmetGeosetVisData()
+    public HelmetGeosetVisData()
     {
         Id = 0;
         HairFlags = 0;

@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Prism.Ioc;
 using WDE.Common.Disposables;
 using WDE.Common.Managers;
@@ -16,9 +17,18 @@ namespace WDE.MapRenderer
         private readonly Lazy<IDocumentManager> documentManager;
         private readonly IMessageBoxService messageBoxService;
         private readonly IContainerProvider provider;
+        // mutated on the UI thread, but Modules is enumerated by ModuleManager's ctor on the game thread
+        private readonly object modulesLock = new();
         private List<Func<IContainerProvider, IGameModule>> modules = new();
 
-        public IEnumerable<Func<IContainerProvider, IGameModule>> Modules => modules;
+        public IEnumerable<Func<IContainerProvider, IGameModule>> Modules
+        {
+            get
+            {
+                lock (modulesLock)
+                    return modules.ToArray();
+            }
+        }
         public event Action<Func<IContainerProvider, IGameModule>>? ModuleRegistered;
         public event Action<Func<IContainerProvider, IGameModule>>? ModuleRemoved;
 
@@ -33,14 +43,18 @@ namespace WDE.MapRenderer
         
         public IDisposable RegisterGameModule(Func<IContainerProvider, IGameModule> gameModule)
         {
-            modules.Add(gameModule);
+            lock (modulesLock)
+                modules.Add(gameModule);
             ModuleRegistered?.Invoke(gameModule);
             return new ActionDisposable(() =>
             {
-                var indexOf = modules.IndexOf(gameModule);
+                lock (modulesLock)
+                {
+                    var indexOf = modules.IndexOf(gameModule);
+                    modules[indexOf] = modules[^1];
+                    modules.RemoveAt(modules.Count - 1);
+                }
                 ModuleRemoved?.Invoke(gameModule);
-                modules[indexOf] = modules[^1];
-                modules.RemoveAt(modules.Count - 1);
             });
         }
 

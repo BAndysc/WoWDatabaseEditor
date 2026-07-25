@@ -1,4 +1,4 @@
-using ImGuiNET;
+using Hexa.NET.ImGui;
 using TheEngine.Interfaces;
 using WDE.MpqReader.Structures;
 using System;
@@ -234,7 +234,7 @@ public class M2Inspector : IInspectorDrawer<M2>
         ImGui.AlignTextToFramePadding();
         ImGui.TextUnformatted("Name");
         ImGui.NextColumn();
-        ImGui.TextUnformatted(name);
+        ImGui.TextUnformatted(new string(m2.name.AsSpan()));
         ImGui.NextColumn();
 
         // Flags row (generic flags renderer)
@@ -603,8 +603,8 @@ public class M2Inspector : IInspectorDrawer<M2>
         if (ImGui.BeginChild(childId, new System.Numerics.Vector2(0, height), ImGuiChildFlags.Borders | ImGuiChildFlags.AutoResizeY, ImGuiWindowFlags.HorizontalScrollbar))
         {
             var clipper = new ImGuiListClipper();
-            ImGuiNative.ImGuiListClipper_Begin(&clipper, array.Length, itemHeight);
-            while (ImGuiNative.ImGuiListClipper_Step(&clipper) != 0)
+            clipper.Begin(array.Length, itemHeight);
+            while (clipper.Step())
             {
                 for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
                 {
@@ -621,7 +621,7 @@ public class M2Inspector : IInspectorDrawer<M2>
                     }
                 }
             }
-            ImGuiNative.ImGuiListClipper_End(&clipper);
+            clipper.End();
         }
         ImGui.EndChild();
     }

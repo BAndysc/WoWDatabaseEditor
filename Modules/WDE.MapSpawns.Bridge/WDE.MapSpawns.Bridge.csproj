@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <WarningsAsErrors>$(WarningsAsErrors),nullable</WarningsAsErrors>
+    </PropertyGroup>
+    <PropertyGroup>
+        <OutputPath>..\WoWDatabaseEditor\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+
+    <Import Project="..\..\Avalonia.props" />
+    <Import Project="..\..\Module.props" />
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
+        <ProjectReference Include="..\..\Rendering\WDE.MapSpawns\WDE.MapSpawns.csproj" />
+        <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
+    </ItemGroup>
+</Project>

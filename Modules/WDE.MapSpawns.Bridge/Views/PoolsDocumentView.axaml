@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:WDE.MapSpawns.Bridge.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="450"
+             x:DataType="vm:PoolsDocumentViewModel"
+             x:Class="WDE.MapSpawns.Bridge.Views.PoolsDocumentView">
+    <DockPanel Margin="10">
+        <Border DockPanel.Dock="Top" Background="#334090E0" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+            <TextBlock TextWrapping="Wrap"
+                       Text="Read-only preview. Spawn pools are edited in the 3D map view: open the map, pick the Spawn pool tool and manage pools from there." />
+        </Border>
+
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{CompiledBinding Pools}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:PoolViewModel">
+                        <Expander Header="{CompiledBinding Header}" IsExpanded="True" Margin="0,0,0,6" HorizontalAlignment="Stretch">
+                            <StackPanel>
+                                <Grid ColumnDefinitions="120,180,80,*" Margin="4,2">
+                                    <TextBlock Grid.Column="0" Text="Type" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="1" Text="Member" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="2" Text="Chance" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="3" Text="Description" FontWeight="Bold" />
+                                </Grid>
+                                <ItemsControl ItemsSource="{CompiledBinding Members}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:PoolMemberRowViewModel">
+                                            <Grid ColumnDefinitions="120,180,80,*" Margin="4,1">
+                                                <TextBlock Grid.Column="0" Text="{CompiledBinding Type}" />
+                                                <TextBlock Grid.Column="1" Text="{CompiledBinding Key}" />
+                                                <TextBlock Grid.Column="2" Text="{CompiledBinding Chance}" />
+                                                <TextBlock Grid.Column="3" Text="{CompiledBinding Description}" TextTrimming="CharacterEllipsis" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

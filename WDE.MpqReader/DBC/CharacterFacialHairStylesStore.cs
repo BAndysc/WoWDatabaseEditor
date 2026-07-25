@@ -4,27 +4,29 @@ using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class CharacterFacialHairStylesStore : BaseDbcStore<uint, CharacterFacialHairStyles>
+public class CharacterFacialHairStylesStore : NativeBaseDbcStore<uint, CharacterFacialHairStyles>
 {
-    public CharacterFacialHairStylesStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version)
+    public CharacterFacialHairStylesStore(IDBC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
-        uint idx = 1;
+        int idx = 1;
         foreach (var row in rows)
         {
-            var o = new CharacterFacialHairStyles(row, version);
-            store[idx] = o;
+            ref var o = ref this.ElementAt(idx - 1);
+            o = new CharacterFacialHairStyles(row, version);
+            Set((uint)idx, ref o);
 
             idx++;
         }
     }
     
-    public CharacterFacialHairStylesStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version)
+    public CharacterFacialHairStylesStore(IWDC rows, GameFilesVersion version) : base(rows.RecordCount)
     {
-        uint idx = 1;
+        int idx = 1;
         foreach (var row in rows)
         {
-            var o = new CharacterFacialHairStyles(row, version);
-            store[idx] = o;
+            ref var o = ref this.ElementAt(idx - 1);
+            o = new CharacterFacialHairStyles(row, version);
+            Set((uint)idx, ref o);
 
             idx++;
         }

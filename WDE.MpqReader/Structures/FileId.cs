@@ -1,10 +1,12 @@
+using WDE.MpqReader.DBC;
+
 namespace WDE.MpqReader.Structures;
 
 public readonly struct FileId : IEquatable<FileId>
 {
     public bool Equals(FileId other)
     {
-        return FileName == other.FileName && FileDataId == other.FileDataId && FileType == other.FileType;
+        return FileName.ToString() == other.FileName.ToString() && FileDataId == other.FileDataId && FileType == other.FileType;
     }
 
     public override bool Equals(object? obj)
@@ -14,7 +16,7 @@ public readonly struct FileId : IEquatable<FileId>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(FileName, FileDataId, (int)FileType);
+        return HashCode.Combine(FileName.ToString(), FileDataId, (int)FileType);
     }
 
     public static bool operator ==(FileId left, FileId right)
@@ -33,20 +35,20 @@ public readonly struct FileId : IEquatable<FileId>
         FileId
     }
     
-    public readonly string FileName;
+    public readonly ManagedString FileName;
     public readonly uint FileDataId;
     public readonly Type FileType;
-    
+
     public FileId(string fileName)
     {
-        FileName = fileName;
+        FileName = ManagedString.Create(fileName);
         FileDataId = 0;
         FileType = Type.FileName;
     }
-    
+
     public FileId(uint fileId)
     {
-        FileName = null!;
+        FileName = ManagedString.Empty;
         FileDataId = fileId;
         FileType = Type.FileId;
     }
@@ -70,13 +72,13 @@ public readonly struct FileId : IEquatable<FileId>
 
     public override string ToString()
     {
-        return FileType == Type.FileName ? FileName : $"File{FileDataId}.ext";
+        return FileType == Type.FileName ? FileName.ToString() : $"File{FileDataId}.ext";
     }
 
     public FileId Replace(string searchFor, string replaceWith, StringComparison options)
     {
         if (FileType == Type.FileId)
             return this;
-        return FileName.Replace(searchFor, replaceWith, options);
+        return FileName.ToString().Replace(searchFor, replaceWith, options);
     }
 }

@@ -2,19 +2,21 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class ModelFileDataStore : BaseDbcStore<int, ModelFileData>
+public class ModelFileDataStore : NativeBaseDbcStore<int, ModelFileData>
 {
-    public ModelFileDataStore()
+    public ModelFileDataStore() : base(0)
     {
-        
+
     }
-    
-    public ModelFileDataStore(IEnumerable<IWdcIterator> dbcIterator)
+
+    public ModelFileDataStore(IWDC dbcIterator) : base(dbcIterator.RecordCount)
     {
+        int index = 0;
         foreach (var i in dbcIterator)
         {
-            var textureFileData = new ModelFileData(i);
-            store[textureFileData.ModelResourceId] = textureFileData;
+            ref var textureFileData = ref this.ElementAt(index++);
+            textureFileData = new ModelFileData(i);
+            Set(textureFileData.ModelResourceId, ref textureFileData);
         }
     }
 }

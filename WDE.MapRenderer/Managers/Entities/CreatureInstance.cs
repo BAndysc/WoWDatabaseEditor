@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Text;
-using ImGuiNET;
-using TheAvaloniaOpenGL.Resources;
+using Hexa.NET.ImGui;
 using TheEngine;
 using TheEngine.Components;
 using TheEngine.ECS;
@@ -54,10 +53,13 @@ public class MdxRendererInspector : IInspectorDrawer<MdxRenderer>
 
     public byte[] ModelBufferString = new byte[256];
 
-    public void Draw(MdxRenderer component)
+    public unsafe void Draw(MdxRenderer component)
     {
         Encoding.ASCII.GetBytes(component.ModelFileId.ToString(), ModelBufferString);
-        ImGui.InputText("Model: ", ModelBufferString, (uint)ModelBufferString.Length);
+        fixed (byte* ptr = &ModelBufferString[0])
+        {
+            ImGui.InputText("Model: \0"u8, ptr, (uint)ModelBufferString.Length);
+        }
         ImGui.Text($"Display ID: {component.DisplayId}");
         if (component.Owner != Entity.Empty && component.Geosets.Count > 0)
         {
@@ -88,9 +90,7 @@ public class CreatureInstance : WorldObjectInstance
 {
     private readonly ICreatureTemplate? creatureTemplate;
     public readonly uint CreatureDisplayId;
-    private List<INativeBuffer> bonesBuffers = new();
     public M2AnimationComponentData masterAnimation = null!;
-    private MaterialInstanceRenderData materialInstanceRenderData = null!;
     private string unitName = "";
 
     public CreatureInstance(IGameContext gameContext,
@@ -126,7 +126,7 @@ public class CreatureInstance : WorldObjectInstance
         }
     }
 
-    private (int animId, AnimationDataFlags flags) GetAnimId(M2AnimationType type)
+    private unsafe (int animId, AnimationDataFlags flags) GetAnimId(M2AnimationType type)
     {
         AnimationDataFlags flags = AnimationDataFlags.None;
         int animId = (int)type;
@@ -139,10 +139,10 @@ public class CreatureInstance : WorldObjectInstance
                    !visited[(int)animId])
             {
                 visited[(int)animId] = true;
-                if (animationData.Fallback != 0)
+                if (animationData->Fallback != 0)
                 {
-                    animId = (int)animationData.Fallback;
-                    flags = animationData.Flags;
+                    animId = (int)animationData->Fallback;
+                    flags = animationData->Flags;
                 }
                 else
                     break;
@@ -191,29 +191,24 @@ public class CreatureInstance : WorldObjectInstance
     public MdxManager.MdxInstance? Mdx { get; private set; }
     public M2? Model => Mdx?.model;
 
-    public MaterialInstanceRenderData MaterialRenderData => materialInstanceRenderData;
-    
+    public override void SetTranslucent(bool translucent)
+    {
+        base.SetTranslucent(translucent); // body + equipment attachments (owned materials)
+        if (mountData != null)
+            ApplyTranslucent(mountData.materials, translucent);
+    }
+
     public Material BaseMaterial { get; private set; } = null!;
 
     private class MountData
     {
         public MdxManager.MdxInstance mdxInstance; // to keep reference to the mesh
-        public INativeBuffer<Matrix4x4> boneMatricesBuffer;
-        public INativeBuffer<Matrix4x4> textureTransformsBuffer;
-        public INativeBuffer<Vector4> colorBuffer;
         public Entity mountEntity;
-        public SmallList<Entity> renderers;
+        public List<Material> materials = new(); // per-instance clones (shorter life than the creature)
 
         public void Destroy(IEntityManager entityManager)
         {
-            foreach (var entity in renderers)
-            {
-                entityManager.DestroyEntity(entity);
-            }
             entityManager.DestroyEntity(mountEntity);
-            boneMatricesBuffer.Dispose();
-            textureTransformsBuffer.Dispose();
-            colorBuffer.Dispose();
         }
     }
 
@@ -226,7 +221,11 @@ public class CreatureInstance : WorldObjectInstance
             var entityManager = gameContext.EntityManager;
             var archetypes = gameContext.Archetypes;
 
-            this.mountData?.Destroy(entityManager);
+            if (this.mountData != null)
+            {
+                this.mountData.Destroy(entityManager);
+                DisposeMaterials(this.mountData.materials);
+            }
             // todo: delete would be better?
             entityManager.AddComponent(WorldObjectEntity, new ShareRenderEnabledBit(){OtherEntity = Entity.Empty});
             this.mountData = null;
@@ -235,41 +234,40 @@ public class CreatureInstance : WorldObjectInstance
                 return;
             mountData = new();
             mountData.mdxInstance = value;
-        
-            mountData.boneMatricesBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
-            mountData.boneMatricesBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(value.model.bones.Length).Span);
-            mountData.colorBuffer = gameContext.Engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
-            mountData.colorBuffer.UpdateBuffer(AnimationSystem.IdentityColors(value.model.colors.Length).Span);
-            mountData.textureTransformsBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferPixelOnly, 1, BufferInternalFormat.Float4);
-            mountData.textureTransformsBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(value.model.texture_transforms.Length + 1).Span);
+
+            var mountModel = value.model;
+            var animSystem = gameContext.AnimationSystem;
+            var (mountBoneBase, mountColorBase, mountTexBase) = animSystem.AllocateAnimationSlots(mountModel);
 
             mountData.mountEntity = entityManager.CreateEntity(archetypes.AttachmentArchetype, "Mount"u8);
+            entityManager.SetParent(mountData.mountEntity, objectEntity);
             mountData.mountEntity.SetCopyParentTransform(entityManager, objectEntity);
             mountData.mountEntity.SetDirtyPosition(entityManager);
             mountData.mountEntity.SetRenderLayer(entityManager, renderLayer);
-            var mountAnimationData = entityManager.SetManagedComponent(mountData.mountEntity, new M2AnimationComponentData(value.model)
+            var mountAnimationData = entityManager.SetManagedComponent(mountData.mountEntity, new M2AnimationComponentData(mountModel)
             {
                 SetNewAnimation = 0,
-                _buffer = mountData.boneMatricesBuffer,
-                _colors = mountData.colorBuffer,
-                _textureTransforms = mountData.textureTransformsBuffer
+                BoneBase = mountBoneBase,
+                ColorBase = mountColorBase,
+                TexTransformBase = mountTexBase,
+                _boneCache = AnimationSystem.IdentityMatrix(mountModel.bones.Length).ToArray(),
+                _colorCache = AnimationSystem.IdentityColors(mountModel.colors.Length).ToArray(),
+                _texTransformCache = AnimationSystem.IdentityMatrix(mountModel.texture_transforms.Length + 1).ToArray(),
             });
             entityManager.AddComponent(mountData.mountEntity, new ShareRenderEnabledBit(){OtherEntity = WorldObjectEntity});
             entityManager.AddComponent(WorldObjectEntity, new ShareRenderEnabledBit(){OtherEntity = mountData.mountEntity});
             entityManager.AddManagedComponent(mountData.mountEntity, new MdxRenderer(value) { Owner = mountData.mountEntity });
-            MaterialInstanceRenderData itemMaterialInstanceRenderData = new MaterialInstanceRenderData();
-            itemMaterialInstanceRenderData.SetBuffer("boneMatrices", mountData.boneMatricesBuffer);
-            itemMaterialInstanceRenderData.SetBuffer("vertexColors", mountData.colorBuffer);
-            itemMaterialInstanceRenderData.SetBuffer("textureTransforms", mountData.textureTransformsBuffer);
-            entityManager.SetManagedComponent(mountData.mountEntity, itemMaterialInstanceRenderData);
             if (!isRenderingEnabled)
                 mountData.mountEntity.SetForceDisabledRendering(entityManager, true);
 
             foreach (var material in value.materials)
             {
-                var instanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
-
-                mountData.mountEntity.SetRenderer(entityManager, value.mesh, material.submesh, material.material, instanceData);
+                var instanceData = new Int4(
+                    material.batch.colorIndex < 0 ? -1 : mountColorBase + material.batch.colorIndex,
+                    material.batch.textureTransformIndex < 0 ? -1 : mountTexBase + material.batch.textureTransformIndex,
+                    material.batch.textureTransformIndex2 < 0 ? -1 : mountTexBase + material.batch.textureTransformIndex2,
+                    mountBoneBase);
+                mountData.mountEntity.SetRenderer(entityManager, value.mesh, material.submesh, OwnMaterial(material.material, mountData.materials), instanceData);
             }
 
             masterAnimation.AttachedTo = mountAnimationData;
@@ -304,27 +302,21 @@ public class CreatureInstance : WorldObjectInstance
         objectEntity.SetDirtyPosition(entityManager);
         objectEntity.SetRenderLayer(entityManager, renderLayer);
 
-        var boneMatricesBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
-        bonesBuffers.Add(boneMatricesBuffer);
-        boneMatricesBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(instance.model.bones.Length).Span);
-        var colorBuffer = gameContext.Engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
-        bonesBuffers.Add(colorBuffer);
-        colorBuffer.UpdateBuffer(AnimationSystem.IdentityColors(instance.model.colors.Length).Span);
-        var textureTransformsBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferPixelOnly, 1, BufferInternalFormat.Float4);
-        bonesBuffers.Add(textureTransformsBuffer);
-        textureTransformsBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(instance.model.texture_transforms.Length + 1).Span);
+        var animSystem = gameContext.AnimationSystem;
+        var model = instance.model;
+        var (boneBase, colorBase, texBase) = animSystem.AllocateAnimationSlots(model);
 
-        masterAnimation = new M2AnimationComponentData(instance.model)
+        masterAnimation = new M2AnimationComponentData(model)
         {
             SetNewAnimation = 0,
-            _buffer = boneMatricesBuffer,
-            _colors = colorBuffer,
-            _textureTransforms = textureTransformsBuffer,
+            BoneBase = boneBase,
+            ColorBase = colorBase,
+            TexTransformBase = texBase,
+            _boneCache = AnimationSystem.IdentityMatrix(model.bones.Length).ToArray(),
+            _colorCache = AnimationSystem.IdentityColors(model.colors.Length).ToArray(),
+            _texTransformCache = AnimationSystem.IdentityMatrix(model.texture_transforms.Length + 1).ToArray(),
         };
         entityManager.SetManagedComponent(objectEntity, masterAnimation);
-
-        // optimization here, we can share the render data, because we know all the materials will be the same shader
-        BaseMaterial = instance.materials[0].material;
 
         if (instance.attachments != null)
         {
@@ -332,19 +324,18 @@ public class CreatureInstance : WorldObjectInstance
                 AddAttachment(attachmentType, itemModel);
         }
 
-        materialInstanceRenderData = new MaterialInstanceRenderData();
-        materialInstanceRenderData.SetBuffer("boneMatrices", boneMatricesBuffer);
-        materialInstanceRenderData.SetBuffer("vertexColors", colorBuffer);
-        materialInstanceRenderData.SetBuffer("textureTransforms", textureTransformsBuffer);
-        entityManager.SetManagedComponent(objectEntity, materialInstanceRenderData);
-
         var mdxRenderer = new MdxRenderer(instance) { Owner = objectEntity };
         entityManager.SetManagedComponent(objectEntity, mdxRenderer);
         foreach (var material in instance.materials)
         {
-            var instanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
-
-            var rendererIndex = objectEntity.SetRenderer(entityManager, instance.mesh, material.submesh, material.material, instanceData,
+            var instanceData = new Int4(
+                material.batch.colorIndex < 0 ? -1 : colorBase + material.batch.colorIndex,
+                material.batch.textureTransformIndex < 0 ? -1 : texBase + material.batch.textureTransformIndex,
+                material.batch.textureTransformIndex2 < 0 ? -1 : texBase + material.batch.textureTransformIndex2,
+                boneBase);
+            var ownMaterial = OwnMaterial(material.material); // per-instance copy (dither etc. must not leak onto shared model materials)
+            BaseMaterial ??= ownMaterial;
+            var rendererIndex = objectEntity.SetRenderer(entityManager, instance.mesh, material.submesh, ownMaterial, instanceData,
                 hidden: !material.batch.activeByDefault);
             mdxRenderer.Geosets.Add((material.batch.geoset, rendererIndex));
         }
@@ -352,10 +343,20 @@ public class CreatureInstance : WorldObjectInstance
         var size = instance.mesh.Bounds.Size / 2;
         
         textEntity = gameContext.UiManager.DrawPersistentWorldText("calibri", new Vector2(0.5f, 0.5f), unitName, 0.25f, Matrix.Identity, 50);
+        entityManager.SetParent(textEntity, objectEntity);
         entityManager.AddComponent(textEntity, new CopyParentTransform(){Parent = objectEntity, Local = Matrix4x4.CreateTranslation(new Vector3(0, 0, size.Z))});
         entityManager.AddComponent(textEntity, new DirtyPosition(true));
         textEntity.SetRenderLayer(entityManager, renderLayer);
-        handles.Add(textEntity);
+
+        // status icons (quest !/?, gossip, AI) anchor above the nameplate. The nameplate renders
+        // ~[0.85, 1.15] local units ABOVE its own anchor (world_text.vert offsets glyphs by
+        // "1.0 - y"), and everything local is scaled by the entity transform - so the icon anchor
+        // (world space) is (name anchor + text extent + gap) * scale
+        if (creatureTemplate != null)
+        {
+            var worldScale = instance.scale * creatureTemplate.Scale;
+            gameContext.StatusIconsManager.Register(this, creatureTemplate, (size.Z + 1.25f) * worldScale);
+        }
     }
 
     private Entity chatEntity;
@@ -368,9 +369,9 @@ public class CreatureInstance : WorldObjectInstance
         var size = (Model.bounding_box.max.Z - Model.bounding_box.min.Z) / 2;
         chatEntity = gameContext.UiManager.DrawPersistentWorldText("calibri", new Vector2(0.5f, 0.5f), text, 0.25f, Matrix.Identity, 50,
             textType.GetTextColor(), new Vector4(0, 0, 0, 0.9f));
+        entityManager.SetParent(chatEntity, objectEntity);
         entityManager.AddComponent(chatEntity, new CopyParentTransform(){Parent = objectEntity, Local = Matrix4x4.CreateTranslation(new Vector3(0, 0, size))});
         entityManager.AddComponent(chatEntity, new DirtyPosition(true));
-        handles.Add(chatEntity);
     }
 
     private static string SplitLongText(string text)
@@ -417,7 +418,6 @@ public class CreatureInstance : WorldObjectInstance
         {
             var entityManager = gameContext.EntityManager;
             entityManager.DestroyEntity(chatEntity);
-            handles.Remove(chatEntity);
             chatEntity = Entity.Empty;
         }
     }
@@ -428,55 +428,57 @@ public class CreatureInstance : WorldObjectInstance
         var entityManager = gameContext.EntityManager;
         var archetypes = gameContext.Archetypes;
         
-        var itemBoneMatricesBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
-        bonesBuffers.Add(itemBoneMatricesBuffer);
-        itemBoneMatricesBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(itemModel.model.bones.Length).Span);
-        var itemColorBuffer = gameContext.Engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
-        bonesBuffers.Add(itemColorBuffer);
-        itemColorBuffer.UpdateBuffer(AnimationSystem.IdentityColors(itemModel.model.colors.Length).Span);
-        var itemTextureTransformsBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferPixelOnly, 1, BufferInternalFormat.Float4);
-        bonesBuffers.Add(itemTextureTransformsBuffer);
-        itemTextureTransformsBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(itemModel.model.texture_transforms.Length + 1).Span);
+        var itemAnimSystem = gameContext.AnimationSystem;
+        var itemM = itemModel.model;
+        var (itemBoneBase, itemColorBase, itemTexBase) = itemAnimSystem.AllocateAnimationSlots(itemM);
 
         var itemEntity = entityManager.CreateEntity(archetypes.AttachmentArchetype, $"Item of {unitName}");
+        entityManager.SetParent(itemEntity, objectEntity);
         itemEntity.SetCopyParentTransform(entityManager, objectEntity);
         itemEntity.SetDirtyPosition(entityManager);
         itemEntity.SetRenderLayer(entityManager, renderLayer);
-        entityManager.SetManagedComponent(itemEntity, new M2AnimationComponentData(itemModel.model, masterAnimation, attachmentType)
+        entityManager.SetManagedComponent(itemEntity, new M2AnimationComponentData(itemM, masterAnimation, attachmentType)
         {
             SetNewAnimation = 0,
-            _buffer = itemBoneMatricesBuffer,
-            _colors = itemColorBuffer,
-            _textureTransforms = itemTextureTransformsBuffer
+            BoneBase = itemBoneBase,
+            ColorBase = itemColorBase,
+            TexTransformBase = itemTexBase,
+            _boneCache = AnimationSystem.IdentityMatrix(itemM.bones.Length).ToArray(),
+            _colorCache = AnimationSystem.IdentityColors(itemM.colors.Length).ToArray(),
+            _texTransformCache = AnimationSystem.IdentityMatrix(itemM.texture_transforms.Length + 1).ToArray(),
         });
-        handles.Add(itemEntity);
-        MaterialInstanceRenderData itemMaterialInstanceRenderData = new MaterialInstanceRenderData();
-        itemMaterialInstanceRenderData.SetBuffer("boneMatrices", itemBoneMatricesBuffer);
-        itemMaterialInstanceRenderData.SetBuffer("vertexColors", itemColorBuffer);
-        itemMaterialInstanceRenderData.SetBuffer("textureTransforms", itemTextureTransformsBuffer);
-        entityManager.SetManagedComponent(itemEntity, itemMaterialInstanceRenderData);
         if (!isRenderingEnabled)
             itemEntity.SetForceDisabledRendering(entityManager, true);
 
         foreach (var material in itemModel.materials)
         {
-            var instanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
-            itemEntity.SetRenderer(entityManager, itemModel.mesh, material.submesh, material.material, instanceData);
+            var instanceData = new Int4(
+                material.batch.colorIndex < 0 ? -1 : itemColorBase + material.batch.colorIndex,
+                material.batch.textureTransformIndex < 0 ? -1 : itemTexBase + material.batch.textureTransformIndex,
+                material.batch.textureTransformIndex2 < 0 ? -1 : itemTexBase + material.batch.textureTransformIndex2,
+                itemBoneBase);
+            itemEntity.SetRenderer(entityManager, itemModel.mesh, material.submesh, OwnMaterial(material.material), instanceData);
         }
     }
 
     public async ValueTask SetVirtualItem(int slot, uint itemId, CancellationToken cancellationToken)
     {
-        if (itemId != 0 &&
-            gameContext.DbcManager.ItemStore.TryGetValue(itemId, out var item))
+        uint? itemDisplayInfo = null;
+        unsafe
         {
-            await SetVirtualItem(slot, item, cancellationToken);
+            if (itemId != 0 &&
+                gameContext.DbcManager.ItemStore.TryGetValue(itemId, out var item))
+            {
+                itemDisplayInfo = item->DisplayId;
+            }
         }
+        if (itemDisplayInfo.HasValue)
+            await SetVirtualItemDisplayId(slot, itemDisplayInfo.Value, cancellationToken);
     }
 
-    public async ValueTask SetVirtualItem(int slot, Item itemInfo, CancellationToken cancellationToken)
+    public async ValueTask SetVirtualItemDisplayId(int slot, uint itemDisplayInfo, CancellationToken cancellationToken)
     {
-        var weaponModel = await gameContext.MdxManager.LoadItemMesh(itemInfo.DisplayId, false, 0, 0);
+        var weaponModel = await gameContext.MdxManager.LoadItemMesh(itemDisplayInfo, false, 0, 0);
 
         if (weaponModel == null)
             return;
@@ -503,29 +505,21 @@ public class CreatureInstance : WorldObjectInstance
         Mdx = null;
         chatEntity = Entity.Empty;
         pendingMountDisplayId = 0; // to make sure we don't load mount model after dispose
-        
+
         var entityManager = gameContext.EntityManager;
 
-        mountData?.Destroy(entityManager);
+        gameContext.StatusIconsManager.Unregister(this);
 
-        foreach (var entity in handles)
-            entityManager.DestroyEntity(entity);
-
-        foreach (var collider in colliders)
-            entityManager.DestroyEntity(collider);
-        
-        colliders.Clear();
-        handles.Clear();
-        
-        foreach (var buf in bonesBuffers)
-        {
-            buf.Dispose();
-        }
-        
-        bonesBuffers.Clear();
-        
+        // mount, items, nametag and chat bubble are all parented to objectEntity, so destroying it cascades
         entityManager.DestroyEntity(objectEntity);
         objectEntity = Entity.Empty;
+
+        DisposeOwnedMaterials();
+        if (mountData != null)
+        {
+            DisposeMaterials(mountData.materials);
+            mountData = null;
+        }
     }
 
     private uint pendingMountDisplayId = 0;

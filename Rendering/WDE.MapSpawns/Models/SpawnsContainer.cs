@@ -19,10 +19,14 @@ public interface ISpawnsContainer
     PerChunkHolder<List<SpawnInstance>> SpawnsPerChunk { get; }
     FlatTreeList<SpawnEntry, SpawnInstance> Spawns { get; }
     void Clear();
+
+    /// <summary>Adds a spawn that doesn't come from the DB map load (e.g. one placed this session) into
+    /// the tree + per-chunk lists, so it behaves like any other spawn (selection, chunk unload, tree).</summary>
+    void AddExternalSpawn(SpawnInstance instance, ICreatureTemplate? creatureTemplate, IGameObjectTemplate? gameObjectTemplate);
+    /// <summary>Removes a spawn from the tree + per-chunk lists (does NOT dispose its world object).</summary>
+    void RemoveExternalSpawn(SpawnInstance instance);
 }
 
-[AutoRegister]
-[SingleInstance]
 public class SpawnsContainer : ISpawnsContainer
 {
     private readonly IDatabaseProvider databaseProvider;
@@ -34,7 +38,7 @@ public class SpawnsContainer : ISpawnsContainer
     public FlatTreeList<SpawnEntry, SpawnInstance> spawns;
     public PerChunkHolder<List<SpawnInstance>> SpawnsPerChunk => spawnsPerChunk;
     public FlatTreeList<SpawnEntry, SpawnInstance> Spawns => spawns;
-    
+
     public SpawnsContainer(IDatabaseProvider databaseProvider)
     {
         this.databaseProvider = databaseProvider;
@@ -71,6 +75,27 @@ public class SpawnsContainer : ISpawnsContainer
         entries.Clear();
         spawnsPerChunk.Clear();
         LoadedMap = null;
+    }
+
+    public void AddExternalSpawn(SpawnInstance instance, ICreatureTemplate? creatureTemplate, IGameObjectTemplate? gameObjectTemplate)
+    {
+        var type = instance is CreatureSpawnInstance ? SpawnType.Creature : SpawnType.GameObject;
+        var entry = entries.FirstOrDefault(e => e.Type == type && e.Entry == instance.Entry);
+        if (entry == null)
+        {
+            entry = creatureTemplate != null ? new SpawnEntry(creatureTemplate) : new SpawnEntry(gameObjectTemplate!);
+            entries.Add(entry);
+        }
+        entry.Spawns.Add(instance);
+        spawnsPerChunk[instance.Chunk]!.Add(instance);
+    }
+
+    public void RemoveExternalSpawn(SpawnInstance instance)
+    {
+        var type = instance is CreatureSpawnInstance ? SpawnType.Creature : SpawnType.GameObject;
+        var entry = entries.FirstOrDefault(e => e.Type == type && e.Entry == instance.Entry);
+        entry?.Spawns.Remove(instance);
+        spawnsPerChunk[instance.Chunk]?.Remove(instance);
     }
 
     private async Task LoadModelsTasks(int mapId)

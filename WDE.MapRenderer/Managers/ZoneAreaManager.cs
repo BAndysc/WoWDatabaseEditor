@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Diagnostics;
-using ImGuiNET;
+using System.Text;
+using Hexa.NET.ImGui;
 using WDE.Common.Services;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader;
@@ -121,9 +122,13 @@ public class ZoneAreaManager
 
         foreach (var map in mapStore)
         {
-            progress.Current = map.Name + " (" + map.Id + ")";
+            string fullName;
 
-            var fullName = gameFiles.Wdt(map.Directory);
+            unsafe
+            {
+                progress.Current = Encoding.UTF8.GetString(map->Name.AsSpan()) + " (" + map->Id + ")";
+                fullName = gameFiles.Wdt(map->Directory);
+            }
             PooledArray<byte>? wdtBytes;
             try
             {
@@ -143,12 +148,18 @@ public class ZoneAreaManager
             }
             
             ChunkAreas?[,] areas = new ChunkAreas?[64, 64];
-            areaTables[map.Id] = areas;
+            unsafe
+            {
+                areaTables[map->Id] = areas;
+            }
             
             var currentWdt = new FastWDTChunks(new MemoryBinaryReader(wdtBytes!));
             wdtBytes.Dispose();
 
-            binWriter.Write(map.Id);
+            unsafe
+            {
+                binWriter.Write(map->Id);
+            }
             var fileOffsetForCount = file.Position;
             int totalPresentChunks = 0;
             binWriter.Write((ushort)0);
@@ -160,7 +171,12 @@ public class ZoneAreaManager
                     progress.Done++;
                     if (currentWdt.Chunks[y][x])
                     {
-                        using var adtBytes = await gameFiles.ReadFile(gameFiles.Adt(map.Directory, x, y));
+                        string adtName;
+                        unsafe
+                        {
+                            adtName = gameFiles.Adt(map->Directory, x, y);
+                        }
+                        using var adtBytes = await gameFiles.ReadFile(adtName);
                         if (adtBytes != null)
                         {
                             var adt = new FastAdtAreaTable(new MemoryBinaryReader(adtBytes));

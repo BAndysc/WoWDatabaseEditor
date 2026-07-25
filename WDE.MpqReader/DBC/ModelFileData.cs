@@ -2,7 +2,7 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class ModelFileData
+public ref struct ModelFileData
 {
     public readonly int FileData;
     public readonly int ModelResourceId;

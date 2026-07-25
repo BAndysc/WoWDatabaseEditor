@@ -3,7 +3,7 @@ using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class Vehicle
+public ref struct Vehicle
 {
     public readonly int Id;
     public readonly int Seat0;

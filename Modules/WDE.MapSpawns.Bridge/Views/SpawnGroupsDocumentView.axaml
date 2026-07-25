@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:WDE.MapSpawns.Bridge.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="450"
+             x:DataType="vm:SpawnGroupsDocumentViewModel"
+             x:Class="WDE.MapSpawns.Bridge.Views.SpawnGroupsDocumentView">
+    <DockPanel Margin="10">
+        <Border DockPanel.Dock="Top" Background="#334090E0" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+            <TextBlock TextWrapping="Wrap"
+                       Text="Read-only preview. Spawn groups are edited in the 3D map view: open the map, pick the Spawn group tool and manage groups from there." />
+        </Border>
+
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{CompiledBinding Groups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SpawnGroupViewModel">
+                        <Expander Header="{CompiledBinding Header}" IsExpanded="True" Margin="0,0,0,6" HorizontalAlignment="Stretch">
+                            <StackPanel>
+                                <Grid ColumnDefinitions="120,100" Margin="4,2">
+                                    <TextBlock Grid.Column="0" Text="Type" FontWeight="Bold" />
+                                    <TextBlock Grid.Column="1" Text="Guid" FontWeight="Bold" />
+                                </Grid>
+                                <ItemsControl ItemsSource="{CompiledBinding Members}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:SpawnGroupMemberRowViewModel">
+                                            <Grid ColumnDefinitions="120,100" Margin="4,1">
+                                                <TextBlock Grid.Column="0" Text="{CompiledBinding Type}" />
+                                                <TextBlock Grid.Column="1" Text="{CompiledBinding Guid}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

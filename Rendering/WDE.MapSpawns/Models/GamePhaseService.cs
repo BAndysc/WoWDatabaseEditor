@@ -32,15 +32,21 @@ public class GamePhaseService : IGamePhaseService
     public ObservableCollection<GamePhaseViewModel> ActivePhases { get; } = new();
     public IObservable<IReadOnlyList<GamePhaseViewModel>> ActivePhasesObservable { get; }
 
+    // IsPhaseActive is called every frame from the game thread while Active toggles/DBC loads
+    // mutate ActivePhases on the UI thread - the game thread must only read this immutable snapshot
+    private volatile GamePhaseViewModel[] activePhasesSnapshot = [];
+
     public bool IsPhaseActive(SmallReadOnlyList<int>? phaseIds, int? phaseGroup)
     {
+        var activePhases = activePhasesSnapshot;
+
         if (!phaseIds.HasValue && !phaseGroup.HasValue)
             return true;
 
         if (phaseGroup.HasValue)
         {
             if (phaseGroup == 0)
-                return ActivePhases.Count == 0;
+                return activePhases.Length == 0;
 
             var phaseGroupEntry = phaseStore.GetPhaseXPhaseGroupById(phaseGroup.Value);
 
@@ -48,7 +54,7 @@ public class GamePhaseService : IGamePhaseService
                 return false;
 
             foreach (var phaseId in phaseGroupEntry.Phases)
-                if (ActivePhases.Any(x => x.Entry == phaseId))
+                if (activePhases.Any(x => x.Entry == phaseId))
                     return true;
 
             return false;
@@ -58,12 +64,12 @@ public class GamePhaseService : IGamePhaseService
         {
             if (phaseIds.Value.Count == 0 || phaseIds.Value is [0])
             {
-                return ActivePhases.Count == 0;
+                return activePhases.Length == 0;
             }
             else
             {
                 foreach (var phaseId in phaseIds)
-                    if (ActivePhases.Any(x => x.Entry == phaseId))
+                    if (activePhases.Any(x => x.Entry == phaseId))
                         return true;
                 return false;
             }
@@ -89,46 +95,43 @@ public class GamePhaseService : IGamePhaseService
         {
             DbcLoaded(dbcStore);
             eventAggregator.GetEvent<DbcLoadedEvent>().Subscribe(DbcLoaded);
-            BindPhases();
         }
         else
         {
             foreach (var phaseMask in Enum.GetValues<InGamePhase>())
-                Phases.Add(new GamePhaseViewModel((uint)phaseMask, ""));
-            BindPhases();
+                AddPhase(new GamePhaseViewModel((uint)phaseMask, ""));
             Phases[0].Active = true;
         }
     }
-    
+
     private void DbcLoaded(IDbcStore dbcStore)
     {
         foreach (var phase in dbcStore.PhaseStore)
         {
-            Phases.Add(new GamePhaseViewModel((uint)phase.Key, phase.Value));
+            AddPhase(new GamePhaseViewModel((uint)phase.Key, phase.Value));
         }
-
-        BindPhases();
     }
 
-    private void BindPhases()
+    // binds exactly the added phase - binding all Phases here again would duplicate
+    // the Active handlers on every DbcLoaded
+    private void AddPhase(GamePhaseViewModel e)
     {
-        foreach (var e in Phases)
-        {
-            e.ToObservable(x => x.Active)
-                .Skip(1)
-                .SubscribeAction(@is =>
+        Phases.Add(e);
+        e.ToObservable(x => x.Active)
+            .Skip(1)
+            .SubscribeAction(@is =>
+            {
+                if (@is)
                 {
-                    if (@is)
-                    {
-                        activePhaseMask |= e.Entry;
-                        ActivePhases.Add(e);
-                    }
-                    else
-                    {
-                        activePhaseMask &= ~e.Entry;
-                        ActivePhases.Remove(e);
-                    }
-                });
-        }
+                    activePhaseMask |= e.Entry;
+                    ActivePhases.Add(e);
+                }
+                else
+                {
+                    activePhaseMask &= ~e.Entry;
+                    ActivePhases.Remove(e);
+                }
+                activePhasesSnapshot = ActivePhases.ToArray();
+            });
     }
 }

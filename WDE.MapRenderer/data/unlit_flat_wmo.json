@@ -3,7 +3,6 @@
     "Path": "data/unlit_flat_wmo.frag"
   },
   "ZWrite": true,
-  "Instancing": true,
   "Vertex": {
     "Path": "data/unlit_flat_wmo.vert",
     "Input": [

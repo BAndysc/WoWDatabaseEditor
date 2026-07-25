@@ -1,4 +1,4 @@
-using ImGuiNET;
+using Hexa.NET.ImGui;
 using System.Collections;
 using TheEngine;
 using TheEngine.Interfaces;
@@ -72,15 +72,15 @@ public class LoadingManager : IDisposable
         this.loadingNotificationBox = new SimpleBox(engine, BoxPlacement.BottomCenter);
     }
 
-    public void Update(float delta)
+    public unsafe void Update(float delta)
     {
         if (!gameProperties.LoadWorld)
         {
             return;
         }
-        if (currentLoadedMap != gameContext.CurrentMap.Id)
+        if (gameContext.CurrentMap != null && currentLoadedMap != gameContext.CurrentMap->Id)
         {
-            currentLoadedMap = gameContext.CurrentMap.Id;
+            currentLoadedMap = gameContext.CurrentMap->Id;
             var oldLoadingToken = loadingToken;
             loadingToken = new LoadingToken();
             LoadingCoroutine(currentLoadedMap.Value, oldLoadingToken, loadingToken).FireAndForget();

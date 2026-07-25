@@ -3,7 +3,7 @@ using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class CharacterFacialHairStyles
+public ref struct CharacterFacialHairStyles
 {
     // public readonly uint Id; // deosn't exist in dbc
     public readonly int RaceID;
@@ -42,7 +42,7 @@ public class CharacterFacialHairStyles
         Geoset5 = dbcIterator.GetInt("Geoset", 4);
     }
 
-    private CharacterFacialHairStyles()
+    public CharacterFacialHairStyles()
     {
         // Id = 0;
         RaceID = 0;
