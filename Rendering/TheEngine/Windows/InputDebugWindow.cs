@@ -77,7 +77,7 @@ public class InputDebugWindow
 
         ImGui.Columns(1);
         ImGui.PushFont(boldFont, 0);
-        ImGui.TextUnformatted("Game view:");
+        ImGui.TextUnformatted("Game view:"u8);
         ImGui.PopFont();
         ImGui.Columns(2);
 
@@ -123,7 +123,7 @@ public class InputDebugWindow
 
         ImGui.Columns(1);
         ImGui.PushFont(boldFont, 0);
-        ImGui.TextUnformatted("Raw events:");
+        ImGui.TextUnformatted("Raw events:"u8);
         ImGui.PopFont();
         ImGui.Columns(2);
 

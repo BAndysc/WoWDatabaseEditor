@@ -17,12 +17,12 @@ public class DecalInspector : IRefInspectorDrawer<Decal>
 
     public void Draw(Entity entity, ref Decal component)
     {
-        ImGui.Columns(2, "decal", false);
+        ImGui.Columns(2, "decal"u8, false);
 
         ImGuiEx.TextUnformatted("Is Enabled\0"u8);
         ImGui.NextColumn();
         bool enabled = !component.Disabled;
-        if (ImGui.Checkbox("##enabled", ref enabled))
+        if (ImGui.Checkbox("##enabled"u8, ref enabled))
         {
             component.Disabled = !enabled;
         }
@@ -35,7 +35,7 @@ public class DecalInspector : IRefInspectorDrawer<Decal>
 
         ImGuiEx.TextUnformatted("Fade Angle\0"u8);
         ImGui.NextColumn();
-        ImGui.SliderFloat("##FadeAngleCos", ref component.FadeAngleCos, 0, 1);
+        ImGui.SliderFloat("##FadeAngleCos"u8, ref component.FadeAngleCos, 0, 1);
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Albedo\0"u8);

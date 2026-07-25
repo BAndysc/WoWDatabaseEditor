@@ -39,8 +39,8 @@ internal class DebugViewToolbar
             ImGui.PopStyleColor();
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip(own
-                ? "Scene view culls with its own camera"
-                : "Scene view shows what the game view renders");
+                ? "Scene view culls with its own camera"u8
+                : "Scene view shows what the game view renders"u8);
     }
 
     // Color RGB-axis icons loaded once from icons/*.png and shown on the gizmo-mode buttons.

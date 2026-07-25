@@ -9,26 +9,26 @@ public class DrawTextDataInspector : IInspectorDrawer<UIManager.DrawTextData>
 {
     public void Draw(UIManager.DrawTextData component)
     {
-        ImGui.Columns(2, "drawtextdata_inspector", false);
+        ImGui.Columns(2, "drawtextdata_inspector"u8, false);
 
         ImGuiEx.TextUnformatted("Font\0"u8);
         ImGui.NextColumn();
         var font = component.font ?? "";
-        if (ImGui.InputText("##font", ref font, 256))
+        if (ImGui.InputText("##font"u8, ref font, 256))
             component.font = font;
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Text\0"u8);
         ImGui.NextColumn();
         var text = component.text ?? "";
-        if (ImGui.InputText("##text", ref text, 1024))
+        if (ImGui.InputText("##text"u8, ref text, 1024))
             component.text = text;
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Font Size\0"u8);
         ImGui.NextColumn();
         var fontSize = component.fontSize;
-        if (ImGui.InputFloat("##fontSize", ref fontSize, 0.5f, 1.0f))
+        if (ImGui.InputFloat("##fontSize"u8, ref fontSize, 0.5f, 1.0f))
             component.fontSize = fontSize;
         ImGui.NextColumn();
 
@@ -42,7 +42,7 @@ public class DrawTextDataInspector : IInspectorDrawer<UIManager.DrawTextData>
         ImGuiEx.TextUnformatted("Visibility Distance\0"u8);
         ImGui.NextColumn();
         var visDist = MathF.Sqrt(component.visibilityDistanceSquare);
-        if (ImGui.InputFloat("##visDist", ref visDist, 1f, 10f))
+        if (ImGui.InputFloat("##visDist"u8, ref visDist, 1f, 10f))
             component.visibilityDistanceSquare = visDist * visDist;
         ImGui.NextColumn();
 
@@ -54,7 +54,7 @@ public class DrawTextDataInspector : IInspectorDrawer<UIManager.DrawTextData>
         ImGuiEx.TextUnformatted("Background Color\0"u8);
         ImGui.NextColumn();
         bool hasBackground = component.backgroundColor.HasValue;
-        if (ImGui.Checkbox("##hasBg", ref hasBackground))
+        if (ImGui.Checkbox("##hasBg"u8, ref hasBackground))
             component.backgroundColor = hasBackground ? Vector4.One : null;
         if (component.backgroundColor.HasValue)
         {

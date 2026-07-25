@@ -107,24 +107,24 @@ public class WorldMapGameModule : IGameModule
         RefreshCurrentMapTiles();
 
         ImGui.SetNextWindowSize(new Vector2(700, 740), ImGuiCond.FirstUseEver);
-        if (ImGui.Begin("Map", ref mapOpened))
+        if (ImGui.Begin("Map"u8, ref mapOpened))
         {
             ImGui.SetNextItemWidth(180);
-            ImGui.SliderFloat("##zoom", ref tileSize, MinTileSize, MaxTileSize, "%.0f px / tile", ImGuiSliderFlags.Logarithmic);
+            ImGui.SliderFloat("##zoom"u8, ref tileSize, MinTileSize, MaxTileSize, "%.0f px / tile"u8, ImGuiSliderFlags.Logarithmic);
             ImGui.SameLine();
-            if (ImGui.Button("Center on camera"))
+            if (ImGui.Button("Center on camera"u8))
                 centerOnCameraRequest = true;
             if (trsLoadTask is { IsCompleted: false })
             {
                 ImGui.SameLine();
-                ImGui.TextDisabled("(loading minimaps...)");
+                ImGui.TextDisabled("(loading minimaps...)"u8);
             }
 
             bool hoverValid = false;
             Vector2 hoverWow = default;
             int hoverTileX = 0, hoverTileY = 0;
 
-            if (ImGui.BeginChild("##worldmap", new Vector2(0, -ImGui.GetFrameHeightWithSpacing()),
+            if (ImGui.BeginChild("##worldmap"u8, new Vector2(0, -ImGui.GetFrameHeightWithSpacing()),
                     ImGuiChildFlags.None,
                     ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoScrollWithMouse))
             {
@@ -137,7 +137,7 @@ public class WorldMapGameModule : IGameModule
                     MathF.Max(0, (viewSize.Y - canvasSize.Y) * 0.5f));
                 ImGui.SetCursorPos(ImGui.GetCursorPos() + centerPadding);
                 var origin = ImGui.GetCursorScreenPos();
-                ImGui.InvisibleButton("##canvas", canvasSize);
+                ImGui.InvisibleButton("##canvas"u8, canvasSize);
                 bool hovered = ImGui.IsItemHovered();
                 bool active = ImGui.IsItemActive();
 
@@ -244,7 +244,7 @@ public class WorldMapGameModule : IGameModule
                 }
             }
             else
-                ImGui.TextDisabled("scroll = zoom, drag = pan, click = teleport");
+                ImGui.TextDisabled("scroll = zoom, drag = pan, click = teleport"u8);
         }
         ImGui.End();
     }

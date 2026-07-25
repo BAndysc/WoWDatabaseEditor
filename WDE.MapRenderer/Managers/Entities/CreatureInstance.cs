@@ -79,7 +79,7 @@ public class MdxRendererInspector : IInspectorDrawer<MdxRenderer>
             }
         }
 
-        if (ImGui.CollapsingHeader("M2"))
+        if (ImGui.CollapsingHeader("M2"u8))
         {
             entityInspector.DrawInspector(component.Model);
         }

@@ -70,7 +70,7 @@ public class GameViewNotifications
         if (active.Count == 0)
             return;
 
-        if (!ImGui.Begin("3D"))
+        if (!ImGui.Begin("3D"u8))
         {
             ImGui.End();
             return;
@@ -121,7 +121,7 @@ public class GameViewNotifications
             ImGui.PopTextWrapPos();
 
             if (hovered)
-                ImGui.SetTooltip("Click to dismiss");
+                ImGui.SetTooltip("Click to dismiss"u8);
 
             // clicks on a toast must not fall through into the world underneath
             engine.GameView.BlockClicksOver(new RectangleF(min.X, min.Y, size.X, size.Y));

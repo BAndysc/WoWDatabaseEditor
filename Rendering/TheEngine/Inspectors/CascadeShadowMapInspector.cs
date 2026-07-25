@@ -47,11 +47,11 @@ public class CascadeShadowMapInspector : IRefInspectorDrawer<CascadeShadowMap>
 
         bool changed = false;
 
-        ImGui.Columns(2, "cascadeShadowMap", false);
+        ImGui.Columns(2, "cascadeShadowMap"u8, false);
 
         Label("Is Enabled\0"u8);
         bool enabled = !component.Disabled;
-        if (ImGui.Checkbox("##enabled", ref enabled))
+        if (ImGui.Checkbox("##enabled"u8, ref enabled))
             component.Disabled = !enabled;
         ImGui.NextColumn();
 
@@ -76,70 +76,70 @@ public class CascadeShadowMapInspector : IRefInspectorDrawer<CascadeShadowMap>
 
         Label("Max Distance\0"u8);
         ImGui.SetNextItemWidth(-1);
-        if (ImGui.DragFloat("##maxDistance", ref maxDistance, 1f, 1f, 5000f))
+        if (ImGui.DragFloat("##maxDistance"u8, ref maxDistance, 1f, 1f, 5000f))
             changed = true;
         ImGui.NextColumn();
 
         // each inner split is clamped to (previous, next) so they can never cross or leave [0,100]
         Label("Split 1 (%)\0"u8);
         ImGui.SetNextItemWidth(-1);
-        if (ImGui.SliderFloat("##split1", ref p1, 0.1f, p2 - 0.1f))
+        if (ImGui.SliderFloat("##split1"u8, ref p1, 0.1f, p2 - 0.1f))
             changed = true;
         ImGui.NextColumn();
 
         Label("Split 2 (%)\0"u8);
         ImGui.SetNextItemWidth(-1);
-        if (ImGui.SliderFloat("##split2", ref p2, p1 + 0.1f, p3 - 0.1f))
+        if (ImGui.SliderFloat("##split2"u8, ref p2, p1 + 0.1f, p3 - 0.1f))
             changed = true;
         ImGui.NextColumn();
 
         Label("Split 3 (%)\0"u8);
         ImGui.SetNextItemWidth(-1);
-        if (ImGui.SliderFloat("##split3", ref p3, p2 + 0.1f, 99.9f))
+        if (ImGui.SliderFloat("##split3"u8, ref p3, p2 + 0.1f, 99.9f))
             changed = true;
         ImGui.NextColumn();
 
         Label("Caster Extrusion\0"u8);
         ImGui.SetNextItemWidth(-1);
-        if (ImGui.SliderFloat("##casterExtrusion", ref component.CasterExtrusion, 0f, 500f))
+        if (ImGui.SliderFloat("##casterExtrusion"u8, ref component.CasterExtrusion, 0f, 500f))
             changed = true;
         ImGui.NextColumn();
 
         Label("Depth Bias (const)\0"u8);
         ImGui.SetNextItemWidth(-1);
-        ImGui.SliderFloat("##depthBiasConstant", ref component.DepthBiasConstant, 0f, 8f);
+        ImGui.SliderFloat("##depthBiasConstant"u8, ref component.DepthBiasConstant, 0f, 8f);
         ImGui.NextColumn();
 
         Label("Depth Bias (slope)\0"u8);
         ImGui.SetNextItemWidth(-1);
-        ImGui.SliderFloat("##depthBiasSlope", ref component.DepthBiasSlope, 0f, 8f);
+        ImGui.SliderFloat("##depthBiasSlope"u8, ref component.DepthBiasSlope, 0f, 8f);
         ImGui.NextColumn();
 
         Label("Normal Bias\0"u8);
         ImGui.SetNextItemWidth(-1);
-        ImGui.SliderFloat("##normalBias", ref component.NormalBias, 0f, 0.5f);
+        ImGui.SliderFloat("##normalBias"u8, ref component.NormalBias, 0f, 0.5f);
         ImGui.NextColumn();
 
         Label("Constant Bias\0"u8);
         ImGui.SetNextItemWidth(-1);
         // world units along the light (converted per cascade in the shader)
-        ImGui.SliderFloat("##constantBias", ref component.ConstantBias, 0f, 1f);
+        ImGui.SliderFloat("##constantBias"u8, ref component.ConstantBias, 0f, 1f);
         ImGui.NextColumn();
 
         // PCF blur: radius is the kernel half-size (0 = hard shadows), blur the per-tap spacing.
         Label("PCF Radius\0"u8);
         ImGui.SetNextItemWidth(-1);
-        ImGui.SliderInt("##pcfRadius", ref component.PcfRadius, 0, 4);
+        ImGui.SliderInt("##pcfRadius"u8, ref component.PcfRadius, 0, 4);
         ImGui.NextColumn();
 
         Label("Blur\0"u8);
         ImGui.SetNextItemWidth(-1);
-        ImGui.SliderFloat("##blur", ref component.Blur, 0f, 4f);
+        ImGui.SliderFloat("##blur"u8, ref component.Blur, 0f, 4f);
         ImGui.NextColumn();
 
         Label("Cascade Blend\0"u8);
         ImGui.SetNextItemWidth(-1);
-        ImGui.SliderFloat("##cascadeBlend", ref component.CascadeBlend, 0f, 0.5f);
+        ImGui.SliderFloat("##cascadeBlend"u8, ref component.CascadeBlend, 0f, 0.5f);
         ImGui.NextColumn();
 
         ImGui.Columns(1);

@@ -126,7 +126,7 @@ public class SpawnsTreeWindow
         if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
             SetContextRequest(false, null);
 
-        if (!ImGui.Begin("Spawns"))
+        if (!ImGui.Begin("Spawns"u8))
         {
             ImGui.End();
             return;
@@ -192,7 +192,7 @@ public class SpawnsTreeWindow
             else if (buildError != null)
                 ImGui.TextColored(new Vector4(1, 0.4f, 0.4f, 1), buildError);
             else
-                ImGui.TextUnformatted("Press Load to build the spawns tree.");
+                ImGui.TextUnformatted("Press Load to build the spawns tree."u8);
             ImGui.End();
             return;
         }
@@ -209,14 +209,14 @@ public class SpawnsTreeWindow
         }
 
         ImGui.SetNextItemWidth(search.Length > 0 ? -28f : -1f);
-        if (ImGui.InputTextWithHint("##treesearch", "name / entry / #guid / zone or map (id)", ref search, 256))
+        if (ImGui.InputTextWithHint("##treesearch"u8, "name / entry / #guid / zone or map (id)"u8, ref search, 256))
             searchDebounceLeft = SearchDebounceSeconds;
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Words match independently against names, entries, #guid\nand zone/area/map names or ids");
+            ImGui.SetTooltip("Words match independently against names, entries, #guid\nand zone/area/map names or ids"u8);
         if (search.Length > 0)
         {
             ImGui.SameLine();
-            if (ImGui.Button("x##clearsearch", new Vector2(22, 0)))
+            if (ImGui.Button("x##clearsearch"u8, new Vector2(22, 0)))
                 search = ""; // the empty filter applies instantly below
         }
 
@@ -288,7 +288,7 @@ public class SpawnsTreeWindow
                 expandChanged = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Expand all");
+                ImGui.SetTooltip("Expand all"u8);
             ImGui.SameLine(0, 2);
             if (ImGui.Button($"{Lucide.ChevronsDownUp}##collapseall"))
             {
@@ -304,7 +304,7 @@ public class SpawnsTreeWindow
                 expandChanged = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Collapse all (back to the map list)");
+                ImGui.SetTooltip("Collapse all (back to the map list)"u8);
             ImGui.SameLine(0, 2);
             // index loop, not List.Find(lambda): this runs every frame and the closure over loadedMap
             // allocated a Predicate<SpawnTreeNode> + closure per frame
@@ -321,23 +321,23 @@ public class SpawnsTreeWindow
                 }
             }
             ImGui.BeginDisabled(loadedMapNode == null);
-            if (ImGui.Button("@##locatemap") && loadedMapNode != null)
+            if (ImGui.Button("@##locatemap"u8) && loadedMapNode != null)
                 RevealNode(loadedMapNode);
             ImGui.EndDisabled();
             if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
                 ImGui.SetTooltip(loadedMapNode != null
-                    ? "Scroll to the loaded map"
-                    : "No map is loaded in the 3D view");
+                    ? "Scroll to the loaded map"u8
+                    : "No map is loaded in the 3D view"u8);
 
             ImGui.SameLine(0, 8);
-            if (ImGui.Checkbox("This map only", ref onlyLoadedMap))
+            if (ImGui.Checkbox("This map only"u8, ref onlyLoadedMap))
             {
                 flatDirty = true;
                 bool value = onlyLoadedMap;
                 mainThread.Dispatch(() => treeSettings.SaveOnlyLoadedMap(value));
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Hide every map except the one loaded in the 3D view");
+                ImGui.SetTooltip("Hide every map except the one loaded in the 3D view"u8);
 
             if (searching)
             {
@@ -370,9 +370,9 @@ public class SpawnsTreeWindow
 
         ImGui.SameLine();
         if (ImGui.Button(phasesButtonLabel))
-            ImGui.OpenPopup("##phasespopup");
+            ImGui.OpenPopup("##phasespopup"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Which in-game phases the 3D view shows\n(spawns outside the active phases are hidden)");
+            ImGui.SetTooltip("Which in-game phases the 3D view shows\n(spawns outside the active phases are hidden)"u8);
 
         if (ImGuiEx.BeginPopup("##phasespopup"))
         {
@@ -414,10 +414,10 @@ public class SpawnsTreeWindow
         var arrowSize = ImGui.GetFrameHeight();
         var indentStep = arrowSize;
         var lineHeight = arrowSize; // arrow box is the tallest per-row item -> real row pitch
-        var baseX = ImGui.GetCursorPosX();
 
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 0));
-        ImGui.BeginChild("items", ImGui.GetContentRegionAvail(), ImGuiChildFlags.None, ImGuiWindowFlags.HorizontalScrollbar);
+        ImGui.BeginChild("items"u8, ImGui.GetContentRegionAvail(), ImGuiChildFlags.None, ImGuiWindowFlags.HorizontalScrollbar);
+        var baseX = ImGui.GetCursorPosX(); // INSIDE the child - the parent's cursor X would offset every row
 
         // scroll a freshly revealed node (from an external 3D selection) into view
         if (pendingScrollNode != null)
@@ -432,7 +432,13 @@ public class SpawnsTreeWindow
             pendingScrollNode = null;
         }
 
-        var rowBgWidth = ImGui.GetWindowWidth();
+        // rows span exactly the content width (visible + scrolled-away part) so the hit target
+        // itself never widens the content: the horizontal scrollbar must appear only when the
+        // expanded tree's LABELS are really wider than the window (GetWindowWidth would include
+        // padding + the vertical scrollbar and permanently overflow by that much); avail is
+        // measured from the scroll-shifted cursor, so GetScrollX must come back out or scrolling
+        // right would grow the content it scrolls over
+        var rowBgWidth = ImGui.GetContentRegionAvail().X - ImGui.GetScrollX() + ImGui.GetScrollMaxX();
         var drawList = ImGui.GetWindowDrawList();
         var iconSize = ImGui.GetFontSize();
 
@@ -452,7 +458,7 @@ public class SpawnsTreeWindow
                 bool isSelected = ReferenceEquals(node, selected);
                 ImGui.SetCursorPosX(baseX);
                 ImGui.SetNextItemAllowOverlap();
-                if (ImGui.Selectable("##row", isSelected, ImGuiSelectableFlags.SpanAllColumns, new Vector2(rowBgWidth, lineHeight)))
+                if (ImGui.Selectable("##row"u8, isSelected, ImGuiSelectableFlags.SpanAllColumns, new Vector2(rowBgWidth, lineHeight)))
                     Select(node);
                 if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                     Activate(node);
@@ -473,7 +479,7 @@ public class SpawnsTreeWindow
                 if (node.HasChildren)
                 {
                     bool open = EffectiveOpen(node);
-                    ImGui.InvisibleButton("##exp", new Vector2(arrowSize, arrowSize));
+                    ImGui.InvisibleButton("##exp"u8, new Vector2(arrowSize, arrowSize));
                     var col = ImGui.GetColorU32(ImGui.IsItemHovered() ? ImGuiCol.Text : ImGuiCol.TextDisabled);
                     var glyphPos = arrowPos + new Vector2(0, (arrowSize - ImGui.GetFontSize()) * 0.5f);
                     ImGuiP.RenderArrow(drawList, glyphPos, col, open ? ImGuiDir.Down : ImGuiDir.Right);
@@ -735,13 +741,13 @@ public class SpawnsTreeWindow
                 ImGui.TextColored(new Vector4(0.70f, 0.55f, 0.95f, 0.9f), tooltipPool);
         }
         else if (node.PoolId != 0)
-            ImGui.TextDisabled("Display-only: the pool rolls every spawn of this entry,\nso there is no single position to navigate to");
+            ImGui.TextDisabled("Display-only: the pool rolls every spawn of this entry,\nso there is no single position to navigate to"u8);
         if (tooltipAncestry != null)
             ImGui.TextDisabled(tooltipAncestry);
         if (node.IsLeaf)
             ImGui.TextDisabled(node.Map == spawnsContainer.LoadedMap
-                ? "Double-click: fly the camera there"
-                : "Double-click: load the map and fly there");
+                ? "Double-click: fly the camera there"u8
+                : "Double-click: load the map and fly there"u8);
         ImGui.EndTooltip();
     }
 

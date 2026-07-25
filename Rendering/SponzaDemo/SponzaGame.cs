@@ -630,7 +630,7 @@ public class SponzaGame : IGame
     {
         // the engine boots with the Scene View tab focused; the captures are of the game
         // view ("3D" tab), which only renders while its tab is visible
-        ImGui.SetWindowFocus("3D");
+        ImGui.SetWindowFocus("3D"u8);
 
         if (replayIndex == -1)
         {

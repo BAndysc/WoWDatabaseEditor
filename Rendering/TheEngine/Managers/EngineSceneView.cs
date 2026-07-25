@@ -196,20 +196,20 @@ internal class EngineSceneView : BaseBaseView
             : (ITexture?)engine.renderManager.sceneViewOpaqueTexture2D;
         BeginWindow("Scene View\0"u8, display?.Handle.ToRawIntPtr() ?? IntPtr.Zero, false);
 
-        if (ImGui.BeginPopupContextItem("##scene_context"))
+        if (ImGui.BeginPopupContextItem("##scene_context"u8))
         {
-            if (ImGui.BeginMenu("Add"))
+            if (ImGui.BeginMenu("Add"u8))
             {
-                if (ImGui.MenuItem("Empty Entity"))
+                if (ImGui.MenuItem("Empty Entity"u8))
                     SpawnEmptyEntity();
-                if (ImGui.MenuItem("Cube"))
+                if (ImGui.MenuItem("Cube"u8))
                     SpawnPrimitive(PrimitiveType.Cube);
-                if (ImGui.MenuItem("Sphere"))
+                if (ImGui.MenuItem("Sphere"u8))
                     SpawnPrimitive(PrimitiveType.Sphere);
                 ImGui.Separator();
-                if (ImGui.MenuItem("Point Light"))
+                if (ImGui.MenuItem("Point Light"u8))
                     SpawnLight(LightType.Point);
-                if (ImGui.MenuItem("Directional Light"))
+                if (ImGui.MenuItem("Directional Light"u8))
                     SpawnLight(LightType.Directional);
                 ImGui.EndMenu();
             }
@@ -226,7 +226,7 @@ internal class EngineSceneView : BaseBaseView
 
         // offset past the docking tab bar (see DebugViewToolbar)
         ImGui.SetCursorPos(new Vector2(10, ImGui.GetCursorStartPos().Y + 10));
-        if (ImGui.Button("sync camera"))
+        if (ImGui.Button("sync camera"u8))
         {
             position = engine.cameraManger.MainCamera.Transform.Position;
         }

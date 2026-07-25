@@ -82,9 +82,9 @@ public class ZoneAreaManager
             return;
 
         ImGui.SetNextWindowSize(new Vector2(400, 170), ImGuiCond.Always);
-        ImGui.Begin("First time data generation");
+        ImGui.Begin("First time data generation"u8);
         
-        ImGui.TextWrapped("This is the first time you've opened the 3D view, the editor needs to process the files first.\n\nIt will take few minutes, but I promise, it has to be done only once!");
+        ImGui.TextWrapped("This is the first time you've opened the 3D view, the editor needs to process the files first.\n\nIt will take few minutes, but I promise, it has to be done only once!"u8);
 
         var frac = progress.Done * 1.0f / progress.Total;
         ImGui.ProgressBar(frac, new Vector2(-1, 0), $"{frac*100:0.00}%");

@@ -10,7 +10,7 @@ public class RigidBodyInspector : IRefInspectorDrawer<RigidBody>
 {
     public void Draw(Entity entity, ref RigidBody component)
     {
-        ImGui.Columns(2, "rigidbody", false);
+        ImGui.Columns(2, "rigidbody"u8, false);
 
         ImGuiEx.TextUnformatted("Type\0"u8);
         ImGui.NextColumn();
@@ -27,22 +27,22 @@ public class RigidBodyInspector : IRefInspectorDrawer<RigidBody>
 
         ImGuiEx.TextUnformatted("Mass\0"u8);
         ImGui.NextColumn();
-        ImGui.DragFloat("##Mass", ref component.Mass, 0.05f, 0.001f, 10000f);
+        ImGui.DragFloat("##Mass"u8, ref component.Mass, 0.05f, 0.001f, 10000f);
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Linear Damping\0"u8);
         ImGui.NextColumn();
-        ImGui.SliderFloat("##LinearDamping", ref component.LinearDamping, 0, 1);
+        ImGui.SliderFloat("##LinearDamping"u8, ref component.LinearDamping, 0, 1);
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Angular Damping\0"u8);
         ImGui.NextColumn();
-        ImGui.SliderFloat("##AngularDamping", ref component.AngularDamping, 0, 1);
+        ImGui.SliderFloat("##AngularDamping"u8, ref component.AngularDamping, 0, 1);
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Gravity Scale\0"u8);
         ImGui.NextColumn();
-        ImGui.DragFloat("##GravityScale", ref component.GravityScale, 0.05f, -10f, 10f);
+        ImGui.DragFloat("##GravityScale"u8, ref component.GravityScale, 0.05f, -10f, 10f);
         ImGui.NextColumn();
 
         ImGui.Columns(1);

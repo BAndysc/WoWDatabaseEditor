@@ -10,7 +10,7 @@ public class CameraInspector : IInspectorDrawer<Camera>
 {
     public void Draw(Camera component)
     {
-        ImGui.Columns(2, "camera_inspector", false);
+        ImGui.Columns(2, "camera_inspector"u8, false);
 
         ImGuiEx.TextUnformatted("Transform\0"u8);
         ImGui.NextColumn();
@@ -26,7 +26,7 @@ public class CameraInspector : IInspectorDrawer<Camera>
         ImGuiEx.TextUnformatted("Field of View\0"u8);
         ImGui.NextColumn();
         var fov = component.FOV;
-        if (ImGui.SliderFloat("##fov", ref fov, 0.1f, 179.9f))
+        if (ImGui.SliderFloat("##fov"u8, ref fov, 0.1f, 179.9f))
         {
             component.FOV = fov;
         }
@@ -35,7 +35,7 @@ public class CameraInspector : IInspectorDrawer<Camera>
         ImGuiEx.TextUnformatted("Near clip\0"u8);
         ImGui.NextColumn();
         var nearClip = component.NearClip;
-        if (ImGui.InputFloat("##nearClip", ref nearClip, 1, 10))
+        if (ImGui.InputFloat("##nearClip"u8, ref nearClip, 1, 10))
         {
             component.NearClip = Math.Max(1, nearClip);
         }
@@ -44,7 +44,7 @@ public class CameraInspector : IInspectorDrawer<Camera>
         ImGuiEx.TextUnformatted("Far clip\0"u8);
         ImGui.NextColumn();
         var farClip = component.FarClip;
-        if (ImGui.InputFloat("##farClip", ref farClip, 1, 10))
+        if (ImGui.InputFloat("##farClip"u8, ref farClip, 1, 10))
         {
             component.FarClip = Math.Max(nearClip + 0.1f, farClip);
         }

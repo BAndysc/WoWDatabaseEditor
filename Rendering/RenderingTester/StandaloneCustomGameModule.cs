@@ -100,17 +100,17 @@ public class StandaloneCustomGameModule : IGameModule
                (inputManager.Mouse.LastClickScreenPosition - inputManager.Mouse.ScreenPoint).LengthSquared() < 10))
         {
             currentMenu = GenerateContextMenu();
-            ImGui.OpenPopup("contextmenu");
+            ImGui.OpenPopup("contextmenu"u8);
         }
 
         if (currentMenu != null)
         {
-            if (ImGui.BeginPopup("contextmenu"))
+            if (ImGui.BeginPopup("contextmenu"u8))
             {
                 foreach (var option in currentMenu)
                 {
                     if (option.Item1 == "-")
-                        ImGui.Text("----");
+                        ImGui.Text("----"u8);
                     else
                     {
                         if (ImGui.Selectable(option.Item1))

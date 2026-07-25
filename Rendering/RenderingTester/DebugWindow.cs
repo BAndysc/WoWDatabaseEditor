@@ -97,33 +97,33 @@ public unsafe class DebugWindow : IGameModule
 
     public void RenderGUI()
     {
-        ImGui.Begin("Debug");
+        ImGui.Begin("Debug"u8);
 
         selectedMap = allMapIds.IndexOf(gameContext.CurrentMapId);
-        if (ImGui.Combo("Map", ref selectedMap, mapNamesArray, maps.Count))
+        if (ImGui.Combo("Map"u8, ref selectedMap, mapNamesArray, maps.Count))
             gameContext.SetMap(allMapIds[selectedMap]);
 
-        if (ImGui.Checkbox("Render terrain", ref renderTerrain))
+        if (ImGui.Checkbox("Render terrain"u8, ref renderTerrain))
             chunkManager.RenderTerrain = renderTerrain;
 
         float viewDistance = (float)gameProperties.ViewDistanceModifier;
-        if (ImGui.SliderFloat("View Distance", ref viewDistance, 1, 32))
+        if (ImGui.SliderFloat("View Distance"u8, ref viewDistance, 1, 32))
             gameProperties.ViewDistanceModifier = viewDistance;
 
         bool pausedTime = gameProperties.DisableTimeFlow;
-        if (ImGui.Checkbox("Pause time", ref pausedTime))
+        if (ImGui.Checkbox("Pause time"u8, ref pausedTime))
             gameProperties.DisableTimeFlow = pausedTime;
 
         var minutes = gameProperties.CurrentTime.TotalMinutes;
-        if (ImGui.SliderInt("Current time", ref minutes, 0, 1439))
+        if (ImGui.SliderInt("Current time"u8, ref minutes, 0, 1439))
             gameProperties.CurrentTime = Time.FromMinutes(minutes);
         
         bool renderGui = gameProperties.RenderGui;
-        if (ImGui.Checkbox("Render GUI", ref renderGui))
+        if (ImGui.Checkbox("Render GUI"u8, ref renderGui))
             gameProperties.RenderGui = renderGui;
 
         float dynamicResolution = gameProperties.DynamicResolution;
-        if (ImGui.SliderFloat("Dynamic scale", ref dynamicResolution, 0.1f, 1))
+        if (ImGui.SliderFloat("Dynamic scale"u8, ref dynamicResolution, 0.1f, 1))
             gameProperties.DynamicResolution = dynamicResolution;
 
         ImGui.End();

@@ -145,8 +145,8 @@ public class TestModule : IGameModule
 
     public unsafe void RenderGUI()
     {
-        ImGui.Begin("Creature Display Infos");
-        ImGui.InputText("Search", ref displayInfoSearch, 256);
+        ImGui.Begin("Creature Display Infos"u8);
+        ImGui.InputText("Search"u8, ref displayInfoSearch, 256);
         bool searchChanged = !string.Equals(displayInfoSearch, lastDisplayInfoSearch, StringComparison.Ordinal);
         if (!string.IsNullOrWhiteSpace(displayInfoSearch))
         {
@@ -176,7 +176,7 @@ public class TestModule : IGameModule
             lastDisplayInfoSearch = string.Empty;
         }
         int displayCount = filteredDisplayInfoIndices?.Count ?? displayInfoStore.Count;
-        if (ImGui.BeginListBox("##displayInfos", new System.Numerics.Vector2(400, 400)))
+        if (ImGui.BeginListBox("##displayInfos"u8, new System.Numerics.Vector2(400, 400)))
         {
             ImGuiListClipper clipper = new ImGuiListClipper();
             clipper.Begin(displayCount, ImGui.GetTextLineHeightWithSpacing());
@@ -235,7 +235,7 @@ public class TestModule : IGameModule
             }
             int animIndex = validAnimationIds.IndexOf(lastSelectedAnimationId);
             if (animIndex < 0) animIndex = 0;
-            if (ImGui.Combo("Animation", ref animIndex, validAnimationNames.ToArray(), validAnimationNames.Count))
+            if (ImGui.Combo("Animation"u8, ref animIndex, validAnimationNames.ToArray(), validAnimationNames.Count))
             {
                 lastSelectedAnimationId = validAnimationIds[animIndex];
                 creatureInstance.Animation = (M2AnimationType)lastSelectedAnimationId;

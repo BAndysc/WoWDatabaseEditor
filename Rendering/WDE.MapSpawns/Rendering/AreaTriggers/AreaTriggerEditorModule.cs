@@ -417,7 +417,7 @@ public class AreaTriggerEditorModule : WorldPointModuleBase
         if (toolService.ActiveTool != Tool || triggers.Count == 0)
             return;
 
-        if (!ImGui.Begin("3D"))
+        if (!ImGui.Begin("3D"u8))
         {
             ImGui.End();
             return;

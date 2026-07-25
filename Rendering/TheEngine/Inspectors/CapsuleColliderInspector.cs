@@ -10,16 +10,16 @@ public class CapsuleColliderInspector : IRefInspectorDrawer<CapsuleCollider>
 {
     public void Draw(Entity entity, ref CapsuleCollider component)
     {
-        ImGui.Columns(2, "capsulecollider", false);
+        ImGui.Columns(2, "capsulecollider"u8, false);
 
         ImGuiEx.TextUnformatted("Radius\0"u8);
         ImGui.NextColumn();
-        ImGui.DragFloat("##Radius", ref component.Radius, 0.05f, 0.001f, 10000f);
+        ImGui.DragFloat("##Radius"u8, ref component.Radius, 0.05f, 0.001f, 10000f);
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Length\0"u8);
         ImGui.NextColumn();
-        ImGui.DragFloat("##Length", ref component.Length, 0.05f, 0.001f, 10000f);
+        ImGui.DragFloat("##Length"u8, ref component.Length, 0.05f, 0.001f, 10000f);
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Center\0"u8);

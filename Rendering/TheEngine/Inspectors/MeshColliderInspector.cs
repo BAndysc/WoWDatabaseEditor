@@ -26,7 +26,7 @@ public class MeshColliderInspector : IRefInspectorDrawer<MeshCollider>
         {
         }
 
-        ImGui.Columns(2, "meshcollider", false);
+        ImGui.Columns(2, "meshcollider"u8, false);
 
         ImGuiEx.TextUnformatted("Mesh\0"u8);
         ImGui.NextColumn();
@@ -36,9 +36,9 @@ public class MeshColliderInspector : IRefInspectorDrawer<MeshCollider>
         ImGuiEx.TextUnformatted("Submesh\0"u8);
         ImGui.NextColumn();
         if (mesh != null)
-            ImGui.SliderInt("##SubMesh", ref component.SubMesh, 0, Math.Max(0, mesh.SubmeshCount - 1));
+            ImGui.SliderInt("##SubMesh"u8, ref component.SubMesh, 0, Math.Max(0, mesh.SubmeshCount - 1));
         else
-            ImGui.InputInt("##SubMesh", ref component.SubMesh);
+            ImGui.InputInt("##SubMesh"u8, ref component.SubMesh);
         ImGui.NextColumn();
 
         ImGui.Columns(1);

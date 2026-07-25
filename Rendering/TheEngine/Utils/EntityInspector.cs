@@ -209,7 +209,7 @@ public class EntityInspector
         var em = engine.entityManager;
         ImGui.Begin("Entity inspector\0"u8);
 
-        float filterButtonWidth = hierarchyTreeMode ? 0 : ImGui.CalcTextSize("Filter").X + ImGui.GetStyle().FramePadding.X * 2 + ImGui.GetStyle().ItemSpacing.X;
+        float filterButtonWidth = hierarchyTreeMode ? 0 : ImGui.CalcTextSize("Filter"u8).X + ImGui.GetStyle().FramePadding.X * 2 + ImGui.GetStyle().ItemSpacing.X;
         float searchInputWidth = ImGui.GetContentRegionAvail().X - filterButtonWidth;
         if (searchInputWidth < 50) searchInputWidth = 50;
         ImGui.SetNextItemWidth(searchInputWidth);
@@ -230,14 +230,14 @@ public class EntityInspector
         if (!hierarchyTreeMode)
         {
             ImGui.SameLine();
-            if (ImGui.Button("Filter"))
+            if (ImGui.Button("Filter"u8))
             {
-                ImGui.OpenPopup("ComponentFilter");
+                ImGui.OpenPopup("ComponentFilter"u8);
             }
 
-            if (ImGui.BeginPopup("ComponentFilter"))
+            if (ImGui.BeginPopup("ComponentFilter"u8))
             {
-                ImGui.Text("Select components to filter by:");
+                ImGui.Text("Select components to filter by:"u8);
                 ImGui.Separator();
 
                 foreach (var type in em.KnownTypes)
@@ -339,7 +339,7 @@ public class EntityInspector
 
             ImGui.Text(foundNEntitiesText);
             // Use available content region for child size to avoid double scrollbars
-            ImGui.BeginChild("items", ImGui.GetContentRegionAvail(), ImGuiChildFlags.None, ImGuiWindowFlags.HorizontalScrollbar);
+            ImGui.BeginChild("items"u8, ImGui.GetContentRegionAvail(), ImGuiChildFlags.None, ImGuiWindowFlags.HorizontalScrollbar);
             ImGuiListClipper clipper = new ImGuiListClipper();
             clipper.Begin(total, ImGui.GetTextLineHeightWithSpacing());
 
@@ -547,7 +547,7 @@ public class EntityInspector
         ImGui.Text(foundNEntitiesText);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new System.Numerics.Vector2(0, 0));
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new System.Numerics.Vector2(0, 0));
-        ImGui.BeginChild("items", ImGui.GetContentRegionAvail(), ImGuiChildFlags.None, ImGuiWindowFlags.HorizontalScrollbar);
+        ImGui.BeginChild("items"u8, ImGui.GetContentRegionAvail(), ImGuiChildFlags.None, ImGuiWindowFlags.HorizontalScrollbar);
 
         var arrowSize = ImGui.GetFrameHeight();
         var indentStep = arrowSize;
@@ -759,7 +759,7 @@ public class EntityInspector
             return;
         if (nested > 6)
         {
-            ImGui.Text("Detected infinite nesting");
+            ImGui.Text("Detected infinite nesting"u8);
             return;
         }
         nested++;

@@ -16,12 +16,12 @@ public class LightInspector : IRefInspectorDrawer<Light>
 
     public void Draw(Entity entity, ref Light component)
     {
-        ImGui.Columns(2, "light", false);
+        ImGui.Columns(2, "light"u8, false);
 
         ImGuiEx.TextUnformatted("Is Enabled\0"u8);
         ImGui.NextColumn();
         bool enabled = !component.Disabled;
-        if (ImGui.Checkbox("##enabled", ref enabled))
+        if (ImGui.Checkbox("##enabled"u8, ref enabled))
             component.Disabled = !enabled;
         ImGui.NextColumn();
 
@@ -45,24 +45,24 @@ public class LightInspector : IRefInspectorDrawer<Light>
 
         ImGuiEx.TextUnformatted("Intensity\0"u8);
         ImGui.NextColumn();
-        ImGui.SliderFloat("##Intensity", ref component.Intensity, 0, component.Type == LightType.Directional ? 5 : 2);
+        ImGui.SliderFloat("##Intensity"u8, ref component.Intensity, 0, component.Type == LightType.Directional ? 5 : 2);
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Cast Shadows\0"u8);
         ImGui.NextColumn();
-        ImGui.Checkbox("##CastShadows", ref component.CastShadows);
+        ImGui.Checkbox("##CastShadows"u8, ref component.CastShadows);
         ImGui.NextColumn();
 
         if (component.Type == LightType.Point)
         {
             ImGuiEx.TextUnformatted("Attenuation Start\0"u8);
             ImGui.NextColumn();
-            ImGui.SliderFloat("##AttenuationStart", ref component.AttenuationStart, 0, 1000);
+            ImGui.SliderFloat("##AttenuationStart"u8, ref component.AttenuationStart, 0, 1000);
             ImGui.NextColumn();
 
             ImGuiEx.TextUnformatted("Attenuation End\0"u8);
             ImGui.NextColumn();
-            ImGui.SliderFloat("##AttenuationEnd", ref component.AttenuationEnd, 0, 1000);
+            ImGui.SliderFloat("##AttenuationEnd"u8, ref component.AttenuationEnd, 0, 1000);
             ImGui.NextColumn();
         }
         else // directional

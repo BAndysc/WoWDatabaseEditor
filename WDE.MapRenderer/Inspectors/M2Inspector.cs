@@ -226,27 +226,27 @@ public class M2Inspector : IInspectorDrawer<M2>
         }
         maxLabelWidth += ImGui.GetStyle().ItemSpacing.X + 8;
 
-        ImGui.Columns(2, "m2_columns", false);
+        ImGui.Columns(2, "m2_columns"u8, false);
         ImGui.SetColumnWidth(0, maxLabelWidth);
 
         // Name row
         var name = m2.name.AsSpan();
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Name");
+        ImGui.TextUnformatted("Name"u8);
         ImGui.NextColumn();
         ImGui.TextUnformatted(new string(m2.name.AsSpan()));
         ImGui.NextColumn();
 
         // Flags row (generic flags renderer)
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Flags");
+        ImGui.TextUnformatted("Flags"u8);
         ImGui.NextColumn();
         DrawFlags(m2.global_flags, typeof(M2Flags));
         ImGui.NextColumn();
 
         // Global Loops row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Global Loops");
+        ImGui.TextUnformatted("Global Loops"u8);
         ImGui.NextColumn();
         DrawArray<uint>(
             m2.global_loops,
@@ -258,7 +258,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Sequences row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Sequences");
+        ImGui.TextUnformatted("Sequences"u8);
         ImGui.NextColumn();
         DrawArray<M2Sequence>(
             m2.sequences,
@@ -270,7 +270,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // SequenceIdToAnimationId row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("SequenceIdToAnimationId");
+        ImGui.TextUnformatted("SequenceIdToAnimationId"u8);
         ImGui.NextColumn();
         DrawArray<short>(
             m2.sequenceIdToAnimationId,
@@ -282,7 +282,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Bones row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Bones");
+        ImGui.TextUnformatted("Bones"u8);
         ImGui.NextColumn();
         DrawArray<M2CompBone>(
             m2.bones.array,
@@ -294,7 +294,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // BoneIndicesById row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("BoneIndicesById");
+        ImGui.TextUnformatted("BoneIndicesById"u8);
         ImGui.NextColumn();
         DrawArray<short>(
             m2.boneIndicesById,
@@ -306,7 +306,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Vertices row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Vertices");
+        ImGui.TextUnformatted("Vertices"u8);
         ImGui.NextColumn();
         DrawArray<M2Vertex>(
             m2.vertices,
@@ -318,7 +318,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Colors row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Colors");
+        ImGui.TextUnformatted("Colors"u8);
         ImGui.NextColumn();
         bool hasColors = m2.colors.Length > 0;
         string buttonLabel = $"Open Colors ({m2.colors.Length})##open_colors";
@@ -334,7 +334,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // TextureWeights row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("TextureWeights");
+        ImGui.TextUnformatted("TextureWeights"u8);
         ImGui.NextColumn();
         bool hasWeights = m2.textureWeights.Length > 0;
         string buttonLabelWeights = $"Open TextureWeights ({m2.textureWeights.Length})##open_textureweights";
@@ -350,7 +350,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // TextureTransforms row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("TextureTransforms");
+        ImGui.TextUnformatted("TextureTransforms"u8);
         ImGui.NextColumn();
         bool hasTransforms = m2.texture_transforms.Length > 0;
         string buttonLabelTransforms = $"Open TextureTransforms ({m2.texture_transforms.Length})##open_texturetransforms";
@@ -366,7 +366,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // TextureIndicesById row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("TextureIndicesById");
+        ImGui.TextUnformatted("TextureIndicesById"u8);
         ImGui.NextColumn();
         DrawArray<short>(
             m2.textureIndicesById,
@@ -378,7 +378,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Textures row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Textures");
+        ImGui.TextUnformatted("Textures"u8);
         ImGui.NextColumn();
         DrawArray<M2Texture>(
             m2.textures,
@@ -390,7 +390,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Materials row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Materials");
+        ImGui.TextUnformatted("Materials"u8);
         ImGui.NextColumn();
         DrawArray<M2Material>(
             m2.materials,
@@ -402,7 +402,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Bone Lookup Table row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Bone Lookup Table");
+        ImGui.TextUnformatted("Bone Lookup Table"u8);
         ImGui.NextColumn();
         DrawArray<short>(
             m2.bone_lookup_table,
@@ -414,7 +414,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Texture Lookup Table row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Texture Lookup Table");
+        ImGui.TextUnformatted("Texture Lookup Table"u8);
         ImGui.NextColumn();
         DrawArray<short>(
             m2.texture_lookup_table,
@@ -426,7 +426,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Tex Unit Lookup Table row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Tex Unit Lookup Table");
+        ImGui.TextUnformatted("Tex Unit Lookup Table"u8);
         ImGui.NextColumn();
         DrawArray<short>(
             m2.tex_unit_lookup_table,
@@ -438,7 +438,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Transparency Lookup Table row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Transparency Lookup Table");
+        ImGui.TextUnformatted("Transparency Lookup Table"u8);
         ImGui.NextColumn();
         DrawArray<short>(
             m2.transparency_lookup_table,
@@ -450,7 +450,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Texture Transforms Lookup Table row
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Texture Transforms Lookup Table");
+        ImGui.TextUnformatted("Texture Transforms Lookup Table"u8);
         ImGui.NextColumn();
         DrawArray<short>(
             m2.texture_transforms_lookup_table,
@@ -462,7 +462,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Attachments Information
         ImGui.Separator();
-        ImGui.TextUnformatted("Attachments");
+        ImGui.TextUnformatted("Attachments"u8);
         ImGui.NextColumn();
         DrawArray<M2Attachment>(
             m2.attachments,
@@ -474,7 +474,7 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Attachment Indices By Id
         ImGui.AlignTextToFramePadding();
-        ImGui.TextUnformatted("Attachment Indices By Id");
+        ImGui.TextUnformatted("Attachment Indices By Id"u8);
         ImGui.NextColumn();
         DrawArray<short>(
             m2.attachmentIndicesById,
@@ -488,39 +488,39 @@ public class M2Inspector : IInspectorDrawer<M2>
 
         // Bounding and Collision Information
         ImGui.Separator();
-        ImGui.TextUnformatted("Geometry Information");
+        ImGui.TextUnformatted("Geometry Information"u8);
         ImGui.Separator();
 
-        if (ImGui.BeginTable("geometry_table", 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit))
+        if (ImGui.BeginTable("geometry_table"u8, 3, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingFixedFit))
         {
-            ImGui.TableSetupColumn("Property", ImGuiTableColumnFlags.WidthFixed, 200);
-            ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch);
-            ImGui.TableSetupColumn("Details", ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("Property"u8, ImGuiTableColumnFlags.WidthFixed, 200);
+            ImGui.TableSetupColumn("Value"u8, ImGuiTableColumnFlags.WidthStretch);
+            ImGui.TableSetupColumn("Details"u8, ImGuiTableColumnFlags.WidthStretch);
             ImGui.TableHeadersRow();
 
             // Bounding Box
             ImGui.TableNextRow();
-            ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Bounding Box");
+            ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Bounding Box"u8);
             ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted($"Min: ({m2.bounding_box.min.X:F3}, {m2.bounding_box.min.Y:F3}, {m2.bounding_box.min.Z:F3})");
             ImGui.TableSetColumnIndex(2); ImGui.TextUnformatted($"Max: ({m2.bounding_box.max.X:F3}, {m2.bounding_box.max.Y:F3}, {m2.bounding_box.max.Z:F3})");
 
             // Bounding Sphere
             ImGui.TableNextRow();
-            ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Bounding Sphere Radius");
+            ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Bounding Sphere Radius"u8);
             ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted($"{m2.bounding_sphere_radius:F3}");
-            ImGui.TableSetColumnIndex(2); ImGui.TextUnformatted("Used for detail doodad draw distance");
+            ImGui.TableSetColumnIndex(2); ImGui.TextUnformatted("Used for detail doodad draw distance"u8);
 
             // Collision Box
             ImGui.TableNextRow();
-            ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Collision Box");
+            ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Collision Box"u8);
             ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted($"Min: ({m2.collision_box.min.X:F3}, {m2.collision_box.min.Y:F3}, {m2.collision_box.min.Z:F3})");
             ImGui.TableSetColumnIndex(2); ImGui.TextUnformatted($"Max: ({m2.collision_box.max.X:F3}, {m2.collision_box.max.Y:F3}, {m2.collision_box.max.Z:F3})");
 
             // Collision Sphere
             ImGui.TableNextRow();
-            ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Collision Sphere Radius");
+            ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Collision Sphere Radius"u8);
             ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted($"{m2.collision_sphere_radius:F3}");
-            ImGui.TableSetColumnIndex(2); ImGui.TextUnformatted("Used for collision detection");
+            ImGui.TableSetColumnIndex(2); ImGui.TextUnformatted("Used for collision detection"u8);
 
             ImGui.EndTable();
         }
@@ -629,45 +629,45 @@ public class M2Inspector : IInspectorDrawer<M2>
     // Helper to render M2Sequence in two columns
     private void DrawM2Sequence(M2Sequence seq)
     {
-        ImGui.BeginTable("seq_table", 2, ImGuiTableFlags.SizingFixedFit);
+        ImGui.BeginTable("seq_table"u8, 2, ImGuiTableFlags.SizingFixedFit);
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("id");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("id"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted($"{(M2AnimationType)seq.id} ({seq.id})");
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("variationIndex");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("variationIndex"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(seq.variationIndex.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("duration");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("duration"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(seq.duration.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("movespeed");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("movespeed"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(seq.movespeed.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("flags");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("flags"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(seq.flags.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("frequency");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("frequency"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(seq.frequency.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("replay");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("replay"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted($"{seq.replay.minimum} - {seq.replay.maximum}");
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("blendTime");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("blendTime"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(seq.blendTime.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("bounds.extent.min");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("bounds.extent.min"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(seq.bounds.extent.min.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("bounds.extent.max");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("bounds.extent.max"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(seq.bounds.extent.max.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("bounds.radius");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("bounds.radius"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(seq.bounds.radius.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("variationNext");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("variationNext"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(seq.variationNext.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("aliasNext");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("aliasNext"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(seq.aliasNext.ToString());
         ImGui.EndTable();
     }
@@ -675,24 +675,24 @@ public class M2Inspector : IInspectorDrawer<M2>
     // Helper to render M2CompBone in two columns, skipping translation, rotation, scale
     private void DrawM2CompBone(M2CompBone bone)
     {
-        ImGui.BeginTable("bone_table", 2, ImGuiTableFlags.SizingFixedFit);
+        ImGui.BeginTable("bone_table"u8, 2, ImGuiTableFlags.SizingFixedFit);
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("key_bone_id");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("key_bone_id"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(GetBoneName(bone.key_bone_id));
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("flags");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("flags"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(bone.flags.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("parent_bone");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("parent_bone"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(bone.parent_bone.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("submesh_id");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("submesh_id"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(bone.submesh_id.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("boneNameCRC");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("boneNameCRC"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(bone.boneNameCRC.ToString("X8"));
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("pivot");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("pivot"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(bone.pivot.ToString());
         ImGui.EndTable();
     }
@@ -700,69 +700,69 @@ public class M2Inspector : IInspectorDrawer<M2>
     // Helper to render M2Vertex in two columns
     private void DrawM2Vertex(M2Vertex v)
     {
-        ImGui.BeginTable("vertex_table", 2, ImGuiTableFlags.SizingFixedFit);
+        ImGui.BeginTable("vertex_table"u8, 2, ImGuiTableFlags.SizingFixedFit);
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("pos");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("pos"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted($"{v.pos.X:0.###}, {v.pos.Y:0.###}, {v.pos.Z:0.###}");
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("bone_weights");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("bone_weights"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(v.bone_weights.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("bone_indices");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("bone_indices"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(v.bone_indices.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("normal");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("normal"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted($"{v.normal.X:0.###}, {v.normal.Y:0.###}, {v.normal.Z:0.###}");
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("tex_coord1");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("tex_coord1"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted($"{v.tex_coord1.X:0.###}, {v.tex_coord1.Y:0.###}");
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("tex_coord2");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("tex_coord2"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted($"{v.tex_coord2.X:0.###}, {v.tex_coord2.Y:0.###}");
         ImGui.EndTable();
     }
 
     private void DrawM2TextureTooltip(M2Texture t)
     {
-        ImGui.BeginTable("texture_table", 2, ImGuiTableFlags.SizingFixedFit);
+        ImGui.BeginTable("texture_table"u8, 2, ImGuiTableFlags.SizingFixedFit);
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Type");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Type"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(t.type.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Flags");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Flags"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(t.flags.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Filename");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Filename"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(t.filename.Length > 1 ? new string(t.filename.AsSpan()) : "");
         ImGui.EndTable();
     }
 
     private void DrawM2MaterialTooltip(M2Material mat)
     {
-        ImGui.BeginTable("material_table", 2, ImGuiTableFlags.SizingFixedFit);
+        ImGui.BeginTable("material_table"u8, 2, ImGuiTableFlags.SizingFixedFit);
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Blending Mode");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Blending Mode"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(mat.blending_mode.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Flags");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Flags"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(mat.flags.ToString());
         ImGui.EndTable();
     }
 
     private void DrawM2AttachmentTooltip(M2Attachment att)
     {
-        ImGui.BeginTable("attachment_table", 2, ImGuiTableFlags.SizingFixedFit);
+        ImGui.BeginTable("attachment_table"u8, 2, ImGuiTableFlags.SizingFixedFit);
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Attachment Type");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Attachment Type"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(att.id.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Bone");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Bone"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(att.bone.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Unknown");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Unknown"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted(att.unknown.ToString());
         ImGui.TableNextRow();
-        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Position");
+        ImGui.TableSetColumnIndex(0); ImGui.TextUnformatted("Position"u8);
         ImGui.TableSetColumnIndex(1); ImGui.TextUnformatted($"({att.position.X:F3}, {att.position.Y:F3}, {att.position.Z:F3})");
         ImGui.EndTable();
     }
@@ -889,7 +889,7 @@ public class M2ColorWindow : M2AnimationWindowBase
         // If both are missing, nothing to show
         if (!hasColor && !hasAlpha)
         {
-            ImGui.TextUnformatted("No color or alpha keys.");
+            ImGui.TextUnformatted("No color or alpha keys."u8);
             return;
         }
 
@@ -1046,7 +1046,7 @@ public class M2TextureWeightWindow : M2AnimationWindowBase
 
         if (!hasWeight || count == 0)
         {
-            ImGui.TextUnformatted("No weight keys.");
+            ImGui.TextUnformatted("No weight keys."u8);
             return;
         }
 
@@ -1100,7 +1100,7 @@ public class M2TextureWeightWindow : M2AnimationWindowBase
         float legendX = basePos.X + 5;
         float legendY = basePos.Y + 5;
         drawList.AddRectFilled(new Vector2(legendX, legendY), new Vector2(legendX + 12, legendY + 12), ImGui.GetColorU32(new Vector4(1, 1, 0, 1)));
-        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "Weight");
+        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "Weight"u8);
     }
 }
 
@@ -1121,9 +1121,9 @@ public class M2TextureTransformWindow : M2AnimationWindowBase
     protected override void DrawContent()
     {
         // Track selector
-        ImGui.TextUnformatted("Track:");
+        ImGui.TextUnformatted("Track:"u8);
         ImGui.SameLine();
-        if (ImGui.BeginCombo("##track", trackNames[selectedTrack]))
+        if (ImGui.BeginCombo("##track"u8, trackNames[selectedTrack]))
         {
             for (int i = 0; i < trackNames.Length; ++i)
             {
@@ -1220,13 +1220,13 @@ public class M2TextureTransformWindow : M2AnimationWindowBase
         float legendX = basePos.X + 5;
         float legendY = basePos.Y + 5;
         drawList.AddRectFilled(new Vector2(legendX, legendY), new Vector2(legendX + 12, legendY + 12), ImGui.GetColorU32(new Vector4(1, 0, 0, 1)));
-        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "X");
+        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "X"u8);
         legendY += 16;
         drawList.AddRectFilled(new Vector2(legendX, legendY), new Vector2(legendX + 12, legendY + 12), ImGui.GetColorU32(new Vector4(0, 1, 0, 1)));
-        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "Y");
+        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "Y"u8);
         legendY += 16;
         drawList.AddRectFilled(new Vector2(legendX, legendY), new Vector2(legendX + 12, legendY + 12), ImGui.GetColorU32(new Vector4(0, 0, 1, 1)));
-        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "Z");
+        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "Z"u8);
     }
 
     private void DrawQuaternionTrack(MutableM2Track<Quaternion> track, int animIdx, string label)
@@ -1296,16 +1296,16 @@ public class M2TextureTransformWindow : M2AnimationWindowBase
         float legendX = basePos.X + 5;
         float legendY = basePos.Y + 5;
         drawList.AddRectFilled(new Vector2(legendX, legendY), new Vector2(legendX + 12, legendY + 12), ImGui.GetColorU32(new Vector4(1, 0, 0, 1)));
-        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "X");
+        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "X"u8);
         legendY += 16;
         drawList.AddRectFilled(new Vector2(legendX, legendY), new Vector2(legendX + 12, legendY + 12), ImGui.GetColorU32(new Vector4(0, 1, 0, 1)));
-        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "Y");
+        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "Y"u8);
         legendY += 16;
         drawList.AddRectFilled(new Vector2(legendX, legendY), new Vector2(legendX + 12, legendY + 12), ImGui.GetColorU32(new Vector4(0, 0, 1, 1)));
-        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "Z");
+        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "Z"u8);
         legendY += 16;
         drawList.AddRectFilled(new Vector2(legendX, legendY), new Vector2(legendX + 12, legendY + 12), ImGui.GetColorU32(new Vector4(1, 1, 0, 1)));
-        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "W");
+        drawList.AddText(new Vector2(legendX + 16, legendY), ImGui.GetColorU32(new Vector4(1, 1, 1, 1)), "W"u8);
     }
 
     private void DrawCurve(ImDrawListPtr drawList, Vector2 basePos, Vector2 plotSize, float[] xs, float[] ys, Vector4 color)

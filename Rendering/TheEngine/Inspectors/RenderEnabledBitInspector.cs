@@ -19,21 +19,21 @@ internal class RenderEnabledBitInspector : IRefInspectorDrawer<RenderEnabledBit>
     {
         var isUserEnabled = !component.IsForceDisabled();
 
-        if (ImGui.BeginTable("RenderEnabledBitTable", 2, ImGuiTableFlags.SizingFixedFit))
+        if (ImGui.BeginTable("RenderEnabledBitTable"u8, 2, ImGuiTableFlags.SizingFixedFit))
         {
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.Text("Is Enabled:");
+            ImGui.Text("Is Enabled:"u8);
             ImGui.TableNextColumn();
             bool userEnabledValue = isUserEnabled;
-            if (ImGui.Checkbox("##IsUserDisabled", ref userEnabledValue))
+            if (ImGui.Checkbox("##IsUserDisabled"u8, ref userEnabledValue))
             {
                 component.SetDisabled(!userEnabledValue);
             }
 
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ImGui.Text("Render Layer:");
+            ImGui.Text("Render Layer:"u8);
             ImGui.TableNextColumn();
 
             int currentLayer = component.Layer;

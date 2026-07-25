@@ -46,7 +46,7 @@ public class TheEngineUi
         // selects it. We stop once 3D has been the active tab once, so the user can switch
         // freely afterwards and their choice persists.
         if (!gameView.WasEverVisible)
-            ImGui.SetWindowFocus("3D");
+            ImGui.SetWindowFocus("3D"u8);
 #endif
         gameView.Draw(delta);
         inputWindow.Update(delta);

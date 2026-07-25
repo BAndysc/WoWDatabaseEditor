@@ -209,13 +209,13 @@ namespace TheEngine.Managers
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, Vector2.Zero);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
-            ImGui.Begin("Root", ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoTitleBar |
+            ImGui.Begin("Root"u8, ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoTitleBar |
                                 ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize |
                                 ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoNavFocus |
                                 ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.MenuBar);
             ImGui.PopStyleVar(2);
 
-            ImGui.DockSpace(ImGui.GetID("3D Dockspace"), Vector2.Zero, ImGuiDockNodeFlags.PassthruCentralNode);
+            ImGui.DockSpace(ImGui.GetID("3D Dockspace"u8), Vector2.Zero, ImGuiDockNodeFlags.PassthruCentralNode);
 
             if (ImGui.BeginMenuBar())
             {

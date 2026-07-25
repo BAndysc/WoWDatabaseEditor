@@ -28,14 +28,14 @@ public class MeshRendererInspector : IRefInspectorDrawer<MeshRenderer>
         // SubMeshId/Opaque are properties (they recompute MeshRenderer.SortKey on assignment), so they
         // can't be passed by ref - edit a local and write back through the property when it changes.
         int subMeshId = component.SubMeshId;
-        if (ImGui.SliderInt("##submesh", ref subMeshId, 0, mesh.SubmeshCount - 1))
+        if (ImGui.SliderInt("##submesh"u8, ref subMeshId, 0, mesh.SubmeshCount - 1))
             component.SubMeshId = subMeshId;
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Opaque\0"u8);
         ImGui.NextColumn();
         bool opaque = component.Opaque;
-        if (ImGui.Checkbox("##opaque", ref opaque))
+        if (ImGui.Checkbox("##opaque"u8, ref opaque))
             component.Opaque = opaque;
         ImGui.NextColumn();
 
@@ -158,7 +158,7 @@ public class MeshRendererInspector : IRefInspectorDrawer<MeshRenderer>
                     else if (uniform.type == typeof(Matrix))
                     {
                         ref var value = ref Unsafe.AsRef<Matrix>(ptr);
-                        ImGui.TextUnformatted("Matrix (read-only)");
+                        ImGui.TextUnformatted("Matrix (read-only)"u8);
                     }
                     else if (uniform.type == typeof(BindlessTextureId))
                     {
@@ -180,7 +180,7 @@ public class MeshRendererInspector : IRefInspectorDrawer<MeshRenderer>
         ImGui.Columns(1);
 
 
-        if (ImGui.Button("Save to obj"))
+        if (ImGui.Button("Save to obj"u8))
         {
             mesh.SaveToObj("mesh.obj");
         }

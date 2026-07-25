@@ -42,7 +42,7 @@ public class EntryPickerService
         ImGui.SameLine(0, 2);
         ImGui.PushID(id);
         ImGui.BeginDisabled(pickInFlight);
-        if (ImGui.SmallButton("..."))
+        if (ImGui.SmallButton("..."u8))
             Pick(parameterKey, currentValue, onPicked).ListenErrors();
         ImGui.EndDisabled();
         ImGui.PopID();

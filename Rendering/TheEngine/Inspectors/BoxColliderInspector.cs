@@ -10,7 +10,7 @@ public class BoxColliderInspector : IRefInspectorDrawer<BoxCollider>
 {
     public void Draw(Entity entity, ref BoxCollider component)
     {
-        ImGui.Columns(2, "boxcollider", false);
+        ImGui.Columns(2, "boxcollider"u8, false);
 
         ImGuiEx.TextUnformatted("Size\0"u8);
         ImGui.NextColumn();

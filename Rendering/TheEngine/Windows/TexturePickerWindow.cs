@@ -49,11 +49,11 @@ public static class TexturePickerWindow
             ImGui.SameLine();
         }
 
-        if (ImGui.Button("Pick..."))
+        if (ImGui.Button("Pick..."u8))
         {
             current = texture;
             filter = string.Empty;
-            ImGui.OpenPopup("texture_picker_popup");
+            ImGui.OpenPopup("texture_picker_popup"u8);
         }
 
         DrawPickerPopup(engine, id);
@@ -72,20 +72,20 @@ public static class TexturePickerWindow
         var pos = (display - size) * 0.5f;
         ImGui.SetNextWindowSize(size, ImGuiCond.Always);
         ImGui.SetNextWindowPos(pos, ImGuiCond.Always);
-        if (!ImGui.BeginPopup("texture_picker_popup", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove))
+        if (!ImGui.BeginPopup("texture_picker_popup"u8, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove))
             return;
 
-        ImGui.InputText("##texture_picker_filter", ref filter, 128);
+        ImGui.InputText("##texture_picker_filter"u8, ref filter, 128);
         ImGui.Separator();
 
         ITexture? picked = null;
         bool didPick = false;
 
-        if (ImGui.Selectable("(none)", current == null))
+        if (ImGui.Selectable("(none)"u8, current == null))
             didPick = true;
         ImGui.Separator();
 
-        ImGui.BeginChild("##texture_picker_grid", new Vector2(0, 0));
+        ImGui.BeginChild("##texture_picker_grid"u8, new Vector2(0, 0));
 
         const float thumbSize = 64f;
         const float cellSize = thumbSize + 16f;

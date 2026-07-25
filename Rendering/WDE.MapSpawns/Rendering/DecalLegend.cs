@@ -11,7 +11,7 @@ public static class DecalLegend
     public static void Draw(params (Vector4 color, string label)[] entries)
     {
         ImGui.Separator();
-        ImGui.TextDisabled("Markers:");
+        ImGui.TextDisabled("Markers:"u8);
         float right = ImGui.GetWindowWidth() - ImGui.GetStyle().WindowPadding.X;
         foreach (var (color, label) in entries)
         {

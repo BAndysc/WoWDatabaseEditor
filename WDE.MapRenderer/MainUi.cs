@@ -19,7 +19,7 @@ public class MainUi
 
     private void DrawMenuBar()
     {
-        if (ImGui.BeginMenu("Rendering"))
+        if (ImGui.BeginMenu("Rendering"u8))
         {
             foreach (var layer in renderManager.RenderLayers)
             {

@@ -310,7 +310,7 @@ public abstract class WorldPointModuleBase : IGameModule
 
         dragger.DrawGuides(); // axis-lock guide line while a grab is constrained
 
-        if (!ImGui.Begin("3D"))
+        if (!ImGui.Begin("3D"u8))
         {
             ImGui.End();
             return;

@@ -10,11 +10,11 @@ public class SphereColliderInspector : IRefInspectorDrawer<SphereCollider>
 {
     public void Draw(Entity entity, ref SphereCollider component)
     {
-        ImGui.Columns(2, "spherecollider", false);
+        ImGui.Columns(2, "spherecollider"u8, false);
 
         ImGuiEx.TextUnformatted("Radius\0"u8);
         ImGui.NextColumn();
-        ImGui.DragFloat("##Radius", ref component.Radius, 0.05f, 0.001f, 10000f);
+        ImGui.DragFloat("##Radius"u8, ref component.Radius, 0.05f, 0.001f, 10000f);
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Center\0"u8);
