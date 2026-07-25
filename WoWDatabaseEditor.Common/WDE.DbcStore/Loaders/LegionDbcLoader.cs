@@ -544,5 +544,10 @@ internal class LegionDbcLoader : BaseDbcLoader
             });
         });
         Load("PhaseXPhaseGroup.db2", row => data.PhaseXPhaseGroup.Add(new (row.GetInt(0), row.GetUShort(1), row.GetInt(2))));
+        Load("RewardPack.db2", data.RewardPacks, row => new RewardPack()
+        {
+            Id = row.Key,
+            TreasurePickerID = row.GetUInt(6)
+        });
     }
 }

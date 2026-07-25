@@ -91,4 +91,5 @@ public class DbcData
     public List<Vehicle> Vehicles { get; } = new();
     public List<IPlayerCondition> PlayerConditions { get; } = new();
     public List<PhaseXPhaseGroupRow> PhaseXPhaseGroup { get; } = new();
+    public List<RewardPack> RewardPacks { get; } = new();
 }

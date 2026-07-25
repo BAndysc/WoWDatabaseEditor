@@ -49,6 +49,15 @@ public class LootLoader : ILootLoader
                 }
                 return loots;
             }
+            case LootSourceType.Mission:
+            {
+                var template = await databaseProvider.GetGarrisonMissionTemplate((int)solutionItemEntry);
+                if (template == null)
+                    throw new UserException("Couldn't find garrison mission template with entry " + solutionItemEntry);
+
+                var lootId = template.LootId;
+                return new LootEntry[] { new LootEntry(lootId) };
+            }
             // case LootSourceType.Skinning:
             // {
             //     var template = await databaseProvider.GetCreatureTemplate(solutionItemEntry);
@@ -105,6 +114,7 @@ public class LootLoader : ILootLoader
             case LootSourceType.Skinning:
                 return new LootEntry[] { new(solutionItemEntry) };
             case LootSourceType.Disenchant:
+            case LootSourceType.Obliterate:
                 return new LootEntry[] { }; // note: this should be loaded from dbc itemsparse
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);

@@ -208,6 +208,9 @@ namespace WDE.Common.Database
 
         Task<IReadOnlyList<IQuestFactionChange>> GetQuestFactionChanges() => Task.FromResult<IReadOnlyList<IQuestFactionChange>>([]);
 
+        Task<IReadOnlyList<IGarrisonMissionTemplate>> GetGarrisonMissionTemplates() => Task.FromResult<IReadOnlyList<IGarrisonMissionTemplate>>([]);
+        Task<IGarrisonMissionTemplate?> GetGarrisonMissionTemplate(int entry) => Task.FromResult<IGarrisonMissionTemplate?>(null);
+
         // @todo: make it async one day
         IList<IPhaseName>? GetPhaseNames();
 
