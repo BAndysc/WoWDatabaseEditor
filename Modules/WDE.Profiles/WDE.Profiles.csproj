@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>
@@ -9,6 +9,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+        <PackageReference Include="System.Drawing.Common" Version="10.0.9" />
     </ItemGroup>
     <Import Project="..\..\Avalonia.props" />
     <PropertyGroup>

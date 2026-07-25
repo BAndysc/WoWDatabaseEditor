@@ -104,7 +104,10 @@ namespace WDE.HttpDatabase.Models
         
         public long TargetParam3 { get; set; }
 
-        
+
+        public long TargetParam4 { get; set; }
+
+
         public float TargetX { get; set; }
 
         
@@ -151,6 +154,7 @@ namespace WDE.HttpDatabase.Models
             TargetParam1 = line.TargetParam1;
             TargetParam2 = line.TargetParam2;
             TargetParam3 = line.TargetParam3;
+            TargetParam4 = line.TargetParam4;
             TargetX = line.TargetX;
             TargetY = line.TargetY;
             TargetZ = line.TargetZ;

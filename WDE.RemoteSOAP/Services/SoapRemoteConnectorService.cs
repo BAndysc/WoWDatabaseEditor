@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using WDE.Common.CoreVersion;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WDE.RemoteSOAP.Helpers;
@@ -25,7 +26,8 @@ namespace WDE.RemoteSOAP.Services
         public bool HasValidSettings { get; set; }
 
         public SoapRemoteConnectorService(IConnectionSettingsProvider connectionSettings,
-            ISoapClientFactory soapClientFactory)
+            ISoapClientFactory soapClientFactory,
+            ICurrentCoreVersion currentCoreVersion)
         {
             this.connectionSettings = connectionSettings;
             var settings = connectionSettings.GetSettings();
@@ -34,7 +36,8 @@ namespace WDE.RemoteSOAP.Services
             if (settings.IsEmpty)
                 trinitySoapClient = null;
             else
-                trinitySoapClient = new TrinitySoapClient(soapClientFactory, settings.Host!, settings.Port!.Value, settings.User!, settings.Password!);
+                trinitySoapClient = new TrinitySoapClient(soapClientFactory, settings.Host!, settings.Port!.Value, settings.User!, settings.Password!,
+                    currentCoreVersion.Current.SoapCommandNamespace);
         }
 
         public async Task<string> ExecuteCommand(IRemoteCommand command)

@@ -114,18 +114,30 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
         return await model.Creature.OrderBy(t => t.Entry).ToListAsync<ICreature>();
     }
 
+    public override async Task<uint> GetMaxCreatureGuid()
+    {
+        await using var model = Database();
+        return await model.Creature.Select(c => c.Guid).OrderByDescending(g => g).FirstOrDefaultAsync();
+    }
+
+    public override async Task<uint> GetMaxGameObjectGuid()
+    {
+        await using var model = Database();
+        return await model.GameObject.Select(g => g.Guid).OrderByDescending(g => g).FirstOrDefaultAsync();
+    }
+
     public override async Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids)
     {
         await using var model = Database();
         var array = guids.Select(x => x.Guid).ToArray();
-        return await model.Creature.Where(c => array.Contains(c.Guid)).ToListAsync<ICreature>();
+        return await model.Creature.Where(c => Enumerable.Contains(array, c.Guid)).ToListAsync<ICreature>();
     }
-        
+
     public override async Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids)
     {
         await using var model = Database();
         var array = guids.Select(x => x.Guid).ToArray();
-        return await model.GameObject.Where(c => array.Contains(c.Guid)).ToListAsync<IGameObject>();
+        return await model.GameObject.Where(c => Enumerable.Contains(array, c.Guid)).ToListAsync<IGameObject>();
     }
 
     public override async Task<IReadOnlyList<ITrinityString>> GetStringsAsync()

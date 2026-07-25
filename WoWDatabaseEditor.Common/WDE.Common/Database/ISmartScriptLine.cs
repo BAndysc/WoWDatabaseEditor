@@ -104,6 +104,8 @@ namespace WDE.Common.Database
 
         long TargetParam3 { get; }
 
+        long TargetParam4 { get; }
+
         int TargetConditionId { get; }
 
         float TargetX { get; }
@@ -168,6 +170,7 @@ namespace WDE.Common.Database
         public long TargetParam1 { get; set; }
         public long TargetParam2 { get; set; }
         public long TargetParam3 { get; set; }
+        public long TargetParam4 { get; set; }
         public int TargetConditionId { get; set; }
         public float TargetX { get; set; }
         public float TargetY { get; set; }
@@ -290,6 +293,8 @@ namespace WDE.Common.Database
                     return line.TargetParam2;
                 case 2:
                     return line.TargetParam3;
+                case 3:
+                    return line.TargetParam4;
             }
 
             throw new IndexOutOfRangeException();

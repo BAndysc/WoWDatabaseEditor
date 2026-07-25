@@ -118,6 +118,27 @@ public class MasterWaypointData : IWaypointData
     public byte ActionChance { get; set; }
 }
 
+/// <summary>TC master's per-path metadata row (the parent of waypoint_path_node).</summary>
+[Table(Name = "waypoint_path")]
+public class MasterWaypointPathHeader : IWaypointPathHeader
+{
+    [PrimaryKey]
+    [Column(Name = "PathId")]
+    public uint PathId { get; set; }
+
+    [Column(Name = "MoveType")]
+    public int MoveType { get; set; }
+
+    [Column(Name = "Flags")]
+    public int Flags { get; set; }
+
+    [Column(Name = "Velocity")]
+    public float? Velocity { get; set; }
+
+    [Column(Name = "Comment")]
+    public string? Comment { get; set; }
+}
+
 [Table(Name = "waypoint_data")]
 public class NonMasterWaypointData : BaseWaypointData
 {

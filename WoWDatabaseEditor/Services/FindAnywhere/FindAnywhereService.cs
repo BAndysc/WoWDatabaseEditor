@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Common.Services.FindAnywhere;
 using WDE.Common.Utils;
@@ -39,6 +40,7 @@ public class FindAnywhereService : IFindAnywhereService
 
     public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType sourceTypes, IReadOnlyList<string> parameterName, IReadOnlyList<long> parameterValue, CancellationToken cancellationToken)
     {
+        USAGE.Count("feature_used", ("feature", "find_anywhere"));
         // poor's man alising
         if (parameterName.Count == 1 && parameterName[0] == "SpellParameter")
             parameterName = ["SpellParameter", "SpellAreaSpellParameter", "SpellOrRankedSpellParameter", "MultiSpellParameter"];

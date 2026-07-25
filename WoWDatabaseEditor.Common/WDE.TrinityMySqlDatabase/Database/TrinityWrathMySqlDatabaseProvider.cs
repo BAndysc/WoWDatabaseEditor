@@ -127,18 +127,30 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
         return await model.Creature.OrderBy(t => t.Entry).ToListAsync<ICreature>();
     }
 
+    public override async Task<uint> GetMaxCreatureGuid()
+    {
+        await using var model = Database();
+        return await model.Creature.Select(c => c.Guid).OrderByDescending(g => g).FirstOrDefaultAsync();
+    }
+
+    public override async Task<uint> GetMaxGameObjectGuid()
+    {
+        await using var model = Database();
+        return await model.GameObject.Select(g => g.Guid).OrderByDescending(g => g).FirstOrDefaultAsync();
+    }
+
     public override async Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids)
     {
         await using var model = Database();
         var array = guids.Select(x => x.Guid).ToArray();
-        return await model.Creature.Where(c => array.Contains(c.Guid)).ToListAsync<ICreature>();
+        return await model.Creature.Where(c => Enumerable.Contains(array, c.Guid)).ToListAsync<ICreature>();
     }
         
     public override async Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids)
     {
         await using var model = Database();
         var array = guids.Select(x => x.Guid).ToArray();
-        return await model.GameObject.Where(c => array.Contains(c.Guid)).ToListAsync<IGameObject>();
+        return await model.GameObject.Where(c => Enumerable.Contains(array, c.Guid)).ToListAsync<IGameObject>();
     }
 
     public override async Task<IReadOnlyList<ITrinityString>> GetStringsAsync()
@@ -308,8 +320,9 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
         {
             case EventScriptType.Event:
                 return await model.EventScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+            // spell_scripts was removed from current TrinityCore.
             case EventScriptType.Spell:
-                return await model.SpellScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+                return new List<IEventScriptLine>();
             case EventScriptType.Waypoint:
                 return await model.WaypointScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
             case EventScriptType.Gossip:
@@ -325,10 +338,10 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
     public override async Task<IReadOnlyList<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions)
     {
         await using var model = Database();
+        // spell_scripts was removed from current TrinityCore.
         var events = await model.EventScripts.Where(GenerateWhereConditionsForEventScript<MySqlEventScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-        var spells = await model.SpellScripts.Where(GenerateWhereConditionsForEventScript<MySqlSpellScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
         var waypoints = await model.WaypointScripts.Where(GenerateWhereConditionsForEventScript<MySqlWaypointScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-        return events.Concat(spells).Concat(waypoints).ToList();
+        return events.Concat(waypoints).ToList();
     }
     
     public override IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
@@ -346,7 +359,7 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
     public override async Task<IReadOnlyList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
     {
         await using var model = Database();
-        var predicate = PredicateBuilder.New<MySqlSmartScriptLine>();
+        var predicate = PredicateBuilder.New<WrathMySqlSmartScriptLine>();
         foreach (var value in conditions)
         {
             if (value.what == IDatabaseProvider.SmartLinePropertyType.Action)
@@ -374,6 +387,8 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
                     predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam3 == value.valueToSearch);
                 else if (value.parameterIndex == 4)
                     predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam4 == value.valueToSearch);
+                else if (value.parameterIndex == 5)
+                    predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam5 == value.valueToSearch);
             }
             else if (value.what == IDatabaseProvider.SmartLinePropertyType.Target)
             {
@@ -383,6 +398,8 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
                     predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam2 == value.valueToSearch);
                 else if (value.parameterIndex == 3)
                     predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam3 == value.valueToSearch);
+                else if (value.parameterIndex == 4)
+                    predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam4 == value.valueToSearch);
             }
         }
         return await model.SmartScript.Where(predicate).ToListAsync<ISmartScriptLine>();    
@@ -414,4 +431,8 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
         await using var model = Database();
         return await model.WaypointData.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IWaypointData>();
     }
+
+    // `waypoints` and `script_waypoint` were removed from current TrinityCore but still exist in
+    // many 3.3.5 TDB forks - the base implementation queries them and falls back to null when the
+    // table is gone, so both schema generations load what they actually have.
 }

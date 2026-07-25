@@ -108,6 +108,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "target_param3")]
         public long TargetParam3 { get; set; }
 
+        public abstract long TargetParam4 { get; set; }
+
         [Column(Name = "target_x")]
         public float TargetX { get; set; }
 
@@ -197,6 +199,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "event_param5")]
         public override long EventParam5 { get; set; }
 
+        [Column(Name = "target_param4")]
+        public override long TargetParam4 { get; set; }
+
         public override SmallReadOnlyList<uint>? Difficulties
         {
             get
@@ -215,7 +220,26 @@ namespace WDE.TrinityMySqlDatabase.Models
     public class MySqlSmartScriptLine : BaseSqlSmartScriptLine
     {
         public override SmallReadOnlyList<uint>? Difficulties => default;
+
+        [Column(Name = "event_param5")]
         public override long EventParam5 { get; set; }
+
         public override long ActionParam7 { get; set; }
+        public override long TargetParam4 { get; set; }
+    }
+
+    // Backported TrinityWrath schema: has event_param5 and target_param4 (but no action_param7 nor Difficulties)
+    [Table(Name = "smart_scripts")]
+    public class WrathMySqlSmartScriptLine : BaseSqlSmartScriptLine
+    {
+        public override SmallReadOnlyList<uint>? Difficulties => default;
+
+        [Column(Name = "event_param5")]
+        public override long EventParam5 { get; set; }
+
+        public override long ActionParam7 { get; set; }
+
+        [Column(Name = "target_param4")]
+        public override long TargetParam4 { get; set; }
     }
 }

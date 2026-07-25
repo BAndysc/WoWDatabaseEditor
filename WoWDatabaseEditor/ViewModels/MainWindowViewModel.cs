@@ -8,6 +8,7 @@ using Prism.Commands;
 using Prism.Events;
 using PropertyChanged.SourceGenerator;
 using ReactiveUI;
+using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Events;
 using WDE.Common.Managers;
@@ -145,6 +146,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             {
                 if (DocumentManager.ActiveDocument is ISolutionItemDocument { SolutionItem: { } } sid)
                 {
+                    USAGE.Count("feature_used", ("feature", "copy_sql"));
                     await taskRunner.ScheduleTask("Generating SQL",
                         async () =>
                         {
@@ -158,7 +160,10 @@ namespace WoWDatabaseEditorCore.ViewModels
             GenerateCurrentSqlCommand = new DelegateCommand(() =>
             {
                 if (DocumentManager.ActiveDocument is ISolutionItemDocument {SolutionItem: { }} sid)
+                {
+                    USAGE.Count("feature_used", ("feature", "generate_sql"));
                     solutionSqlService.OpenDocumentWithSqlFor(sid.SolutionItem);
+                }
             }, () => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
 
             FindAnywhereCommand = new AsyncAutoCommand(async () =>

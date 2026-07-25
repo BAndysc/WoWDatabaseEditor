@@ -102,6 +102,7 @@ namespace WoWDatabaseEditor.Services.SolutionService
 
         public Task ReloadSolutionRemotelyTask(ISolutionItem item)
         {
+            USAGE.Count("feature_used", ("feature", "remote_reload"));
             var itemName = solutionItemNameRegistry.GetName(item);
             
             return taskRunner.ScheduleTask($"Reload {itemName} on server",

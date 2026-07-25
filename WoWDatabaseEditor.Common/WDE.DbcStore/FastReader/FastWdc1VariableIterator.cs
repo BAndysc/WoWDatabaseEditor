@@ -191,6 +191,21 @@ public partial class FastWdc1Reader
                 ? ""
                 : Encoding.UTF8.GetString(data.Slice(start, zeroByteIndex - start - 1));
         }
+
+        public ReadOnlySpan<byte> GetUtf8String(int field)
+        {
+            if (parent.header.Flags.HasFlagFast(Wdc1Header.HeaderFlags.IndexMap))
+                field--;
+
+            var data = parent.data.Span;
+            var start = offset + GetFieldBitOffset(field) / 8;
+            var zeroByteIndex = start;
+            while (data[zeroByteIndex++] != 0) ;
+            lastKnownFieldSize = (zeroByteIndex - start) * 8; // including null byte
+            return zeroByteIndex <= start
+                ? ReadOnlySpan<byte>.Empty
+                : data.Slice(start, zeroByteIndex - start - 1);
+        }
     }
 
 }

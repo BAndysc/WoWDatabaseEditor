@@ -3,9 +3,82 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Channels;
 using DynamicData.Binding;
+using WDE.Common.Tasks;
 
 namespace WDE.Common.Utils;
+
+public class FlatTreeListThreadMarshal : ObservableCollectionExtended<INodeType>, IDisposable
+{
+    private readonly INotifyCollectionChanged originalList;
+    private readonly IReadOnlyList<INodeType> originalListAsList;
+
+    private Channel<(NotifyCollectionChangedEventArgs, List<INodeType>?)> changesChannel =
+        Channel.CreateUnbounded<(NotifyCollectionChangedEventArgs, List<INodeType>?)>();
+
+    private CancellationTokenSource cts = new();
+
+    public FlatTreeListThreadMarshal(IReadOnlyList<INodeType> initial, INotifyCollectionChanged originalList,
+        IMainThread mainThread)
+    {
+        this.AddRange(initial);
+        this.originalList = originalList;
+        this.originalListAsList = initial;
+        originalList.CollectionChanged += OriginalListOnCollectionChanged;
+        mainThread.Schedule(async () =>
+        {
+            await foreach (var (change, allItems) in changesChannel.Reader.ReadAllAsync(cts.Token))
+            {
+                using var _ = SuspendNotifications();
+                int i = 0;
+                switch (change.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (INodeType added in change.NewItems!)
+                        {
+                            Insert(change.NewStartingIndex + i, added);
+                            i++;
+                        }
+                        break;
+                    case NotifyCollectionChangedAction.Remove:
+                        var count = change.OldItems!.Count;
+                        for (int j = 0; j < count; ++j)
+                        {
+                            RemoveAt(change.OldStartingIndex);
+                        }
+                        break;
+                    case NotifyCollectionChangedAction.Replace:
+                    case NotifyCollectionChangedAction.Move:
+                        throw new NotSupportedException("not impemented");
+                    case NotifyCollectionChangedAction.Reset:
+                        Clear();
+                        AddRange(allItems ?? []);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        });
+    }
+
+    private void OriginalListOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action == NotifyCollectionChangedAction.Reset)
+            changesChannel.Writer.WriteAsync((e, originalListAsList.ToList())).GetAwaiter().GetResult();
+        else
+            changesChannel.Writer.WriteAsync((e, null)).GetAwaiter().GetResult();
+    }
+
+    public void Dispose()
+    {
+        originalList.CollectionChanged -= OriginalListOnCollectionChanged;
+        changesChannel.Writer.TryComplete();
+        cts.Cancel();
+    }
+}
 
 public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeType>, IList<INodeType>, IReadOnlyList<INodeType>, INotifyCollectionChanged where P : IParentType where C : IChildType
 {
@@ -286,6 +359,30 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
                 yield return child;
             }
         }
+    }
+
+    /// <summary>
+    /// Allocation-free variant of <see cref="GetChildren()"/>: appends every leaf child (depth-first)
+    /// into <paramref name="result"/>. The iterator overload allocates a state-machine object per parent
+    /// node plus a boxed <c>List&lt;&gt;.Enumerator</c> per <c>foreach</c>, which is ruinous when called
+    /// every frame - this version traverses by index and touches the heap zero times. Callers should keep
+    /// a reusable list; this method does NOT clear it.
+    /// </summary>
+    public void GetChildren(List<C> result)
+    {
+        // ReSharper disable once ForCanBeConvertedToForeach - deliberate index loop to avoid enumerator boxing
+        for (int i = 0; i < roots.Count; ++i)
+            AppendChildren(roots[i], result);
+    }
+
+    private void AppendChildren(P parent, List<C> result)
+    {
+        var nested = parent.NestedParents;
+        for (int i = 0; i < nested.Count; ++i)
+            AppendChildren((P)nested[i], result);
+        var children = parent.Children;
+        for (int i = 0; i < children.Count; ++i)
+            result.Add((C)children[i]);
     }
 
     public IEnumerator<P> GetParentsEnumerator()

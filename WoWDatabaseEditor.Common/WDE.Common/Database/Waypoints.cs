@@ -96,3 +96,34 @@ public interface IMangosWaypointsPathName
     public uint PathId { get; }
     public string Name { get; }
 }
+
+/// <summary>The per-path metadata row of TC master's `waypoint_path` (the points live in
+/// `waypoint_path_node`): movement type, flags, an optional velocity override and a comment
+/// apply to the whole path there instead of per point.</summary>
+public interface IWaypointPathHeader
+{
+    public uint PathId { get; }
+    public int MoveType { get; }
+    public int Flags { get; }
+    public float? Velocity { get; }
+    public string? Comment { get; }
+}
+
+/// <summary>Mutable holder of <see cref="IWaypointPathHeader"/> data for editors.</summary>
+public struct WaypointPathHeader : IWaypointPathHeader
+{
+    public uint PathId { get; set; }
+    public int MoveType { get; set; }
+    public int Flags { get; set; }
+    public float? Velocity { get; set; }
+    public string? Comment { get; set; }
+
+    public static WaypointPathHeader From(IWaypointPathHeader other) => new()
+    {
+        PathId = other.PathId,
+        MoveType = other.MoveType,
+        Flags = other.Flags,
+        Velocity = other.Velocity,
+        Comment = other.Comment,
+    };
+}

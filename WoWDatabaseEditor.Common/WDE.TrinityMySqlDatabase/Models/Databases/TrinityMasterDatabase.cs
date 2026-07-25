@@ -25,6 +25,7 @@ public class TrinityMasterDatabase : BaseTrinityDatabase
     public ITable<MySqlSpellScriptLine> SpellScripts => this.GetTable<MySqlSpellScriptLine>();
     public ITable<MasterMySqlSmartScriptLine> SmartScript => this.GetTable<MasterMySqlSmartScriptLine>();
     public ITable<MasterWaypointData> WaypointData => this.GetTable<MasterWaypointData>();
+    public ITable<MasterWaypointPathHeader> WaypointPathHeader => this.GetTable<MasterWaypointPathHeader>();
     public ITable<MySqlConditionLineMaster> ConditionsMaster => this.GetTable<MySqlConditionLineMaster>();
     public ITable<MySqlConversationActor> ConversationActor => this.GetTable<MySqlConversationActor>();
     

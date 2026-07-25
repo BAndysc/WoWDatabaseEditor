@@ -13,6 +13,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         {
         }
 
+        public ITable<MySqlCreatureFormation> CreatureFormations => this.GetTable<MySqlCreatureFormation>();
         public ITable<MySqlAreaTriggerScript> AreaTriggerScript => this.GetTable<MySqlAreaTriggerScript>();
         public ITable<MySqlGameObjectTemplate> GameObjectTemplate => this.GetTable<MySqlGameObjectTemplate>();
         public ITable<MySqlQuestTemplate> QuestTemplate => this.GetTable<MySqlQuestTemplate>();

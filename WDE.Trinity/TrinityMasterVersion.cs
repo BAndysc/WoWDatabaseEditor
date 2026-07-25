@@ -24,6 +24,7 @@ namespace WDE.Trinity
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>() {typeof(INpcText), typeof(ICreatureClassLevelStat), typeof(IBroadcastText)};
         public bool AlternativeTrinityDatabase => false;
+        public bool SupportsTransactions => true;
         public WaypointTables SupportedWaypoints => WaypointTables.WaypointData;
         public bool SpawnGroupTemplateHasType => false;
 

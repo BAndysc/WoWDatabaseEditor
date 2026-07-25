@@ -11,8 +11,8 @@ namespace WDE.CMMySqlDatabase.Models.Wrath
         [Column("displayId"                           )] public uint   DisplayId      { get; set; } // mediumint(8) unsigned
         [Column("name"          , CanBeNull    = false)] public string Name           { get; set; } = null!; // varchar(100)
         [Column("IconName"      , CanBeNull    = false)] public string IconName       { get; set; } = null!; // varchar(100)
-        [Column("castBarCaption", CanBeNull    = false)] public string CastBarCaption { get; set; } = null!; // varchar(100)
-        [Column("unk1"          , CanBeNull    = false)] public string Unk1           { get; set; } = null!; // varchar(100)
+        [Column("OpeningText"   , CanBeNull    = false)] public string CastBarCaption { get; set; } = null!; // varchar(100)
+        [Column("ClosingText"   , CanBeNull    = false)] public string Unk1           { get; set; } = null!; // varchar(100)
         [Column("faction"                             )] public ushort Faction        { get; set; } // smallint(5) unsigned
         [Column("flags"                               )] public uint   Flags          { get; set; } // int(10) unsigned
         [Column("ExtraFlags"                          )] public uint   ExtraFlags     { get; set; } // int(11) unsigned

@@ -108,6 +108,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "target_param3")]
         public long TargetParam3 { get; set; }
 
+        [Column(Name = "target_param4")]
+        public long TargetParam4 { get; set; }
+
         [Column(Name = "target_x")]
         public float TargetX { get; set; }
 
@@ -156,6 +159,7 @@ namespace WDE.TrinityMySqlDatabase.Models
             TargetParam1 = line.TargetParam1;
             TargetParam2 = line.TargetParam2;
             TargetParam3 = line.TargetParam3;
+            TargetParam4 = line.TargetParam4;
             TargetX = line.TargetX;
             TargetY = line.TargetY;
             TargetZ = line.TargetZ;

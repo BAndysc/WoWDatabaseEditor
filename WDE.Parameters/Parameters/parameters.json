@@ -227,7 +227,7 @@
 			"0": { "name": "NONE" },
 			"1": {"name": "GOSSIP"},
 			"2": {"name": "QUESTGIVER"},
-			"4": {"name": "UNK1"},
+			"4": {"name": "ACCOUNT_BANKER"},
 			"8": {"name": "UNK2"},
 			"16": {"name": "TRAINER"},
 			"32": {"name": "TRAINER_CLASS"},
@@ -240,7 +240,7 @@
 			"4096": {"name": "REPAIR"},
 			"8192": {"name": "FLIGHTMASTER"},
 			"16384": {"name": "SPIRITHEALER"},
-			"32768": {"name": "SPIRITGUIDE"},
+			"32768": {"name": "AREA_SPIRIT_HEALER"},
 			"65536": {"name": "INNKEEPER"},
 			"131072": {"name": "BANKER"},
 			"262144": {"name": "PETITIONER"},
@@ -252,9 +252,37 @@
 			"16777216": {"name": "SPELLCLICK"},
 			"33554432": {"name": "PLAYER_VEHICLE"},
 			"67108864": {"name": "MAILBOX"},
-			"134217728": {"name": "REFORGER"},
+			"134217728": {"name": "ARTIFACT_POWER_RESPEC"},
 			"268435456": {"name": "TRANSMOGRIFIER"},
-			"536870912": {"name": "VAULTKEEPER"}
+			"536870912": {"name": "VAULTKEEPER"},
+			"1073741824": {"name": "WILD_BATTLE_PET", "description": "Pet that player can fight (Battle Pet)"},
+			"2147483648": {"name": "BLACK_MARKET"}
+		}
+	},
+	"NpcFlag2Parameter": {
+		"isflag": true,
+		"inmenu": true,
+		"quickaccess": "Full",
+		"name": "NPC flags 2",
+		"prefix": "UNIT_NPC_FLAG_2_",
+		"values": {
+			"0": { "name": "NONE" },
+			"1": {"name": "ITEM_UPGRADE_MASTER"},
+			"2": {"name": "GARRISON_ARCHITECT"},
+			"4": {"name": "STEERING", "description": "Clientside pathfinding (avoiding obstacles)"},
+			"8": {"name": "AREA_SPIRIT_HEALER_INDIVIDUAL"},
+			"16": {"name": "SHIPMENT_CRAFTER", "description": "Garrison work orders"},
+			"32": {"name": "GARRISON_MISSION_NPC"},
+			"64": {"name": "TRADESKILL_NPC", "description": "Crafting at npc"},
+			"128": {"name": "BLACK_MARKET_VIEW", "description": "Only allows viewing black market auctions, no bidding"},
+			"512": {"name": "GARRISON_TALENT_NPC"},
+			"1024": {"name": "CONTRIBUTION_COLLECTOR"},
+			"8192": {"name": "FAST_STEERING_AVOIDS_OBSTACLES"},
+			"16384": {"name": "AZERITE_RESPEC"},
+			"32768": {"name": "ISLANDS_QUEUE"},
+			"65536": {"name": "SUPPRESS_NPC_SOUNDS_EXCEPT_END_OF_INTERACTION"},
+			"524288": {"name": "PERKS_VENDOR", "description": "Trading post vendor"},
+			"2097152": {"name": "PERSONAL_TABARD_DESIGNER"}
 		}
 	},
 	"FlagApplyModeParameter": {
@@ -1480,6 +1508,22 @@
 			"8": {"name": "eclipse"},
 			"9": {"name": "holy power"},
 			"10": {"name": "alternate power"}
+		}
+	},
+	"PowerOrDisabledParameter": {
+		"name": "Power type",
+		"values": {
+			"0": {"name": "disabled"},
+			"1": {"name": "mana"},
+			"2": {"name": "rage"},
+			"3": {"name": "focus"},
+			"4": {"name": "energy"},
+			"6": {"name": "runes"},
+			"7": {"name": "runic power"},
+			"8": {"name": "soul shards"},
+			"9": {"name": "eclipse"},
+			"10": {"name": "holy power"},
+			"11": {"name": "alternate power"}
 		}
 	},
 	"StandStateParameter": {
@@ -2734,6 +2778,14 @@
 	},
 	"GameobjectStateParameter": {
 		"values": {
+			"0": {"name": "active", "description": "show in world as used and not reset (closed door open)"},
+			"1": {"name": "ready", "description": "show in world as ready (closed door close)"},
+			"2": {"name": "active alternative", "description": "show in world as used in alt way and not reset (closed door open by cannon fire)"}
+		}
+	},
+	"GameobjectStateOrMinus1Parameter": {
+		"values": {
+			"-1": {"name": "no overide", "description": "use default state"},
 			"0": {"name": "active", "description": "show in world as used and not reset (closed door open)"},
 			"1": {"name": "ready", "description": "show in world as ready (closed door close)"},
 			"2": {"name": "active alternative", "description": "show in world as used in alt way and not reset (closed door open by cannon fire)"}

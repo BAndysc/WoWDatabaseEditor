@@ -6,7 +6,8 @@ namespace WDE.TrinityMySqlDatabase.Models;
 
 public class TrinityCataDatabase : BaseTrinityDatabase
 {
-    public ITable<MySqlCreatureTemplateWrath> CreatureTemplate => this.GetTable<MySqlCreatureTemplateWrath>();
+    public ITable<MySqlCreatureTemplateCata> CreatureTemplate => this.GetTable<MySqlCreatureTemplateCata>();
+    public ITable<MySqlCreatureFormationCata> CreatureFormationsCata => this.GetTable<MySqlCreatureFormationCata>();
     public ITable<MySqlCreatureCata> Creature => this.GetTable<MySqlCreatureCata>();
     public ITable<MySqlBroadcastText> BroadcastTexts => this.GetTable<MySqlBroadcastText>();
     public ITable<TrinityString> Strings => this.GetTable<TrinityString>();

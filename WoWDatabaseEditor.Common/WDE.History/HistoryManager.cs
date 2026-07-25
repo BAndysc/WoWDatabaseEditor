@@ -144,6 +144,8 @@ namespace WDE.History
             if (Past.Count == 0)
                 throw new NothingToUndoException();
 
+            WDE.Common.USAGE.Count("feature_used", ("feature", "undo"));
+
             IHistoryAction action = Past[^1];
             Past.RemoveAt(Past.Count - 1);
             Future.Insert(0, action);
@@ -161,6 +163,8 @@ namespace WDE.History
         {
             if (Future.Count == 0)
                 throw new NothingToRedoException();
+
+            WDE.Common.USAGE.Count("feature_used", ("feature", "redo"));
 
             IHistoryAction action = Future[0];
             Future.RemoveAt(0);

@@ -194,6 +194,17 @@ public partial class FastWdc1Reader
                 return *(float*)ptr;
         }
 
+        public ReadOnlySpan<byte> GetUtf8String(int field)
+        {
+            var strings = parent.strings.Span;
+            var start = GetInt(field);
+            var zeroByteIndex = start;
+            while (strings[zeroByteIndex++] != 0) ;
+            return zeroByteIndex <= start
+                ? ReadOnlySpan<byte>.Empty
+                : strings.Slice(start, zeroByteIndex - start - 1);
+        }
+
         public string GetString(int field)
         {
             var strings = parent.strings.Span;

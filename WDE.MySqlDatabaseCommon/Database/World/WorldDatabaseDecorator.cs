@@ -105,6 +105,25 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type) => impl.GetSpawnGroupSpawnByGuidAsync(guid, type);
         public Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id) => impl.GetSpawnGroupFormation(id);
         public Task<IReadOnlyList<ISpawnGroupFormation>?> GetSpawnGroupFormations() => impl.GetSpawnGroupFormations();
+        public Task<IReadOnlyList<ISpawnGroupRandomEntry>?> GetSpawnGroupRandomEntriesAsync() => impl.GetSpawnGroupRandomEntriesAsync();
+        public Task<IReadOnlyList<ISpawnGroupLinkedGroup>?> GetSpawnGroupLinkedGroupsAsync() => impl.GetSpawnGroupLinkedGroupsAsync();
+        public Task<IReadOnlyList<ISpawnGroupSquadMember>?> GetSpawnGroupSquadsAsync() => impl.GetSpawnGroupSquadsAsync();
+        // the pool getters are default interface methods (returning null); without these explicit
+        // forwards the decorator would answer with the defaults instead of the real provider
+        public Task<IReadOnlyList<IPoolTemplate>?> GetPoolTemplatesAsync() => impl.GetPoolTemplatesAsync();
+        public Task<IPoolTemplate?> GetPoolTemplateByIdAsync(uint entry) => impl.GetPoolTemplateByIdAsync(entry);
+        public Task<IReadOnlyList<IPoolCreatureMember>?> GetPoolCreaturesAsync() => impl.GetPoolCreaturesAsync();
+        public Task<IReadOnlyList<IPoolGameObjectMember>?> GetPoolGameObjectsAsync() => impl.GetPoolGameObjectsAsync();
+        public Task<IReadOnlyList<IPoolCreatureEntryMember>?> GetPoolCreatureEntryPoolsAsync() => impl.GetPoolCreatureEntryPoolsAsync();
+        public Task<IReadOnlyList<IPoolGameObjectEntryMember>?> GetPoolGameObjectEntryPoolsAsync() => impl.GetPoolGameObjectEntryPoolsAsync();
+        public Task<IReadOnlyList<IPoolNesting>?> GetPoolNestingsAsync() => impl.GetPoolNestingsAsync();
+
+        public Task<IReadOnlyList<ICreatureLinking>?> GetCreatureLinkingsAsync() => impl.GetCreatureLinkingsAsync();
+        public Task<IReadOnlyList<ICreatureLinkingTemplate>?> GetCreatureLinkingTemplatesAsync() => impl.GetCreatureLinkingTemplatesAsync();
+
+        public Task<IReadOnlyList<IWorldSafeLoc>?> GetWorldSafeLocsAsync() => impl.GetWorldSafeLocsAsync();
+        public Task<IReadOnlyList<IGraveyardLink>?> GetGraveyardLinksAsync() => impl.GetGraveyardLinksAsync();
+        public Task<IReadOnlyList<ISpellTargetPosition>?> GetSpellTargetPositionsAsync() => impl.GetSpellTargetPositionsAsync();
         
         public Task<IReadOnlyList<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) => impl.GetGossipMenuOptionsAsync(menuId);
         public Task<INpcText?> GetNpcText(uint entry) => impl.GetNpcText(entry);
@@ -153,6 +172,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync() => impl.GetGameObjectsAsync();
         public Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(int map) => impl.GetCreaturesByMapAsync(map);
         public Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(int map) => impl.GetGameObjectsByMapAsync(map);
+        public Task<uint> GetMaxCreatureGuid() => impl.GetMaxCreatureGuid();
+        public Task<uint> GetMaxGameObjectGuid() => impl.GetMaxGameObjectGuid();
 
         public Task<IReadOnlyList<ICoreCommandHelp>> GetCommands() => impl.GetCommands();
         public Task<IReadOnlyList<ITrinityString>> GetStringsAsync() => impl.GetStringsAsync();
@@ -165,8 +186,13 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId) => impl.GetQuestStarters(questId);
         public Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId) => impl.GetQuestEnders(questId);
+        // default interface methods (returning null) - without these explicit forwards the
+        // decorator would answer with the defaults instead of the real provider
+        public Task<IReadOnlyList<IQuestRelation>?> GetAllQuestStarters() => impl.GetAllQuestStarters();
+        public Task<IReadOnlyList<IQuestRelation>?> GetAllQuestEnders() => impl.GetAllQuestEnders();
 
         public Task<IReadOnlyList<IQuestFactionChange>> GetQuestFactionChanges() => impl.GetQuestFactionChanges();
+        public Task<IReadOnlyList<ICreatureFormation>> GetCreatureFormations() => impl.GetCreatureFormations();
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => impl.GetSceneTemplateAsync(sceneId);
         public Task<IReadOnlyList<ISceneTemplate>?> GetSceneTemplatesAsync() => impl.GetSceneTemplatesAsync();
         public Task<IPhaseName?> GetPhaseNameAsync(uint phaseId) => impl.GetPhaseNameAsync(phaseId);
@@ -214,6 +240,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => impl.GetMangosPathName(pathId);
 
+        public Task<IWaypointPathHeader?> GetWaypointPathHeader(uint pathId) => impl.GetWaypointPathHeader(pathId);
+
         public Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type, uint entry) => impl.GetLoot(type, entry);
         
         public Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type) => impl.GetLoot(type);
@@ -239,6 +267,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IReadOnlyList<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => impl.GetEventScript(type, id);
         
         public Task<IReadOnlyList<IEventAiLine>> GetEventAi(int id) => impl.GetEventAi(id);
+
+        public Task<IReadOnlyList<IEventAiLine>> FindEventAiLinesBy(IEnumerable<(IDatabaseProvider.EventAiLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) => impl.FindEventAiLinesBy(conditions);
 
         public Task<IReadOnlyList<IQuestScriptName>> GetQuestScriptNames(uint questId) => impl.GetQuestScriptNames(questId);
         

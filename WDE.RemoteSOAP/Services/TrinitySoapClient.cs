@@ -15,14 +15,15 @@ namespace WDE.RemoteSOAP.Services
         private readonly TrinitySoapParser soapParser;
         
         public TrinitySoapClient(ISoapClientFactory soapClientFactory,
-            string host, 
-            int port, 
-            string userName, 
-            string password)
+            string host,
+            int port,
+            string userName,
+            string password,
+            string commandNamespace = "urn:TC")
         {
             endpoint = new Uri($"http://{host}:{port}");
             soapClient = soapClientFactory.Factory(userName, password);
-            soapParser = new TrinitySoapParser();
+            soapParser = new TrinitySoapParser(commandNamespace);
         }
         
         public async Task<SoapResponse> ExecuteCommand(string command)

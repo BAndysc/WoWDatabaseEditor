@@ -78,14 +78,6 @@ public partial class SqlWorkbenchView : UserControl
         }));
         
         editor.Options.AllowScrollBelowDocument = false;
-        _completionWindow = new CompletionWindow(editor.TextArea);
-        _completionWindow.Styles.Add(new StyleInclude(new Uri("resm:Styles?assembly=WDE.SqlWorkbench")){Source = new Uri("avares://WDE.SqlWorkbench/Generic.axaml")});
-        _completionWindow.WindowManagerAddShadowHint = true;
-        _completionWindow.Width = 450;
-        _completionWindow.MaxHeight = 600;
-        _completionWindow.IsLightDismissEnabled = true;
-        _completionWindow.CloseAutomatically = false;
-        _completionWindow.CloseWhenCaretAtBeginning = false;
 
         BindToDataContext();
     }
@@ -159,23 +151,42 @@ public partial class SqlWorkbenchView : UserControl
         UnbindFromDataContext();
     }
 
+    private CompletionWindow GetCompletionWindow()
+    {
+        if (_completionWindow != null)
+            return _completionWindow;
+
+        _completionWindow = new CompletionWindow(editor.TextArea);
+        _completionWindow.Closed += (_, __) => _completionWindow = null!;
+        _completionWindow.Styles.Add(new StyleInclude(new Uri("resm:Styles?assembly=WDE.SqlWorkbench")){Source = new Uri("avares://WDE.SqlWorkbench/Generic.axaml")});
+        _completionWindow.WindowManagerAddShadowHint = true;
+        _completionWindow.Width = 450;
+        _completionWindow.MaxHeight = 600;
+        _completionWindow.IsLightDismissEnabled = true;
+        _completionWindow.CloseAutomatically = false;
+        _completionWindow.CloseWhenCaretAtBeginning = false;
+        return _completionWindow;
+    }
+
     private void OnCompletionsSetChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (DataContext is SqlWorkbenchViewModel vm)
         {
+            var completionWindow = GetCompletionWindow();
             if (vm.Completions.Count > 0)
             {
-                if (!_completionWindow.IsOpen)
+                if (!completionWindow.IsOpen)
                 {
-                    _completionWindow.CompletionList.CompletionData.Clear();
-                    _completionWindow.CompletionList.CompletionData.AddRange(vm.Completions);
-                    _completionWindow.Show();
-                    _completionWindow.RefreshCompletion();
+                    completionWindow.CompletionList.CompletionData.Clear();
+                    completionWindow.CompletionList.CompletionData.AddRange(vm.Completions);
+                    completionWindow.Show();
+                    // todo: avalonia 12
+                    // completionWindow.RefreshCompletion();
                 }
             }
             else
             {
-                _completionWindow.Close();
+                completionWindow.Close();
             }
         }
     }
@@ -193,10 +204,10 @@ public partial class SqlWorkbenchView : UserControl
     protected override void OnKeyUp(KeyEventArgs e)
     {
         base.OnKeyUp(e);
-        if (e.Key is Key.Up or Key.Down && _completionWindow.IsOpen)
+        if (e.Key is Key.Up or Key.Down && _completionWindow != null && _completionWindow.IsOpen)
             return;
 
-        if (e.Key is Key.Left or Key.Right && _completionWindow.IsOpen)
+        if (e.Key is Key.Left or Key.Right && _completionWindow != null && _completionWindow.IsOpen)
         {
             _completionWindow.Close();
         }

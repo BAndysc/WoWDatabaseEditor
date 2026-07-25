@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using MySqlConnector;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
@@ -12,14 +13,17 @@ namespace WDE.MySqlDatabaseCommon.Database
     {
         private readonly IMySqlAuthConnectionStringProvider authConnectionString;
         private readonly IAuthDatabaseProvider databaseProvider;
+        private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly DatabaseLogger databaseLogger;
 
         public AuthMySqlExecutor(IMySqlAuthConnectionStringProvider authConnectionString,
             IAuthDatabaseProvider databaseProvider,
+            ICurrentCoreVersion currentCoreVersion,
             DatabaseLogger databaseLogger)
         {
             this.authConnectionString = authConnectionString;
             this.databaseProvider = databaseProvider;
+            this.currentCoreVersion = currentCoreVersion;
             this.databaseLogger = databaseLogger;
         }
 
@@ -33,13 +37,18 @@ namespace WDE.MySqlDatabaseCommon.Database
             databaseLogger.Log(query, null, TraceLevel.Info, QueryType.WriteQuery);
             
             using var writeLock = await DatabaseLock.WriteLock();
-            
+
+            // when the core mixes InnoDB and MyISAM tables (cmangos), a transaction cannot
+            // span both engines, so run without one
+            bool useTransaction = currentCoreVersion.Current.DatabaseFeatures.SupportsTransactions;
+
             MySqlConnection conn = new(authConnectionString.ConnectionString);
-            MySqlTransaction transaction;
+            MySqlTransaction? transaction = null;
             try
             {
                 await conn.OpenAsync();
-                transaction = await conn.BeginTransactionAsync();
+                if (useTransaction)
+                    transaction = await conn.BeginTransactionAsync();
             }
             catch (Exception e)
             {
@@ -50,17 +59,20 @@ namespace WDE.MySqlDatabaseCommon.Database
             {
                 MySqlCommand cmd = new(query, conn, transaction);
                 await cmd.ExecuteNonQueryAsync();
-                await transaction.CommitAsync();
+                if (transaction != null)
+                    await transaction.CommitAsync();
             }
             catch (MySqlConnector.MySqlException e)
             {
-                await transaction.RollbackAsync();
+                if (transaction != null)
+                    await transaction.RollbackAsync();
                 await conn.CloseAsync();
                 throw new IMySqlExecutor.QueryFailedDatabaseException(e.Message, e);
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
+                if (transaction != null)
+                    await transaction.RollbackAsync();
                 await conn.CloseAsync();
                 throw new IMySqlExecutor.QueryFailedDatabaseException(ex);
             }

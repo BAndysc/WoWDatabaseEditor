@@ -157,18 +157,30 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         return await model.Creature.OrderBy(t => t.Entry).ToListAsync<ICreature>();
     }
 
+    public override async Task<uint> GetMaxCreatureGuid()
+    {
+        await using var model = Database();
+        return await model.Creature.Select(c => c.Guid).OrderByDescending(g => g).FirstOrDefaultAsync();
+    }
+
+    public override async Task<uint> GetMaxGameObjectGuid()
+    {
+        await using var model = Database();
+        return await model.GameObject.Select(g => g.Guid).OrderByDescending(g => g).FirstOrDefaultAsync();
+    }
+
     public override async Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids)
     {
         await using var model = Database();
         var array = guids.Select(x => x.Guid).ToArray();
-        return await model.Creature.Where(c => array.Contains(c.Guid)).ToListAsync<ICreature>();
+        return await model.Creature.Where(c => Enumerable.Contains(array, c.Guid)).ToListAsync<ICreature>();
     }
         
     public override async Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids)
     {
         await using var model = Database();
         var array = guids.Select(x => x.Guid).ToArray();
-        return await model.GameObject.Where(c => array.Contains(c.Guid)).ToListAsync<IGameObject>();
+        return await model.GameObject.Where(c => Enumerable.Contains(array, c.Guid)).ToListAsync<IGameObject>();
     }
 
     public override async Task<IReadOnlyList<ITrinityString>> GetStringsAsync()
@@ -395,8 +407,8 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         {
             case EventScriptType.Event:
                 return await model.EventScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+            // spell_scripts and waypoint_scripts tables were removed from current TrinityCore.
             case EventScriptType.Spell:
-                return await model.SpellScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
             case EventScriptType.Waypoint:
             case EventScriptType.Gossip:
             case EventScriptType.QuestStart:
@@ -411,9 +423,9 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
     public override async Task<IReadOnlyList<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions)
     {
         await using var model = Database();
+        // spell_scripts was removed from current TrinityCore; only event_scripts remains.
         var events = await model.EventScripts.Where(GenerateWhereConditionsForEventScript<MySqlEventScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-        var spells = await model.SpellScripts.Where(GenerateWhereConditionsForEventScript<MySqlSpellScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-        return events.Concat(spells).ToList();
+        return events.ToList();
     }
     
     public override IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
@@ -468,6 +480,8 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
                     predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam2 == value.valueToSearch);
                 else if (value.parameterIndex == 3)
                     predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam3 == value.valueToSearch);
+                else if (value.parameterIndex == 4)
+                    predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam4 == value.valueToSearch);
             }
         }
         return await model.SmartScript.Where(predicate).ToListAsync<ISmartScriptLine>();    
@@ -498,6 +512,12 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
     {
         await using var model = Database();
         return await model.WaypointData.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IWaypointData>();
+    }
+
+    public override async Task<IWaypointPathHeader?> GetWaypointPathHeader(uint pathId)
+    {
+        await using var model = Database();
+        return await model.WaypointPathHeader.FirstOrDefaultAsync(p => p.PathId == pathId);
     }
 
     public override async Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(int sourceType, int sourceEntry, int sourceId)

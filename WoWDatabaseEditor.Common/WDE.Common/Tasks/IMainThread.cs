@@ -15,5 +15,8 @@ namespace WDE.Common.Tasks
         /// <param name="interval">The interval at which to tick.</param>
         /// <returns>An <see cref="T:System.IDisposable" /> used to cancel the timer.</returns>
         IDisposable StartTimer(Func<bool> action, TimeSpan interval);
+
+        Task<T> Schedule<T>(Func<Task<T>> func);
+        Task<T> Schedule<T>(Func<T> func);
     }
 }

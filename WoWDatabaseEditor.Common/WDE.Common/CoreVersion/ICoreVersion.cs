@@ -24,6 +24,9 @@ namespace WDE.Common.CoreVersion
         PhasingType PhasingType { get; }
         GameVersion Version { get; }
         bool HideRelatedItems => false;
+        // XML namespace of the SOAP executeCommand method exposed by the server's remote console.
+        // TrinityCore/AzerothCore use "urn:TC", CMaNGOS uses "urn:MaNGOS".
+        string SoapCommandNamespace => "urn:TC";
         LootEditingMode LootEditingMode => LootEditingMode.PerLogicalEntity;
         // todo: this can be moved to settings as a configurable option
         IEnumerable<(DatabaseTable id, bool enabled)> TopBarQuickTableEditors => Array.Empty<(DatabaseTable, bool)>();
@@ -89,13 +92,17 @@ namespace WDE.Common.CoreVersion
         SmartScriptWaypoint = 2, // waypoints
         ScriptWaypoint = 4, // script_waypoint
         MangosWaypointPath = 8, // waypoint_path
-        MangosCreatureMovement = 16 // creature_movement(_template)
+        MangosCreatureMovement = 16, // creature_movement (keyed by creature guid)
+        MangosCreatureMovementTemplate = 32 // creature_movement_template (keyed by entry + pathId)
     }
     
     public interface IDatabaseFeatures
     {
         ISet<Type> UnsupportedTables { get; }
         bool AlternativeTrinityDatabase { get; }
+        // false when the database mixes InnoDB and MyISAM tables (cmangos), so a single
+        // transaction can't cover updates to both engines
+        bool SupportsTransactions { get; }
         bool HasAiEntry => false;
         WaypointTables SupportedWaypoints { get; }
         bool SpawnGroupTemplateHasType { get; }

@@ -120,7 +120,10 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
             cells.Add(BadLuckProtectionId);
     
         if (ParentVm.LootEditorFeatures.HasConditionId)
+        {
             cells.Add(ConditionId);
+            cells.Add(new ActionCell(ParentVm.EditMangosConditionsCommand, this, () => "Edit"));
+        }
         else
             cells.Add(new ActionCell(ParentVm.EditConditionsCommand, this, () => $"Conditions ({conditions.CountActualConditions()})"));
 

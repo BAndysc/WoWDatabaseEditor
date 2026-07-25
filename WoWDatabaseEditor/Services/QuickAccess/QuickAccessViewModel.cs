@@ -104,6 +104,7 @@ public class QuickAccessViewModel : ObservableBase, IQuickAccessViewModel
 
     public void Commit(QuickAccessItemViewModel vm)
     {
+        WDE.Common.USAGE.Count("feature_used", ("feature", "quick_access"));
         vm.Execute();
     }
 }

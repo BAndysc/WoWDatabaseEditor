@@ -43,7 +43,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly IUserSettings userSettings;
         private readonly IDotNetService dotNetService;
         private bool showGiveStarBox;
-        private bool showAvalonia11Box;
+        private bool showAvalonia12Box;
         public AboutViewModel AboutViewModel { get; }
         public ObservableCollection<NewItemPrototypeInfo> FlatItemPrototypes { get; } = new();
         public ObservableCollection<MostRecentlyUsedViewModel> MostRecentlyUsedItems { get; } = new();
@@ -59,15 +59,17 @@ namespace WoWDatabaseEditorCore.ViewModels
             set => SetProperty(ref showGiveStarBox, value);
         }
 
-        public bool ShowAvalonia11Box
+        public bool ShowAvalonia12Box
         {
-            get => showAvalonia11Box;
+            get => showAvalonia12Box;
             set
             {
-                SetProperty(ref showAvalonia11Box, value);
+                SetProperty(ref showAvalonia12Box, value);
                 UpdateSettings();
             }
         }
+
+        public ICommand DismissAvalonia12Command { get; }
 
         public string ProgramTitle { get; }
         
@@ -186,8 +188,10 @@ namespace WoWDatabaseEditorCore.ViewModels
                               !applicationReleaseConfiguration.GetBool("SKIP_STAR_BOX").GetValueOrDefault() &&
                               !userSettings.Get<QuickStartSettings>().DismissedLeaveStarBox;
 
-            showAvalonia11Box = !userSettings.Get<QuickStartSettings>().DismissedAvalonia11Box;
+            showAvalonia12Box = !userSettings.Get<QuickStartSettings>().DismissedAvalonia12Box;
 
+            DismissAvalonia12Command = new DelegateCommand(() => ShowAvalonia12Box = false);
+            
             try
             {
                 ReloadMruList();
@@ -212,7 +216,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             userSettings.Update(new QuickStartSettings()
             {
                 DismissedLeaveStarBox = !ShowGiveStarBox,
-                DismissedAvalonia11Box = !showAvalonia11Box
+                DismissedAvalonia12Box = !showAvalonia12Box
             });
         }
 
@@ -250,7 +254,7 @@ namespace WoWDatabaseEditorCore.ViewModels
     public struct QuickStartSettings : ISettings
     {
         public bool DismissedLeaveStarBox { get; set; }
-        public bool DismissedAvalonia11Box { get; set; }
+        public bool DismissedAvalonia12Box { get; set; }
     }
 
     public class MostRecentlyUsedViewModel

@@ -3,6 +3,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
+using WDE.Common.CoreVersion;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
@@ -21,7 +22,7 @@ namespace WDE.RemoteSOAP.ViewModels
         private string? port;
         private string? user;
 
-        public SoapConfigViewModel(IConnectionSettingsProvider settings, ISoapClientFactory clientFactory)
+        public SoapConfigViewModel(IConnectionSettingsProvider settings, ISoapClientFactory clientFactory, ICurrentCoreVersion currentCoreVersion)
         {
             port = (settings.GetSettings().Port ?? 7878).ToString();
             user = settings.GetSettings().User;
@@ -43,7 +44,7 @@ namespace WDE.RemoteSOAP.ViewModels
                 int? port = null;
                 if (int.TryParse(Port, out int port_))
                     port = port_;
-                var client = new TrinitySoapClient(clientFactory, host, port ?? 0, user!, pass!);
+                var client = new TrinitySoapClient(clientFactory, host, port ?? 0, user!, pass!, currentCoreVersion.Current.SoapCommandNamespace);
                 try
                 {
                     var response = await client.ExecuteCommand("server info");
@@ -53,7 +54,7 @@ namespace WDE.RemoteSOAP.ViewModels
                     {
                         if (string.IsNullOrEmpty(response.Message))
                             TestConnectionOutput =
-                                "Server responded, but response ill-formed. Is it TrinityCore based server?";
+                                "Server responded, but response ill-formed. Is it a TrinityCore or CMaNGOS based server?";
                         else
                             TestConnectionOutput = "Server responded, but command failed: " + response.Message;
                     }
@@ -113,7 +114,7 @@ namespace WDE.RemoteSOAP.ViewModels
         public string Name => "Soap connector";
 
         public string ShortDescription =>
-            "WoW Database Editor can connect to the TrinityCore-based server console and execute reload commands for you.\n\nFirstly you have to enable SOAP in worldserver configuration, set `SOAP.Enabled` to `1` in order to do so. Then put your GM account username and password to execute commands on your behalf.";
+            "WoW Database Editor can connect to the TrinityCore or CMaNGOS based server console and execute reload commands for you.\n\nFirstly you have to enable SOAP in worldserver configuration, set `SOAP.Enabled` to `1` in order to do so. Then put your GM account username and password to execute commands on your behalf.";
 
         public AsyncAutoCommand TestConnection { get; }
 

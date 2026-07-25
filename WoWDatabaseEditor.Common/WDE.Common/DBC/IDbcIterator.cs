@@ -1,3 +1,5 @@
+using System;
+
 namespace WDE.Common.DBC
 {
     public interface IDbcIterator
@@ -19,6 +21,7 @@ namespace WDE.Common.DBC
         public byte GetByte(int field, int arrayIndex);
         public string GetString(int field);
         public string GetString(int field, int arrayIndex);
+        public ReadOnlySpan<byte> GetUtf8String(int field);
         public float GetFloat(int field);
         public float GetFloat(int field, int arrayIndex);
     }

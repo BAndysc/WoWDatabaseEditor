@@ -3,10 +3,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:viewModels="clr-namespace:WDE.SourceCodeIntegrationEditor.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Margin="20"
              Padding="10" 
              controls:WizardPanel.StepTitle="Pick core source folder"
+             x:DataType="viewModels:WizardStyleViewModelBase"
              x:Class="WDE.SourceCodeIntegrationEditor.Views.SourceCodeWizardPage">
     <StackPanel>
         <TextBlock FontWeight="Light" FontSize="20" Margin="0,0,0,10">WoW Core sources</TextBlock>

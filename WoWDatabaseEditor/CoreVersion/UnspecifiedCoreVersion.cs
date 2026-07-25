@@ -23,6 +23,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
         public bool SpawnGroupTemplateHasType => false;
         public ISet<SmartScriptType> SupportedTypes => new HashSet<SmartScriptType>();
         public bool AlternativeTrinityDatabase => false;
+        public bool SupportsTransactions => true;
         public WaypointTables SupportedWaypoints => 0;
         public PhasingType PhasingType => PhasingType.PhaseIds;
         public GameVersion Version { get; } = default;

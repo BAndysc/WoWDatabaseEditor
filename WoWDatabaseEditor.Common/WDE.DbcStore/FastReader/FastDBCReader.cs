@@ -95,7 +95,6 @@ namespace WDE.DbcStore.FastReader
             public ushort GetUShort(int field) => (ushort)GetUInt(field);
 
             public string GetString(int field, int arrayIndex) => throw new Exception("DBC doesn't have arrays");
-
             public float GetFloat(int field) => BitConverter.ToSingle(parent.bytes, offset + field * 4);
             
             public float GetFloat(int field, int arrayIndex) => throw new Exception("DBC doesn't have arrays");
@@ -106,6 +105,14 @@ namespace WDE.DbcStore.FastReader
                 var zeroByteIndex = start;
                 while (parent.bytes[zeroByteIndex++] != 0) ;
                 return zeroByteIndex <= start ? "" : Encoding.UTF8.GetString(parent.bytes, start, zeroByteIndex - start - 1);
+            }
+
+            public ReadOnlySpan<byte> GetUtf8String(int field)
+            {
+                var start = (int)(parent.stringsOffsetInBytes + GetUInt(field));
+                var zeroByteIndex = start;
+                while (parent.bytes[zeroByteIndex++] != 0) ;
+                return zeroByteIndex <= start ? ReadOnlySpan<byte>.Empty : parent.bytes.AsSpan(start, zeroByteIndex - start - 1);
             }
         }
 

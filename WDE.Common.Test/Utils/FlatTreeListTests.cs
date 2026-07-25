@@ -199,6 +199,35 @@ public class FlatTreeListTests
         }, flat);
     }
 
+    [Test]
+    public void Test_GetChildrenList_MatchesIterator()
+    {
+        var p = new ParentType(true, new ParentType(true, new Child(3), new Child(4)), new Child(2));
+        var p2 = new ParentType(false, new ParentType(true, new Child(5)), new Child(6));
+        ObservableCollection<ParentType> parents = new() { p, p2 };
+        FlatTreeList<ParentType, Child> flat = new FlatTreeList<ParentType, Child>(parents);
+
+        // the allocation-free overload must yield exactly the same depth-first leaf order as the iterator,
+        // and it must be independent of expansion state (GetChildren walks the model, not the visible list)
+        var expected = new List<Child>(flat.GetChildren());
+        var actual = new List<Child>();
+        flat.GetChildren(actual);
+
+        CollectionAssert.AreEqual(expected, actual);
+        CollectionAssert.AreEqual(new object[]
+        {
+            p.nested[0].children[0], // Child(3)
+            p.nested[0].children[1], // Child(4)
+            p.children[0],           // Child(2)
+            p2.nested[0].children[0],// Child(5)
+            p2.children[0],          // Child(6)
+        }, actual);
+
+        // GetChildren(List) appends (does not clear) - documented contract
+        flat.GetChildren(actual);
+        Assert.AreEqual(expected.Count * 2, actual.Count);
+    }
+
     private class ParentType : IParentType, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;

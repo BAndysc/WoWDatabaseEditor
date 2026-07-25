@@ -45,6 +45,7 @@ namespace WDE.AzerothCore
         };
 
         public bool AlternativeTrinityDatabase => true;
+        public bool SupportsTransactions => true;
         public WaypointTables SupportedWaypoints => WaypointTables.WaypointData | WaypointTables.SmartScriptWaypoint | WaypointTables.ScriptWaypoint;
         public bool SpawnGroupTemplateHasType => false;
         public DatabaseTable TableName => DatabaseTable.WorldTable("smart_scripts");

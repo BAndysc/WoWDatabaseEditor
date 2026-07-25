@@ -165,7 +165,9 @@ namespace WDE.PacketViewer.PacketParserIntegration
         {
             using var input = File.OpenRead(path);
             var firstBytes = new byte[100]; // enough for the header
+#pragma warning disable CA2022
             input.Read(firstBytes);
+#pragma warning restore CA2022
 
             ulong? version = 0;
             DumpFormatType? formatType = 0;

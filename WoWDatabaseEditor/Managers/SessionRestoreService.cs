@@ -60,21 +60,21 @@ public class SessionRestoreService
         if (lastSessionFile.Exists && this.settings.RestoreOpenTabsMode != RestoreOpenTabsMode.NeverRestore)
         {
             if (this.settings.RestoreOpenTabsMode == RestoreOpenTabsMode.RestoreWhenCrashed)
-                ShowMessage();
+                ShowMessage().ListenErrors();
             taskRunner.ScheduleTask("Restore last session", async () => Restore());
         }
         Run().ListenErrors();
     }
 
-    private void ShowMessage()
+    private async Task ShowMessage()
     {
-        messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+        await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
             .SetTitle("Restore last session")
             .SetMainInstruction("The editor wasn't properly closed")
             .SetContent(
                 "Unfortunately the editor wasn't properly closed last time. The recently opened documents will be restored.")
             .WithOkButton(true)
-            .Build()).ListenErrors();
+            .Build());
     }
 
     public void GracefulShutdown()

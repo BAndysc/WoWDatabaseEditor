@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.DBC;
 using WDE.Module.Attributes;
@@ -78,6 +79,22 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(int map);
         Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(int map);
 
+        /// <summary>Highest creature.guid (0 when the table is empty). The default is correct
+        /// but loads the whole table; backends override it with a real MAX query.</summary>
+        async Task<uint> GetMaxCreatureGuid()
+        {
+            var creatures = await GetCreaturesAsync();
+            return creatures.Count == 0 ? 0 : creatures.Max(c => c.Guid);
+        }
+
+        /// <summary>Highest gameobject.guid (0 when the table is empty). The default is correct
+        /// but loads the whole table; backends override it with a real MAX query.</summary>
+        async Task<uint> GetMaxGameObjectGuid()
+        {
+            var gameObjects = await GetGameObjectsAsync();
+            return gameObjects.Count == 0 ? 0 : gameObjects.Max(g => g.Guid);
+        }
+
         Task<IReadOnlyList<ITrinityString>> GetStringsAsync();
         Task<IReadOnlyList<IDatabaseSpellDbc>> GetSpellDbcAsync();
         Task<IReadOnlyList<IDatabaseSpellEffectDbc>> GetSpellEffectDbcAsync() => Task.FromResult<IReadOnlyList<IDatabaseSpellEffectDbc>>(new List<IDatabaseSpellEffectDbc>());
@@ -87,6 +104,29 @@ namespace WDE.Common.Database
         Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type);
         Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id);
         Task<IReadOnlyList<ISpawnGroupFormation>?> GetSpawnGroupFormations();
+        // CMaNGOS-only spawn-group extras; null on cores without the tables
+        Task<IReadOnlyList<ISpawnGroupRandomEntry>?> GetSpawnGroupRandomEntriesAsync() => Task.FromResult<IReadOnlyList<ISpawnGroupRandomEntry>?>(null);
+        Task<IReadOnlyList<ISpawnGroupLinkedGroup>?> GetSpawnGroupLinkedGroupsAsync() => Task.FromResult<IReadOnlyList<ISpawnGroupLinkedGroup>?>(null);
+        Task<IReadOnlyList<ISpawnGroupSquadMember>?> GetSpawnGroupSquadsAsync() => Task.FromResult<IReadOnlyList<ISpawnGroupSquadMember>?>(null);
+
+        // CMaNGOS-style spawn pools; null on cores without the tables (Trinity's unified
+        // pool_members can implement these later; HttpDatabase pass-through can be added when needed)
+        Task<IReadOnlyList<IPoolTemplate>?> GetPoolTemplatesAsync() => Task.FromResult<IReadOnlyList<IPoolTemplate>?>(null);
+        Task<IPoolTemplate?> GetPoolTemplateByIdAsync(uint entry) => Task.FromResult<IPoolTemplate?>(null);
+        Task<IReadOnlyList<IPoolCreatureMember>?> GetPoolCreaturesAsync() => Task.FromResult<IReadOnlyList<IPoolCreatureMember>?>(null);
+        Task<IReadOnlyList<IPoolGameObjectMember>?> GetPoolGameObjectsAsync() => Task.FromResult<IReadOnlyList<IPoolGameObjectMember>?>(null);
+        Task<IReadOnlyList<IPoolCreatureEntryMember>?> GetPoolCreatureEntryPoolsAsync() => Task.FromResult<IReadOnlyList<IPoolCreatureEntryMember>?>(null);
+        Task<IReadOnlyList<IPoolGameObjectEntryMember>?> GetPoolGameObjectEntryPoolsAsync() => Task.FromResult<IReadOnlyList<IPoolGameObjectEntryMember>?>(null);
+        Task<IReadOnlyList<IPoolNesting>?> GetPoolNestingsAsync() => Task.FromResult<IReadOnlyList<IPoolNesting>?>(null);
+
+        // CMaNGOS-only creature linking (guid + entry variants); null on cores without the tables
+        Task<IReadOnlyList<ICreatureLinking>?> GetCreatureLinkingsAsync() => Task.FromResult<IReadOnlyList<ICreatureLinking>?>(null);
+        Task<IReadOnlyList<ICreatureLinkingTemplate>?> GetCreatureLinkingTemplatesAsync() => Task.FromResult<IReadOnlyList<ICreatureLinkingTemplate>?>(null);
+
+        // CMaNGOS-only world safe locs (graveyards) + spell target positions; null on cores without the tables
+        Task<IReadOnlyList<IWorldSafeLoc>?> GetWorldSafeLocsAsync() => Task.FromResult<IReadOnlyList<IWorldSafeLoc>?>(null);
+        Task<IReadOnlyList<IGraveyardLink>?> GetGraveyardLinksAsync() => Task.FromResult<IReadOnlyList<IGraveyardLink>?>(null);
+        Task<IReadOnlyList<ISpellTargetPosition>?> GetSpellTargetPositionsAsync() => Task.FromResult<IReadOnlyList<ISpellTargetPosition>?>(null);
 
         Task<IReadOnlyList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IReadOnlyList<IItem>?>(null);
 
@@ -96,6 +136,7 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => Task.FromResult<IReadOnlyList<IEventScriptLine>>(new List<IEventScriptLine>());
 
         Task<IReadOnlyList<IEventAiLine>> GetEventAi(int id) => Task.FromResult<IReadOnlyList<IEventAiLine>>(new List<IEventAiLine>());
+        Task<IReadOnlyList<IEventAiLine>> FindEventAiLinesBy(IEnumerable<(EventAiLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) => Task.FromResult<IReadOnlyList<IEventAiLine>>(new List<IEventAiLine>());
 
         Task<IReadOnlyList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
         Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId);
@@ -128,6 +169,17 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId);
         Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId);
 
+        // TC master's per-path waypoint_path metadata row. Default null so only master overrides it.
+        // NB: like every default method here it MUST be explicitly forwarded in
+        // CachedDatabaseProvider and WorldDatabaseDecorator, or their callers silently get null.
+        Task<IWaypointPathHeader?> GetWaypointPathHeader(uint pathId) =>
+            Task.FromResult<IWaypointPathHeader?>(null);
+
+        // creature_formations (leader↔member follow links). Default empty so only the cores that
+        // actually have the table override it (see the Trinity providers + the two wrappers).
+        Task<IReadOnlyList<ICreatureFormation>> GetCreatureFormations() =>
+            Task.FromResult<IReadOnlyList<ICreatureFormation>>(new List<ICreatureFormation>());
+
         Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type, uint entry);
         Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type);
         Task<ILootTemplateName?> GetLootTemplateName(LootSourceType type, uint entry);
@@ -149,6 +201,11 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<IQuestRelation>> GetQuestStarters(uint questId);
         Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId);
 
+        // bulk variants of the two above (every quest at once) - for "does this entry start/end any
+        // quest" lookups, e.g. the 3D view's NPC status icons. Null = provider without the data.
+        Task<IReadOnlyList<IQuestRelation>?> GetAllQuestStarters() => Task.FromResult<IReadOnlyList<IQuestRelation>?>(null);
+        Task<IReadOnlyList<IQuestRelation>?> GetAllQuestEnders() => Task.FromResult<IReadOnlyList<IQuestRelation>?>(null);
+
         Task<IReadOnlyList<IQuestFactionChange>> GetQuestFactionChanges() => Task.FromResult<IReadOnlyList<IQuestFactionChange>>([]);
 
         // @todo: make it async one day
@@ -160,6 +217,14 @@ namespace WDE.Common.Database
             Action,
             Target,
             Source
+        }
+
+        public enum EventAiLinePropertyType
+        {
+            Event,
+            Action1,
+            Action2,
+            Action3
         }
 
         [Flags]
@@ -246,6 +311,43 @@ namespace WDE.Common.Database
         }
 
         Task<ICreatureAiSummon?> GetCreatureAiSummon(uint entry);
+
+        /// <summary>All rows of one dbscripts_on_* table with the given script id, ordered by priority.</summary>
+        Task<IReadOnlyList<IDbScriptLine>> GetDbScript(string tableName, uint id)
+        {
+            return Task.FromResult<IReadOnlyList<IDbScriptLine>>(new List<IDbScriptLine>());
+        }
+
+        /// <summary>Distinct script ids present in one dbscripts_on_* table (for pickers).</summary>
+        Task<IReadOnlyList<uint>> GetDbScriptIds(string tableName)
+        {
+            return Task.FromResult<IReadOnlyList<uint>>(new List<uint>());
+        }
+
+        /// <summary>Rows of the `conditions` table with the given condition_entry values.</summary>
+        Task<IReadOnlyList<IMangosConditionLine>> GetConditionsByEntries(IReadOnlyList<uint> entries)
+        {
+            return Task.FromResult<IReadOnlyList<IMangosConditionLine>>(new List<IMangosConditionLine>());
+        }
+
+        /// <summary>Highest condition_entry in the `conditions` table (0 when empty).</summary>
+        Task<uint> GetMaxConditionEntry()
+        {
+            return Task.FromResult(0u);
+        }
+
+        /// <summary>One row of the `unit_condition` table, null when missing.</summary>
+        Task<IMangosUnitConditionLine?> GetUnitConditionById(int id)
+        {
+            return Task.FromResult<IMangosUnitConditionLine?>(null);
+        }
+
+        /// <summary>Lowest unit_condition.Id (0 when the table is empty). Ids are signed;
+        /// custom rows use negative ids.</summary>
+        Task<int> GetMinUnitConditionId()
+        {
+            return Task.FromResult(0);
+        }
 
         public enum RandomTemplateType
         {

@@ -24,6 +24,7 @@ namespace WDE.Trinity
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate), typeof(ISceneTemplate), typeof(IAreaTriggerCreateProperties)};
         public bool AlternativeTrinityDatabase => false;
+        public bool SupportsTransactions => true;
         public WaypointTables SupportedWaypoints => WaypointTables.WaypointData | WaypointTables.SmartScriptWaypoint | WaypointTables.ScriptWaypoint;
         public bool SpawnGroupTemplateHasType => false;
 

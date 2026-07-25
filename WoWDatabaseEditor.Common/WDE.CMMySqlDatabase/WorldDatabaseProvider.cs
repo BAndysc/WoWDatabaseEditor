@@ -74,5 +74,35 @@ namespace WDE.CMMySqlDatabase
         {
             return mangosImpl?.GetCreatureAiSummon(entry) ?? Task.FromResult<ICreatureAiSummon?>(null);
         }
+
+        public Task<IReadOnlyList<IDbScriptLine>> GetDbScript(string tableName, uint id)
+        {
+            return mangosImpl?.GetDbScript(tableName, id) ?? Task.FromResult<IReadOnlyList<IDbScriptLine>>(new List<IDbScriptLine>());
+        }
+
+        public Task<IReadOnlyList<uint>> GetDbScriptIds(string tableName)
+        {
+            return mangosImpl?.GetDbScriptIds(tableName) ?? Task.FromResult<IReadOnlyList<uint>>(new List<uint>());
+        }
+
+        public Task<IReadOnlyList<IMangosConditionLine>> GetConditionsByEntries(IReadOnlyList<uint> entries)
+        {
+            return mangosImpl?.GetConditionsByEntries(entries) ?? Task.FromResult<IReadOnlyList<IMangosConditionLine>>(new List<IMangosConditionLine>());
+        }
+
+        public Task<uint> GetMaxConditionEntry()
+        {
+            return mangosImpl?.GetMaxConditionEntry() ?? Task.FromResult(0u);
+        }
+
+        public Task<IMangosUnitConditionLine?> GetUnitConditionById(int id)
+        {
+            return mangosImpl?.GetUnitConditionById(id) ?? Task.FromResult<IMangosUnitConditionLine?>(null);
+        }
+
+        public Task<int> GetMinUnitConditionId()
+        {
+            return mangosImpl?.GetMinUnitConditionId() ?? Task.FromResult(0);
+        }
     }
 }

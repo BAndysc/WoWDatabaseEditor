@@ -1,4 +1,5 @@
 using Prism.Events;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Tasks;
 using WDE.MySqlDatabaseCommon.Providers;
@@ -13,12 +14,14 @@ public class HotfixMySqlExecutor : BaseMySqlExecutor
 
     public HotfixMySqlExecutor(IMySqlHotfixConnectionStringProvider hotfixConnectionString,
         IDatabaseProvider databaseProvider,
+        ICurrentCoreVersion currentCoreVersion,
         IQueryEvaluator queryEvaluator,
         IEventAggregator eventAggregator,
         IMainThread mainThread,
         DatabaseLogger databaseLogger) : base(hotfixConnectionString.ConnectionString,
         hotfixConnectionString.DatabaseName,
         databaseProvider,
+        currentCoreVersion,
         queryEvaluator,
         eventAggregator,
         mainThread,

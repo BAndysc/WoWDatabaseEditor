@@ -22,11 +22,7 @@ public partial class ImportView : UserControl
 
     private void Drop(object? sender, DragEventArgs e)
     {
-        if (!e.Data.Contains(DataFormats.Files))
-            return;
-
-        var files = e.Data.GetFiles();
-        if (files == null)
+        if (e.DataTransfer.TryGetFiles() is not {} files)
             return;
 
         if (DataContext is not ImportViewModel vm)
@@ -44,12 +40,12 @@ public partial class ImportView : UserControl
 
     private void DragOver(object? sender, DragEventArgs e)
     {
-        e.DragEffects = e.Data.Contains(DataFormats.Files) ? DragDropEffects.Copy : DragDropEffects.None;
+        e.DragEffects = e.DataTransfer.Formats.Contains(DataFormat.File) ? DragDropEffects.Copy : DragDropEffects.None;
     }
 
     private void DragEnter(object? sender, DragEventArgs e)
     {
-        e.DragEffects = e.Data.Contains(DataFormats.Files) ? DragDropEffects.Copy : DragDropEffects.None;
+        e.DragEffects = e.DataTransfer.Formats.Contains(DataFormat.File) ? DragDropEffects.Copy : DragDropEffects.None;
     }
 
     private void TableItemKeyPressed(object? sender, KeyEventArgs e)

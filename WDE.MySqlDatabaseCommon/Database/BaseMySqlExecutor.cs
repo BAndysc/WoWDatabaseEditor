@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MySqlConnector;
 using Prism.Events;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Tasks;
@@ -20,16 +21,18 @@ namespace WDE.MySqlDatabaseCommon.Database
         private readonly string connectionString;
         private readonly string databaseName;
         private readonly IDatabaseProvider databaseProvider;
+        private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly IQueryEvaluator queryEvaluator;
         private readonly IEventAggregator eventAggregator;
         private readonly IMainThread mainThread;
         private readonly DatabaseLogger databaseLogger;
-        
+
         public abstract bool IsConnected { get; }
 
-        public BaseMySqlExecutor(string connectionString, 
+        public BaseMySqlExecutor(string connectionString,
             string databaseName,
             IDatabaseProvider databaseProvider,
+            ICurrentCoreVersion currentCoreVersion,
             IQueryEvaluator queryEvaluator,
             IEventAggregator eventAggregator,
             IMainThread mainThread,
@@ -38,6 +41,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             this.connectionString = connectionString;
             this.databaseName = databaseName;
             this.databaseProvider = databaseProvider;
+            this.currentCoreVersion = currentCoreVersion;
             this.queryEvaluator = queryEvaluator;
             this.eventAggregator = eventAggregator;
             this.mainThread = mainThread;
@@ -171,13 +175,18 @@ namespace WDE.MySqlDatabaseCommon.Database
             databaseLogger.Log(query, null, TraceLevel.Info, QueryType.WriteQuery);
             
             using var writeLock = await DatabaseLock.WriteLock();
-            
+
+            // when the core mixes InnoDB and MyISAM tables (cmangos), a transaction cannot
+            // span both engines, so run without one; rollback still requires a transaction
+            bool useTransaction = rollback || currentCoreVersion.Current.DatabaseFeatures.SupportsTransactions;
+
             MySqlConnection conn = new(connectionString);
-            MySqlTransaction transaction;
+            MySqlTransaction? transaction = null;
             try
             {
                 await conn.OpenAsync();
-                transaction = await conn.BeginTransactionAsync();
+                if (useTransaction)
+                    transaction = await conn.BeginTransactionAsync();
             }
             catch (Exception e)
             {
@@ -188,20 +197,25 @@ namespace WDE.MySqlDatabaseCommon.Database
             {
                 MySqlCommand cmd = new(query, conn, transaction);
                 await cmd.ExecuteNonQueryAsync();
-                if (rollback)
-                    await transaction.RollbackAsync();
-                else
-                    await transaction.CommitAsync();
+                if (transaction != null)
+                {
+                    if (rollback)
+                        await transaction.RollbackAsync();
+                    else
+                        await transaction.CommitAsync();
+                }
             }
             catch (MySqlConnector.MySqlException e)
             {
-                await transaction.RollbackAsync();
+                if (transaction != null)
+                    await transaction.RollbackAsync();
                 await conn.CloseAsync();
                 throw new IMySqlExecutor.QueryFailedDatabaseException(e.Message, e);
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
+                if (transaction != null)
+                    await transaction.RollbackAsync();
                 await conn.CloseAsync();
                 throw new IMySqlExecutor.QueryFailedDatabaseException(ex);
             }
@@ -242,9 +256,14 @@ namespace WDE.MySqlDatabaseCommon.Database
 
             public T? Value<T>(int row, int column)
             {
-                if (rows[row][column] == null)
+                var value = rows[row][column];
+                if (value == null)
                     return default;
-                return (T) rows[row][column]!;
+                if (value is T typed)
+                    return typed;
+                // mysql returns e.g. a boxed uint for unsigned columns and unboxing to
+                // a different numeric type throws, so convert when the types don't match
+                return (T)Convert.ChangeType(value, Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T));
             }
 
             public bool IsNull(int row, int column) => rows[row][column] == null;

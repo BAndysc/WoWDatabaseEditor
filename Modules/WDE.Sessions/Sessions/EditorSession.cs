@@ -36,7 +36,13 @@ namespace WDE.Sessions.Sessions
                 }
                 else
                 {
+                    // notify with Replace: observers (the sessions panel mirrors this collection via
+                    // ToStream) must swap the stored item too - a re-save carries a NEW item instance
+                    // with the current state (keyed items: same key, new content), and a silent swap
+                    // leaves the panel showing the stale item/name/query
+                    var previous = queries[indexOf].Item1;
                     queries[indexOf] = (item, query);
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, previous, indexOf));
                 }
             }
         }

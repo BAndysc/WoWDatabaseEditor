@@ -11,7 +11,7 @@ namespace WDE.HttpDatabase;
 
 public class HttpDatabaseProviderImpl : IAsyncDatabaseProvider
 {
-    private const string URL = "http://localhost:5262/";
+    private const string URL = "http://localhost:8000/";
 
     public bool IsConnected { get; }
 
@@ -24,11 +24,20 @@ public class HttpDatabaseProviderImpl : IAsyncDatabaseProvider
 
     public async Task<SelectResult> ExecuteAnyQuery(string query)
     {
-        var result = await client.PostAsync(Path.Join(URL, "ExecuteSelectSql"),
-            new StringContent(JsonConvert.SerializeObject(new { query }), new MediaTypeHeaderValue("application/json")));
-        result.EnsureSuccessStatusCode();
-        var str = await result.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<SelectResult>(str);
+        try
+        {
+            var result = await client.PostAsync(Path.Join(URL, "ExecuteSelectSql"),
+                new StringContent(JsonConvert.SerializeObject(new { query }),
+                    new MediaTypeHeaderValue("application/json")));
+            result.EnsureSuccessStatusCode();
+            var str = await result.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<SelectResult>(str);
+        }
+        catch (Exception e)
+        {
+            LOG.LogError(e);
+            return new SelectResult();
+        }
     }
 
     public async Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync()

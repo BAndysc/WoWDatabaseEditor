@@ -159,6 +159,7 @@ namespace WDE.Parameters
                 (sheath, pvp, pet, shapeShift) => new UnitBytes2Parameter(sheath, pvp, pet, shapeShift, windowManager));
             factory.RegisterCombined("PhaseParameter", "DbcPhaseParameter", "DatabasePhaseParameter", (dbc, db) => new PhaseParameter(dbc, db));
             factory.RegisterDepending("MultiPhaseParameter", "PhaseParameter", phases => new MultiStringParameter(phases, parameterPickerService.Value));
+            factory.RegisterCombined("NpcFlag64Parameter", "NpcFlagParameter", "NpcFlag2Parameter", (npc, npc2) => new NpcFlag64Parameter(npc, npc2));
             
             eventAggregator.GetEvent<DatabaseCacheReloaded>().Subscribe(type =>
             {
@@ -932,6 +933,28 @@ namespace WDE.Parameters
         }
 
         public event Action<IParameter<long>>? ItemsChanged;
+    }
+
+    // Combines the low 32 bits (NpcFlagParameter, NPCFlags) with the high 32 bits
+    // (NpcFlag2Parameter, NPCFlags2 shifted left by 32) for cores that pack both enums
+    // into a single 64-bit `npcflag` column (e.g. TrinityMaster's creature/creature_template/
+    // game_event_npcflag, all `bigint unsigned`).
+    public class NpcFlag64Parameter : FlagParameter
+    {
+        public NpcFlag64Parameter(IParameter<long> npcFlags, IParameter<long> npcFlags2)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            if (npcFlags.Items != null)
+                foreach (var item in npcFlags.Items)
+                    Items[item.Key] = item.Value;
+            if (npcFlags2.Items != null)
+                foreach (var item in npcFlags2.Items)
+                {
+                    if (item.Key == 0)
+                        continue;
+                    Items[item.Key << 32] = item.Value;
+                }
+        }
     }
 
     public class ConversationParameter : LateAsyncLoadParameter

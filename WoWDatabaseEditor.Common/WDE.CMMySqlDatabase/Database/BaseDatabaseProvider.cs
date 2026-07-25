@@ -96,6 +96,18 @@ namespace WDE.CMMySqlDatabase.Database
         public abstract Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync();
         public abstract Task<IReadOnlyList<ICreature>> GetCreaturesAsync();
 
+        public virtual async Task<uint> GetMaxCreatureGuid()
+        {
+            var creatures = await GetCreaturesAsync();
+            return creatures.Count == 0 ? 0 : creatures.Max(c => c.Guid);
+        }
+
+        public virtual async Task<uint> GetMaxGameObjectGuid()
+        {
+            var gameObjects = await GetGameObjectsAsync();
+            return gameObjects.Count == 0 ? 0 : gameObjects.Max(g => g.Guid);
+        }
+
         public async Task<IReadOnlyList<IConversationTemplate>> GetConversationTemplatesAsync()
         {
             return new List<IConversationTemplate>();
@@ -357,29 +369,9 @@ namespace WDE.CMMySqlDatabase.Database
         
         public virtual Task<IReadOnlyList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IReadOnlyList<IItem>?>(null);
 
-        private ExpressionStarter<R> GenerateWhereConditionsForEventScript<R>(IEnumerable<(uint command, int dataIndex, long valueToSearch)> conditions) where R : IEventScriptLine
-        {
-            var predicate = PredicateBuilder.New<R>();
-            foreach (var value in conditions)
-            {
-                if (value.dataIndex == 0)
-                    predicate = predicate.Or(o => o.Command == value.command && o.DataLong1 == (ulong)value.valueToSearch);
-                else if (value.dataIndex == 1)
-                    predicate = predicate.Or(o => o.Command == value.command && o.DataLong2 == (ulong)value.valueToSearch);
-                else if (value.dataIndex == 2)
-                    predicate = predicate.Or(o => o.Command == value.command && o.DataInt == (int)value.valueToSearch);
-            }
-            return predicate;
-        }
-
-        public async Task<IReadOnlyList<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions)
-        {
-            await using var model = Database();
-            var events = await model.EventScripts.Where(GenerateWhereConditionsForEventScript<MySqlEventScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-            var spells = await model.SpellScripts.Where(GenerateWhereConditionsForEventScript<MySqlSpellScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-            var waypoints = await model.WaypointScripts.Where(GenerateWhereConditionsForEventScript<MySqlWaypointScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-            return events.Concat(spells).Concat(waypoints).ToList();
-        }
+        // no FindEventScriptLinesBy override: TC-style event_scripts/spell_scripts/waypoint_scripts
+        // don't exist on CMaNGOS (dbscripts_on_* are handled by the dbscripts module),
+        // so the empty IDatabaseProvider default applies
 
         public abstract Task<IReadOnlyList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
 
@@ -642,10 +634,49 @@ namespace WDE.CMMySqlDatabase.Database
 
         public abstract Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectLootCrossReference(uint lootId);
 
-        public async Task<IReadOnlyList<IEventAiLine>> GetEventAi(int entryOrGuid) 
+        public async Task<IReadOnlyList<IEventAiLine>> GetEventAi(int entryOrGuid)
         {
             await using var model = Database();
             return await model.CreatureAiScripts.Where(x => x.CreatureIdOrGuid == entryOrGuid).OrderBy(x => x.Id).ToListAsync<IEventAiLine>();
+        }
+
+        private static ExpressionStarter<EventAiLine> GenerateWhereConditionsForEventAi(IEnumerable<(IDatabaseProvider.EventAiLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
+        {
+            var predicate = PredicateBuilder.New<EventAiLine>();
+            foreach (var condition in conditions)
+            {
+                var type = (uint)condition.whatValue;
+                var value = (int)condition.valueToSearch;
+                predicate = (condition.what, condition.parameterIndex) switch
+                {
+                    (IDatabaseProvider.EventAiLinePropertyType.Event, 1) => predicate.Or(o => o.EventType == type && o.EventParam1 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Event, 2) => predicate.Or(o => o.EventType == type && o.EventParam2 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Event, 3) => predicate.Or(o => o.EventType == type && o.EventParam3 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Event, 4) => predicate.Or(o => o.EventType == type && o.EventParam4 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Event, 5) => predicate.Or(o => o.EventType == type && o.EventParam5 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Event, 6) => predicate.Or(o => o.EventType == type && o.EventParam6 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Action1, 1) => predicate.Or(o => o.Action1Type == type && o.Action1Param1 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Action1, 2) => predicate.Or(o => o.Action1Type == type && o.Action1Param2 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Action1, 3) => predicate.Or(o => o.Action1Type == type && o.Action1Param3 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Action2, 1) => predicate.Or(o => o.Action2Type == type && o.Action2Param1 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Action2, 2) => predicate.Or(o => o.Action2Type == type && o.Action2Param2 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Action2, 3) => predicate.Or(o => o.Action2Type == type && o.Action2Param3 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Action3, 1) => predicate.Or(o => o.Action3Type == type && o.Action3Param1 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Action3, 2) => predicate.Or(o => o.Action3Type == type && o.Action3Param2 == value),
+                    (IDatabaseProvider.EventAiLinePropertyType.Action3, 3) => predicate.Or(o => o.Action3Type == type && o.Action3Param3 == value),
+                    _ => predicate
+                };
+            }
+            return predicate;
+        }
+
+        public async Task<IReadOnlyList<IEventAiLine>> FindEventAiLinesBy(IEnumerable<(IDatabaseProvider.EventAiLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
+        {
+            var predicate = GenerateWhereConditionsForEventAi(conditions);
+            if (!predicate.IsStarted)
+                return new List<IEventAiLine>();
+            await using var model = Database();
+            return await model.CreatureAiScripts.Where(predicate).OrderBy(x => x.Id).ToListAsync<IEventAiLine>();
         }
 
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
@@ -668,6 +699,61 @@ namespace WDE.CMMySqlDatabase.Database
         {
             await using var model = Database();
             return await model.CreatureAiSummons.FirstOrDefaultAsync(x => x.Id == entry);
+        }
+
+        public async Task<IReadOnlyList<IDbScriptLine>> GetDbScript(string tableName, uint id)
+        {
+            await using var model = Database();
+            return await model.GetTable<DbScriptLine>().TableName(tableName)
+                .Where(x => x.Id == id)
+                .OrderBy(x => x.Priority)
+                .ToListAsync<IDbScriptLine>();
+        }
+
+        public async Task<IReadOnlyList<uint>> GetDbScriptIds(string tableName)
+        {
+            await using var model = Database();
+            return await model.GetTable<DbScriptLine>().TableName(tableName)
+                .Select(x => x.Id)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<IMangosConditionLine>> GetConditionsByEntries(IReadOnlyList<uint> entries)
+        {
+            if (entries.Count == 0)
+                return new List<IMangosConditionLine>();
+            await using var model = Database();
+            return await model.GetTable<MangosConditionLine>()
+                .Where(x => entries.Contains(x.ConditionEntry))
+                .OrderBy(x => x.ConditionEntry)
+                .ToListAsync<IMangosConditionLine>();
+        }
+
+        public async Task<uint> GetMaxConditionEntry()
+        {
+            await using var model = Database();
+            return await model.GetTable<MangosConditionLine>()
+                .Select(x => x.ConditionEntry)
+                .OrderByDescending(x => x)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<IMangosUnitConditionLine?> GetUnitConditionById(int id)
+        {
+            await using var model = Database();
+            return await model.GetTable<MangosUnitConditionLine>()
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<int> GetMinUnitConditionId()
+        {
+            await using var model = Database();
+            return await model.GetTable<MangosUnitConditionLine>()
+                .Select(x => x.Id)
+                .OrderBy(x => x)
+                .FirstOrDefaultAsync();
         }
 
         private bool Supports<R>()
@@ -704,7 +790,97 @@ namespace WDE.CMMySqlDatabase.Database
             await using var model = Database();
             return await model.SpawnGroupFormations.ToListAsync<ISpawnGroupFormation>();
         }
-    
+
+        public async Task<IReadOnlyList<ISpawnGroupRandomEntry>?> GetSpawnGroupRandomEntriesAsync()
+        {
+            await using var model = Database();
+            return await model.SpawnGroupRandomEntries.ToListAsync<ISpawnGroupRandomEntry>();
+        }
+
+        public async Task<IReadOnlyList<ISpawnGroupLinkedGroup>?> GetSpawnGroupLinkedGroupsAsync()
+        {
+            await using var model = Database();
+            return await model.SpawnGroupLinkedGroups.ToListAsync<ISpawnGroupLinkedGroup>();
+        }
+
+        public async Task<IReadOnlyList<ISpawnGroupSquadMember>?> GetSpawnGroupSquadsAsync()
+        {
+            await using var model = Database();
+            return await model.SpawnGroupSquads.ToListAsync<ISpawnGroupSquadMember>();
+        }
+
+        public async Task<IReadOnlyList<IPoolTemplate>?> GetPoolTemplatesAsync()
+        {
+            await using var model = Database();
+            return await model.PoolTemplate.ToListAsync<IPoolTemplate>();
+        }
+
+        public async Task<IPoolTemplate?> GetPoolTemplateByIdAsync(uint entry)
+        {
+            await using var model = Database();
+            return await model.PoolTemplate.FirstOrDefaultAsync<IPoolTemplate>(x => x.Entry == entry);
+        }
+
+        public async Task<IReadOnlyList<IPoolCreatureMember>?> GetPoolCreaturesAsync()
+        {
+            await using var model = Database();
+            return await model.PoolCreatures.ToListAsync<IPoolCreatureMember>();
+        }
+
+        public async Task<IReadOnlyList<IPoolGameObjectMember>?> GetPoolGameObjectsAsync()
+        {
+            await using var model = Database();
+            return await model.PoolGameObjects.ToListAsync<IPoolGameObjectMember>();
+        }
+
+        public async Task<IReadOnlyList<IPoolCreatureEntryMember>?> GetPoolCreatureEntryPoolsAsync()
+        {
+            await using var model = Database();
+            return await model.PoolCreatureTemplates.ToListAsync<IPoolCreatureEntryMember>();
+        }
+
+        public async Task<IReadOnlyList<IPoolGameObjectEntryMember>?> GetPoolGameObjectEntryPoolsAsync()
+        {
+            await using var model = Database();
+            return await model.PoolGameObjectTemplates.ToListAsync<IPoolGameObjectEntryMember>();
+        }
+
+        public async Task<IReadOnlyList<IPoolNesting>?> GetPoolNestingsAsync()
+        {
+            await using var model = Database();
+            return await model.PoolNestings.ToListAsync<IPoolNesting>();
+        }
+
+        public async Task<IReadOnlyList<ICreatureLinking>?> GetCreatureLinkingsAsync()
+        {
+            await using var model = Database();
+            return await model.CreatureLinkings.ToListAsync<ICreatureLinking>();
+        }
+
+        public async Task<IReadOnlyList<ICreatureLinkingTemplate>?> GetCreatureLinkingTemplatesAsync()
+        {
+            await using var model = Database();
+            return await model.CreatureLinkingTemplates.ToListAsync<ICreatureLinkingTemplate>();
+        }
+
+        public async Task<IReadOnlyList<IWorldSafeLoc>?> GetWorldSafeLocsAsync()
+        {
+            await using var model = Database();
+            return await model.WorldSafeLocs.ToListAsync<IWorldSafeLoc>();
+        }
+
+        public async Task<IReadOnlyList<IGraveyardLink>?> GetGraveyardLinksAsync()
+        {
+            await using var model = Database();
+            return await model.GraveyardLinks.ToListAsync<IGraveyardLink>();
+        }
+
+        public async Task<IReadOnlyList<ISpellTargetPosition>?> GetSpellTargetPositionsAsync()
+        {
+            await using var model = Database();
+            return await model.SpellTargetPositions.ToListAsync<ISpellTargetPosition>();
+        }
+
         public async Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type)
         {
             await using var model = Database();
@@ -729,6 +905,24 @@ namespace WDE.CMMySqlDatabase.Database
             await using var model = Database();
             var creatures = await model.CreatureQuestEnders.Where(x => x.Quest == questId).ToListAsync<IQuestRelation>();
             var gameobjects = await model.GameObjectQuestEnders.Where(x => x.Quest == questId).ToListAsync<IQuestRelation>();
+            creatures.AddRange(gameobjects);
+            return creatures;
+        }
+
+        public async Task<IReadOnlyList<IQuestRelation>?> GetAllQuestStarters()
+        {
+            await using var model = Database();
+            var creatures = await model.CreatureQuestStarters.ToListAsync<IQuestRelation>();
+            var gameobjects = await model.GameObjectQuestStarters.ToListAsync<IQuestRelation>();
+            creatures.AddRange(gameobjects);
+            return creatures;
+        }
+
+        public async Task<IReadOnlyList<IQuestRelation>?> GetAllQuestEnders()
+        {
+            await using var model = Database();
+            var creatures = await model.CreatureQuestEnders.ToListAsync<IQuestRelation>();
+            var gameobjects = await model.GameObjectQuestEnders.ToListAsync<IQuestRelation>();
             creatures.AddRange(gameobjects);
             return creatures;
         }

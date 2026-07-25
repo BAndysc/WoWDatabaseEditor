@@ -82,10 +82,10 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "IconName")] 
         public string? IconName { get; set; }
 
-        [Column(Name = "exp")] 
-        public short RequiredExpansion { get; set; }
-        
-        [Column(Name = "rank")] 
+        [Column(Name = "exp")]
+        public virtual short RequiredExpansion { get; set; }
+
+        [Column(Name = "rank")]
         public byte Rank { get; set; }
         
         [Column(Name = "unit_class")] 
@@ -154,8 +154,17 @@ namespace WDE.TrinityMySqlDatabase.Models
         public uint SkinningLootId { get; set; }
     
         public int LootCount => 1;
-        
+
         public uint GetLootId(int index) => LootId;
+    }
+
+    // Cataclysm creature_template renamed the `exp` column to `HealthScalingExpansion`;
+    // everything else matches the Wrath schema.
+    [Table(Name = "creature_template")]
+    public class MySqlCreatureTemplateCata : MySqlCreatureTemplateWrath
+    {
+        [Column(Name = "HealthScalingExpansion")]
+        public override short RequiredExpansion { get; set; }
     }
 
     [Table(Name = "creature_template")]

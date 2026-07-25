@@ -39,6 +39,9 @@ public class LootEditorModule : ModuleBase
                     .Register("MinValueOrLootReferenceParameter", new MinValueOrLootReferenceParameter(lootPicker));
                 
                 containerProvider.Resolve<IParameterFactory>()
+                    .Register("LootCreatureParameter", new LootParameter(lootPicker, LootSourceType.Creature));
+
+                containerProvider.Resolve<IParameterFactory>()
                     .Register("LootGameObjectParameter", new LootParameter(lootPicker, LootSourceType.GameObject));
                 
                 containerProvider.Resolve<IParameterFactory>()

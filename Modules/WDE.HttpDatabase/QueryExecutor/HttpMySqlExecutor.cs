@@ -182,7 +182,17 @@ public class HttpMySqlExecutor : IMySqlExecutor
 
         public object? Value(int row, int column) => data[row][columns[column]].Item2;
 
-        public T? Value<T>(int row, int column) => (T?)Value(row, column);
+        public T? Value<T>(int row, int column)
+        {
+            var value = Value(row, column);
+            if (value == null)
+                return default;
+            if (value is T typed)
+                return typed;
+            // the runtime type may differ from T (e.g. a boxed uint for unsigned columns)
+            // and unboxing to a different numeric type throws, so convert instead
+            return (T)Convert.ChangeType(value, Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T));
+        }
 
         public bool IsNull(int row, int column) => Value(row, column) == null;
 

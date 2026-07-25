@@ -82,7 +82,7 @@ namespace WDE.WorldMap
                 Unbind(context);
                 Bind(context);
 
-                var parent = e.Parent;
+                var parent = e.AttachmentPoint;
 
                 while (parent != null && parent is not WoWMapViewer)
                     parent = parent.GetVisualParent();

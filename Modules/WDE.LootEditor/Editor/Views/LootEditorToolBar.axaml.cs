@@ -29,7 +29,7 @@ public partial class LootEditorToolBar : UserControl
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        attachedRoot = this.GetVisualRoot() as Window;
+        attachedRoot = TopLevel.GetTopLevel(this) as Window;
         if (attachedRoot != null)
         {
             attachedRoot.KeyBindings.Add(new KeyBinding()

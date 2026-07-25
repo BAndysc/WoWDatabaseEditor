@@ -81,5 +81,12 @@
       "10": {"name": "custom eventai e", "description": "Sender = Npc that throws custom event, Invoker = TARGET_T_ACTION_INVOKER (if exists)"},
       "11": {"name": "custom eventai f", "description": "Sender = Npc that throws custom event, Invoker = TARGET_T_ACTION_INVOKER (if exists)"}
     }
+  },
+  "MangosSplineFlagsParameter": {
+    "values": {
+      "0": {"name": "none"},
+      "0x1000": {"name": "walk mode"},
+      "0x2000": {"name": "flying"}
+    }
   }
 }

@@ -20,6 +20,6 @@ public class TrinityWrathDatabase : BaseTrinityDatabase
     public ITable<MySqlEventScriptLine> EventScripts => this.GetTable<MySqlEventScriptLine>();
     public ITable<MySqlWaypointScriptLine> WaypointScripts => this.GetTable<MySqlWaypointScriptLine>();
     public ITable<MySqlSpellScriptLine> SpellScripts => this.GetTable<MySqlSpellScriptLine>();
-    public ITable<MySqlSmartScriptLine> SmartScript => this.GetTable<MySqlSmartScriptLine>();
+    public ITable<WrathMySqlSmartScriptLine> SmartScript => this.GetTable<WrathMySqlSmartScriptLine>();
     public ITable<NonMasterWaypointData> WaypointData => this.GetTable<NonMasterWaypointData>();
 }

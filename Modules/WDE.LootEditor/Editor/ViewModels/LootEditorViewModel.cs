@@ -55,6 +55,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     private readonly IHistoryManager historyManager;
     private readonly ILootLoader lootLoader;
     private readonly IConditionEditService conditionEditService;
+    private readonly IMangosConditionService mangosConditionService;
     private readonly ILootEditorPreferences preferences;
     private readonly ILootQueryGenerator queryGenerator;
     private readonly ILootUserQuestionsService userQuestionsService;
@@ -102,6 +103,8 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     public ObservableCollection<LootEntry> PerDatabaseSolutionItems { get; } = new();
     
     public AsyncAutoCommand<LootItemViewModel> EditConditionsCommand { get; }
+
+    public AsyncAutoCommand<LootItemViewModel> EditMangosConditionsCommand { get; }
     
     public DelegateCommand<LootGroup> CollapseExpandCommand { get; }
     
@@ -134,6 +137,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     internal LootEditorViewModel(IHistoryManager historyManager,
         ILootLoader lootLoader,
         IConditionEditService conditionEditService,
+        IMangosConditionService mangosConditionService,
         ILootEditorPreferences preferences,
         ILootQueryGenerator queryGenerator,
         IDbcStore dbcStore,
@@ -176,6 +180,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         historyManager.AddHandler(HistoryHandler);
         this.lootLoader = lootLoader;
         this.conditionEditService = conditionEditService;
+        this.mangosConditionService = mangosConditionService;
         this.preferences = preferences;
         this.queryGenerator = queryGenerator;
         this.userQuestionsService = userQuestionsService;
@@ -292,6 +297,8 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         if (LootEditorFeatures.HasBadLuckProtectionId)
             LootColumns.Add(new TableTableColumnHeader("Bad luck protection"){Width = 100});
         LootColumns.Add(new TableTableColumnHeader(lootEditorFeatures.HasConditionId ? "Condition id" : "Conditions"){Width = 120});
+        if (lootEditorFeatures.HasConditionId)
+            LootColumns.Add(new TableTableColumnHeader("Condition"){Width = 90});
         if (LootEditorFeatures.HasCommentField(LootSourceType))
             LootColumns.Add(new TableTableColumnHeader("Comment"){Width = 300});
         if (LootEditorFeatures.HasPatchField)
@@ -433,6 +440,15 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             var newConditions = await conditionEditService.EditConditions(key, loot.Conditions);
             if (newConditions != null)
                 loot.Conditions = newConditions.ToList();
+        });
+
+        EditMangosConditionsCommand = new AsyncAutoCommand<LootItemViewModel>(async loot =>
+        {
+            // LootMgr: target = the looting player, source = the looted object
+            var newRoot = await mangosConditionService.EditConditions((uint)loot.ConditionId.Value,
+                sourceTarget: new MangosConditionSourceTarget("Player (looter)", "the looted creature / GO / item"));
+            if (newRoot.HasValue)
+                await loot.ConditionId.SetValue(newRoot.Value);
         });
 
         AddNewLootCommand = new AsyncAutoCommand(async () =>

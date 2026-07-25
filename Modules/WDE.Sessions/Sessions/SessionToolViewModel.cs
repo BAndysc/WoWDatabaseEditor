@@ -137,7 +137,10 @@ namespace WDE.Sessions.Sessions
                         {
                             if (ev.Type == CollectionEventType.Add)
                             {
-                                CurrentSolutionItems.Add(new SolutionItemViewModel(iconRegistry, nameRegistry, ev.Item));
+                                // honor the index: a session Replace streams as Remove+Add at the same
+                                // spot, so the re-saved item must not jump to the end of the list
+                                CurrentSolutionItems.Insert(System.Math.Min(ev.Index, CurrentSolutionItems.Count),
+                                    new SolutionItemViewModel(iconRegistry, nameRegistry, ev.Item));
                             }
                             else if (ev.Type == CollectionEventType.Remove)
                             {

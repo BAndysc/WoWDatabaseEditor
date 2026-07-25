@@ -144,7 +144,7 @@ internal class VisualStudioManagerViewModel : IVisualStudioManagerViewModel
 
         var e = new IdeBreakpointRequestPopupEventArgs(args.HitDebugPoint);
         eventAggregator.GetEvent<IdeBreakpointRequestPopupEvent>().Publish(e);
-        if (e.AttachPopupToObject is Control { } c && c.GetVisualRoot() is { } root)
+        if (e.AttachPopupToObject is Control { } c && TopLevel.GetTopLevel(c) is { } root)
         {
             var vm = new BreakpointHitPopupViewModel(dte, args) { ShowTail = true };
             var view = new BreakpointHitPopupView() { DataContext = vm };

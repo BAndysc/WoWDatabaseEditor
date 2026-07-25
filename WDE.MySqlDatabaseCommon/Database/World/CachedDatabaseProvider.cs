@@ -419,6 +419,25 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type) => WaitForCache(nonCachedDatabase.GetSpawnGroupSpawnByGuidAsync(guid, type));
         public Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id) => WaitForCache(nonCachedDatabase.GetSpawnGroupFormation(id));
         public Task<IReadOnlyList<ISpawnGroupFormation>?> GetSpawnGroupFormations() => WaitForCache(nonCachedDatabase.GetSpawnGroupFormations());
+        public Task<IReadOnlyList<ISpawnGroupRandomEntry>?> GetSpawnGroupRandomEntriesAsync() => WaitForCache(nonCachedDatabase.GetSpawnGroupRandomEntriesAsync());
+        public Task<IReadOnlyList<ISpawnGroupLinkedGroup>?> GetSpawnGroupLinkedGroupsAsync() => WaitForCache(nonCachedDatabase.GetSpawnGroupLinkedGroupsAsync());
+        public Task<IReadOnlyList<ISpawnGroupSquadMember>?> GetSpawnGroupSquadsAsync() => WaitForCache(nonCachedDatabase.GetSpawnGroupSquadsAsync());
+        // the pool getters are default interface methods (returning null); without these explicit
+        // forwards this wrapper would answer with the defaults instead of the real provider
+        public Task<IReadOnlyList<IPoolTemplate>?> GetPoolTemplatesAsync() => WaitForCache(nonCachedDatabase.GetPoolTemplatesAsync());
+        public Task<IPoolTemplate?> GetPoolTemplateByIdAsync(uint entry) => WaitForCache(nonCachedDatabase.GetPoolTemplateByIdAsync(entry));
+        public Task<IReadOnlyList<IPoolCreatureMember>?> GetPoolCreaturesAsync() => WaitForCache(nonCachedDatabase.GetPoolCreaturesAsync());
+        public Task<IReadOnlyList<IPoolGameObjectMember>?> GetPoolGameObjectsAsync() => WaitForCache(nonCachedDatabase.GetPoolGameObjectsAsync());
+        public Task<IReadOnlyList<IPoolCreatureEntryMember>?> GetPoolCreatureEntryPoolsAsync() => WaitForCache(nonCachedDatabase.GetPoolCreatureEntryPoolsAsync());
+        public Task<IReadOnlyList<IPoolGameObjectEntryMember>?> GetPoolGameObjectEntryPoolsAsync() => WaitForCache(nonCachedDatabase.GetPoolGameObjectEntryPoolsAsync());
+        public Task<IReadOnlyList<IPoolNesting>?> GetPoolNestingsAsync() => WaitForCache(nonCachedDatabase.GetPoolNestingsAsync());
+
+        public Task<IReadOnlyList<ICreatureLinking>?> GetCreatureLinkingsAsync() => WaitForCache(nonCachedDatabase.GetCreatureLinkingsAsync());
+        public Task<IReadOnlyList<ICreatureLinkingTemplate>?> GetCreatureLinkingTemplatesAsync() => WaitForCache(nonCachedDatabase.GetCreatureLinkingTemplatesAsync());
+
+        public Task<IReadOnlyList<IWorldSafeLoc>?> GetWorldSafeLocsAsync() => WaitForCache(nonCachedDatabase.GetWorldSafeLocsAsync());
+        public Task<IReadOnlyList<IGraveyardLink>?> GetGraveyardLinksAsync() => WaitForCache(nonCachedDatabase.GetGraveyardLinksAsync());
+        public Task<IReadOnlyList<ISpellTargetPosition>?> GetSpellTargetPositionsAsync() => WaitForCache(nonCachedDatabase.GetSpellTargetPositionsAsync());
 
         public Task<IReadOnlyList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => WaitForCache(nonCachedDatabase.GetLinesCallingSmartTimedActionList(timedActionList));
 
@@ -499,6 +518,12 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IReadOnlyList<IQuestRelation>> GetQuestEnders(uint questId) => WaitForCache(nonCachedDatabase.GetQuestEnders(questId));
 
+        // default interface methods (returning null) - without these explicit forwards this
+        // wrapper would answer with the defaults instead of the real provider
+        public Task<IReadOnlyList<IQuestRelation>?> GetAllQuestStarters() => WaitForCache(nonCachedDatabase.GetAllQuestStarters());
+
+        public Task<IReadOnlyList<IQuestRelation>?> GetAllQuestEnders() => WaitForCache(nonCachedDatabase.GetAllQuestEnders());
+
         public Task<IReadOnlyList<IQuestFactionChange>> GetQuestFactionChanges() => nonCachedDatabase.GetQuestFactionChanges();
 
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => WaitForCache(nonCachedDatabase.GetSceneTemplateAsync(sceneId));
@@ -514,6 +539,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IList<IPhaseName>? GetPhaseNames() => nonCachedDatabase.GetPhaseNames();
 
         public Task<IReadOnlyList<ICreatureAddon>> GetCreatureAddons() => WaitForCache(nonCachedDatabase.GetCreatureAddons());
+
+        public Task<IReadOnlyList<ICreatureFormation>> GetCreatureFormations() => nonCachedDatabase.GetCreatureFormations();
 
         public Task<IReadOnlyList<ICreatureTemplateAddon>> GetCreatureTemplateAddons() => WaitForCache(nonCachedDatabase.GetCreatureTemplateAddons());
 
@@ -553,6 +580,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => WaitForCache(nonCachedDatabase.GetMangosPathName(pathId));
 
+        public Task<IWaypointPathHeader?> GetWaypointPathHeader(uint pathId) => WaitForCache(nonCachedDatabase.GetWaypointPathHeader(pathId));
+
         public Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type, uint entry) => nonCachedDatabase.GetLoot(type, entry);
 
         public Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type) => nonCachedDatabase.GetLoot(type);
@@ -578,6 +607,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IReadOnlyList<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => WaitForCache(nonCachedDatabase.GetEventScript(type, id));
 
         public Task<IReadOnlyList<IEventAiLine>> GetEventAi(int id) => WaitForCache(nonCachedDatabase.GetEventAi(id));
+
+        public Task<IReadOnlyList<IEventAiLine>> FindEventAiLinesBy(IEnumerable<(IDatabaseProvider.EventAiLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
+            => WaitForCache(nonCachedDatabase.FindEventAiLinesBy(conditions));
 
         public async Task<IReadOnlyList<IDatabaseSpellDbc>> GetSpellDbcAsync()
         {

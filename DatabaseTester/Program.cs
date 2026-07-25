@@ -60,6 +60,16 @@ public class Program
         {
             throw new Exception("Operation not supported");
         }
+
+        public async Task<T> Schedule<T>(Func<Task<T>> func)
+        {
+            return await func();
+        }
+
+        public async Task<T> Schedule<T>(Func<T> func)
+        {
+            return func();
+        }
     }
 
     private static bool TryGetDefaultObjectForType(Type type, out object? obj)
@@ -281,7 +291,45 @@ public class Program
                 Console.WriteLine("Skipping table: " + e.TableName + " because it is not supported by the selected core.");
                 continue;
             }
-            
+
+            try
+            {
+                await executor.ExecuteSql(query, true);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e.Message);
+                Console.WriteLine(query);
+                return -1;
+            }
+        }
+
+        // table-gated exporters (waypoints): these tables vary per DATABASE, not just per core
+        // family (current TC removed `waypoints`/`script_waypoint`; older TDB forks still have
+        // them) - skip what this database genuinely doesn't have instead of failing on it
+        foreach (var (gateTable, queryGenerator) in tester.GenerateGated())
+        {
+            if (gateTable is { } table)
+            {
+                var exists = await executor.ExecuteSelectSql($"SHOW TABLES LIKE '{table.Table}'");
+                if (exists.Rows == 0)
+                {
+                    Console.WriteLine($"Skipping table: {table} because it does not exist in this database.");
+                    continue;
+                }
+            }
+
+            IQuery query;
+            try
+            {
+                query = queryGenerator();
+            }
+            catch (TableNotSupportedException e)
+            {
+                Console.WriteLine("Skipping table: " + e.TableName + " because it is not supported by the selected core.");
+                continue;
+            }
+
             try
             {
                 await executor.ExecuteSql(query, true);

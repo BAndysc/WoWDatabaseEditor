@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Exceptions;
 using WDE.Common.Services;
+using WDE.Common.Services.IdGenerator;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Utils;
 using WDE.QueryGenerators.Base;
@@ -17,19 +18,19 @@ namespace WDE.PacketViewer.Processing.Processors;
 [AutoRegister]
 public class SpawnDumper : PacketProcessor<bool>, IPacketTextDumper
 {
-    private readonly IPersonalGuidRangeService personalGuidRangeService;
+    private readonly IIdGeneratorService idGenerator;
     private readonly ICachedDatabaseProvider cachedDatabaseProvider;
     private readonly IQueryGenerator<CreatureSpawnModelEssentials> creatureQueryProvider;
     private readonly IQueryGenerator<GameObjectSpawnModelEssentials> gameObjectQueryProvider;
     private Dictionary<UniversalGuid, SpawnData> spawnedCreatures = new();
     private Dictionary<UniversalGuid, SpawnData> spawnedGameObjects = new();
 
-    public SpawnDumper(IPersonalGuidRangeService personalGuidRangeService,
+    public SpawnDumper(IIdGeneratorService idGenerator,
         ICachedDatabaseProvider cachedDatabaseProvider,
         IQueryGenerator<CreatureSpawnModelEssentials> creatureQueryProvider,
         IQueryGenerator<GameObjectSpawnModelEssentials> gameObjectQueryProvider)
     {
-        this.personalGuidRangeService = personalGuidRangeService;
+        this.idGenerator = idGenerator;
         this.cachedDatabaseProvider = cachedDatabaseProvider;
         this.creatureQueryProvider = creatureQueryProvider;
         this.gameObjectQueryProvider = gameObjectQueryProvider;
@@ -39,14 +40,26 @@ public class SpawnDumper : PacketProcessor<bool>, IPacketTextDumper
     {
         var q = Queries.BeginTransaction(DataDatabaseType.World);
 
-        if (!personalGuidRangeService.IsConfigured)
+        uint creatureStartGuid = 0, gameObjectStartGuid = 0;
+        try
         {
-            throw new UserException("Personal Guid Range is not configured. Please set it in the settings.");
+            if (spawnedCreatures.Count > 0)
+                creatureStartGuid = (uint)await idGenerator.GetNextRange(new CreatureGuidIdType(), spawnedCreatures.Count);
+            if (spawnedGameObjects.Count > 0)
+                gameObjectStartGuid = (uint)await idGenerator.GetNextRange(new GameObjectGuidIdType(), spawnedGameObjects.Count);
+        }
+        catch (IdSourceNotConfiguredException)
+        {
+            throw new UserException("The guid source is not configured. Please set it in the settings.");
+        }
+        catch (NoMoreIdsException e)
+        {
+            throw new UserException(e.Message + " Please extend the range in the settings.");
         }
 
         if (spawnedCreatures.Count > 0)
         {
-            var startGuid = personalGuidRangeService.GetNextGuidRange(GuidType.Creature, (uint)spawnedCreatures.Count);
+            var startGuid = creatureStartGuid;
             var spawns = spawnedCreatures.Values.Select((data, index) =>
                 new CreatureSpawnModelEssentials()
                 {
@@ -69,7 +82,7 @@ public class SpawnDumper : PacketProcessor<bool>, IPacketTextDumper
 
         if (spawnedGameObjects.Count > 0)
         {
-            var startGuid = personalGuidRangeService.GetNextGuidRange(GuidType.GameObject, (uint)spawnedGameObjects.Count);
+            var startGuid = gameObjectStartGuid;
             var spawns = spawnedGameObjects.Values.Select((data, index) =>
                 new GameObjectSpawnModelEssentials()
                 {

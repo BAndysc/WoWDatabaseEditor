@@ -200,6 +200,7 @@ namespace WDE.Sessions.Sessions
         
         public void BeginSession(string sessionName)
         {
+            USAGE.Count("feature_used", ("feature", "session_begin"));
             var sess = new EditorSession(sessionName, GenerateSessionFileName(sessionName), DateTime.Now, DateTime.Now);
             Add(sess);
             CurrentSession = sess;
@@ -240,7 +241,8 @@ namespace WDE.Sessions.Sessions
         {
             if (CurrentSession == null)
                 return;
-            
+
+            USAGE.Count("feature_used", ("feature", "session_finalize"));
             File.WriteAllText(fileName, GenerateCurrentQuery());
         }
 

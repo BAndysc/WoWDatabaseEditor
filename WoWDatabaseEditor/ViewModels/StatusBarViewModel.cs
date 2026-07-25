@@ -8,6 +8,7 @@ using WDE.Common.Debugging;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Services.IdGenerator;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
@@ -25,7 +26,7 @@ public partial class StatusBarViewModel : ObservableBase
     public IConnectionsStatusBarItem Connections { get; }
     private readonly TasksViewModel tasksViewModel;
     private readonly IMainThread mainThread;
-    private readonly IPersonalGuidRangeService guidRangeService;
+    private readonly IIdGeneratorService idGenerator;
     private readonly IServerExecutableService serverExecutableService;
     private readonly IDebuggerService debuggerService;
     private readonly Lazy<IClipboardService> clipboardService;
@@ -39,7 +40,7 @@ public partial class StatusBarViewModel : ObservableBase
         TasksViewModel tasksViewModel,
         IEventAggregator eventAggregator,
         IMainThread mainThread,
-        IPersonalGuidRangeService guidRangeService,
+        IIdGeneratorService idGenerator,
         IServerExecutableService serverExecutableService,
         IConnectionsStatusBarItem connectionsStatusBarItem,
         IDebuggerService debuggerService,
@@ -51,7 +52,7 @@ public partial class StatusBarViewModel : ObservableBase
         Connections = connectionsStatusBarItem;
         this.tasksViewModel = tasksViewModel;
         this.mainThread = mainThread;
-        this.guidRangeService = guidRangeService;
+        this.idGenerator = idGenerator;
         this.serverExecutableService = serverExecutableService;
         this.debuggerService = debuggerService;
         this.clipboardService = clipboardService;
@@ -73,10 +74,10 @@ public partial class StatusBarViewModel : ObservableBase
         });
 
         SupportsBreakpoints = debuggerService.Sources.Count > 0;
-        CopyNextCreatureGuidCommand = GenerateGuidCommand(GuidType.Creature);
-        CopyNextGameobjectGuidCommand = GenerateGuidCommand(GuidType.GameObject);
-        CopyCreatureGuidRangeCommand = GenerateGuidRangeCommand(GuidType.Creature, () => creatureGuidCount);
-        CopyGameobjectGuidRangeCommand = GenerateGuidRangeCommand(GuidType.GameObject, () => gameobjectGuidCount);
+        CopyNextCreatureGuidCommand = GenerateGuidCommand(() => new CreatureGuidIdType());
+        CopyNextGameobjectGuidCommand = GenerateGuidCommand(() => new GameObjectGuidIdType());
+        CopyCreatureGuidRangeCommand = GenerateGuidRangeCommand(() => new CreatureGuidIdType(), () => creatureGuidCount);
+        CopyGameobjectGuidRangeCommand = GenerateGuidRangeCommand(() => new GameObjectGuidIdType(), () => gameobjectGuidCount);
         On<uint>(() => CreatureGuidCount, _ => CopyCreatureGuidRangeCommand.RaiseCanExecuteChanged());
         On<uint>(() => GameobjectGuidCount, _ => CopyGameobjectGuidRangeCommand.RaiseCanExecuteChanged());
         On(this.statusBar, x => x.CurrentNotification, _ => RaisePropertyChanged(nameof(CurrentNotification)));
@@ -86,29 +87,31 @@ public partial class StatusBarViewModel : ObservableBase
         this.debuggerService.DebugPointChanged += id => RaisePropertyChanged(nameof(TotalBreakpoints));
     }
 
-    private AsyncAutoCommand GenerateGuidCommand(GuidType type)
+    private AsyncAutoCommand GenerateGuidCommand(Func<IIdType> requestFactory)
     {
         return new AsyncAutoCommand(async () =>
         {
-            var guid = await guidRangeService.GetNextGuidOrShowError(type, messageBoxService.Value);
+            var request = requestFactory();
+            var guid = await idGenerator.GetNextOrShowError(request, messageBoxService.Value);
             if (guid.HasValue)
             {
                 clipboardService.Value.SetText(guid.Value.ToString());
-                statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Copied " + guid.Value + $" to your clipboard ({type})"));
+                statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Copied " + guid.Value + $" to your clipboard ({IdTypeNames.Of(request.GetType())})"));
             }
         });
     }
 
-    private AsyncAutoCommand GenerateGuidRangeCommand(GuidType type, Func<uint> getter)
+    private AsyncAutoCommand GenerateGuidRangeCommand(Func<IIdType> requestFactory, Func<uint> getter)
     {
         return new AsyncAutoCommand(async () =>
         {
             var count = getter();
-            var guid = await guidRangeService.GetNextGuidRangeOrShowError(type, count, messageBoxService.Value);
+            var request = requestFactory();
+            var guid = await idGenerator.GetNextRangeOrShowError(request, (int)count, messageBoxService.Value);
             if (guid.HasValue)
             {
                 clipboardService.Value.SetText(guid.Value.ToString());
-                statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Copied " + guid.Value + $" to your clipboard ({type}). You have {count} consecutive guids"));
+                statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Copied " + guid.Value + $" to your clipboard ({IdTypeNames.Of(request.GetType())}). You have {count} consecutive guids"));
             }
         }, () => getter() > 0);
     }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LinqKit;
 using LinqToDB;
 using LinqToDB.Data;
+using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.DBC;
@@ -36,7 +37,13 @@ namespace WDE.TrinityMySqlDatabase.Database
         }
 
         protected T Database() => new();
-        
+
+        public virtual async Task<IReadOnlyList<ICreatureFormation>> GetCreatureFormations()
+        {
+            await using var model = Database();
+            return await model.CreatureFormations.ToListAsync<ICreatureFormation>();
+        }
+
         public async Task<IReadOnlyList<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry)
         {
             await using var model = Database();
@@ -112,6 +119,18 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract void ConnectOrThrow();
         public abstract Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync();
         public abstract Task<IReadOnlyList<ICreature>> GetCreaturesAsync();
+
+        public virtual async Task<uint> GetMaxCreatureGuid()
+        {
+            var creatures = await GetCreaturesAsync();
+            return creatures.Count == 0 ? 0 : creatures.Max(c => c.Guid);
+        }
+
+        public virtual async Task<uint> GetMaxGameObjectGuid()
+        {
+            var gameObjects = await GetGameObjectsAsync();
+            return gameObjects.Count == 0 ? 0 : gameObjects.Max(g => g.Guid);
+        }
 
         public async Task<IReadOnlyList<IConversationTemplate>> GetConversationTemplatesAsync()
         {
@@ -470,16 +489,35 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId);
 
+        // schema-tolerant: current TrinityCore removed `waypoints` and `script_waypoint` (merged
+        // into the waypoint_data family), but many 3.3.5 TDB forks still have them - query and fall
+        // back to null when the table is gone, so both schema generations work
         public virtual async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId, uint count)
         {
-            await using var model = Database();
-            return await model.SmartScriptWaypoint.Where(wp => wp.PathId >= pathId && wp.PathId < pathId + count).OrderBy(wp => wp.PointId).ToListAsync<ISmartScriptWaypoint>();
+            try
+            {
+                await using var model = Database();
+                return await model.SmartScriptWaypoint.Where(wp => wp.PathId >= pathId && wp.PathId < pathId + count).OrderBy(wp => wp.PointId).ToListAsync<ISmartScriptWaypoint>();
+            }
+            catch (Exception e)
+            {
+                LOG.LogWarning(e, "Couldn't load `waypoints` (SmartAI) - the table may not exist in this database");
+                return null;
+            }
         }
 
         public virtual async Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId)
         {
-            await using var model = Database();
-            return await model.ScriptWaypoint.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IScriptWaypoint>();
+            try
+            {
+                await using var model = Database();
+                return await model.ScriptWaypoint.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IScriptWaypoint>();
+            }
+            catch (Exception e)
+            {
+                LOG.LogWarning(e, "Couldn't load `script_waypoint` - the table may not exist in this database");
+                return null;
+            }
         }
 
         public async Task<IReadOnlyList<IMangosWaypoint>?> GetMangosWaypoints(uint pathId) => null;
@@ -489,6 +527,12 @@ namespace WDE.TrinityMySqlDatabase.Database
         public async Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId) => null;
 
         public async Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => null;
+
+        // only TC master has the per-path waypoint_path metadata row (virtual, not the interface
+        // default: a derived class can't take over a default interface method without the base
+        // declaring it)
+        public virtual Task<IWaypointPathHeader?> GetWaypointPathHeader(uint pathId) =>
+            Task.FromResult<IWaypointPathHeader?>(null);
 
         public async Task<IReadOnlyList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates()
         {
@@ -754,6 +798,24 @@ namespace WDE.TrinityMySqlDatabase.Database
             await using var model = Database();
             var creatures = await model.CreatureQuestEnders.Where(x => x.Quest == questId).ToListAsync<IQuestRelation>();
             var gameobjects = await model.GameObjectQuestEnders.Where(x => x.Quest == questId).ToListAsync<IQuestRelation>();
+            creatures.AddRange(gameobjects);
+            return creatures;
+        }
+
+        public async Task<IReadOnlyList<IQuestRelation>?> GetAllQuestStarters()
+        {
+            await using var model = Database();
+            var creatures = await model.CreatureQuestStarters.ToListAsync<IQuestRelation>();
+            var gameobjects = await model.GameObjectQuestStarters.ToListAsync<IQuestRelation>();
+            creatures.AddRange(gameobjects);
+            return creatures;
+        }
+
+        public async Task<IReadOnlyList<IQuestRelation>?> GetAllQuestEnders()
+        {
+            await using var model = Database();
+            var creatures = await model.CreatureQuestEnders.ToListAsync<IQuestRelation>();
+            var gameobjects = await model.GameObjectQuestEnders.ToListAsync<IQuestRelation>();
             creatures.AddRange(gameobjects);
             return creatures;
         }
