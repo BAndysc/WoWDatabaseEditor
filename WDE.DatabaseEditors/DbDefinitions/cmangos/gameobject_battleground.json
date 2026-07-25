@@ -1,0 +1,51 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Gameobject Battleground Events",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Assigns battleground gameobject spawns (by guid) to a battleground event index (main event + sub event, must match a row in battleground_events). Battleground scripts spawn and despawn all objects of an event together when the event becomes (in)active.",
+  "table_name": "gameobject_battleground",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "PVP",
+  "icon_path": "Icons/document_bg.png",
+  "reload_command": "reload gameobject_battleground",
+  "picker": "GameobjectGUIDParameter",
+  "primary_key": [
+    "guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "db_column_name": "guid",
+          "value_type": "GameobjectGUIDParameter"
+        },
+        {
+          "name": "Spawn",
+          "help": "Open the gameobject spawn.",
+          "meta": "table:gameobject;`guid` = {guid}"
+        },
+        {
+          "name": "Event 1",
+          "help": "Main battleground event id (must exist in battleground_events for the gameobject's map). 255 = BG_EVENT_NONE.",
+          "db_column_name": "event1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Event 2",
+          "help": "Sub event id (must exist in battleground_events for the gameobject's map). 255 = BG_EVENT_NONE.",
+          "db_column_name": "event2",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

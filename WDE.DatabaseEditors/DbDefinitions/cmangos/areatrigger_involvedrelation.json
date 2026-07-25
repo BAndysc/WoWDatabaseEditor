@@ -1,0 +1,48 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Areatrigger Involvedrelation",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Marks an area trigger as a quest exploration objective: entering the trigger completes the explore requirement of the given quest (the quest must have the explore or event special flag).",
+  "table_name": "areatrigger_involvedrelation",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "group_name": "Areatriggers",
+  "icon_path": "Icons/document_areatrigger.png",
+  "reload_command": "reload areatrigger_involvedrelation",
+  "picker": "AreaTriggerParameter",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "help": "Area trigger id from AreaTrigger.dbc.",
+          "db_column_name": "id",
+          "value_type": "AreaTriggerParameter",
+          "preferred_width": 162.0
+        },
+        {
+          "name": "Quest",
+          "help": "Quest credited when a player with the quest enters the trigger.",
+          "db_column_name": "quest",
+          "value_type": "QuestParameter",
+          "preferred_width": 398.0
+        },
+        {
+          "name": "Quest",
+          "help": "Open the completed quest.",
+          "meta": "tableByKey:quest_template;quest",
+          "preferred_width": 358.0
+        }
+      ]
+    }
+  ]
+}

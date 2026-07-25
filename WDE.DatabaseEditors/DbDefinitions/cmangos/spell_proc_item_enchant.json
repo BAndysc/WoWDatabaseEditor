@@ -1,0 +1,39 @@
+{
+  "id": "spell_proc_item_enchant",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Proc Item Enchant",
+  "description": "Proc-per-minute rates for spells triggered by item enchantments (e.g. weapon enchant procs). The spell must be the first rank in its chain, the rate is propagated to higher ranks.",
+  "table_name": "spell_proc_item_enchant",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "SpellParameter",
+  "reload_command": "reload spell_proc_item_enchant",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "entry",
+          "value_type": "SpellParameter",
+          "help": "Enchantment proc spell, must be the first rank in its spell chain"
+        },
+        {
+          "name": "PPM Rate",
+          "db_column_name": "ppmRate",
+          "value_type": "float",
+          "help": "Procs per minute, scaled by weapon speed"
+        }
+      ]
+    }
+  ]
+}

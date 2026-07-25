@@ -1,0 +1,82 @@
+{
+  "id": "npc_vendor_template_classic",
+  "compatibility": [
+    "CMaNGOS-Classic"
+  ],
+  "name": "Npc Vendor Template",
+  "description": "A reusable list of items for sale that can be shared by multiple vendor creatures via creature_template.VendorTemplateId, instead of repeating the same item list in npc_vendor for each entry. Per-creature npc_vendor rows are added on top of the template list.",
+  "table_name": "npc_vendor_template",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "NPC Vendor",
+  "icon_path": "Icons/document_dollar.png",
+  "picker": "Parameter",
+  "reload_command": "reload npc_vendor",
+  "primary_key": [
+    "entry",
+    "item"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "help": "Vendor template id, referenced from creature_template.VendorTemplateId (not a creature entry itself)."
+        },
+        {
+          "name": "Item",
+          "db_column_name": "item",
+          "value_type": "ItemParameter",
+          "help": "Item sold by the vendor."
+        },
+        {
+          "name": "Item",
+          "meta": "tableByKey:item_template;item",
+          "help": "Open the sold item."
+        },
+        {
+          "name": "Max Count",
+          "db_column_name": "maxcount",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Limited stock: maximum number of this item available at once, 0 = unlimited. If set, Incr Time must be non-zero."
+        },
+        {
+          "name": "Incr Time",
+          "db_column_name": "incrtime",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Restock time in seconds for one unit of a limited-stock item. Must be 0 when Max Count is 0, non-zero otherwise."
+        },
+        {
+          "name": "Slot",
+          "db_column_name": "slot",
+          "value_type": "uint",
+          "help": "Only defines the ordering of items in the vendor window (rows are loaded ORDER BY slot)."
+        },
+        {
+          "name": "Condition Id",
+          "db_column_name": "condition_id",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "conditions.condition_entry controlling whether this item is offered to a given player, 0 = always offered."
+        },
+        {
+          "is_meta": true,
+          "name": "Condition",
+          "meta": "mangos_conditions:condition_id;source=the vendor NPC;target=Player",
+          "help": "Edit the condition tree referenced by Condition Id."
+        },
+        {
+          "name": "Comments",
+          "db_column_name": "comments",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

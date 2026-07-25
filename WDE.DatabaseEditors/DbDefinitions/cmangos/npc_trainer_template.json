@@ -1,0 +1,100 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK",
+    "CMaNGOS-TBC",
+    "CMaNGOS-Classic"
+  ],
+  "name": "Npc Trainer Template",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "A reusable list of trainer-taught spells (cost, skill/level/ability requirements) that can be shared by multiple trainer creatures via creature_template.TrainerTemplateId, instead of repeating the same spell list in npc_trainer for each entry.",
+  "table_name": "npc_trainer_template",
+  "table_index_name": "entry",
+  "record_mode": "MultiRecord",
+  "skip_quick_load": true,
+  "group_name": "Trainers",
+  "icon_path": "Icons/document_book.png",
+  "primary_key": [
+    "entry",
+    "spell"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "Trainer template id, referenced from creature_template.TrainerTemplateId (not a creature entry itself).",
+          "db_column_name": "entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spell",
+          "help": "Spell taught by the trainer. Must not be a talent, and must exist / be a valid learnable spell.",
+          "db_column_name": "spell",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Spell Cost",
+          "help": "Copper cost to learn the spell from the trainer.",
+          "db_column_name": "spellcost",
+          "value_type": "MoneyParameter"
+        },
+        {
+          "name": "Req Skill",
+          "help": "Required skill line, 0 = none.",
+          "db_column_name": "reqskill",
+          "value_type": "SkillParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Req Skill Value",
+          "help": "Minimum skill value required in Req Skill.",
+          "db_column_name": "reqskillvalue",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Req Level",
+          "help": "Minimum player level required (0 = use the taught spell's own spell level).",
+          "db_column_name": "reqlevel",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Req Ability 1",
+          "help": "Optional prerequisite spell the player must already know.",
+          "db_column_name": "ReqAbility1",
+          "value_type": "SpellParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Req Ability 2",
+          "help": "Optional prerequisite spell the player must already know.",
+          "db_column_name": "ReqAbility2",
+          "value_type": "SpellParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Req Ability 3",
+          "help": "Optional prerequisite spell the player must already know.",
+          "db_column_name": "ReqAbility3",
+          "value_type": "SpellParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Condition Id",
+          "help": "conditions.condition_entry controlling whether this spell is offered to a given player, 0 = always offered.",
+          "db_column_name": "condition_id",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Condition",
+          "help": "Edit the condition tree referenced by Condition Id.",
+          "meta": "mangos_conditions:condition_id;source=the trainer NPC;target=Player"
+        }
+      ]
+    }
+  ]
+}

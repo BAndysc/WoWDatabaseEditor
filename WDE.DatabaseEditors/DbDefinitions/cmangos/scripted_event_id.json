@@ -1,0 +1,41 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Scripted Event Id",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Assigns a C++ (ScriptDevAI) script to an event id. The script runs when the event is triggered, e.g. by spell effect SPELL_EFFECT_SEND_EVENT (61), a gameobject or a transport node event.",
+  "table_name": "scripted_event_id",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_event_script.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Event Id",
+          "db_column_name": "id",
+          "value_type": "int",
+          "preferred_width": 116.0
+        },
+        {
+          "name": "Script Name",
+          "help": "Name of an event id script registered in the core (C++/ScriptDevAI).",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "preferred_width": 788.0
+        }
+      ]
+    }
+  ]
+}

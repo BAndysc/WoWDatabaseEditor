@@ -1,0 +1,44 @@
+{
+  "id": "spell_affect",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC"
+  ],
+  "name": "Spell Affect",
+  "description": "Supplies the missing spell family mask for spell modifier auras (add flat/pct modifier, add target trigger, override class scripts) whose DBC EffectItemType is empty, defining which spells the modifier effect affects. Only first rank spells are allowed, data is propagated to higher ranks.",
+  "table_name": "spell_affect",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "SpellParameter",
+  "reload_command": "reload spell_affect",
+  "primary_key": [
+    "entry",
+    "effectId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "entry",
+          "value_type": "SpellParameter",
+          "help": "Spell with a spell modifier aura effect, must be the first rank in its spell chain"
+        },
+        {
+          "name": "Effect Index",
+          "db_column_name": "effectId",
+          "value_type": "SpellEffectIndexParameter"
+        },
+        {
+          "name": "Spell Family Mask",
+          "db_column_name": "SpellFamilyMask",
+          "value_type": "uint",
+          "help": "64 bit spell family (class) mask matched against the SpellFamilyFlags of candidate spells to decide which spells are affected by this modifier effect"
+        }
+      ]
+    }
+  ]
+}

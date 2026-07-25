@@ -1,0 +1,71 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Game Event Mail",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Mails automatically sent to players of the given races (optionally only those who completed a quest) when a game event starts (positive event id) or stops (negative event id).",
+  "table_name": "game_event_mail",
+  "table_index_name": "event",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_gameevent_mail.png",
+  "picker": "GameEventParameter",
+  "primary_key": [
+    "event",
+    "raceMask",
+    "quest"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Event",
+          "help": "Game event id (game_event.entry), signed. Positive: the mail is sent when the event starts. Negative: the mail is sent when the event stops. 0 is not allowed.",
+          "db_column_name": "event",
+          "value_type": "GameEventParameter"
+        },
+        {
+          "name": "Event",
+          "help": "Open the game event.",
+          "meta": "table:game_event;`entry` = ABS({event})"
+        },
+        {
+          "name": "Race Mask",
+          "help": "Mask of player races that receive the mail. Must include at least one playable race.",
+          "db_column_name": "raceMask",
+          "value_type": "RaceMaskParameter"
+        },
+        {
+          "name": "Quest",
+          "help": "If set, only players who have completed (been rewarded) this quest receive the mail. 0 = no quest requirement.",
+          "db_column_name": "quest",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Quest",
+          "help": "Open the required quest.",
+          "meta": "tableByKey:quest_template;quest"
+        },
+        {
+          "name": "Mail Template Id",
+          "help": "MailTemplate.dbc id defining the mail's subject and body.",
+          "db_column_name": "mailTemplateId",
+          "value_type": "MailTemplateParameter"
+        },
+        {
+          "name": "Sender Entry",
+          "help": "creature_template entry shown as the mail sender.",
+          "db_column_name": "senderEntry",
+          "value_type": "CreatureParameter"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "spell_cone",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Cone",
+  "description": "Overrides the cone angle used by cone-shaped spell effects (default is 60 degrees). Entries must be defined for the first rank of a spell and all ranks must use the same angle.",
+  "table_name": "spell_cone",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "SpellParameter",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "Id",
+          "value_type": "SpellParameter",
+          "help": "Cone angle is looked up by the first rank of the spell chain"
+        },
+        {
+          "name": "Cone Degrees",
+          "db_column_name": "ConeDegrees",
+          "value_type": "int",
+          "default": 60,
+          "help": "Width of the cone in degrees; negative value = cone behind the caster"
+        }
+      ]
+    }
+  ]
+}

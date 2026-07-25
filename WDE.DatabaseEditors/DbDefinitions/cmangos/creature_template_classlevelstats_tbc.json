@@ -1,0 +1,115 @@
+{
+  "id": "creature_template_classlevelstats_tbc",
+  "compatibility": [
+//    "CMaNGOS-TBC"
+  ],
+  "name": "Creature Class Level Stats",
+  "description": "Base health, mana, damage, attack power, armor and attributes for creatures per unit class, level and expansion. creature_template multipliers scale these base values. Loaded by ObjectMgr::LoadCreatureClassLvlStats.",
+  "table_name": "creature_template_classlevelstats",
+  "table_index_name": "Level",
+  "record_mode": "SingleRow",
+  "group_name": "Templates",
+  "icon_path": "Icons/document_creature_template.png",
+  "picker": "Parameter",
+  "reload_command": "reload creature_template_classlevelstats",
+  "primary_key": [
+    "Level",
+    "Class"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Level",
+          "db_column_name": "Level",
+          "value_type": "int"
+        },
+        {
+          "name": "Class",
+          "db_column_name": "Class",
+          "value_type": "UnitClassParameter"
+        },
+        {
+          "name": "Base Health (Classic)",
+          "db_column_name": "BaseHealthExp0",
+          "value_type": "uint",
+          "default": 1
+        },
+        {
+          "name": "Base Health (TBC)",
+          "db_column_name": "BaseHealthExp1",
+          "value_type": "uint",
+          "default": 1
+        },
+        {
+          "name": "Base Mana",
+          "db_column_name": "BaseMana",
+          "value_type": "uint"
+        },
+        {
+          "name": "Base Damage (Classic)",
+          "db_column_name": "BaseDamageExp0",
+          "value_type": "float"
+        },
+        {
+          "name": "Base Damage (TBC)",
+          "db_column_name": "BaseDamageExp1",
+          "value_type": "float"
+        },
+        {
+          "name": "Base Melee Attack Power",
+          "db_column_name": "BaseMeleeAttackPower",
+          "value_type": "float"
+        },
+        {
+          "name": "Base Ranged Attack Power",
+          "db_column_name": "BaseRangedAttackPower",
+          "value_type": "float"
+        },
+        {
+          "name": "Base Armor",
+          "db_column_name": "BaseArmor",
+          "value_type": "uint"
+        },
+        {
+          "name": "Strength",
+          "db_column_name": "Strength",
+          "value_type": "int"
+        },
+        {
+          "name": "Agility",
+          "db_column_name": "Agility",
+          "value_type": "int"
+        },
+        {
+          "name": "Stamina",
+          "db_column_name": "Stamina",
+          "value_type": "int"
+        },
+        {
+          "name": "Intellect",
+          "db_column_name": "Intellect",
+          "value_type": "int"
+        },
+        {
+          "name": "Spirit",
+          "db_column_name": "Spirit",
+          "value_type": "int"
+        },
+        {
+          "name": "Base Damage Classic (OLD)",
+          "db_column_name": "BaseDamageExp0OLD",
+          "value_type": "float",
+          "help": "Deprecated column kept during damage rework migration."
+        },
+        {
+          "name": "Base Damage TBC (OLD)",
+          "db_column_name": "BaseDamageExp1OLD",
+          "value_type": "float",
+          "help": "Deprecated column kept during damage rework migration."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "spell_elixir",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Elixir",
+  "description": "Classifies consumable spells as battle elixir, guardian elixir, flask (battle + guardian), unstable/shattrath flask or well fed buff. The server uses the classification for aura stacking rules of elixirs and food buffs.",
+  "table_name": "spell_elixir",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "SpellParameter",
+  "reload_command": "reload spell_elixir",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "entry",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Mask",
+          "db_column_name": "mask",
+          "value_type": "CmangosSpellElixirMaskParameter",
+          "help": "Battle (1) + guardian (2) together mark a flask (3)"
+        }
+      ]
+    }
+  ]
+}

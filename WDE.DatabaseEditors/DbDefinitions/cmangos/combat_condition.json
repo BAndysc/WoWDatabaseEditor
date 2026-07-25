@@ -1,0 +1,181 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Combat Condition",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Combat conditions evaluated by creature AI (e.g. creature spell lists): an optional worldstate expression, unit conditions on self and current target, and counted unit conditions over nearby friends and enemies on the threat list.",
+  "table_name": "combat_condition",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_conditions.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "Id",
+          "value_type": "int",
+          "preferred_width": 72.0
+        },
+        {
+          "name": "Worldstate Expression",
+          "help": "worldstate_expression.Id which must evaluate to true; 0 = no worldstate requirement.",
+          "db_column_name": "WorldStateExpressionID",
+          "value_type": "TableReference(worldstate_expression#Id)Parameter",
+          "zero_is_blank": true,
+          "preferred_width": 192.0
+        },
+        {
+          "name": "Self Condition",
+          "help": "unit_condition.Id checked on the creature itself; 0 = none.",
+          "db_column_name": "SelfConditionID",
+          "value_type": "int",
+          "zero_is_blank": true,
+          "preferred_width": 110.0
+        },
+        {
+          "name": "Self Condition Editor",
+          "help": "Edit the unit condition referenced by Self Condition.",
+          "meta": "mangos_unit_conditions:SelfConditionID",
+          "preferred_width": 141.0
+        },
+        {
+          "name": "Target Condition",
+          "help": "unit_condition.Id checked on the creature's current target; 0 = none.",
+          "db_column_name": "TargetConditionID",
+          "value_type": "int",
+          "zero_is_blank": true,
+          "preferred_width": 128.0
+        },
+        {
+          "name": "Target Condition Editor",
+          "help": "Edit the unit condition referenced by Target Condition.",
+          "meta": "mangos_unit_conditions:TargetConditionID",
+          "preferred_width": 169.0
+        },
+        {
+          "name": "Friend Condition Logic",
+          "help": "How the two friend condition checks are combined.",
+          "db_column_name": "FriendConditionLogic",
+          "value_type": "CmangosConditionLogicParameter",
+          "preferred_width": 216.0
+        },
+        {
+          "name": "Enemy Condition Logic",
+          "help": "How the two enemy condition checks are combined.",
+          "db_column_name": "EnemyConditionLogic",
+          "value_type": "CmangosConditionLogicParameter",
+          "preferred_width": 218.0
+        },
+        {
+          "name": "Friend Condition 0",
+          "help": "unit_condition.Id counted over nearby friendly units; 0 = none (skips the whole friend check).",
+          "db_column_name": "FriendConditionID_0",
+          "value_type": "int",
+          "zero_is_blank": true,
+          "preferred_width": 138.0
+        },
+        {
+          "name": "Friend Condition 0 Editor",
+          "help": "Edit the unit condition referenced by Friend Condition 0.",
+          "meta": "mangos_unit_conditions:FriendConditionID_0",
+          "preferred_width": 160.0
+        },
+        {
+          "name": "Friend Condition 1",
+          "help": "unit_condition.Id counted over nearby friendly units; 0 = none.",
+          "db_column_name": "FriendConditionID_1",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Friend Condition 1 Editor",
+          "help": "Edit the unit condition referenced by Friend Condition 1.",
+          "meta": "mangos_unit_conditions:FriendConditionID_1"
+        },
+        {
+          "name": "Friend Condition Op 0",
+          "help": "Comparison of the number of friends fulfilling condition 0 against Friend Condition Count 0.",
+          "db_column_name": "FriendConditionOp_0",
+          "value_type": "CmangosConditionOperationParameter"
+        },
+        {
+          "name": "Friend Condition Op 1",
+          "help": "Comparison of the number of friends fulfilling condition 1 against Friend Condition Count 1.",
+          "db_column_name": "FriendConditionOp_1",
+          "value_type": "CmangosConditionOperationParameter"
+        },
+        {
+          "name": "Friend Condition Count 0",
+          "help": "Number of friends compared using Friend Condition Op 0.",
+          "db_column_name": "FriendConditionCount_0",
+          "value_type": "int"
+        },
+        {
+          "name": "Friend Condition Count 1",
+          "help": "Number of friends compared using Friend Condition Op 1.",
+          "db_column_name": "FriendConditionCount_1",
+          "value_type": "int"
+        },
+        {
+          "name": "Enemy Condition 0",
+          "help": "unit_condition.Id counted over enemies on the threat list; 0 = none (skips the whole enemy check).",
+          "db_column_name": "EnemyConditionID_0",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Enemy Condition 0 Editor",
+          "help": "Edit the unit condition referenced by Enemy Condition 0.",
+          "meta": "mangos_unit_conditions:EnemyConditionID_0"
+        },
+        {
+          "name": "Enemy Condition 1",
+          "help": "unit_condition.Id counted over enemies on the threat list; 0 = none.",
+          "db_column_name": "EnemyConditionID_1",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Enemy Condition 1 Editor",
+          "help": "Edit the unit condition referenced by Enemy Condition 1.",
+          "meta": "mangos_unit_conditions:EnemyConditionID_1"
+        },
+        {
+          "name": "Enemy Condition Op 0",
+          "help": "Comparison of the number of enemies fulfilling condition 0 against Enemy Condition Count 0.",
+          "db_column_name": "EnemyConditionOp_0",
+          "value_type": "CmangosConditionOperationParameter"
+        },
+        {
+          "name": "Enemy Condition Op 1",
+          "help": "Comparison of the number of enemies fulfilling condition 1 against Enemy Condition Count 1.",
+          "db_column_name": "EnemyConditionOp_1",
+          "value_type": "CmangosConditionOperationParameter"
+        },
+        {
+          "name": "Enemy Condition Count 0",
+          "help": "Number of enemies compared using Enemy Condition Op 0.",
+          "db_column_name": "EnemyConditionCount_0",
+          "value_type": "int"
+        },
+        {
+          "name": "Enemy Condition Count 1",
+          "help": "Number of enemies compared using Enemy Condition Op 1.",
+          "db_column_name": "EnemyConditionCount_1",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

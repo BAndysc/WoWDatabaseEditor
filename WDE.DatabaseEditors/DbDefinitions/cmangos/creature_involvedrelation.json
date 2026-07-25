@@ -1,0 +1,40 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Creature Quest Enders",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Maps creature entries to the quests they end (quest takers): players turn in the listed quests at this creature.",
+  "table_name": "creature_involvedrelation",
+  "table_index_name": "id",
+  "record_mode": "MultiRecord",
+  "group_name": "Quests",
+  "icon_path": "Icons/document_questender.png",
+  "reload_command": "reload creature_involvedrelation",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "id",
+    "quest"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature",
+          "db_column_name": "id",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Quest",
+          "db_column_name": "quest",
+          "value_type": "QuestParameter",
+          "preferred_width": 1249.0
+        }
+      ]
+    }
+  ]
+}

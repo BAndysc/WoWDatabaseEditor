@@ -1,0 +1,62 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Vehicle Accessory",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Accessory creatures spawned and boarded onto a vehicle's seats when the vehicle creature is summoned (turrets, passengers etc.). Loaded by ObjectMgr::LoadVehicleAccessory into sVehicleAccessoryStorage.",
+  "table_name": "vehicle_accessory",
+  "table_index_name": "vehicle_entry",
+  "record_mode": "MultiRecord",
+  "group_name": "Vehicles",
+  "icon_path": "Icons/document_carwarning.png",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "vehicle_entry",
+    "seat"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Vehicle Entry",
+          "help": "Creature entry of the vehicle.",
+          "db_column_name": "vehicle_entry",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Seat",
+          "help": "Seat index (0-7) the accessory boards.",
+          "db_column_name": "seat",
+          "value_type": "VehicleSeatIndexParameter",
+          "preferred_width": 71.0
+        },
+        {
+          "name": "Accessory Entry",
+          "help": "Creature entry of the summoned accessory.",
+          "db_column_name": "accessory_entry",
+          "value_type": "CreatureParameter",
+          "preferred_width": 243.0
+        },
+        {
+          "name": "Ride Spell",
+          "help": "Optional control/ride spell cast to board the accessory instead of the default.",
+          "db_column_name": "RideSpellId",
+          "value_type": "SpellParameter",
+          "can_be_null": true,
+          "zero_is_blank": true,
+          "preferred_width": 218.0
+        },
+        {
+          "name": "Comment",
+          "help": "Informational comment only, not read by the core.",
+          "db_column_name": "comment",
+          "value_type": "string",
+          "preferred_width": 276.0
+        }
+      ]
+    }
+  ]
+}

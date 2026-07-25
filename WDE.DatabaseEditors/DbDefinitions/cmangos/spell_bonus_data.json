@@ -1,0 +1,60 @@
+{
+  "id": "spell_bonus_data",
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Bonus Data",
+  "description": "Custom spell power and attack power coefficients for direct and periodic (DoT/HoT) damage or healing of a spell, overriding the default coefficient calculation. Note: recent CMaNGOS WoTLK cores calculate coefficients internally and no longer read this table.",
+  "table_name": "spell_bonus_data",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "SpellParameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "entry",
+          "value_type": "SpellParameter",
+          "help": "First rank of the spell, data applies to all ranks"
+        },
+        {
+          "name": "Direct Bonus",
+          "db_column_name": "direct_bonus",
+          "value_type": "float",
+          "help": "Spell power coefficient for direct damage/heal, e.g. 0.428 = 42.8% of spell power"
+        },
+        {
+          "name": "Dot Bonus",
+          "db_column_name": "dot_bonus",
+          "value_type": "float",
+          "help": "Spell power coefficient per tick of periodic damage/heal"
+        },
+        {
+          "name": "Ap Bonus",
+          "db_column_name": "ap_bonus",
+          "value_type": "float",
+          "help": "Attack power coefficient for direct damage/heal"
+        },
+        {
+          "name": "Ap Dot Bonus",
+          "db_column_name": "ap_dot_bonus",
+          "value_type": "float",
+          "help": "Attack power coefficient per tick of periodic damage/heal"
+        },
+        {
+          "name": "Comments",
+          "db_column_name": "comments",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

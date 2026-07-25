@@ -1,0 +1,51 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Game Event Quest",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Makes a quest available only while the given game event is active: the quest is added to its quest givers when the event starts and removed when it stops.",
+  "table_name": "game_event_quest",
+  "table_index_name": "quest",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_gameevent_quest.png",
+  "picker": "QuestParameter",
+  "primary_key": [
+    "quest",
+    "event"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Quest",
+          "help": "Quest entry from quest_template.",
+          "db_column_name": "quest",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Quest",
+          "help": "Open the quest template.",
+          "meta": "tableByKey:quest_template;quest"
+        },
+        {
+          "name": "Event",
+          "help": "Game event id (game_event.entry) during which the quest is available.",
+          "db_column_name": "event",
+          "value_type": "GameEventParameter"
+        },
+        {
+          "name": "Event",
+          "help": "Open the game event.",
+          "meta": "table:game_event;`entry` = {event}"
+        }
+      ]
+    }
+  ]
+}

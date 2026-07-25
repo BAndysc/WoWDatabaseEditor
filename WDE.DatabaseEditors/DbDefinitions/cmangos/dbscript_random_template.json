@@ -1,13 +1,17 @@
 {
-  "id": "dbscript_random_templates",
   "compatibility": [
-    "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic"
+    "CMaNGOS-WoTLK",
+    "CMaNGOS-TBC",
+    "CMaNGOS-Classic"
   ],
   "name": "Db script Random Templates",
+  "single_solution_name": "",
+  "multi_solution_name": "",
   "description": "Random templates used to define random texts or relay script IDs",
   "table_name": "dbscript_random_templates",
   "table_index_name": "id",
   "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Database scripts",
   "icon_path": "Icons/document_dice.png",
   "primary_key": [
@@ -41,8 +45,8 @@
           "name": "Chance",
           "db_column_name": "chance",
           "value_type": "PercentageParameter",
-          "preferred_width": 40.0,
-          "zero_is_blank": true
+          "zero_is_blank": true,
+          "preferred_width": 65.0
         },
         {
           "name": "Comment",

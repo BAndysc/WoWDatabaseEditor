@@ -1,0 +1,127 @@
+{
+  "id": "dbscript_string",
+  "compatibility": [
+    "CMaNGOS-Classic"
+  ],
+  "name": "Dbscript String",
+  "description": "Texts used by the DBScripts engine (e.g. SCRIPT_COMMAND_TALK in dbscripts_on_* tables). Loaded as server strings at startup; entries must be in the range 2000000000 to 2000999999. On WoTLK this table was removed in favour of broadcast texts and dbscript_random_templates.",
+  "table_name": "dbscript_string",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Texts",
+  "icon_path": "Icons/document_trinity_strings.png",
+  "picker": "Parameter",
+  "reload_command": "reload dbscript_string",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "help": "Referenced from dbscripts_on_* talk commands. Must be in the dbscript string range 2000000000 to 2000999999."
+        },
+        {
+          "name": "Content Default",
+          "db_column_name": "content_default",
+          "value_type": "string",
+          "help": "enUS/enGB text (LOCALE_enUS)."
+        },
+        {
+          "name": "Content Loc 1",
+          "db_column_name": "content_loc1",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "koKR localization (LOCALE_koKR)."
+        },
+        {
+          "name": "Content Loc 2",
+          "db_column_name": "content_loc2",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "frFR localization (LOCALE_frFR)."
+        },
+        {
+          "name": "Content Loc 3",
+          "db_column_name": "content_loc3",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "deDE localization (LOCALE_deDE)."
+        },
+        {
+          "name": "Content Loc 4",
+          "db_column_name": "content_loc4",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "zhCN localization (LOCALE_zhCN)."
+        },
+        {
+          "name": "Content Loc 5",
+          "db_column_name": "content_loc5",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "zhTW localization (LOCALE_zhTW)."
+        },
+        {
+          "name": "Content Loc 6",
+          "db_column_name": "content_loc6",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "esES localization (LOCALE_esES)."
+        },
+        {
+          "name": "Content Loc 7",
+          "db_column_name": "content_loc7",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "esMX localization (LOCALE_esMX)."
+        },
+        {
+          "name": "Content Loc 8",
+          "db_column_name": "content_loc8",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "ruRU localization (LOCALE_ruRU)."
+        },
+        {
+          "name": "Sound",
+          "db_column_name": "sound",
+          "value_type": "SoundParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Chat Type",
+          "db_column_name": "type",
+          "value_type": "MangosChatTypeParameter"
+        },
+        {
+          "name": "Language",
+          "db_column_name": "language",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Emote",
+          "db_column_name": "emote",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Broadcast Text Id",
+          "db_column_name": "broadcast_text_id",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "comment",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

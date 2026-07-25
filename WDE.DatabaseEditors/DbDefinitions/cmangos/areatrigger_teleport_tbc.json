@@ -1,0 +1,139 @@
+{
+  "id": "areatrigger_teleport_tbc",
+  "compatibility": [
+    "CMaNGOS-TBC"
+  ],
+  "name": "Areatrigger Teleport",
+  "description": "Teleport destinations for area triggers (instance and dungeon entrances): when a player enters the trigger and fulfills the requirements, they are teleported to the target position. Completes the AreaTrigger.dbc data.",
+  "table_name": "areatrigger_teleport",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "group_name": "Areatriggers",
+  "icon_path": "Icons/document_areatrigger.png",
+  "picker": "AreaTriggerParameter",
+  "reload_command": "reload areatrigger_teleport",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "AreaTriggerParameter",
+          "help": "Area trigger id from AreaTrigger.dbc."
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "Informational comment only, not read by the core."
+        },
+        {
+          "name": "Required Level",
+          "db_column_name": "required_level",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Minimum player level to pass the trigger, 0 = no level requirement."
+        },
+        {
+          "name": "Required Item",
+          "db_column_name": "required_item",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Key item the player must have in inventory, 0 = none."
+        },
+        {
+          "name": "Required Item 2",
+          "db_column_name": "required_item2",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Alternative key item, 0 = none."
+        },
+        {
+          "name": "Heroic Key",
+          "db_column_name": "heroic_key",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Key item required to enter in heroic difficulty, 0 = none."
+        },
+        {
+          "name": "Heroic Key 2",
+          "db_column_name": "heroic_key2",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Alternative heroic key item, 0 = none."
+        },
+        {
+          "name": "Required Quest Done",
+          "db_column_name": "required_quest_done",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true,
+          "help": "Quest the player must have completed, 0 = none."
+        },
+        {
+          "name": "Required Quest Done Heroic",
+          "db_column_name": "required_quest_done_heroic",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true,
+          "help": "Quest the player must have completed to enter in heroic difficulty, 0 = none."
+        },
+        {
+          "name": "Target Map",
+          "db_column_name": "target_map",
+          "value_type": "MapParameter",
+          "help": "Destination map."
+        },
+        {
+          "name": "Target Position X",
+          "db_column_name": "target_position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Target Position Y",
+          "db_column_name": "target_position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Target Position Z",
+          "db_column_name": "target_position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Target Orientation",
+          "db_column_name": "target_orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Condition Id",
+          "db_column_name": "condition_id",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "conditions.condition_entry that must be fulfilled to pass the trigger, 0 = no condition."
+        },
+        {
+          "is_meta": true,
+          "name": "Condition",
+          "meta": "mangos_conditions:condition_id;target=Player",
+          "help": "Edit the condition tree referenced by Condition Id."
+        },
+        {
+          "name": "Status",
+          "db_column_name": "status",
+          "value_type": "uint",
+          "help": "Not read by the current core (the loader does not select this column)."
+        },
+        {
+          "name": "Status Failed Text",
+          "db_column_name": "status_failed_text",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "Custom message shown to the player when the requirements are not met."
+        }
+      ]
+    }
+  ]
+}

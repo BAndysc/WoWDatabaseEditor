@@ -1,0 +1,76 @@
+{
+  "id": "battleground_template_classic_tbc",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC"
+  ],
+  "name": "Battleground Template",
+  "description": "Properties of each joinable battleground: per-team player limits, level bracket (classic/tbc only), alliance and horde start locations with the maximum allowed start distance, and an optional player-skinning refloot id. Id is the battleground type id from BattlemasterList.dbc.",
+  "table_name": "battleground_template",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "group_name": "PVP",
+  "icon_path": "Icons/document_bg.png",
+  "picker": "BattlegroundParameter",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Battleground",
+          "help": "Battleground type id (BattlemasterList.dbc).",
+          "db_column_name": "id",
+          "value_type": "uint"
+        },
+        {
+          "name": "Min Players Per Team",
+          "db_column_name": "MinPlayersPerTeam",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max Players Per Team",
+          "db_column_name": "MaxPlayersPerTeam",
+          "value_type": "uint"
+        },
+        {
+          "name": "Min Level",
+          "db_column_name": "MinLvl",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max Level",
+          "db_column_name": "MaxLvl",
+          "value_type": "uint"
+        },
+        {
+          "name": "Alliance Start Loc",
+          "help": "WorldSafeLocs.dbc id of the alliance start/spawn location.",
+          "db_column_name": "AllianceStartLoc",
+          "value_type": "WorldSafeLocParameter"
+        },
+        {
+          "name": "Horde Start Loc",
+          "help": "WorldSafeLocs.dbc id of the horde start/spawn location.",
+          "db_column_name": "HordeStartLoc",
+          "value_type": "WorldSafeLocParameter"
+        },
+        {
+          "name": "Start Max Dist",
+          "help": "Maximum allowed distance from the start location (players farther away on start are teleported back).",
+          "db_column_name": "StartMaxDist",
+          "value_type": "float"
+        },
+        {
+          "name": "Player Skin Refloot Id",
+          "help": "Reference loot id used when skinning player corpses on this battleground; 0 = none.",
+          "db_column_name": "PlayerSkinReflootId",
+          "value_type": "TableReference(reference_loot_template#entry)Parameter",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Page Text",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Text pages of readable items and gameobjects (books, plaques, letters), referenced by item_template.PageText and gameobject template data. next_page chains multiple pages into one document.",
+  "table_name": "page_text",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Texts",
+  "icon_path": "Icons/document_book.png",
+  "reload_command": "reload page_text",
+  "picker": "Parameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Text",
+          "db_column_name": "text",
+          "value_type": "string"
+        },
+        {
+          "name": "Next Page",
+          "help": "Entry of the following page; 0 = last page. Circular references are rejected by the server.",
+          "db_column_name": "next_page",
+          "value_type": "TableReference(page_text#entry)Parameter",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,12 @@
 {
-  "id": "creature_spell_list",
   "compatibility": [
-    "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic"
+    "CMaNGOS-WoTLK",
+    "CMaNGOS-TBC",
+    "CMaNGOS-Classic"
   ],
   "name": "Creature Spell List",
+  "single_solution_name": "",
+  "multi_solution_name": "",
   "description": "Used to define spells per creature.",
   "table_name": "creature_spell_list",
   "table_index_name": "Id",
@@ -23,6 +26,11 @@
           "name": "Id",
           "db_column_name": "Id",
           "value_type": "CreatureTemplateSpellListIdParameter"
+        },
+        {
+          "name": "List Header",
+          "help": "Open the spell list header (chance settings).",
+          "meta": "table:creature_spell_list_entry;`Id` = {Id}"
         },
         {
           "name": "Position",
@@ -60,9 +68,26 @@
           "value_type": "MangosSpellListFlagsParameter"
         },
         {
+          "name": "Combat Condition",
+          "help": "combat_condition entry that must be satisfied for the spell to be cast; -1 = no condition.",
+          "db_column_name": "CombatCondition",
+          "value_type": "TableReference(combat_condition#Id)Parameter",
+          "default": -1
+        },
+        {
+          "name": "Combat Condition",
+          "help": "Open the combat condition.",
+          "meta": "table:combat_condition;`Id` = {CombatCondition}"
+        },
+        {
           "name": "Target",
           "db_column_name": "TargetId",
           "value_type": "TableReference(creature_spell_targeting#Id)Parameter"
+        },
+        {
+          "name": "Targeting",
+          "help": "Open the targeting definition.",
+          "meta": "table:creature_spell_targeting;`Id` = {TargetId}"
         },
         {
           "name": "Relay Script Id",

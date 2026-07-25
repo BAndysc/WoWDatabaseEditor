@@ -1,0 +1,57 @@
+{
+  "id": "spell_target_position",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Target Position",
+  "description": "Destination coordinates for spells with a database-defined target location (implicit target TARGET_LOCATION_DATABASE), for example teleport spells.",
+  "table_name": "spell_target_position",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_spell_target_position.png",
+  "picker": "SpellParameter",
+  "reload_command": "reload spell_target_position",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "id",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Target Map",
+          "db_column_name": "target_map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Target Position X",
+          "db_column_name": "target_position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Target Position Y",
+          "db_column_name": "target_position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Target Position Z",
+          "db_column_name": "target_position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Target Orientation",
+          "db_column_name": "target_orientation",
+          "value_type": "float"
+        }
+      ]
+    }
+  ]
+}

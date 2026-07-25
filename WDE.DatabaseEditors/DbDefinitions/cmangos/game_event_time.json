@@ -1,0 +1,48 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Game Event Time",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Absolute date window for date-scheduled game events (game_event.schedule_type = 1 DATE): the event never starts before start_time nor after end_time; within the window it follows the event's occurence/length cycle.",
+  "table_name": "game_event_time",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_gameevent.png",
+  "picker": "GameEventParameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "Game event id (game_event.entry). The referenced event must have schedule_type 1 (DATE), otherwise the row is ignored.",
+          "db_column_name": "entry",
+          "value_type": "GameEventParameter"
+        },
+        {
+          "name": "Start Time",
+          "help": "Absolute start date (DATETIME, e.g. 2010-12-15 06:00:00); the event will never start before this date.",
+          "db_column_name": "start_time",
+          "value_type": "string",
+          "default": "1970-01-01 00:00:00"
+        },
+        {
+          "name": "End Time",
+          "help": "Absolute end date (DATETIME); the event will never start after this date.",
+          "db_column_name": "end_time",
+          "value_type": "string",
+          "default": "1970-01-01 00:00:00"
+        }
+      ]
+    }
+  ]
+}

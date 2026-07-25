@@ -1,5 +1,4 @@
 {
-  "id": "creature",
   "compatibility": [
     "TrinityMaster"
   ],
@@ -15,6 +14,14 @@
   "primary_key": [
     "guid"
   ],
+  "foreign_tables": [
+    {
+      "table_name": "creature_addon",
+      "foreign_key": [
+        "guid"
+      ]
+    }
+  ],
   "groups": [
     {
       "group_name": "group",
@@ -22,7 +29,7 @@
         {
           "name": "Guid",
           "db_column_name": "guid",
-          "value_type": "string",
+          "value_type": "long",
           "read_only": true,
           "preferred_width": 68.0
         },
@@ -119,7 +126,8 @@
         {
           "name": "Npc flag",
           "db_column_name": "npcflag",
-          "value_type": "NpcFlagParameter",
+          "value_type": "NpcFlag64Parameter",
+          "help": "64-bit packed value on master: low 32 bits = NPCFlags, high 32 bits = NPCFlags2 (UnitDefines.h)",
           "can_be_null": true,
           "zero_is_blank": true
         },
@@ -197,6 +205,97 @@
           "db_column_name": "areaId",
           "value_type": "ZoneAreaParameter",
           "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "creature_addon (FK)",
+      "fields": [
+        {
+          "name": "Path Id",
+          "db_column_name": "PathId",
+          "foreign_table": "creature_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Mount",
+          "db_column_name": "mount",
+          "foreign_table": "creature_addon",
+          "value_type": "CreatureModelDataParameter"
+        },
+        {
+          "name": "Mount Creature ID",
+          "db_column_name": "MountCreatureID",
+          "foreign_table": "creature_addon",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Stand State",
+          "db_column_name": "StandState",
+          "foreign_table": "creature_addon",
+          "value_type": "StandStateParameter"
+        },
+        {
+          "name": "Anim Tier",
+          "db_column_name": "AnimTier",
+          "foreign_table": "creature_addon",
+          "value_type": "AnimationTierParameter"
+        },
+        {
+          "name": "Vis Flags",
+          "db_column_name": "VisFlags",
+          "foreign_table": "creature_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Sheath State",
+          "db_column_name": "SheathState",
+          "foreign_table": "creature_addon",
+          "value_type": "SheathStateParameter",
+          "default": 1
+        },
+        {
+          "name": "Pv PFlags",
+          "db_column_name": "PvPFlags",
+          "foreign_table": "creature_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote",
+          "db_column_name": "emote",
+          "foreign_table": "creature_addon",
+          "value_type": "EmoteStateParameter"
+        },
+        {
+          "name": "Ai Anim Kit",
+          "db_column_name": "aiAnimKit",
+          "foreign_table": "creature_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Movement Anim Kit",
+          "db_column_name": "movementAnimKit",
+          "foreign_table": "creature_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Melee Anim Kit",
+          "db_column_name": "meleeAnimKit",
+          "foreign_table": "creature_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Visibility Distance Type",
+          "db_column_name": "visibilityDistanceType",
+          "foreign_table": "creature_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Auras",
+          "db_column_name": "auras",
+          "foreign_table": "creature_addon",
+          "value_type": "MultiSpellParameter",
+          "can_be_null": true
         }
       ]
     }

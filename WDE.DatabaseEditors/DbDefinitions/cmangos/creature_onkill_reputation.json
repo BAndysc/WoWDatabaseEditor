@@ -1,0 +1,88 @@
+{
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Creature On-Kill Reputation",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Reputation rewarded to players for killing a creature: up to two factions with reputation amount, a maximum standing cap, and optional team-wide (whole group/raid regardless of tap) or team-dependent (faction 1 for Alliance, faction 2 for Horde) behavior.",
+  "table_name": "creature_onkill_reputation",
+  "table_index_name": "creature_id",
+  "record_mode": "SingleRow",
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_faction_change.png",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "creature_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature",
+          "db_column_name": "creature_id",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Reward Faction 1",
+          "help": "faction.dbc id of the first rewarded faction. 0 = none.",
+          "db_column_name": "RewOnKillRepFaction1",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Faction 2",
+          "help": "faction.dbc id of the second rewarded faction. 0 = none.",
+          "db_column_name": "RewOnKillRepFaction2",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Max Standing 1",
+          "help": "Reputation rank cap for faction 1: no reputation is given once the player reached this standing.",
+          "db_column_name": "MaxStanding1",
+          "value_type": "ReputationRankParameter"
+        },
+        {
+          "name": "Is Team Award 1",
+          "help": "If 1, reputation with faction 1 is awarded to the whole team of the faction's team parent.",
+          "db_column_name": "IsTeamAward1",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Reward Value 1",
+          "help": "Amount of reputation given for faction 1 (can be negative).",
+          "db_column_name": "RewOnKillRepValue1",
+          "value_type": "int"
+        },
+        {
+          "name": "Max Standing 2",
+          "help": "Reputation rank cap for faction 2: no reputation is given once the player reached this standing.",
+          "db_column_name": "MaxStanding2",
+          "value_type": "ReputationRankParameter"
+        },
+        {
+          "name": "Is Team Award 2",
+          "help": "If 1, reputation with faction 2 is awarded to the whole team of the faction's team parent.",
+          "db_column_name": "IsTeamAward2",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Reward Value 2",
+          "help": "Amount of reputation given for faction 2 (can be negative).",
+          "db_column_name": "RewOnKillRepValue2",
+          "value_type": "int"
+        },
+        {
+          "name": "Team Dependent",
+          "help": "If 1, Alliance players are rewarded only with faction 1 and Horde players only with faction 2.",
+          "db_column_name": "TeamDependent",
+          "value_type": "BoolParameter"
+        }
+      ]
+    }
+  ]
+}

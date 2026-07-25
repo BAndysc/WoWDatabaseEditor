@@ -1,0 +1,77 @@
+{
+  "id": "instance_template_tbc",
+  "compatibility": [
+    "CMaNGOS-TBC"
+  ],
+  "name": "Instance Template",
+  "description": "Per-instance-map settings: level and player limits, reset timer and the instance script. Every instanceable map should have a row here.",
+  "table_name": "instance_template",
+  "table_index_name": "map",
+  "record_mode": "SingleRow",
+  "group_name": "Instance",
+  "icon_path": "Icons/document_instance_template.png",
+  "picker": "MapParameter",
+  "primary_key": [
+    "map"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter",
+          "help": "Instanceable map id from Map.dbc."
+        },
+        {
+          "name": "Parent",
+          "db_column_name": "parent",
+          "value_type": "MapParameter",
+          "zero_is_blank": true,
+          "help": "Parent map id, set only for maps nested inside another non-continent map, 0 = none."
+        },
+        {
+          "name": "Level Min",
+          "db_column_name": "levelMin",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Minimum player level to enter, 0 = no limit."
+        },
+        {
+          "name": "Level Max",
+          "db_column_name": "levelMax",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Maximum player level allowed to enter, 0 = no limit."
+        },
+        {
+          "name": "Max Players",
+          "db_column_name": "maxPlayers",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Maximum number of players inside the instance, 0 = unlimited."
+        },
+        {
+          "name": "Reset Delay",
+          "db_column_name": "reset_delay",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Raid/heroic reset time in days, 0 = no global reset schedule."
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "help": "C++ InstanceData script name bound to this map."
+        },
+        {
+          "name": "Mount Allowed",
+          "db_column_name": "mountAllowed",
+          "value_type": "BoolParameter",
+          "help": "Whether players can use mounts inside the instance."
+        }
+      ]
+    }
+  ]
+}

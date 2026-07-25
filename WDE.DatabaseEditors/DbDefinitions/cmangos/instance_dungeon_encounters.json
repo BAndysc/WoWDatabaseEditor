@@ -1,0 +1,188 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Instance Dungeon Encounters",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Server-side copy of DungeonEncounter.dbc: defines the boss encounters of each map and difficulty. Referenced by instance_encounters and used for the completed-encounters mask of instance saves, conditions and worldstates.",
+  "table_name": "instance_dungeon_encounters",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Instance",
+  "icon_path": "Icons/document_instance_template.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "help": "Encounter id (DungeonEncounter.dbc id on WoTLK), referenced by instance_encounters.entry.",
+          "db_column_name": "Id",
+          "value_type": "uint"
+        },
+        {
+          "name": "Map",
+          "help": "Map the encounter takes place on.",
+          "db_column_name": "MapId",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Difficulty",
+          "help": "Map difficulty this encounter entry applies to.",
+          "db_column_name": "Difficulty",
+          "value_type": "MapDifficultyParameter"
+        },
+        {
+          "name": "Encounter Data",
+          "help": "Order index of the encounter within the dungeon (m_orderIndex in the DBC).",
+          "db_column_name": "EncounterData",
+          "value_type": "uint"
+        },
+        {
+          "name": "Encounter Index",
+          "help": "Bit index (m_Bit) of this encounter in the instance's completed encounters mask.",
+          "db_column_name": "EncounterIndex",
+          "value_type": "uint"
+        },
+        {
+          "name": "Complete WorldState ID",
+          "help": "Worldstate variable set to 1 when the encounter is completed, 0 = none.",
+          "db_column_name": "CompleteWorldStateID",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Encounter Name",
+          "help": "Encounter name (enUS locale).",
+          "db_column_name": "EncounterName",
+          "value_type": "string"
+        },
+        {
+          "name": "Encounter Name 2",
+          "help": "Encounter name in locale 2.",
+          "db_column_name": "EncounterName2",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 3",
+          "help": "Encounter name in locale 3.",
+          "db_column_name": "EncounterName3",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 4",
+          "help": "Encounter name in locale 4.",
+          "db_column_name": "EncounterName4",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 5",
+          "help": "Encounter name in locale 5.",
+          "db_column_name": "EncounterName5",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 6",
+          "help": "Encounter name in locale 6.",
+          "db_column_name": "EncounterName6",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 7",
+          "help": "Encounter name in locale 7.",
+          "db_column_name": "EncounterName7",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 8",
+          "help": "Encounter name in locale 8.",
+          "db_column_name": "EncounterName8",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 9",
+          "help": "Encounter name in locale 9.",
+          "db_column_name": "EncounterName9",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 10",
+          "help": "Encounter name in locale 10.",
+          "db_column_name": "EncounterName10",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 11",
+          "help": "Encounter name in locale 11.",
+          "db_column_name": "EncounterName11",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 12",
+          "help": "Encounter name in locale 12.",
+          "db_column_name": "EncounterName12",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 13",
+          "help": "Encounter name in locale 13.",
+          "db_column_name": "EncounterName13",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 14",
+          "help": "Encounter name in locale 14.",
+          "db_column_name": "EncounterName14",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 15",
+          "help": "Encounter name in locale 15.",
+          "db_column_name": "EncounterName15",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Encounter Name 16",
+          "help": "Encounter name in locale 16.",
+          "db_column_name": "EncounterName16",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name Lang Flags",
+          "help": "DBC name language flags (m_name_lang_flags).",
+          "db_column_name": "NameLangFlags",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spell Icon ID",
+          "help": "SpellIcon.dbc id shown for the encounter.",
+          "db_column_name": "SpellIconID",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

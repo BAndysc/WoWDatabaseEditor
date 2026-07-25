@@ -1,0 +1,49 @@
+{
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Item Convert",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Converts an item into another one when it is given to a player who cannot use the original: used for cross-faction/race item equivalents (target item's allowable races must not overlap the original's) and for Bind-on-Account items whose reputation requirement the receiver does not meet. Loaded by ObjectMgr::LoadItemConverts.",
+  "table_name": "item_convert",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Items",
+  "icon_path": "Icons/document_faction_change.png",
+  "reload_command": "reload item_convert",
+  "picker": "ItemParameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Item",
+          "help": "The original item (item_template.entry).",
+          "db_column_name": "entry",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Item",
+          "help": "Open the source item.",
+          "meta": "tableByKey:item_template;entry"
+        },
+        {
+          "name": "Converted Item",
+          "help": "The item the player receives instead.",
+          "db_column_name": "item",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Target Item",
+          "help": "Open the item it converts into.",
+          "meta": "tableByKey:item_template;item"
+        }
+      ]
+    }
+  ]
+}

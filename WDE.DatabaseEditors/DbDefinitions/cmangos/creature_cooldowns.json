@@ -1,0 +1,53 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Creature Spell Cooldowns",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Per creature entry spell cooldown ranges in milliseconds. When the creature casts the spell, a random cooldown between min and max overrides the spell's default recovery time; also used as repeat timers for creature spell lists.",
+  "table_name": "creature_cooldowns",
+  "table_index_name": "Entry",
+  "record_mode": "MultiRecord",
+  "skip_quick_load": true,
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_creature_spell.png",
+  "reload_command": "reload creature_cooldowns",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "Entry",
+    "SpellId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "Entry",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Spell",
+          "db_column_name": "SpellId",
+          "value_type": "SpellParameter",
+          "preferred_width": 172.0
+        },
+        {
+          "name": "Cooldown Min (ms)",
+          "db_column_name": "CooldownMin",
+          "value_type": "MillisecondsParameter",
+          "preferred_width": 247.0
+        },
+        {
+          "name": "Cooldown Max (ms)",
+          "db_column_name": "CooldownMax",
+          "value_type": "MillisecondsParameter",
+          "preferred_width": 310.0
+        }
+      ]
+    }
+  ]
+}

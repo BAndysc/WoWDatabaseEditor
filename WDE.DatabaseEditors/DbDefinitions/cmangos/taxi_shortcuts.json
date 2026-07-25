@@ -1,0 +1,52 @@
+{
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Taxi Shortcuts",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Marks taxi paths that have express/shortcut variants: when a shortcut applies, only the first Takeoff and last Landing waypoints of the path are flown and the middle part is skipped. Loaded by ObjectMgr::LoadTaxiShortcuts.",
+  "table_name": "taxi_shortcuts",
+  "table_index_name": "pathid",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_transports.png",
+  "reload_command": "reload taxi_shortcuts",
+  "picker": "TaxiPathParameter",
+  "primary_key": [
+    "pathid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Path",
+          "help": "Taxi path id from TaxiPath.dbc.",
+          "db_column_name": "pathid",
+          "value_type": "TaxiPathParameter"
+        },
+        {
+          "name": "Takeoff Length",
+          "help": "Number of waypoints flown at the start of the path.",
+          "db_column_name": "takeoff",
+          "value_type": "uint"
+        },
+        {
+          "name": "Landing Length",
+          "help": "Number of waypoints flown at the end of the path.",
+          "db_column_name": "landing",
+          "value_type": "uint"
+        },
+        {
+          "name": "Comments",
+          "help": "Informational comment only, not read by the core.",
+          "db_column_name": "comments",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

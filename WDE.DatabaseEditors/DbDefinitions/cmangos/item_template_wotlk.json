@@ -1,0 +1,916 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Item Template",
+  "single_solution_name": "Item {name} template",
+  "multi_solution_name": "Multiple item templates",
+  "description": "Definition of every item in the game: class, stats, damage, requirements, on-use/equip spells, sockets, vendor prices and loot money. Loaded once at server startup by ObjectMgr::LoadItemPrototypes; there is no reload command, changes require a server restart.",
+  "table_name": "item_template",
+  "table_index_name": "entry",
+  "record_mode": "Template",
+  "group_name": "Items",
+  "icon_path": "Icons/document_sword.png",
+  "picker": "ItemParameter",
+  "table_name_source_field": "name",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Class",
+          "db_column_name": "class",
+          "value_type": "ItemClassParameter"
+        },
+        {
+          "name": "Subclass",
+          "help": "Subclass within the item class, class-dependent (e.g. Weapon: 0 = one-hand axe, 1 = two-hand axe, 2 = bow, 15 = dagger...; Armor: 0 = misc, 1 = cloth, 2 = leather, 3 = mail, 4 = plate, 6 = shield). See ItemSubclass* enums in ItemPrototype.h.",
+          "db_column_name": "subclass",
+          "value_type": "uint"
+        },
+        {
+          "name": "Sound Override Subclass",
+          "help": "Sent to the client instead of the real subclass for sound purposes; -1 = none (use the real subclass).",
+          "db_column_name": "unk0",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string"
+        },
+        {
+          "name": "Display Id",
+          "help": "ItemDisplayInfo.dbc id.",
+          "db_column_name": "displayid",
+          "value_type": "uint"
+        },
+        {
+          "name": "Quality",
+          "db_column_name": "Quality",
+          "value_type": "ItemQualityParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "General",
+      "fields": [
+        {
+          "name": "Flags",
+          "db_column_name": "Flags",
+          "value_type": "ItemFlagParameter"
+        },
+        {
+          "name": "Flags 2",
+          "db_column_name": "Flags2",
+          "value_type": "CmangosItemFlags2Parameter"
+        },
+        {
+          "name": "Bonding",
+          "db_column_name": "bonding",
+          "value_type": "ItemBondingParameter"
+        },
+        {
+          "name": "Description",
+          "help": "Flavour text shown in the tooltip.",
+          "db_column_name": "description",
+          "value_type": "string"
+        },
+        {
+          "name": "Inventory Type",
+          "db_column_name": "InventoryType",
+          "value_type": "ItemInventoryTypeParameter"
+        },
+        {
+          "name": "Material",
+          "help": "Affects the sounds the item makes when moved in the inventory.",
+          "db_column_name": "Material",
+          "value_type": "ItemMaterialParameter"
+        },
+        {
+          "name": "Sheath",
+          "help": "Where the weapon is shown on the character when sheathed.",
+          "db_column_name": "sheath",
+          "value_type": "ItemSheathParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Buy Count",
+          "help": "Stack size a vendor sells at once.",
+          "db_column_name": "BuyCount",
+          "value_type": "uint",
+          "default": 1
+        },
+        {
+          "name": "Buy Price",
+          "db_column_name": "BuyPrice",
+          "value_type": "MoneyParameter"
+        },
+        {
+          "name": "Sell Price",
+          "db_column_name": "SellPrice",
+          "value_type": "MoneyParameter"
+        },
+        {
+          "name": "Max Count",
+          "help": "Maximum number of the item a player can carry; 0 = no limit.",
+          "db_column_name": "maxcount",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Stackable",
+          "help": "Maximum stack size.",
+          "db_column_name": "stackable",
+          "value_type": "int",
+          "default": 1
+        },
+        {
+          "name": "Container Slots",
+          "help": "Number of slots for bags/quivers.",
+          "db_column_name": "ContainerSlots",
+          "value_type": "uint"
+        },
+        {
+          "name": "Bag Family",
+          "help": "Bag family the item can be stored in (special bags).",
+          "db_column_name": "BagFamily",
+          "value_type": "ItemBagFamilyParameter"
+        },
+        {
+          "name": "Duration",
+          "help": "Item lifetime in seconds, 0 = permanent. By default only in-game time counts; see Extra Flags for real-time counting.",
+          "db_column_name": "Duration",
+          "value_type": "uint"
+        },
+        {
+          "name": "Extra Flags",
+          "db_column_name": "ExtraFlags",
+          "value_type": "CmangosItemExtraFlagsParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Requirements",
+      "fields": [
+        {
+          "name": "Allowable Class",
+          "help": "-1 = usable by all classes.",
+          "db_column_name": "AllowableClass",
+          "value_type": "ClassMaskParameter",
+          "default": -1
+        },
+        {
+          "name": "Allowable Race",
+          "help": "-1 = usable by all races.",
+          "db_column_name": "AllowableRace",
+          "value_type": "RaceMaskParameter",
+          "default": -1
+        },
+        {
+          "name": "Required Level",
+          "db_column_name": "RequiredLevel",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required Skill",
+          "db_column_name": "RequiredSkill",
+          "value_type": "SkillParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Skill Rank",
+          "db_column_name": "RequiredSkillRank",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required Spell",
+          "db_column_name": "requiredspell",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Honor Rank",
+          "help": "Required PvP honor rank (classic honor system rank value); not checked by the cmangos core.",
+          "db_column_name": "requiredhonorrank",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required City Rank",
+          "help": "Unused.",
+          "db_column_name": "RequiredCityRank",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required Reputation Faction",
+          "db_column_name": "RequiredReputationFaction",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Reputation Rank",
+          "db_column_name": "RequiredReputationRank",
+          "value_type": "ReputationRankParameter"
+        },
+        {
+          "name": "Area",
+          "help": "If set, the item can only be used in this area.",
+          "db_column_name": "area",
+          "value_type": "ZoneAreaParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Map",
+          "help": "If set, the item can only be used on this map.",
+          "db_column_name": "Map",
+          "value_type": "MapParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Stats",
+      "fields": [
+        {
+          "name": "Item Level",
+          "db_column_name": "ItemLevel",
+          "value_type": "uint"
+        },
+        {
+          "name": "Stats Count",
+          "help": "Number of stat type/value pairs actually used (max 10).",
+          "db_column_name": "StatsCount",
+          "value_type": "uint"
+        },
+        {
+          "name": "Stat Type 1",
+          "db_column_name": "stat_type1",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 1",
+          "db_column_name": "stat_value1",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 2",
+          "db_column_name": "stat_type2",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 2",
+          "db_column_name": "stat_value2",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 3",
+          "db_column_name": "stat_type3",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 3",
+          "db_column_name": "stat_value3",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 4",
+          "db_column_name": "stat_type4",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 4",
+          "db_column_name": "stat_value4",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 5",
+          "db_column_name": "stat_type5",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 5",
+          "db_column_name": "stat_value5",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 6",
+          "db_column_name": "stat_type6",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 6",
+          "db_column_name": "stat_value6",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 7",
+          "db_column_name": "stat_type7",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 7",
+          "db_column_name": "stat_value7",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 8",
+          "db_column_name": "stat_type8",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 8",
+          "db_column_name": "stat_value8",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 9",
+          "db_column_name": "stat_type9",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 9",
+          "db_column_name": "stat_value9",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 10",
+          "db_column_name": "stat_type10",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 10",
+          "db_column_name": "stat_value10",
+          "value_type": "int"
+        },
+        {
+          "name": "Scaling Stat Distribution",
+          "help": "ScalingStatDistribution.dbc id, used for heirloom level scaling.",
+          "db_column_name": "ScalingStatDistribution",
+          "value_type": "int"
+        },
+        {
+          "name": "Scaling Stat Value",
+          "help": "Mask selecting which columns of ScalingStatValues.dbc are used.",
+          "db_column_name": "ScalingStatValue",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Damage & Armor",
+      "fields": [
+        {
+          "name": "Damage Min 1",
+          "db_column_name": "dmg_min1",
+          "value_type": "float"
+        },
+        {
+          "name": "Damage Max 1",
+          "db_column_name": "dmg_max1",
+          "value_type": "float"
+        },
+        {
+          "name": "Damage Type 1",
+          "db_column_name": "dmg_type1",
+          "value_type": "Itemdmg_typeParameter"
+        },
+        {
+          "name": "Damage Min 2",
+          "db_column_name": "dmg_min2",
+          "value_type": "float"
+        },
+        {
+          "name": "Damage Max 2",
+          "db_column_name": "dmg_max2",
+          "value_type": "float"
+        },
+        {
+          "name": "Damage Type 2",
+          "db_column_name": "dmg_type2",
+          "value_type": "Itemdmg_typeParameter"
+        },
+        {
+          "name": "Armor",
+          "db_column_name": "armor",
+          "value_type": "uint"
+        },
+        {
+          "name": "Block",
+          "help": "Shield block value.",
+          "db_column_name": "block",
+          "value_type": "uint"
+        },
+        {
+          "name": "Holy Resistance",
+          "db_column_name": "holy_res",
+          "value_type": "uint"
+        },
+        {
+          "name": "Fire Resistance",
+          "db_column_name": "fire_res",
+          "value_type": "uint"
+        },
+        {
+          "name": "Nature Resistance",
+          "db_column_name": "nature_res",
+          "value_type": "uint"
+        },
+        {
+          "name": "Frost Resistance",
+          "db_column_name": "frost_res",
+          "value_type": "uint"
+        },
+        {
+          "name": "Shadow Resistance",
+          "db_column_name": "shadow_res",
+          "value_type": "uint"
+        },
+        {
+          "name": "Arcane Resistance",
+          "db_column_name": "arcane_res",
+          "value_type": "uint"
+        },
+        {
+          "name": "Delay",
+          "help": "Weapon attack speed in milliseconds.",
+          "db_column_name": "delay",
+          "value_type": "MillisecondsParameter",
+          "default": 1000
+        },
+        {
+          "name": "Ammo Type",
+          "db_column_name": "ammo_type",
+          "value_type": "CmangosAmmoTypeParameter"
+        },
+        {
+          "name": "Ranged Mod Range",
+          "help": "Ranged weapon range modifier (usually 100).",
+          "db_column_name": "RangedModRange",
+          "value_type": "float"
+        },
+        {
+          "name": "Max Durability",
+          "db_column_name": "MaxDurability",
+          "value_type": "uint"
+        },
+        {
+          "name": "Armor Damage Modifier",
+          "help": "Amount subtracted from the armor value (used for nerfs without changing the client DBC-visible armor).",
+          "db_column_name": "ArmorDamageModifier",
+          "value_type": "float"
+        }
+      ]
+    },
+    {
+      "group_name": "Spells",
+      "fields": [
+        {
+          "name": "Spell Id 1",
+          "db_column_name": "spellid_1",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Trigger 1",
+          "db_column_name": "spelltrigger_1",
+          "value_type": "CmangosItemSpelltriggerParameter"
+        },
+        {
+          "name": "Spell Charges 1",
+          "help": "0 = unlimited; negative = the item is consumed (deleted) when the charges are used up.",
+          "db_column_name": "spellcharges_1",
+          "value_type": "int"
+        },
+        {
+          "name": "Spell PPM Rate 1",
+          "help": "Proc-per-minute rate for \"chance on hit\" triggers; overrides the spell proc chance when > 0.",
+          "db_column_name": "spellppmRate_1",
+          "value_type": "float"
+        },
+        {
+          "name": "Spell Cooldown 1",
+          "help": "Cooldown in milliseconds; -1 = use the spell's own cooldown.",
+          "db_column_name": "spellcooldown_1",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spell Category 1",
+          "db_column_name": "spellcategory_1",
+          "value_type": "SpellCategoryParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Category Cooldown 1",
+          "help": "Category cooldown in milliseconds; -1 = use the spell's own category cooldown.",
+          "db_column_name": "spellcategorycooldown_1",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spell Id 2",
+          "db_column_name": "spellid_2",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Trigger 2",
+          "db_column_name": "spelltrigger_2",
+          "value_type": "CmangosItemSpelltriggerParameter"
+        },
+        {
+          "name": "Spell Charges 2",
+          "help": "0 = unlimited; negative = the item is consumed (deleted) when the charges are used up.",
+          "db_column_name": "spellcharges_2",
+          "value_type": "int"
+        },
+        {
+          "name": "Spell PPM Rate 2",
+          "help": "Proc-per-minute rate for \"chance on hit\" triggers; overrides the spell proc chance when > 0.",
+          "db_column_name": "spellppmRate_2",
+          "value_type": "float"
+        },
+        {
+          "name": "Spell Cooldown 2",
+          "help": "Cooldown in milliseconds; -1 = use the spell's own cooldown.",
+          "db_column_name": "spellcooldown_2",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spell Category 2",
+          "db_column_name": "spellcategory_2",
+          "value_type": "SpellCategoryParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Category Cooldown 2",
+          "help": "Category cooldown in milliseconds; -1 = use the spell's own category cooldown.",
+          "db_column_name": "spellcategorycooldown_2",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spell Id 3",
+          "db_column_name": "spellid_3",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Trigger 3",
+          "db_column_name": "spelltrigger_3",
+          "value_type": "CmangosItemSpelltriggerParameter"
+        },
+        {
+          "name": "Spell Charges 3",
+          "help": "0 = unlimited; negative = the item is consumed (deleted) when the charges are used up.",
+          "db_column_name": "spellcharges_3",
+          "value_type": "int"
+        },
+        {
+          "name": "Spell PPM Rate 3",
+          "help": "Proc-per-minute rate for \"chance on hit\" triggers; overrides the spell proc chance when > 0.",
+          "db_column_name": "spellppmRate_3",
+          "value_type": "float"
+        },
+        {
+          "name": "Spell Cooldown 3",
+          "help": "Cooldown in milliseconds; -1 = use the spell's own cooldown.",
+          "db_column_name": "spellcooldown_3",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spell Category 3",
+          "db_column_name": "spellcategory_3",
+          "value_type": "SpellCategoryParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Category Cooldown 3",
+          "help": "Category cooldown in milliseconds; -1 = use the spell's own category cooldown.",
+          "db_column_name": "spellcategorycooldown_3",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spell Id 4",
+          "db_column_name": "spellid_4",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Trigger 4",
+          "db_column_name": "spelltrigger_4",
+          "value_type": "CmangosItemSpelltriggerParameter"
+        },
+        {
+          "name": "Spell Charges 4",
+          "help": "0 = unlimited; negative = the item is consumed (deleted) when the charges are used up.",
+          "db_column_name": "spellcharges_4",
+          "value_type": "int"
+        },
+        {
+          "name": "Spell PPM Rate 4",
+          "help": "Proc-per-minute rate for \"chance on hit\" triggers; overrides the spell proc chance when > 0.",
+          "db_column_name": "spellppmRate_4",
+          "value_type": "float"
+        },
+        {
+          "name": "Spell Cooldown 4",
+          "help": "Cooldown in milliseconds; -1 = use the spell's own cooldown.",
+          "db_column_name": "spellcooldown_4",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spell Category 4",
+          "db_column_name": "spellcategory_4",
+          "value_type": "SpellCategoryParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Category Cooldown 4",
+          "help": "Category cooldown in milliseconds; -1 = use the spell's own category cooldown.",
+          "db_column_name": "spellcategorycooldown_4",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spell Id 5",
+          "db_column_name": "spellid_5",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Trigger 5",
+          "db_column_name": "spelltrigger_5",
+          "value_type": "CmangosItemSpelltriggerParameter"
+        },
+        {
+          "name": "Spell Charges 5",
+          "help": "0 = unlimited; negative = the item is consumed (deleted) when the charges are used up.",
+          "db_column_name": "spellcharges_5",
+          "value_type": "int"
+        },
+        {
+          "name": "Spell PPM Rate 5",
+          "help": "Proc-per-minute rate for \"chance on hit\" triggers; overrides the spell proc chance when > 0.",
+          "db_column_name": "spellppmRate_5",
+          "value_type": "float"
+        },
+        {
+          "name": "Spell Cooldown 5",
+          "help": "Cooldown in milliseconds; -1 = use the spell's own cooldown.",
+          "db_column_name": "spellcooldown_5",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spell Category 5",
+          "db_column_name": "spellcategory_5",
+          "value_type": "SpellCategoryParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Category Cooldown 5",
+          "help": "Category cooldown in milliseconds; -1 = use the spell's own category cooldown.",
+          "db_column_name": "spellcategorycooldown_5",
+          "value_type": "int",
+          "default": -1
+        }
+      ]
+    },
+    {
+      "group_name": "Reading & Quest",
+      "fields": [
+        {
+          "name": "Page Text",
+          "help": "First page shown when the item is read (page_text.entry).",
+          "db_column_name": "PageText",
+          "value_type": "TableReference(page_text#entry)Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Page Text",
+          "help": "Open the readable page text.",
+          "meta": "table:page_text;`entry` = {PageText}"
+        },
+        {
+          "name": "Language",
+          "help": "Language the page text is written in (0 = universal).",
+          "db_column_name": "LanguageID",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Page Material",
+          "help": "Background of the page text window.",
+          "db_column_name": "PageMaterial",
+          "value_type": "PageTextMaterialParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Start Quest",
+          "help": "Quest offered when right-clicking the item.",
+          "db_column_name": "startquest",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Start Quest",
+          "help": "Open the quest started by this item.",
+          "meta": "tableByKey:quest_template;startquest"
+        }
+      ]
+    },
+    {
+      "group_name": "Sockets & Gems",
+      "fields": [
+        {
+          "name": "Socket Color 1",
+          "db_column_name": "socketColor_1",
+          "value_type": "CmangosSocketColorParameter"
+        },
+        {
+          "name": "Socket Content 1",
+          "help": "Unused (amount of gems in the socket).",
+          "db_column_name": "socketContent_1",
+          "value_type": "int"
+        },
+        {
+          "name": "Socket Color 2",
+          "db_column_name": "socketColor_2",
+          "value_type": "CmangosSocketColorParameter"
+        },
+        {
+          "name": "Socket Content 2",
+          "help": "Unused (amount of gems in the socket).",
+          "db_column_name": "socketContent_2",
+          "value_type": "int"
+        },
+        {
+          "name": "Socket Color 3",
+          "db_column_name": "socketColor_3",
+          "value_type": "CmangosSocketColorParameter"
+        },
+        {
+          "name": "Socket Content 3",
+          "help": "Unused (amount of gems in the socket).",
+          "db_column_name": "socketContent_3",
+          "value_type": "int"
+        },
+        {
+          "name": "Socket Bonus",
+          "help": "Enchantment applied when all sockets are filled with matching gems.",
+          "db_column_name": "socketBonus",
+          "value_type": "SpellItemEnchantmentParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Gem Properties",
+          "help": "GemProperties.dbc id; set on gem items only.",
+          "db_column_name": "GemProperties",
+          "value_type": "int"
+        },
+        {
+          "name": "Totem Category",
+          "help": "TotemCategory.dbc id: totem or profession tool category this item counts as.",
+          "db_column_name": "TotemCategory",
+          "value_type": "ItemTotemCategoryParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Random Enchantments",
+      "fields": [
+        {
+          "name": "Random Property",
+          "help": "ItemRandomProperties.dbc id set; the actual enchantment is rolled from item_enchantment_template using this value as entry. Cannot be used together with Random Suffix.",
+          "db_column_name": "RandomProperty",
+          "value_type": "uint"
+        },
+        {
+          "name": "Enchantment Template",
+          "help": "Random enchantments rolled for this item.",
+          "meta": "table:item_enchantment_template;`entry` = {RandomProperty}"
+        },
+        {
+          "name": "Random Suffix",
+          "help": "ItemRandomSuffix.dbc id set, rolled from item_enchantment_template. Cannot be used together with Random Property.",
+          "db_column_name": "RandomSuffix",
+          "value_type": "uint"
+        },
+        {
+          "name": "Item Set",
+          "db_column_name": "itemset",
+          "value_type": "ItemSetParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Loot",
+      "fields": [
+        {
+          "name": "Lock Id",
+          "help": "Lock.dbc id; how the item can be opened (key, lockpicking, ...).",
+          "db_column_name": "lockid",
+          "value_type": "LockParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Min Money Loot",
+          "help": "Minimum money contained when the item is opened.",
+          "db_column_name": "minMoneyLoot",
+          "value_type": "MoneyParameter"
+        },
+        {
+          "name": "Max Money Loot",
+          "help": "Maximum money contained when the item is opened.",
+          "db_column_name": "maxMoneyLoot",
+          "value_type": "MoneyParameter"
+        },
+        {
+          "name": "Disenchant Id",
+          "help": "Disenchant loot template (disenchant_loot_template.entry).",
+          "db_column_name": "DisenchantID",
+          "value_type": "LootDisenchantParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Disenchant Skill",
+          "help": "Required enchanting skill to disenchant; -1 = cannot be disenchanted.",
+          "db_column_name": "RequiredDisenchantSkill",
+          "value_type": "int",
+          "default": -1
+        }
+      ]
+    },
+    {
+      "group_name": "Misc",
+      "fields": [
+        {
+          "name": "Food Type",
+          "help": "Pet food category, used for hunter pet feeding.",
+          "db_column_name": "FoodType",
+          "value_type": "ItemFoodTypeParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Item Limit Category",
+          "help": "ItemLimitCategory.dbc id, limits how many items of the category can be equipped/socketed (e.g. unique-equipped gems).",
+          "db_column_name": "ItemLimitCategory",
+          "value_type": "int"
+        },
+        {
+          "name": "Holiday Id",
+          "help": "The item can only be used while this holiday is active.",
+          "db_column_name": "HolidayId",
+          "value_type": "HolidaysParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Script Name",
+          "help": "C++ ScriptDevAI script name bound to this item.",
+          "db_column_name": "ScriptName",
+          "value_type": "string"
+        }
+      ]
+    },
+    {
+      "group_name": "Related tables",
+      "fields": [
+        {
+          "name": "Required Targets",
+          "help": "Required cast targets of this item.",
+          "meta": "table:item_required_target;`entry` = {entry}"
+        },
+        {
+          "name": "Converts To",
+          "help": "Item conversion (item_convert).",
+          "meta": "table:item_convert;`entry` = {entry}"
+        },
+        {
+          "name": "Expire Convert",
+          "help": "Conversion when the item expires.",
+          "meta": "table:item_expire_convert;`entry` = {entry}"
+        },
+        {
+          "name": "Sold By",
+          "help": "Vendors selling this item.",
+          "meta": "table:npc_vendor;`item` = {entry}"
+        }
+      ]
+    }
+  ]
+}

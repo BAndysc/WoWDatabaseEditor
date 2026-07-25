@@ -1,0 +1,52 @@
+{
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Skill Extra Item Template",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Chance for profession specializations to create additional items when crafting: if the player knows the required specialization spell, the create spell has a chance to yield up to the given number of extra items. Loaded by SpellMgr::LoadSkillExtraItemTable.",
+  "table_name": "skill_extra_item_template",
+  "table_index_name": "spellId",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_spell.png",
+  "reload_command": "reload skill_extra_item_template",
+  "picker": "SpellParameter",
+  "primary_key": [
+    "spellId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Create Spell",
+          "help": "Crafting spell that can produce extra items.",
+          "db_column_name": "spellId",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Required Specialization",
+          "help": "Specialization spell the crafter must know (e.g. Elixir Master).",
+          "db_column_name": "requiredSpecialization",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Extra Item Chance",
+          "help": "Chance (0-1) to create additional items.",
+          "db_column_name": "additionalCreateChance",
+          "value_type": "float"
+        },
+        {
+          "name": "Extra Item Max Count",
+          "help": "Maximum number of extra items created.",
+          "db_column_name": "additionalMaxNum",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

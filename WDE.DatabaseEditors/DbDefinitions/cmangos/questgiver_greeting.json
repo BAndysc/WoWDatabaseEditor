@@ -1,0 +1,64 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Questgiver Greeting",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Custom greeting text and emote shown in the quest greeting window when a player opens the quest list of a questgiver creature or gameobject.",
+  "table_name": "questgiver_greeting",
+  "table_index_name": "Entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Quests",
+  "icon_path": "Icons/document_quest.png",
+  "reload_command": "reload questgiver_greeting",
+  "picker": "Parameter",
+  "primary_key": [
+    "Entry",
+    "Type"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "Creature or gameobject entry, depending on Type.",
+          "db_column_name": "Entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Creature",
+          "help": "Open the creature template.",
+          "meta": "tableByKey:creature_template;Entry"
+        },
+        {
+          "name": "Type",
+          "db_column_name": "Type",
+          "value_type": "QuestGreetingTypeParameter"
+        },
+        {
+          "name": "Text",
+          "db_column_name": "Text",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Emote",
+          "db_column_name": "EmoteId",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote Delay",
+          "db_column_name": "EmoteDelay",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

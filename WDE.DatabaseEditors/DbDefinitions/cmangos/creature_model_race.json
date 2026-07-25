@@ -1,0 +1,55 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Creature Model Race",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Race-dependent model overrides: when a player of a matching race sees a creature with this display id, it is replaced either by another model (modelid_racial) or by the model of another creature entry. Used e.g. for mounts and totems that look different per race.",
+  "table_name": "creature_model_race",
+  "table_index_name": "modelid",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_creature_model_info.png",
+  "picker": "CreatureModelDataParameter",
+  "primary_key": [
+    "modelid",
+    "racemask"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Model Id",
+          "help": "Base display id being replaced (must exist in creature_model_info).",
+          "db_column_name": "modelid",
+          "value_type": "CreatureModelDataParameter"
+        },
+        {
+          "name": "Race Mask",
+          "help": "Mask of player races this override applies to.",
+          "db_column_name": "racemask",
+          "value_type": "RaceMaskParameter"
+        },
+        {
+          "name": "Creature Entry",
+          "help": "Replacement source: use the model of this creature_template entry. Mutually exclusive with Model Id Racial.",
+          "db_column_name": "creature_entry",
+          "value_type": "CreatureParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Model Id Racial",
+          "help": "Replacement display id (must exist in creature_model_info). Ignored if Creature Entry is set.",
+          "db_column_name": "modelid_racial",
+          "value_type": "CreatureModelDataParameter",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

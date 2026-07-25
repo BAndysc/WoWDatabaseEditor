@@ -1,0 +1,112 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK",
+    "CMaNGOS-TBC"
+  ],
+  "name": "Game Event",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Defines a world event (holiday, seasonal event, server-side event...): its scheduling type, occurrence/length, and grouping/linking to other events.",
+  "table_name": "game_event",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Game events",
+  "icon_path": "Icons/document_gameevent.png",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "Event id 0 is reserved and cannot be used.",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Schedule Type",
+          "help": "GameEventScheduleType enum: 0 SERVERSIDE (start/end fully controlled by server, e.g. via .gameevent start/stop), 1 DATE (classic explicit start_time/end_time schedule from game_event_time), 2-4 Darkmoon Faire (weekly rotation), 5-10 Darkmoon Faire building stages, 11 YEARLY, 12 LUNAR_NEW_YEAR, 13 EASTER.",
+          "db_column_name": "schedule_type",
+          "value_type": "CmangosGameEventScheduleTypeParameter"
+        },
+        {
+          "name": "Occurence",
+          "help": "How often (in minutes) the event repeats.",
+          "db_column_name": "occurence",
+          "value_type": "MinuteIntervalParameter"
+        },
+        {
+          "name": "Length",
+          "help": "How long (in minutes) the event stays active each occurrence. Must be > 0 and <= Occurence.",
+          "db_column_name": "length",
+          "value_type": "MinuteIntervalParameter"
+        },
+        {
+          "name": "Holiday",
+          "help": "Holidays.dbc id; when set, drives calendar/quest holiday checks and the holiday-specific schedule computation.",
+          "db_column_name": "holiday",
+          "value_type": "HolidaysParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Linked To",
+          "help": "If set, this event can only be active while the referenced event is also active.",
+          "db_column_name": "linkedTo",
+          "value_type": "GameEventParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Event Group",
+          "help": "Arbitrary group id; all events sharing a non-zero group are tracked together (used to pick a random/rotating member of the group).",
+          "db_column_name": "EventGroup",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Description",
+          "db_column_name": "description",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    },
+    {
+      "group_name": "Related tables",
+      "fields": [
+        {
+          "name": "Creatures",
+          "help": "Creature spawns added/removed by this event.",
+          "meta": "table:game_event_creature;`event` IN ({entry}, -{entry})"
+        },
+        {
+          "name": "Gameobjects",
+          "help": "Gameobject spawns added/removed by this event.",
+          "meta": "table:game_event_gameobject;`event` IN ({entry}, -{entry})"
+        },
+        {
+          "name": "Creature Data",
+          "help": "Creature model/equipment/spell changes during this event.",
+          "meta": "table:game_event_creature_data;`event` = {entry}"
+        },
+        {
+          "name": "Quests",
+          "help": "Quests only available during this event.",
+          "meta": "table:game_event_quest;`event` = {entry}"
+        },
+        {
+          "name": "Mails",
+          "help": "Mails sent when this event starts/stops.",
+          "meta": "table:game_event_mail;`event` IN ({entry}, -{entry})"
+        },
+        {
+          "name": "Schedule",
+          "help": "Explicit schedule entries of this event.",
+          "meta": "table:game_event_time;`entry` = {entry}"
+        }
+      ]
+    }
+  ]
+}

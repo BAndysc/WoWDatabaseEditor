@@ -1,0 +1,122 @@
+{
+  "id": "creature_ai_texts",
+  "compatibility": [
+    "CMaNGOS-Classic"
+  ],
+  "name": "Creature EventAI Texts",
+  "description": "EventAI text table: texts displayed by creature EventAI scripts (e.g. ACTION_T_TEXT) via DoScriptText, together with the chat type, language, sound and emote to play. Entries are keyed by NEGATIVE ids (valid range -1 to -999999).",
+  "table_name": "creature_ai_texts",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Texts",
+  "icon_path": "Icons/document_txt.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "Negative text identifier, valid range -1 to -999999. All EventAI text ids MUST be negative.",
+          "db_column_name": "entry",
+          "value_type": "int"
+        },
+        {
+          "name": "Content Default",
+          "help": "The text in the default language (English).",
+          "db_column_name": "content_default",
+          "value_type": "string"
+        },
+        {
+          "name": "Content Loc1 (Korean)",
+          "db_column_name": "content_loc1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc2 (French)",
+          "db_column_name": "content_loc2",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc3 (German)",
+          "db_column_name": "content_loc3",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc4 (Chinese)",
+          "db_column_name": "content_loc4",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc5 (Taiwanese)",
+          "db_column_name": "content_loc5",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc6 (Spanish)",
+          "db_column_name": "content_loc6",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc7 (Spanish Mexico)",
+          "db_column_name": "content_loc7",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc8 (Russian)",
+          "db_column_name": "content_loc8",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Sound",
+          "help": "Sound ID played together with the text.",
+          "db_column_name": "sound",
+          "value_type": "SoundParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Type",
+          "help": "How the text is displayed: Say/Yell/Text Emote/Boss Emote/Whisper/Boss Whisper/Zone Yell/Zone Emote.",
+          "db_column_name": "type",
+          "value_type": "MangosChatTypeParameter"
+        },
+        {
+          "name": "Language",
+          "help": "The in-game language the text is spoken in (0 = universal, understood by all races).",
+          "db_column_name": "language",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Emote",
+          "help": "Emote played by the text source (not the target) when the text is displayed.",
+          "db_column_name": "emote",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Broadcast Text Id",
+          "db_column_name": "broadcast_text_id",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "comment",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

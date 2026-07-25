@@ -1,0 +1,43 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Battlemaster Entry",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Links battlemaster NPCs to the battleground they handle: talking to the listed creature opens the queue window for the given battleground type (BattlemasterList.dbc id).",
+  "table_name": "battlemaster_entry",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "PVP",
+  "icon_path": "Icons/document_bg.png",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature",
+          "db_column_name": "entry",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Battleground",
+          "db_column_name": "bg_template",
+          "value_type": "BattlegroundParameter"
+        },
+        {
+          "name": "Battleground",
+          "help": "Open the battleground template.",
+          "meta": "table:battleground_template;`id` = {bg_template}"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "spell_scripts",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Scripts",
+  "description": "Binds a C++ SpellScript/AuraScript (by its registered script name) to a spell id. The scripts customize spell and aura behaviour in the core (SpellScriptMgr).",
+  "table_name": "spell_scripts",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_code.png",
+  "picker": "SpellParameter",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "Id",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "help": "Name of a SpellScript or AuraScript registered in the core (C++)."
+        }
+      ]
+    }
+  ]
+}

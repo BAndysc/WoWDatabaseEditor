@@ -1,13 +1,17 @@
 {
-  "id": "creature_ai_summons",
   "compatibility": [
-    "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic"
+    "CMaNGOS-WoTLK",
+    "CMaNGOS-TBC",
+    "CMaNGOS-Classic"
   ],
   "name": "Creature Ai Summons",
+  "single_solution_name": "",
+  "multi_solution_name": "",
   "description": "Positions for summons in Event AI",
   "table_name": "creature_ai_summons",
   "table_index_name": "id",
   "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Event AI",
   "icon_path": "Icons/document_creature_summon_groups.png",
   "reload_command": "reload creature_ai_summons",
@@ -21,33 +25,35 @@
         {
           "name": "Id",
           "db_column_name": "id",
-          "value_type": "uint"
+          "value_type": "uint",
+          "preferred_width": 93.0
         },
         {
-          "name": "Position X",
+          "name": "X",
           "db_column_name": "position_x",
           "value_type": "float"
         },
         {
-          "name": "Position Y",
+          "name": "Y",
           "db_column_name": "position_y",
           "value_type": "float"
         },
         {
-          "name": "Position Z",
+          "name": "Z",
           "db_column_name": "position_z",
           "value_type": "float"
         },
         {
-          "name": "Orientation",
+          "name": "O",
           "db_column_name": "orientation",
           "value_type": "float"
         },
         {
-          "name": "Spawntimesecs",
+          "name": "Spawn time secs",
           "db_column_name": "spawntimesecs",
           "value_type": "uint",
-          "default": 120
+          "default": 120,
+          "preferred_width": 141.0
         },
         {
           "name": "Comment",

@@ -1,0 +1,75 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK",
+    "CMaNGOS-TBC",
+    "CMaNGOS-Classic"
+  ],
+  "name": "Spell Chain",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Defines spell rank chains (e.g. Fireball Rank 1/2/3...) used to find the correct rank of a spell for a given caster level and to resolve talent/ability prerequisites.",
+  "table_name": "spell_chain",
+  "table_index_name": "spell_id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "reload_command": "reload spell_chain",
+  "primary_key": [
+    "spell_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "spell_id",
+          "value_type": "SpellParameter",
+          "read_only": true
+        },
+        {
+          "name": "Spell",
+          "meta": "tableByKey:spell_template;spell_id",
+          "help": "Open the spell template."
+        },
+        {
+          "name": "Prev Spell",
+          "help": "The immediate previous rank of this spell, or the spell this one is a learned side-effect of (talent rank 1 has prev_spell = 0).",
+          "db_column_name": "prev_spell",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Prev Rank",
+          "meta": "tableByKey:spell_template;prev_spell",
+          "help": "Open the previous rank."
+        },
+        {
+          "name": "First Spell",
+          "help": "Rank 1 spell id of this chain (same as spell_id for rank 1).",
+          "db_column_name": "first_spell",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "First Rank",
+          "meta": "tableByKey:spell_template;first_spell",
+          "help": "Open the first rank."
+        },
+        {
+          "name": "Rank",
+          "help": "Rank number of this spell within its chain (1-based).",
+          "db_column_name": "rank",
+          "value_type": "uint"
+        },
+        {
+          "name": "Req Spell",
+          "help": "An additional required spell (e.g. required tradeskill spell) that is not part of the rank chain itself, 0 if none.",
+          "db_column_name": "req_spell",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

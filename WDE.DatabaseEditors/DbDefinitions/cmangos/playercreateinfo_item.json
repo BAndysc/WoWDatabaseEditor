@@ -1,0 +1,45 @@
+{
+  "id": "playercreateinfo_item",
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Player Create Info Items",
+  "description": "Additional starting items given to newly created characters of the given race/class combination, on top of the DBC defined start outfit.",
+  "table_name": "playercreateinfo_item",
+  "table_index_name": "race",
+  "record_mode": "SingleRow",
+  "group_name": "Player create info",
+  "icon_path": "Icons/document_loot2.png",
+  "picker": "RaceParameter",
+  "primary_key": [],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Race",
+          "db_column_name": "race",
+          "value_type": "RaceParameter"
+        },
+        {
+          "name": "Class",
+          "db_column_name": "class",
+          "value_type": "ClassParameter"
+        },
+        {
+          "name": "Item",
+          "db_column_name": "itemid",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Amount",
+          "db_column_name": "amount",
+          "value_type": "uint",
+          "default": 1
+        }
+      ]
+    }
+  ]
+}

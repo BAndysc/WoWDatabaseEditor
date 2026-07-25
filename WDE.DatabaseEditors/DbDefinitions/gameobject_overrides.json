@@ -1,7 +1,7 @@
 {
   "id": "gameobject_overrides",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityMaster"
   ],
   "name": "Gameobject Overrides",
   "single_solution_name": "Gameobject Overrides",

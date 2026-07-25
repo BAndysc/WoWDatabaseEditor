@@ -1,0 +1,37 @@
+{
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Exploration Base XP",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Base experience awarded for discovering an area of the given area level. The actual XP is scaled by the difference between player level and area level.",
+  "table_name": "exploration_basexp",
+  "table_index_name": "level",
+  "record_mode": "SingleRow",
+  "group_name": "Player",
+  "icon_path": "Icons/document_map.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "level"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Area Level",
+          "db_column_name": "level",
+          "value_type": "int"
+        },
+        {
+          "name": "Base XP",
+          "db_column_name": "basexp",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 {
-  "id": "broadcast_text",
   "compatibility": [
-    "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic"
+    "CMaNGOS-WoTLK",
+    "CMaNGOS-TBC",
+    "CMaNGOS-Classic"
   ],
   "name": "Broadcast Text",
   "single_solution_name": "Broadcast Text",
@@ -12,10 +13,9 @@
   "record_mode": "SingleRow",
   "skip_quick_load": true,
   "group_name": "Advanced",
-  "icon_path": "Icons/document_table.png",
-  "picker": "",
+  "icon_path": "Icons/document_gpssignal.png",
   "primary_key": [
-    "ID"
+    "Id"
   ],
   "groups": [
     {
@@ -37,7 +37,7 @@
           "name": "Chat Type ID",
           "db_column_name": "ChatTypeID",
           "value_type": "MangosChatTypeParameter",
-          "preferred_width": 70
+          "preferred_width": 70.0
         },
         {
           "name": "Text",
@@ -92,19 +92,26 @@
         },
         {
           "name": "Condition ID",
+          "help": "conditions.condition_entry controlling whether this text can be used, 0 = always.",
           "db_column_name": "ConditionID",
-          "value_type": "int"
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Condition",
+          "help": "Edit the condition tree referenced by Condition ID.",
+          "meta": "mangos_conditions:ConditionID"
         },
         {
           "name": "Sound Entries ID 1",
           "db_column_name": "SoundEntriesID1",
-          "value_type": "uint",
+          "value_type": "SoundParameter",
           "zero_is_blank": true
         },
         {
           "name": "Sound Entries ID 2",
           "db_column_name": "SoundEntriesID2",
-          "value_type": "uint",
+          "value_type": "SoundParameter",
           "zero_is_blank": true
         },
         {

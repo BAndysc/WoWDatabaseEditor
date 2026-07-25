@@ -1,0 +1,136 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Gossip Menu Option",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Clickable options of gossip menus. Defines the icon, text and required npc flags of each option, and the action performed when a player selects it: open a submenu, open the vendor/trainer/taxi/bank window, show a point of interest on the map or run a dbscripts_on_gossip script.",
+  "table_name": "gossip_menu_option",
+  "table_index_name": "menu_id",
+  "record_mode": "MultiRecord",
+  "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_gossip.png",
+  "reload_command": "reload gossip_menu_option",
+  "picker": "GossipMenuParameter",
+  "primary_key": [
+    "menu_id",
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Menu Id",
+          "db_column_name": "menu_id",
+          "value_type": "GossipMenuParameter"
+        },
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "uint"
+        },
+        {
+          "name": "Icon",
+          "db_column_name": "option_icon",
+          "value_type": "GossipIconParameter"
+        },
+        {
+          "name": "Text",
+          "db_column_name": "option_text",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Broadcast Text",
+          "db_column_name": "option_broadcast_text",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Option Type",
+          "db_column_name": "option_id",
+          "value_type": "CmangosGossipOptionIdParameter"
+        },
+        {
+          "name": "Npc Flag",
+          "help": "Npc flags the creature must have for this option to be shown. Note: CMaNGOS Classic uses the vanilla flag layout (0x4 vendor, 0x8 flightmaster, 0x2000 stablemaster, ...) which differs from the TBC+ values listed here.",
+          "db_column_name": "npc_option_npcflag",
+          "value_type": "NpcFlagParameter"
+        },
+        {
+          "name": "Submenu Id",
+          "help": "Gossip menu opened when this option is selected. 0 = none.",
+          "db_column_name": "action_menu_id",
+          "value_type": "GossipMenuParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Submenu",
+          "help": "Open the submenu this option leads to.",
+          "meta": "tableByKey:gossip_menu;action_menu_id"
+        },
+        {
+          "name": "Action Poi Id",
+          "help": "Point of interest highlighted on the player's map when this option is selected. 0 = none.",
+          "db_column_name": "action_poi_id",
+          "value_type": "TableReference(points_of_interest#entry)Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "POI",
+          "help": "Open the point of interest shown by this option.",
+          "meta": "table:points_of_interest;`entry` = {action_poi_id}"
+        },
+        {
+          "name": "Action Script Id",
+          "help": "Id of a dbscripts_on_gossip script executed when this option is selected. 0 = none.",
+          "db_column_name": "action_script_id",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Box Coded",
+          "help": "If 1, selecting the option opens a text box asking the player to enter a code.",
+          "db_column_name": "box_coded",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Box Money",
+          "help": "Money (in copper) required in the confirmation box before the option is executed.",
+          "db_column_name": "box_money",
+          "value_type": "MoneyParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Box Text",
+          "help": "Text shown in the confirmation box popped up by this option.",
+          "db_column_name": "box_text",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Box Broadcast Text",
+          "db_column_name": "box_broadcast_text",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Condition Id",
+          "help": "Entry in the `conditions` table that must be satisfied for this option to be shown. 0 = always.",
+          "db_column_name": "condition_id",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Condition",
+          "help": "Edit the condition tree controlling whether this option is shown.",
+          "meta": "mangos_conditions:condition_id;source=the NPC / GO the menu belongs to;target=Player"
+        }
+      ]
+    }
+  ]
+}

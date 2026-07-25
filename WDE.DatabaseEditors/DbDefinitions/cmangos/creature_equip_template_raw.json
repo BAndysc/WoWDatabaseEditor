@@ -1,0 +1,84 @@
+{
+  "id": "creature_equip_template_raw",
+  "compatibility": [
+    "CMaNGOS-TBC"
+  ],
+  "name": "Creature Equipment Template (Raw)",
+  "description": "Deprecated raw variant of creature_equip_template: equipment defined directly by item display ids plus packed item info and virtual item slot values instead of item entries. Only used for ids that have no row in creature_equip_template.",
+  "table_name": "creature_equip_template_raw",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_creature_template.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "Equipment template id, referenced by creature_template.EquipmentTemplateId. Must not duplicate an id already present in creature_equip_template.",
+          "db_column_name": "entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Model 1 (Main Hand)",
+          "help": "Item display id shown in the main hand slot.",
+          "db_column_name": "equipmodel1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Model 2 (Off Hand)",
+          "help": "Item display id shown in the off hand slot.",
+          "db_column_name": "equipmodel2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Model 3 (Ranged)",
+          "help": "Item display id shown in the ranged slot.",
+          "db_column_name": "equipmodel3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Info 1",
+          "help": "Packed virtual item info bytes (item class, subclass, material, inventory type, sheath) for slot 1.",
+          "db_column_name": "equipinfo1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Info 2",
+          "help": "Packed virtual item info bytes (item class, subclass, material, inventory type, sheath) for slot 2.",
+          "db_column_name": "equipinfo2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Info 3",
+          "help": "Packed virtual item info bytes (item class, subclass, material, inventory type, sheath) for slot 3.",
+          "db_column_name": "equipinfo3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Slot 1",
+          "help": "Additional virtual item slot info for slot 1.",
+          "db_column_name": "equipslot1",
+          "value_type": "int"
+        },
+        {
+          "name": "Slot 2",
+          "help": "Additional virtual item slot info for slot 2.",
+          "db_column_name": "equipslot2",
+          "value_type": "int"
+        },
+        {
+          "name": "Slot 3",
+          "help": "Additional virtual item slot info for slot 3.",
+          "db_column_name": "equipslot3",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

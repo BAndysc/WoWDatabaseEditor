@@ -1,0 +1,1478 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Template",
+  "single_solution_name": "Spell {name} template",
+  "multi_solution_name": "Multiple spell templates",
+  "description": "The core spell definition table (equivalent of Spell.dbc merged with server-side extensions): school/family/attributes, cast requirements, costs, effects and visuals for every spell id used by the server.",
+  "table_name": "spell_template",
+  "table_index_name": "Id",
+  "record_mode": "Template",
+  "skip_quick_load": true,
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "General",
+      "fields": [
+        {
+          "name": "Id",
+          "help": "Spell id (SpellEntry::Id, matches Spell.dbc).",
+          "db_column_name": "Id",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Category",
+          "help": "SpellCategory.dbc id; spells sharing a non-zero category share the Category Recovery Time cooldown.",
+          "db_column_name": "Category",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Dispel",
+          "help": "Determines what dispel/purge effects can remove this aura and what SPELL_AURA_MOD_DEBUFF_RESISTANCE school applies.",
+          "db_column_name": "Dispel",
+          "value_type": "DispelTypeParameter"
+        },
+        {
+          "name": "School Mask",
+          "help": "SpellSchoolMask bitmask (m_schoolMask): damage/resist school(s) of this spell, used for resistances and school-based immunities/procs.",
+          "db_column_name": "SchoolMask",
+          "value_type": "SpellSchoolMaskParameter",
+          "default": 1
+        },
+        {
+          "name": "Mechanic",
+          "help": "Used for mechanic immunity/resistance checks; also feeds GetAllEffectsMechanicMask() together with per-effect Effect Mechanic.",
+          "db_column_name": "Mechanic",
+          "value_type": "CmangosMechanicParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Attributes",
+          "help": "SpellAttributes (SPELL_ATTR_*) bitmask, base spell behavior flags.",
+          "db_column_name": "Attributes",
+          "value_type": "CmangosSpellAttributesParameter"
+        },
+        {
+          "name": "Attributes Ex",
+          "help": "SpellAttributesEx (SPELL_ATTR_EX_*) bitmask.",
+          "db_column_name": "AttributesEx",
+          "value_type": "CmangosSpellAttributesExParameter"
+        },
+        {
+          "name": "Attributes Ex 2",
+          "help": "SpellAttributesEx2 (SPELL_ATTR_EX2_*) bitmask.",
+          "db_column_name": "AttributesEx2",
+          "value_type": "CmangosSpellAttributesEx2Parameter"
+        },
+        {
+          "name": "Attributes Ex 3",
+          "help": "SpellAttributesEx3 (SPELL_ATTR_EX3_*) bitmask.",
+          "db_column_name": "AttributesEx3",
+          "value_type": "CmangosSpellAttributesEx3Parameter"
+        },
+        {
+          "name": "Attributes Ex 4",
+          "help": "SpellAttributesEx4 (SPELL_ATTR_EX4_*) bitmask.",
+          "db_column_name": "AttributesEx4",
+          "value_type": "CmangosSpellAttributesEx4Parameter"
+        },
+        {
+          "name": "Attributes Ex 5",
+          "help": "SpellAttributesEx5 (SPELL_ATTR_EX5_*) bitmask.",
+          "db_column_name": "AttributesEx5",
+          "value_type": "CmangosSpellAttributesEx5Parameter"
+        },
+        {
+          "name": "Attributes Ex 6",
+          "help": "SpellAttributesEx6 (SPELL_ATTR_EX6_*) bitmask.",
+          "db_column_name": "AttributesEx6",
+          "value_type": "CmangosSpellAttributesEx6Parameter"
+        },
+        {
+          "name": "Attributes Ex 7",
+          "help": "SpellAttributesEx7 (SPELL_ATTR_EX7_*) bitmask.",
+          "db_column_name": "AttributesEx7",
+          "value_type": "CmangosSpellAttributesEx7Parameter"
+        },
+        {
+          "name": "Spell Family Name",
+          "help": "SpellFamily enum (class family the spell belongs to for class-specific handling, e.g. Mage/Warrior/generic).",
+          "db_column_name": "SpellFamilyName",
+          "value_type": "SpellFamilyNameParameter"
+        },
+        {
+          "name": "Spell Family Flags",
+          "help": "Low 64 bits of the 96-bit ClassFamilyMask (m_spellClassMask) used by Spell::IsFitToFamilyMask to recognize specific class abilities (e.g. all Fireball ranks) for talents/set bonuses/procs. Paired with Spell Family Flags 2 for the remaining 32 bits.",
+          "db_column_name": "SpellFamilyFlags",
+          "value_type": "string"
+        },
+        {
+          "name": "Spell Family Flags 2",
+          "help": "Upper 32 bits of the 96-bit ClassFamilyMask, continuing Spell Family Flags.",
+          "db_column_name": "SpellFamilyFlags2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spell Priority",
+          "help": "m_spellPriority DBC field; marked not used by the core.",
+          "db_column_name": "SpellPriority",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spell Difficulty Id",
+          "help": "SpellDifficulty.dbc id, maps this spell id to different spell ids per dungeon/raid difficulty.",
+          "db_column_name": "SpellDifficultyId",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Is Server Side",
+          "help": "Custom cmangos addition: marks a spell defined purely server-side (not present in the client's Spell.dbc); such spells are assigned ids above the DBC range.",
+          "db_column_name": "IsServerSide",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Attributes Serverside",
+          "help": "Custom cmangos SpellAttributesServerside bitmask, only meaningful for server-side (IsServerSide) spells.",
+          "db_column_name": "AttributesServerside",
+          "value_type": "CmangosSpellAttributesServersideParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Stances, Targets & Requirements",
+      "fields": [
+        {
+          "name": "Stances",
+          "help": "ShapeshiftForm bitmask (m_shapeshiftMask, low dword): forms the caster must be in to use/learn this spell. 0 = any/no form.",
+          "db_column_name": "Stances",
+          "value_type": "ShapeshiftFormMaskParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Stances 2",
+          "help": "High dword continuation of the Stances shapeshift form bitmask.",
+          "db_column_name": "Stances2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Stances Not",
+          "help": "ShapeshiftForm bitmask (m_shapeshiftExclude, low dword): forms that prevent using/learning this spell.",
+          "db_column_name": "StancesNot",
+          "value_type": "ShapeshiftFormMaskParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Stances Not 2",
+          "help": "High dword continuation of the Stances Not shapeshift form bitmask.",
+          "db_column_name": "StancesNot2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Targets",
+          "help": "SpellCastTargetFlags m_targets bitmask describing valid target object types for this spell.",
+          "db_column_name": "Targets",
+          "value_type": "CmangosSpellCastTargetFlagsParameter"
+        },
+        {
+          "name": "Target Creature Type",
+          "help": "CreatureType bitmask restricting valid targets (0 = any creature type, including players).",
+          "db_column_name": "TargetCreatureType",
+          "value_type": "CreatureTypeMaskParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Requires Spell Focus",
+          "help": "SpellFocusObject.dbc id; caster must be within range of a gameobject using this spell focus to cast.",
+          "db_column_name": "RequiresSpellFocus",
+          "value_type": "SpellFocusObjectParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Facing Caster Flags",
+          "help": "m_facingCasterFlags: when set (1), caster must be in front of the target to cast.",
+          "db_column_name": "FacingCasterFlags",
+          "value_type": "CmangosSpellFacingFlagsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Area Id",
+          "help": "AreaGroup.dbc id (m_requiredAreasId); restricts casting to areas contained in this area group, 0 = no restriction.",
+          "db_column_name": "AreaId",
+          "value_type": "AreaGroupParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Min Faction Id",
+          "help": "m_minFactionID; documented as 'not used' by the core.",
+          "db_column_name": "MinFactionId",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Min Reputation",
+          "help": "m_minReputation; documented as 'not used' by the core.",
+          "db_column_name": "MinReputation",
+          "value_type": "ReputationRankParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Aura Vision",
+          "help": "m_requiredAuraVision (AuraVision.dbc-related bitmask); documented as 'not used' by the core.",
+          "db_column_name": "RequiredAuraVision",
+          "value_type": "uint",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Aura State Requirements",
+      "fields": [
+        {
+          "name": "Caster Aura State",
+          "help": "AuraState the caster must have to cast this spell, 0 = none required.",
+          "db_column_name": "CasterAuraState",
+          "value_type": "AuraStateTypeParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Target Aura State",
+          "help": "AuraState the target must have to be affected, 0 = none required.",
+          "db_column_name": "TargetAuraState",
+          "value_type": "AuraStateTypeParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Caster Aura State Not",
+          "help": "AuraState that prevents the caster from casting this spell if present.",
+          "db_column_name": "CasterAuraStateNot",
+          "value_type": "AuraStateTypeParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Target Aura State Not",
+          "help": "AuraState that prevents the target from being affected if present.",
+          "db_column_name": "TargetAuraStateNot",
+          "value_type": "AuraStateTypeParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Caster Aura Spell",
+          "help": "Caster must have this aura active to cast the spell, 0 = no requirement.",
+          "db_column_name": "CasterAuraSpell",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Target Aura Spell",
+          "help": "Target must have this aura active to be affected, 0 = no requirement.",
+          "db_column_name": "TargetAuraSpell",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Exclude Caster Aura Spell",
+          "help": "Caster must NOT have this aura to cast the spell, 0 = no requirement.",
+          "db_column_name": "ExcludeCasterAuraSpell",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Exclude Target Aura Spell",
+          "help": "Target must NOT have this aura to be affected, 0 = no requirement.",
+          "db_column_name": "ExcludeTargetAuraSpell",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Casting, Interrupts & Procs",
+      "fields": [
+        {
+          "name": "Casting Time Index",
+          "help": "SpellCastTimes.dbc id defining base cast time.",
+          "db_column_name": "CastingTimeIndex",
+          "value_type": "SpellCastTimeParameter"
+        },
+        {
+          "name": "Range Index",
+          "help": "SpellRange.dbc id defining min/max cast range.",
+          "db_column_name": "RangeIndex",
+          "value_type": "SpellRangeParameter",
+          "default": 1
+        },
+        {
+          "name": "Speed",
+          "help": "Missile travel speed in yards/second, 0 = instant hit (m_speed).",
+          "db_column_name": "Speed",
+          "value_type": "float"
+        },
+        {
+          "name": "Recovery Time",
+          "help": "Spell-specific cooldown in milliseconds.",
+          "db_column_name": "RecoveryTime",
+          "value_type": "MillisecondsParameter"
+        },
+        {
+          "name": "Category Recovery Time",
+          "help": "Shared cooldown (ms) applied to every spell in the same Category.",
+          "db_column_name": "CategoryRecoveryTime",
+          "value_type": "MillisecondsParameter"
+        },
+        {
+          "name": "Start Recovery Category",
+          "help": "Global-cooldown-like category (m_startRecoveryCategory) sharing Start Recovery Time with other spells of the same category.",
+          "db_column_name": "StartRecoveryCategory",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Start Recovery Time",
+          "help": "Global-cooldown-style cooldown (ms) applied on cast start.",
+          "db_column_name": "StartRecoveryTime",
+          "value_type": "MillisecondsParameter"
+        },
+        {
+          "name": "Interrupt Flags",
+          "help": "SpellInterruptFlags bitmask: what interrupts the cast (movement, damage taken, spell cast...).",
+          "db_column_name": "InterruptFlags",
+          "value_type": "SpellInterruptFlagParameter"
+        },
+        {
+          "name": "Aura Interrupt Flags",
+          "help": "AuraInterruptFlags bitmask: what removes the resulting aura (movement, action, damage taken...).",
+          "db_column_name": "AuraInterruptFlags",
+          "value_type": "SpellAuraInterruptFlagParameter"
+        },
+        {
+          "name": "Channel Interrupt Flags",
+          "help": "ChannelInterruptFlags bitmask (shares the AuraInterruptFlags flag values): what interrupts channeling.",
+          "db_column_name": "ChannelInterruptFlags",
+          "value_type": "SpellAuraInterruptFlagParameter"
+        },
+        {
+          "name": "Proc Flags",
+          "help": "ProcFlags bitmask: which combat events can trigger this spell's aura proc (melee hit, taken damage, cast spell...).",
+          "db_column_name": "ProcFlags",
+          "value_type": "SpellProcFlagParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Proc Chance",
+          "help": "Base percent chance to proc when a Proc Flags event occurs.",
+          "db_column_name": "ProcChance",
+          "value_type": "PercentageParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Proc Charges",
+          "help": "Number of times the proc aura can trigger before it is removed, 0 = infinite/not a limited-charge proc.",
+          "db_column_name": "ProcCharges",
+          "value_type": "uint",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Levels & Power Cost",
+      "fields": [
+        {
+          "name": "Base Level",
+          "help": "m_baseLevel; minimum caster level used for level-scaled effect calculations.",
+          "db_column_name": "BaseLevel",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Level",
+          "help": "Level at which this spell/rank is normally learned; used as a fallback for Req Level style checks.",
+          "db_column_name": "SpellLevel",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Max Level",
+          "help": "Level above which level-based scaling caps, 0 = no cap.",
+          "db_column_name": "MaxLevel",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Max Target Level",
+          "help": "Maximum target level this spell can affect, 0 = no limit.",
+          "db_column_name": "MaxTargetLevel",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Max Affected Targets",
+          "help": "Caps the number of targets hit by an area/chain effect, 0 = no cap from this field.",
+          "db_column_name": "MaxAffectedTargets",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Duration Index",
+          "help": "SpellDuration.dbc id defining base/per-level/max duration of the resulting aura.",
+          "db_column_name": "DurationIndex",
+          "value_type": "SpellDurationParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Power Type",
+          "help": "Powers enum (0 Mana, 1 Rage, 2 Focus, 3 Energy, 4 Happiness, 5 Rune, 6 RunicPower, -2 Health) consumed by Mana Cost/Mana Per Second.",
+          "db_column_name": "PowerType",
+          "value_type": "PowerTypeParameter"
+        },
+        {
+          "name": "Mana Cost",
+          "help": "Flat Power Type cost to cast.",
+          "db_column_name": "ManaCost",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Mana Cost Perlevel",
+          "help": "Additional Power Type cost per caster level.",
+          "db_column_name": "ManaCostPerlevel",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Mana Cost Percentage",
+          "help": "Cost expressed as a percentage of the caster's base Power Type instead of/in addition to Mana Cost.",
+          "db_column_name": "ManaCostPercentage",
+          "value_type": "PercentageParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Mana Per Second",
+          "help": "Power Type drained per channel/aura tick second.",
+          "db_column_name": "ManaPerSecond",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Mana Per Second Per Level",
+          "help": "Additional Power Type drained per second per caster level.",
+          "db_column_name": "ManaPerSecondPerLevel",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Stack Amount",
+          "help": "m_cumulativeAura; max stack count of the resulting aura, 0/1 = does not stack.",
+          "db_column_name": "StackAmount",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Modal Next Spell",
+          "help": "m_modalNextSpell; documented as not used by the core.",
+          "db_column_name": "ModalNextSpell",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Reagents, Totems & Equipped Item",
+      "fields": [
+        {
+          "name": "Totem 1",
+          "help": "Totem item required in hand to cast (item entry), 0 = none.",
+          "db_column_name": "Totem1",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Totem 2",
+          "help": "Second totem item required in hand to cast, 0 = none.",
+          "db_column_name": "Totem2",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent 1",
+          "help": "Reagent item #1 consumed on cast, 0 = unused slot.",
+          "db_column_name": "Reagent1",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent 2",
+          "help": "Reagent item #2 consumed on cast, 0 = unused slot.",
+          "db_column_name": "Reagent2",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent 3",
+          "help": "Reagent item #3 consumed on cast, 0 = unused slot.",
+          "db_column_name": "Reagent3",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent 4",
+          "help": "Reagent item #4 consumed on cast, 0 = unused slot.",
+          "db_column_name": "Reagent4",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent 5",
+          "help": "Reagent item #5 consumed on cast, 0 = unused slot.",
+          "db_column_name": "Reagent5",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent 6",
+          "help": "Reagent item #6 consumed on cast, 0 = unused slot.",
+          "db_column_name": "Reagent6",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent 7",
+          "help": "Reagent item #7 consumed on cast, 0 = unused slot.",
+          "db_column_name": "Reagent7",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent 8",
+          "help": "Reagent item #8 consumed on cast, 0 = unused slot.",
+          "db_column_name": "Reagent8",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent Count 1",
+          "help": "Quantity of Reagent 1 consumed.",
+          "db_column_name": "ReagentCount1",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent Count 2",
+          "help": "Quantity of Reagent 2 consumed.",
+          "db_column_name": "ReagentCount2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent Count 3",
+          "help": "Quantity of Reagent 3 consumed.",
+          "db_column_name": "ReagentCount3",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent Count 4",
+          "help": "Quantity of Reagent 4 consumed.",
+          "db_column_name": "ReagentCount4",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent Count 5",
+          "help": "Quantity of Reagent 5 consumed.",
+          "db_column_name": "ReagentCount5",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent Count 6",
+          "help": "Quantity of Reagent 6 consumed.",
+          "db_column_name": "ReagentCount6",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent Count 7",
+          "help": "Quantity of Reagent 7 consumed.",
+          "db_column_name": "ReagentCount7",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reagent Count 8",
+          "help": "Quantity of Reagent 8 consumed.",
+          "db_column_name": "ReagentCount8",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Totem Category 1",
+          "help": "TotemCategory.dbc id; an alternative to Totem 1 allowing any item of this totem category, 0 = none.",
+          "db_column_name": "TotemCategory1",
+          "value_type": "ItemTotemCategoryParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Totem Category 2",
+          "help": "TotemCategory.dbc id; an alternative to Totem 2, 0 = none.",
+          "db_column_name": "TotemCategory2",
+          "value_type": "ItemTotemCategoryParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Equipped Item Class",
+          "help": "ItemClass the caster must have equipped to cast (e.g. weapon), -1 = no requirement.",
+          "db_column_name": "EquippedItemClass",
+          "value_type": "ItemClassParameter",
+          "default": -1
+        },
+        {
+          "name": "Equipped Item Sub Class Mask",
+          "help": "Bitmask of item subclasses (interpreted against Equipped Item Class) that satisfy the equip requirement, e.g. weapon subclass mask when Equipped Item Class = Weapon.",
+          "db_column_name": "EquippedItemSubClassMask",
+          "value_type": "int"
+        },
+        {
+          "name": "Equipped Item Inventory Type Mask",
+          "help": "Bitmask of InventoryType values (1 << InventoryType) that satisfy the equip requirement.",
+          "db_column_name": "EquippedItemInventoryTypeMask",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Effects",
+      "fields": [
+        {
+          "name": "Effect 1",
+          "db_column_name": "Effect1",
+          "value_type": "CmangosSpellEffectParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect 2",
+          "db_column_name": "Effect2",
+          "value_type": "CmangosSpellEffectParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect 3",
+          "db_column_name": "Effect3",
+          "value_type": "CmangosSpellEffectParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Die Sides 1",
+          "help": "Random roll size for effect 1 (Base Points + random(1..DieSides)).",
+          "db_column_name": "EffectDieSides1",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Die Sides 2",
+          "help": "Random roll size for effect 2 (Base Points + random(1..DieSides)).",
+          "db_column_name": "EffectDieSides2",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Die Sides 3",
+          "help": "Random roll size for effect 3 (Base Points + random(1..DieSides)).",
+          "db_column_name": "EffectDieSides3",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Base Points 1",
+          "help": "Base value for effect 1 (actual applied value is Base Points + 1, then randomized by Die Sides and scaled by level/combo points/AP/spellpower coefficients).",
+          "db_column_name": "EffectBasePoints1",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Base Points 2",
+          "help": "Base value for effect 2 (actual applied value is Base Points + 1, then randomized by Die Sides and scaled by level/combo points/AP/spellpower coefficients).",
+          "db_column_name": "EffectBasePoints2",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Base Points 3",
+          "help": "Base value for effect 3 (actual applied value is Base Points + 1, then randomized by Die Sides and scaled by level/combo points/AP/spellpower coefficients).",
+          "db_column_name": "EffectBasePoints3",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Real Points Per Level 1",
+          "help": "Additional effect 1 value per caster level above Base Level.",
+          "db_column_name": "EffectRealPointsPerLevel1",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Real Points Per Level 2",
+          "help": "Additional effect 2 value per caster level above Base Level.",
+          "db_column_name": "EffectRealPointsPerLevel2",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Real Points Per Level 3",
+          "help": "Additional effect 3 value per caster level above Base Level.",
+          "db_column_name": "EffectRealPointsPerLevel3",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Mechanic 1",
+          "help": "Mechanic applied specifically by effect 1.",
+          "db_column_name": "EffectMechanic1",
+          "value_type": "CmangosMechanicParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Mechanic 2",
+          "help": "Mechanic applied specifically by effect 2.",
+          "db_column_name": "EffectMechanic2",
+          "value_type": "CmangosMechanicParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Mechanic 3",
+          "help": "Mechanic applied specifically by effect 3.",
+          "db_column_name": "EffectMechanic3",
+          "value_type": "CmangosMechanicParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Implicit Target A 1",
+          "help": "Targets enum: primary implicit target selector for effect 1 (e.g. self, target unit, area around caster...).",
+          "db_column_name": "EffectImplicitTargetA1",
+          "value_type": "CmangosSpellTargetParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Implicit Target A 2",
+          "help": "Targets enum: primary implicit target selector for effect 2 (e.g. self, target unit, area around caster...).",
+          "db_column_name": "EffectImplicitTargetA2",
+          "value_type": "CmangosSpellTargetParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Implicit Target A 3",
+          "help": "Targets enum: primary implicit target selector for effect 3 (e.g. self, target unit, area around caster...).",
+          "db_column_name": "EffectImplicitTargetA3",
+          "value_type": "CmangosSpellTargetParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Implicit Target B 1",
+          "help": "Targets enum: secondary implicit target selector for effect 1, used together with Implicit Target A.",
+          "db_column_name": "EffectImplicitTargetB1",
+          "value_type": "CmangosSpellTargetParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Implicit Target B 2",
+          "help": "Targets enum: secondary implicit target selector for effect 2, used together with Implicit Target A.",
+          "db_column_name": "EffectImplicitTargetB2",
+          "value_type": "CmangosSpellTargetParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Implicit Target B 3",
+          "help": "Targets enum: secondary implicit target selector for effect 3, used together with Implicit Target A.",
+          "db_column_name": "EffectImplicitTargetB3",
+          "value_type": "CmangosSpellTargetParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Radius Index 1",
+          "help": "SpellRadius.dbc id defining the area radius of effect 1 for area target selectors.",
+          "db_column_name": "EffectRadiusIndex1",
+          "value_type": "SpellRadiusParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Radius Index 2",
+          "help": "SpellRadius.dbc id defining the area radius of effect 2 for area target selectors.",
+          "db_column_name": "EffectRadiusIndex2",
+          "value_type": "SpellRadiusParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Radius Index 3",
+          "help": "SpellRadius.dbc id defining the area radius of effect 3 for area target selectors.",
+          "db_column_name": "EffectRadiusIndex3",
+          "value_type": "SpellRadiusParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Apply Aura Name 1",
+          "help": "Aura applied by effect 1 when Effect 1 = APPLY_AURA.",
+          "db_column_name": "EffectApplyAuraName1",
+          "value_type": "CmangosAuraTypeParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Apply Aura Name 2",
+          "help": "Aura applied by effect 2 when Effect 2 = APPLY_AURA.",
+          "db_column_name": "EffectApplyAuraName2",
+          "value_type": "CmangosAuraTypeParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Apply Aura Name 3",
+          "help": "Aura applied by effect 3 when Effect 3 = APPLY_AURA.",
+          "db_column_name": "EffectApplyAuraName3",
+          "value_type": "CmangosAuraTypeParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Amplitude 1",
+          "help": "Periodic tick interval in ms for effect 1's aura, 0 = not periodic.",
+          "db_column_name": "EffectAmplitude1",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Amplitude 2",
+          "help": "Periodic tick interval in ms for effect 2's aura, 0 = not periodic.",
+          "db_column_name": "EffectAmplitude2",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Amplitude 3",
+          "help": "Periodic tick interval in ms for effect 3's aura, 0 = not periodic.",
+          "db_column_name": "EffectAmplitude3",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Multiple Value 1",
+          "help": "Extra float multiplier/value for effect 1 (meaning depends on Effect 1/Apply Aura Name).",
+          "db_column_name": "EffectMultipleValue1",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Multiple Value 2",
+          "help": "Extra float multiplier/value for effect 2 (meaning depends on Effect 2/Apply Aura Name).",
+          "db_column_name": "EffectMultipleValue2",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Multiple Value 3",
+          "help": "Extra float multiplier/value for effect 3 (meaning depends on Effect 3/Apply Aura Name).",
+          "db_column_name": "EffectMultipleValue3",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Chain Target 1",
+          "help": "Number of extra chain/jump targets for effect 1 (e.g. Chain Lightning), 0/1 = no chaining.",
+          "db_column_name": "EffectChainTarget1",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Chain Target 2",
+          "help": "Number of extra chain/jump targets for effect 2 (e.g. Chain Lightning), 0/1 = no chaining.",
+          "db_column_name": "EffectChainTarget2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Chain Target 3",
+          "help": "Number of extra chain/jump targets for effect 3 (e.g. Chain Lightning), 0/1 = no chaining.",
+          "db_column_name": "EffectChainTarget3",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Item Type 1",
+          "help": "Item created/enchanted by effect 1 (e.g. CREATE_ITEM effect), 0 = none.",
+          "db_column_name": "EffectItemType1",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Item Type 2",
+          "help": "Item created/enchanted by effect 2 (e.g. CREATE_ITEM effect), 0 = none.",
+          "db_column_name": "EffectItemType2",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Item Type 3",
+          "help": "Item created/enchanted by effect 3 (e.g. CREATE_ITEM effect), 0 = none.",
+          "db_column_name": "EffectItemType3",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Misc Value 1",
+          "help": "Generic effect 1 parameter whose meaning depends on Effect 1 / Effect Apply Aura Name 1 (e.g. summoned creature id, dispel school, misc enum value...).",
+          "db_column_name": "EffectMiscValue1",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Misc Value 2",
+          "help": "Generic effect 2 parameter whose meaning depends on Effect 2 / Effect Apply Aura Name 2 (e.g. summoned creature id, dispel school, misc enum value...).",
+          "db_column_name": "EffectMiscValue2",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Misc Value 3",
+          "help": "Generic effect 3 parameter whose meaning depends on Effect 3 / Effect Apply Aura Name 3 (e.g. summoned creature id, dispel school, misc enum value...).",
+          "db_column_name": "EffectMiscValue3",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Misc Value B 1",
+          "help": "Second generic effect 1 parameter, meaning depends on Effect 1 / Effect Apply Aura Name 1.",
+          "db_column_name": "EffectMiscValueB1",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Misc Value B 2",
+          "help": "Second generic effect 2 parameter, meaning depends on Effect 2 / Effect Apply Aura Name 2.",
+          "db_column_name": "EffectMiscValueB2",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Misc Value B 3",
+          "help": "Second generic effect 3 parameter, meaning depends on Effect 3 / Effect Apply Aura Name 3.",
+          "db_column_name": "EffectMiscValueB3",
+          "value_type": "int"
+        },
+        {
+          "name": "Effect Trigger Spell 1",
+          "help": "Spell triggered/cast by effect 1 (e.g. TRIGGER_SPELL effect, or the spell applied by a proc aura), 0 = none.",
+          "db_column_name": "EffectTriggerSpell1",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Trigger Spell 2",
+          "help": "Spell triggered/cast by effect 2 (e.g. TRIGGER_SPELL effect, or the spell applied by a proc aura), 0 = none.",
+          "db_column_name": "EffectTriggerSpell2",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Trigger Spell 3",
+          "help": "Spell triggered/cast by effect 3 (e.g. TRIGGER_SPELL effect, or the spell applied by a proc aura), 0 = none.",
+          "db_column_name": "EffectTriggerSpell3",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Effect Points Per Combo Point 1",
+          "help": "Additional effect 1 value per combo point spent (rogue/druid finishers).",
+          "db_column_name": "EffectPointsPerComboPoint1",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Points Per Combo Point 2",
+          "help": "Additional effect 2 value per combo point spent (rogue/druid finishers).",
+          "db_column_name": "EffectPointsPerComboPoint2",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Points Per Combo Point 3",
+          "help": "Additional effect 3 value per combo point spent (rogue/druid finishers).",
+          "db_column_name": "EffectPointsPerComboPoint3",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Spell Class Mask 1 1",
+          "help": "Dword #1 of the 96-bit per-effect ClassFamilyMask for effect 1 (m_effectSpellClassMaskA/B/C); used by class-specific effect handlers/talent mods to recognize this effect, similar to Spell Family Flags but scoped to a single effect.",
+          "db_column_name": "EffectSpellClassMask1_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Effect Spell Class Mask 1 2",
+          "help": "Dword #2 of the 96-bit per-effect ClassFamilyMask for effect 1 (m_effectSpellClassMaskA/B/C); used by class-specific effect handlers/talent mods to recognize this effect, similar to Spell Family Flags but scoped to a single effect.",
+          "db_column_name": "EffectSpellClassMask1_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Effect Spell Class Mask 1 3",
+          "help": "Dword #3 of the 96-bit per-effect ClassFamilyMask for effect 1 (m_effectSpellClassMaskA/B/C); used by class-specific effect handlers/talent mods to recognize this effect, similar to Spell Family Flags but scoped to a single effect.",
+          "db_column_name": "EffectSpellClassMask1_3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Effect Spell Class Mask 2 1",
+          "help": "Dword #1 of the 96-bit per-effect ClassFamilyMask for effect 2 (m_effectSpellClassMaskA/B/C); used by class-specific effect handlers/talent mods to recognize this effect, similar to Spell Family Flags but scoped to a single effect.",
+          "db_column_name": "EffectSpellClassMask2_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Effect Spell Class Mask 2 2",
+          "help": "Dword #2 of the 96-bit per-effect ClassFamilyMask for effect 2 (m_effectSpellClassMaskA/B/C); used by class-specific effect handlers/talent mods to recognize this effect, similar to Spell Family Flags but scoped to a single effect.",
+          "db_column_name": "EffectSpellClassMask2_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Effect Spell Class Mask 2 3",
+          "help": "Dword #3 of the 96-bit per-effect ClassFamilyMask for effect 2 (m_effectSpellClassMaskA/B/C); used by class-specific effect handlers/talent mods to recognize this effect, similar to Spell Family Flags but scoped to a single effect.",
+          "db_column_name": "EffectSpellClassMask2_3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Effect Spell Class Mask 3 1",
+          "help": "Dword #1 of the 96-bit per-effect ClassFamilyMask for effect 3 (m_effectSpellClassMaskA/B/C); used by class-specific effect handlers/talent mods to recognize this effect, similar to Spell Family Flags but scoped to a single effect.",
+          "db_column_name": "EffectSpellClassMask3_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Effect Spell Class Mask 3 2",
+          "help": "Dword #2 of the 96-bit per-effect ClassFamilyMask for effect 3 (m_effectSpellClassMaskA/B/C); used by class-specific effect handlers/talent mods to recognize this effect, similar to Spell Family Flags but scoped to a single effect.",
+          "db_column_name": "EffectSpellClassMask3_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Effect Spell Class Mask 3 3",
+          "help": "Dword #3 of the 96-bit per-effect ClassFamilyMask for effect 3 (m_effectSpellClassMaskA/B/C); used by class-specific effect handlers/talent mods to recognize this effect, similar to Spell Family Flags but scoped to a single effect.",
+          "db_column_name": "EffectSpellClassMask3_3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Dmg Multiplier 1",
+          "help": "Per-chain-jump damage multiplier applied to effect 1 on each successive chain target (m_effectChainAmplitude).",
+          "db_column_name": "DmgMultiplier1",
+          "value_type": "float"
+        },
+        {
+          "name": "Dmg Multiplier 2",
+          "help": "Per-chain-jump damage multiplier applied to effect 2 on each successive chain target (m_effectChainAmplitude).",
+          "db_column_name": "DmgMultiplier2",
+          "value_type": "float"
+        },
+        {
+          "name": "Dmg Multiplier 3",
+          "help": "Per-chain-jump damage multiplier applied to effect 3 on each successive chain target (m_effectChainAmplitude).",
+          "db_column_name": "DmgMultiplier3",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Bonus Coefficient 1",
+          "help": "Spell power scaling coefficient applied to effect 1's value.",
+          "db_column_name": "EffectBonusCoefficient1",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Bonus Coefficient 2",
+          "help": "Spell power scaling coefficient applied to effect 2's value.",
+          "db_column_name": "EffectBonusCoefficient2",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Bonus Coefficient 3",
+          "help": "Spell power scaling coefficient applied to effect 3's value.",
+          "db_column_name": "EffectBonusCoefficient3",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Bonus Coefficient From AP 1",
+          "help": "Attack power scaling coefficient applied to effect 1's value.",
+          "db_column_name": "EffectBonusCoefficientFromAP1",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Bonus Coefficient From AP 2",
+          "help": "Attack power scaling coefficient applied to effect 2's value.",
+          "db_column_name": "EffectBonusCoefficientFromAP2",
+          "value_type": "float"
+        },
+        {
+          "name": "Effect Bonus Coefficient From AP 3",
+          "help": "Attack power scaling coefficient applied to effect 3's value.",
+          "db_column_name": "EffectBonusCoefficientFromAP3",
+          "value_type": "float"
+        }
+      ]
+    },
+    {
+      "group_name": "Visual & Misc",
+      "fields": [
+        {
+          "name": "Spell Visual",
+          "help": "SpellVisual.dbc id (primary).",
+          "db_column_name": "SpellVisual",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Visual 2",
+          "help": "SpellVisual.dbc id (secondary, e.g. for a different caster type).",
+          "db_column_name": "SpellVisual2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Icon ID",
+          "help": "SpellIcon.dbc id shown in the client spellbook/aura icon.",
+          "db_column_name": "SpellIconID",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Active Icon ID",
+          "help": "SpellIcon.dbc id shown while the spell is active/toggled (e.g. stances).",
+          "db_column_name": "ActiveIconID",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Rune Cost ID",
+          "help": "SpellRuneCost.dbc id defining Death Knight rune costs, 0 = none.",
+          "db_column_name": "RuneCostID",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Missile ID",
+          "help": "SpellMissile.dbc id overriding missile visuals.",
+          "db_column_name": "SpellMissileID",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Power Display Id",
+          "help": "PowerDisplay.dbc id customizing the power bar shown for this spell's power type.",
+          "db_column_name": "PowerDisplayId",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Description Variable ID",
+          "help": "SpellDescriptionVariables.dbc id used to fill $-variables in the client tooltip.",
+          "db_column_name": "SpellDescriptionVariableID",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Dmg Class",
+          "help": "m_defenseType; determines whether the effect can be resisted/parried/dodged/blocked like a melee attack.",
+          "db_column_name": "DmgClass",
+          "value_type": "CmangosSpellDmgClassParameter"
+        },
+        {
+          "name": "Prevention Type",
+          "help": "What the resulting aura prevents the target from doing.",
+          "db_column_name": "PreventionType",
+          "value_type": "CmangosSpellPreventionTypeParameter"
+        },
+        {
+          "name": "Stance Bar Order",
+          "help": "m_stanceBarOrder; documented as not used by the core.",
+          "db_column_name": "StanceBarOrder",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Names & Ranks",
+      "fields": [
+        {
+          "name": "Spell Name 1",
+          "help": "Locale enUS name.",
+          "db_column_name": "SpellName",
+          "value_type": "string"
+        },
+        {
+          "name": "Spell Name 2",
+          "help": "Localized name, locale slot 2 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName2",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 3",
+          "help": "Localized name, locale slot 3 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName3",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 4",
+          "help": "Localized name, locale slot 4 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName4",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 5",
+          "help": "Localized name, locale slot 5 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName5",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 6",
+          "help": "Localized name, locale slot 6 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName6",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 7",
+          "help": "Localized name, locale slot 7 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName7",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 8",
+          "help": "Localized name, locale slot 8 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName8",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 9",
+          "help": "Localized name, locale slot 9 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName9",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 10",
+          "help": "Localized name, locale slot 10 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName10",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 11",
+          "help": "Localized name, locale slot 11 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName11",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 12",
+          "help": "Localized name, locale slot 12 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName12",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 13",
+          "help": "Localized name, locale slot 13 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName13",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 14",
+          "help": "Localized name, locale slot 14 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName14",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 15",
+          "help": "Localized name, locale slot 15 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName15",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Spell Name 16",
+          "help": "Localized name, locale slot 16 (see mangos_string/Locales.h locale order).",
+          "db_column_name": "SpellName16",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 1",
+          "help": "Locale enUS rank/subtext text (e.g. 'Rank 3').",
+          "db_column_name": "Rank1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 2",
+          "help": "Localized rank/subtext text, locale slot 2.",
+          "db_column_name": "Rank2",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 3",
+          "help": "Localized rank/subtext text, locale slot 3.",
+          "db_column_name": "Rank3",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 4",
+          "help": "Localized rank/subtext text, locale slot 4.",
+          "db_column_name": "Rank4",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 5",
+          "help": "Localized rank/subtext text, locale slot 5.",
+          "db_column_name": "Rank5",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 6",
+          "help": "Localized rank/subtext text, locale slot 6.",
+          "db_column_name": "Rank6",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 7",
+          "help": "Localized rank/subtext text, locale slot 7.",
+          "db_column_name": "Rank7",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 8",
+          "help": "Localized rank/subtext text, locale slot 8.",
+          "db_column_name": "Rank8",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 9",
+          "help": "Localized rank/subtext text, locale slot 9.",
+          "db_column_name": "Rank9",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 10",
+          "help": "Localized rank/subtext text, locale slot 10.",
+          "db_column_name": "Rank10",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 11",
+          "help": "Localized rank/subtext text, locale slot 11.",
+          "db_column_name": "Rank11",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 12",
+          "help": "Localized rank/subtext text, locale slot 12.",
+          "db_column_name": "Rank12",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 13",
+          "help": "Localized rank/subtext text, locale slot 13.",
+          "db_column_name": "Rank13",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 14",
+          "help": "Localized rank/subtext text, locale slot 14.",
+          "db_column_name": "Rank14",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 15",
+          "help": "Localized rank/subtext text, locale slot 15.",
+          "db_column_name": "Rank15",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Rank 16",
+          "help": "Localized rank/subtext text, locale slot 16.",
+          "db_column_name": "Rank16",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    },
+    {
+      "group_name": "Related tables",
+      "fields": [
+        {
+          "name": "Chain (ranks)",
+          "meta": "table:spell_chain;`spell_id` = {Id} OR `first_spell` = {Id}",
+          "help": "Rank chain rows of this spell."
+        },
+        {
+          "name": "Learn Spell",
+          "meta": "table:spell_learn_spell;`entry` = {Id} OR `SpellID` = {Id}",
+          "help": "Spells learned when casting this spell."
+        },
+        {
+          "name": "Proc Event",
+          "meta": "table:spell_proc_event;`entry` = {Id}",
+          "help": "Proc event definition."
+        },
+        {
+          "name": "Bonus Data",
+          "meta": "table:spell_bonus_data;`entry` = {Id}",
+          "help": "Direct/dot spell power coefficients."
+        },
+        {
+          "name": "Threat",
+          "meta": "table:spell_threat;`entry` = {Id}",
+          "help": "Threat override of this spell."
+        },
+        {
+          "name": "Target Position",
+          "meta": "table:spell_target_position;`id` = {Id}",
+          "help": "Teleport / target destination of this spell."
+        },
+        {
+          "name": "Script Target",
+          "meta": "table:spell_script_target;`entry` = {Id}",
+          "help": "Script targets of this spell."
+        },
+        {
+          "name": "Area Requirements",
+          "meta": "table:spell_area;`spell` = {Id}",
+          "help": "Area-bound aura application rules."
+        },
+        {
+          "name": "Pet Auras",
+          "meta": "table:spell_pet_auras;`spell` = {Id}",
+          "help": "Pet auras applied by this spell."
+        },
+        {
+          "name": "Elixir",
+          "meta": "table:spell_elixir;`entry` = {Id}",
+          "help": "Elixir classification of this spell."
+        },
+        {
+          "name": "Cone",
+          "meta": "table:spell_cone;`Id` = {Id}",
+          "help": "Cone angle of this spell."
+        },
+        {
+          "name": "Skill Discovery",
+          "meta": "table:skill_discovery_template;`spellId` = {Id}",
+          "help": "Discovery rules of this spell."
+        },
+        {
+          "name": "Skill Extra Item",
+          "meta": "table:skill_extra_item_template;`spellId` = {Id}",
+          "help": "Extra item creation rules of this spell."
+        }
+      ]
+    }
+  ],
+  "table_name_source_field": "SpellName",
+  "picker": "SpellParameter"
+}

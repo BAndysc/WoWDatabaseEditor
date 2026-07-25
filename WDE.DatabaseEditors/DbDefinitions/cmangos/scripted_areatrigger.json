@@ -1,0 +1,41 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Scripted Areatrigger",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Assigns a C++ (ScriptDevAI) script to an areatrigger from AreaTrigger.dbc. The script runs when a player enters the trigger.",
+  "table_name": "scripted_areatrigger",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_areatrigger.png",
+  "picker": "AreaTriggerParameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Areatrigger",
+          "db_column_name": "entry",
+          "value_type": "AreaTriggerParameter",
+          "preferred_width": 173.0
+        },
+        {
+          "name": "Script Name",
+          "help": "Name of an areatrigger script registered in the core (C++/ScriptDevAI).",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "preferred_width": 741.0
+        }
+      ]
+    }
+  ]
+}

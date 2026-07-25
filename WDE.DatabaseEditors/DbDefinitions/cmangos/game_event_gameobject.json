@@ -1,0 +1,51 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Game Event Gameobject",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Links gameobject spawns to a game event: the gameobject is spawned while the event is active (positive event id) or despawned for the event's duration (negative event id).",
+  "table_name": "game_event_gameobject",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_gameevent.png",
+  "picker": "GameobjectGUIDParameter",
+  "primary_key": [
+    "guid",
+    "event"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "help": "Gameobject spawn guid from the gameobject table.",
+          "db_column_name": "guid",
+          "value_type": "GameobjectGUIDParameter"
+        },
+        {
+          "name": "Spawn",
+          "help": "Open the affected gameobject spawn.",
+          "meta": "table:gameobject;`guid` = {guid}"
+        },
+        {
+          "name": "Event",
+          "help": "Game event id (game_event.entry), signed. Positive: the gameobject is only spawned while the event is active (if the guid is part of a pool, all pool members must be listed for the event). Negative: the gameobject is removed for the duration of the event and pool grouping is ignored. 0 is not allowed.",
+          "db_column_name": "event",
+          "value_type": "GameEventParameter"
+        },
+        {
+          "name": "Event",
+          "help": "Open the game event.",
+          "meta": "table:game_event;`entry` = ABS({event})"
+        }
+      ]
+    }
+  ]
+}

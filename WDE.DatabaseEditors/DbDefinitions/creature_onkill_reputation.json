@@ -1,7 +1,7 @@
 {
   "id": "creature_onkill_reputation",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityMaster"
   ],
   "name": "Creature On Kill Reputation",
   "single_solution_name": "Creature On Kill Reputation",

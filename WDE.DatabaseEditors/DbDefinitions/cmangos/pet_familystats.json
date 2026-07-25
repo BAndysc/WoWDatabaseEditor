@@ -1,0 +1,48 @@
+{
+  "id": "pet_familystats",
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC"
+  ],
+  "name": "Pet Family Stats",
+  "description": "Health, damage and armor multipliers applied to hunter pet stats per creature family.",
+  "table_name": "pet_familystats",
+  "table_index_name": "family",
+  "record_mode": "SingleRow",
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_creature_template.png",
+  "picker": "CreatureFamilyParameter",
+  "primary_key": [
+    "family"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Family",
+          "db_column_name": "family",
+          "value_type": "CreatureFamilyParameter"
+        },
+        {
+          "name": "Health Modifier",
+          "db_column_name": "healthModifier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Damage Modifier",
+          "db_column_name": "damageModifier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Armor Modifier",
+          "db_column_name": "armorModifier",
+          "value_type": "float",
+          "default": 1.0
+        }
+      ]
+    }
+  ]
+}

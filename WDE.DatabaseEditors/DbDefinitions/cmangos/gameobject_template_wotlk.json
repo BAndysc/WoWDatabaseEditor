@@ -1,0 +1,1762 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Gameobject Template",
+  "single_solution_name": "Gameobject {name} template",
+  "multi_solution_name": "Multiple gameobject templates",
+  "description": "Templates of all gameobjects: doors, chests, buttons, traps, transports and more. The type determines how the object behaves and how the 24 data fields are interpreted; every gameobject spawn references an entry from this table.",
+  "table_name": "gameobject_template",
+  "table_index_name": "entry",
+  "record_mode": "Template",
+  "group_name": "Templates",
+  "icon_path": "Icons/document_gameobject_template.png",
+  "picker": "GameobjectParameter",
+  "table_name_source_field": "name",
+  "primary_key": [
+    "entry"
+  ],
+  "foreign_tables": [
+    {
+      "table_name": "gameobject_template_addon",
+      "foreign_key": [
+        "Entry"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "group_name": "General",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string"
+        },
+        {
+          "name": "Type",
+          "help": "Gameobject type: determines behaviour and the meaning of the data0-data23 fields.",
+          "db_column_name": "type",
+          "value_type": "GameobjectTypeParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Visual",
+      "fields": [
+        {
+          "name": "Display Id",
+          "db_column_name": "displayId",
+          "value_type": "GameObjectDisplayInfoParameter"
+        },
+        {
+          "name": "Size",
+          "help": "Model scale of the gameobject.",
+          "db_column_name": "size",
+          "value_type": "float",
+          "default": 1
+        },
+        {
+          "name": "Icon Name",
+          "help": "Cursor icon shown when hovering the object (e.g. taxi, quest, attack).",
+          "db_column_name": "IconName",
+          "value_type": "GameObjectIconNameParameter"
+        },
+        {
+          "name": "Opening Text",
+          "help": "Caption shown on the cast bar while the object is being opened/used.",
+          "db_column_name": "OpeningText",
+          "value_type": "string"
+        },
+        {
+          "name": "Closing Text",
+          "help": "Caption shown on the cast bar while the object is being closed.",
+          "db_column_name": "ClosingText",
+          "value_type": "string"
+        }
+      ]
+    },
+    {
+      "group_name": "Faction & flags",
+      "fields": [
+        {
+          "name": "Faction",
+          "db_column_name": "faction",
+          "value_type": "FactionTemplateParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "flags",
+          "value_type": "GameObjectFlagParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Extra Flags",
+          "db_column_name": "ExtraFlags",
+          "value_type": "CmangosGameObjectExtraFlagsParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Quest items",
+      "fields": [
+        {
+          "name": "Quest Item 1",
+          "db_column_name": "questItem1",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Quest Item 2",
+          "db_column_name": "questItem2",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Quest Item 3",
+          "db_column_name": "questItem3",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Quest Item 4",
+          "db_column_name": "questItem4",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Quest Item 5",
+          "db_column_name": "questItem5",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Quest Item 6",
+          "db_column_name": "questItem6",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Type: door",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 0
+      },
+      "fields": [
+        {
+          "name": "Start as opened",
+          "help": "Used client side to determine GO_ACTIVATED means open/closed.",
+          "db_column_name": "data0",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Lock id",
+          "help": "Lock id (Lock.dbc).",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Auto close time",
+          "help": "Time in ms until autoclose (seconds = value / 1000; prior to 3.0.3 the conversion was / 0x10000).",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Immune to damage",
+          "help": "Break opening whenever you receive damage?",
+          "db_column_name": "data3",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "On open text id",
+          "help": "On open text id; can be used to replace the cast bar caption.",
+          "db_column_name": "data4",
+          "value_type": "uint"
+        },
+        {
+          "name": "On close text id",
+          "help": "On close text id.",
+          "db_column_name": "data5",
+          "value_type": "uint"
+        },
+        {
+          "name": "Ignored by pathfinding",
+          "db_column_name": "data6",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: button",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 1
+      },
+      "fields": [
+        {
+          "name": "Start as opened",
+          "db_column_name": "data0",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Lock id",
+          "help": "Lock id (Lock.dbc).",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Auto close time",
+          "help": "Time in ms until autoclose (seconds = value / 1000; prior to 3.0.3 the conversion was / 0x10000).",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Linked trap entry",
+          "help": "Gameobject entry of the linked trap.",
+          "db_column_name": "data3",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Immune to damage",
+          "help": "Also marks battleground objects.",
+          "db_column_name": "data4",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Is large",
+          "db_column_name": "data5",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "On open text id",
+          "help": "On open text id; can be used to replace the cast bar caption.",
+          "db_column_name": "data6",
+          "value_type": "int"
+        },
+        {
+          "name": "On close text id",
+          "help": "On close text id.",
+          "db_column_name": "data7",
+          "value_type": "uint"
+        },
+        {
+          "name": "LOS ok",
+          "help": "Usable without line of sight.",
+          "db_column_name": "data8",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: quest giver",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 2
+      },
+      "fields": [
+        {
+          "name": "Lock id",
+          "help": "Lock id (Lock.dbc).",
+          "db_column_name": "data0",
+          "value_type": "LockParameter"
+        },
+        {
+          "name": "Quest list id",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Page material",
+          "help": "Page material id (PageTextMaterial.dbc).",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Gossip menu id",
+          "help": "Gossip menu shown on use (gossip_menu).",
+          "db_column_name": "data3",
+          "value_type": "GossipMenuParameter"
+        },
+        {
+          "name": "Custom anim",
+          "help": "Custom animation played on use.",
+          "db_column_name": "data4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Immune to damage",
+          "db_column_name": "data5",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "On open text id",
+          "help": "On open text id; can be used to replace the cast bar caption.",
+          "db_column_name": "data6",
+          "value_type": "int"
+        },
+        {
+          "name": "LOS ok",
+          "help": "Usable without line of sight.",
+          "db_column_name": "data7",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Allow mounted",
+          "help": "Usable while mounted.",
+          "db_column_name": "data8",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Is large",
+          "db_column_name": "data9",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: chest",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 3
+      },
+      "fields": [
+        {
+          "name": "Lock id",
+          "help": "Lock id (Lock.dbc).",
+          "db_column_name": "data0",
+          "value_type": "LockParameter"
+        },
+        {
+          "name": "Loot id",
+          "help": "loot template id (gameobject_loot_template)",
+          "db_column_name": "data1",
+          "value_type": "LootGameObjectParameter"
+        },
+        {
+          "name": "Restock time (s)",
+          "help": "Chest restock time in seconds.",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Is consumable",
+          "help": "Despawn after use.",
+          "db_column_name": "data3",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Min success opens",
+          "help": "Minimum number of successful opens (e.g. mining veins).",
+          "db_column_name": "data4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max success opens",
+          "help": "Maximum number of successful opens.",
+          "db_column_name": "data5",
+          "value_type": "uint"
+        },
+        {
+          "name": "On looted event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data6",
+          "value_type": "int"
+        },
+        {
+          "name": "Linked trap entry",
+          "help": "Gameobject entry of the linked trap.",
+          "db_column_name": "data7",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Required quest id",
+          "help": "Quest required for GO activation for player (not used currently).",
+          "db_column_name": "data8",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Level",
+          "help": "Object level.",
+          "db_column_name": "data9",
+          "value_type": "uint"
+        },
+        {
+          "name": "LOS ok",
+          "help": "Usable without line of sight.",
+          "db_column_name": "data10",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Leave loot",
+          "db_column_name": "data11",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Not in combat",
+          "help": "Cannot be used while in combat.",
+          "db_column_name": "data12",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Log loot",
+          "db_column_name": "data13",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "On open text id",
+          "help": "On open text id; can be used to replace the cast bar caption.",
+          "db_column_name": "data14",
+          "value_type": "uint"
+        },
+        {
+          "name": "Use group loot rules",
+          "db_column_name": "data15",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Floating tooltip",
+          "db_column_name": "data16",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: generic",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 5
+      },
+      "fields": [
+        {
+          "name": "Floating tooltip",
+          "db_column_name": "data0",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Highlight",
+          "db_column_name": "data1",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Server only",
+          "db_column_name": "data2",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Is large",
+          "db_column_name": "data3",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Float on water",
+          "db_column_name": "data4",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Required quest id",
+          "help": "Quest required for the object to be usable/visible.",
+          "db_column_name": "data5",
+          "value_type": "QuestParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: trap",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 6
+      },
+      "fields": [
+        {
+          "name": "Lock id",
+          "help": "Lock id (Lock.dbc).",
+          "db_column_name": "data0",
+          "value_type": "LockParameter"
+        },
+        {
+          "name": "Level",
+          "help": "Object level.",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Diameter",
+          "help": "Diameter for trap activation (radius x 2).",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spell id",
+          "help": "Spell cast when the trap triggers.",
+          "db_column_name": "data3",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Charges",
+          "help": "Need respawn (if > 0).",
+          "db_column_name": "data4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Cooldown (s)",
+          "help": "Cooldown time in seconds.",
+          "db_column_name": "data5",
+          "value_type": "uint"
+        },
+        {
+          "name": "Auto close time",
+          "help": "Time in ms until autoclose (seconds = value / 1000; prior to 3.0.3 the conversion was / 0x10000).",
+          "db_column_name": "data6",
+          "value_type": "int"
+        },
+        {
+          "name": "Start delay (s)",
+          "help": "Delay in seconds before the trap arms.",
+          "db_column_name": "data7",
+          "value_type": "uint"
+        },
+        {
+          "name": "Server only",
+          "db_column_name": "data8",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Is stealthed",
+          "db_column_name": "data9",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Is large",
+          "db_column_name": "data10",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Is invisible",
+          "db_column_name": "data11",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "On open text id",
+          "help": "On open text id; can be used to replace the cast bar caption.",
+          "db_column_name": "data12",
+          "value_type": "uint"
+        },
+        {
+          "name": "On close text id",
+          "help": "On close text id.",
+          "db_column_name": "data13",
+          "value_type": "uint"
+        },
+        {
+          "name": "Ignore totems",
+          "db_column_name": "data14",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: chair",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 7
+      },
+      "fields": [
+        {
+          "name": "Slots",
+          "help": "Number of sitting slots.",
+          "db_column_name": "data0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Height",
+          "help": "Chair height (sitting animation 0-4).",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Only creator use",
+          "help": "Usable only by its creator.",
+          "db_column_name": "data2",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Triggered event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data3",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: spell focus",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 8
+      },
+      "fields": [
+        {
+          "name": "Spell focus type",
+          "help": "Spell focus object type (SpellFocusObject.dbc).",
+          "db_column_name": "data0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Radius",
+          "help": "Distance in which the focus applies.",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Linked trap entry",
+          "help": "Gameobject entry of the linked trap.",
+          "db_column_name": "data2",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Server only",
+          "db_column_name": "data3",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Required quest id",
+          "help": "Quest required for the object to be usable/visible.",
+          "db_column_name": "data4",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Is large",
+          "db_column_name": "data5",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Floating tooltip",
+          "db_column_name": "data6",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: text",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 9
+      },
+      "fields": [
+        {
+          "name": "Page id",
+          "help": "Text page shown on use (page_text).",
+          "db_column_name": "data0",
+          "value_type": "TableReference(page_text#entry)Parameter"
+        },
+        {
+          "name": "Language",
+          "help": "Language id (Languages.dbc).",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Page material",
+          "help": "Page material id (PageTextMaterial.dbc).",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Allow mounted",
+          "help": "Usable while mounted.",
+          "db_column_name": "data3",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: goober",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 10
+      },
+      "fields": [
+        {
+          "name": "Lock id",
+          "help": "Lock id (Lock.dbc).",
+          "db_column_name": "data0",
+          "value_type": "LockParameter"
+        },
+        {
+          "name": "Required quest id",
+          "help": "Quest required for GO activation for player.",
+          "db_column_name": "data1",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Triggered event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Auto close time",
+          "help": "Time in ms until autoclose (seconds = value / 1000; prior to 3.0.3 the conversion was / 0x10000).",
+          "db_column_name": "data3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Custom anim",
+          "help": "Custom animation played on use.",
+          "db_column_name": "data4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Is consumable",
+          "help": "Despawn after use.",
+          "db_column_name": "data5",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Cooldown (s)",
+          "help": "Cooldown time in seconds.",
+          "db_column_name": "data6",
+          "value_type": "int"
+        },
+        {
+          "name": "Page id",
+          "help": "Text page shown on use (page_text).",
+          "db_column_name": "data7",
+          "value_type": "TableReference(page_text#entry)Parameter"
+        },
+        {
+          "name": "Language",
+          "help": "Language id (Languages.dbc).",
+          "db_column_name": "data8",
+          "value_type": "uint"
+        },
+        {
+          "name": "Page material",
+          "help": "Page material id (PageTextMaterial.dbc).",
+          "db_column_name": "data9",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spell id",
+          "help": "Spell cast on use.",
+          "db_column_name": "data10",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Immune to damage",
+          "db_column_name": "data11",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Linked trap entry",
+          "help": "Gameobject entry of the linked trap.",
+          "db_column_name": "data12",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Is large",
+          "db_column_name": "data13",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "On open text id",
+          "help": "On open text id; can be used to replace the cast bar caption.",
+          "db_column_name": "data14",
+          "value_type": "uint"
+        },
+        {
+          "name": "On close text id",
+          "help": "On close text id.",
+          "db_column_name": "data15",
+          "value_type": "uint"
+        },
+        {
+          "name": "Is PvP object",
+          "help": "Flags used only in battlegrounds.",
+          "db_column_name": "data16",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Allow mounted",
+          "help": "Usable while mounted.",
+          "db_column_name": "data17",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Floating tooltip",
+          "db_column_name": "data18",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Gossip menu id",
+          "help": "Gossip menu shown on use (gossip_menu).",
+          "db_column_name": "data19",
+          "value_type": "GossipMenuParameter"
+        },
+        {
+          "name": "World state sets state",
+          "help": "World state set by the goober.",
+          "db_column_name": "data20",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: transport",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 11
+      },
+      "fields": [
+        {
+          "name": "Pause",
+          "help": "Time to pause.",
+          "db_column_name": "data0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Start as opened",
+          "db_column_name": "data1",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Auto close time",
+          "help": "Time in ms until autoclose (seconds = value / 1000; prior to 3.0.3 the conversion was / 0x10000).",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Pause 1 event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Pause 2 event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data4",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: area damage",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 12
+      },
+      "fields": [
+        {
+          "name": "Lock id",
+          "help": "Lock id (Lock.dbc).",
+          "db_column_name": "data0",
+          "value_type": "LockParameter"
+        },
+        {
+          "name": "Radius",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Min damage",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max damage",
+          "db_column_name": "data3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Damage school",
+          "help": "Spell school of the damage dealt.",
+          "db_column_name": "data4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Auto close time",
+          "help": "Time in ms until autoclose (seconds = value / 1000; prior to 3.0.3 the conversion was / 0x10000).",
+          "db_column_name": "data5",
+          "value_type": "uint"
+        },
+        {
+          "name": "On open text id",
+          "help": "On open text id; can be used to replace the cast bar caption.",
+          "db_column_name": "data6",
+          "value_type": "int"
+        },
+        {
+          "name": "On close text id",
+          "help": "On close text id.",
+          "db_column_name": "data7",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: camera",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 13
+      },
+      "fields": [
+        {
+          "name": "Lock id",
+          "help": "Lock id (Lock.dbc).",
+          "db_column_name": "data0",
+          "value_type": "LockParameter"
+        },
+        {
+          "name": "Cinematic id",
+          "help": "Cinematic sequence played on use (CinematicSequences.dbc).",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Triggered event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "On open text id",
+          "help": "On open text id; can be used to replace the cast bar caption.",
+          "db_column_name": "data3",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: mo transport",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 15
+      },
+      "fields": [
+        {
+          "name": "Taxi path id",
+          "help": "Path the transport moves along (TaxiPath.dbc).",
+          "db_column_name": "data0",
+          "value_type": "TaxiPathParameter"
+        },
+        {
+          "name": "Move speed",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Acceleration rate",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "On start event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data3",
+          "value_type": "uint"
+        },
+        {
+          "name": "On stop event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Transport physics",
+          "db_column_name": "data5",
+          "value_type": "uint"
+        },
+        {
+          "name": "Map id",
+          "help": "Map the transport travels to.",
+          "db_column_name": "data6",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "World state 1",
+          "db_column_name": "data7",
+          "value_type": "uint"
+        },
+        {
+          "name": "Can be stopped",
+          "db_column_name": "data8",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: summoning ritual",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 18
+      },
+      "fields": [
+        {
+          "name": "Required participants",
+          "help": "Number of casters required to complete the ritual.",
+          "db_column_name": "data0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spell id",
+          "help": "Spell cast when the ritual completes.",
+          "db_column_name": "data1",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Anim spell id",
+          "help": "Spell used for the channel animation.",
+          "db_column_name": "data2",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Ritual persistent",
+          "help": "Ritual persists after the summon.",
+          "db_column_name": "data3",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Caster target spell id",
+          "help": "Spell cast on the target of the casters.",
+          "db_column_name": "data4",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Caster target spell targets",
+          "help": "Targets of the caster target spell.",
+          "db_column_name": "data5",
+          "value_type": "uint"
+        },
+        {
+          "name": "Casters grouped",
+          "help": "Casters must be in the same group.",
+          "db_column_name": "data6",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Ritual no target check",
+          "help": "Do not check the ritual target.",
+          "db_column_name": "data7",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: guard post",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 21
+      },
+      "fields": [
+        {
+          "name": "Creature entry",
+          "help": "Creature spawned by the guard post.",
+          "db_column_name": "data0",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Charges",
+          "db_column_name": "data1",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: spell caster",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 22
+      },
+      "fields": [
+        {
+          "name": "Spell id",
+          "help": "Spell cast on use.",
+          "db_column_name": "data0",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Charges",
+          "help": "Number of uses before despawn.",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Party only",
+          "help": "Usable only by party members of the summoner.",
+          "db_column_name": "data2",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Allow mounted",
+          "help": "Is usable while on mount (0/1).",
+          "db_column_name": "data3",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Is large",
+          "db_column_name": "data4",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Condition id 1",
+          "db_column_name": "data5",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: meeting stone",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 23
+      },
+      "fields": [
+        {
+          "name": "Min level",
+          "db_column_name": "data0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max level",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Area id",
+          "help": "Area the meeting stone belongs to.",
+          "db_column_name": "data2",
+          "value_type": "ZoneAreaParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: flag stand",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 24
+      },
+      "fields": [
+        {
+          "name": "Lock id",
+          "help": "Lock id (Lock.dbc).",
+          "db_column_name": "data0",
+          "value_type": "LockParameter"
+        },
+        {
+          "name": "On pickup spell id",
+          "help": "Spell cast when the flag is picked up.",
+          "db_column_name": "data1",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Radius",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Return aura spell id",
+          "help": "Aura applied when the flag is returned.",
+          "db_column_name": "data3",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Return spell id",
+          "help": "Spell cast when the flag is returned.",
+          "db_column_name": "data4",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Immune to damage",
+          "db_column_name": "data5",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "On open text id",
+          "help": "On open text id; can be used to replace the cast bar caption.",
+          "db_column_name": "data6",
+          "value_type": "int"
+        },
+        {
+          "name": "LOS ok",
+          "help": "Usable without line of sight.",
+          "db_column_name": "data7",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: fishing hole",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 25
+      },
+      "fields": [
+        {
+          "name": "Radius",
+          "help": "How close the bobber must land for sending loot.",
+          "db_column_name": "data0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Loot id",
+          "help": "loot template id (fishing hole loot)",
+          "db_column_name": "data1",
+          "value_type": "LootGameObjectParameter"
+        },
+        {
+          "name": "Min success opens",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max success opens",
+          "db_column_name": "data3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Lock id",
+          "help": "Lock id (Lock.dbc); possibly 1628 for all.",
+          "db_column_name": "data4",
+          "value_type": "LockParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: flag drop",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 26
+      },
+      "fields": [
+        {
+          "name": "Lock id",
+          "help": "Lock id (Lock.dbc).",
+          "db_column_name": "data0",
+          "value_type": "LockParameter"
+        },
+        {
+          "name": "Triggered event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "On pickup spell id",
+          "help": "Spell cast when the flag is picked up.",
+          "db_column_name": "data2",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Immune to damage",
+          "db_column_name": "data3",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "On open text id",
+          "help": "On open text id; can be used to replace the cast bar caption.",
+          "db_column_name": "data4",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: mini game",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 27
+      },
+      "fields": [
+        {
+          "name": "Game type",
+          "db_column_name": "data0",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: capture point",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 29
+      },
+      "fields": [
+        {
+          "name": "Radius",
+          "db_column_name": "data0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spell id",
+          "help": "Visual spell of the capture point.",
+          "db_column_name": "data1",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "World state 1",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "World state 2",
+          "db_column_name": "data3",
+          "value_type": "uint"
+        },
+        {
+          "name": "On win event id 1",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data4",
+          "value_type": "uint"
+        },
+        {
+          "name": "On win event id 2",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data5",
+          "value_type": "uint"
+        },
+        {
+          "name": "On contested event id 1",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data6",
+          "value_type": "int"
+        },
+        {
+          "name": "On contested event id 2",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data7",
+          "value_type": "uint"
+        },
+        {
+          "name": "On progress event id 1",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data8",
+          "value_type": "uint"
+        },
+        {
+          "name": "On progress event id 2",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data9",
+          "value_type": "uint"
+        },
+        {
+          "name": "On neutral event id 1",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data10",
+          "value_type": "uint"
+        },
+        {
+          "name": "On neutral event id 2",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data11",
+          "value_type": "uint"
+        },
+        {
+          "name": "Neutral percent",
+          "db_column_name": "data12",
+          "value_type": "uint"
+        },
+        {
+          "name": "World state 3",
+          "db_column_name": "data13",
+          "value_type": "uint"
+        },
+        {
+          "name": "Min superiority",
+          "db_column_name": "data14",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max superiority",
+          "db_column_name": "data15",
+          "value_type": "uint"
+        },
+        {
+          "name": "Min time",
+          "db_column_name": "data16",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max time",
+          "db_column_name": "data17",
+          "value_type": "uint"
+        },
+        {
+          "name": "Is large",
+          "db_column_name": "data18",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Highlight",
+          "db_column_name": "data19",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Starting value",
+          "db_column_name": "data20",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unidirectional",
+          "db_column_name": "data21",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: aura generator",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 30
+      },
+      "fields": [
+        {
+          "name": "Start as opened",
+          "db_column_name": "data0",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Radius",
+          "db_column_name": "data1",
+          "value_type": "int"
+        },
+        {
+          "name": "Aura 1 spell id",
+          "help": "Aura applied inside the radius.",
+          "db_column_name": "data2",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Condition id 1",
+          "db_column_name": "data3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Aura 2 spell id",
+          "help": "Alternative aura applied inside the radius.",
+          "db_column_name": "data4",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Condition id 2",
+          "db_column_name": "data5",
+          "value_type": "uint"
+        },
+        {
+          "name": "Server only",
+          "db_column_name": "data6",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: dungeon difficulty",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 31
+      },
+      "fields": [
+        {
+          "name": "Map id",
+          "db_column_name": "data0",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Difficulty",
+          "db_column_name": "data1",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: barber chair",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 32
+      },
+      "fields": [
+        {
+          "name": "Chair height",
+          "db_column_name": "data0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Height offset",
+          "db_column_name": "data1",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: destructible building",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 33
+      },
+      "fields": [
+        {
+          "name": "Intact num hits",
+          "db_column_name": "data0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Credit proxy creature",
+          "help": "Creature awarded kill credit on destruction.",
+          "db_column_name": "data1",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Unused",
+          "db_column_name": "data2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Intact event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Damaged display id",
+          "db_column_name": "data4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Damaged num hits",
+          "db_column_name": "data5",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unknown 1",
+          "db_column_name": "data6",
+          "value_type": "int"
+        },
+        {
+          "name": "Unknown 2",
+          "db_column_name": "data7",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unknown 3",
+          "db_column_name": "data8",
+          "value_type": "uint"
+        },
+        {
+          "name": "Damaged event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data9",
+          "value_type": "uint"
+        },
+        {
+          "name": "Destroyed display id",
+          "db_column_name": "data10",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unknown 4",
+          "db_column_name": "data11",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unknown 5",
+          "db_column_name": "data12",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unknown 6",
+          "db_column_name": "data13",
+          "value_type": "uint"
+        },
+        {
+          "name": "Destroyed event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data14",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unused",
+          "db_column_name": "data15",
+          "value_type": "uint"
+        },
+        {
+          "name": "Rebuilding time (s)",
+          "help": "Unknown, only few with value 300.",
+          "db_column_name": "data16",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unused",
+          "db_column_name": "data17",
+          "value_type": "uint"
+        },
+        {
+          "name": "Destructible data",
+          "help": "m_ID of DestructibleModelData.dbc.",
+          "db_column_name": "data18",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unused",
+          "db_column_name": "data19",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unknown 7",
+          "db_column_name": "data20",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unused",
+          "db_column_name": "data21",
+          "value_type": "uint"
+        },
+        {
+          "name": "Rebuilding event id",
+          "help": "event id, executed as dbscripts_on_event / used by scripts",
+          "db_column_name": "data22",
+          "value_type": "uint"
+        },
+        {
+          "name": "Unknown 8",
+          "db_column_name": "data23",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: trap door",
+      "show_if": {
+        "db_column_name": "type",
+        "value": 35
+      },
+      "fields": [
+        {
+          "name": "When to pause",
+          "db_column_name": "data0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Start as opened",
+          "db_column_name": "data1",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Auto close",
+          "db_column_name": "data2",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Loot",
+      "fields": [
+        {
+          "name": "Min Money",
+          "help": "Minimum money contained in the object's loot (chests).",
+          "db_column_name": "mingold",
+          "value_type": "MoneyParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Max Money",
+          "help": "Maximum money contained in the object's loot (chests).",
+          "db_column_name": "maxgold",
+          "value_type": "MoneyParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Scripts",
+      "fields": [
+        {
+          "name": "Custom Data 1",
+          "help": "CMaNGOS-specific extra data field used by some gameobject types.",
+          "db_column_name": "CustomData1",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "String Id",
+          "db_column_name": "StringId",
+          "value_type": "TableReference(string_id#Id)Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Script Name",
+          "help": "Core (ScriptDevAI) script name bound to this gameobject.",
+          "db_column_name": "ScriptName",
+          "value_type": "string"
+        }
+      ]
+    },
+    {
+      "group_name": "Addon (gameobject_template_addon)",
+      "fields": [
+        {
+          "name": "Art Kit 0",
+          "help": "Art kit id altering the object's visuals (0 = none).",
+          "db_column_name": "Artkit0",
+          "foreign_table": "gameobject_template_addon",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Art Kit 1",
+          "help": "Art kit id altering the object's visuals (0 = none).",
+          "db_column_name": "Artkit1",
+          "foreign_table": "gameobject_template_addon",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Art Kit 2",
+          "help": "Art kit id altering the object's visuals (0 = none).",
+          "db_column_name": "Artkit2",
+          "foreign_table": "gameobject_template_addon",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Art Kit 3",
+          "help": "Art kit id altering the object's visuals (0 = none).",
+          "db_column_name": "Artkit3",
+          "foreign_table": "gameobject_template_addon",
+          "value_type": "int",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Related tables",
+      "fields": [
+        {
+          "name": "Spawns",
+          "help": "All spawns of this gameobject.",
+          "meta": "table:gameobject;`id` = {entry}"
+        },
+        {
+          "name": "Spawn Entry Variants",
+          "help": "Spawns randomly choosing this entry.",
+          "meta": "table:gameobject_spawn_entry;`entry` = {entry}"
+        },
+        {
+          "name": "Quest Starter",
+          "help": "Quests started by this object.",
+          "meta": "table:gameobject_questrelation;`id` = {entry}"
+        },
+        {
+          "name": "Quest Ender",
+          "help": "Quests ended by this object.",
+          "meta": "table:gameobject_involvedrelation;`id` = {entry}"
+        }
+      ]
+    }
+  ]
+}

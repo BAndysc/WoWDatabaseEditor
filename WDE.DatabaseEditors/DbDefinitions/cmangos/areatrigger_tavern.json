@@ -1,0 +1,44 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Areatrigger Tavern",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Area triggers that mark taverns and inns: a player entering the trigger is put into the resting state (rest bonus, ability to log out instantly).",
+  "table_name": "areatrigger_tavern",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Areatriggers",
+  "icon_path": "Icons/document_areatrigger.png",
+  "reload_command": "reload areatrigger_tavern",
+  "picker": "AreaTriggerParameter",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "help": "Area trigger id from AreaTrigger.dbc.",
+          "db_column_name": "id",
+          "value_type": "AreaTriggerParameter",
+          "preferred_width": 173.0
+        },
+        {
+          "name": "Name",
+          "help": "Informational comment only, not read by the core.",
+          "db_column_name": "name",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 512.0
+        }
+      ]
+    }
+  ]
+}

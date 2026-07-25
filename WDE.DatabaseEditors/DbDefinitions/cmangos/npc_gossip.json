@@ -1,0 +1,43 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Npc Gossip",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Per-spawn override of the default gossip text: maps a creature spawn GUID to the npc_text shown when the player talks to that specific creature and no gossip menu applies.",
+  "table_name": "npc_gossip",
+  "table_index_name": "npc_guid",
+  "record_mode": "SingleRow",
+  "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_gossip_creature.png",
+  "reload_command": "reload npc_gossip",
+  "picker": "CreatureGUIDParameter",
+  "primary_key": [
+    "npc_guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Npc Guid",
+          "db_column_name": "npc_guid",
+          "value_type": "CreatureGUIDParameter"
+        },
+        {
+          "name": "Text Id",
+          "db_column_name": "textid",
+          "value_type": "NpcTextParameter"
+        },
+        {
+          "name": "Text",
+          "help": "Open the npc_text shown for this creature.",
+          "meta": "table:npc_text;`ID` = {textid}"
+        }
+      ]
+    }
+  ]
+}

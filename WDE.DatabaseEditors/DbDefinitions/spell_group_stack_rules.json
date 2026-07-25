@@ -1,7 +1,7 @@
 {
   "id": "spell_group_stack_rules",
   "compatibility": [
-    "TrinityWrath", "TrinityCata"
+    "TrinityWrath", "TrinityCata", "TrinityMaster"
   ],
   "name": "Spell Group Stack Rules",
   "single_solution_name": "Spell Group Stack Rules Table",

@@ -1,0 +1,52 @@
+{
+  "id": "spell_pet_auras_wotlk",
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Pet Auras",
+  "description": "Auras applied to a player's pet when the owner has the given (dummy) spell, e.g. talents that passively buff the pet. The trigger spell effect must be a dummy effect or dummy aura.",
+  "table_name": "spell_pet_auras",
+  "table_index_name": "spell",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "SpellParameter",
+  "reload_command": "reload spell_pet_auras",
+  "primary_key": [
+    "spell",
+    "effectId",
+    "pet"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "spell",
+          "value_type": "SpellParameter",
+          "help": "Owner's spell with a dummy effect or dummy aura that triggers the pet aura"
+        },
+        {
+          "name": "Effect Index",
+          "db_column_name": "effectId",
+          "value_type": "SpellEffectIndexParameter",
+          "help": "Index of the dummy effect/aura within the trigger spell"
+        },
+        {
+          "name": "Pet",
+          "db_column_name": "pet",
+          "value_type": "CreatureParameter",
+          "zero_is_blank": true,
+          "help": "Creature entry of the pet the aura applies to, 0 = default for all pets"
+        },
+        {
+          "name": "Aura",
+          "db_column_name": "aura",
+          "value_type": "SpellParameter",
+          "help": "Aura spell cast on the pet"
+        }
+      ]
+    }
+  ]
+}

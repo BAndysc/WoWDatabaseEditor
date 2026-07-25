@@ -1,0 +1,122 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK",
+    "CMaNGOS-TBC"
+  ],
+  "name": "Creature Spawn Data Template",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "A reusable spawn-time override template for creature_template values (npc/unit flags, faction, model, equipment, health/mana, spawn behavior flags), applied to spawns that reference it instead of repeating the same overrides on every guid.",
+  "table_name": "creature_spawn_data_template",
+  "table_index_name": "Entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Templates",
+  "icon_path": "Icons/document_creature_template.png",
+  "primary_key": [
+    "Entry",
+    "NpcFlags",
+    "UnitFlags",
+    "ModelId",
+    "EquipmentId",
+    "CurHealth",
+    "CurMana",
+    "SpawnFlags"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Template Id",
+          "db_column_name": "Entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Npc Flags",
+          "help": "Overrides creature_template.npcflag for spawns using this template. -1 = don't override.",
+          "db_column_name": "NpcFlags",
+          "value_type": "CmangosNpcFlagsParameter",
+          "default": -1,
+          "preferred_width": 129.0
+        },
+        {
+          "name": "Unit Flags",
+          "help": "Overrides UNIT_FLAGS (low 32 bits) and UNIT_FLAGS_2 (high 32 bits) for spawns using this template; the loader reads the column as a single 64-bit value. -1 = don't override. Flag labels are wotlk names; bits whose meaning differs on TBC are annotated.",
+          "db_column_name": "UnitFlags",
+          "value_type": "CmangosUnitFlagsParameter",
+          "default": -1,
+          "preferred_width": 179.0
+        },
+        {
+          "name": "Faction",
+          "help": "Overrides creature_template.faction for spawns using this template.",
+          "db_column_name": "Faction",
+          "value_type": "FactionTemplateParameter",
+          "preferred_width": 148.0
+        },
+        {
+          "name": "Model Id",
+          "help": "Overrides the display model for spawns using this template.",
+          "db_column_name": "ModelId",
+          "value_type": "CreatureModelDataParameter",
+          "preferred_width": 160.0
+        },
+        {
+          "name": "Equipment Id",
+          "help": "Overrides the equipment_template id. -1 = don't override, 0 = no equipment.",
+          "db_column_name": "EquipmentId",
+          "value_type": "EquipmentCreatureGuidParameter",
+          "default": -1,
+          "preferred_width": 136.0
+        },
+        {
+          "name": "Cur Health",
+          "help": "Current health to spawn with (absolute, not percent).",
+          "db_column_name": "CurHealth",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "preferred_width": 121.0
+        },
+        {
+          "name": "Cur Mana",
+          "help": "Current mana/power to spawn with (absolute).",
+          "db_column_name": "CurMana",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "preferred_width": 134.0
+        },
+        {
+          "name": "Spawn Flags",
+          "db_column_name": "SpawnFlags",
+          "value_type": "CmangosSpawnFlagsParameter",
+          "preferred_width": 176.0
+        },
+        {
+          "name": "Relay Id",
+          "help": "dbscripts_on_relay script id executed on spawn, if any.",
+          "db_column_name": "RelayId",
+          "value_type": "StartRelayIdParameter",
+          "zero_is_blank": true,
+          "preferred_width": 188.0
+        },
+        {
+          "name": "String Id",
+          "help": "Optional string id (must exist as a registered ScriptMgr string id) used to target spawns using this template from db-scripts by name.",
+          "db_column_name": "StringId",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "preferred_width": 156.0
+        },
+        {
+          "name": "Name",
+          "help": "Developer-facing template name/comment (should not be empty).",
+          "db_column_name": "Name",
+          "value_type": "string",
+          "preferred_width": 230.0
+        }
+      ]
+    }
+  ]
+}

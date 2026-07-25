@@ -1,0 +1,68 @@
+{
+  "id": "player_levelstats",
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Player Level Stats",
+  "description": "Base attributes (strength, agility, stamina, intellect, spirit) for each race/class combination at each level. Used by the server to initialize player stats on login and level up.",
+  "table_name": "player_levelstats",
+  "table_index_name": "race",
+  "record_mode": "SingleRow",
+  "group_name": "Player",
+  "icon_path": "Icons/document_table.png",
+  "picker": "RaceParameter",
+  "primary_key": [
+    "race",
+    "class",
+    "level"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Race",
+          "db_column_name": "race",
+          "value_type": "RaceParameter"
+        },
+        {
+          "name": "Class",
+          "db_column_name": "class",
+          "value_type": "ClassParameter"
+        },
+        {
+          "name": "Level",
+          "db_column_name": "level",
+          "value_type": "uint"
+        },
+        {
+          "name": "Strength",
+          "db_column_name": "str",
+          "value_type": "uint"
+        },
+        {
+          "name": "Agility",
+          "db_column_name": "agi",
+          "value_type": "uint"
+        },
+        {
+          "name": "Stamina",
+          "db_column_name": "sta",
+          "value_type": "uint"
+        },
+        {
+          "name": "Intellect",
+          "db_column_name": "inte",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spirit",
+          "db_column_name": "spi",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

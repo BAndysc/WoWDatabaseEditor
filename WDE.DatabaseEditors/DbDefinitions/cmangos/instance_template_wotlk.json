@@ -1,0 +1,64 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Instance Template",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Per-instance-map settings: level limits, mount permission and the instance script. Every instanceable map should have a row here (reset times come from MapDifficulty.dbc on WoTLK).",
+  "table_name": "instance_template",
+  "table_index_name": "map",
+  "record_mode": "SingleRow",
+  "group_name": "Instance",
+  "icon_path": "Icons/document_instance_template.png",
+  "picker": "MapParameter",
+  "primary_key": [
+    "map"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Map",
+          "help": "Instanceable map id from Map.dbc.",
+          "db_column_name": "map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Parent",
+          "help": "Parent map id, set only for maps nested inside another non-continent map, 0 = none.",
+          "db_column_name": "parent",
+          "value_type": "MapParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Level Min",
+          "help": "Minimum player level to enter, 0 = no limit.",
+          "db_column_name": "levelMin",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Level Max",
+          "help": "Maximum player level allowed to enter, 0 = no limit.",
+          "db_column_name": "levelMax",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Script Name",
+          "help": "C++ InstanceData script name bound to this map.",
+          "db_column_name": "ScriptName",
+          "value_type": "string"
+        },
+        {
+          "name": "Mount Allowed",
+          "help": "Whether players can use mounts inside the instance.",
+          "db_column_name": "mountAllowed",
+          "value_type": "BoolParameter"
+        }
+      ]
+    }
+  ]
+}

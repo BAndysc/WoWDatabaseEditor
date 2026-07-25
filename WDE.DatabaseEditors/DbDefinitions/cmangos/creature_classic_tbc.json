@@ -1,0 +1,203 @@
+{
+  "id": "creature_classic_tbc",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC"
+  ],
+  "name": "Creature",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "The table contains all creature spawns",
+  "table_name": "creature",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "group_name": "Spawns",
+  "icon_path": "Icons/document_creatures.png",
+  "primary_key": [
+    "guid"
+  ],
+  "foreign_tables": [
+    {
+      "table_name": "creature_addon",
+      "foreign_key": [
+        "guid"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "db_column_name": "guid",
+          "value_type": "uint",
+          "read_only": true,
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Entry",
+          "db_column_name": "id",
+          "value_type": "CreatureParameter",
+          "preferred_width": 206.0
+        },
+        {
+          "name": "Template",
+          "meta": "tableByKey:creature_template;id",
+          "help": "Open the creature template of this spawn."
+        },
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter",
+          "preferred_width": 138.0
+        },
+        {
+          "name": "Spawn Mask",
+          "db_column_name": "spawnMask",
+          "value_type": "SpawnMaskParameter",
+          "default": 1,
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Movement Type",
+          "db_column_name": "MovementType",
+          "value_type": "CmangosMovementTypeParameter",
+          "preferred_width": 80.0
+        }
+      ]
+    },
+    {
+      "group_name": "Spawn",
+      "fields": [
+        {
+          "name": "Min spawn time secs",
+          "db_column_name": "spawntimesecsmin",
+          "value_type": "uint",
+          "default": 120,
+          "preferred_width": 106.0
+        },
+        {
+          "name": "Max spawn time secs",
+          "db_column_name": "spawntimesecsmax",
+          "value_type": "uint",
+          "default": 120,
+          "preferred_width": 106.0
+        },
+        {
+          "name": "Spawn radius",
+          "db_column_name": "spawndist",
+          "value_type": "float",
+          "default": 5,
+          "preferred_width": 88.0
+        }
+      ]
+    },
+    {
+      "group_name": "Addon",
+      "fields": [
+        {
+          "name": "Mount",
+          "db_column_name": "mount",
+          "foreign_table": "creature_addon",
+          "value_type": "CreatureModelDataParameter",
+          "preferred_width": 145.0
+        },
+        {
+          "name": "Stand State",
+          "db_column_name": "stand_state",
+          "foreign_table": "creature_addon",
+          "value_type": "StandStateParameter"
+        },
+        {
+          "name": "Sheath State",
+          "db_column_name": "sheath_state",
+          "foreign_table": "creature_addon",
+          "value_type": "SheathStateParameter",
+          "preferred_width": 98.0
+        },
+        {
+          "name": "Emote",
+          "db_column_name": "emote",
+          "foreign_table": "creature_addon",
+          "value_type": "EmoteStateParameter",
+          "preferred_width": 134.0
+        },
+        {
+          "name": "Move Flags",
+          "db_column_name": "moveflags",
+          "foreign_table": "creature_addon",
+          "value_type": "MangosSplineFlagsParameter",
+          "preferred_width": 82.0
+        },
+        {
+          "name": "Auras",
+          "db_column_name": "auras",
+          "foreign_table": "creature_addon",
+          "value_type": "MultiSpellParameter",
+          "can_be_null": true,
+          "preferred_width": 75.0
+        }
+      ]
+    },
+    {
+      "group_name": "Position",
+      "fields": [
+        {
+          "name": "X",
+          "db_column_name": "position_x",
+          "value_type": "float",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Y",
+          "db_column_name": "position_y",
+          "value_type": "float",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Z",
+          "db_column_name": "position_z",
+          "value_type": "float",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "O",
+          "db_column_name": "orientation",
+          "value_type": "float",
+          "preferred_width": 90.0
+        }
+      ]
+    },
+    {
+      "group_name": "Related tables",
+      "fields": [
+        {
+          "name": "Waypoints",
+          "meta": "table:creature_movement;`Id` = {guid}",
+          "help": "Per-guid waypoint path of this spawn."
+        },
+        {
+          "name": "Entry Variants",
+          "meta": "table:creature_spawn_entry;`guid` = {guid}",
+          "help": "Random entry choices for this spawn."
+        },
+        {
+          "name": "Spawn Data",
+          "meta": "table:creature_spawn_data;`Guid` = {guid}",
+          "help": "Spawn data template assignment."
+        },
+        {
+          "name": "Game Event",
+          "meta": "table:game_event_creature;`guid` = {guid}",
+          "help": "Game event spawning/despawning this creature."
+        },
+        {
+          "name": "Linking",
+          "meta": "table:creature_linking;`guid` = {guid} OR `master_guid` = {guid}",
+          "help": "Guid-based creature linking involving this spawn."
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "id": "script_spline_chain_waypoints",
   "compatibility": [
-    "TrinityWrath", "TrinityCata"
+    "TrinityWrath", "TrinityCata", "TrinityMaster"
   ],
   "name": "Script Spline Chain Waypoints",
   "single_solution_name": "Script Spline Chain Waypoints",

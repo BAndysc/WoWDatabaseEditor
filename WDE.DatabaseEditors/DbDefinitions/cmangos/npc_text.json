@@ -1,0 +1,572 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Npc Text",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Texts displayed in the NPC gossip window, referenced by gossip_menu.text_id and npc_gossip.textid. Each entry holds up to 8 text alternatives picked by probability; every alternative has male and female text variants, a language and up to three timed emotes.",
+  "table_name": "npc_text",
+  "table_index_name": "ID",
+  "record_mode": "SingleRow",
+  "group_name": "Texts",
+  "icon_path": "Icons/document_npc_text.png",
+  "reload_command": "reload npc_text",
+  "picker": "NpcTextParameter",
+  "primary_key": [
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "help": "Referenced by gossip_menu.text_id and npc_gossip.textid.",
+          "db_column_name": "ID",
+          "value_type": "NpcTextParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Text 0",
+      "fields": [
+        {
+          "name": "Text 0 Male",
+          "help": "Text shown when the questgiver/talking NPC addresses a male character (also used as fallback).",
+          "db_column_name": "text0_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 0 Female",
+          "help": "Text shown when the NPC addresses a female character.",
+          "db_column_name": "text0_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Language 0",
+          "db_column_name": "lang0",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 0",
+          "help": "Relative chance for this text alternative to be picked.",
+          "db_column_name": "prob0",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote 0.0 Delay",
+          "db_column_name": "em0_0",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 0.0",
+          "db_column_name": "em0_1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 0.1 Delay",
+          "db_column_name": "em0_2",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 0.1",
+          "db_column_name": "em0_3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 0.2 Delay",
+          "db_column_name": "em0_4",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 0.2",
+          "db_column_name": "em0_5",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Text 1",
+      "fields": [
+        {
+          "name": "Text 1 Male",
+          "help": "Text shown when the questgiver/talking NPC addresses a male character (also used as fallback).",
+          "db_column_name": "text1_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 1 Female",
+          "help": "Text shown when the NPC addresses a female character.",
+          "db_column_name": "text1_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Language 1",
+          "db_column_name": "lang1",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 1",
+          "help": "Relative chance for this text alternative to be picked.",
+          "db_column_name": "prob1",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote 1.0 Delay",
+          "db_column_name": "em1_0",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 1.0",
+          "db_column_name": "em1_1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 1.1 Delay",
+          "db_column_name": "em1_2",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 1.1",
+          "db_column_name": "em1_3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 1.2 Delay",
+          "db_column_name": "em1_4",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 1.2",
+          "db_column_name": "em1_5",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Text 2",
+      "fields": [
+        {
+          "name": "Text 2 Male",
+          "help": "Text shown when the questgiver/talking NPC addresses a male character (also used as fallback).",
+          "db_column_name": "text2_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 2 Female",
+          "help": "Text shown when the NPC addresses a female character.",
+          "db_column_name": "text2_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Language 2",
+          "db_column_name": "lang2",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 2",
+          "help": "Relative chance for this text alternative to be picked.",
+          "db_column_name": "prob2",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote 2.0 Delay",
+          "db_column_name": "em2_0",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 2.0",
+          "db_column_name": "em2_1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 2.1 Delay",
+          "db_column_name": "em2_2",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 2.1",
+          "db_column_name": "em2_3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 2.2 Delay",
+          "db_column_name": "em2_4",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 2.2",
+          "db_column_name": "em2_5",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Text 3",
+      "fields": [
+        {
+          "name": "Text 3 Male",
+          "help": "Text shown when the questgiver/talking NPC addresses a male character (also used as fallback).",
+          "db_column_name": "text3_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 3 Female",
+          "help": "Text shown when the NPC addresses a female character.",
+          "db_column_name": "text3_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Language 3",
+          "db_column_name": "lang3",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 3",
+          "help": "Relative chance for this text alternative to be picked.",
+          "db_column_name": "prob3",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote 3.0 Delay",
+          "db_column_name": "em3_0",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 3.0",
+          "db_column_name": "em3_1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 3.1 Delay",
+          "db_column_name": "em3_2",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 3.1",
+          "db_column_name": "em3_3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 3.2 Delay",
+          "db_column_name": "em3_4",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 3.2",
+          "db_column_name": "em3_5",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Text 4",
+      "fields": [
+        {
+          "name": "Text 4 Male",
+          "help": "Text shown when the questgiver/talking NPC addresses a male character (also used as fallback).",
+          "db_column_name": "text4_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 4 Female",
+          "help": "Text shown when the NPC addresses a female character.",
+          "db_column_name": "text4_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Language 4",
+          "db_column_name": "lang4",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 4",
+          "help": "Relative chance for this text alternative to be picked.",
+          "db_column_name": "prob4",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote 4.0 Delay",
+          "db_column_name": "em4_0",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 4.0",
+          "db_column_name": "em4_1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 4.1 Delay",
+          "db_column_name": "em4_2",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 4.1",
+          "db_column_name": "em4_3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 4.2 Delay",
+          "db_column_name": "em4_4",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 4.2",
+          "db_column_name": "em4_5",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Text 5",
+      "fields": [
+        {
+          "name": "Text 5 Male",
+          "help": "Text shown when the questgiver/talking NPC addresses a male character (also used as fallback).",
+          "db_column_name": "text5_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 5 Female",
+          "help": "Text shown when the NPC addresses a female character.",
+          "db_column_name": "text5_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Language 5",
+          "db_column_name": "lang5",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 5",
+          "help": "Relative chance for this text alternative to be picked.",
+          "db_column_name": "prob5",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote 5.0 Delay",
+          "db_column_name": "em5_0",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 5.0",
+          "db_column_name": "em5_1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 5.1 Delay",
+          "db_column_name": "em5_2",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 5.1",
+          "db_column_name": "em5_3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 5.2 Delay",
+          "db_column_name": "em5_4",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 5.2",
+          "db_column_name": "em5_5",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Text 6",
+      "fields": [
+        {
+          "name": "Text 6 Male",
+          "help": "Text shown when the questgiver/talking NPC addresses a male character (also used as fallback).",
+          "db_column_name": "text6_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 6 Female",
+          "help": "Text shown when the NPC addresses a female character.",
+          "db_column_name": "text6_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Language 6",
+          "db_column_name": "lang6",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 6",
+          "help": "Relative chance for this text alternative to be picked.",
+          "db_column_name": "prob6",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote 6.0 Delay",
+          "db_column_name": "em6_0",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 6.0",
+          "db_column_name": "em6_1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 6.1 Delay",
+          "db_column_name": "em6_2",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 6.1",
+          "db_column_name": "em6_3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 6.2 Delay",
+          "db_column_name": "em6_4",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 6.2",
+          "db_column_name": "em6_5",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Text 7",
+      "fields": [
+        {
+          "name": "Text 7 Male",
+          "help": "Text shown when the questgiver/talking NPC addresses a male character (also used as fallback).",
+          "db_column_name": "text7_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 7 Female",
+          "help": "Text shown when the NPC addresses a female character.",
+          "db_column_name": "text7_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Language 7",
+          "db_column_name": "lang7",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 7",
+          "help": "Relative chance for this text alternative to be picked.",
+          "db_column_name": "prob7",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote 7.0 Delay",
+          "db_column_name": "em7_0",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 7.0",
+          "db_column_name": "em7_1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 7.1 Delay",
+          "db_column_name": "em7_2",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 7.1",
+          "db_column_name": "em7_3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 7.2 Delay",
+          "db_column_name": "em7_4",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 7.2",
+          "db_column_name": "em7_5",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Related tables",
+      "fields": [
+        {
+          "name": "Broadcast Texts",
+          "help": "Open the broadcast-text based version of this npc_text.",
+          "meta": "table:npc_text_broadcast_text;`Id` = {ID}"
+        }
+      ]
+    }
+  ]
+}

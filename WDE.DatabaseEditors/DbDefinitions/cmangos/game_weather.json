@@ -1,0 +1,106 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Game Weather",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Percent chances for rain, snow and storm weather per zone and season (each season lasts a quarter of the year). Zones without a row use a default 25% chance for each weather type; chances above 100 are reset to 25.",
+  "table_name": "game_weather",
+  "table_index_name": "zone",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_stormynight.png",
+  "picker": "ZoneAreaParameter",
+  "primary_key": [
+    "zone"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Zone",
+          "help": "Zone the weather chances apply to. Not every zone supports weather changes.",
+          "db_column_name": "zone",
+          "value_type": "ZoneAreaParameter"
+        },
+        {
+          "name": "Spring Rain Chance",
+          "db_column_name": "spring_rain_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        },
+        {
+          "name": "Spring Snow Chance",
+          "db_column_name": "spring_snow_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        },
+        {
+          "name": "Spring Storm Chance",
+          "db_column_name": "spring_storm_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        },
+        {
+          "name": "Summer Rain Chance",
+          "db_column_name": "summer_rain_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        },
+        {
+          "name": "Summer Snow Chance",
+          "db_column_name": "summer_snow_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        },
+        {
+          "name": "Summer Storm Chance",
+          "db_column_name": "summer_storm_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        },
+        {
+          "name": "Fall Rain Chance",
+          "db_column_name": "fall_rain_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        },
+        {
+          "name": "Fall Snow Chance",
+          "db_column_name": "fall_snow_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        },
+        {
+          "name": "Fall Storm Chance",
+          "db_column_name": "fall_storm_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        },
+        {
+          "name": "Winter Rain Chance",
+          "db_column_name": "winter_rain_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        },
+        {
+          "name": "Winter Snow Chance",
+          "db_column_name": "winter_snow_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        },
+        {
+          "name": "Winter Storm Chance",
+          "db_column_name": "winter_storm_chance",
+          "value_type": "PercentageParameter",
+          "default": 25
+        }
+      ]
+    }
+  ]
+}

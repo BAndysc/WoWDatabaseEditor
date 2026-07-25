@@ -1,0 +1,41 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Worldstate Expression",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Server-evaluated expressions over worldstate values, encoded as a hex string in the client WorldStateExpression binary format. Referenced by combat_condition and other systems to gate behaviour on map/world state.",
+  "table_name": "worldstate_expression",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_code.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "Id",
+          "value_type": "WorldStateNameParameter",
+          "preferred_width": 375.0
+        },
+        {
+          "name": "Expression",
+          "help": "Hex-encoded binary expression (client WorldStateExpression format) evaluated against worldstate values. Use the picker to edit it in a structured editor.",
+          "db_column_name": "Expression",
+          "value_type": "WorldStateExpressionStringParameter",
+          "preferred_width": 435.0
+        }
+      ]
+    }
+  ]
+}

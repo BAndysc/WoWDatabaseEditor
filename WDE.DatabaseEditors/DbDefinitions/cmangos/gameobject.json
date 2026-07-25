@@ -1,9 +1,10 @@
 {
-  "id": "gameobject",
   "compatibility": [
     "CMaNGOS-WoTLK"
   ],
   "name": "Gameobject",
+  "single_solution_name": "",
+  "multi_solution_name": "",
   "description": "The table contains all gameobject spawns",
   "table_name": "gameobject",
   "table_index_name": "guid",
@@ -12,6 +13,14 @@
   "icon_path": "Icons/document_gameobjects.png",
   "primary_key": [
     "guid"
+  ],
+  "foreign_tables": [
+    {
+      "table_name": "gameobject_addon",
+      "foreign_key": [
+        "guid"
+      ]
+    }
   ],
   "groups": [
     {
@@ -27,6 +36,11 @@
           "name": "Entry",
           "db_column_name": "id",
           "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Template",
+          "help": "Open the gameobject template of this spawn.",
+          "meta": "tableByKey:gameobject_template;id"
         },
         {
           "name": "Map",
@@ -46,17 +60,86 @@
           "default": 1
         },
         {
-          "name": "Position X",
+          "name": "Min spawn time secs",
+          "db_column_name": "spawntimesecsmin",
+          "value_type": "int"
+        },
+        {
+          "name": "Max spawn time secs",
+          "db_column_name": "spawntimesecsmax",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Addon",
+      "fields": [
+        {
+          "name": "Anim progress",
+          "db_column_name": "animprogress",
+          "foreign_table": "gameobject_addon",
+          "value_type": "uint",
+          "default": 255
+        },
+        {
+          "name": "State",
+          "help": "GOState override for this spawn. -1 = no override (falls back to the gameobject spawn's default state).",
+          "db_column_name": "state",
+          "foreign_table": "gameobject_addon",
+          "value_type": "GameobjectStateOrMinus1Parameter",
+          "default": -1
+        },
+        {
+          "name": "Path Rotation 0",
+          "help": "Quaternion X. Used mainly for transports/paths; the (x,y,z,w) quaternion must be a unit quaternion or it is reset to identity by the loader.",
+          "db_column_name": "path_rotation0",
+          "foreign_table": "gameobject_addon",
+          "value_type": "float"
+        },
+        {
+          "name": "Path Rotation 1",
+          "db_column_name": "path_rotation1",
+          "foreign_table": "gameobject_addon",
+          "value_type": "float"
+        },
+        {
+          "name": "Path Rotation 2",
+          "db_column_name": "path_rotation2",
+          "foreign_table": "gameobject_addon",
+          "value_type": "float"
+        },
+        {
+          "name": "Path Rotation 3",
+          "help": "Quaternion W (default 1.0 = identity rotation).",
+          "db_column_name": "path_rotation3",
+          "foreign_table": "gameobject_addon",
+          "value_type": "float",
+          "default": 1
+        },
+        {
+          "name": "String Id",
+          "help": "Optional string id (must exist as registered via dbscripts SET_STRING_ID / ScriptMgr string ids) used to target this gameobject from db-scripts by name instead of guid.",
+          "db_column_name": "StringId",
+          "foreign_table": "gameobject_addon",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Position",
+      "fields": [
+        {
+          "name": "X",
           "db_column_name": "position_x",
           "value_type": "float"
         },
         {
-          "name": "Position Y",
+          "name": "Y",
           "db_column_name": "position_y",
           "value_type": "float"
         },
         {
-          "name": "Position Z",
+          "name": "Z",
           "db_column_name": "position_z",
           "value_type": "float"
         },
@@ -84,16 +167,21 @@
           "name": "Rotation 3",
           "db_column_name": "rotation3",
           "value_type": "float"
+        }
+      ]
+    },
+    {
+      "group_name": "Related tables",
+      "fields": [
+        {
+          "name": "Entry Variants",
+          "help": "Random entry choices for this spawn.",
+          "meta": "table:gameobject_spawn_entry;`guid` = {guid}"
         },
         {
-          "name": "Spawn time secs min",
-          "db_column_name": "spawntimesecsmin",
-          "value_type": "int"
-        },
-        {
-          "name": "Spawn time secs max",
-          "db_column_name": "spawntimesecsmax",
-          "value_type": "int"
+          "name": "Game Event",
+          "help": "Game event spawning/despawning this object.",
+          "meta": "table:game_event_gameobject;`guid` = {guid}"
         }
       ]
     }

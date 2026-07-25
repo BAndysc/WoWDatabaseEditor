@@ -1,0 +1,47 @@
+{
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Item Enchantment Template",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Random enchantment rolls: when an item with RandomProperty/RandomSuffix set in item_template is created, one enchantment is picked from all rows sharing the same entry, weighted by chance. Loaded by LoadRandomEnchantmentsTable (ItemEnchantmentMgr).",
+  "table_name": "item_enchantment_template",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Items",
+  "icon_path": "Icons/document_dice.png",
+  "reload_command": "reload item_enchantment_template",
+  "picker": "Parameter",
+  "primary_key": [
+    "entry",
+    "ench"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "Random enchantment set id, referenced by item_template.RandomProperty / RandomSuffix.",
+          "db_column_name": "entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Enchant",
+          "help": "ItemRandomProperties.dbc id (or ItemRandomSuffix.dbc id for suffix rolls).",
+          "db_column_name": "ench",
+          "value_type": "uint"
+        },
+        {
+          "name": "Chance",
+          "help": "Chance in percent (> 0 and <= 100) to roll this enchantment; rows outside this range are ignored.",
+          "db_column_name": "chance",
+          "value_type": "float"
+        }
+      ]
+    }
+  ]
+}

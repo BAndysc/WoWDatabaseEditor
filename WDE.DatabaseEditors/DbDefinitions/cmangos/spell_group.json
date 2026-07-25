@@ -1,0 +1,43 @@
+{
+  "id": "spell_group",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Group",
+  "description": "Defines aura stacking groups: spells assigned to a group via spell_group_spell do not stack with each other according to the group rule. Group ids must be below 64; ids 3 (well fed) and 8 (aura) have hardcoded meaning in the core.",
+  "table_name": "spell_group",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "Id",
+          "value_type": "uint",
+          "help": "Group id, must be lower than 64 (stored as a 64 bit mask); 3 = well fed and 8 = aura are hardcoded group ids"
+        },
+        {
+          "name": "Rule",
+          "db_column_name": "Rule",
+          "value_type": "CmangosSpellGroupRuleParameter",
+          "help": "Unique: only one spell of the group can be active on a target; unique per caster: only one spell of the group per caster"
+        },
+        {
+          "name": "Name",
+          "db_column_name": "Name",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

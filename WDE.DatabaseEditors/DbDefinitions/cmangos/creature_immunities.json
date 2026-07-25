@@ -1,0 +1,56 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK",
+    "CMaNGOS-TBC",
+    "CMaNGOS-Classic"
+  ],
+  "name": "Creature Immunities",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Defines named sets of damage/effect/mechanic immunities that can be applied to (and removed from) a creature entry, e.g. via EventAI ACTION_T_SET_IMMUNITY_SET.",
+  "table_name": "creature_immunities",
+  "table_index_name": "Entry",
+  "record_mode": "MultiRecord",
+  "skip_quick_load": true,
+  "group_name": "Immunities",
+  "icon_path": "Icons/document_vaccine.png",
+  "reload_command": "reload creature_immunities",
+  "primary_key": [
+    "Entry",
+    "SetId",
+    "Type",
+    "Value"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "Entry",
+          "value_type": "CreatureParameter",
+          "read_only": true
+        },
+        {
+          "name": "Set Id",
+          "help": "Arbitrary id grouping several (Type, Value) immunity rows into one named set for this creature entry. Referenced by EventAI action ACTION_T_SET_IMMUNITY_SET to toggle the whole set on/off at runtime.",
+          "db_column_name": "SetId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Type",
+          "db_column_name": "Type",
+          "value_type": "SpellImmunityTypeParameter",
+          "preferred_width": 285.0
+        },
+        {
+          "name": "Value",
+          "help": "Meaning depends on Type: a SpellEffects value, AuraType value, SpellSchoolMask bitmask, DispelType value, or Mechanics value respectively.",
+          "db_column_name": "Value",
+          "value_type": "uint",
+          "preferred_width": 548.0
+        }
+      ]
+    }
+  ]
+}

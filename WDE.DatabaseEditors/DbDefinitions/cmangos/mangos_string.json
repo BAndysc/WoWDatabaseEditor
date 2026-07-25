@@ -1,0 +1,97 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK",
+    "CMaNGOS-TBC",
+    "CMaNGOS-Classic"
+  ],
+  "name": "Mangos String",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Localized text strings used by server-side systems (scripts, EventAI, announcements, error messages) referenced by a numeric entry.",
+  "table_name": "mangos_string",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_trinity_strings.png",
+  "reload_command": "reload mangos_string",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "Referenced from C++ code and scripts (e.g. LANG_* constants) as well as custom script/DB usage. Negative built-in ranges are reserved; positive entries are free for scripts/modules.",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Content Default",
+          "help": "enUS/enGB text (LOCALE_enUS).",
+          "db_column_name": "content_default",
+          "value_type": "string"
+        },
+        {
+          "name": "Content Loc 1",
+          "help": "koKR localization (LOCALE_koKR).",
+          "db_column_name": "content_loc1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc 2",
+          "help": "frFR localization (LOCALE_frFR).",
+          "db_column_name": "content_loc2",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc 3",
+          "help": "deDE localization (LOCALE_deDE).",
+          "db_column_name": "content_loc3",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc 4",
+          "help": "zhCN localization (LOCALE_zhCN).",
+          "db_column_name": "content_loc4",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc 5",
+          "help": "zhTW localization (LOCALE_zhTW).",
+          "db_column_name": "content_loc5",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc 6",
+          "help": "esES localization (LOCALE_esES).",
+          "db_column_name": "content_loc6",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc 7",
+          "help": "esMX localization (LOCALE_esMX).",
+          "db_column_name": "content_loc7",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Content Loc 8",
+          "help": "ruRU localization (LOCALE_ruRU).",
+          "db_column_name": "content_loc8",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

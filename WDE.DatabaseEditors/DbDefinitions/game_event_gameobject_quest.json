@@ -1,7 +1,7 @@
 {
   "id": "game_event_gameobject_quest",
   "compatibility": [
-    "TrinityWrath", "TrinityCata"
+    "TrinityWrath", "TrinityCata", "TrinityMaster"
   ],
   "name": "Game Event Gameobject Quest",
   "single_solution_name": "Game Event Gameobject Quest",

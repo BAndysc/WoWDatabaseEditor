@@ -1,0 +1,42 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Creature Spawn Entry",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Possible creature entries for a spawn with entry 0: on each (re)spawn the server picks one of the listed entries at random for that guid.",
+  "table_name": "creature_spawn_entry",
+  "table_index_name": "guid",
+  "record_mode": "MultiRecord",
+  "skip_quick_load": true,
+  "group_name": "Spawns",
+  "icon_path": "Icons/document_dice.png",
+  "picker": "CreatureGUIDParameter",
+  "primary_key": [
+    "guid",
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "help": "creature.guid of the spawn (which must have entry 0).",
+          "db_column_name": "guid",
+          "value_type": "CreatureGUIDParameter"
+        },
+        {
+          "name": "Creature Entry",
+          "help": "One of the creature entries that can be randomly chosen for this spawn.",
+          "db_column_name": "entry",
+          "value_type": "CreatureParameter",
+          "preferred_width": 584.0
+        }
+      ]
+    }
+  ]
+}

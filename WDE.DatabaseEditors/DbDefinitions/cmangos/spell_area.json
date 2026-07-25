@@ -1,0 +1,113 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Area",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Applies (or forbids) auras in specific areas or zones, optionally restricted by quest state, another aura, race and gender. Used e.g. for zone-wide buffs and quest-phase auras.",
+  "table_name": "spell_area",
+  "table_index_name": "area",
+  "record_mode": "MultiRecord",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell_area.png",
+  "reload_command": "reload spell_area",
+  "picker": "ZoneAreaParameter",
+  "primary_key": [
+    "spell",
+    "area",
+    "quest_start",
+    "quest_start_active",
+    "aura_spell",
+    "racemask",
+    "gender"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "spell",
+          "value_type": "SpellParameter",
+          "preferred_width": 245.0
+        },
+        {
+          "name": "Area",
+          "help": "Zone or area the spell applies in, 0 = any area",
+          "db_column_name": "area",
+          "value_type": "ZoneAreaParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Quest Start",
+          "help": "The spell applies only when this quest has been rewarded (or is active, if Quest Start Active is set), 0 = no quest requirement",
+          "db_column_name": "quest_start",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true,
+          "preferred_width": 194.0
+        },
+        {
+          "name": "Quest Start Active",
+          "help": "If 1, having Quest Start in the quest log (active) also satisfies the requirement, not only having it rewarded",
+          "db_column_name": "quest_start_active",
+          "value_type": "BoolParameter",
+          "preferred_width": 124.0
+        },
+        {
+          "name": "Quest End",
+          "help": "The spell no longer applies once this quest is rewarded, 0 = none",
+          "db_column_name": "quest_end",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true,
+          "preferred_width": 227.0
+        },
+        {
+          "name": "Condition Id",
+          "help": "conditions.condition_entry the player must fulfil; when set it replaces the quest/race/gender checks of this row, 0 = none",
+          "db_column_name": "condition_id",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Condition",
+          "help": "Edit the condition tree that must be satisfied for the aura to be applied.",
+          "meta": "mangos_conditions:condition_id;target=Player",
+          "preferred_width": 78.0
+        },
+        {
+          "name": "Aura Spell",
+          "help": "Player must have an aura of this spell (must be a dummy/phase/ghost aura); negative value = player must NOT have the aura, 0 = no requirement",
+          "db_column_name": "aura_spell",
+          "value_type": "SpellAreaSpellParameter",
+          "zero_is_blank": true,
+          "preferred_width": 133.0
+        },
+        {
+          "name": "Race Mask",
+          "help": "Races the spell applies to, 0 = any race",
+          "db_column_name": "racemask",
+          "value_type": "RaceMaskParameter",
+          "zero_is_blank": true,
+          "preferred_width": 158.0
+        },
+        {
+          "name": "Gender",
+          "help": "2 (none) = any gender",
+          "db_column_name": "gender",
+          "value_type": "GenderParameter",
+          "default": 2,
+          "preferred_width": 145.0
+        },
+        {
+          "name": "Autocast",
+          "help": "If 1, the spell is automatically applied to the player while all requirements are met and removed when they are not; if 0 the spell is only forbidden outside the requirements",
+          "db_column_name": "autocast",
+          "value_type": "BoolParameter"
+        }
+      ]
+    }
+  ]
+}

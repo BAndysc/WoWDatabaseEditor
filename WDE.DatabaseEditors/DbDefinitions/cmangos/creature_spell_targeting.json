@@ -1,15 +1,18 @@
 {
-  "id": "creature_spell_targeting",
   "compatibility": [
-    "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic"
+    "CMaNGOS-WoTLK",
+    "CMaNGOS-TBC",
+    "CMaNGOS-Classic"
   ],
   "name": "Creature Spell Targeting",
+  "single_solution_name": "",
+  "multi_solution_name": "",
   "description": "Spell targeting data",
   "table_name": "creature_spell_targeting",
   "table_index_name": "Id",
   "record_mode": "SingleRow",
-  "group_name": "Combat",
   "skip_quick_load": true,
+  "group_name": "Combat",
   "icon_path": "Icons/document_creature_spell_group.png",
   "reload_command": "reload creature_spell_targeting",
   "primary_key": [
@@ -44,6 +47,18 @@
           "name": "Param 3",
           "db_column_name": "Param3",
           "value_type": "int"
+        },
+        {
+          "name": "Unit Condition",
+          "help": "unit_condition.Id restricting valid targets; -1 = no condition. Positive ids are DBC-imported and wiped on reseed; use negative ids for custom conditions.",
+          "db_column_name": "UnitCondition",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Condition",
+          "help": "Edit the unit condition referenced by Unit Condition.",
+          "meta": "mangos_unit_conditions:UnitCondition"
         },
         {
           "name": "Comments",

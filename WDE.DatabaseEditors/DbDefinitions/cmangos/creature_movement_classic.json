@@ -1,0 +1,77 @@
+{
+  "id": "creature_movement_classic",
+  "compatibility": [
+    "CMaNGOS-Classic"
+  ],
+  "name": "Creature Movement",
+  "description": "Waypoint path for a single creature spawn, keyed by the creature's guid. Used by the waypoint movement generator when the spawn has MovementType 2 (WAYPOINT_MOTION_TYPE) or 4 (LINEAR_WP_MOTION_TYPE) in the `creature` table.",
+  "table_name": "creature_movement",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "group_name": "Waypoints",
+  "icon_path": "Icons/document_waypoints.png",
+  "picker": "CreatureGUIDParameter",
+  "primary_key": [
+    "Id",
+    "Point"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature Guid",
+          "db_column_name": "Id",
+          "value_type": "CreatureGUIDParameter"
+        },
+        {
+          "name": "Spawn",
+          "meta": "table:creature;`guid` = {Id}",
+          "help": "Open the creature spawn using this path."
+        },
+        {
+          "name": "Point",
+          "db_column_name": "Point",
+          "value_type": "uint"
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "PositionX",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "PositionY",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "PositionZ",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "Orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Wait Time",
+          "db_column_name": "WaitTime",
+          "value_type": "MillisecondsParameter"
+        },
+        {
+          "name": "Script Id",
+          "db_column_name": "ScriptId",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comment",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

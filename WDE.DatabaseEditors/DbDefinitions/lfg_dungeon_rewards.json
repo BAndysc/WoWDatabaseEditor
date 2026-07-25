@@ -1,7 +1,7 @@
 {
   "id": "lfg_dungeon_rewards",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityMaster"
   ],
   "name": "LFG Dungeon Rewards",
   "single_solution_name": "LFG Dungeon Rewards",

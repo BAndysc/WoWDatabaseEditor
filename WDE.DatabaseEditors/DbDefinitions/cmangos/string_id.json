@@ -1,0 +1,40 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "String Id",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Defines string identifiers used to tag creatures and gameobjects for scripts (referenced by creature_template/gameobject_template StringId1/StringId2 and spawn StringId columns). Scripts and spell targeting can then look up all objects tagged with a given string id.",
+  "table_name": "string_id",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_txt.png",
+  "reload_command": "reload string_id",
+  "picker": "Parameter",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "Id",
+          "value_type": "uint"
+        },
+        {
+          "name": "Name",
+          "db_column_name": "Name",
+          "value_type": "string",
+          "preferred_width": 691.0
+        }
+      ]
+    }
+  ]
+}

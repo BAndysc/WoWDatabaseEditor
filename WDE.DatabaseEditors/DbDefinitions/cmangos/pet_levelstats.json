@@ -1,0 +1,77 @@
+{
+  "id": "pet_levelstats",
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Pet Level Stats",
+  "description": "Base stats (health, mana, armor and attributes) for pets of the given creature entry at each level. Entry 1 is used as the default for hunter pets.",
+  "table_name": "pet_levelstats",
+  "table_index_name": "creature_entry",
+  "record_mode": "SingleRow",
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_creature_template.png",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "creature_entry",
+    "level"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature Entry",
+          "db_column_name": "creature_entry",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Level",
+          "db_column_name": "level",
+          "value_type": "uint"
+        },
+        {
+          "name": "HP",
+          "db_column_name": "hp",
+          "value_type": "uint"
+        },
+        {
+          "name": "Mana",
+          "db_column_name": "mana",
+          "value_type": "uint"
+        },
+        {
+          "name": "Armor",
+          "db_column_name": "armor",
+          "value_type": "uint"
+        },
+        {
+          "name": "Strength",
+          "db_column_name": "str",
+          "value_type": "uint"
+        },
+        {
+          "name": "Agility",
+          "db_column_name": "agi",
+          "value_type": "uint"
+        },
+        {
+          "name": "Stamina",
+          "db_column_name": "sta",
+          "value_type": "uint"
+        },
+        {
+          "name": "Intellect",
+          "db_column_name": "inte",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spirit",
+          "db_column_name": "spi",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

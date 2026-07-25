@@ -1,0 +1,53 @@
+{
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Mail Level Reward",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Mail automatically sent to players of matching races when they reach the given level (e.g. riding trainer advertisements). Uses a mail template from MailTemplate.dbc sent by the given creature.",
+  "table_name": "mail_level_reward",
+  "table_index_name": "level",
+  "record_mode": "SingleRow",
+  "group_name": "Player",
+  "icon_path": "Icons/document_gameevent_mail.png",
+  "reload_command": "reload mail_level_reward",
+  "picker": "Parameter",
+  "primary_key": [
+    "level",
+    "raceMask"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Level",
+          "help": "Player level that triggers the mail.",
+          "db_column_name": "level",
+          "value_type": "uint"
+        },
+        {
+          "name": "Race Mask",
+          "help": "Races that receive the mail.",
+          "db_column_name": "raceMask",
+          "value_type": "RaceMaskParameter"
+        },
+        {
+          "name": "Mail Template",
+          "help": "Mail template id from MailTemplate.dbc.",
+          "db_column_name": "mailTemplateId",
+          "value_type": "MailTemplateParameter"
+        },
+        {
+          "name": "Sender",
+          "help": "Creature entry that sends the mail.",
+          "db_column_name": "senderEntry",
+          "value_type": "CreatureParameter"
+        }
+      ]
+    }
+  ]
+}

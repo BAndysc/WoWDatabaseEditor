@@ -1,0 +1,79 @@
+{
+  "id": "achievement_reward",
+  "compatibility": [
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Achievement Reward",
+  "description": "Rewards (title, item sent by mail) granted when a player completes an achievement. Titles can differ per team and the mail item is sent by the given creature with the given subject/text.",
+  "table_name": "achievement_reward",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Achievements",
+  "icon_path": "Icons/document_achievement.png",
+  "picker": "AchievementParameter",
+  "reload_command": "reload achievement_reward",
+  "primary_key": [
+    "entry",
+    "gender"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Achievement",
+          "db_column_name": "entry",
+          "value_type": "AchievementParameter",
+          "help": "Achievement id from Achievement.dbc."
+        },
+        {
+          "name": "Gender",
+          "db_column_name": "gender",
+          "value_type": "GenderParameter",
+          "help": "Gender restriction of the reward row: 0 male, 1 female, 2 any (only one gender-2 row allowed per achievement).",
+          "default": 2
+        },
+        {
+          "name": "Title (Alliance)",
+          "db_column_name": "title_A",
+          "value_type": "CharTitleParameter",
+          "help": "Title id from CharTitles.dbc awarded to Alliance players.",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Title (Horde)",
+          "db_column_name": "title_H",
+          "value_type": "CharTitleParameter",
+          "help": "Title id from CharTitles.dbc awarded to Horde players.",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Item",
+          "db_column_name": "item",
+          "value_type": "ItemParameter",
+          "help": "Item sent by mail, requires a sender.",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Mail Sender",
+          "db_column_name": "sender",
+          "value_type": "CreatureParameter",
+          "help": "Creature entry that sends the reward mail.",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Mail Subject",
+          "db_column_name": "subject",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Mail Text",
+          "db_column_name": "text",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

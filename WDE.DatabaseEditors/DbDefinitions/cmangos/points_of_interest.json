@@ -1,0 +1,68 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Points Of Interest",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Points of interest that can be highlighted on the player's world map and minimap, e.g. when a gossip option with action_poi_id is selected or by scripts. Sent to the client with position, icon, flags and a label.",
+  "table_name": "points_of_interest",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Quests",
+  "icon_path": "Icons/document_point_of_interest.png",
+  "reload_command": "reload points_of_interest",
+  "picker": "Parameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "x",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "y",
+          "value_type": "float"
+        },
+        {
+          "name": "Icon",
+          "help": "Client-side POI icon id shown on the map.",
+          "db_column_name": "icon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Flags",
+          "help": "Sent raw to the client in SMSG_GOSSIP_POI.",
+          "db_column_name": "flags",
+          "value_type": "uint"
+        },
+        {
+          "name": "Data",
+          "help": "Extra data (importance) sent raw to the client.",
+          "db_column_name": "data",
+          "value_type": "uint"
+        },
+        {
+          "name": "Icon Name",
+          "help": "Label shown next to the point of interest on the map (localizable via locales_points_of_interest).",
+          "db_column_name": "icon_name",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

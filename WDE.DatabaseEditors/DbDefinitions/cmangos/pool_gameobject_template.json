@@ -1,0 +1,56 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Pool Gameobject Template",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Adds every spawn of a gameobject template to a spawn pool at once: all gameobject guids with this entry join the pool with the given chance, instead of listing each guid in pool_gameobject.",
+  "table_name": "pool_gameobject_template",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Pooling",
+  "icon_path": "Icons/document_pool_gameobject.png",
+  "picker": "GameobjectParameter",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "help": "Gameobject template entry; every spawn (guid) of this entry is added to the pool. The guids must not also be listed in pool_gameobject.",
+          "db_column_name": "id",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Template",
+          "help": "Open the pooled gameobject template.",
+          "meta": "tableByKey:gameobject_template;id"
+        },
+        {
+          "name": "Pool Entry",
+          "help": "Pool id from pool_template the spawns belong to.",
+          "db_column_name": "pool_entry",
+          "value_type": "TableReference(pool_template#entry)Parameter"
+        },
+        {
+          "name": "Chance",
+          "help": "Explicit chance (percent, 0-100) applied to each spawn of this template. Only used when the pool's max_limit is 1; otherwise (or when chance is 0) members are picked with equal probability.",
+          "db_column_name": "chance",
+          "value_type": "float"
+        },
+        {
+          "name": "Description",
+          "db_column_name": "description",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

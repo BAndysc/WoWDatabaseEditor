@@ -1,0 +1,49 @@
+{
+  "id": "spell_script_target",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Script Target",
+  "description": "Defines the valid targets for spells with script targeting (implicit targets like TARGET_UNIT_SCRIPT_NEAR_CASTER, TARGET_GAMEOBJECT_SCRIPT_NEAR_CASTER or persistent area auras). When such a spell is cast, only the creatures/gameobjects listed here are selected as targets.",
+  "table_name": "spell_script_target",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "SpellParameter",
+  "reload_command": "reload spell_script_target",
+  "primary_key": [],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "entry",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Type",
+          "db_column_name": "type",
+          "value_type": "CmangosSpellScriptTargetTypeParameter"
+        },
+        {
+          "name": "Target Entry",
+          "db_column_name": "targetEntry",
+          "value_type": "CreatureGameobjectNameParameter",
+          "zero_is_blank": true,
+          "help": "Meaning depends on Type: gameobject or creature template entry (0 with type gameobject = any gameobject), a spawn guid for the obsolete guid types, or a string_id.Id for the string id type."
+        },
+        {
+          "name": "Inverse Effect Mask",
+          "db_column_name": "inverseEffectMask",
+          "value_type": "SpellEffectMaskParameter",
+          "zero_is_blank": true,
+          "help": "Mask of spell effect indexes for which this entry is NOT used."
+        }
+      ]
+    }
+  ]
+}

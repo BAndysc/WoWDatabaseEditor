@@ -1,0 +1,68 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "World Safe Locs",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Graveyard and safe resurrection locations (server-side copy of WorldSafeLocs.dbc, extendable with custom entries). Referenced by game_graveyard_zone links and used when resurrecting players at a spirit healer.",
+  "table_name": "world_safe_locs",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_graveyard.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "help": "Location id, matches the WorldSafeLocs.dbc id for original entries.",
+          "db_column_name": "id",
+          "value_type": "uint"
+        },
+        {
+          "name": "Map",
+          "help": "Map the graveyard is located on.",
+          "db_column_name": "map",
+          "value_type": "MapParameter",
+          "preferred_width": 171.0
+        },
+        {
+          "name": "X",
+          "db_column_name": "x",
+          "value_type": "float"
+        },
+        {
+          "name": "Y",
+          "db_column_name": "y",
+          "value_type": "float"
+        },
+        {
+          "name": "Z",
+          "db_column_name": "z",
+          "value_type": "float"
+        },
+        {
+          "name": "O",
+          "help": "Orientation.",
+          "db_column_name": "o",
+          "value_type": "float"
+        },
+        {
+          "name": "Name",
+          "help": "Graveyard name.",
+          "db_column_name": "name",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

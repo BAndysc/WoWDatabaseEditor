@@ -1,0 +1,86 @@
+{
+  "compatibility": [
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Script Waypoint",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Waypoint paths for the script library (ScriptDevAI), keyed by creature entry with multiple paths per entry via PathId. Scripts start these paths explicitly (e.g. escort quests), independently of the creature's database MovementType.",
+  "table_name": "script_waypoint",
+  "table_index_name": "Entry",
+  "record_mode": "MultiRecord",
+  "group_name": "Waypoints",
+  "icon_path": "Icons/document_waypoints.png",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "Entry",
+    "PathId",
+    "Point"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature Entry",
+          "db_column_name": "Entry",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Path Id",
+          "db_column_name": "PathId",
+          "value_type": "uint",
+          "preferred_width": 118.0
+        },
+        {
+          "name": "Point",
+          "db_column_name": "Point",
+          "value_type": "uint",
+          "preferred_width": 63.0
+        },
+        {
+          "name": "X",
+          "db_column_name": "PositionX",
+          "value_type": "float",
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Y",
+          "db_column_name": "PositionY",
+          "value_type": "float",
+          "preferred_width": 134.0
+        },
+        {
+          "name": "Z",
+          "db_column_name": "PositionZ",
+          "value_type": "float",
+          "preferred_width": 148.0
+        },
+        {
+          "name": "O",
+          "db_column_name": "Orientation",
+          "value_type": "float",
+          "preferred_width": 122.0
+        },
+        {
+          "name": "Wait Time",
+          "db_column_name": "WaitTime",
+          "value_type": "MillisecondsParameter"
+        },
+        {
+          "name": "Script Id",
+          "db_column_name": "ScriptId",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comment",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

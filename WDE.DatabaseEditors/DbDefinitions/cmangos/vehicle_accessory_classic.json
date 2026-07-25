@@ -1,0 +1,49 @@
+{
+  "id": "vehicle_accessory_classic",
+  "compatibility": [
+    "CMaNGOS-Classic"
+  ],
+  "name": "Vehicle Accessory",
+  "description": "Accessory creatures spawned and boarded onto a vehicle's seats when the vehicle creature is summoned (turrets, passengers etc.). Vehicle support on the Classic core is a backport.",
+  "table_name": "vehicle_accessory",
+  "table_index_name": "vehicle_entry",
+  "record_mode": "SingleRow",
+  "group_name": "Vehicles",
+  "icon_path": "Icons/document_vehicle_template.png",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "vehicle_entry",
+    "seat"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Vehicle Entry",
+          "db_column_name": "vehicle_entry",
+          "value_type": "CreatureParameter",
+          "help": "Creature entry of the vehicle."
+        },
+        {
+          "name": "Seat",
+          "db_column_name": "seat",
+          "value_type": "VehicleSeatIndexParameter",
+          "help": "Seat index (0-7) the accessory boards."
+        },
+        {
+          "name": "Accessory Entry",
+          "db_column_name": "accessory_entry",
+          "value_type": "CreatureParameter",
+          "help": "Creature entry of the summoned accessory."
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "comment",
+          "value_type": "string",
+          "help": "Informational comment only, not read by the core."
+        }
+      ]
+    }
+  ]
+}

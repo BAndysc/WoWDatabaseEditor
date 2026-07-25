@@ -1,0 +1,54 @@
+{
+  "id": "playercreateinfo_skills",
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Player Create Info Skills",
+  "description": "Skills known by newly created characters matching the race and class masks (0 mask = all races/classes). Step is the skill tier step used to compute the initial skill value.",
+  "table_name": "playercreateinfo_skills",
+  "table_index_name": "raceMask",
+  "record_mode": "SingleRow",
+  "group_name": "Player create info",
+  "icon_path": "Icons/document_book.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "raceMask",
+    "classMask",
+    "skill"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Race Mask",
+          "db_column_name": "raceMask",
+          "value_type": "RaceMaskParameter"
+        },
+        {
+          "name": "Class Mask",
+          "db_column_name": "classMask",
+          "value_type": "ClassMaskParameter"
+        },
+        {
+          "name": "Skill",
+          "db_column_name": "skill",
+          "value_type": "SkillParameter"
+        },
+        {
+          "name": "Step",
+          "db_column_name": "step",
+          "value_type": "uint"
+        },
+        {
+          "name": "Note",
+          "db_column_name": "note",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

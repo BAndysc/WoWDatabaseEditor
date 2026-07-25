@@ -1,0 +1,47 @@
+{
+  "id": "pet_name_generation",
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Pet Name Generation",
+  "description": "Word parts used to generate random names for newly tamed or summoned pets of the given creature entry. A generated name is a random first half word followed by a random second half word.",
+  "table_name": "pet_name_generation",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_txt.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "uint",
+          "autoincrement": true
+        },
+        {
+          "name": "Word",
+          "db_column_name": "word",
+          "value_type": "string"
+        },
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Half",
+          "db_column_name": "half",
+          "value_type": "PetNameGenerationHalfParameter"
+        }
+      ]
+    }
+  ]
+}

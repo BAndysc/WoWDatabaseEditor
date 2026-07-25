@@ -1,0 +1,37 @@
+{
+  "id": "spell_facing",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC"
+  ],
+  "name": "Spell Facing",
+  "description": "Defines facing requirements for spells (whether the target must be in front of the caster). In WoTLK+ this data comes from the FacingCasterFlags field of Spell.dbc, for Classic/TBC it is supplied by this table.",
+  "table_name": "spell_facing",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "SpellParameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "entry",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Facing Caster Flags",
+          "db_column_name": "facingcasterflag",
+          "value_type": "CmangosSpellFacingFlagsParameter",
+          "default": 1,
+          "help": "1 = the target must be in front of the caster to cast the spell"
+        }
+      ]
+    }
+  ]
+}

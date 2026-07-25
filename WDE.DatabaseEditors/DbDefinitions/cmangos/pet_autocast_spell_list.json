@@ -1,0 +1,51 @@
+{
+  "id": "pet_autocast_spell_list",
+  "compatibility": [
+//    "CMaNGOS-TBC"
+  ],
+  "name": "Pet Autocast Spell List",
+  "description": "Spells automatically cast by pets and charmed creatures of the given creature entry when autocast is enabled, with an optional combat condition and a spell list targeting entry.",
+  "table_name": "pet_autocast_spell_list",
+  "table_index_name": "CreatureEntry",
+  "record_mode": "SingleRow",
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_creature_spell.png",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "CreatureEntry",
+    "SpellId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature Entry",
+          "db_column_name": "CreatureEntry",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Spell",
+          "db_column_name": "SpellId",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Combat Condition",
+          "db_column_name": "CombatCondition",
+          "value_type": "TableReference(combat_condition#Id)Parameter",
+          "default": -1
+        },
+        {
+          "name": "Target",
+          "db_column_name": "TargetId",
+          "value_type": "TableReference(creature_spell_targeting#Id)Parameter"
+        },
+        {
+          "name": "Comments",
+          "db_column_name": "Comments",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

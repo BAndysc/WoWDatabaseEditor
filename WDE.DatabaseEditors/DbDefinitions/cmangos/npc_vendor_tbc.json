@@ -1,0 +1,94 @@
+{
+  "id": "npc_vendor_tbc",
+  "compatibility": [
+    "CMaNGOS-TBC"
+  ],
+  "name": "Npc Vendor",
+  "description": "Items sold by a vendor creature (entry = creature_template entry, the creature must have the vendor npc flag). Rows are offered in slot order; items listed here are added on top of any shared list assigned via creature_template.VendorTemplateId.",
+  "table_name": "npc_vendor",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "NPC Vendor",
+  "icon_path": "Icons/document_dollar.png",
+  "picker": "CreatureParameter",
+  "reload_command": "reload npc_vendor",
+  "primary_key": [
+    "entry",
+    "item"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "CreatureParameter",
+          "help": "Creature entry of the vendor (creature_template), must have UNIT_NPC_FLAG_VENDOR."
+        },
+        {
+          "name": "Creature",
+          "meta": "tableByKey:creature_template;entry",
+          "help": "Open the vendor creature template."
+        },
+        {
+          "name": "Item",
+          "db_column_name": "item",
+          "value_type": "ItemParameter",
+          "help": "Item sold by the vendor."
+        },
+        {
+          "name": "Item",
+          "meta": "tableByKey:item_template;item",
+          "help": "Open the sold item."
+        },
+        {
+          "name": "Max Count",
+          "db_column_name": "maxcount",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Limited stock: maximum number of this item available at once, 0 = unlimited. If set, Incr Time must be non-zero."
+        },
+        {
+          "name": "Incr Time",
+          "db_column_name": "incrtime",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Restock time in seconds for one unit of a limited-stock item. Must be 0 when Max Count is 0, non-zero otherwise."
+        },
+        {
+          "name": "Slot",
+          "db_column_name": "slot",
+          "value_type": "uint",
+          "help": "Only defines the ordering of items in the vendor window (rows are loaded ORDER BY slot)."
+        },
+        {
+          "name": "Extended Cost",
+          "db_column_name": "ExtendedCost",
+          "value_type": "ExtendedCostParameter",
+          "zero_is_blank": true,
+          "help": "ItemExtendedCost.dbc id: alternative price in honor/arena points or token items required instead of plain money, 0 = plain money cost."
+        },
+        {
+          "name": "Condition Id",
+          "db_column_name": "condition_id",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "conditions.condition_entry controlling whether this item is offered to a given player, 0 = always offered."
+        },
+        {
+          "is_meta": true,
+          "name": "Condition",
+          "meta": "mangos_conditions:condition_id;source=the vendor NPC;target=Player",
+          "help": "Edit the condition tree referenced by Condition Id."
+        },
+        {
+          "name": "Comments",
+          "db_column_name": "comments",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "achievement_criteria_requirement",
+  "compatibility": [
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Achievement Criteria Requirement",
+  "description": "Additional requirements an achievement criteria must fulfill to progress or complete (target creature, aura, area, map difficulty etc.). Loaded by AchievementGlobalMgr::LoadAchievementCriteriaRequirements; a criteria can have several requirements of different types.",
+  "table_name": "achievement_criteria_requirement",
+  "table_index_name": "criteria_id",
+  "record_mode": "SingleRow",
+  "group_name": "Achievements",
+  "icon_path": "Icons/document_achievement.png",
+  "picker": "AchievementCriteriaParameter",
+  "reload_command": "reload achievement_criteria_requirement",
+  "primary_key": [
+    "criteria_id",
+    "type"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Criteria",
+          "db_column_name": "criteria_id",
+          "value_type": "AchievementCriteriaParameter",
+          "help": "Criteria id from AchievementCriteria.dbc."
+        },
+        {
+          "name": "Requirement Type",
+          "db_column_name": "type",
+          "value_type": "CmangosAchievementCriteriaRequirementTypeParameter"
+        },
+        {
+          "name": "Value1",
+          "db_column_name": "value1",
+          "value_type": "uint",
+          "help": "Meaning depends on the requirement type."
+        },
+        {
+          "name": "Value2",
+          "db_column_name": "value2",
+          "value_type": "uint",
+          "help": "Meaning depends on the requirement type."
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "help": "C++ AchievementCriteriaScript name, used with requirement type 11 (script).",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

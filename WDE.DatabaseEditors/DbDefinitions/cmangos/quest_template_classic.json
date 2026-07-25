@@ -1,0 +1,999 @@
+{
+  "id": "quest_template_classic",
+  "compatibility": [
+    "CMaNGOS-Classic"
+  ],
+  "name": "Quest Template",
+  "description": "Definition of every quest: availability requirements, chaining, objectives, texts, emotes and rewards. Loaded at startup by ObjectMgr::LoadQuests; quests are offered via creature_questrelation/gameobject_questrelation and item_template StartQuest.",
+  "table_name": "quest_template",
+  "table_index_name": "entry",
+  "record_mode": "Template",
+  "group_name": "Quests",
+  "icon_path": "Icons/document_quest_template.png",
+  "picker": "QuestParameter",
+  "reload_command": "reload quest_template",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "General",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Title",
+          "db_column_name": "Title",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Method",
+          "db_column_name": "Method",
+          "value_type": "QuestTypeParameter",
+          "default": 2,
+          "help": "0 = quest is auto-completed on accept (no objectives/details), 2 = normal quest."
+        },
+        {
+          "name": "Type",
+          "db_column_name": "Type",
+          "value_type": "QuestInfoParameter",
+          "zero_is_blank": true,
+          "help": "QuestInfo.dbc id shown by the client (Elite, PvP, Dungeon, Raid...), 0 = normal quest."
+        },
+        {
+          "name": "Quest Level",
+          "db_column_name": "QuestLevel",
+          "value_type": "int",
+          "help": "Level used for XP/money/reputation calculation and quest log sorting. -1 = scales with player level."
+        },
+        {
+          "name": "Min Level",
+          "db_column_name": "MinLevel",
+          "value_type": "uint",
+          "help": "Minimum player level required to accept the quest."
+        },
+        {
+          "name": "Max Level",
+          "db_column_name": "MaxLevel",
+          "value_type": "uint",
+          "default": 255,
+          "help": "Maximum player level allowed to accept the quest, 255 = no limit."
+        },
+        {
+          "name": "Zone Or Sort",
+          "db_column_name": "ZoneOrSort",
+          "value_type": "ZoneOrQuestSortParameter",
+          "help": "Positive = zone id the quest is listed under in the quest log, negative = QuestSort.dbc category (class/profession/seasonal quests)."
+        },
+        {
+          "name": "Suggested Players",
+          "db_column_name": "SuggestedPlayers",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Suggested number of players to complete the quest, shown in the quest details."
+        },
+        {
+          "name": "Limit Time",
+          "db_column_name": "LimitTime",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Time limit in seconds to complete the quest after accepting, 0 = no limit."
+        },
+        {
+          "name": "Quest Flags",
+          "db_column_name": "QuestFlags",
+          "value_type": "QuestFlagParameter",
+          "help": "Client-side quest flags (sharable, daily, weekly, raid, PvP...)."
+        },
+        {
+          "name": "Special Flags",
+          "db_column_name": "SpecialFlags",
+          "value_type": "CmangosQuestSpecialFlagsParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Requirements",
+      "fields": [
+        {
+          "name": "Required Classes",
+          "db_column_name": "RequiredClasses",
+          "value_type": "ClassMaskParameter",
+          "zero_is_blank": true,
+          "help": "Class mask required to accept the quest, 0 = any class."
+        },
+        {
+          "name": "Required Races",
+          "db_column_name": "RequiredRaces",
+          "value_type": "RaceMaskParameter",
+          "zero_is_blank": true,
+          "help": "Race mask required to accept the quest, 0 = any race."
+        },
+        {
+          "name": "Required Skill",
+          "db_column_name": "RequiredSkill",
+          "value_type": "SkillParameter",
+          "zero_is_blank": true,
+          "help": "Skill required to accept the quest, 0 = none."
+        },
+        {
+          "name": "Required Skill Value",
+          "db_column_name": "RequiredSkillValue",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Minimum value of Required Skill."
+        },
+        {
+          "name": "Required Condition",
+          "db_column_name": "RequiredCondition",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "conditions.condition_entry that must be satisfied to see and accept the quest, 0 = none."
+        },
+        {
+          "is_meta": true,
+          "name": "Condition",
+          "meta": "mangos_conditions:RequiredCondition;target=Player",
+          "help": "Edit the condition tree referenced by Required Condition."
+        },
+        {
+          "name": "Rep Objective Faction",
+          "db_column_name": "RepObjectiveFaction",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true,
+          "help": "Faction for a reputation objective: the quest completes when Rep Objective Value is reached, 0 = none."
+        },
+        {
+          "name": "Rep Objective Value",
+          "db_column_name": "RepObjectiveValue",
+          "value_type": "int",
+          "help": "Reputation value with Rep Objective Faction required to complete the quest."
+        },
+        {
+          "name": "Required Min Rep Faction",
+          "db_column_name": "RequiredMinRepFaction",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true,
+          "help": "Faction with which a minimum reputation is required to accept the quest, 0 = none."
+        },
+        {
+          "name": "Required Min Rep Value",
+          "db_column_name": "RequiredMinRepValue",
+          "value_type": "int",
+          "help": "Minimum reputation with Required Min Rep Faction needed to accept the quest."
+        },
+        {
+          "name": "Required Max Rep Faction",
+          "db_column_name": "RequiredMaxRepFaction",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true,
+          "help": "Faction with which reputation must stay below a value to accept the quest, 0 = none."
+        },
+        {
+          "name": "Required Max Rep Value",
+          "db_column_name": "RequiredMaxRepValue",
+          "value_type": "int",
+          "help": "Reputation with Required Max Rep Faction must be below this value to accept the quest."
+        }
+      ]
+    },
+    {
+      "group_name": "Chaining",
+      "fields": [
+        {
+          "name": "Prev Quest",
+          "db_column_name": "PrevQuestId",
+          "value_type": "PrevQuestParameter",
+          "zero_is_blank": true,
+          "help": "Positive = quest that must be rewarded before this one becomes available, negative = quest that must be active (in the quest log)."
+        },
+        {
+          "name": "Next Quest",
+          "db_column_name": "NextQuestId",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true,
+          "help": "Quest that becomes available after this quest; if negative, the follow-up requires this quest to be active in the log instead of rewarded."
+        },
+        {
+          "name": "Exclusive Group",
+          "db_column_name": "ExclusiveGroup",
+          "value_type": "int",
+          "zero_is_blank": true,
+          "help": "Quests sharing the same positive group: only one of them can be taken/rewarded. Same negative group: all of them must be rewarded before the follow-up opens."
+        },
+        {
+          "name": "Breadcrumb For Quest",
+          "db_column_name": "BreadcrumbForQuestId",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true,
+          "help": "This quest is a breadcrumb for the given quest: it becomes unavailable once that quest is completed or accepted."
+        },
+        {
+          "name": "Next Quest In Chain",
+          "db_column_name": "NextQuestInChain",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true,
+          "help": "Quest id shown to the client as the next quest of the chain (also enforced as an accept requirement)."
+        },
+        {
+          "name": "Next Quest In Chain",
+          "meta": "tableByKey:quest_template;NextQuestInChain",
+          "help": "Open the follow-up quest."
+        }
+      ]
+    },
+    {
+      "group_name": "Quest Start",
+      "fields": [
+        {
+          "name": "Source Item",
+          "db_column_name": "SrcItemId",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item given to the player when the quest is accepted (removed on abandon/reward)."
+        },
+        {
+          "name": "Source Item",
+          "meta": "tableByKey:item_template;SrcItemId",
+          "help": "Open the item given when the quest is accepted."
+        },
+        {
+          "name": "Source Item Count",
+          "db_column_name": "SrcItemCount",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Number of Source Item given on accept."
+        },
+        {
+          "name": "Source Spell",
+          "db_column_name": "SrcSpell",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true,
+          "help": "Spell cast on the player when the quest is accepted."
+        }
+      ]
+    },
+    {
+      "group_name": "Objectives",
+      "fields": [
+        {
+          "name": "Required Item 1",
+          "db_column_name": "ReqItemId1",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item the player must deliver to complete the quest."
+        },
+        {
+          "name": "Required Item 2",
+          "db_column_name": "ReqItemId2",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item the player must deliver to complete the quest."
+        },
+        {
+          "name": "Required Item 3",
+          "db_column_name": "ReqItemId3",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item the player must deliver to complete the quest."
+        },
+        {
+          "name": "Required Item 4",
+          "db_column_name": "ReqItemId4",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item the player must deliver to complete the quest."
+        },
+        {
+          "name": "Required Item Count 1",
+          "db_column_name": "ReqItemCount1",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Item Count 2",
+          "db_column_name": "ReqItemCount2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Item Count 3",
+          "db_column_name": "ReqItemCount3",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Item Count 4",
+          "db_column_name": "ReqItemCount4",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Source Item 1",
+          "db_column_name": "ReqSourceId1",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Quest-only source item dropped by objective-related kills or objects (not shown as an objective itself)."
+        },
+        {
+          "name": "Required Source Item 2",
+          "db_column_name": "ReqSourceId2",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Quest-only source item dropped by objective-related kills or objects (not shown as an objective itself)."
+        },
+        {
+          "name": "Required Source Item 3",
+          "db_column_name": "ReqSourceId3",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Quest-only source item dropped by objective-related kills or objects (not shown as an objective itself)."
+        },
+        {
+          "name": "Required Source Item 4",
+          "db_column_name": "ReqSourceId4",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Quest-only source item dropped by objective-related kills or objects (not shown as an objective itself)."
+        },
+        {
+          "name": "Required Source Item Count 1",
+          "db_column_name": "ReqSourceCount1",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Source Item Count 2",
+          "db_column_name": "ReqSourceCount2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Source Item Count 3",
+          "db_column_name": "ReqSourceCount3",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Source Item Count 4",
+          "db_column_name": "ReqSourceCount4",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Creature Or GO 1",
+          "db_column_name": "ReqCreatureOrGOId1",
+          "value_type": "CreatureGameobjectParameter",
+          "zero_is_blank": true,
+          "help": "Positive = creature entry to kill or receive kill credit for, negative = gameobject entry to use."
+        },
+        {
+          "name": "Required Creature Or GO 2",
+          "db_column_name": "ReqCreatureOrGOId2",
+          "value_type": "CreatureGameobjectParameter",
+          "zero_is_blank": true,
+          "help": "Positive = creature entry to kill or receive kill credit for, negative = gameobject entry to use."
+        },
+        {
+          "name": "Required Creature Or GO 3",
+          "db_column_name": "ReqCreatureOrGOId3",
+          "value_type": "CreatureGameobjectParameter",
+          "zero_is_blank": true,
+          "help": "Positive = creature entry to kill or receive kill credit for, negative = gameobject entry to use."
+        },
+        {
+          "name": "Required Creature Or GO 4",
+          "db_column_name": "ReqCreatureOrGOId4",
+          "value_type": "CreatureGameobjectParameter",
+          "zero_is_blank": true,
+          "help": "Positive = creature entry to kill or receive kill credit for, negative = gameobject entry to use."
+        },
+        {
+          "name": "Required Creature Or GO Count 1",
+          "db_column_name": "ReqCreatureOrGOCount1",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Creature Or GO Count 2",
+          "db_column_name": "ReqCreatureOrGOCount2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Creature Or GO Count 3",
+          "db_column_name": "ReqCreatureOrGOCount3",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Creature Or GO Count 4",
+          "db_column_name": "ReqCreatureOrGOCount4",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Required Spell Cast 1",
+          "db_column_name": "ReqSpellCast1",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true,
+          "help": "Spell that must be cast on the corresponding Required Creature Or GO to count the objective (instead of killing it)."
+        },
+        {
+          "name": "Required Spell Cast 2",
+          "db_column_name": "ReqSpellCast2",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true,
+          "help": "Spell that must be cast on the corresponding Required Creature Or GO to count the objective (instead of killing it)."
+        },
+        {
+          "name": "Required Spell Cast 3",
+          "db_column_name": "ReqSpellCast3",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true,
+          "help": "Spell that must be cast on the corresponding Required Creature Or GO to count the objective (instead of killing it)."
+        },
+        {
+          "name": "Required Spell Cast 4",
+          "db_column_name": "ReqSpellCast4",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true,
+          "help": "Spell that must be cast on the corresponding Required Creature Or GO to count the objective (instead of killing it)."
+        }
+      ]
+    },
+    {
+      "group_name": "Texts",
+      "fields": [
+        {
+          "name": "Details",
+          "db_column_name": "Details",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "Quest description shown in the quest details window at the questgiver."
+        },
+        {
+          "name": "Objectives",
+          "db_column_name": "Objectives",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "Objectives summary text shown in the quest log."
+        },
+        {
+          "name": "Offer Reward Text",
+          "db_column_name": "OfferRewardText",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "Text shown in the reward window at the quest ender."
+        },
+        {
+          "name": "Request Items Text",
+          "db_column_name": "RequestItemsText",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "Text shown at the quest ender while the objectives are not complete yet."
+        },
+        {
+          "name": "End Text",
+          "db_column_name": "EndText",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "Text shown in the quest log objectives section for exploration/event quests without other objectives."
+        },
+        {
+          "name": "Objective Text 1",
+          "db_column_name": "ObjectiveText1",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "Custom text for this objective slot, overrides the auto-generated kill/collect counter text."
+        },
+        {
+          "name": "Objective Text 2",
+          "db_column_name": "ObjectiveText2",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "Custom text for this objective slot, overrides the auto-generated kill/collect counter text."
+        },
+        {
+          "name": "Objective Text 3",
+          "db_column_name": "ObjectiveText3",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "Custom text for this objective slot, overrides the auto-generated kill/collect counter text."
+        },
+        {
+          "name": "Objective Text 4",
+          "db_column_name": "ObjectiveText4",
+          "value_type": "string",
+          "can_be_null": true,
+          "help": "Custom text for this objective slot, overrides the auto-generated kill/collect counter text."
+        }
+      ]
+    },
+    {
+      "group_name": "Rewards",
+      "fields": [
+        {
+          "name": "Reward Choice Item 1",
+          "db_column_name": "RewChoiceItemId1",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item the player can choose from as a reward."
+        },
+        {
+          "name": "Reward Choice Item 2",
+          "db_column_name": "RewChoiceItemId2",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item the player can choose from as a reward."
+        },
+        {
+          "name": "Reward Choice Item 3",
+          "db_column_name": "RewChoiceItemId3",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item the player can choose from as a reward."
+        },
+        {
+          "name": "Reward Choice Item 4",
+          "db_column_name": "RewChoiceItemId4",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item the player can choose from as a reward."
+        },
+        {
+          "name": "Reward Choice Item 5",
+          "db_column_name": "RewChoiceItemId5",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item the player can choose from as a reward."
+        },
+        {
+          "name": "Reward Choice Item 6",
+          "db_column_name": "RewChoiceItemId6",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item the player can choose from as a reward."
+        },
+        {
+          "name": "Reward Choice Item Count 1",
+          "db_column_name": "RewChoiceItemCount1",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Choice Item Count 2",
+          "db_column_name": "RewChoiceItemCount2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Choice Item Count 3",
+          "db_column_name": "RewChoiceItemCount3",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Choice Item Count 4",
+          "db_column_name": "RewChoiceItemCount4",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Choice Item Count 5",
+          "db_column_name": "RewChoiceItemCount5",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Choice Item Count 6",
+          "db_column_name": "RewChoiceItemCount6",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Item 1",
+          "db_column_name": "RewItemId1",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item always given as a reward."
+        },
+        {
+          "name": "Reward Item 2",
+          "db_column_name": "RewItemId2",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item always given as a reward."
+        },
+        {
+          "name": "Reward Item 3",
+          "db_column_name": "RewItemId3",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item always given as a reward."
+        },
+        {
+          "name": "Reward Item 4",
+          "db_column_name": "RewItemId4",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "help": "Item always given as a reward."
+        },
+        {
+          "name": "Reward Item Count 1",
+          "db_column_name": "RewItemCount1",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Item Count 2",
+          "db_column_name": "RewItemCount2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Item Count 3",
+          "db_column_name": "RewItemCount3",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Item Count 4",
+          "db_column_name": "RewItemCount4",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Or Required Money",
+          "db_column_name": "RewOrReqMoney",
+          "value_type": "MoneyParameter",
+          "help": "Positive = money reward in copper, negative = money required to complete the quest."
+        },
+        {
+          "name": "Reward Money Max Level",
+          "db_column_name": "RewMoneyMaxLevel",
+          "value_type": "MoneyParameter",
+          "help": "Money (copper) given instead of experience when the player is at max level."
+        },
+        {
+          "name": "Reward Spell",
+          "db_column_name": "RewSpell",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true,
+          "help": "Spell shown as reward in the quest log and cast on the player at reward (unless Reward Spell Cast is set)."
+        },
+        {
+          "name": "Reward Spell Cast",
+          "db_column_name": "RewSpellCast",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true,
+          "help": "Spell actually cast on the player at reward; Reward Spell is then only displayed."
+        },
+        {
+          "name": "Reward Mail Template",
+          "db_column_name": "RewMailTemplateId",
+          "value_type": "MailTemplateParameter",
+          "zero_is_blank": true,
+          "help": "mail_loot_template / QuestMailSender mail template sent to the player after rewarding the quest."
+        },
+        {
+          "name": "Reward Mail Delay",
+          "db_column_name": "RewMailDelaySecs",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Delay in seconds before the reward mail is sent."
+        }
+      ]
+    },
+    {
+      "group_name": "Reputation Rewards",
+      "fields": [
+        {
+          "name": "Reward Rep Faction 1",
+          "db_column_name": "RewRepFaction1",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true,
+          "help": "Faction that receives a reputation reward (or loss) from this quest."
+        },
+        {
+          "name": "Reward Rep Faction 2",
+          "db_column_name": "RewRepFaction2",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true,
+          "help": "Faction that receives a reputation reward (or loss) from this quest."
+        },
+        {
+          "name": "Reward Rep Faction 3",
+          "db_column_name": "RewRepFaction3",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true,
+          "help": "Faction that receives a reputation reward (or loss) from this quest."
+        },
+        {
+          "name": "Reward Rep Faction 4",
+          "db_column_name": "RewRepFaction4",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true,
+          "help": "Faction that receives a reputation reward (or loss) from this quest."
+        },
+        {
+          "name": "Reward Rep Faction 5",
+          "db_column_name": "RewRepFaction5",
+          "value_type": "FactionParameter",
+          "zero_is_blank": true,
+          "help": "Faction that receives a reputation reward (or loss) from this quest."
+        },
+        {
+          "name": "Reward Rep Value 1",
+          "db_column_name": "RewRepValue1",
+          "value_type": "int",
+          "zero_is_blank": true,
+          "help": "Reputation gained/lost with the corresponding faction. On WotLK the DB value is 100x the actual reputation (25000 = 250)."
+        },
+        {
+          "name": "Reward Rep Value 2",
+          "db_column_name": "RewRepValue2",
+          "value_type": "int",
+          "zero_is_blank": true,
+          "help": "Reputation gained/lost with the corresponding faction. On WotLK the DB value is 100x the actual reputation (25000 = 250)."
+        },
+        {
+          "name": "Reward Rep Value 3",
+          "db_column_name": "RewRepValue3",
+          "value_type": "int",
+          "zero_is_blank": true,
+          "help": "Reputation gained/lost with the corresponding faction. On WotLK the DB value is 100x the actual reputation (25000 = 250)."
+        },
+        {
+          "name": "Reward Rep Value 4",
+          "db_column_name": "RewRepValue4",
+          "value_type": "int",
+          "zero_is_blank": true,
+          "help": "Reputation gained/lost with the corresponding faction. On WotLK the DB value is 100x the actual reputation (25000 = 250)."
+        },
+        {
+          "name": "Reward Rep Value 5",
+          "db_column_name": "RewRepValue5",
+          "value_type": "int",
+          "zero_is_blank": true,
+          "help": "Reputation gained/lost with the corresponding faction. On WotLK the DB value is 100x the actual reputation (25000 = 250)."
+        },
+        {
+          "name": "Reputation Spillover Mask",
+          "db_column_name": "ReputationSpilloverMask",
+          "value_type": "CmangosRepSpilloverMaskParameter",
+          "zero_is_blank": true,
+          "help": "Reward faction slots whose reputation reward is NOT spilled over to allied factions."
+        }
+      ]
+    },
+    {
+      "group_name": "Emotes",
+      "fields": [
+        {
+          "name": "Details Emote 1",
+          "db_column_name": "DetailsEmote1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "help": "Emote played by the questgiver while presenting the quest details."
+        },
+        {
+          "name": "Details Emote 2",
+          "db_column_name": "DetailsEmote2",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "help": "Emote played by the questgiver while presenting the quest details."
+        },
+        {
+          "name": "Details Emote 3",
+          "db_column_name": "DetailsEmote3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "help": "Emote played by the questgiver while presenting the quest details."
+        },
+        {
+          "name": "Details Emote 4",
+          "db_column_name": "DetailsEmote4",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "help": "Emote played by the questgiver while presenting the quest details."
+        },
+        {
+          "name": "Details Emote Delay 1",
+          "db_column_name": "DetailsEmoteDelay1",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Details Emote Delay 2",
+          "db_column_name": "DetailsEmoteDelay2",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Details Emote Delay 3",
+          "db_column_name": "DetailsEmoteDelay3",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Details Emote Delay 4",
+          "db_column_name": "DetailsEmoteDelay4",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Incomplete Emote",
+          "db_column_name": "IncompleteEmote",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "help": "Emote played by the quest ender when the player returns with incomplete objectives."
+        },
+        {
+          "name": "Incomplete Emote Delay",
+          "db_column_name": "IncompleteEmoteDelay",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Complete Emote",
+          "db_column_name": "CompleteEmote",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "help": "Emote played by the quest ender when the player returns with all objectives complete."
+        },
+        {
+          "name": "Complete Emote Delay",
+          "db_column_name": "CompleteEmoteDelay",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Offer Reward Emote 1",
+          "db_column_name": "OfferRewardEmote1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "help": "Emote played by the quest ender in the offer reward window."
+        },
+        {
+          "name": "Offer Reward Emote 2",
+          "db_column_name": "OfferRewardEmote2",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "help": "Emote played by the quest ender in the offer reward window."
+        },
+        {
+          "name": "Offer Reward Emote 3",
+          "db_column_name": "OfferRewardEmote3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "help": "Emote played by the quest ender in the offer reward window."
+        },
+        {
+          "name": "Offer Reward Emote 4",
+          "db_column_name": "OfferRewardEmote4",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "help": "Emote played by the quest ender in the offer reward window."
+        },
+        {
+          "name": "Offer Reward Emote Delay 1",
+          "db_column_name": "OfferRewardEmoteDelay1",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Offer Reward Emote Delay 2",
+          "db_column_name": "OfferRewardEmoteDelay2",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Offer Reward Emote Delay 3",
+          "db_column_name": "OfferRewardEmoteDelay3",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Offer Reward Emote Delay 4",
+          "db_column_name": "OfferRewardEmoteDelay4",
+          "value_type": "MillisecondsParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Map Point",
+      "fields": [
+        {
+          "name": "Point Map",
+          "db_column_name": "PointMapId",
+          "value_type": "MapParameter",
+          "help": "Map of the point of interest shown on the player's map for this quest (pre-POI system)."
+        },
+        {
+          "name": "Point X",
+          "db_column_name": "PointX",
+          "value_type": "float"
+        },
+        {
+          "name": "Point Y",
+          "db_column_name": "PointY",
+          "value_type": "float"
+        },
+        {
+          "name": "Point Opt",
+          "db_column_name": "PointOpt",
+          "value_type": "uint",
+          "help": "Unknown option sent to the client together with the quest point of interest."
+        }
+      ]
+    },
+    {
+      "group_name": "Scripting",
+      "fields": [
+        {
+          "name": "Start Script",
+          "db_column_name": "StartScript",
+          "value_type": "TableReference(dbscripts_on_quest_start#id)Parameter",
+          "zero_is_blank": true,
+          "help": "Id in dbscripts_on_quest_start executed when the quest is accepted, 0 = none."
+        },
+        {
+          "name": "Complete Script",
+          "db_column_name": "CompleteScript",
+          "value_type": "TableReference(dbscripts_on_quest_end#id)Parameter",
+          "zero_is_blank": true,
+          "help": "Id in dbscripts_on_quest_end executed when the quest is rewarded, 0 = none."
+        }
+      ]
+    },
+    {
+      "group_name": "Related tables",
+      "fields": [
+        {
+          "name": "Quest Starter (creatures)",
+          "meta": "table:creature_questrelation;`quest` = {entry}",
+          "help": "Creatures starting this quest."
+        },
+        {
+          "name": "Quest Ender (creatures)",
+          "meta": "table:creature_involvedrelation;`quest` = {entry}",
+          "help": "Creatures ending this quest."
+        },
+        {
+          "name": "Quest Starter (gameobjects)",
+          "meta": "table:gameobject_questrelation;`quest` = {entry}",
+          "help": "Gameobjects starting this quest."
+        },
+        {
+          "name": "Quest Ender (gameobjects)",
+          "meta": "table:gameobject_involvedrelation;`quest` = {entry}",
+          "help": "Gameobjects ending this quest."
+        },
+        {
+          "name": "Exploration Trigger",
+          "meta": "table:areatrigger_involvedrelation;`quest` = {entry}",
+          "help": "Area triggers completing this quest."
+        },
+        {
+          "name": "POI",
+          "meta": "table:quest_poi;`questId` = {entry}",
+          "help": "Map points of interest of this quest."
+        },
+        {
+          "name": "Game Event",
+          "meta": "table:game_event_quest;`quest` = {entry}",
+          "help": "Game events enabling this quest."
+        }
+      ]
+    }
+  ],
+  "table_name_source_field": "Title",
+  "single_solution_name": "Quest {name} template",
+  "multi_solution_name": "Multiple quest templates"
+}

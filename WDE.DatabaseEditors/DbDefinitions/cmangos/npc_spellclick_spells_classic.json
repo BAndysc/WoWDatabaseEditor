@@ -1,0 +1,75 @@
+{
+  "id": "npc_spellclick_spells_classic",
+  "compatibility": [
+    "CMaNGOS-Classic"
+  ],
+  "name": "Npc Spellclick Spells",
+  "description": "Spells cast when a player clicks a creature with UNIT_NPC_FLAG_SPELLCLICK. Cast Flags decide who casts on whom; availability is gated either by Condition Id or (legacy) by the quest columns. Backport of the WoTLK spellclick system.",
+  "table_name": "npc_spellclick_spells",
+  "table_index_name": "npc_entry",
+  "record_mode": "SingleRow",
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_npc_spellclick_spell.png",
+  "picker": "CreatureParameter",
+  "reload_command": "reload npc_spellclick_spells",
+  "primary_key": [],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Npc Entry",
+          "db_column_name": "npc_entry",
+          "value_type": "CreatureParameter",
+          "help": "Creature entry (creature_template) that is clicked, must have UNIT_NPC_FLAG_SPELLCLICK."
+        },
+        {
+          "name": "Spell Id",
+          "db_column_name": "spell_id",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true,
+          "help": "Spell cast on click. Can be 0 for special cases handled by script (OnNpcSpellClick)."
+        },
+        {
+          "name": "Quest Start",
+          "db_column_name": "quest_start",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true,
+          "help": "Legacy requirement (ignored when Condition Id is set): quest that must be rewarded (or active, see Quest Start Active) for the spellclick to work, 0 = no quest requirement."
+        },
+        {
+          "name": "Quest Start Active",
+          "db_column_name": "quest_start_active",
+          "value_type": "BoolParameter",
+          "help": "If 1, having Quest Start merely active (taken) is enough; if 0, it must be rewarded."
+        },
+        {
+          "name": "Quest End",
+          "db_column_name": "quest_end",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true,
+          "help": "Legacy requirement (ignored when Condition Id is set): spellclick stops working once this quest is rewarded, 0 = never expires."
+        },
+        {
+          "name": "Cast Flags",
+          "db_column_name": "cast_flags",
+          "value_type": "SpellclickCastFlagParameter",
+          "help": "Bit 1: the clicking player is the caster (otherwise the clicked creature). Bit 2: the clicking player is the target (otherwise the clicked creature)."
+        },
+        {
+          "name": "Condition Id",
+          "db_column_name": "condition_id",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "conditions.condition_entry controlling whether the spellclick is available to a given player. When set, the quest columns are ignored. 0 = use quest columns."
+        },
+        {
+          "is_meta": true,
+          "name": "Condition",
+          "meta": "mangos_conditions:condition_id;source=the clicked NPC;target=Player",
+          "help": "Edit the condition tree referenced by Condition Id."
+        }
+      ]
+    }
+  ]
+}

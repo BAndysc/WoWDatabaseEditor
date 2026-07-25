@@ -1,0 +1,42 @@
+{
+  "id": "spell_group_spell",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Group Spell",
+  "description": "Assigns spells to aura stacking groups defined in spell_group. All spells within a group follow the group's stacking rule.",
+  "table_name": "spell_group_spell",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "Id",
+    "SpellId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Group",
+          "db_column_name": "Id",
+          "value_type": "TableReference(spell_group#Id)Parameter"
+        },
+        {
+          "name": "Group",
+          "meta": "table:spell_group;`Id` = {Id}",
+          "help": "Open the spell group."
+        },
+        {
+          "name": "Spell",
+          "db_column_name": "SpellId",
+          "value_type": "SpellParameter"
+        }
+      ]
+    }
+  ]
+}

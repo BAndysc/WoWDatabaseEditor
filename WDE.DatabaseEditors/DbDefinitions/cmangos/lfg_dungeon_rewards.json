@@ -1,0 +1,56 @@
+{
+  "compatibility": [
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "LFG Dungeon Rewards",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Quest rewards granted for completing a random dungeon via the Dungeon Finder. The first completion of the day rewards First Quest, consecutive completions reward Other Quest; rows are picked by the lowest Max Level not below the player level.",
+  "table_name": "lfg_dungeon_rewards",
+  "table_index_name": "dungeonId",
+  "record_mode": "SingleRow",
+  "group_name": "Instance",
+  "icon_path": "Icons/document_instance_template.png",
+  "picker": "LFGDungeonParameter",
+  "primary_key": [
+    "dungeonId",
+    "maxLevel"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Dungeon",
+          "help": "Random dungeon id from LFGDungeons.dbc.",
+          "db_column_name": "dungeonId",
+          "value_type": "LFGDungeonParameter"
+        },
+        {
+          "name": "Dungeon",
+          "help": "Open the LFG dungeon template.",
+          "meta": "table:lfg_dungeon_template;`dungeonId` = {dungeonId}"
+        },
+        {
+          "name": "Max Level",
+          "help": "Highest player level this reward row applies to.",
+          "db_column_name": "maxLevel",
+          "value_type": "uint"
+        },
+        {
+          "name": "First Quest",
+          "help": "Quest rewarded on the first completion of the day.",
+          "db_column_name": "firstQuestId",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Other Quest",
+          "help": "Quest rewarded on consecutive completions of the day.",
+          "db_column_name": "otherQuestId",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

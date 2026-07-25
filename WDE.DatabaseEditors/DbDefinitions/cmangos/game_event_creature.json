@@ -1,0 +1,51 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Game Event Creature",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Links creature spawns to a game event: the creature is spawned while the event is active (positive event id) or despawned for the event's duration (negative event id).",
+  "table_name": "game_event_creature",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_gameevent_npc.png",
+  "picker": "CreatureGUIDParameter",
+  "primary_key": [
+    "guid",
+    "event"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "help": "Creature spawn guid from the creature table.",
+          "db_column_name": "guid",
+          "value_type": "CreatureGUIDParameter"
+        },
+        {
+          "name": "Spawn",
+          "help": "Open the affected creature spawn.",
+          "meta": "table:creature;`guid` = {guid}"
+        },
+        {
+          "name": "Event",
+          "help": "Game event id (game_event.entry), signed. Positive: the creature is only spawned while the event is active (if the guid is part of a pool, all pool members must be listed for the event). Negative: the creature is removed for the duration of the event and pool grouping is ignored. 0 is not allowed.",
+          "db_column_name": "event",
+          "value_type": "GameEventParameter"
+        },
+        {
+          "name": "Event",
+          "help": "Open the game event.",
+          "meta": "table:game_event;`entry` = ABS({event})"
+        }
+      ]
+    }
+  ]
+}

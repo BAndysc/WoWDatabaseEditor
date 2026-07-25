@@ -1,0 +1,246 @@
+{
+  "id": "faction_store",
+  "compatibility": [
+//    "CMaNGOS-TBC"
+  ],
+  "name": "Faction Store",
+  "description": "Database copy of Faction.dbc used by the TBC core instead of the client file: base reputation per race/class, reputation flags, spillover parameters and localized faction names. Loaded as sFactionStore SQL storage.",
+  "table_name": "faction_store",
+  "table_index_name": "Entry",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_faction_change.png",
+  "picker": "FactionParameter",
+  "primary_key": [
+    "Entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "Entry",
+          "value_type": "uint",
+          "help": "Faction id (Faction.dbc)."
+        },
+        {
+          "name": "Reputation List Id",
+          "db_column_name": "ReputationListID",
+          "value_type": "int",
+          "help": "Index in the client reputation pane, -1 if the faction has no reputation."
+        },
+        {
+          "name": "Base Rep Race Mask 1",
+          "db_column_name": "BaseRepRaceMask1",
+          "value_type": "RaceMaskParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Base Rep Race Mask 2",
+          "db_column_name": "BaseRepRaceMask2",
+          "value_type": "RaceMaskParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Base Rep Race Mask 3",
+          "db_column_name": "BaseRepRaceMask3",
+          "value_type": "RaceMaskParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Base Rep Race Mask 4",
+          "db_column_name": "BaseRepRaceMask4",
+          "value_type": "RaceMaskParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Base Rep Class Mask 1",
+          "db_column_name": "BaseRepClassMask1",
+          "value_type": "ClassMaskParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Base Rep Class Mask 2",
+          "db_column_name": "BaseRepClassMask2",
+          "value_type": "ClassMaskParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Base Rep Class Mask 3",
+          "db_column_name": "BaseRepClassMask3",
+          "value_type": "ClassMaskParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Base Rep Class Mask 4",
+          "db_column_name": "BaseRepClassMask4",
+          "value_type": "ClassMaskParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Base Rep Value 1",
+          "db_column_name": "BaseRepValue1",
+          "value_type": "int"
+        },
+        {
+          "name": "Base Rep Value 2",
+          "db_column_name": "BaseRepValue2",
+          "value_type": "int"
+        },
+        {
+          "name": "Base Rep Value 3",
+          "db_column_name": "BaseRepValue3",
+          "value_type": "int"
+        },
+        {
+          "name": "Base Rep Value 4",
+          "db_column_name": "BaseRepValue4",
+          "value_type": "int"
+        },
+        {
+          "name": "Reputation Flags 1",
+          "db_column_name": "ReputationFlags1",
+          "value_type": "CmangosFactionFlagsParameter"
+        },
+        {
+          "name": "Reputation Flags 2",
+          "db_column_name": "ReputationFlags2",
+          "value_type": "CmangosFactionFlagsParameter"
+        },
+        {
+          "name": "Reputation Flags 3",
+          "db_column_name": "ReputationFlags3",
+          "value_type": "CmangosFactionFlagsParameter"
+        },
+        {
+          "name": "Reputation Flags 4",
+          "db_column_name": "ReputationFlags4",
+          "value_type": "CmangosFactionFlagsParameter"
+        },
+        {
+          "name": "Team",
+          "db_column_name": "Team",
+          "value_type": "FactionParameter",
+          "help": "Parent faction id (e.g. 469 Alliance, 67 Horde, 169 Steamwheedle Cartel), used for reputation spillover.",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spillover Rate In",
+          "db_column_name": "SpilloverRateIn",
+          "value_type": "float"
+        },
+        {
+          "name": "Spillover Rate Out",
+          "db_column_name": "SpilloverRateOut",
+          "value_type": "float"
+        },
+        {
+          "name": "Spillover Max Rank In",
+          "db_column_name": "SpilloverMaxRankIn",
+          "value_type": "ReputationRankParameter"
+        },
+        {
+          "name": "Spillover Rank Unk",
+          "db_column_name": "SpilloverRank_unk",
+          "value_type": "uint"
+        },
+        {
+          "name": "Name (enUS)",
+          "db_column_name": "FactionName1",
+          "value_type": "string"
+        },
+        {
+          "name": "Name (koKR)",
+          "db_column_name": "FactionName2",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (frFR)",
+          "db_column_name": "FactionName3",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (deDE)",
+          "db_column_name": "FactionName4",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (zhCN)",
+          "db_column_name": "FactionName5",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (zhTW)",
+          "db_column_name": "FactionName6",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (esES)",
+          "db_column_name": "FactionName7",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (esMX)",
+          "db_column_name": "FactionName8",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (ruRU)",
+          "db_column_name": "FactionName9",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (unused 10)",
+          "db_column_name": "FactionName10",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (unused 11)",
+          "db_column_name": "FactionName11",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (unused 12)",
+          "db_column_name": "FactionName12",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (unused 13)",
+          "db_column_name": "FactionName13",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (unused 14)",
+          "db_column_name": "FactionName14",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (unused 15)",
+          "db_column_name": "FactionName15",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Name (unused 16)",
+          "db_column_name": "FactionName16",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "spell_learn_spell",
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Learn Spell",
+  "description": "Additional spells that are automatically learned when a player learns the trigger spell (and unlearned when it is removed). Complements the learn-spell effects already present in Spell.dbc; talent spells are not allowed as learned spells.",
+  "table_name": "spell_learn_spell",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "SpellParameter",
+  "reload_command": "reload spell_learn_spell",
+  "primary_key": [
+    "entry",
+    "SpellID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "entry",
+          "value_type": "SpellParameter",
+          "help": "Spell which, when learned, also teaches the learned spell"
+        },
+        {
+          "name": "Learned Spell",
+          "db_column_name": "SpellID",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Active",
+          "db_column_name": "Active",
+          "value_type": "BoolParameter",
+          "default": 1,
+          "help": "If 1 the learned spell is shown in the spellbook, if 0 it is learned as a hidden/passive spell"
+        }
+      ]
+    }
+  ]
+}

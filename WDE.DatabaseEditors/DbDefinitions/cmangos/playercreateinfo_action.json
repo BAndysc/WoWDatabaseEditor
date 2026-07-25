@@ -1,0 +1,53 @@
+{
+  "id": "playercreateinfo_action",
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Player Create Info Actions",
+  "description": "Initial action bar buttons for newly created characters of each race/class combination. The action value is a spell, item or macro id depending on the type column.",
+  "table_name": "playercreateinfo_action",
+  "table_index_name": "race",
+  "record_mode": "SingleRow",
+  "group_name": "Player create info",
+  "icon_path": "Icons/document_actionlist.png",
+  "picker": "RaceParameter",
+  "primary_key": [
+    "race",
+    "class",
+    "button"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Race",
+          "db_column_name": "race",
+          "value_type": "RaceParameter"
+        },
+        {
+          "name": "Class",
+          "db_column_name": "class",
+          "value_type": "ClassParameter"
+        },
+        {
+          "name": "Button",
+          "db_column_name": "button",
+          "value_type": "PlayercreateinfoActionButtonParameter"
+        },
+        {
+          "name": "Action",
+          "db_column_name": "action",
+          "value_type": "uint"
+        },
+        {
+          "name": "Type",
+          "db_column_name": "type",
+          "value_type": "PlayerCreateinfoActionTypeParameter"
+        }
+      ]
+    }
+  ]
+}

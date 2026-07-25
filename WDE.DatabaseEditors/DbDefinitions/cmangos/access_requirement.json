@@ -1,13 +1,15 @@
 {
-  "id": "access_requirement",
   "compatibility": [
     "CMaNGOS-WoTLK"
   ],
   "name": "Access Requirement",
+  "single_solution_name": "",
+  "multi_solution_name": "",
   "description": "Controls requirements for a map",
   "table_name": "access_requirement",
   "table_index_name": "mapId",
   "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Maps",
   "icon_path": "Icons/document_access_requirements.png",
   "primary_key": [
@@ -21,72 +23,84 @@
         {
           "name": "Map",
           "db_column_name": "mapId",
-          "value_type": "MapParameter"
+          "value_type": "MapParameter",
+          "preferred_width": 163.0
         },
         {
           "name": "Difficulty",
           "db_column_name": "difficulty",
-          "value_type": "MapDifficultyParameter"
+          "value_type": "MapDifficultyParameter",
+          "preferred_width": 135.0
         },
         {
           "name": "Level Min",
           "db_column_name": "level_min",
           "value_type": "uint",
-          "zero_is_blank": true
+          "zero_is_blank": true,
+          "preferred_width": 73.0
         },
         {
           "name": "Level Max",
           "db_column_name": "level_max",
           "value_type": "uint",
-          "zero_is_blank": true
+          "zero_is_blank": true,
+          "preferred_width": 76.0
         },
         {
           "name": "Item Level",
           "db_column_name": "item_level",
           "value_type": "uint",
-          "zero_is_blank": true
+          "zero_is_blank": true,
+          "preferred_width": 79.0
         },
         {
           "name": "Item",
           "db_column_name": "item",
           "value_type": "ItemParameter",
-          "zero_is_blank": true
+          "zero_is_blank": true,
+          "preferred_width": 91.0
         },
         {
           "name": "Item 2",
           "db_column_name": "item2",
           "value_type": "ItemParameter",
-          "zero_is_blank": true
+          "zero_is_blank": true,
+          "preferred_width": 87.0
         },
         {
-          "name": "Quest Done A",
+          "name": "Quest Done Alliance",
           "db_column_name": "quest_done_A",
           "value_type": "QuestParameter",
-          "zero_is_blank": true
+          "zero_is_blank": true,
+          "preferred_width": 131.0
         },
         {
-          "name": "Quest Done H",
+          "name": "Quest Done Horde",
           "db_column_name": "quest_done_H",
           "value_type": "QuestParameter",
-          "zero_is_blank": true
+          "zero_is_blank": true,
+          "preferred_width": 136.0
         },
         {
           "name": "Completed Achievement",
           "db_column_name": "completed_achievement",
           "value_type": "AchievementParameter",
-          "zero_is_blank": true
+          "zero_is_blank": true,
+          "preferred_width": 169.0
         },
         {
           "name": "Quest Failed Text",
           "db_column_name": "quest_failed_text",
           "value_type": "string",
-          "can_be_null": true
+          "can_be_null": true,
+          "preferred_width": 139.0
         },
         {
           "name": "Comment",
           "db_column_name": "comment",
           "value_type": "string",
-          "can_be_null": true
+          "can_be_null": true,
+          "preferred_width": 137.0
         }
       ]
     }

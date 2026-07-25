@@ -1,0 +1,39 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Worldstate Name",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Defines names for server-side (variable) worldstates, so scripts and commands can reference and inspect them by name.",
+  "table_name": "worldstate_name",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_txt.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Worldstate Id",
+          "db_column_name": "Id",
+          "value_type": "int"
+        },
+        {
+          "name": "Name",
+          "db_column_name": "Name",
+          "value_type": "string",
+          "preferred_width": 733.0
+        }
+      ]
+    }
+  ]
+}

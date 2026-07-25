@@ -1,7 +1,7 @@
 {
     "id": "creature_summon_groups",
     "compatibility": [
-      "TrinityWrath"
+      "TrinityWrath", "TrinityMaster"
     ],
     "name": "Creature Summon Groups",
     "description": "Used to define summon groups summoned later in the script",

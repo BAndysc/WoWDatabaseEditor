@@ -1,0 +1,64 @@
+{
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Vehicle Seat Addon",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Overrides per vehicle seat: passenger orientation on the seat and the position used when a passenger exits (relative offset or absolute destination). Loaded by ObjectMgr::LoadVehicleSeatParameters.",
+  "table_name": "vehicle_seat_addon",
+  "table_index_name": "SeatEntry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Vehicles",
+  "icon_path": "Icons/document_seat.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "SeatEntry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Seat Entry",
+          "help": "Seat id from VehicleSeat.dbc.",
+          "db_column_name": "SeatEntry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Seat Orientation",
+          "help": "Passenger orientation on the seat, in radians.",
+          "db_column_name": "SeatOrientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Exit X",
+          "db_column_name": "ExitParamX",
+          "value_type": "float"
+        },
+        {
+          "name": "Exit Y",
+          "db_column_name": "ExitParamY",
+          "value_type": "float"
+        },
+        {
+          "name": "Exit Z",
+          "db_column_name": "ExitParamZ",
+          "value_type": "float"
+        },
+        {
+          "name": "Exit Orientation",
+          "db_column_name": "ExitParamO",
+          "value_type": "float"
+        },
+        {
+          "name": "Exit Param Mode",
+          "help": "How exit coordinates are applied: 1 = relative offset, 2 = absolute position.",
+          "db_column_name": "ExitParamValue",
+          "value_type": "VehicleExitPositionParameter"
+        }
+      ]
+    }
+  ]
+}

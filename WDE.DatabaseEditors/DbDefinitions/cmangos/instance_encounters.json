@@ -1,0 +1,59 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Instance Encounters",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Defines how each dungeon encounter (instance_dungeon_encounters) is credited as completed: by killing a creature, casting a spell or by script. Used to track completed encounters of instance saves and for LFG completion rewards.",
+  "table_name": "instance_encounters",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Instance",
+  "icon_path": "Icons/document_fight.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "Encounter id from instance_dungeon_encounters (DungeonEncounter.dbc id on WoTLK).",
+          "db_column_name": "entry",
+          "value_type": "TableReference(instance_dungeon_encounters#Id)Parameter"
+        },
+        {
+          "name": "Credit Type",
+          "help": "How the encounter is completed: 0 = kill creature, 1 = cast spell, 2 = credited by script.",
+          "db_column_name": "creditType",
+          "value_type": "CmangosEncounterCreditTypeParameter"
+        },
+        {
+          "name": "Credit Entry",
+          "help": "Creature entry when Credit Type is kill creature, spell id when it is cast spell, unused for script.",
+          "db_column_name": "creditEntry",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Credit Creature",
+          "help": "Open the creature granting encounter credit (creditType 0).",
+          "meta": "tableByKey:creature_template;creditEntry"
+        },
+        {
+          "name": "Last Encounter Dungeon",
+          "help": "LFGDungeons.dbc id if this is the final encounter of the dungeon (grants the LFG dungeon completion reward), 0 otherwise.",
+          "db_column_name": "lastEncounterDungeon",
+          "value_type": "LFGDungeonParameter",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

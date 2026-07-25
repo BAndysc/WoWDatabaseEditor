@@ -1,0 +1,77 @@
+{
+  "id": "waypoint_path_classic",
+  "compatibility": [
+    "CMaNGOS-Classic"
+  ],
+  "name": "Waypoint Path",
+  "description": "Standalone waypoint paths keyed by a global PathId, assigned to creatures by scripts or spawn group formations. Every path must have a name defined in waypoint_path_name. Orientation 100 means no orientation at the point.",
+  "table_name": "waypoint_path",
+  "table_index_name": "PathId",
+  "record_mode": "SingleRow",
+  "group_name": "Waypoints",
+  "icon_path": "Icons/document_waypoints.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "PathId",
+    "Point"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Path Id",
+          "db_column_name": "PathId",
+          "value_type": "TableReference(waypoint_path_name#PathId)Parameter"
+        },
+        {
+          "name": "Path Name",
+          "meta": "table:waypoint_path_name;`PathId` = {PathId}",
+          "help": "Open the name of this path."
+        },
+        {
+          "name": "Point",
+          "db_column_name": "Point",
+          "value_type": "uint"
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "PositionX",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "PositionY",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "PositionZ",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "Orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Wait Time",
+          "db_column_name": "WaitTime",
+          "value_type": "MillisecondsParameter"
+        },
+        {
+          "name": "Script Id",
+          "db_column_name": "ScriptId",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comment",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

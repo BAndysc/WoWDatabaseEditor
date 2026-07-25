@@ -1,0 +1,51 @@
+{
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Transports",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Registers continent transports (ships, zeppelins): gameobject templates of type MO_TRANSPORT (15) listed here are spawned globally and travel along their TaxiPath; period is the time of one full path loop in milliseconds.",
+  "table_name": "transports",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Gameobjects",
+  "icon_path": "Icons/document_transports.png",
+  "picker": "GameobjectParameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "Gameobject template entry of type MO_TRANSPORT (15).",
+          "db_column_name": "entry",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Gameobject",
+          "help": "Open the transport gameobject template.",
+          "meta": "tableByKey:gameobject_template;entry"
+        },
+        {
+          "name": "Name",
+          "help": "Internal descriptive name of the transport.",
+          "db_column_name": "name",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Period",
+          "help": "Time of one full path loop in milliseconds; must match the client-computed path period or movement desyncs.",
+          "db_column_name": "period",
+          "value_type": "MillisecondsParameter"
+        }
+      ]
+    }
+  ]
+}

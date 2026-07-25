@@ -1,0 +1,80 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Creature Model Info",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Per display id (CreatureDisplayInfo.dbc) model data used by the server: bounding radius and combat reach for distance checks, default walk/run speeds, gender and the alternative model of the other gender, plus an alternative (non-combat/spirit healer) model.",
+  "table_name": "creature_model_info",
+  "table_index_name": "modelid",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_creature_model_info.png",
+  "picker": "CreatureModelDataParameter",
+  "primary_key": [
+    "modelid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Model Id",
+          "db_column_name": "modelid",
+          "value_type": "CreatureModelDataParameter"
+        },
+        {
+          "name": "Bounding Radius",
+          "help": "Model collision radius, used for melee/interaction distance calculation.",
+          "db_column_name": "bounding_radius",
+          "value_type": "float"
+        },
+        {
+          "name": "Combat Reach",
+          "help": "Combat reach of the model, used for melee range calculation (player models always use 1.5).",
+          "db_column_name": "combat_reach",
+          "value_type": "float"
+        },
+        {
+          "name": "Speed Walk",
+          "help": "Default walking speed for any creature using this model.",
+          "db_column_name": "SpeedWalk",
+          "value_type": "float",
+          "default": 1
+        },
+        {
+          "name": "Speed Run",
+          "help": "Default running speed for any creature using this model.",
+          "db_column_name": "SpeedRun",
+          "value_type": "float",
+          "default": 1.14286
+        },
+        {
+          "name": "Gender",
+          "help": "Gender of this model: 0 = male, 1 = female, 2 = none/neutral.",
+          "db_column_name": "gender",
+          "value_type": "GenderParameter",
+          "default": 2
+        },
+        {
+          "name": "Model Id Other Gender",
+          "help": "Display id of the same creature model in the other gender (used when a creature_template offers gendered models). 0 = none.",
+          "db_column_name": "modelid_other_gender",
+          "value_type": "CreatureModelDataParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Model Id Alternative",
+          "help": "Alternative display id, e.g. the model shown to dead players by spirit healers. 0 = none.",
+          "db_column_name": "modelid_alternative",
+          "value_type": "CreatureModelDataParameter",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

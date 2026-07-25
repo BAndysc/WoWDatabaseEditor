@@ -144,7 +144,8 @@
         {
           "name": "Npc flag",
           "db_column_name": "npcflag",
-          "value_type": "NpcFlagParameter"
+          "value_type": "NpcFlag64Parameter",
+          "help": "64-bit packed value on master: low 32 bits = NPCFlags, high 32 bits = NPCFlags2 (UnitDefines.h)"
         },
         {
           "name": "Unit Flags",

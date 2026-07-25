@@ -1,7 +1,7 @@
 {
   "id": "player_factionchange_titles",
   "compatibility": [
-    "TrinityWrath", "TrinityCata"
+    "TrinityWrath", "TrinityCata", "TrinityMaster"
   ],
   "name": "Player Faction Change Titles",
   "single_solution_name": "Player Faction Change Titles",

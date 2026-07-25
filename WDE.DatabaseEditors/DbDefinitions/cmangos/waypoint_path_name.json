@@ -1,0 +1,43 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Waypoint Path Name",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Human readable name for each waypoint_path PathId. The core requires every path in waypoint_path to have a name here and reports an error on load otherwise.",
+  "table_name": "waypoint_path_name",
+  "table_index_name": "PathId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Waypoints",
+  "icon_path": "Icons/document_waypoints.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "PathId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Path Id",
+          "db_column_name": "PathId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Nodes",
+          "help": "Open the nodes of this path.",
+          "meta": "table:waypoint_path;`PathId` = {PathId}"
+        },
+        {
+          "name": "Name",
+          "db_column_name": "Name",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

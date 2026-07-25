@@ -1,0 +1,89 @@
+{
+  "id": "game_event_creature_data_tbc",
+  "compatibility": [
+    "CMaNGOS-TBC"
+  ],
+  "name": "Game Event Creature Data",
+  "description": "Temporarily overrides a creature spawn's template entry, display model, equipment and vendor list while a game event is active; optional spells are cast on the creature when the event starts and ends.",
+  "table_name": "game_event_creature_data",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "group_name": "Game events",
+  "icon_path": "Icons/document_gameevent_npc.png",
+  "picker": "CreatureGUIDParameter",
+  "primary_key": [
+    "guid",
+    "event"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "help": "Creature spawn guid from the creature table.",
+          "db_column_name": "guid",
+          "value_type": "CreatureGUIDParameter"
+        },
+        {
+          "name": "Spawn",
+          "meta": "table:creature;`guid` = {guid}",
+          "help": "Open the affected creature spawn."
+        },
+        {
+          "name": "Entry Id",
+          "help": "Alternative creature_template entry the creature is updated to while the event is active. 0 = keep the original entry.",
+          "db_column_name": "entry_id",
+          "value_type": "CreatureParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Model Id",
+          "help": "Display id (CreatureDisplayInfo.dbc) used while the event is active. 0 = no model change.",
+          "db_column_name": "modelid",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Equipment Id",
+          "help": "creature_equip_template entry used while the event is active. 0 = no equipment change.",
+          "db_column_name": "equipment_id",
+          "value_type": "TableReference(creature_equip_template#entry)Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Vendor Id",
+          "help": "npc_vendor_template entry the creature offers as vendor while the event is active. 0 = no vendor change.",
+          "db_column_name": "vendor_id",
+          "value_type": "TableReference(npc_vendor_template#entry)Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell Start",
+          "help": "Spell cast on the creature when the event starts (typically an aura kept while the event is active). 0 = none.",
+          "db_column_name": "spell_start",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Spell End",
+          "help": "Spell cast on the creature when the event stops. 0 = none.",
+          "db_column_name": "spell_end",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Event",
+          "help": "Game event id (game_event.entry) during which this override is applied. Only positive ids are allowed here.",
+          "db_column_name": "event",
+          "value_type": "GameEventParameter"
+        },
+        {
+          "name": "Event",
+          "meta": "table:game_event;`entry` = {event}",
+          "help": "Open the game event."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "World Template",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Binds a C++ world map script (WorldMapData) to a non-instanceable continent map, similar to instance_template for instances.",
+  "table_name": "world_template",
+  "table_index_name": "map",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_map.png",
+  "picker": "MapParameter",
+  "primary_key": [
+    "map"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Map",
+          "help": "Non-instanceable (continent) map id from Map.dbc.",
+          "db_column_name": "map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Script Name",
+          "help": "C++ world map script name bound to this map.",
+          "db_column_name": "ScriptName",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

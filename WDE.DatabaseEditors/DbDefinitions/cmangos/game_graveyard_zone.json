@@ -1,0 +1,60 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Game Graveyard Zone",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Links graveyards (world_safe_locs) to areas/zones or whole maps: when a player dies, the closest graveyard linked to their area (then zone, then map) and usable by their team is chosen.",
+  "table_name": "game_graveyard_zone",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_graveyard.png",
+  "reload_command": "reload game_graveyard_zone",
+  "picker": "Parameter",
+  "primary_key": [
+    "id",
+    "ghost_loc",
+    "link_kind"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "help": "Graveyard id from world_safe_locs (WorldSafeLocs.dbc id).",
+          "db_column_name": "id",
+          "value_type": "TableReference(world_safe_locs#id)Parameter"
+        },
+        {
+          "name": "Safe Loc",
+          "help": "Open the graveyard world safe location.",
+          "meta": "table:world_safe_locs;`id` = {id}"
+        },
+        {
+          "name": "Ghost Loc",
+          "help": "Area or zone id the dead player is in when Link Kind is area link; a map id when Link Kind is map link.",
+          "db_column_name": "ghost_loc",
+          "value_type": "ZoneAreaParameter"
+        },
+        {
+          "name": "Link Kind",
+          "help": "0 = Ghost Loc is an area/zone id, 1 = Ghost Loc is a map id.",
+          "db_column_name": "link_kind",
+          "value_type": "CmangosGraveyardLinkKindParameter"
+        },
+        {
+          "name": "Team",
+          "help": "Team allowed to use this graveyard link: 0 = both, 67 = horde, 469 = alliance.",
+          "db_column_name": "faction",
+          "value_type": "CmangosTeamParameter"
+        }
+      ]
+    }
+  ]
+}

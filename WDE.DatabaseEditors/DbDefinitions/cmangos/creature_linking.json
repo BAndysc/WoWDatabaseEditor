@@ -1,0 +1,55 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Creature Linking",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Creature Linking System, guid-based variant: links one specific creature spawn (slave) to a master spawn so that aggro/evade/death/respawn events of one trigger reactions on the other. For entry-wide rules use creature_linking_template instead.",
+  "table_name": "creature_linking",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_link.png",
+  "picker": "CreatureGUIDParameter",
+  "primary_key": [
+    "guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "help": "creature.guid of the slave mob that is linked. Must be on the same map as the master.",
+          "db_column_name": "guid",
+          "value_type": "CreatureGUIDParameter"
+        },
+        {
+          "name": "Spawn",
+          "help": "Open the linked (slave) spawn.",
+          "meta": "table:creature;`guid` = {guid}"
+        },
+        {
+          "name": "Master Guid",
+          "help": "creature.guid of the master whose events trigger reactions on the slave.",
+          "db_column_name": "master_guid",
+          "value_type": "CreatureGUIDParameter"
+        },
+        {
+          "name": "Master Spawn",
+          "help": "Open the master spawn.",
+          "meta": "table:creature;`guid` = {master_guid}"
+        },
+        {
+          "name": "Flag",
+          "db_column_name": "flag",
+          "value_type": "CmangosCreatureLinkingFlagsParameter"
+        }
+      ]
+    }
+  ]
+}

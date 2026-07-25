@@ -1,0 +1,59 @@
+{
+  "compatibility": [
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Lfg Dungeon Template",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Teleport coordinates used by the Dungeon/Raid Finder to place the player inside the dungeon entrance for a given LFGDungeons.dbc entry.",
+  "table_name": "lfg_dungeon_template",
+  "table_index_name": "dungeonId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Instance",
+  "icon_path": "Icons/document_instance_template.png",
+  "primary_key": [
+    "dungeonId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Dungeon",
+          "help": "LFGDungeons.dbc id.",
+          "db_column_name": "dungeonId",
+          "value_type": "LFGDungeonParameter",
+          "read_only": true
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Name",
+          "help": "Developer-facing comment column present in the DB schema; not read by LFGMgr::LoadLFGDungeons (SELECT only fetches dungeonId, position_x/y/z, orientation).",
+          "db_column_name": "name",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

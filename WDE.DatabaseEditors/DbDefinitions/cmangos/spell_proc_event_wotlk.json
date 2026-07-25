@@ -1,0 +1,129 @@
+{
+  "id": "spell_proc_event_wotlk",
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spell Proc Event",
+  "description": "Extra proc conditions for aura spells: what school, spell family, proc flags and extended hit conditions must be met for the aura to trigger, plus proc-per-minute rate, custom chance and hidden cooldown. Only first rank spells should be defined, data is propagated to higher ranks.",
+  "table_name": "spell_proc_event",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "SpellParameter",
+  "reload_command": "reload spell_proc_event",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "entry",
+          "value_type": "SpellParameter",
+          "help": "Aura spell with proc trigger, should be the first rank in its spell chain"
+        },
+        {
+          "name": "School Mask",
+          "db_column_name": "SchoolMask",
+          "value_type": "SpellSchoolMaskParameter",
+          "zero_is_blank": true,
+          "help": "If nonzero, the proccing spell must match this school mask"
+        },
+        {
+          "name": "Spell Family Name",
+          "db_column_name": "SpellFamilyName",
+          "value_type": "SpellFamilyNameParameter",
+          "zero_is_blank": true,
+          "help": "If nonzero, the proccing spell must belong to this spell family"
+        },
+        {
+          "name": "Family Mask A (Effect 0)",
+          "db_column_name": "SpellFamilyMaskA0",
+          "value_type": "uint",
+          "help": "Low 32 bits of the spell family flags the proccing spell must match for effect index 0"
+        },
+        {
+          "name": "Family Mask A (Effect 1)",
+          "db_column_name": "SpellFamilyMaskA1",
+          "value_type": "uint",
+          "help": "Low 32 bits of the spell family flags the proccing spell must match for effect index 1"
+        },
+        {
+          "name": "Family Mask A (Effect 2)",
+          "db_column_name": "SpellFamilyMaskA2",
+          "value_type": "uint",
+          "help": "Low 32 bits of the spell family flags the proccing spell must match for effect index 2"
+        },
+        {
+          "name": "Family Mask B (Effect 0)",
+          "db_column_name": "SpellFamilyMaskB0",
+          "value_type": "uint",
+          "help": "High 32 bits of the spell family flags the proccing spell must match for effect index 0"
+        },
+        {
+          "name": "Family Mask B (Effect 1)",
+          "db_column_name": "SpellFamilyMaskB1",
+          "value_type": "uint",
+          "help": "High 32 bits of the spell family flags the proccing spell must match for effect index 1"
+        },
+        {
+          "name": "Family Mask B (Effect 2)",
+          "db_column_name": "SpellFamilyMaskB2",
+          "value_type": "uint",
+          "help": "High 32 bits of the spell family flags the proccing spell must match for effect index 2"
+        },
+        {
+          "name": "Family Mask C (Effect 0)",
+          "db_column_name": "SpellFamilyMaskC0",
+          "value_type": "uint",
+          "help": "Spell family flags2 the proccing spell must match for effect index 0"
+        },
+        {
+          "name": "Family Mask C (Effect 1)",
+          "db_column_name": "SpellFamilyMaskC1",
+          "value_type": "uint",
+          "help": "Spell family flags2 the proccing spell must match for effect index 1"
+        },
+        {
+          "name": "Family Mask C (Effect 2)",
+          "db_column_name": "SpellFamilyMaskC2",
+          "value_type": "uint",
+          "help": "Spell family flags2 the proccing spell must match for effect index 2"
+        },
+        {
+          "name": "Proc Flags",
+          "db_column_name": "procFlags",
+          "value_type": "SpellProcFlagParameter",
+          "help": "Overrides the procFlags from Spell.dbc, 0 = use dbc value"
+        },
+        {
+          "name": "Proc Ex",
+          "db_column_name": "procEx",
+          "value_type": "CmangosSpellProcExFlagsParameter",
+          "help": "Extended proc condition (hit result etc.); 0 = trigger on hit/crit only"
+        },
+        {
+          "name": "PPM Rate",
+          "db_column_name": "ppmRate",
+          "value_type": "float",
+          "help": "Procs per minute for weapon-speed based procs, 0 = use flat chance from Spell.dbc"
+        },
+        {
+          "name": "Custom Chance",
+          "db_column_name": "CustomChance",
+          "value_type": "float",
+          "help": "Custom proc chance in percent, overrides the chance from Spell.dbc, 0 = no override"
+        },
+        {
+          "name": "Cooldown",
+          "db_column_name": "Cooldown",
+          "value_type": "MillisecondsParameter",
+          "help": "Hidden proc cooldown in milliseconds applied to the triggered spell"
+        }
+      ]
+    }
+  ]
+}

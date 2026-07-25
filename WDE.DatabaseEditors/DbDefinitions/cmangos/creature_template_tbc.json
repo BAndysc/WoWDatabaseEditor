@@ -1,0 +1,849 @@
+{
+  "id": "creature_template_tbc",
+  "compatibility": [
+    "CMaNGOS-TBC"
+  ],
+  "name": "Creature Template",
+  "description": "Main creature definition table: names, models, level and stat multipliers, flags, loot, trainer/vendor links, movement and AI for every creature entry. Loaded once at server startup by ObjectMgr::LoadCreatureTemplates.",
+  "table_name": "creature_template",
+  "table_index_name": "Entry",
+  "record_mode": "Template",
+  "group_name": "Templates",
+  "icon_path": "Icons/document_creature_template.png",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "Entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "Entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Name",
+          "db_column_name": "Name",
+          "value_type": "string"
+        },
+        {
+          "name": "Sub Name",
+          "db_column_name": "SubName",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Icon Name",
+          "db_column_name": "IconName",
+          "value_type": "IconNameParameter",
+          "can_be_null": true,
+          "help": "Cursor icon shown when hovering the creature (e.g. Attack, Buy, Speak)."
+        },
+        {
+          "name": "Min Level",
+          "db_column_name": "MinLevel",
+          "value_type": "uint",
+          "default": 1
+        },
+        {
+          "name": "Max Level",
+          "db_column_name": "MaxLevel",
+          "value_type": "uint",
+          "default": 1
+        },
+        {
+          "name": "Heroic Entry",
+          "db_column_name": "HeroicEntry",
+          "value_type": "CreatureParameter",
+          "zero_is_blank": true,
+          "help": "Creature entry used in heroic dungeon difficulty."
+        }
+      ]
+    },
+    {
+      "group_name": "Models",
+      "fields": [
+        {
+          "name": "Display Id 1",
+          "db_column_name": "DisplayId1",
+          "value_type": "CreatureModelDataParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Display Id 2",
+          "db_column_name": "DisplayId2",
+          "value_type": "CreatureModelDataParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Display Id 3",
+          "db_column_name": "DisplayId3",
+          "value_type": "CreatureModelDataParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Display Id 4",
+          "db_column_name": "DisplayId4",
+          "value_type": "CreatureModelDataParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Display Id Probability 1",
+          "db_column_name": "DisplayIdProbability1",
+          "value_type": "uint",
+          "help": "Relative weight used when randomly picking one of the up to 4 display ids."
+        },
+        {
+          "name": "Display Id Probability 2",
+          "db_column_name": "DisplayIdProbability2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Display Id Probability 3",
+          "db_column_name": "DisplayIdProbability3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Display Id Probability 4",
+          "db_column_name": "DisplayIdProbability4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Scale",
+          "db_column_name": "Scale",
+          "value_type": "float",
+          "default": 1.0
+        }
+      ]
+    },
+    {
+      "group_name": "General",
+      "fields": [
+        {
+          "name": "Faction",
+          "db_column_name": "Faction",
+          "value_type": "FactionTemplateParameter"
+        },
+        {
+          "name": "Family",
+          "db_column_name": "Family",
+          "value_type": "CreatureFamilyParameter",
+          "zero_is_blank": true,
+          "help": "Pet family, only for tameable beasts (CreatureFamily.dbc)."
+        },
+        {
+          "name": "Creature Type",
+          "db_column_name": "CreatureType",
+          "value_type": "CreatureTypeParameter"
+        },
+        {
+          "name": "Inhabit Type",
+          "db_column_name": "InhabitType",
+          "value_type": "InhabitTypeParameter",
+          "default": 3
+        },
+        {
+          "name": "Regenerate Stats",
+          "db_column_name": "RegenerateStats",
+          "value_type": "CmangosRegenStatsFlagsParameter",
+          "default": 3
+        },
+        {
+          "name": "Racial Leader",
+          "db_column_name": "RacialLeader",
+          "value_type": "BoolParameter",
+          "help": "Killing a racial leader awards extra honor."
+        },
+        {
+          "name": "Unit Class",
+          "db_column_name": "UnitClass",
+          "value_type": "UnitClassParameter",
+          "help": "Determines base stats row in creature_template_classlevelstats."
+        },
+        {
+          "name": "Rank",
+          "db_column_name": "Rank",
+          "value_type": "NpcRankParameter"
+        },
+        {
+          "name": "Expansion",
+          "db_column_name": "Expansion",
+          "value_type": "ExpansionParameter",
+          "default": -1,
+          "help": "Expansion whose class/level stats are used. -1 marks invalid/custom-stats entries."
+        }
+      ]
+    },
+    {
+      "group_name": "Flags",
+      "fields": [
+        {
+          "name": "Npc Flags",
+          "db_column_name": "NpcFlags",
+          "value_type": "NpcFlagParameter"
+        },
+        {
+          "name": "Unit Flags",
+          "db_column_name": "UnitFlags",
+          "value_type": "UnitFlagParameter"
+        },
+        {
+          "name": "Dynamic Flags",
+          "db_column_name": "DynamicFlags",
+          "value_type": "CmangosClassicTbcDynamicFlagsParameter"
+        },
+        {
+          "name": "Extra Flags",
+          "db_column_name": "ExtraFlags",
+          "value_type": "CmangosCreatureExtraFlagsParameter",
+          "help": "CMaNGOS-specific creature flags (values differ from TrinityCore)."
+        },
+        {
+          "name": "Creature Type Flags",
+          "db_column_name": "CreatureTypeFlags",
+          "value_type": "TypeFlagsParameter"
+        },
+        {
+          "name": "Static Flags 1",
+          "db_column_name": "StaticFlags1",
+          "value_type": "CreatureStaticFlags1Parameter"
+        },
+        {
+          "name": "Static Flags 2",
+          "db_column_name": "StaticFlags2",
+          "value_type": "CreatureStaticFlags2Parameter"
+        },
+        {
+          "name": "Static Flags 3",
+          "db_column_name": "StaticFlags3",
+          "value_type": "CreatureStaticFlags3Parameter"
+        },
+        {
+          "name": "Static Flags 4",
+          "db_column_name": "StaticFlags4",
+          "value_type": "CreatureStaticFlags4Parameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Movement",
+      "fields": [
+        {
+          "name": "Speed Walk",
+          "db_column_name": "SpeedWalk",
+          "value_type": "float"
+        },
+        {
+          "name": "Speed Run",
+          "db_column_name": "SpeedRun",
+          "value_type": "float"
+        },
+        {
+          "name": "Movement Type",
+          "db_column_name": "MovementType",
+          "value_type": "CmangosMovementTypeParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Combat Behaviour",
+      "fields": [
+        {
+          "name": "Detection Range",
+          "db_column_name": "Detection",
+          "value_type": "uint",
+          "default": 18,
+          "help": "Detection range for proximity (line of sight) aggro, in yards."
+        },
+        {
+          "name": "Call For Help Range",
+          "db_column_name": "CallForHelp",
+          "value_type": "uint",
+          "help": "Range in which the creature calls nearby allies for help, in yards."
+        },
+        {
+          "name": "Pursuit Time",
+          "db_column_name": "Pursuit",
+          "value_type": "MillisecondsParameter",
+          "help": "Hit refresh time after which the creature evades, in milliseconds."
+        },
+        {
+          "name": "Leash Range",
+          "db_column_name": "Leash",
+          "value_type": "uint",
+          "help": "Leash range from the combat start position, in yards. 0 = no leash."
+        },
+        {
+          "name": "Leash Timeout",
+          "db_column_name": "Timeout",
+          "value_type": "MillisecondsParameter",
+          "help": "Time for refreshing leashing before evade, in milliseconds."
+        }
+      ]
+    },
+    {
+      "group_name": "Stats",
+      "fields": [
+        {
+          "name": "Health Multiplier",
+          "db_column_name": "HealthMultiplier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Power Multiplier",
+          "db_column_name": "PowerMultiplier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Damage Multiplier",
+          "db_column_name": "DamageMultiplier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Damage Variance",
+          "db_column_name": "DamageVariance",
+          "value_type": "float",
+          "default": 0.4
+        },
+        {
+          "name": "Armor Multiplier",
+          "db_column_name": "ArmorMultiplier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Experience Multiplier",
+          "db_column_name": "ExperienceMultiplier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Strength Multiplier",
+          "db_column_name": "StrengthMultiplier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Agility Multiplier",
+          "db_column_name": "AgilityMultiplier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Stamina Multiplier",
+          "db_column_name": "StaminaMultiplier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Intellect Multiplier",
+          "db_column_name": "IntellectMultiplier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Spirit Multiplier",
+          "db_column_name": "SpiritMultiplier",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Min Level Health",
+          "db_column_name": "MinLevelHealth",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max Level Health",
+          "db_column_name": "MaxLevelHealth",
+          "value_type": "uint"
+        },
+        {
+          "name": "Min Level Mana",
+          "db_column_name": "MinLevelMana",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max Level Mana",
+          "db_column_name": "MaxLevelMana",
+          "value_type": "uint"
+        },
+        {
+          "name": "Min Melee Damage",
+          "db_column_name": "MinMeleeDmg",
+          "value_type": "float"
+        },
+        {
+          "name": "Max Melee Damage",
+          "db_column_name": "MaxMeleeDmg",
+          "value_type": "float"
+        },
+        {
+          "name": "Min Ranged Damage",
+          "db_column_name": "MinRangedDmg",
+          "value_type": "float"
+        },
+        {
+          "name": "Max Ranged Damage",
+          "db_column_name": "MaxRangedDmg",
+          "value_type": "float"
+        },
+        {
+          "name": "Armor",
+          "db_column_name": "Armor",
+          "value_type": "uint"
+        },
+        {
+          "name": "Melee Attack Power",
+          "db_column_name": "MeleeAttackPower",
+          "value_type": "uint"
+        },
+        {
+          "name": "Ranged Attack Power",
+          "db_column_name": "RangedAttackPower",
+          "value_type": "uint"
+        },
+        {
+          "name": "Melee Attack Time",
+          "db_column_name": "MeleeBaseAttackTime",
+          "value_type": "MillisecondsParameter",
+          "default": 2000
+        },
+        {
+          "name": "Ranged Attack Time",
+          "db_column_name": "RangedBaseAttackTime",
+          "value_type": "MillisecondsParameter",
+          "default": 2000
+        },
+        {
+          "name": "Damage School",
+          "db_column_name": "DamageSchool",
+          "value_type": "SpellSchoolParameter"
+        },
+        {
+          "name": "Damage Multiplier (OLD)",
+          "db_column_name": "DamageMultiplierOLD",
+          "value_type": "float",
+          "default": 1.0,
+          "help": "Deprecated column kept during damage rework migration."
+        },
+        {
+          "name": "Damage Variance (OLD)",
+          "db_column_name": "DamageVarianceOLD",
+          "value_type": "float",
+          "default": 1.0,
+          "help": "Deprecated column kept during damage rework migration."
+        }
+      ]
+    },
+    {
+      "group_name": "Loot",
+      "fields": [
+        {
+          "name": "Min Loot Gold",
+          "db_column_name": "MinLootGold",
+          "value_type": "MoneyParameter"
+        },
+        {
+          "name": "Max Loot Gold",
+          "db_column_name": "MaxLootGold",
+          "value_type": "MoneyParameter"
+        },
+        {
+          "name": "Loot Id",
+          "db_column_name": "LootId",
+          "value_type": "LootCreatureParameter",
+          "zero_is_blank": true,
+          "help": "References creature_loot_template.entry, usually equal to the creature entry. 0 = no loot."
+        },
+        {
+          "name": "Pickpocket Loot Id",
+          "db_column_name": "PickpocketLootId",
+          "value_type": "LootPickpocketParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Skinning Loot Id",
+          "db_column_name": "SkinningLootId",
+          "value_type": "LootSkinningParameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Quests",
+      "fields": [
+        {
+          "name": "Kill Credit 1",
+          "db_column_name": "KillCredit1",
+          "value_type": "CreatureParameter",
+          "zero_is_blank": true,
+          "help": "Killing this creature also credits the given entry."
+        },
+        {
+          "name": "Kill Credit",
+          "meta": "tableByKey:creature_template;KillCredit1",
+          "help": "Open the creature granted as kill credit."
+        },
+        {
+          "name": "Kill Credit 2",
+          "db_column_name": "KillCredit2",
+          "value_type": "CreatureParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Kill Credit",
+          "meta": "tableByKey:creature_template;KillCredit2",
+          "help": "Open the creature granted as kill credit."
+        }
+      ]
+    },
+    {
+      "group_name": "Immunities & Resistances",
+      "fields": [
+        {
+          "name": "Mechanic Immune Mask",
+          "db_column_name": "MechanicImmuneMask",
+          "value_type": "SpellMechanicMaskParameter",
+          "help": "Mask of mechanics the creature is immune to, bit = 1 << (mechanic - 1)."
+        },
+        {
+          "name": "School Immune Mask",
+          "db_column_name": "SchoolImmuneMask",
+          "value_type": "SpellSchoolMaskParameter"
+        },
+        {
+          "name": "Holy Resistance",
+          "db_column_name": "ResistanceHoly",
+          "value_type": "int"
+        },
+        {
+          "name": "Fire Resistance",
+          "db_column_name": "ResistanceFire",
+          "value_type": "int"
+        },
+        {
+          "name": "Nature Resistance",
+          "db_column_name": "ResistanceNature",
+          "value_type": "int"
+        },
+        {
+          "name": "Frost Resistance",
+          "db_column_name": "ResistanceFrost",
+          "value_type": "int"
+        },
+        {
+          "name": "Shadow Resistance",
+          "db_column_name": "ResistanceShadow",
+          "value_type": "int"
+        },
+        {
+          "name": "Arcane Resistance",
+          "db_column_name": "ResistanceArcane",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Interaction",
+      "fields": [
+        {
+          "name": "Trainer Type",
+          "db_column_name": "TrainerType",
+          "value_type": "TrainerTypeParameter"
+        },
+        {
+          "name": "Trainer Spell",
+          "db_column_name": "TrainerSpell",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true,
+          "help": "Player must already know this spell to interact with the trainer."
+        },
+        {
+          "name": "Trainer Class",
+          "db_column_name": "TrainerClass",
+          "value_type": "ClassParameter",
+          "zero_is_blank": true,
+          "help": "Class the trainer teaches (class and pet trainers)."
+        },
+        {
+          "name": "Trainer Race",
+          "db_column_name": "TrainerRace",
+          "value_type": "RaceParameter",
+          "zero_is_blank": true,
+          "help": "Race requirement (e.g. riding trainers)."
+        },
+        {
+          "name": "Trainer Template Id",
+          "db_column_name": "TrainerTemplateId",
+          "value_type": "TableReference(npc_trainer_template#entry)Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Trainer Template",
+          "meta": "tableByKey:npc_trainer_template;TrainerTemplateId",
+          "help": "Open the shared trainer spell list."
+        },
+        {
+          "name": "Vendor Template Id",
+          "db_column_name": "VendorTemplateId",
+          "value_type": "TableReference(npc_vendor_template#entry)Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Vendor Template",
+          "meta": "table:npc_vendor_template;`entry` = {VendorTemplateId}",
+          "help": "Open the shared vendor item list."
+        },
+        {
+          "name": "Equipment Template Id",
+          "db_column_name": "EquipmentTemplateId",
+          "value_type": "TableReference(creature_equip_template#entry)Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Equipment",
+          "meta": "table:creature_equip_template;`entry` = {EquipmentTemplateId}",
+          "help": "Open the equipment template."
+        },
+        {
+          "name": "Gossip Menu Id",
+          "db_column_name": "GossipMenuId",
+          "value_type": "GossipMenuParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Gossip Menu",
+          "meta": "tableByKey:gossip_menu;GossipMenuId",
+          "help": "Open the gossip menu assigned to this creature."
+        },
+        {
+          "name": "Interaction Pause Timer",
+          "db_column_name": "InteractionPauseTimer",
+          "value_type": "int",
+          "default": -1,
+          "help": "Time in milliseconds the creature pauses its movement when a player interacts with it. -1 = use config default."
+        }
+      ]
+    },
+    {
+      "group_name": "Scripting",
+      "fields": [
+        {
+          "name": "Pet Spell Data Id",
+          "db_column_name": "PetSpellDataId",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "help": "Id from CreatureSpellData.dbc defining the pet action bar spells."
+        },
+        {
+          "name": "Corpse Decay",
+          "db_column_name": "CorpseDecay",
+          "value_type": "uint",
+          "help": "Time in seconds before the corpse despawns."
+        },
+        {
+          "name": "Spell List",
+          "db_column_name": "SpellList",
+          "value_type": "CreatureTemplateSpellListIdParameter",
+          "zero_is_blank": true,
+          "help": "creature_spell_list Id (entry*100 + set). 0 = defaults to Entry*100."
+        },
+        {
+          "name": "Spell List",
+          "meta": "table:creature_spell_list;`Id` = {SpellList}",
+          "help": "Open the assigned combat spell list."
+        },
+        {
+          "name": "Charmed Spell List",
+          "db_column_name": "CharmedSpellList",
+          "value_type": "CreatureTemplateSpellListIdParameter",
+          "zero_is_blank": true,
+          "help": "Spell list used while the creature is charmed/possessed."
+        },
+        {
+          "name": "String Id 1",
+          "db_column_name": "StringId1",
+          "value_type": "TableReference(string_id#Id)Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "String Id 2",
+          "db_column_name": "StringId2",
+          "value_type": "TableReference(string_id#Id)Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "AI Name",
+          "db_column_name": "AIName",
+          "value_type": "string",
+          "help": "AI to use, e.g. EventAI. Empty = default AI by creature type."
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "help": "C++ ScriptDevAI script name bound to this creature."
+        }
+      ]
+    },
+    {
+      "group_name": "Addon (creature_template_addon)",
+      "fields": [
+        {
+          "name": "Mount",
+          "db_column_name": "mount",
+          "value_type": "CreatureModelDataParameter",
+          "zero_is_blank": true,
+          "help": "Mount creature display id.",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "Stand State",
+          "db_column_name": "stand_state",
+          "value_type": "StandStateParameter",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "Sheath State",
+          "db_column_name": "sheath_state",
+          "value_type": "SheathStateParameter",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "Emote State",
+          "db_column_name": "emote",
+          "value_type": "EmoteStateParameter",
+          "zero_is_blank": true,
+          "help": "Permanent emote state (UNIT_NPC_EMOTESTATE).",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "Spline Flags",
+          "db_column_name": "moveflags",
+          "value_type": "MangosSplineFlagsParameter",
+          "help": "0x1000 = walk mode, 0x2000 = flying.",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "Auras",
+          "db_column_name": "auras",
+          "value_type": "MultiSpellParameter",
+          "can_be_null": true,
+          "help": "Space-separated list of aura spell ids applied on spawn.",
+          "foreign_table": "creature_template_addon"
+        }
+      ]
+    },
+    {
+      "group_name": "Related tables",
+      "fields": [
+        {
+          "name": "Spawns",
+          "meta": "table:creature;`id` = {Entry}",
+          "help": "All spawns of this creature."
+        },
+        {
+          "name": "Spawn Entry Variants",
+          "meta": "table:creature_spawn_entry;`entry` = {Entry}",
+          "help": "Spawns randomly choosing this entry (creature_spawn_entry)."
+        },
+        {
+          "name": "Vendor Items",
+          "meta": "table:npc_vendor;`entry` = {Entry}",
+          "help": "Items sold by this creature."
+        },
+        {
+          "name": "Trainer Spells",
+          "meta": "table:npc_trainer;`entry` = {Entry}",
+          "help": "Spells taught by this creature."
+        },
+        {
+          "name": "Quest Starter",
+          "meta": "table:creature_questrelation;`id` = {Entry}",
+          "help": "Quests started by this creature."
+        },
+        {
+          "name": "Quest Ender",
+          "meta": "table:creature_involvedrelation;`id` = {Entry}",
+          "help": "Quests ended by this creature."
+        },
+        {
+          "name": "On-Kill Reputation",
+          "meta": "table:creature_onkill_reputation;`creature_id` = {Entry}",
+          "help": "Reputation granted when killing this creature."
+        },
+        {
+          "name": "Movement Paths",
+          "meta": "table:creature_movement_template;`Entry` = {Entry}",
+          "help": "Waypoint paths shared by all spawns of this entry."
+        },
+        {
+          "name": "Script Waypoints",
+          "meta": "table:script_waypoint;`Entry` = {Entry}",
+          "help": "ScriptDevAI escort waypoints for this creature."
+        },
+        {
+          "name": "Immunities",
+          "meta": "table:creature_immunities;`Entry` = {Entry}",
+          "help": "Extra immunity sets of this creature."
+        },
+        {
+          "name": "Cooldowns",
+          "meta": "table:creature_cooldowns;`Entry` = {Entry}",
+          "help": "Per-spell cooldown overrides of this creature."
+        },
+        {
+          "name": "Spell Lists",
+          "meta": "table:creature_spell_list;`Id` BETWEEN {Entry} * 100 AND {Entry} * 100 + 99",
+          "help": "All combat spell lists defined for this entry (entry*100+setId)."
+        },
+        {
+          "name": "Creature Linking",
+          "meta": "table:creature_linking_template;`entry` = {Entry} OR `master_entry` = {Entry}",
+          "help": "Entry-wide creature linking rules involving this creature."
+        },
+        {
+          "name": "Quest Greeting",
+          "meta": "table:questgiver_greeting;`Entry` = {Entry}",
+          "help": "Quest-giver greeting text of this creature."
+        },
+        {
+          "name": "Trainer Greeting",
+          "meta": "table:trainer_greeting;`Entry` = {Entry}",
+          "help": "Trainer greeting text of this creature."
+        },
+        {
+          "name": "Pet Auto-Cast Spells",
+          "meta": "table:pet_autocast_spell_list;`CreatureEntry` = {Entry}",
+          "help": "Auto-cast spell list when used as a pet."
+        },
+        {
+          "name": "Pet Create Spells",
+          "meta": "table:petcreateinfo_spell;`entry` = {Entry}",
+          "help": "Spells known when created as a pet."
+        },
+        {
+          "name": "Pet Level Stats",
+          "meta": "table:pet_levelstats;`creature_entry` = {Entry}",
+          "help": "Per-level stats when used as a pet."
+        }
+      ]
+    }
+  ],
+  "table_name_source_field": "Name",
+  "single_solution_name": "Creature {name} template",
+  "multi_solution_name": "Multiple creature templates",
+  "foreign_tables": [
+    {
+      "table_name": "creature_template_addon",
+      "foreign_key": [
+        "entry"
+      ]
+    }
+  ]
+}

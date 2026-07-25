@@ -1,0 +1,52 @@
+{
+  "compatibility": [
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Achievement Criteria Data (legacy)",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Legacy pre-2009 name of the achievement_criteria_requirement table (renamed in CMaNGOS revision 8723). Current CMaNGOS-WoTLK does not read this table anymore; use Achievement Criteria Requirement instead.",
+  "table_name": "achievement_criteria_data",
+  "table_index_name": "criteria_id",
+  "record_mode": "SingleRow",
+  "group_name": "Achievements",
+  "icon_path": "Icons/document_achievement.png",
+  "picker": "AchievementCriteriaParameter",
+  "primary_key": [
+    "criteria_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Criteria",
+          "help": "Criteria id from AchievementCriteria.dbc.",
+          "db_column_name": "criteria_id",
+          "value_type": "AchievementCriteriaParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Requirement Type",
+          "db_column_name": "type",
+          "value_type": "CmangosAchievementCriteriaRequirementTypeParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Value1",
+          "help": "Meaning depends on the requirement type.",
+          "db_column_name": "value1",
+          "value_type": "int",
+          "can_be_null": true
+        },
+        {
+          "name": "Value2",
+          "help": "Meaning depends on the requirement type.",
+          "db_column_name": "value2",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

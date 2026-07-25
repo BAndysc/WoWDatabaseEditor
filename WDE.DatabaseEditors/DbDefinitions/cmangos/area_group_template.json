@@ -1,0 +1,72 @@
+{
+  "id": "area_group_template",
+  "compatibility": [
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Area Group Template",
+  "description": "Database copy of AreaGroup.dbc: groups of up to six areas, chained via Next Group when a group needs more entries. Used by SpellMgr to check spell area restrictions (SpellEntry.AreaGroupId).",
+  "table_name": "area_group_template",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_map.png",
+  "picker": "AreaGroupParameter",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "Id",
+          "value_type": "uint"
+        },
+        {
+          "name": "Area 1",
+          "db_column_name": "AreaId1",
+          "value_type": "ZoneAreaParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Area 2",
+          "db_column_name": "AreaId2",
+          "value_type": "ZoneAreaParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Area 3",
+          "db_column_name": "AreaId3",
+          "value_type": "ZoneAreaParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Area 4",
+          "db_column_name": "AreaId4",
+          "value_type": "ZoneAreaParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Area 5",
+          "db_column_name": "AreaId5",
+          "value_type": "ZoneAreaParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Area 6",
+          "db_column_name": "AreaId6",
+          "value_type": "ZoneAreaParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Next Group",
+          "db_column_name": "NextGroup",
+          "value_type": "TableReference(area_group_template#Id)Parameter",
+          "help": "Id of the next area group when the group has more than six areas.",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

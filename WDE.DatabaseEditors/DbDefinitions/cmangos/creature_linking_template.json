@@ -1,0 +1,69 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Creature Linking Template",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Creature Linking System, entry-based variant: links all creatures of an entry on a map (slaves) to a master entry so that aggro/evade/death/respawn events of one trigger reactions on the other. Masters and slaves are paired within search_range of their spawn positions (0 = whole map, master must be unique).",
+  "table_name": "creature_linking_template",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Creatures",
+  "icon_path": "Icons/document_link.png",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "entry",
+    "map"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "creature_template.entry of the slave mob that is linked.",
+          "db_column_name": "entry",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Creature",
+          "help": "Open the linked (slave) creature template.",
+          "meta": "tableByKey:creature_template;entry"
+        },
+        {
+          "name": "Map",
+          "help": "Map id of the linked mobs.",
+          "db_column_name": "map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Master Entry",
+          "help": "creature_template.entry of the master whose events trigger reactions on the slaves.",
+          "db_column_name": "master_entry",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Master",
+          "help": "Open the master creature template.",
+          "meta": "tableByKey:creature_template;master_entry"
+        },
+        {
+          "name": "Flag",
+          "help": "Follow requires a unique master spawn within search range.",
+          "db_column_name": "flag",
+          "value_type": "CmangosCreatureLinkingFlagsParameter"
+        },
+        {
+          "name": "Search Range",
+          "help": "Range (based on spawn coordinates) in which master and slave are linked together. 0 = whole map (master entry must have exactly one spawn on the map).",
+          "db_column_name": "search_range",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,10 @@
 {
-  "id": "creature",
   "compatibility": [
     "CMaNGOS-WoTLK"
   ],
   "name": "Creature",
+  "single_solution_name": "",
+  "multi_solution_name": "",
   "description": "The table contains all creature spawns",
   "table_name": "creature",
   "table_index_name": "guid",
@@ -13,6 +14,26 @@
   "primary_key": [
     "guid"
   ],
+  "foreign_tables": [
+    {
+      "table_name": "creature_addon",
+      "foreign_key": [
+        "guid"
+      ]
+    },
+    {
+      "table_name": "creature_conditional_spawn",
+      "foreign_key": [
+        "Guid"
+      ]
+    },
+    {
+      "table_name": "creature_spawn_data",
+      "foreign_key": [
+        "Guid"
+      ]
+    }
+  ],
   "groups": [
     {
       "group_name": "group",
@@ -21,72 +42,225 @@
           "name": "Guid",
           "db_column_name": "guid",
           "value_type": "uint",
-          "read_only": true
+          "read_only": true,
+          "preferred_width": 90.0
         },
         {
           "name": "Entry",
           "db_column_name": "id",
-          "value_type": "CreatureParameter"
+          "value_type": "CreatureParameter",
+          "preferred_width": 206.0
+        },
+        {
+          "name": "Template",
+          "help": "Open the creature template of this spawn.",
+          "meta": "tableByKey:creature_template;id"
         },
         {
           "name": "Map",
           "db_column_name": "map",
-          "value_type": "MapParameter"
+          "value_type": "MapParameter",
+          "preferred_width": 138.0
         },
         {
           "name": "Spawn Mask",
           "db_column_name": "spawnMask",
           "value_type": "SpawnMaskParameter",
-          "default": 1
+          "default": 1,
+          "preferred_width": 90.0
         },
         {
           "name": "Phase Mask",
           "db_column_name": "phaseMask",
           "value_type": "PhaseMaskParameter",
-          "default": 1
+          "default": 1,
+          "preferred_width": 81.0
         },
         {
-          "name": "Position X",
-          "db_column_name": "position_x",
-          "value_type": "float"
-        },
+          "name": "Movement Type",
+          "db_column_name": "MovementType",
+          "value_type": "CmangosMovementTypeParameter",
+          "preferred_width": 80.0
+        }
+      ]
+    },
+    {
+      "group_name": "Spawn",
+      "fields": [
         {
-          "name": "Position Y",
-          "db_column_name": "position_y",
-          "value_type": "float"
-        },
-        {
-          "name": "Position Z",
-          "db_column_name": "position_z",
-          "value_type": "float"
-        },
-        {
-          "name": "Orientation",
-          "db_column_name": "orientation",
-          "value_type": "float"
-        },
-        {
-          "name": "Spawn time secs min",
+          "name": "Min spawn time secs",
           "db_column_name": "spawntimesecsmin",
           "value_type": "uint",
-          "default": 120
+          "default": 120,
+          "preferred_width": 106.0
         },
         {
-          "name": "Spawn time secs max",
+          "name": "Max spawn time secs",
           "db_column_name": "spawntimesecsmax",
           "value_type": "uint",
-          "default": 120
+          "default": 120,
+          "preferred_width": 106.0
         },
         {
           "name": "Spawn radius",
           "db_column_name": "spawndist",
           "value_type": "float",
-          "default": 5.0
+          "default": 5,
+          "preferred_width": 88.0
+        }
+      ]
+    },
+    {
+      "group_name": "Addon",
+      "fields": [
+        {
+          "name": "Mount",
+          "db_column_name": "mount",
+          "foreign_table": "creature_addon",
+          "value_type": "CreatureModelDataParameter",
+          "preferred_width": 145.0
         },
         {
-          "name": "Movement Type",
-          "db_column_name": "MovementType",
-          "value_type": "CmangosMovementTypeParameter"
+          "name": "Stand State",
+          "db_column_name": "stand_state",
+          "foreign_table": "creature_addon",
+          "value_type": "StandStateParameter"
+        },
+        {
+          "name": "Sheath State",
+          "db_column_name": "sheath_state",
+          "foreign_table": "creature_addon",
+          "value_type": "SheathStateParameter",
+          "preferred_width": 98.0
+        },
+        {
+          "name": "Pvp Flags",
+          "db_column_name": "pvp_flags",
+          "foreign_table": "creature_addon",
+          "value_type": "uint",
+          "preferred_width": 63.0
+        },
+        {
+          "name": "Emote",
+          "db_column_name": "emote",
+          "foreign_table": "creature_addon",
+          "value_type": "EmoteStateParameter",
+          "preferred_width": 134.0
+        },
+        {
+          "name": "Move Flags",
+          "db_column_name": "moveflags",
+          "foreign_table": "creature_addon",
+          "value_type": "MangosSplineFlagsParameter",
+          "preferred_width": 82.0
+        },
+        {
+          "name": "Auras",
+          "db_column_name": "auras",
+          "foreign_table": "creature_addon",
+          "value_type": "MultiSpellParameter",
+          "can_be_null": true,
+          "preferred_width": 75.0
+        }
+      ]
+    },
+    {
+      "group_name": "Related tables",
+      "fields": [
+        {
+          "name": "Waypoints",
+          "help": "Per-guid waypoint path of this spawn.",
+          "meta": "table:creature_movement;`Id` = {guid}"
+        },
+        {
+          "name": "Entry Variants",
+          "help": "Random entry choices for this spawn.",
+          "meta": "table:creature_spawn_entry;`guid` = {guid}"
+        },
+        {
+          "name": "Spawn Data",
+          "help": "Spawn data template assignment.",
+          "meta": "table:creature_spawn_data;`Guid` = {guid}"
+        },
+        {
+          "name": "Game Event",
+          "help": "Game event spawning/despawning this creature.",
+          "meta": "table:game_event_creature;`guid` = {guid}"
+        },
+        {
+          "name": "Linking",
+          "help": "Guid-based creature linking involving this spawn.",
+          "meta": "table:creature_linking;`guid` = {guid} OR `master_guid` = {guid}"
+        },
+        {
+          "name": "Creature Spawn Entry",
+          "meta": "tableByKey:creature_spawn_entry;guid"
+        }
+      ]
+    },
+    {
+      "group_name": "Conditional Spawn",
+      "fields": [
+        {
+          "name": "Entry Alliance",
+          "help": "Creature entry spawned when the instance belongs to the Alliance team.",
+          "db_column_name": "EntryAlliance",
+          "foreign_table": "creature_conditional_spawn",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Entry Horde",
+          "help": "Creature entry spawned when the instance belongs to the Horde team.",
+          "db_column_name": "EntryHorde",
+          "foreign_table": "creature_conditional_spawn",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Conditional Spawn Comment",
+          "db_column_name": "Comments",
+          "foreign_table": "creature_conditional_spawn",
+          "value_type": "string"
+        }
+      ]
+    },
+    {
+      "group_name": "Additional Spawn Data",
+      "fields": [
+        {
+          "name": "Template Id",
+          "db_column_name": "Id",
+          "foreign_table": "creature_spawn_data",
+          "value_type": "TableReference(creature_spawn_data_template#Entry)Parameter",
+          "zero_is_blank": true
+        }
+      ]
+    },
+    {
+      "group_name": "Position",
+      "fields": [
+        {
+          "name": "X",
+          "db_column_name": "position_x",
+          "value_type": "float",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Y",
+          "db_column_name": "position_y",
+          "value_type": "float",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Z",
+          "db_column_name": "position_z",
+          "value_type": "float",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "O",
+          "db_column_name": "orientation",
+          "value_type": "float",
+          "preferred_width": 90.0
         }
       ]
     }

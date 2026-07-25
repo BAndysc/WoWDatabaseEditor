@@ -1,0 +1,51 @@
+{
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Skill Discovery Template",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Profession spells that can be discovered while crafting: casting the requirement spell gives a chance to learn the discovered spell once the required skill value is reached. Loaded by SpellMgr::LoadSkillDiscoveryTable.",
+  "table_name": "skill_discovery_template",
+  "table_index_name": "spellId",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_spell.png",
+  "reload_command": "reload skill_discovery_template",
+  "picker": "SpellParameter",
+  "primary_key": [
+    "spellId",
+    "reqSpell"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Discovered Spell",
+          "db_column_name": "spellId",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Requirement Spell",
+          "help": "Spell whose cast can trigger the discovery (0 = any spell of the skill line).",
+          "db_column_name": "reqSpell",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Req Skill Value",
+          "help": "Minimum skill value required to discover the spell.",
+          "db_column_name": "reqSkillValue",
+          "value_type": "uint"
+        },
+        {
+          "name": "Chance",
+          "help": "Discovery chance, scaled by Rate.Skill.Discovery config.",
+          "db_column_name": "chance",
+          "value_type": "float"
+        }
+      ]
+    }
+  ]
+}

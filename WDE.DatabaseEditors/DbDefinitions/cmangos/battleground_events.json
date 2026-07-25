@@ -1,0 +1,53 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Battleground Events",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Defines and describes the battleground event indexes (main event1 + sub event2) used on each battleground map. Rows in creature_battleground and gameobject_battleground must reference an event pair defined here; battleground scripts (de)activate whole events, (de)spawning all objects assigned to them together.",
+  "table_name": "battleground_events",
+  "table_index_name": "map",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "PVP",
+  "icon_path": "Icons/document_bg.png",
+  "picker": "MapParameter",
+  "primary_key": [
+    "map",
+    "event1",
+    "event2"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Event 1",
+          "help": "Main battleground event id.",
+          "db_column_name": "event1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Event 2",
+          "help": "Sub event id.",
+          "db_column_name": "event2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Description",
+          "help": "Human readable description of what this event represents (e.g. a node state).",
+          "db_column_name": "description",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

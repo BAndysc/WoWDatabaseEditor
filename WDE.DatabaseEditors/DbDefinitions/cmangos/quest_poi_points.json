@@ -1,0 +1,56 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Quest POI Points",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "World-map coordinates of the polygon points forming each quest POI blob defined in quest_poi. Loaded together with quest_poi by ObjectMgr::LoadQuestPOI.",
+  "table_name": "quest_poi_points",
+  "table_index_name": "questId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Quests",
+  "icon_path": "Icons/document_point_of_interest.png",
+  "reload_command": "reload quest_poi",
+  "picker": "QuestParameter",
+  "primary_key": [
+    "questId"
+  ],
+  "groups": [
+    {
+      "group_name": "Quest POI Point",
+      "fields": [
+        {
+          "name": "Quest",
+          "db_column_name": "questId",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Quest",
+          "help": "Open the quest template.",
+          "meta": "tableByKey:quest_template;questId"
+        },
+        {
+          "name": "POI Id",
+          "help": "quest_poi.poiId this point belongs to.",
+          "db_column_name": "poiId",
+          "value_type": "uint"
+        },
+        {
+          "name": "X",
+          "help": "World X coordinate of the point.",
+          "db_column_name": "x",
+          "value_type": "int"
+        },
+        {
+          "name": "Y",
+          "help": "World Y coordinate of the point.",
+          "db_column_name": "y",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

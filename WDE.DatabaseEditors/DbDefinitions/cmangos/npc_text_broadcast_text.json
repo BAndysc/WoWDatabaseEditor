@@ -1,0 +1,128 @@
+{
+  "compatibility": [
+    "CMaNGOS-Classic",
+    "CMaNGOS-TBC",
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Npc Text Broadcast Text",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Alternative way to define gossip window texts from broadcast_text entries instead of npc_text. Ids share the npc_text id space (referenced the same way from gossip_menu) and must not duplicate npc_text ids; each of the up to 8 alternatives is picked by probability, with text, language and emotes taken from the broadcast text.",
+  "table_name": "npc_text_broadcast_text",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Texts",
+  "icon_path": "Icons/document_npc_text.png",
+  "reload_command": "reload npc_text",
+  "picker": "NpcTextParameter",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "help": "Shares the id space with npc_text; must not exist in npc_text as well.",
+          "db_column_name": "Id",
+          "value_type": "NpcTextParameter"
+        },
+        {
+          "name": "Npc Text",
+          "help": "Open the classic npc_text row with the same id.",
+          "meta": "table:npc_text;`ID` = {Id}"
+        },
+        {
+          "name": "Probability 0",
+          "db_column_name": "Prob0",
+          "value_type": "float"
+        },
+        {
+          "name": "Probability 1",
+          "db_column_name": "Prob1",
+          "value_type": "float"
+        },
+        {
+          "name": "Probability 2",
+          "db_column_name": "Prob2",
+          "value_type": "float"
+        },
+        {
+          "name": "Probability 3",
+          "db_column_name": "Prob3",
+          "value_type": "float"
+        },
+        {
+          "name": "Probability 4",
+          "db_column_name": "Prob4",
+          "value_type": "float"
+        },
+        {
+          "name": "Probability 5",
+          "db_column_name": "Prob5",
+          "value_type": "float"
+        },
+        {
+          "name": "Probability 6",
+          "db_column_name": "Prob6",
+          "value_type": "float"
+        },
+        {
+          "name": "Probability 7",
+          "db_column_name": "Prob7",
+          "value_type": "float"
+        },
+        {
+          "name": "Broadcast Text 0",
+          "db_column_name": "BroadcastTextId0",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Broadcast Text 1",
+          "db_column_name": "BroadcastTextId1",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Broadcast Text 2",
+          "db_column_name": "BroadcastTextId2",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Broadcast Text 3",
+          "db_column_name": "BroadcastTextId3",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Broadcast Text 4",
+          "db_column_name": "BroadcastTextId4",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Broadcast Text 5",
+          "db_column_name": "BroadcastTextId5",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Broadcast Text 6",
+          "db_column_name": "BroadcastTextId6",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Broadcast Text 7",
+          "db_column_name": "BroadcastTextId7",
+          "value_type": "BroadcastTextParameter",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

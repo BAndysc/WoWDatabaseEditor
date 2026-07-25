@@ -1,0 +1,50 @@
+{
+  "compatibility": [
+//    "CMaNGOS-Classic",
+//    "CMaNGOS-TBC",
+//    "CMaNGOS-WoTLK"
+  ],
+  "name": "Player Create Info Spells",
+  "single_solution_name": "",
+  "multi_solution_name": "",
+  "description": "Additional spells known by newly created characters of the given race/class combination, on top of the DBC defined starting spells.",
+  "table_name": "playercreateinfo_spell",
+  "table_index_name": "race",
+  "record_mode": "SingleRow",
+  "group_name": "Player create info",
+  "icon_path": "Icons/document_spell.png",
+  "picker": "RaceParameter",
+  "primary_key": [
+    "race",
+    "class",
+    "Spell"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Race",
+          "db_column_name": "race",
+          "value_type": "RaceParameter"
+        },
+        {
+          "name": "Class",
+          "db_column_name": "class",
+          "value_type": "ClassParameter"
+        },
+        {
+          "name": "Spell",
+          "db_column_name": "Spell",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Note",
+          "db_column_name": "Note",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}
