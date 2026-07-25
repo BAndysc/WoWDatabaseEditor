@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WDE.CMangosConditions.ViewModels;assembly=WDE.CMangosConditions"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="40"
+             x:DataType="viewModels:StandaloneMangosConditionsViewModel"
+             x:Class="WDE.CMangosConditions.Avalonia.Views.StandaloneMangosConditionsToolBar">
+    <controls:ToolbarPanel>
+        <TextBlock VerticalAlignment="Center" Margin="4,0">Root entry:</TextBlock>
+        <TextBox Width="110"
+                 VerticalAlignment="Center"
+                 Watermark="condition id"
+                 Text="{CompiledBinding RootEntryText}">
+            <TextBox.KeyBindings>
+                <KeyBinding Command="{CompiledBinding LoadCommand}" Gesture="Enter" />
+            </TextBox.KeyBindings>
+        </TextBox>
+        <components:ButtonImage Image="Icons/icon_open.png" ToolTip.Tip="Load the condition tree with this root entry" Command="{CompiledBinding LoadCommand}" />
+        <components:ButtonImage Image="Icons/icon_new.png" ToolTip.Tip="Start a new, empty condition tree" Command="{CompiledBinding NewCommand}" />
+        <components:ButtonImage Image="Icons/icon_save.png" ToolTip.Tip="Save to the database (delete + reinsert edited entries)" Command="{CompiledBinding SaveCommand}" />
+        <Panel Width="20" />
+
+        <components:ButtonImage Image="Icons/icon_left.png" ToolTip.Tip="Undo" Command="{CompiledBinding Editor.UndoCommand}" />
+        <components:ButtonImage Image="Icons/icon_right.png" ToolTip.Tip="Redo" Command="{CompiledBinding Editor.RedoCommand}" />
+        <Panel Width="20" />
+
+        <components:ButtonImage Image="Icons/icon_copy.png" ToolTip.Tip="Copy subtree" Command="{CompiledBinding Editor.CopyCommand}" />
+        <components:ButtonImage Image="Icons/icon_cut.png" ToolTip.Tip="Cut subtree" Command="{CompiledBinding Editor.CutCommand}" />
+        <components:ButtonImage Image="Icons/icon_paste.png" ToolTip.Tip="Paste" Command="{CompiledBinding Editor.PasteCommand}" />
+        <Panel Width="20" />
+
+        <components:ButtonImage Image="Icons/icon_add.png" ToolTip.Tip="Add root condition" Command="{CompiledBinding Editor.AddRootCommand}" />
+        <components:ButtonImage Image="Icons/icon_delete.png" ToolTip.Tip="Remove selected" Command="{CompiledBinding Editor.RemoveItemCommand}" />
+        <Panel Width="20" />
+
+        <Button Command="{CompiledBinding Editor.AddChildCommand}" ToolTip.Tip="Add a nested condition under the selected AND/OR/NOT">Add nested</Button>
+        <Button Command="{CompiledBinding Editor.WrapInAndCommand}" ToolTip.Tip="Wrap the selected condition in an AND">AND</Button>
+        <Button Command="{CompiledBinding Editor.WrapInOrCommand}" ToolTip.Tip="Wrap the selected condition in an OR">OR</Button>
+        <Button Command="{CompiledBinding Editor.WrapInNotCommand}" ToolTip.Tip="Wrap the selected condition in a NOT">NOT</Button>
+    </controls:ToolbarPanel>
+</UserControl>

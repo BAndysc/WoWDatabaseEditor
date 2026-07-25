@@ -23,6 +23,7 @@ public class CMangosWrathVersion : ICoreVersion, IDatabaseFeatures, ISmartScript
     public bool SupportsConditionTargetVictim => false;
     public PhasingType PhasingType => PhasingType.PhaseMasks;
     public GameVersion Version { get; } = new(3, 3, 5, 12340);
+    public string SoapCommandNamespace => "urn:MaNGOS";
 
     public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate),
         typeof(IConversationTemplate),
@@ -38,7 +39,8 @@ public class CMangosWrathVersion : ICoreVersion, IDatabaseFeatures, ISmartScript
     };
 
     public bool AlternativeTrinityDatabase => true;
-    public WaypointTables SupportedWaypoints => WaypointTables.MangosWaypointPath | WaypointTables.MangosCreatureMovement;
+    public bool SupportsTransactions => false; // cmangos mixes InnoDB and MyISAM tables
+    public WaypointTables SupportedWaypoints => WaypointTables.MangosWaypointPath | WaypointTables.MangosCreatureMovement | WaypointTables.MangosCreatureMovementTemplate;
     public bool SpawnGroupTemplateHasType => true;
     public DatabaseTable TableName => DatabaseTable.WorldTable("smart_scripts");
 

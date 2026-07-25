@@ -1,0 +1,29 @@
+<controls:DialogViewBase xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+                xmlns:views="clr-namespace:WDE.CMangosConditions.Avalonia.Views"
+                xmlns:viewModels="clr-namespace:WDE.CMangosConditions.ViewModels;assembly=WDE.CMangosConditions"
+                mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+                x:DataType="viewModels:MangosConditionsEditorViewModel"
+                x:Class="WDE.CMangosConditions.Avalonia.Views.MangosConditionsEditorView">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Padding="10,6"
+                IsVisible="{CompiledBinding HasSourceTargetHint}"
+                Background="{DynamicResource TextControlBackground}">
+            <TextBlock Text="{CompiledBinding SourceTargetHint}"
+                       Opacity="0.7"
+                       TextWrapping="Wrap" />
+        </Border>
+        <views:MangosConditionsTreeEditor Grid.Row="1" />
+        <OkCancelButtons Grid.Row="2" Margin="10"
+                         AcceptCommand="{CompiledBinding Accept}"
+                         CancelCommand="{CompiledBinding Cancel}" />
+    </Grid>
+</controls:DialogViewBase>

@@ -1,0 +1,21 @@
+<controls:DialogViewBase xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+                xmlns:views="clr-namespace:WDE.CMangosConditions.Avalonia.Views"
+                xmlns:viewModels="clr-namespace:WDE.CMangosConditions.ViewModels;assembly=WDE.CMangosConditions"
+                mc:Ignorable="d" d:DesignWidth="750" d:DesignHeight="600"
+                x:DataType="viewModels:UnitConditionEditorViewModel"
+                x:Class="WDE.CMangosConditions.Avalonia.Views.UnitConditionEditorView">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions>
+        <views:UnitConditionsEditor Grid.Row="0" />
+        <OkCancelButtons Grid.Row="1" Margin="10"
+                         AcceptCommand="{CompiledBinding Accept}"
+                         CancelCommand="{CompiledBinding Cancel}" />
+    </Grid>
+</controls:DialogViewBase>

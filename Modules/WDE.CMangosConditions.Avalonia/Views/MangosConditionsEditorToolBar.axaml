@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WDE.CMangosConditions.ViewModels;assembly=WDE.CMangosConditions"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:MangosConditionsEditorViewModel"
+             x:Class="WDE.CMangosConditions.Avalonia.Views.MangosConditionsEditorToolBar">
+    <controls:ToolbarPanel>
+        <components:ButtonImage Image="Icons/icon_left.png" ToolTip.Tip="Undo" Command="{CompiledBinding UndoCommand}" />
+        <components:ButtonImage Image="Icons/icon_right.png" ToolTip.Tip="Redo" Command="{CompiledBinding RedoCommand}" />
+        <Panel Width="20" />
+
+        <components:ButtonImage Image="Icons/icon_copy.png" ToolTip.Tip="Copy subtree" Command="{CompiledBinding CopyCommand}" />
+        <components:ButtonImage Image="Icons/icon_cut.png" ToolTip.Tip="Cut subtree" Command="{CompiledBinding CutCommand}" />
+        <components:ButtonImage Image="Icons/icon_paste.png" ToolTip.Tip="Paste" Command="{CompiledBinding PasteCommand}" />
+        <Panel Width="20" />
+
+        <components:ButtonImage Image="Icons/icon_add.png" ToolTip.Tip="Add root condition" Command="{CompiledBinding AddRootCommand}" />
+        <components:ButtonImage Image="Icons/icon_delete.png" ToolTip.Tip="Remove selected" Command="{CompiledBinding RemoveItemCommand}" />
+        <Panel Width="20" />
+
+        <Button Command="{CompiledBinding AddChildCommand}" ToolTip.Tip="Add a nested condition under the selected AND/OR/NOT">Add nested</Button>
+        <Button Command="{CompiledBinding WrapInAndCommand}" ToolTip.Tip="Wrap the selected condition in an AND">AND</Button>
+        <Button Command="{CompiledBinding WrapInOrCommand}" ToolTip.Tip="Wrap the selected condition in an OR">OR</Button>
+        <Button Command="{CompiledBinding WrapInNotCommand}" ToolTip.Tip="Wrap the selected condition in a NOT">NOT</Button>
+    </controls:ToolbarPanel>
+</UserControl>

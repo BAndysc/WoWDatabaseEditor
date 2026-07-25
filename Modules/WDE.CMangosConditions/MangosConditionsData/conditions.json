@@ -1,0 +1,497 @@
+[
+  {
+    "id": -3,
+    "name": "CONDITION_NOT",
+    "name_readable": "Not (negate child)",
+    "help": "True when the child condition is false. The child condition must have a lower entry id than this condition.",
+    "min_children": 1,
+    "max_children": 1,
+    "description": "NOT — true when the child is false"
+  },
+  {
+    "id": -2,
+    "name": "CONDITION_OR",
+    "name_readable": "Or (any child true)",
+    "help": "True when any of the 2-4 child conditions is true. The child conditions must have lower entry ids than this condition.",
+    "min_children": 2,
+    "max_children": 4,
+    "description": "OR — any of the following:"
+  },
+  {
+    "id": -1,
+    "name": "CONDITION_AND",
+    "name_readable": "And (all children true)",
+    "help": "True when all of the 2-4 child conditions are true. The child conditions must have lower entry ids than this condition.",
+    "min_children": 2,
+    "max_children": 4,
+    "description": "AND — all of the following:"
+  },
+  {
+    "id": 0,
+    "name": "CONDITION_NONE",
+    "name_readable": "Always",
+    "help": "Empty condition, always met.",
+    "description": "{negate:Always|Never}"
+  },
+  {
+    "id": 1,
+    "name": "CONDITION_AURA",
+    "name_readable": "Has aura",
+    "help": "The target unit has an aura of the given spell and effect index.",
+    "tags": ["unit"],
+    "parameters": [
+      { "type": "SpellParameter", "name": "Spell" },
+      { "type": "SpellEffectIndexParameter", "name": "Effect index" }
+    ],
+    "description": "{target} {negate:has|does not have} aura of {pram1} (effect {pram2})"
+  },
+  {
+    "id": 2,
+    "name": "CONDITION_ITEM",
+    "name_readable": "Has item in inventory",
+    "help": "The target player has at least the given amount of the item in their inventory. The count must be at least 1.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "ItemParameter", "name": "Item" },
+      { "type": "Parameter", "name": "Count (at least)" }
+    ],
+    "description": "{target} {negate:has|does not have} {pram2}x {pram1} in inventory"
+  },
+  {
+    "id": 3,
+    "name": "CONDITION_ITEM_EQUIPPED",
+    "name_readable": "Has item equipped",
+    "help": "The target player has the item equipped (a socketed gem with this id also counts).",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "ItemParameter", "name": "Item" }
+    ],
+    "description": "{target} {negate:has|does not have} {pram1} equipped"
+  },
+  {
+    "id": 4,
+    "name": "CONDITION_AREAID",
+    "name_readable": "Is in zone/area",
+    "help": "The checked object (source if provided, otherwise target) is in the given zone or area — the id matches either its zone id or its subarea id. Mode 1 inverts the check.",
+    "tags": ["worldobject"],
+    "parameters": [
+      { "type": "ZoneAreaParameter", "name": "Zone or area" },
+      { "type": "Parameter", "name": "Mode", "values": { "0": { "name": "in zone/area" }, "1": { "name": "not in zone/area" } } }
+    ],
+    "description": "{sourceortarget} {negate:is|is not} {pram2} {pram1}"
+  },
+  {
+    "id": 5,
+    "name": "CONDITION_REPUTATION_RANK_MIN",
+    "name_readable": "Reputation rank at least",
+    "help": "The target player's reputation rank with the faction is at least the given rank.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "FactionParameter", "name": "Faction" },
+      { "type": "ReputationRankParameter", "name": "Min rank" }
+    ],
+    "description": "{target} reputation with {pram1} {negate:is|is not} at least {pram2}"
+  },
+  {
+    "id": 6,
+    "name": "CONDITION_TEAM",
+    "name_readable": "Player team",
+    "help": "The target player (or corpse) belongs to the given team. Always true for referring-loot checks when two-side auction interaction is enabled.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "TeamAllianceParameter", "name": "Team" }
+    ],
+    "description": "{target} {negate:is|is not} {pram1}"
+  },
+  {
+    "id": 7,
+    "name": "CONDITION_SKILL",
+    "name_readable": "Has skill (at least)",
+    "help": "The target player has the skill and its base value is at least the given value (1 to the server's max skill value).",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "SkillParameter", "name": "Skill" },
+      { "type": "Parameter", "name": "Min skill value" }
+    ],
+    "description": "{target} {negate:has|does not have} skill {pram1} at {pram2} or more"
+  },
+  {
+    "id": 8,
+    "name": "CONDITION_QUESTREWARDED",
+    "name_readable": "Quest rewarded",
+    "help": "The target player has completed the quest and received its reward.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "QuestParameter", "name": "Quest" }
+    ],
+    "description": "{target} {negate:was|was not} rewarded quest {pram1}"
+  },
+  {
+    "id": 9,
+    "name": "CONDITION_QUESTTAKEN",
+    "name_readable": "Quest in progress",
+    "help": "The target player currently has the quest in their quest log, optionally in a specific state.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "QuestParameter", "name": "Quest" },
+      { "type": "Parameter", "name": "State", "values": { "0": { "name": "any state" }, "1": { "name": "incomplete" }, "2": { "name": "completed, not rewarded" } } }
+    ],
+    "description": "{target} {negate:has|does not have} quest {pram1} taken ({pram2})"
+  },
+  {
+    "id": 10,
+    "name": "CONDITION_AD_COMMISSION_AURA",
+    "name_readable": "Has Argent Dawn commission aura",
+    "help": "The target player has an Argent Dawn commission trinket aura active (detected by spell visual). No parameters.",
+    "tags": ["player"],
+    "description": "{target} {negate:has|does not have} an Argent Dawn commission aura"
+  },
+  {
+    "id": 11,
+    "name": "CONDITION_PVP_RANK",
+    "name_readable": "PvP rank (vanilla only)",
+    "help": "Reserved for vanilla — on this core the condition always evaluates to false.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "Parameter", "name": "Value 1" },
+      { "type": "Parameter", "name": "Value 2" }
+    ],
+    "description": "pvp rank {pram1} {pram2} (always false on wotlk)"
+  },
+  {
+    "id": 12,
+    "name": "CONDITION_ACTIVE_GAME_EVENT",
+    "name_readable": "Game event active",
+    "help": "The given game_event is currently active. Needs no source or target.",
+    "parameters": [
+      { "type": "GameEventParameter", "name": "Event" }
+    ],
+    "description": "game event {pram1} {negate:is|is not} active"
+  },
+  {
+    "id": 13,
+    "name": "CONDITION_AREA_FLAG",
+    "name_readable": "Area flags",
+    "help": "The area of the checked object (source if provided, otherwise target) has all of the required flags and none of the forbidden flags. At least one of the two masks must be set.",
+    "tags": ["worldobject"],
+    "parameters": [
+      { "type": "Parameter", "name": "Required area flags" },
+      { "type": "Parameter", "name": "Forbidden area flags" }
+    ],
+    "description": "area of {sourceortarget} {negate:has|does not have} flags {pram1} (and not {pram2})"
+  },
+  {
+    "id": 14,
+    "name": "CONDITION_RACE_CLASS",
+    "name_readable": "Race / class mask",
+    "help": "The target unit matches the race mask and the class mask. A mask of 0 means 'any', but at least one of the two must be set.",
+    "tags": ["unit"],
+    "parameters": [
+      { "type": "RaceMaskParameter", "name": "Race mask" },
+      { "type": "ClassMaskParameter", "name": "Class mask" }
+    ],
+    "description": "{target} {negate:matches|does not match} race {pram1} and class {pram2}"
+  },
+  {
+    "id": 15,
+    "name": "CONDITION_LEVEL",
+    "name_readable": "Level",
+    "help": "Compares the target unit's level with the given value.",
+    "tags": ["unit"],
+    "parameters": [
+      { "type": "Parameter", "name": "Level" },
+      { "type": "Parameter", "name": "Compare", "values": { "0": { "name": "exactly" }, "1": { "name": "at least" }, "2": { "name": "at most" } } }
+    ],
+    "description": "{target} level {negate:is|is not} {pram2} {pram1}"
+  },
+  {
+    "id": 16,
+    "name": "CONDITION_UNUSED_2",
+    "name_readable": "Unused (16)",
+    "description": "unused (16)"
+  },
+  {
+    "id": 17,
+    "name": "CONDITION_SPELL",
+    "name_readable": "Knows spell",
+    "help": "The target player knows (or, with mode 1, does not know) the given spell.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "SpellParameter", "name": "Spell" },
+      { "type": "Parameter", "name": "Mode", "values": { "0": { "name": "knows spell" }, "1": { "name": "does not know spell" } } }
+    ],
+    "description": "{target} {negate:matches|does not match}: {pram2} {pram1}"
+  },
+  {
+    "id": 18,
+    "name": "CONDITION_INSTANCE_SCRIPT",
+    "name_readable": "Instance script condition",
+    "help": "Asks the instance script of the current map (taken from the target or source) whether the script-specific condition id is met. The meaning of the id is hardcoded per instance script. The second value is unused on this core.",
+    "tags": ["map"],
+    "parameters": [
+      { "type": "Parameter", "name": "Instance condition id" }
+    ],
+    "description": "instance script {negate:satisfies|does not satisfy} condition {pram1}"
+  },
+  {
+    "id": 19,
+    "name": "CONDITION_QUESTAVAILABLE",
+    "name_readable": "Quest can be taken",
+    "help": "The target player can currently take the quest (level, prerequisites, and so on). Used e.g. for loot or gossip that should only be possible while the player can start the quest.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "QuestParameter", "name": "Quest" }
+    ],
+    "description": "quest {pram1} {negate:can|cannot} be taken by {target}"
+  },
+  {
+    "id": 20,
+    "name": "CONDITION_ACHIEVEMENT",
+    "name_readable": "Has achievement (player)",
+    "help": "The target player has (or, with mode 1, does not have) the achievement.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "AchievementParameter", "name": "Achievement" },
+      { "type": "Parameter", "name": "Mode", "values": { "0": { "name": "has achievement" }, "1": { "name": "does not have achievement" } } }
+    ],
+    "description": "{target} {negate:matches|does not match}: {pram2} {pram1}"
+  },
+  {
+    "id": 21,
+    "name": "CONDITION_ACHIEVEMENT_REALM",
+    "name_readable": "Has achievement (realm)",
+    "help": "The realm has (or, with mode 1, does not have) completed the achievement. Needs no source or target.",
+    "parameters": [
+      { "type": "AchievementParameter", "name": "Achievement" },
+      { "type": "Parameter", "name": "Mode", "values": { "0": { "name": "has achievement" }, "1": { "name": "does not have achievement" } } }
+    ],
+    "description": "realm {negate:matches|does not match}: {pram2} {pram1}"
+  },
+  {
+    "id": 22,
+    "name": "CONDITION_QUEST_NONE",
+    "name_readable": "Quest never taken",
+    "help": "The target player neither has the quest in progress nor has been rewarded for it.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "QuestParameter", "name": "Quest" }
+    ],
+    "description": "quest {pram1} {negate:was never|was} taken or rewarded by {target}"
+  },
+  {
+    "id": 23,
+    "name": "CONDITION_ITEM_WITH_BANK",
+    "name_readable": "Has item (incl. bank)",
+    "help": "The target player has at least the given amount of the item in their inventory or bank. The count must be at least 1.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "ItemParameter", "name": "Item" },
+      { "type": "Parameter", "name": "Count (at least)" }
+    ],
+    "description": "{target} {negate:has|does not have} {pram2}x {pram1} in inventory or bank"
+  },
+  {
+    "id": 24,
+    "name": "CONDITION_UNUSED_3",
+    "name_readable": "Unused (24)",
+    "description": "unused (24)"
+  },
+  {
+    "id": 25,
+    "name": "CONDITION_UNUSED_4",
+    "name_readable": "Unused (25)",
+    "description": "unused (25)"
+  },
+  {
+    "id": 26,
+    "name": "CONDITION_ACTIVE_HOLIDAY",
+    "name_readable": "Holiday active",
+    "help": "The given holiday (Holidays.dbc) is currently active. Preferred over 'Game event active' when possible. Needs no source or target.",
+    "parameters": [
+      { "type": "HolidaysParameter", "name": "Holiday" }
+    ],
+    "description": "holiday {pram1} {negate:is|is not} active"
+  },
+  {
+    "id": 27,
+    "name": "CONDITION_UNUSED_5",
+    "name_readable": "Unused (27)",
+    "description": "unused (27)"
+  },
+  {
+    "id": 28,
+    "name": "CONDITION_LEARNABLE_ABILITY",
+    "name_readable": "Can learn ability",
+    "help": "The target player can learn the ability: they meet the skill/race/class requirements from SkillLineAbility and do not know the spell yet. If an item is given, the player must also not own that item (inventory or bank) — intended for one-time ability-teaching items.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "SpellParameter", "name": "Ability spell" },
+      { "type": "ItemParameter", "name": "Teaching item (optional)" }
+    ],
+    "description": "{target} {negate:can|cannot} learn ability {pram1}"
+  },
+  {
+    "id": 29,
+    "name": "CONDITION_SKILL_BELOW",
+    "name_readable": "Skill below value",
+    "help": "The target player has the skill and its base value is below (not equal to) the given value. Special case: with value 1, true when the player does not have the skill at all.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "SkillParameter", "name": "Skill" },
+      { "type": "Parameter", "name": "Skill value" }
+    ],
+    "description": "{target} skill {pram1} {negate:is|is not} below {pram2}"
+  },
+  {
+    "id": 30,
+    "name": "CONDITION_REPUTATION_RANK_MAX",
+    "name_readable": "Reputation rank at most",
+    "help": "The target player's reputation rank with the faction is at most the given rank.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "FactionParameter", "name": "Faction" },
+      { "type": "ReputationRankParameter", "name": "Max rank" }
+    ],
+    "description": "{target} reputation with {pram1} {negate:is|is not} at most {pram2}"
+  },
+  {
+    "id": 31,
+    "name": "CONDITION_COMPLETED_ENCOUNTER",
+    "name_readable": "Encounter completed",
+    "help": "The current dungeon has completed the given encounter (DungeonEncounter.dbc id). If a second encounter is given, either one satisfies the condition; both must belong to the same map. Only valid inside a dungeon.",
+    "tags": ["map"],
+    "parameters": [
+      { "type": "DungeonEncounterParameter", "name": "Encounter" },
+      { "type": "DungeonEncounterParameter", "name": "Encounter 2 (optional)" }
+    ],
+    "description": "encounter {pram1} (or {pram2}) {negate:is|is not} completed"
+  },
+  {
+    "id": 32,
+    "name": "CONDITION_UNUSED_6",
+    "name_readable": "Unused (32)",
+    "description": "unused (32)"
+  },
+  {
+    "id": 33,
+    "name": "CONDITION_LAST_WAYPOINT",
+    "name_readable": "Last reached waypoint",
+    "help": "Compares the source creature's last reached waypoint with the given id. 'Reached (>=)' is true when the creature has reached this waypoint or a later one; 'not yet reached (<)' when it has not reached it yet.",
+    "tags": ["source-creature"],
+    "parameters": [
+      { "type": "Parameter", "name": "Waypoint id" },
+      { "type": "Parameter", "name": "Compare", "values": { "0": { "name": "exactly at" }, "1": { "name": "reached (>=)" }, "2": { "name": "not yet reached (<)" } } }
+    ],
+    "description": "last waypoint of {source} {negate:matches|does not match}: {pram2} {pram1}"
+  },
+  {
+    "id": 34,
+    "name": "CONDITION_XP_USER",
+    "name_readable": "XP gain state",
+    "help": "Checks whether the target player has experience gain disabled (0) or enabled (1).",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "Parameter", "name": "State", "values": { "0": { "name": "XP gain disabled" }, "1": { "name": "XP gain enabled" } } }
+    ],
+    "description": "{target} {negate:matches|does not match}: {pram1}"
+  },
+  {
+    "id": 35,
+    "name": "CONDITION_GENDER",
+    "name_readable": "Gender",
+    "help": "The target unit has the given gender.",
+    "tags": ["unit"],
+    "parameters": [
+      { "type": "GenderParameter", "name": "Gender" }
+    ],
+    "description": "{target} {negate:is|is not} {pram1}"
+  },
+  {
+    "id": 36,
+    "name": "CONDITION_DEAD_OR_AWAY",
+    "name_readable": "Dead or away",
+    "help": "Checks death/absence. 0: the target player is dead or out of range. 1: all players of the target player's group are dead, GMs excluded, or out of range. 2: all players in the instance are dead or out of range. 3: the source creature is dead. The range (if non-zero) is measured from the source.",
+    "parameters": [
+      { "type": "Parameter", "name": "Who", "values": { "0": { "name": "player dead" }, "1": { "name": "player and group dead" }, "2": { "name": "all players in instance dead" }, "3": { "name": "source creature dead" } } },
+      { "type": "Parameter", "name": "Range (0 = any)" }
+    ],
+    "description": "{pram1} {negate:is|is not} true (within {pram2} yd)"
+  },
+  {
+    "id": 37,
+    "name": "CONDITION_CREATURE_IN_RANGE",
+    "name_readable": "Alive creature in range",
+    "help": "An alive creature with the given entry exists within range of the target. The range must be greater than 0.",
+    "tags": ["worldobject"],
+    "parameters": [
+      { "type": "CreatureParameter", "name": "Creature" },
+      { "type": "Parameter", "name": "Range (yd)" }
+    ],
+    "description": "alive {pram1} {negate:is|is not} within {pram2} yd of {target}"
+  },
+  {
+    "id": 38,
+    "name": "CONDITION_PVP_SCRIPT",
+    "name_readable": "PvP script condition",
+    "help": "Asks the outdoor PvP script (or the battleground the target player is in) for the given zone whether the script-specific condition id is met.",
+    "tags": ["player"],
+    "parameters": [
+      { "type": "ZoneAreaParameter", "name": "Zone" },
+      { "type": "Parameter", "name": "Script condition id" }
+    ],
+    "description": "pvp script in {pram1} {negate:satisfies|does not satisfy} condition {pram2}"
+  },
+  {
+    "id": 39,
+    "name": "CONDITION_SPAWN_COUNT",
+    "name_readable": "Spawned creature count",
+    "help": "At least the given number of creatures with this entry are currently spawned on the map (taken from the source or target).",
+    "tags": ["map"],
+    "parameters": [
+      { "type": "CreatureParameter", "name": "Creature" },
+      { "type": "Parameter", "name": "Min count" }
+    ],
+    "description": "{negate:at least|fewer than} {pram2}x {pram1} spawned on map"
+  },
+  {
+    "id": 40,
+    "name": "CONDITION_WORLD_SCRIPT",
+    "name_readable": "World state script condition",
+    "help": "Asks the global world state script whether the hardcoded condition id is fulfilled with the given value. Needs no source or target.",
+    "parameters": [
+      { "type": "Parameter", "name": "Condition id (hardcoded)" },
+      { "type": "Parameter", "name": "Value" }
+    ],
+    "description": "world script condition {pram1} = {pram2} {negate:is|is not} fulfilled"
+  },
+  {
+    "id": 41,
+    "name": "CONDITION_UNUSED_7",
+    "name_readable": "Unused (41)",
+    "description": "unused (41)"
+  },
+  {
+    "id": 42,
+    "name": "CONDITION_WORLDSTATE",
+    "name_readable": "Map variable compare",
+    "help": "Compares a map-scoped worldstate variable with the operand using the given operator. The worldstate id must be a named worldstate known to the core. Operator 'none' always evaluates to true.",
+    "tags": ["map"],
+    "parameters": [
+      { "type": "Parameter", "name": "Worldstate id" },
+      { "type": "Parameter", "name": "Operator", "values": { "0": { "name": "none (always true)" }, "1": { "name": "=" }, "2": { "name": "!=" }, "3": { "name": "<" }, "4": { "name": "<=" }, "5": { "name": ">" }, "6": { "name": ">=" } } },
+      { "type": "Parameter", "name": "Operand" }
+    ],
+    "description": "map variable {pram1} {negate:satisfies|does not satisfy} {pram2} {pram3}"
+  },
+  {
+    "id": 43,
+    "name": "CONDITION_IS_IN_COMBAT",
+    "name_readable": "Is in combat",
+    "help": "The target unit is in combat (0) or out of combat (1).",
+    "tags": ["unit"],
+    "parameters": [
+      { "type": "Parameter", "name": "State", "values": { "0": { "name": "in combat" }, "1": { "name": "out of combat" } } }
+    ],
+    "description": "{target} {negate:is|is not} {pram1}"
+  }
+]

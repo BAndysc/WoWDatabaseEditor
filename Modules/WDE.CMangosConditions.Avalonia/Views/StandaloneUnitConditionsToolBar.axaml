@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WDE.CMangosConditions.ViewModels;assembly=WDE.CMangosConditions"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="40"
+             x:DataType="viewModels:StandaloneUnitConditionsViewModel"
+             x:Class="WDE.CMangosConditions.Avalonia.Views.StandaloneUnitConditionsToolBar">
+    <controls:ToolbarPanel>
+        <TextBlock VerticalAlignment="Center" Margin="4,0">Id:</TextBlock>
+        <TextBox Width="110"
+                 VerticalAlignment="Center"
+                 Watermark="condition id"
+                 Text="{CompiledBinding IdText}">
+            <TextBox.KeyBindings>
+                <KeyBinding Command="{CompiledBinding LoadCommand}" Gesture="Enter" />
+            </TextBox.KeyBindings>
+        </TextBox>
+        <components:ButtonImage Image="Icons/icon_open.png" ToolTip.Tip="Load the unit condition with this id" Command="{CompiledBinding LoadCommand}" />
+        <components:ButtonImage Image="Icons/icon_new.png" ToolTip.Tip="Start a new unit condition with a free negative id" Command="{CompiledBinding NewCommand}" />
+        <components:ButtonImage Image="Icons/icon_save.png" ToolTip.Tip="Save to the database (delete + reinsert the row)" Command="{CompiledBinding SaveCommand}" />
+        <Panel Width="20" />
+
+        <components:ButtonImage Image="Icons/icon_left.png" ToolTip.Tip="Undo" Command="{CompiledBinding Editor.UndoCommand}" />
+        <components:ButtonImage Image="Icons/icon_right.png" ToolTip.Tip="Redo" Command="{CompiledBinding Editor.RedoCommand}" />
+        <Panel Width="20" />
+
+        <components:ButtonImage Image="Icons/icon_add.png" ToolTip.Tip="Add clause" Command="{CompiledBinding Editor.AddClauseCommand}" />
+    </controls:ToolbarPanel>
+</UserControl>

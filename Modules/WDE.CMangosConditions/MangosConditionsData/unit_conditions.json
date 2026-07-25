@@ -1,0 +1,568 @@
+[
+  {
+    "id": 0,
+    "name": "NONE",
+    "name_readable": "None",
+    "help": "Unused clause, always true.",
+    "description": "(unused)"
+  },
+  {
+    "id": 1,
+    "name": "RACE",
+    "name_readable": "Race",
+    "value": { "type": "RaceParameter", "name": "Race" }
+  },
+  {
+    "id": 2,
+    "name": "CLASS",
+    "name_readable": "Class",
+    "value": { "type": "ClassParameter", "name": "Class" }
+  },
+  {
+    "id": 3,
+    "name": "LEVEL",
+    "name_readable": "Level",
+    "value": { "name": "Level" }
+  },
+  {
+    "id": 4,
+    "name": "IS_SELF",
+    "name_readable": "Is self",
+    "help": "Source unit is the same unit as the target.",
+    "value": { "type": "BoolParameter", "name": "Is self" }
+  },
+  {
+    "id": 5,
+    "name": "IS_MY_PET",
+    "name_readable": "Is my pet",
+    "value": { "type": "BoolParameter", "name": "Is my pet" }
+  },
+  {
+    "id": 6,
+    "name": "IS_MASTER",
+    "name_readable": "Is master",
+    "value": { "type": "BoolParameter", "name": "Is master" }
+  },
+  {
+    "id": 7,
+    "name": "IS_TARGET",
+    "name_readable": "Is target",
+    "help": "The target unit currently targets the source unit.",
+    "value": { "type": "BoolParameter", "name": "Is target" }
+  },
+  {
+    "id": 8,
+    "name": "CAN_ASSIST",
+    "name_readable": "Can assist",
+    "value": { "type": "BoolParameter", "name": "Can assist" }
+  },
+  {
+    "id": 9,
+    "name": "CAN_ATTACK",
+    "name_readable": "Can attack",
+    "value": { "type": "BoolParameter", "name": "Can attack" }
+  },
+  {
+    "id": 10,
+    "name": "HAS_PET",
+    "name_readable": "Has pet",
+    "value": { "type": "BoolParameter", "name": "Has pet" }
+  },
+  {
+    "id": 11,
+    "name": "HAS_WEAPON",
+    "name_readable": "Has weapon",
+    "help": "Has a main hand or off hand weapon.",
+    "value": { "type": "BoolParameter", "name": "Has weapon" }
+  },
+  {
+    "id": 12,
+    "name": "HEALTH_PERCENT",
+    "name_readable": "Health %",
+    "value": { "type": "PercentageParameter", "name": "Health %" }
+  },
+  {
+    "id": 13,
+    "name": "MANA_PERCENT",
+    "name_readable": "Mana %",
+    "value": { "type": "PercentageParameter", "name": "Mana %" }
+  },
+  {
+    "id": 14,
+    "name": "RAGE_PERCENT",
+    "name_readable": "Rage %",
+    "value": { "type": "PercentageParameter", "name": "Rage %" }
+  },
+  {
+    "id": 15,
+    "name": "ENERGY_PERCENT",
+    "name_readable": "Energy %",
+    "value": { "type": "PercentageParameter", "name": "Energy %" }
+  },
+  {
+    "id": 16,
+    "name": "COMBO_POINTS",
+    "name_readable": "Combo points",
+    "value": { "name": "Combo points" }
+  },
+  {
+    "id": 17,
+    "name": "HAS_HELPFUL_AURA_SPELL",
+    "name_readable": "Has helpful aura of spell",
+    "help": "Computes the spell id when a positive aura of that spell is present, 0 otherwise; use = with the spell id.",
+    "value": { "type": "SpellParameter", "name": "Spell" }
+  },
+  {
+    "id": 18,
+    "name": "HAS_HELPFUL_AURA_DISPEL_TYPE",
+    "name_readable": "Has helpful aura of dispel type",
+    "value": { "type": "DispelTypeParameter", "name": "Dispel type" }
+  },
+  {
+    "id": 19,
+    "name": "HAS_HELPFUL_AURA_MECHANIC",
+    "name_readable": "Has helpful aura with mechanic",
+    "value": { "type": "SpellMechanicParameter", "name": "Mechanic" }
+  },
+  {
+    "id": 20,
+    "name": "HAS_HARMFUL_AURA_SPELL",
+    "name_readable": "Has harmful aura of spell",
+    "help": "Computes the spell id when a negative aura of that spell is present, 0 otherwise; use = with the spell id.",
+    "value": { "type": "SpellParameter", "name": "Spell" }
+  },
+  {
+    "id": 21,
+    "name": "HAS_HARMFUL_AURA_DISPEL_TYPE",
+    "name_readable": "Has harmful aura of dispel type",
+    "help": "Currently dead code in the cmangos core (always false).",
+    "value": { "type": "DispelTypeParameter", "name": "Dispel type" },
+    "nyi": true
+  },
+  {
+    "id": 22,
+    "name": "HAS_HARMFUL_AURA_MECHANIC",
+    "name_readable": "Has harmful aura with mechanic",
+    "value": { "type": "SpellMechanicParameter", "name": "Mechanic" }
+  },
+  {
+    "id": 23,
+    "name": "HAS_HARMFUL_AURA_SCHOOL",
+    "name_readable": "Has harmful aura of school",
+    "help": "School INDEX 0-6 (0 physical .. 6 arcane), not a mask.",
+    "value": { "type": "SpellSchoolParameter", "name": "School" }
+  },
+  {
+    "id": 24,
+    "name": "DAMAGE_PHYSICAL",
+    "name_readable": "Physical damage taken",
+    "value": { "name": "Damage" },
+    "nyi": true
+  },
+  {
+    "id": 25,
+    "name": "DAMAGE_HOLY",
+    "name_readable": "Holy damage taken",
+    "value": { "name": "Damage" },
+    "nyi": true
+  },
+  {
+    "id": 26,
+    "name": "DAMAGE_FIRE",
+    "name_readable": "Fire damage taken",
+    "value": { "name": "Damage" },
+    "nyi": true
+  },
+  {
+    "id": 27,
+    "name": "DAMAGE_NATURE",
+    "name_readable": "Nature damage taken",
+    "value": { "name": "Damage" },
+    "nyi": true
+  },
+  {
+    "id": 28,
+    "name": "DAMAGE_FROST",
+    "name_readable": "Frost damage taken",
+    "value": { "name": "Damage" },
+    "nyi": true
+  },
+  {
+    "id": 29,
+    "name": "DAMAGE_SHADOW",
+    "name_readable": "Shadow damage taken",
+    "value": { "name": "Damage" },
+    "nyi": true
+  },
+  {
+    "id": 30,
+    "name": "DAMAGE_ARCANE",
+    "name_readable": "Arcane damage taken",
+    "value": { "name": "Damage" },
+    "nyi": true
+  },
+  {
+    "id": 31,
+    "name": "IN_COMBAT",
+    "name_readable": "In combat",
+    "value": { "type": "BoolParameter", "name": "In combat" }
+  },
+  {
+    "id": 32,
+    "name": "IS_MOVING",
+    "name_readable": "Is moving",
+    "value": { "type": "BoolParameter", "name": "Is moving" }
+  },
+  {
+    "id": 33,
+    "name": "IS_CASTING",
+    "name_readable": "Is casting",
+    "value": { "type": "BoolParameter", "name": "Is casting" }
+  },
+  {
+    "id": 34,
+    "name": "IS_CASTING_SPELL",
+    "name_readable": "Is casting spell",
+    "help": "The core ignores the spell id and only checks for any generic cast.",
+    "value": { "type": "BoolParameter", "name": "Is casting" }
+  },
+  {
+    "id": 35,
+    "name": "IS_CHANNELING",
+    "name_readable": "Is channeling",
+    "value": { "type": "BoolParameter", "name": "Is channeling" }
+  },
+  {
+    "id": 36,
+    "name": "IS_CHANNELING_SPELL",
+    "name_readable": "Is channeling spell",
+    "help": "The core ignores the spell id and only checks for any generic cast.",
+    "value": { "type": "BoolParameter", "name": "Is channeling" }
+  },
+  {
+    "id": 37,
+    "name": "NUMBER_OF_MELEE_ATTACKERS",
+    "name_readable": "Number of melee attackers",
+    "value": { "name": "Count" }
+  },
+  {
+    "id": 38,
+    "name": "IS_ATTACKING_ME",
+    "name_readable": "Is attacking me",
+    "value": { "type": "BoolParameter", "name": "Is attacking me" }
+  },
+  {
+    "id": 39,
+    "name": "RANGE",
+    "name_readable": "Range to target",
+    "value": { "name": "Range (yards)" }
+  },
+  {
+    "id": 40,
+    "name": "IN_MELEE_RANGE",
+    "name_readable": "In melee range",
+    "value": { "type": "BoolParameter", "name": "In melee range" }
+  },
+  {
+    "id": 41,
+    "name": "PURSUIT_TIME",
+    "name_readable": "Pursuit time",
+    "value": { "name": "Seconds" },
+    "nyi": true
+  },
+  {
+    "id": 42,
+    "name": "HAS_HARMFUL_AURA_CANCELLED_BY_DAMAGE",
+    "name_readable": "Has harmful aura cancelled by damage",
+    "value": { "type": "BoolParameter", "name": "Has aura" }
+  },
+  {
+    "id": 43,
+    "name": "HAS_HARMFUL_AURA_WITH_PERIODIC_DAMAGE",
+    "name_readable": "Has harmful aura with periodic damage",
+    "value": { "type": "BoolParameter", "name": "Has aura" }
+  },
+  {
+    "id": 44,
+    "name": "NUMBER_OF_ENEMIES",
+    "name_readable": "Number of enemies",
+    "help": "Size of the threat list.",
+    "value": { "name": "Count" }
+  },
+  {
+    "id": 45,
+    "name": "NUMBER_OF_FRIENDS",
+    "name_readable": "Number of friends",
+    "value": { "name": "Count" },
+    "nyi": true
+  },
+  {
+    "id": 46,
+    "name": "THREAT_PHYSICAL",
+    "name_readable": "Physical threat",
+    "value": { "name": "Threat" },
+    "nyi": true
+  },
+  {
+    "id": 47,
+    "name": "THREAT_HOLY",
+    "name_readable": "Holy threat",
+    "value": { "name": "Threat" },
+    "nyi": true
+  },
+  {
+    "id": 48,
+    "name": "THREAT_FIRE",
+    "name_readable": "Fire threat",
+    "value": { "name": "Threat" },
+    "nyi": true
+  },
+  {
+    "id": 49,
+    "name": "THREAT_NATURE",
+    "name_readable": "Nature threat",
+    "value": { "name": "Threat" },
+    "nyi": true
+  },
+  {
+    "id": 50,
+    "name": "THREAT_FROST",
+    "name_readable": "Frost threat",
+    "value": { "name": "Threat" },
+    "nyi": true
+  },
+  {
+    "id": 51,
+    "name": "THREAT_SHADOW",
+    "name_readable": "Shadow threat",
+    "value": { "name": "Threat" },
+    "nyi": true
+  },
+  {
+    "id": 52,
+    "name": "THREAT_ARCANE",
+    "name_readable": "Arcane threat",
+    "value": { "name": "Threat" },
+    "nyi": true
+  },
+  {
+    "id": 53,
+    "name": "IS_INTERRUPTIBLE",
+    "name_readable": "Is interruptible",
+    "value": { "type": "BoolParameter", "name": "Is interruptible" }
+  },
+  {
+    "id": 54,
+    "name": "NUMBER_OF_ATTACKERS",
+    "name_readable": "Number of attackers",
+    "value": { "name": "Count" }
+  },
+  {
+    "id": 55,
+    "name": "NUMBER_OF_RANGED_ATTACKERS",
+    "name_readable": "Number of ranged attackers",
+    "value": { "name": "Count" }
+  },
+  {
+    "id": 56,
+    "name": "CREATURE_TYPE",
+    "name_readable": "Creature type",
+    "value": { "type": "CreatureTypeParameter", "name": "Creature type" }
+  },
+  {
+    "id": 57,
+    "name": "IS_MELEE_ATTACKING",
+    "name_readable": "Is melee attacking",
+    "value": { "type": "BoolParameter", "name": "Is melee attacking" }
+  },
+  {
+    "id": 58,
+    "name": "IS_RANGED_ATTACKING",
+    "name_readable": "Is ranged attacking",
+    "value": { "type": "BoolParameter", "name": "Is ranged attacking" }
+  },
+  {
+    "id": 59,
+    "name": "HEALTH",
+    "name_readable": "Health (absolute)",
+    "value": { "name": "Health" }
+  },
+  {
+    "id": 60,
+    "name": "SPELL_KNOWN",
+    "name_readable": "Spell known",
+    "help": "Computes the spell id when the unit knows it, 0 otherwise; use = with the spell id.",
+    "value": { "type": "SpellParameter", "name": "Spell" }
+  },
+  {
+    "id": 61,
+    "name": "HAS_HARMFUL_AURA_EFFECT",
+    "name_readable": "Has harmful aura effect",
+    "help": "SPELL_AURA_* effect type.",
+    "value": { "type": "AuraTypeParameter", "name": "Aura effect" }
+  },
+  {
+    "id": 62,
+    "name": "IS_IMMUNE_TO_AREA_OF_EFFECT",
+    "name_readable": "Is immune to AoE",
+    "value": { "type": "BoolParameter", "name": "Is AoE immune" }
+  },
+  {
+    "id": 63,
+    "name": "IS_PLAYER",
+    "name_readable": "Is player",
+    "value": { "type": "BoolParameter", "name": "Is player" }
+  },
+  {
+    "id": 64,
+    "name": "DAMAGE_MAGIC",
+    "name_readable": "Magic damage taken",
+    "value": { "name": "Damage" },
+    "nyi": true
+  },
+  {
+    "id": 65,
+    "name": "DAMAGE_TOTAL",
+    "name_readable": "Total damage taken",
+    "value": { "name": "Damage" },
+    "nyi": true
+  },
+  {
+    "id": 66,
+    "name": "THREAT_MAGIC",
+    "name_readable": "Magic threat",
+    "value": { "name": "Threat" },
+    "nyi": true
+  },
+  {
+    "id": 67,
+    "name": "THREAT_TOTAL",
+    "name_readable": "Total threat",
+    "value": { "name": "Threat" },
+    "nyi": true
+  },
+  {
+    "id": 68,
+    "name": "HAS_CRITTER",
+    "name_readable": "Has critter (mini pet)",
+    "value": { "type": "BoolParameter", "name": "Has critter" }
+  },
+  {
+    "id": 69,
+    "name": "HAS_TOTEM_IN_SLOT_1",
+    "name_readable": "Has totem in slot 1 (fire)",
+    "value": { "type": "BoolParameter", "name": "Has totem" }
+  },
+  {
+    "id": 70,
+    "name": "HAS_TOTEM_IN_SLOT_2",
+    "name_readable": "Has totem in slot 2 (earth)",
+    "value": { "type": "BoolParameter", "name": "Has totem" }
+  },
+  {
+    "id": 71,
+    "name": "HAS_TOTEM_IN_SLOT_3",
+    "name_readable": "Has totem in slot 3 (water)",
+    "value": { "type": "BoolParameter", "name": "Has totem" }
+  },
+  {
+    "id": 72,
+    "name": "HAS_TOTEM_IN_SLOT_4",
+    "name_readable": "Has totem in slot 4 (air)",
+    "value": { "type": "BoolParameter", "name": "Has totem" }
+  },
+  {
+    "id": 73,
+    "name": "HAS_TOTEM_IN_SLOT_5",
+    "name_readable": "Has totem in slot 5",
+    "value": { "type": "BoolParameter", "name": "Has totem" },
+    "nyi": true
+  },
+  {
+    "id": 74,
+    "name": "CREATURE_ID",
+    "name_readable": "Creature entry",
+    "value": { "type": "CreatureParameter", "name": "Creature" }
+  },
+  {
+    "id": 75,
+    "name": "STRING_ID",
+    "name_readable": "Has string id",
+    "help": "Computes the string id when the unit has it, 0 otherwise; use = with the string_id table id.",
+    "value": { "name": "String id (string_id table)" }
+  },
+  {
+    "id": 76,
+    "name": "HAS_AURA",
+    "name_readable": "Has aura",
+    "help": "Computes the spell id when the unit has the aura, 0 otherwise; use = with the spell id.",
+    "value": { "type": "SpellParameter", "name": "Spell" }
+  },
+  {
+    "id": 77,
+    "name": "IS_ENEMY",
+    "name_readable": "Is enemy",
+    "value": { "type": "BoolParameter", "name": "Is enemy" }
+  },
+  {
+    "id": 78,
+    "name": "IS_SPEC_MELEE",
+    "name_readable": "Is melee spec",
+    "value": { "type": "BoolParameter", "name": "Is melee spec" },
+    "nyi": true
+  },
+  {
+    "id": 79,
+    "name": "IS_SPEC_TANK",
+    "name_readable": "Is tank spec",
+    "value": { "type": "BoolParameter", "name": "Is tank spec" },
+    "nyi": true
+  },
+  {
+    "id": 80,
+    "name": "IS_SPEC_RANGED",
+    "name_readable": "Is ranged spec",
+    "value": { "type": "BoolParameter", "name": "Is ranged spec" },
+    "nyi": true
+  },
+  {
+    "id": 81,
+    "name": "IS_SPEC_HEALER",
+    "name_readable": "Is healer spec",
+    "value": { "type": "BoolParameter", "name": "Is healer spec" },
+    "nyi": true
+  },
+  {
+    "id": 82,
+    "name": "IS_PLAYER_CONTROLLED_NPC",
+    "name_readable": "Is player controlled NPC",
+    "value": { "type": "BoolParameter", "name": "Is player controlled" }
+  },
+  {
+    "id": 83,
+    "name": "IS_DYING",
+    "name_readable": "Is dying (health 0)",
+    "value": { "type": "BoolParameter", "name": "Is dying" }
+  },
+  {
+    "id": 84,
+    "name": "PATH_FAIL_COUNT",
+    "name_readable": "Path fail count",
+    "help": "The core currently returns whether the current path is reachable (bool workaround), not a count.",
+    "value": { "name": "Count" }
+  },
+  {
+    "id": 85,
+    "name": "UNUSED",
+    "name_readable": "Unused",
+    "nyi": true
+  },
+  {
+    "id": 86,
+    "name": "LABEL",
+    "name_readable": "Label",
+    "help": "Spell label id.",
+    "value": { "name": "Label" },
+    "nyi": true
+  }
+]

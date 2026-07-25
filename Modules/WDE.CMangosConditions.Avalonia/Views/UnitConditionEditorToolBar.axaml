@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WDE.CMangosConditions.ViewModels;assembly=WDE.CMangosConditions"
+             mc:Ignorable="d" d:DesignWidth="750" d:DesignHeight="40"
+             x:DataType="viewModels:UnitConditionEditorViewModel"
+             x:Class="WDE.CMangosConditions.Avalonia.Views.UnitConditionEditorToolBar">
+    <controls:ToolbarPanel>
+        <components:ButtonImage Image="Icons/icon_left.png" ToolTip.Tip="Undo" Command="{CompiledBinding UndoCommand}" />
+        <components:ButtonImage Image="Icons/icon_right.png" ToolTip.Tip="Redo" Command="{CompiledBinding RedoCommand}" />
+        <Panel Width="20" />
+
+        <components:ButtonImage Image="Icons/icon_add.png" ToolTip.Tip="Add clause" Command="{CompiledBinding AddClauseCommand}" />
+    </controls:ToolbarPanel>
+</UserControl>

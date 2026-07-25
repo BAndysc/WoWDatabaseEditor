@@ -1,0 +1,133 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:views="clr-namespace:WDE.CMangosConditions.Avalonia.Views"
+             xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
+             xmlns:avalonia="clr-namespace:WDE.Common.Avalonia;assembly=WDE.Common.Avalonia"
+             xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:viewModels="clr-namespace:WDE.CMangosConditions.ViewModels;assembly=WDE.CMangosConditions"
+             xmlns:data="clr-namespace:WDE.CMangosConditions.Data;assembly=WDE.CMangosConditions"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="500"
+             Name="Root"
+             x:DataType="viewModels:MangosConditionsEditorViewModel"
+             x:Class="WDE.CMangosConditions.Avalonia.Views.MangosConditionsTreeEditor">
+    <UserControl.Styles>
+        <StyleInclude Source="avares://WDE.CMangosConditions.Avalonia/Views/LabeledControl.axaml"></StyleInclude>
+        <Style Selector="views|LabeledControl">
+            <Setter Property="Margin" Value="0,0,0,2" />
+        </Style>
+    </UserControl.Styles>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TreeView Grid.Row="0"
+                  x:Name="tv"
+                  dnD:DragAndDrop.IsDropTarget="True"
+                  dnD:DragAndDrop.DropHandler="{CompiledBinding }"
+                  dnD:DragAndDrop.IsDragSource="True"
+                  ItemsSource="{CompiledBinding Roots, Mode=OneTime}"
+                  SelectedItem="{CompiledBinding SelectedCondition, Mode=TwoWay}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <TreeView.KeyBindings>
+                <KeyBinding Command="{CompiledBinding RemoveItemCommand}" Gesture="Delete" />
+                <KeyBinding Command="{CompiledBinding RemoveItemCommand}" Gesture="Back" />
+
+                <KeyBinding Command="{CompiledBinding UndoCommand}" Gesture="{x:Static avalonia:KeyGestures.Undo}" />
+                <KeyBinding Command="{CompiledBinding RedoCommand}" Gesture="{x:Static avalonia:KeyGestures.Redo}" />
+
+                <KeyBinding Command="{CompiledBinding CopyCommand}" Gesture="{x:Static avalonia:KeyGestures.Copy}" />
+                <KeyBinding Command="{CompiledBinding PasteCommand}" Gesture="{x:Static avalonia:KeyGestures.Paste}" />
+                <KeyBinding Command="{CompiledBinding CutCommand}" Gesture="{x:Static avalonia:KeyGestures.Cut}" />
+            </TreeView.KeyBindings>
+            <TreeView.ContextMenu>
+                <FixedContextMenu>
+                    <MenuItem Header="Add nested condition" Command="{CompiledBinding AddChildCommand}" />
+                    <MenuItem Header="Add root condition" Command="{CompiledBinding AddRootCommand}" />
+                    <Separator />
+                    <MenuItem Header="Wrap in AND" Command="{CompiledBinding WrapInAndCommand}" />
+                    <MenuItem Header="Wrap in OR" Command="{CompiledBinding WrapInOrCommand}" />
+                    <MenuItem Header="Wrap in NOT" Command="{CompiledBinding WrapInNotCommand}" />
+                    <Separator />
+                    <MenuItem Header="Copy" Command="{CompiledBinding CopyCommand}" InputGesture="{x:Static avalonia:KeyGestures.Copy}" />
+                    <MenuItem Header="Cut" Command="{CompiledBinding CutCommand}" InputGesture="{x:Static avalonia:KeyGestures.Cut}" />
+                    <MenuItem Header="Paste" Command="{CompiledBinding PasteCommand}" InputGesture="{x:Static avalonia:KeyGestures.Paste}" />
+                    <Separator />
+                    <MenuItem Header="Remove" Command="{CompiledBinding RemoveItemCommand}" InputGesture="Delete" />
+                </FixedContextMenu>
+            </TreeView.ContextMenu>
+            <TreeView.Styles>
+                <Style Selector="TreeViewItem" x:DataType="viewModels:MangosConditionViewModel">
+                    <Setter Property="IsExpanded" Value="{CompiledBinding IsExpanded, Mode=TwoWay}" />
+                    <Setter Property="IsSelected" Value="{CompiledBinding IsSelected, Mode=TwoWay}" />
+                </Style>
+            </TreeView.Styles>
+            <TreeView.DataTemplates>
+                <TreeDataTemplate DataType="viewModels:MangosConditionViewModel" ItemsSource="{CompiledBinding Children}">
+                    <controls:FormattedTextBlock IsHitTestVisible="False" Text="{CompiledBinding Readable}" />
+                </TreeDataTemplate>
+            </TreeView.DataTemplates>
+        </TreeView>
+        <GridSplitter Grid.Row="1" Classes="horizontal" />
+        <Border Padding="10" Grid.Row="2"
+                IsVisible="{CompiledBinding SelectedCondition, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                ClipToBounds="True">
+            <StackPanel DataContext="{CompiledBinding SelectedCondition}">
+                <controls1:CompletionComboBox SelectedItem="{Binding #Root.DataContext.SelectedConditionsType}"
+                                              Items="{Binding #Root.DataContext.ConditionTypes, Mode=OneTime}"
+                                              HorizontalAlignment="Stretch">
+                    <controls1:CompletionComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="data:MangosConditionJson">
+                            <TextBlock Text="{CompiledBinding NameReadable}" />
+                        </DataTemplate>
+                    </controls1:CompletionComboBox.ItemTemplate>
+                </controls1:CompletionComboBox>
+                <views:LabeledControl Header="{CompiledBinding Name}" IsVisible="{CompiledBinding IsUsed}" DataContext="{CompiledBinding Value1, Mode=OneWay}">
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:MangosConditionsEditorViewModel)DataContext).SelectedCondition}" />
+                </views:LabeledControl>
+                <views:LabeledControl Header="{CompiledBinding Name}" IsVisible="{CompiledBinding IsUsed}" DataContext="{CompiledBinding Value2, Mode=OneWay}">
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:MangosConditionsEditorViewModel)DataContext).SelectedCondition}" />
+                </views:LabeledControl>
+                <views:LabeledControl Header="{CompiledBinding Name}" IsVisible="{CompiledBinding IsUsed}" DataContext="{CompiledBinding Value3, Mode=OneWay}">
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:MangosConditionsEditorViewModel)DataContext).SelectedCondition}" />
+                </views:LabeledControl>
+                <views:LabeledControl Header="{CompiledBinding Name}" IsVisible="{CompiledBinding IsUsed}" DataContext="{CompiledBinding Value4, Mode=OneWay}">
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:MangosConditionsEditorViewModel)DataContext).SelectedCondition}" />
+                </views:LabeledControl>
+                <views:LabeledControl Header="{CompiledBinding Name}" DataContext="{CompiledBinding Negate, Mode=OneWay}">
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:MangosConditionsEditorViewModel)DataContext).SelectedCondition}" />
+                </views:LabeledControl>
+                <views:LabeledControl Header="{CompiledBinding Name}" DataContext="{CompiledBinding SwapTargets, Mode=OneWay}">
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:MangosConditionsEditorViewModel)DataContext).SelectedCondition}" />
+                </views:LabeledControl>
+                <views:LabeledControl Header="Comment" DataContext="{CompiledBinding Comment, Mode=OneWay}">
+                    <TextBox Text="{CompiledBinding Value}" Watermark="(auto-generated from the readable text)" />
+                </views:LabeledControl>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Grid.Row="3" Margin="10,4"
+                   Foreground="Red"
+                   TextWrapping="Wrap"
+                   IsVisible="{CompiledBinding HasErrors}"
+                   Text="{CompiledBinding Errors}" />
+    </Grid>
+</UserControl>

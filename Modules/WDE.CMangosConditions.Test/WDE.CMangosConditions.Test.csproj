@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NSubstitute" Version="4.2.2" />
+        <PackageReference Include="nunit" Version="3.14.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\WDE.CMangosConditions\WDE.CMangosConditions.csproj" />
+        <ProjectReference Include="..\..\WDE.Parameters\WDE.Parameters.csproj" />
+        <ProjectReference Include="..\..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+        <ProjectReference Include="..\..\WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\WDE.CMangosConditions\MangosConditionsData\conditions.json" Link="MangosConditionsData\conditions.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Include="..\WDE.CMangosConditions\MangosConditionsData\unit_conditions.json" Link="MangosConditionsData\unit_conditions.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+</Project>

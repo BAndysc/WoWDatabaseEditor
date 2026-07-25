@@ -1,0 +1,11 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:WDE.CMangosConditions.Avalonia.Views"
+             xmlns:viewModels="clr-namespace:WDE.CMangosConditions.ViewModels;assembly=WDE.CMangosConditions"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="700"
+             x:DataType="viewModels:StandaloneMangosConditionsViewModel"
+             x:Class="WDE.CMangosConditions.Avalonia.Views.StandaloneMangosConditionsView">
+    <views:MangosConditionsTreeEditor DataContext="{CompiledBinding Editor}" />
+</UserControl>
