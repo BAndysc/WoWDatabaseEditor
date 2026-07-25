@@ -1275,6 +1275,10 @@ namespace WDE.PacketViewer.ViewModels
         private RefCountedArena memoryAllocator;
         private FastObservableCollection<PacketViewModel> AllPackets { get; } = new ();
         private FastObservableCollection<PacketViewModel>? AllPacketsSplit { get; set; }
+        // read-only accessor for MCP tools (WDE.PacketViewer.Mcp): total loaded packet count (split packets if splitting is enabled)
+        public int TotalPacketCount => (splitUpdate ? AllPacketsSplit : null)?.Count ?? AllPackets.Count;
+        // read-only accessor for MCP tools (WDE.PacketViewer.Mcp): full parsed text of the given packet
+        public Task<string> GetPacketTextAsync(PacketViewModel packet) => packetStore.GetTextAsync(packet);
         public ReadOnlyObservableCollection<string> MostRecentlySearched { get; }
         public ObservableCollection<ActionReasonPredictionViewModel> Predictions { get; } = new();
         public ObservableCollection<PossibleActionViewModel> PossibleActions { get; } = new();

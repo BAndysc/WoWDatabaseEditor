@@ -3,6 +3,7 @@ using Prism.Ioc;
 using WDE.Common.Events;
 using WDE.Common.Parameters;
 using WDE.MapRenderer;
+using WDE.MapSpawns.Mcp;
 using WDE.MapSpawns.Rendering;
 using WDE.MapSpawns.Rendering.AreaTriggers;
 using WDE.MapSpawns.Rendering.CreatureLinking;
@@ -36,6 +37,8 @@ public class MapSpawnsModule : ModuleBase
                     gameView.RegisterGameModule(c => c.Resolve<AreaTriggerEditorModule>());
                     gameView.RegisterGameModule(c => c.Resolve<CreatureLinkEditorModule>());
                     gameView.RegisterGameModule(c => c.Resolve<SpawnViewer>());
+                    // answers the MCP tools' game-view requests (status/camera/selection) on the game loop
+                    gameView.RegisterGameModule(c => c.Resolve<McpGameViewBridge>());
                 },
                 ThreadOption.PublisherThread,
                 true);

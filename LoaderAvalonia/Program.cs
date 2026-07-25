@@ -54,6 +54,7 @@ using WDE.LootEditor;
 using WDE.QueryGenerators;
 using WDE.Profiles;
 using WDE.SqlWorkbench;
+using WDE.Mcp;
 using WoWDatabaseEditorCore.Avalonia;
 
 namespace LoaderAvalonia
@@ -114,7 +115,8 @@ namespace LoaderAvalonia
                 typeof(DatabaseDefinitionEditorModule),
                 typeof(LootEditorModule),
                 typeof(SqlWorkbenchModule),
-                typeof(DebuggerModule)
+                typeof(DebuggerModule),
+                typeof(McpModule)
             };
             BaseProgramLoader.Main(modules, args);
         }

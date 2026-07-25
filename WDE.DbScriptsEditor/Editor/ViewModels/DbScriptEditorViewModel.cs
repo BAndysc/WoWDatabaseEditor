@@ -66,6 +66,9 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
         private readonly IHistoryManager history;
 
         private EditableDbScript? script;
+        // The live script model, exposed for programmatic edits (MCP tools edit the open document
+        // the same way the UI does, so the changes are visible, undoable and saved via Save).
+        public EditableDbScript? Script => script;
         private bool isLoading = true;
         private readonly DbScriptConditionsStore conditionsStore = new();
         // readable depends on the condition AND on the actors of the steps the if row guards

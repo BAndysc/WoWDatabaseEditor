@@ -42,7 +42,7 @@
         "destination": "datalong"
       }
     ],
-    "description": "{source}: Talk {Random template:choose(0):{Text}|{Random template}} to {target}"
+    "description": "{source}: Say {Random template:choose(0):{Text}|{Random template}} to {target}"
   },
   {
     "id": 1,
@@ -265,7 +265,7 @@
         "destination": "datalong2"
       }
     ],
-    "description": "{source}: Set flag {Bitmask} on field {Field id}"
+    "description": "{source}: {Field id} |= {Bitmask}"
   },
   {
     "id": 5,
@@ -339,7 +339,7 @@
         "destination": "o"
       }
     ],
-    "description": "Teleport player to {Map} ({X}, {Y}, {Z})"
+    "description": "{source}: Teleport to {Map} ({X}, {Y}, {Z}, {O})"
   },
   {
     "id": 7,
@@ -368,7 +368,7 @@
         "destination": "datalong2"
       }
     ],
-    "description": "Give player explored credit for quest {Quest}"
+    "description": "{source}: Give quest explored credit for {Quest}{Max distance:choose(0):| (within {Max distance} yd)}"
   },
   {
     "id": 8,

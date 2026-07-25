@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:settings="clr-namespace:WDE.Mcp.Settings"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="settings:McpConfigurationViewModel"
+             x:Class="WDE.Mcp.Settings.McpConfigurationView">
+  <ScrollViewer>
+    <StackPanel>
+      <SettingItem Header="Enable MCP server" Help="When enabled, the editor hosts a local Model Context Protocol server on startup, so AI clients (i.e. Claude Code) can query the database, inspect and edit scripts and drive the editor.">
+        <ToggleSwitch IsChecked="{CompiledBinding Enabled}" />
+      </SettingItem>
+
+      <SettingItem Header="Port" Help="TCP port of the HTTP server. The server only listens on 127.0.0.1 (this machine).">
+        <NumericUpDown Value="{CompiledBinding Port}" Minimum="1024" Maximum="65535" Increment="1" FormatString="0" Width="140" HorizontalAlignment="Left" />
+      </SettingItem>
+
+      <SettingItem Header="Status">
+        <StackPanel Spacing="4">
+          <TextBlock IsVisible="{CompiledBinding Status.IsRunning}" Text="{CompiledBinding Status.Url, StringFormat='Running at {0}'}" />
+          <TextBlock IsVisible="{CompiledBinding !Status.IsRunning}" Text="Not running" Opacity="0.7" />
+          <TextBlock IsVisible="{CompiledBinding Status.IsRunning}" Text="{CompiledBinding Status.ToolCount, StringFormat='{}{0} tools registered'}" Opacity="0.7" />
+          <TextBlock Text="{CompiledBinding Status.LastError}" Foreground="Red" TextWrapping="Wrap" />
+        </StackPanel>
+      </SettingItem>
+
+      <SettingItem Header="Connect from Claude Code">
+        <TextBlock Text="claude mcp add --transport http wow-database-editor http://127.0.0.1:3900" FontFamily="Consolas,Menlo,monospace" TextWrapping="Wrap" />
+      </SettingItem>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -14,9 +14,11 @@
   <Import Project="..\Avalonia.props" />
   <ItemGroup>
     <PackageReference Include="ModelContextProtocol.Core" Version="1.4.0" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.9" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
+    <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
     <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
   </ItemGroup>
 </Project>
