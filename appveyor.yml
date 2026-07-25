@@ -21,6 +21,57 @@ before_build:
 - ps: (Get-Content WoWDatabaseEditorCore.Avalonia/Services/ProgramNameService.cs) -replace 'Subtitle => ""', 'Subtitle => "for open source emulator use"' | Out-File -encoding UTF8 WoWDatabaseEditorCore.Avalonia/Services/ProgramNameService.cs
 build_script:
 - cmd: bash.exe build.sh
+test_script:
+- cmd: >-
+    cd test
+
+    bash database_test.sh localhost 3306 root 'Password12!' 'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql'
+
+    cd ../
+
+    dotnet test WDE.MVVM.Test/WDE.MVVM.Test.csproj
+
+    dotnet test WDE.RemoteSOAP.Test/WDE.RemoteSOAP.Test.csproj
+
+    dotnet test WDE.SmartScriptEditor.Test/WDE.SmartScriptEditor.Test.csproj
+
+    dotnet test WDE.EventAiEditor.Test/WDE.EventAiEditor.Test.csproj
+
+    dotnet test WDE.DbScriptsEditor.Test/WDE.DbScriptsEditor.Test.csproj
+
+    dotnet test WDE.Updater.Test/WDE.Updater.Test.csproj
+
+    dotnet test WDE.Parameters.Test/WDE.Parameters.Test.csproj
+
+    dotnet test WDE.SqlQueryGenerator.Test/WDE.SqlQueryGenerator.Test.csproj
+
+    dotnet test WDE.SqlInterpreter.Test/WDE.SqlInterpreter.Test.csproj
+
+    dotnet test WDE.Common.Test/WDE.Common.Test.csproj
+
+    dotnet test WDE.MapSpawns.Test/WDE.MapSpawns.Test.csproj
+
+    dotnet test Modules/WDE.SqlWorkbench.Test/WDE.SqlWorkbench.Test.csproj
+
+    dotnet test Modules/WDE.CMangosConditions.Test/WDE.CMangosConditions.Test.csproj
+
+    dotnet test Modules/WDE.WorldStateExpressions.Test/WDE.WorldStateExpressions.Test.csproj
+
+    dotnet test Modules/WDE.DatabaseEditors.Test/WDE.DatabaseEditors.Test.csproj
+
+    dotnet test Modules/WDE.Debugger.Test/WDE.Debugger.Test.csproj
+
+    dotnet test Modules/WDE.PacketViewer.Test/WDE.PacketViewer.Test.csproj
+
+    dotnet test Rendering/TheEngine.Test/TheEngine.Test.csproj
+
+    dotnet test WoWDatabaseEditor.Common/WDE.DbcStore.Test/WDE.DbcStore.Test.csproj
+
+    dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj
+
+    Rem WDE.WoWHeadConnector.Test excluded: talks to live wowhead.com, currently fails with 404s
+
+    Rem Modules/WDE.QuestChainEditor.Test excluded: targets the pre-rework QuestStore API, does not compile
 artifacts:
 - path: WoWDatabaseEditorMacOs.zip
   name: WoWDatabaseEditorMacOs.zip
