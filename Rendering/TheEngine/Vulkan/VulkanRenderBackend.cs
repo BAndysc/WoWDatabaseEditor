@@ -1000,8 +1000,6 @@ internal sealed unsafe class VulkanRenderBackend : IRenderBackend
     private int presentWaitRelaxedCooldown;
     private int consecutiveHighIntervals;
 
-    private static readonly string? throttleOverride = Environment.GetEnvironmentVariable("THEENGINE_VK_THROTTLE");
-
     // THEENGINE_VK_PACING=1: print raw per-present timings (interval between vkQueuePresentKHR calls
     // and time blocked inside it) every 240 frames - for diagnosing vsync pacing issues
     private static readonly bool pacingDebug = Environment.GetEnvironmentVariable("THEENGINE_VK_PACING") == "1";
@@ -1027,14 +1025,9 @@ internal sealed unsafe class VulkanRenderBackend : IRenderBackend
 
     private void ThrottleLatency()
     {
-        if (!presentTarget.CanThrottlePresentQueue || throttleOverride == "off")
+        if (!presentTarget.CanThrottlePresentQueue)
         {
             lastPresentWaitReturn = 0;
-            return;
-        }
-        if (throttleOverride == "relaxed")
-        {
-            presentTarget.ThrottlePresentQueue(1);
             return;
         }
         bool aggressive = presentWaitRelaxedCooldown <= 0;
