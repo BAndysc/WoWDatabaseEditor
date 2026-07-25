@@ -505,31 +505,64 @@ namespace WDE.MapRenderer.Managers
             if (adt == null)
                 return;
 
-            await engine.EnterGameLoop;
-
+            // All the CPU-heavy prep (vertex grids, per-pixel splat/shadow merge, holes cells)
+            // stays on the thread pool - the game loop below only creates meshes/entities/GPU
+            // resources. adt.Chunks is indexed directly (ChunkId = i*16+j, the array order); the
+            // previous boxed IEnumerable enumerator cost two interface get_Current calls per splat
+            // PIXEL (~2M per tile), all on the game thread.
             float minHeight = float.MaxValue;
             float maxHeight = float.MinValue;
             int k = 0;
-            int k2 = 0;
-            using var chunksEnumerator2 = ((IEnumerable<AdtChunk>)adt.Chunks).GetEnumerator();
+            var subVertices = new Vector3[Constants.ChunksInBlock][];
+
+            // the collider index pattern addresses the 145-vertex grid - identical for every
+            // sub-chunk, so build it once per tile instead of 256 times
+            ushort[] colliderIndices = ArrayPool<ushort>.Shared.Rent(4 * 8 * 8 * 4);
+            {
+                int k__ = 0;
+                for (uint cx = 0; cx < 8; cx++)
+                {
+                    for (uint cy = 0; cy < 8; cy++)
+                    {
+                        uint tl = cy * 17 + cx;
+                        uint tr = tl + 1;
+                        uint middle = tl + 9;
+                        uint bl = middle + 8;
+                        uint br = bl + 1;
+
+                        colliderIndices[k__++] = (ushort)tl;
+                        colliderIndices[k__++] = (ushort)middle;
+                        colliderIndices[k__++] = (ushort)tr;
+                        //
+                        colliderIndices[k__++] = (ushort)tl;
+                        colliderIndices[k__++] = (ushort)bl;
+                        colliderIndices[k__++] = (ushort)middle;
+                        //
+                        colliderIndices[k__++] = (ushort)tr;
+                        colliderIndices[k__++] = (ushort)middle;
+                        colliderIndices[k__++] = (ushort)br;
+                        //
+                        colliderIndices[k__++] = (ushort)middle;
+                        colliderIndices[k__++] = (ushort)bl;
+                        colliderIndices[k__++] = (ushort)br;
+                    }
+                }
+            }
+
             for (int i = 0; i < Constants.ChunksInBlockY; ++i)
             {
                 for (int j = 0; j < Constants.ChunksInBlockX; ++j)
                 {
-                    // this chunk's cell in the per-tile atlas. ChunkId = i*16+j (enumeration order),
+                    // this chunk's cell in the per-tile atlas. ChunkId = i*16+j (array order),
                     // so the shader's cell = (ChunkId%16, ChunkId/16) = (j, i) - keep these in sync.
                     int splatCellX = j * splatCell, splatCellY = i * splatCell;
                     int holesCellX = j * holesCell, holesCellY = i * holesCell;
 
-                    if (!chunksEnumerator2.MoveNext())
-                    {
-                        throw new Exception("Unexpected end of chunks");
-                    }
-
-                    chunk.areaIds[i, j] = chunksEnumerator2.Current.AreaId;
-                    var basePos = chunksEnumerator2.Current.BasePosition;
+                    var c = adt.Chunks[i * Constants.ChunksInBlockX + j];
+                    chunk.areaIds[i, j] = c.AreaId;
+                    var basePos = c.BasePosition;
                     int k_ = 0;
-                    var subVertices = ArrayPool<Vector3>.Shared.Rent(145);
+                    var verts = subVertices[i * Constants.ChunksInBlockX + j] = ArrayPool<Vector3>.Shared.Rent(145);
                     for (int cy = 0; cy < 17; ++cy)
                     {
                         for (int cx = 0; cx < (cy % 2 == 0 ? 9 : 8); cx++)
@@ -544,8 +577,8 @@ namespace WDE.MapRenderer.Managers
                                 VERTX = (Constants.ChunkSize / 8) * 7 * (cx / 7.0f) + Constants.ChunkSize / 8 / 2;
                             }
                             float VERTY = cy / 16.0f * Constants.ChunkSize;
-                            var vert = new Vector3(-VERTY, -VERTX, chunksEnumerator2.Current.Heights[k_]) + basePos;
-                            subVertices[k_] = vert;
+                            var vert = new Vector3(-VERTY, -VERTX, c.Heights[k_]) + basePos;
+                            verts[k_] = vert;
 
                             if (cy % 2 == 0) // inner row, 8 verts
                             {
@@ -554,75 +587,34 @@ namespace WDE.MapRenderer.Managers
                                 chunk.heights[xIndex2, yIndex2] = vert.Z;
                             }
                             vert.Z.MinMax(ref minHeight, ref maxHeight);
-                            
-                            var norm = chunksEnumerator2.Current.Normals[k_];
+
+                            var norm = c.Normals[k_];
                             heightsNormal[k++] = new Vector4(
                                 norm.X,
                                 norm.Y,
                                 norm.Z,
-                                chunksEnumerator2.Current.Heights[k_] + basePos.Z
+                                c.Heights[k_] + basePos.Z
                             );
                             k_++;
                         }
                     }
 
-                    ushort[] indices = ArrayPool<ushort>.Shared.Rent(4 * 8 * 8 * 4);
-                    int k__ = 0;
-                    for (uint cx = 0; cx < 8; cx++)
-                    {
-                        for (uint cy = 0; cy < 8; cy++)
-                        {
-                            uint tl = cy * 17 + cx;
-                            uint tr = tl + 1;
-                            uint middle = tl + 9;
-                            uint bl = middle + 8;
-                            uint br = bl + 1;
-
-                            if (br > ushort.MaxValue)
-                                throw new Exception("Too many vertices");
-
-                            indices[k__++] = (ushort)tl;
-                            indices[k__++] = (ushort)middle;
-                            indices[k__++] = (ushort)tr;
-                            //
-                            indices[k__++] = (ushort)tl;
-                            indices[k__++] = (ushort)bl;
-                            indices[k__++] = (ushort)middle;
-                            //
-                            indices[k__++] = (ushort)tr;
-                            indices[k__++] = (ushort)middle;
-                            indices[k__++] = (ushort)br;
-                            //
-                            indices[k__++] = (ushort)middle;
-                            indices[k__++] = (ushort)bl;
-                            indices[k__++] = (ushort)br;
-                        }
-                    }
-                    var subChunkMesh = meshManager.CreateManagedOnlyMesh(subVertices.AsSpan(0, 145), indices.AsSpan(0, 4 * 8 * 8 * 4));
-                    ArrayPool<Vector3>.Shared.Return(subVertices);
-                    ArrayPool<ushort>.Shared.Return(indices);
-                    var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype, "Terrain collider"u8);
-                    entityManager.GetComponent<LegacyCollider>(entity).CollisionMask = Collisions.COLLISION_MASK_TERRAIN;
-                    entityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
-                    var meshRenderer = new MeshRenderer() { Mesh = subChunkMesh, SubMeshId = 0 };
-                    entityManager.AddArrayComponent(entity, meshRenderer);
-                    entityManager.GetComponent<WorldMeshBounds>(entity) = (WorldMeshBounds)subChunkMesh.Bounds;
-                    entityManager.SetParent(entity, chunk.groupNode);
-
                     // holes cells default to 0 (no hole) since holesAtlas is zero-initialized
-                    if (chunksEnumerator2.Current.Holes != null)
+                    var holes = c.Holes;
+                    if (holes != null)
                     {
                         for (int hx = 0; hx < 4; hx++)
                         {
                             for (int hy = 0; hy < 4; hy++)
                             {
                                 holesAtlas[(holesCellX + hx) + (holesCellY + hy) * holesAtlasW] =
-                                    new Rgba32(chunksEnumerator2.Current.Holes[hx, hy] ? 255 : 0, 0, 0);
+                                    new Rgba32(holes[hx, hy] ? 255 : 0, 0, 0);
                             }
                         }
                     }
 
-                    var sm = chunksEnumerator2.Current.SplatMap;
+                    var sm = c.SplatMap;
+                    var shadowMap = c.ShadowMap;
                     var len = sm?.GetLength(2) ?? 0;
                     for (int _x = 0; _x < 64; ++_x)
                     {
@@ -631,7 +623,7 @@ namespace WDE.MapRenderer.Managers
                             var col = new Rgba32(len >= 1 ? sm[_x, _y, 0] : (byte)255,
                                 len >= 2 ? sm[_x, _y, 1] : (byte)0,
                                 len >= 3 ? sm[_x, _y, 2] : (byte)0,
-                                chunksEnumerator2.Current.ShadowMap != null && chunksEnumerator2.Current.ShadowMap[_x, _y] ? (byte)255 : (byte)0);
+                                shadowMap != null && shadowMap[_x, _y] ? (byte)255 : (byte)0);
                             var left = 255 - col.B;
                             col.G = (byte)Math.Min(col.G, left);
                             left -= col.G;
@@ -642,11 +634,34 @@ namespace WDE.MapRenderer.Managers
                 }
             }
 
+            await engine.EnterGameLoop;
+
             if (cancelationToken.IsCancellationRequested)
             {
+                foreach (var v in subVertices)
+                    if (v != null)
+                        ArrayPool<Vector3>.Shared.Return(v);
+                ArrayPool<ushort>.Shared.Return(colliderIndices);
                 tasksource.SetResult();
                 return;
             }
+
+            // colliders: one managed mesh + entity per sub-chunk (mesh/entity managers are
+            // game-thread only)
+            for (int idx = 0; idx < Constants.ChunksInBlock; ++idx)
+            {
+                var verts = subVertices[idx];
+                var subChunkMesh = meshManager.CreateManagedOnlyMesh(verts.AsSpan(0, 145), colliderIndices.AsSpan(0, 4 * 8 * 8 * 4));
+                ArrayPool<Vector3>.Shared.Return(verts);
+                var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype, "Terrain collider"u8);
+                entityManager.GetComponent<LegacyCollider>(entity).CollisionMask = Collisions.COLLISION_MASK_TERRAIN;
+                entityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
+                var meshRenderer = new MeshRenderer() { Mesh = subChunkMesh, SubMeshId = 0 };
+                entityManager.AddArrayComponent(entity, meshRenderer);
+                entityManager.GetComponent<WorldMeshBounds>(entity) = (WorldMeshBounds)subChunkMesh.Bounds;
+                entityManager.SetParent(entity, chunk.groupNode);
+            }
+            ArrayPool<ushort>.Shared.Return(colliderIndices);
 
             int chnk = 0;
             var material = materialManager.CreateMaterial<LitMaterialData_t>(pipeline);
@@ -654,11 +669,9 @@ namespace WDE.MapRenderer.Managers
             // material data (incl. the global-buffer slot offsets) is written below, once the slots
             // are allocated and the per-tile heights/splat data has been uploaded.
 
-            using var chunksEnumerator = ((IEnumerable<AdtChunk>)adt.Chunks).GetEnumerator();
-            chunksEnumerator.MoveNext();
             var chunkMesh = woWMeshManager.MeshOfChunk;
             var t = new Transform();
-            t.Position = new Vector3(chunksEnumerator.Current.BasePosition.X, chunksEnumerator.Current.BasePosition.Y, 0);
+            t.Position = new Vector3(adt.Chunks[0].BasePosition.X, adt.Chunks[0].BasePosition.Y, 0);
             t.Scale = new Vector3(1);
         
             // one merged 2D atlas texture each, sampled bindlessly (indices baked into the material
@@ -683,7 +696,7 @@ namespace WDE.MapRenderer.Managers
                     int? b = null;
                     int? a = null;
                     int defaultSlot = emptyBindlessIndex;
-                    foreach (var splat in chunksEnumerator.Current.Splats)
+                    foreach (var splat in adt.Chunks[chnk].Splats)
                     {
                         if (splat.TextureId >= adt.Textures.Length)
                         {
@@ -720,7 +733,6 @@ namespace WDE.MapRenderer.Managers
                     chunkToSplatIdxBindless[chnk] = new Int4(r ?? defaultSlot, g ?? defaultSlot, b ?? defaultSlot, a ?? defaultSlot);
 
                     chnk++;
-                    chunksEnumerator.MoveNext();
                 }
             }
 
@@ -998,6 +1010,7 @@ namespace WDE.MapRenderer.Managers
                 if (loadedM2s.TryGetValue(m2.Id, out var refCount))
                 {
                     loadedM2s[m2.Id] = refCount with { RefCount = refCount.RefCount + 1 };
+                    chunk.mdx.Add(m2.Id); // record the shared ref, else this chunk never releases it
                     continue;
                 }
                 loadedM2s[m2.Id] = new LoadedM2(m2.Id, 1);
@@ -1179,6 +1192,7 @@ namespace WDE.MapRenderer.Managers
                 if (loadedWmos.TryGetValue(wmoReference.Id, out var loadedWmo))
                 {
                     loadedWmos[wmoReference.Id] = loadedWmo with { RefCount = loadedWmo.RefCount + 1 };
+                    chunk.wmos.Add(wmoReference.Id); // record the shared ref, else this chunk never releases it
                     continue;
                 }
 
@@ -1408,6 +1422,24 @@ namespace WDE.MapRenderer.Managers
             loadedChunks.Clear();
             chunksXY.Clear();
             await Task.WhenAll(chunksCopy.Select(x => UnloadChunk(x).AsTask()).ToList());
+
+            // with every chunk gone, every refcount must be back to zero; anything left is a leak
+            if (loadedM2s.Count > 0 || loadedWmos.Count > 0)
+            {
+                Console.WriteLine($"[ChunkManager] refcount leak: {loadedM2s.Count} M2s, {loadedWmos.Count} WMOs still loaded after unloading all chunks, destroying them");
+                foreach (var leaked in loadedM2s.Values)
+                {
+                    if (leaked.Entity != Entity.Empty)
+                        entityManager.DestroyEntity(leaked.Entity);
+                }
+                loadedM2s.Clear();
+                foreach (var leaked in loadedWmos.Values)
+                {
+                    if (leaked.Entity != Entity.Empty)
+                        entityManager.DestroyEntity(leaked.Entity);
+                }
+                loadedWmos.Clear();
+            }
         }
 
         public bool IsLoaded(int y, int x)
