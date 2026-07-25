@@ -16,7 +16,7 @@ namespace TheEngine.ECS
             this.engine = engine;
         }
 
-        internal void AddEntity(Entity entity, Archetype archetype)
+        internal void AddEntity(Entity entity, Archetype archetype, bool invokeOnAddedHooks = true)
         {
             var hash = archetype.Hash;
             if (!archetypeToDataIndex.TryGetValue(hash, out var dataIndex))
@@ -25,7 +25,7 @@ namespace TheEngine.ECS
                 dataIndex = data.Count - 1;
                 archetypeToDataIndex[hash] = dataIndex;
             }
-            data[dataIndex].AddEntity(entity);
+            data[dataIndex].AddEntity(entity, invokeOnAddedHooks);
         }
 
         internal void RemoveEntity(Entity entity, ulong archetypeBitMask, bool isDestroyed)
@@ -35,7 +35,8 @@ namespace TheEngine.ECS
 
         public void MoveEntity(Entity entity, Archetype oldArchetype, Archetype newArchetype)
         {
-            AddEntity(entity, newArchetype);
+            // existing components get overwritten by UnsafeCopy below, so don't re-fire OnAdded for them
+            AddEntity(entity, newArchetype, invokeOnAddedHooks: false);
 
             var oldData = data[archetypeToDataIndex[oldArchetype.Hash]];
             var newData = data[archetypeToDataIndex[newArchetype.Hash]];

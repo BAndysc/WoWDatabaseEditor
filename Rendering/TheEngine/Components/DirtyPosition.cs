@@ -25,16 +25,16 @@ namespace TheEngine.Components
         public static explicit operator DirtyPosition(bool b) => new DirtyPosition(b);
     }
     
-    public struct Collider : IComponentData
+    public struct LegacyCollider : IComponentData
     {
         public uint CollisionMask;
     }
     
-    public static class ColliderExtensions
+    public static class LegacyColliderExtensions
     {
         public static void SetColliderMask(this Entity entity, IEntityManager entityManager, uint mask)
         {
-            entityManager.GetComponent<Collider>(entity).CollisionMask = mask;
+            entityManager.GetComponent<LegacyCollider>(entity).CollisionMask = mask;
         }
     }
     

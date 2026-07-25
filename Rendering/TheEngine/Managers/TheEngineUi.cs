@@ -1,4 +1,4 @@
-using ImGuiNET;
+using Hexa.NET.ImGui;
 using TheEngine.Windows;
 
 namespace TheEngine.Managers;
@@ -10,7 +10,6 @@ public class TheEngineUi
     private readonly EngineSceneView sceneView;
 
     private InputDebugWindow inputWindow;
-    private RenderTextureDebugWindow renderTextureDebugWindow;
 
     public TheEngineUi(Engine engine)
     {
@@ -18,7 +17,6 @@ public class TheEngineUi
         this.gameView = engine.gameView;
         this.sceneView = engine.sceneView;
         inputWindow = new InputDebugWindow(engine);
-        renderTextureDebugWindow = new RenderTextureDebugWindow(engine);
         engine.uiManager.OnMenuBarDraw += OnDrawMenuBar;
     }
 
@@ -32,22 +30,25 @@ public class TheEngineUi
                 inputWindow.IsOpen = !inputWindow.IsOpen;
             }
 
-            isOpen = renderTextureDebugWindow.IsOpen;
-            if (ImGuiEx.MenuItem("Render texture debugger\0"u8, null, ref isOpen))
-            {
-                renderTextureDebugWindow.IsOpen = !renderTextureDebugWindow.IsOpen;
-            }
             ImGui.EndMenu();
         }
     }
 
     public void BeginFrame(float delta)
     {
-        gameView.Draw(delta);
 #if !ENGINE_RELEASE
         sceneView.Draw(delta);
+
+        // Default to the "3D" tab. gameView and sceneView are docked together as tabs and
+        // only the active tab renders; the saved imgui.ini restores Scene View as selected,
+        // which a SetNextWindowFocus before Begin can't override. Focusing "3D" by name here
+        // (after both windows have been submitted this frame) is the last word and reliably
+        // selects it. We stop once 3D has been the active tab once, so the user can switch
+        // freely afterwards and their choice persists.
+        if (!gameView.WasEverVisible)
+            ImGui.SetWindowFocus("3D");
 #endif
+        gameView.Draw(delta);
         inputWindow.Update(delta);
-        renderTextureDebugWindow.Update(delta);
     }
 }

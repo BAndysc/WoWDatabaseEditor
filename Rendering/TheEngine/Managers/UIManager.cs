@@ -1,17 +1,18 @@
 using System.Runtime.InteropServices;
-using ImGuiNET;
-using TheAvaloniaOpenGL.Resources;
+using Hexa.NET.ImGui;
+using TheEngine.Resources;
 using TheEngine.Components;
 using TheEngine.Data;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
+using TheMaths;
 using Veldrid;
 
 namespace TheEngine.Managers
 {
-    public class UIManager : IUIManager, System.IDisposable
+    public partial class UIManager : IUIManager, System.IDisposable
     {
         private readonly Engine engine;
         private readonly ICameraManager cameraManager;
@@ -21,9 +22,59 @@ namespace TheEngine.Managers
         private readonly IMesh quad;
         private Vector4[] glyphUVs = new Vector4[1];
         private Vector4[] glyphPositions = new Vector4[1];
-        // glyph data is streamed per draw as transient slices, bound through this instance data
-        private readonly MaterialInstanceRenderData glyphRenderData = new();
         private ImGuiController imGuiController;
+
+        // World text is accumulated for the whole frame and flushed as one instanced draw per font:
+        // every glyph of every label is one instance, indexed by gl_InstanceIndex into shared
+        // per-glyph buffers. This keeps set=1 identical across all labels (bound once) instead of
+        // allocating/updating a fresh descriptor set per label. See FlushWorldText.
+        private readonly Dictionary<string, WorldTextBatch> worldTextBatches = new();
+        private readonly Stack<WorldTextBatch> worldTextBatchPool = new();
+
+        private sealed class WorldTextBatch
+        {
+            public ITexture FontTexture = null!;
+            public Matrix[] Models = new Matrix[256];
+            public Vector4[] Positions = new Vector4[256];
+            public Vector4[] Uvs = new Vector4[256];
+            public Int4[] DrawData = new Int4[256];
+            public int Count;
+
+            public void Append(in Matrix model, in Vector4 position, in Vector4 uv, int packedColor)
+            {
+                if (Count == Models.Length)
+                {
+                    int cap = Models.Length * 2;
+                    Array.Resize(ref Models, cap);
+                    Array.Resize(ref Positions, cap);
+                    Array.Resize(ref Uvs, cap);
+                    Array.Resize(ref DrawData, cap);
+                }
+                Models[Count] = model;
+                Positions[Count] = position;
+                Uvs[Count] = uv;
+                DrawData[Count] = new Int4(packedColor, 0, 0, 0);
+                Count++;
+            }
+        }
+
+        private static int PackColor(Vector4 c)
+        {
+            static int B(float v) => (int)(Math.Clamp(v, 0f, 1f) * 255f + 0.5f);
+            return B(c.X) | (B(c.Y) << 8) | (B(c.Z) << 16) | (B(c.W) << 24);
+        }
+
+        private WorldTextBatch GetWorldTextBatch(string font)
+        {
+            if (!worldTextBatches.TryGetValue(font, out var batch))
+            {
+                batch = worldTextBatchPool.Count > 0 ? worldTextBatchPool.Pop() : new WorldTextBatch();
+                batch.Count = 0;
+                batch.FontTexture = engine.fontManager.GetTexture(font);
+                worldTextBatches[font] = batch;
+            }
+            return batch;
+        }
 
         private float Scaling => engine.WindowHost.DpiScaling;
 
@@ -48,7 +99,7 @@ namespace TheEngine.Managers
         {
             public Vector4 fillColor;
             public int mode;
-            public int padding1;
+            public BindlessTextureId fontIndex; // bindless index of the font atlas (or empty texture for boxes)
             public int padding2;
             public int padding3;
         }
@@ -132,13 +183,21 @@ namespace TheEngine.Managers
             imGuiController.Dispose();
         }
 
-        private MaterialInstanceRenderData UploadGlyphs(int glyphsCount)
+        private (INativeBuffer positions, INativeBuffer uvs) UploadGlyphs(int glyphsCount)
         {
             var commandList = engine.renderManager.CommandList;
-            glyphRenderData.Clear();
-            glyphRenderData.SetBuffer("glyphPositions", commandList.UploadTransientBuffer(BufferInternalFormat.Float4, (ReadOnlySpan<Vector4>)glyphPositions.AsSpan(0, glyphsCount)));
-            glyphRenderData.SetBuffer("glpyhUVs", commandList.UploadTransientBuffer(BufferInternalFormat.Float4, (ReadOnlySpan<Vector4>)glyphUVs.AsSpan(0, glyphsCount)));
-            return glyphRenderData;
+            var positions = commandList.UploadTransientBuffer((ReadOnlySpan<Vector4>)glyphPositions.AsSpan(0, glyphsCount));
+            var uvs = commandList.UploadTransientBuffer((ReadOnlySpan<Vector4>)glyphUVs.AsSpan(0, glyphsCount));
+            return (positions, uvs);
+        }
+
+        // re-queues an already-uploaded glyph slice for the next material bind - lets one upload
+        // back two draws (RenderInstancedIndirect + Render in DrawText) without re-streaming it.
+        private void BindGlyphs(in (INativeBuffer positions, INativeBuffer uvs) glyphs)
+        {
+            var commandList = engine.renderManager.CommandList;
+            commandList.SetBuffer(ShaderUniforms.GlyphPositions, glyphs.positions);
+            commandList.SetBuffer(ShaderUniforms.GlyphUVs, glyphs.uvs);
         }
 
         private void SetupDocking()
@@ -173,26 +232,80 @@ namespace TheEngine.Managers
             SetupDocking();
         }
 
-        internal void Render3D()
+        private partial struct Render3DTextJob : IJob
         {
-            var cameraPos = cameraManager.MainCamera.Transform.Position;
-            persistentTextArchetype.ForEach<LocalToWorld, DisabledObjectBit, RenderEnabledBit, DrawTextData>((itr, thread,
-                start, end, matrices, disabledAccess, renderEnabledBit, datas) =>
+            private IChunkDataIterator itr;
+            private ComponentDataAccess<LocalToWorld> matrices;
+            private ComponentDataAccess<DisabledObjectBit> disabledAccess;
+            private ComponentDataAccess<RenderEnabledBit> renderEnabledBit;
+            private ManagedComponentDataAccess<DrawTextData> datas;
+
+            public UIManager owner;
+            public Vector3 cameraPos;
+
+            public void Execute(int start, int end)
             {
                 for (int i = start; i < end; ++i)
                 {
                     if (disabledAccess[i])
                         continue;
                     if (renderEnabledBit[i].Layer > 0 &&
-                        !engine.renderManager.IsRenderLayerEnabled(renderEnabledBit[i].Layer))
+                        !owner.engine.renderManager.IsRenderLayerEnabled(renderEnabledBit[i].Layer))
                         continue;
                     var data = datas[i];
                     var matrix = matrices[i];
                     if ((matrix.Position - cameraPos).LengthSquared() < data.visibilityDistanceSquare)
-                        DrawWorldText(data.font, data.pivot, data.text, data.fontSize, matrix, data.fontColor,
+                        owner.DrawWorldText(data.font, data.pivot, data.text, data.fontSize, matrix, data.fontColor,
                             data.backgroundColor);
                 }
-            });
+            }
+        }
+
+        internal void Render3D()
+        {
+            var cameraPos = cameraManager.MainCamera.Transform.Position;
+            new Render3DTextJob { owner = this, cameraPos = cameraPos }.Run(persistentTextArchetype);
+            FlushWorldText();
+        }
+
+        // Uploads each font's accumulated glyphs into shared per-glyph buffers and issues one
+        // instanced draw per font. set=1 is identical for every glyph in the batch, so it's bound
+        // once per font instead of once per label.
+        private void FlushWorldText()
+        {
+            if (worldTextBatches.Count == 0)
+                return;
+
+            var commandList = engine.renderManager.CommandList;
+            foreach (var (_, batch) in worldTextBatches)
+            {
+                int n = batch.Count;
+                if (n == 0)
+                {
+                    worldTextBatchPool.Push(batch);
+                    continue;
+                }
+
+                var modelsBuffer = commandList.UploadTransientBuffer((ReadOnlySpan<Matrix>)batch.Models.AsSpan(0, n));
+                var positionsBuffer = commandList.UploadTransientBuffer((ReadOnlySpan<Vector4>)batch.Positions.AsSpan(0, n));
+                var uvsBuffer = commandList.UploadTransientBuffer((ReadOnlySpan<Vector4>)batch.Uvs.AsSpan(0, n));
+                var drawDataBuffer = commandList.UploadTransientBuffer((ReadOnlySpan<Int4>)batch.DrawData.AsSpan(0, n));
+
+                // world_text.vert reads its transform through the instancing SSBOs (model = per-glyph
+                // label matrix). inverseModel is unused by the shader, so it reuses the models buffer.
+                commandList.SetBuffer(ShaderUniforms.InstancingModels, modelsBuffer);
+                commandList.SetBuffer(ShaderUniforms.InstancingInverseModels, modelsBuffer);
+                commandList.SetBuffer(ShaderUniforms.InstancingDrawData, drawDataBuffer);
+                commandList.SetBuffer(ShaderUniforms.GlyphPositions, positionsBuffer);
+                commandList.SetBuffer(ShaderUniforms.GlyphUVs, uvsBuffer);
+
+                SdfMaterialData_t worldData = new() { fontIndex = engine.TextureManager.GetBindlessIndex(batch.FontTexture) };
+                worldMaterial.SetMaterialData(ref worldData);
+                engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, ShaderPassType.Forward, 0, n);
+
+                worldTextBatchPool.Push(batch);
+            }
+            worldTextBatches.Clear();
         }
 
         internal void Render()
@@ -213,13 +326,13 @@ namespace TheEngine.Managers
 
         public void DrawBox(float x, float y, float w, float h, Vector4 color)
         {
-            SdfMaterialData_t data = new() { fillColor = color, mode = 1 };
+            SdfMaterialData_t data = new() { fillColor = color, mode = 1, fontIndex = engine.TextureManager.GetBindlessIndex(engine.TextureManager.EmptyTexture) };
             material.SetMaterialData(ref data);
-            material.SetTexture("font", engine.TextureManager.EmptyTexture);
             
             glyphPositions[0] = new Vector4(x, y + h, w, h);
             glyphUVs[0] = new Vector4(0);
-            engine.RenderManager.RenderInstancedIndirect(quad, material, ShaderPassType.Forward, 0, 1, UploadGlyphs(1));
+            BindGlyphs(UploadGlyphs(1));
+            engine.RenderManager.RenderInstancedIndirect(quad, material, ShaderPassType.Forward, 0, 1);
         }
 
         public Entity DrawPersistentWorldText(string font, Vector2 pivot, string text, float fontSize, Matrix localToWorld, float visibilityDistance, Vector4? fontColor = null,
@@ -242,43 +355,24 @@ namespace TheEngine.Managers
             return entity;
         }
 
-        private void DrawWorldBox(Vector4 color, Vector2 size, Vector2 pivot, Matrix localToWorld)
-        {
-            SdfMaterialData_t data = new() { fillColor = color, mode = 0 };
-            worldMaterial.SetMaterialData(ref data);
-            worldMaterial.SetTexture("font", engine.fontManager.GetTexture("calibri"));
-            float xPixel = -size.X * pivot.X;
-            float yPixel = -size.Y * pivot.Y;
-            Vector4 glyphUv = new Vector4(50 / 512.0f, 20/512.0f, 1/512.0f, 1/512.0f); /* todo: find a better way to find white pixel UVs (instead of hardcoding) */
-            Vector4 glyphPosition = new Vector4(xPixel, yPixel, size.X, -size.Y);
-
-            glyphUVs[0] = glyphUv;
-            glyphPositions[0]  = glyphPosition;
-
-            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, ShaderPassType.Forward, 0, 1, localToWorld, instanceData: UploadGlyphs(1));
-        }
-
         public void DrawWorldText(string font, Vector2 pivot, ReadOnlySpan<char> text, float fontSize, Matrix localToWorld, Vector4 foreColor, Vector4? backgroundColor)
         {
             var fontDef = engine.fontManager.GetFont(font);
             var measurement = MeasureText(font, text, fontSize);
+            var batch = GetWorldTextBatch(font);
 
+            // background quad first (drawn behind the text - same draw, earlier instance), using the
+            // hardcoded white-pixel UV. mode is always alpha (0) for world text.
             if (backgroundColor.HasValue)
-                DrawWorldBox(backgroundColor.Value, measurement, pivot, localToWorld);
-
-            SdfMaterialData_t data = new() { fillColor = foreColor, mode = 0 };
-            worldMaterial.SetMaterialData(ref data);
-            worldMaterial.SetTexture("font", engine.fontManager.GetTexture(font));
+            {
+                Vector4 boxUv = new Vector4(50 / 512.0f, 20 / 512.0f, 1 / 512.0f, 1 / 512.0f); /* todo: find a better way to find white pixel UVs (instead of hardcoding) */
+                Vector4 boxPos = new Vector4(-measurement.X * pivot.X, -measurement.Y * pivot.Y, measurement.X, -measurement.Y);
+                batch.Append(in localToWorld, in boxPos, in boxUv, PackColor(backgroundColor.Value));
+            }
 
             fontSize = fontSize / fontDef.BaseSize;
+            int packedColor = PackColor(foreColor);
 
-            int glyphsCount = 0;
-            if (glyphPositions.Length < text.Length)
-            {
-                glyphPositions = new Vector4[text.Length];
-                glyphUVs = new Vector4[text.Length];
-            }
-            
             float xPixel = -measurement.X * pivot.X;
             float yPixel = -measurement.Y * pivot.Y;
             foreach (var chr in text)
@@ -289,7 +383,7 @@ namespace TheEngine.Managers
                     xPixel = -measurement.X * pivot.Y;
                     continue;
                 }
-                
+
                 ref var charDef = ref fontDef.GetChar(chr);
 
                 Vector4 glyphUv = new Vector4(1.0f * charDef.x / fontDef.Width,
@@ -297,23 +391,19 @@ namespace TheEngine.Managers
                     1.0f * charDef.w / fontDef.Width,
                     1.0f * charDef.h / fontDef.Height);
 
-                Vector4 glyphPosition = new Vector4(xPixel + charDef.xOff * fontSize, yPixel  + charDef.h * fontSize + charDef.yOff * fontSize, charDef.w * fontSize, charDef.h * fontSize);
-                
-                glyphUVs[glyphsCount] = glyphUv;
-                glyphPositions[glyphsCount++]  = glyphPosition;
-                
+                Vector4 glyphPosition = new Vector4(xPixel + charDef.xOff * fontSize, yPixel + charDef.h * fontSize + charDef.yOff * fontSize, charDef.w * fontSize, charDef.h * fontSize);
+
+                batch.Append(in localToWorld, in glyphPosition, in glyphUv, packedColor);
+
                 xPixel += charDef.xAdv * fontSize;
             }
-            
-            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, ShaderPassType.Forward, 0, glyphsCount, localToWorld, instanceData: UploadGlyphs(glyphsCount));
         }
 
         public void DrawText(string font, ReadOnlySpan<char> text, float fontSize, float x, float y, float? maxWidth, Vector4 color)
         {
             var fontDef = engine.fontManager.GetFont(font);
-            SdfMaterialData_t data = new() { fillColor = color, mode = 0 };
+            SdfMaterialData_t data = new() { fillColor = color, mode = 0, fontIndex = engine.TextureManager.GetBindlessIndex(engine.fontManager.GetTexture(font)) };
             material.SetMaterialData(ref data);
-            material.SetTexture("font", engine.fontManager.GetTexture(font));
 
             fontSize = fontSize / fontDef.BaseSize;
 
@@ -350,8 +440,11 @@ namespace TheEngine.Managers
                 xPixel += charDef.xAdv * fontSize;
             }
             
-            engine.RenderManager.RenderInstancedIndirect(quad, material, ShaderPassType.Forward, 0, glyphsCount, UploadGlyphs(glyphsCount));
-            engine.RenderManager.Render(quad, material, ShaderPassType.Forward, 0,  Matrix.Identity, instanceData: glyphRenderData);
+            var glyphs = UploadGlyphs(glyphsCount);
+            BindGlyphs(glyphs);
+            engine.RenderManager.RenderInstancedIndirect(quad, material, ShaderPassType.Forward, 0, glyphsCount);
+            BindGlyphs(glyphs);
+            engine.RenderManager.Render(quad, material, ShaderPassType.Forward, 0, Matrix.Identity);
         }
 
         public Vector2 MeasureText(string font, ReadOnlySpan<char> text, float fontSize)

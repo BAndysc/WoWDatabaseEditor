@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine.Resources;
 using TheEngine.Components;
 using TheEngine.Entities;
 using TheEngine.Interfaces;
@@ -36,7 +36,6 @@ internal sealed class LinesRenderStage : IRenderStage
     // the shader reads no vertex attributes, but GL still needs a VAO bound to draw;
     // on Vulkan the vertex-input-less pipeline makes this disappear
     private readonly IMesh dummyMesh;
-    private readonly MaterialInstanceRenderData renderData = new();
 
     private LineVertex[] vertices = new LineVertex[256];
     private int vertexCount;
@@ -85,14 +84,12 @@ internal sealed class LinesRenderStage : IRenderStage
         if (pending == 0)
             return;
 
-        var buffer = commandList.UploadTransientBuffer(BufferInternalFormat.Float4,
+        var buffer = commandList.UploadTransientBuffer(
             (ReadOnlySpan<LineVertex>)vertices.AsSpan(flushedCount, pending));
         flushedCount = vertexCount;
 
-        renderData.Clear();
-        renderData.SetBuffer("LineVertices", buffer);
-        commandList.SetMaterial(material, ShaderPassType.Forward, renderData);
-        commandList.SetObjectData(Matrix.Identity, Matrix.Identity);
+        commandList.SetBuffer(ShaderUniforms.LineVertices, buffer);
+        commandList.SetMaterial(material, ShaderPassType.Forward);
         commandList.Draw(dummyMesh, pending);
     }
 

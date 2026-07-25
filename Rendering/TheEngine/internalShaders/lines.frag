@@ -1,8 +1,8 @@
-#version 330 core
+#version 450
 #include "theengine.cginc"
 
-in vec4 lineColor;
-out vec4 FragColor;
+layout(location = 0) in vec4 lineColor;
+layout(location = 0) out vec4 FragColor;
 
 void main()
 {

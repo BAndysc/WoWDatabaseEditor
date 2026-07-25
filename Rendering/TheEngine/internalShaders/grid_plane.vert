@@ -1,8 +1,8 @@
-#version 330 core
+#version 450
 #include "theengine.cginc"
 
-out vec3 NearPoint;
-out vec3 FarPoint;
+layout(location = 0) out vec3 NearPoint;
+layout(location = 1) out vec3 FarPoint;
 
 vec3 UnprojectPoint(vec2 xy, float z)
 {
@@ -20,6 +20,6 @@ vec3 UnprojectPoint(vec2 xy, float z)
 void main()
 {
     gl_Position = vec4(position.x, position.y, position.z, 1.0);
-    NearPoint = UnprojectPoint(position.xy, 0);
-    FarPoint = UnprojectPoint(position.xy, 1);
+    NearPoint = UnprojectPoint(position.xy, 0.0);
+    FarPoint = UnprojectPoint(position.xy, 1.0);
 }

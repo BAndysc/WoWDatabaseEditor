@@ -1,3 +1,8 @@
+
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("RenderingTester")]
+[assembly: InternalsVisibleTo("TheEngineTest")]
 namespace TheEngine
 {
     public interface IGame

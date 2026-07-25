@@ -3,7 +3,6 @@
     "Path": "data/sponza_sky.frag"
   },
   "ZWrite": false,
-  "Instancing": false,
   "Vertex": {
     "Path": "data/sponza_sky.vert",
     "Input": [

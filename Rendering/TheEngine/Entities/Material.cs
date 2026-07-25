@@ -3,61 +3,15 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using OpenGLBindings;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine.Resources;
 using TheEngine.Components;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheEngine.Rendering;
-using TheEngine.Resources;
 using TheMaths;
 
 namespace TheEngine.Entities
 {
-    public enum CullingMode
-    {
-        Front,
-        Back,
-        Off
-    }
-    
-    // openGL values on purpose
-    public enum DepthCompare
-    {
-        Never = 0x200,
-        Less,
-        Equal,
-        Lequal,
-        Greater,
-        Notequal,
-        Gequal,
-        Always
-    }
-    
-    
-    // openGL values on purpose
-    public enum Blending
-    {
-        Zero = 0,
-        SrcColor = 768,
-        OneMinusSrcColor = 769,
-        SrcAlpha = 770,
-        OneMinusSrcAlpha = 771,
-        DstAlpha = 772,
-        OneMinusDstAlpha = 773,
-        DstColor = 774,
-        OneMinusDstColor = 775,
-        SrcAlphaSaturate = 776,
-        ConstantColor = 32769,
-        OneMinusConstantColor = 32770,
-        ConstantAlpha = 32771,
-        OneMinusConstantAlpha = 32772,
-        Src1Alpha = 34185,
-        Src1Color = 35065,
-        OneMinusSrc1Color = 35066,
-        OneMinusSrc1Alpha = 35067,
-        One = 1
-    }
 
     public class Material<T> : Material where T : unmanaged
     {
@@ -97,52 +51,10 @@ namespace TheEngine.Entities
             var bytesSpan = MemoryMarshal.Cast<T, byte>(materialDataSpan);
 
             bytesSpan.CopyTo(this.materialDataBytes);
+            BumpResourceGeneration();
         }
 
-        protected override unsafe void ActivateMoreUniforms(ShaderPass shaderPass, ReadOnlySpan<byte> materialData)
-        {
-            foreach (var uniform in uniformData)
-            {
-                var data = materialData.Slice((int)uniform.offset, uniform.size);
-                var loc = uniform.globalLocation;
-                if (!shaderPass.HasGlobalUniform(loc))
-                {
-                    continue;
-                }
-                fixed (byte* ptr = data)
-                {
-                    if (uniform.type == typeof(int))
-                    {
-                        ref var value = ref Unsafe.AsRef<int>(ptr);
-                        shaderPass.SetUniformInt(loc, value);
-                    }
-                    else if (uniform.type == typeof(float))
-                    {
-                        ref var value = ref Unsafe.AsRef<float>(ptr);
-                        shaderPass.SetUniform(loc, value);
-                    }
-                    else if (uniform.type == typeof(Vector3))
-                    {
-                        ref var value = ref Unsafe.AsRef<Vector3>(ptr);
-                        shaderPass.SetUniform(loc, value.X, value.Y, value.Z);
-                    }
-                    else if (uniform.type == typeof(Vector4))
-                    {
-                        ref var value = ref Unsafe.AsRef<Vector4>(ptr);
-                        shaderPass.SetUniform(loc, value.X, value.Y, value.Z, value.W);
-                    }
-                    else if (uniform.type == typeof(Matrix))
-                    {
-                        ref var value = ref Unsafe.AsRef<Matrix>(ptr);
-                        shaderPass.SetUniform(loc, value);
-                    }
-                    else
-                        throw new Exception("Unknown type " + uniform.type);
-                }
-            }
-        }
-
-        public ref T MaterialData => ref MemoryMarshal.Cast<byte, T>(materialDataBytes)[0];
+        public ref readonly T MaterialData => ref MemoryMarshal.Cast<byte, T>(materialDataBytes)[0];
     }
 
     public struct GlobalUniformHandle : IEquatable<GlobalUniformHandle>
@@ -197,10 +109,26 @@ namespace TheEngine.Entities
         public MaterialHandle Handle { get; }
 
         protected byte[] materialDataBytes = Array.Empty<byte>();
-        internal Dictionary<GlobalUniformHandle, ITexture> textures { get; } = new();
-        internal Dictionary<GlobalUniformHandle, INativeBuffer> structuredBuffers { get; } = new();
+
+        // Textures sampled bindlessly (their slot index lives in the material data, not a descriptor
+        // binding) still need a strong reference somewhere or the managed Texture is GC'd and its
+        // native texture finalized, dangling the bindless slot -> GPU page fault. A material anchors
+        // such textures here purely for lifetime; nothing in the descriptor path reads this list.
+        private readonly List<ITexture> keepAliveTextures = new();
+
+        /// <summary>Row index of this material within its type's MaterialManager.MaterialTypeArray SSBO, or -1 if not registered.</summary>
+        internal int MaterialArrayIndex = -1;
 
         public Span<byte> MaterialDataBytes => materialDataBytes;
+
+        /// <summary>
+        /// Monotonic counter bumped whenever this material's constant data, textures or structured
+        /// buffers change. The Vulkan set=1 descriptor cache keys on (material, generation) instead
+        /// of memcmp-ing the material bytes every draw, so a steady material is a cheap int compare.
+        /// </summary>
+        internal uint ResourceGeneration { get; private set; }
+
+        protected void BumpResourceGeneration() => ResourceGeneration++;
 
         public bool BlendingEnabled { get; }
 
@@ -211,34 +139,6 @@ namespace TheEngine.Entities
             Handle = materialHandle;
             BlendingEnabled = pipeline.Description.BlendState.AttachmentStates[0].BlendEnabled;
         }
-
-        public void InvalidateShaderCache()
-        {
-        }
-
-        // public void SetStructuredBuffer<T>(int index, T[] data, StructuredBufferMode mode = StructuredBufferMode.VertexPixel) where T : unmanaged
-        // {
-        //     var bufferMode = BufferTypeEnum.StructuredBuffer;
-        //     if (mode == StructuredBufferMode.PixelOnly)
-        //         bufferMode = BufferTypeEnum.StructuredBufferPixelOnly;
-        //     else if (mode == StructuredBufferMode.VertexOnly)
-        //         bufferMode = BufferTypeEnum.StructuredBufferVertexOnly;
-        //
-        //     INativeBuffer buffer = engine.Device.CreateBuffer<T>(bufferMode, data);
-        //
-        //     if (mode == StructuredBufferMode.PixelOnly)
-        //     {
-        //         structuredPixelsBuffers[index] = buffer;
-        //     }
-        //     else if (mode == StructuredBufferMode.VertexOnly)
-        //     {
-        //         structuredVertexBuffers[index] = buffer;
-        //     }
-        //     else
-        //     {
-        //         structuredBuffers[index] = buffer;
-        //     }
-        // }
 
         public static GlobalUniformHandle GetUniformLocation(string name)
         {
@@ -256,117 +156,33 @@ namespace TheEngine.Entities
             return globalUniformLocationsReverse.GetValueOrDefault(globalUniform);
         }
 
-        private void Set<T>(Dictionary<GlobalUniformHandle, T> dict, string name, T type)
+        /// <summary>Anchors a bindlessly-sampled texture's lifetime to this material (no descriptor
+        /// binding). Every sampled texture is bindless now: the shader reads its slot index from the
+        /// material data, and this keeps the managed texture alive so its bindless slot isn't dangled.</summary>
+        public void KeepAlive(ITexture texture)
         {
-            var loc = GetUniformLocation(name);
-            dict[loc] = type;
+            if (!keepAliveTextures.Contains(texture))
+                keepAliveTextures.Add(texture);
         }
 
-        public void SetBuffer(string name, INativeBuffer buffer)
+        /// <summary>A clone samples the same bindless slots as its source, so it must anchor the same
+        /// textures (see <see cref="KeepAlive"/>).</summary>
+        internal void CopyKeepAlivesFrom(Material source)
         {
-            Set(structuredBuffers, name, buffer);
+            foreach (var texture in source.keepAliveTextures)
+                KeepAlive(texture);
         }
 
-        public void SetTexture(string name, ITexture texture)
+        public IShaderPass? GetShaderPass(ShaderPassType passType)
         {
-            Set(textures, name, texture);
-        }
-        
-        public ITexture GetTexture(string name)
-        {
-            return textures[GetUniformLocation(name)];
-        }
-        
-        public INativeBuffer GetBuffer(string name)
-        {
-            return structuredBuffers[GetUniformLocation(name)];
-        }
-
-        // the data span is passed in (rather than read from materialDataBytes) so the
-        // deferred path can activate from a record-time snapshot of the same bytes
-        protected virtual void ActivateMoreUniforms(ShaderPass shaderPass, ReadOnlySpan<byte> materialData)
-        {
-        }
-
-        public IShaderPass? GetShaderPass(ShaderPassType passType, bool instanced)
-        {
-            return (passType, instanced) switch
+            return passType switch
             {
-                (ShaderPassType.Forward, false) => this.Pipeline.Shader.ForwardPass,
-                (ShaderPassType.Forward, true) => this.Pipeline.Shader.ForwardInstancedPass,
-                (ShaderPassType.Shadow, false) => this.Pipeline.Shader.ShadowPass,
-                (ShaderPassType.Shadow, true) => this.Pipeline.Shader.ShadowInstancedPass,
+                ShaderPassType.Forward => this.Pipeline.Shader.ForwardPass,
+                // dedicated depth/shadow variant if the shader declares one, else the forward pass
+                ShaderPassType.Depth => this.Pipeline.Shader.DepthPass ?? this.Pipeline.Shader.ForwardPass,
+                ShaderPassType.Shadow => this.Pipeline.Shader.ShadowPass,
                 _ => null
             };
-        }
-
-        // called by the command list when binding material resources (BindMaterialResources);
-        // on GL the material's textures/buffers/constants are bound as loose uniforms,
-        // on Vulkan they will become a descriptor set + push constants
-        internal void ActivateUniforms(ShaderPass shaderPass, MaterialInstanceRenderData? instanceData = null)
-        {
-            int slot = 0;
-
-            foreach (var buffer in structuredBuffers)
-            {
-                if (instanceData != null && instanceData.structuredBuffers != null &&
-                    instanceData.structuredBuffers.ContainsKey(buffer.Key))
-                    continue;
-                if (!shaderPass.HasGlobalUniform(buffer.Key))
-                    continue;
-                buffer.Value.Activate(slot);
-                shaderPass.SetUniformInt(buffer.Key, slot);
-                slot++;
-            }
-            foreach (var pair in textures)
-            {
-                if (!shaderPass.HasGlobalUniform(pair.Key))
-                    continue;
-                if (pair.Value != null)
-                {
-                    var texture = engine.textureManager.GetTextureByHandle(pair.Value.Handle);
-                    if (texture == null)
-                        texture = engine.textureManager.GetTextureByHandle(engine.textureManager.EmptyTexture.Handle);
-                    texture.Activate(slot);
-                }
-                else
-                {
-                    var texture = engine.textureManager.GetTextureByHandle(engine.textureManager.EmptyTexture.Handle);
-                    texture.Activate(slot);
-                }
-                shaderPass.SetUniformInt(pair.Key, slot);
-                slot++;
-            }
-
-            ActivateMoreUniforms(shaderPass, materialDataBytes);
-
-            instanceData?.Activate(shaderPass, slot);
-        }
-
-        // the deferred-recording path: the dictionary walks and shader-uniform checks already
-        // happened when the snapshot was captured, this just executes the recorded binds
-        internal void ActivateUniforms(ShaderPass shaderPass, MaterialSnapshot snapshot)
-        {
-            foreach (var (uniform, slot, buffer) in snapshot.Buffers)
-            {
-                buffer.Activate(slot);
-                shaderPass.SetUniformInt(uniform, slot);
-            }
-            foreach (var (uniform, slot, texture) in snapshot.Textures)
-            {
-                var resolved = texture == null ? null : engine.textureManager.GetTextureByHandle(texture.Handle);
-                resolved ??= engine.textureManager.GetTextureByHandle(engine.textureManager.EmptyTexture.Handle);
-                resolved.Activate(slot);
-                shaderPass.SetUniformInt(uniform, slot);
-            }
-            ActivateMoreUniforms(shaderPass, snapshot.MaterialData.AsSpan(0, snapshot.MaterialDataLength));
-        }
-        
-        public enum StructuredBufferMode
-        {
-            VertexOnly,
-            PixelOnly,
-            VertexPixel
         }
     }
 }

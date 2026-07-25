@@ -1,7 +1,7 @@
-#version 330 core
+#version 450
 #include "../internalShaders/theengine.cginc"
 
-out vec2 TexCoord;
+layout(location = 0) out vec2 TexCoord;
 
 void main()
 {

@@ -39,8 +39,11 @@ namespace AvaloniaRenderingTester
 {
     public class MainThread : IMainThread
     {
+        private int mainThread;
+
         public MainThread()
         {
+            mainThread = Environment.CurrentManagedThreadId;
             Profiler.SetupMainThread(this);
         }
 
@@ -64,6 +67,30 @@ namespace AvaloniaRenderingTester
         public IDisposable StartTimer(Func<bool> action, TimeSpan interval)
         {
             return DispatcherTimer.Run(action, interval);
+        }
+
+        public async Task<T> Schedule<T>(Func<Task<T>> func)
+        {
+            if (Environment.CurrentManagedThreadId == mainThread)
+            {
+                return await func();
+            }
+            else
+            {
+                return await Dispatcher.UIThread.InvokeAsync(func);
+            }
+        }
+
+        public async Task<T> Schedule<T>(Func<T> func)
+        {
+            if (Environment.CurrentManagedThreadId == mainThread)
+            {
+                return func();
+            }
+            else
+            {
+                return await Dispatcher.UIThread.InvokeAsync(func);
+            }
         }
 
         private async Task Do(Func<Task> action, TaskCompletionSource tcs)
@@ -113,7 +140,7 @@ namespace AvaloniaRenderingTester
             registry.RegisterInstance<IMainThread>(mainThread);
             registry.RegisterInstance<IEventAggregator>(new EventAggregator());
 
-            registry.RegisterInstance<IClipboardService>(new AvaloniaClipboard());
+            registry.RegisterInstance<IClipboardService>(new AvaloniaClipboard(mainThread));
             
             SetupModules(new DbcStoreModule(),
                 new MpqModule(),
@@ -144,20 +171,28 @@ namespace AvaloniaRenderingTester
 
     public class AvaloniaClipboard : IClipboardService
     {
-        public AvaloniaClipboard()
+        private readonly IMainThread mainThread;
+
+        public AvaloniaClipboard(IMainThread mainThread)
         {
+            this.mainThread = mainThread;
         }
 
         private IClipboard clipboard => Application.Current?.GetTopLevel()?.Clipboard!;
         
-        public Task<string?> GetText()
+        public async Task<string?> GetText()
         {
-            return clipboard.GetTextAsync();
+            return await mainThread.Schedule(async () =>
+            {
+                if (await clipboard.TryGetTextAsync() is { } text)
+                    return text;
+                return null;
+            });
         }
 
         public void SetText(string text)
         {
-            clipboard.SetTextAsync(text).ListenErrors();
+            mainThread.Schedule(async () => clipboard.SetTextAsync(text)).ListenErrors();
         }
     }
 }

@@ -6,18 +6,17 @@ namespace TheEngine.Data;
 public struct SceneData
 {
     public SceneData(ICamera sceneCamera,
-        FogSettings fog, 
-        DirectionalLight mainLight,
-        DirectionalLight secondaryLight)
+        DirectionalLightData mainLight,
+        DirectionalLightData secondaryLight)
     {
         SceneCamera = sceneCamera;
-        Fog = fog;
         MainLight = mainLight;
         SecondaryLight = secondaryLight;
     }
 
     public ICamera SceneCamera { get; }
-    public FogSettings Fog { get; }
-    public DirectionalLight MainLight { get; }
-    public DirectionalLight SecondaryLight { get; }
+    public DirectionalLightData MainLight { get; }
+    public DirectionalLightData SecondaryLight { get; }
+
+    // Fog now lives on the camera (SceneCamera.Fog); resolved in RenderManager.UpdateSceneBuffer.
 }

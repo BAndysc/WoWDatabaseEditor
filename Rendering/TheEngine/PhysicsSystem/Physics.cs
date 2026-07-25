@@ -33,7 +33,7 @@ namespace TheEngine.PhysicsSystem
             this.engine = engine;
             meshManager = engine.meshManager;
             colliders = engine.EntityManager.NewArchetype()
-                .WithComponentData<Collider>()
+                .WithComponentData<LegacyCollider>()
                 //.WithComponentData<RenderEnabledBit>()
                 .WithComponentData<MeshRenderer>()
                 .WithComponentData<LocalToWorld>()
@@ -52,7 +52,7 @@ namespace TheEngine.PhysicsSystem
         public void RaycastAll(Ray ray, Vector3? customOrigin, List<(Entity, Vector3)> destinationList, uint collisionMask = 0)
         {
             ThreadLocal<List<(Entity, Vector3)>?> localEntities = new ThreadLocal<List<(Entity, Vector3)>?>(true);
-            colliders.ParallelForEachRRRROArray<MeshRenderer, Collider, WorldMeshBounds, LocalToWorld, DisabledObjectBit>((itr, thread, start, end, renderers, colliders, meshBounds, localToWorld, disableAccess) =>
+            colliders.ParallelForEachRRRROArray<MeshRenderer, LegacyCollider, WorldMeshBounds, LocalToWorld, DisabledObjectBit>((itr, thread, start, end, renderers, colliders, meshBounds, localToWorld, disableAccess) =>
             {
                 List<(Entity, Vector3)>? result = null;
                 for (int i = start; i < end; ++i)
@@ -109,7 +109,7 @@ namespace TheEngine.PhysicsSystem
         public (Entity, Vector3)? Raycast(Ray ray, Vector3? customOrigin, bool onlyRendered = false, uint collisionMask = 0)
         {
             ThreadLocal<(Entity, float, Vector3)> localEntities = new ThreadLocal<(Entity, float, Vector3)>(true);
-            colliders.ParallelForEachRRRROOArray<MeshRenderer, Collider, WorldMeshBounds, LocalToWorld, RenderEnabledBit, DisabledObjectBit>((itr, thread, start, end, renderers, colliders, meshBounds, localToWorld, renderEnabledAccess, disabledAccess) =>
+            colliders.ParallelForEachRRRROOArray<MeshRenderer, LegacyCollider, WorldMeshBounds, LocalToWorld, RenderEnabledBit, DisabledObjectBit>((itr, thread, start, end, renderers, colliders, meshBounds, localToWorld, renderEnabledAccess, disabledAccess) =>
             {
                 Entity? touchEntity = null;
                 float minDist = float.MaxValue;
@@ -206,7 +206,7 @@ namespace TheEngine.PhysicsSystem
             int index = 1;
             StringBuilder vertices = new();
             StringBuilder indices = new();
-            colliders.ForEachArray<MeshRenderer, Collider, LocalToWorld>((itr, thread, start, end, renderers, colliders, localToWorld) =>
+            colliders.ForEachArray<MeshRenderer, LegacyCollider, LocalToWorld>((itr, thread, start, end, renderers, colliders, localToWorld) =>
             {
                 for (int i = start; i < end; ++i)
                 {

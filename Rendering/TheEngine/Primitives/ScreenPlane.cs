@@ -20,11 +20,14 @@ namespace TheEngine.Primitives
             new Vector3(1, 1, 0),
         };
         
+        // V flipped vs the NDC-corner mapping: under the native top-down (negative-height)
+        // viewport a fullscreen fragment's framebuffer row is the inverse of its NDC y, so the
+        // sampling uv.y must equal the screen row (0 = top) to stay an identity pass.
         private static Vector2[] UVs = {
-            new Vector2(0, 1),
             new Vector2(0, 0),
-            new Vector2(1, 0),
+            new Vector2(0, 1),
             new Vector2(1, 1),
+            new Vector2(1, 0),
         };
 
 

@@ -1,5 +1,4 @@
-﻿using Avalonia.Input;
-using TheMaths;
+﻿using TheEngine.Input;
 
 namespace TheEngine.Interfaces
 {

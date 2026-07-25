@@ -4,10 +4,9 @@
 
 using System;
 using System.Collections.Generic;
-using OpenGLBindings;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine.Resources;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheMaths;
@@ -78,6 +77,18 @@ namespace TheEngine.Managers
                         yield return target;
                 }
             }
+        }
+
+        /// <summary>Reverse lookup of the file path a texture was loaded from via <see cref="LoadTexture"/>,
+        /// for display purposes only (e.g. TexturePickerWindow). Null for procedurally-created textures.</summary>
+        internal string? GetPathFor(ITexture texture)
+        {
+            foreach (var (path, tex) in texturesByPath)
+            {
+                if (tex == texture)
+                    return path;
+            }
+            return null;
         }
 
         public void Dispose()
@@ -181,6 +192,15 @@ namespace TheEngine.Managers
             var texture = engine.Backend.CreateTexture(width, height, pixels, generateMips);
             return AddTexture(texture);
         }
+
+        // Pooled async builder + the backend's pooled IValueTaskSource keep this allocation-free per call.
+        // The await resumes on the render thread (where the upload completes), so AddTexture is safe.
+        [System.Runtime.CompilerServices.AsyncMethodBuilder(typeof(System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder<>))]
+        public async System.Threading.Tasks.ValueTask<ITexture> CreateTextureAsync(Rgba32[][] pixels, int width, int height, bool generateMips, FilteringMode filtering, WrapMode wrapping)
+        {
+            var native = await engine.Backend.CreateTextureAsync(width, height, pixels, generateMips, filtering, wrapping);
+            return native == null ? EmptyTexture : AddTexture(native);
+        }
         
         public unsafe ITexture CreateTexture(Rgba32* pixels, int width, int height, bool generateMips)
         {
@@ -209,6 +229,13 @@ namespace TheEngine.Managers
             return AddTexture(texture);
         }
         
+        /// <summary>Depth-only render texture (no color attachments) wrapping an existing depth texture.</summary>
+        public ITexture CreateDepthOnlyRenderTexture(ITexture depthTexture)
+        {
+            var texture = engine.Backend.CreateRenderTexture(depthTexture.Width, depthTexture.Height, 0, GetTextureByHandle(depthTexture.Handle)!);
+            return AddTexture(texture);
+        }
+
         public ITexture CreateRenderTextureWithColorAndDepth(int width, int height, out ITexture colorTexture, out ITexture depthTexture)
         {
             depthTexture = CreateTexture(null, width, height, TextureFormat.DepthComponent);
@@ -251,14 +278,29 @@ namespace TheEngine.Managers
             ((Texture)texture).NativeTexture.SetWrapping(mode);
         }
 
-        public void BlitFramebuffers(ITexture src, ITexture dst, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, BlitFramebufferFilter filter)
+        public int GetBindlessIndex(ITexture texture)
         {
-            var srcTex = ((Texture)src).NativeTexture as RenderTexture;
-            var dstTex = ((Texture)dst).NativeTexture as RenderTexture;
-            
-            srcTex!.ActivateSourceFrameBuffer(0);
-            dstTex!.ActivateRenderFrameBuffer();
-            engine.Device.device.BlitFramebuffer(srcX0, srcY0, srcX1, srcY1,  dstX0, dstY0,  dstX1,  dstY1, mask, filter);
+            var slot = engine.Backend.GetBindlessTextureSlot(((Texture)texture).NativeTexture);
+            // Remember slot -> managed texture so tooling (e.g. the material inspector, which only sees
+            // an opaque BindlessTextureId in the material data) can resolve a slot back to a previewable
+            // texture. Weak so we never keep a texture alive; steady state is a hit with no allocation.
+            if (!bindlessReverse.TryGetValue(slot, out var wr))
+                bindlessReverse[slot] = new WeakReference<ITexture>(texture);
+            else if (!wr.TryGetTarget(out var existing) || !ReferenceEquals(existing, texture))
+                wr.SetTarget(texture);
+            return slot;
+        }
+
+        // slot -> managed texture, maintained by GetBindlessIndex; for tooling/reverse lookup only.
+        private readonly Dictionary<int, WeakReference<ITexture>> bindlessReverse = new();
+
+        /// <summary>Resolves a bindless slot index back to its managed texture, or null if the slot was
+        /// never registered here or the texture has since been collected. For inspector/debug use.</summary>
+        public ITexture? TryGetTextureByBindlessIndex(int index)
+        {
+            if (bindlessReverse.TryGetValue(index, out var wr) && wr.TryGetTarget(out var tex))
+                return tex;
+            return null;
         }
 
         public bool TextureExists(TextureHandle handle)

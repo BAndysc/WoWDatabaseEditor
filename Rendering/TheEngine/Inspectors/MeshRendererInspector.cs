@@ -1,8 +1,9 @@
 using System.Runtime.CompilerServices;
-using ImGuiNET;
+using Hexa.NET.ImGui;
 using TheEngine.Components;
 using TheEngine.ECS;
 using TheEngine.Entities;
+using TheEngine.Handles;
 using TheEngine.Utils;
 
 namespace TheEngine.Inspectors;
@@ -24,12 +25,18 @@ public class MeshRendererInspector : IRefInspectorDrawer<MeshRenderer>
         ImGui.Columns(2);
         ImGuiEx.TextUnformatted("Submesh\0"u8);
         ImGui.NextColumn();
-        ImGui.SliderInt("##submesh", ref component.SubMeshId, 0, mesh.SubmeshCount - 1);
+        // SubMeshId/Opaque are properties (they recompute MeshRenderer.SortKey on assignment), so they
+        // can't be passed by ref - edit a local and write back through the property when it changes.
+        int subMeshId = component.SubMeshId;
+        if (ImGui.SliderInt("##submesh", ref subMeshId, 0, mesh.SubmeshCount - 1))
+            component.SubMeshId = subMeshId;
         ImGui.NextColumn();
 
         ImGuiEx.TextUnformatted("Opaque\0"u8);
         ImGui.NextColumn();
-        ImGui.Checkbox("##opaque", ref component.Opaque);
+        bool opaque = component.Opaque;
+        if (ImGui.Checkbox("##opaque", ref opaque))
+            component.Opaque = opaque;
         ImGui.NextColumn();
 
         // ImGuiEx.TextUnformatted("Blending enabled\0"u8);
@@ -153,6 +160,13 @@ public class MeshRendererInspector : IRefInspectorDrawer<MeshRenderer>
                         ref var value = ref Unsafe.AsRef<Matrix>(ptr);
                         ImGui.TextUnformatted("Matrix (read-only)");
                     }
+                    else if (uniform.type == typeof(BindlessTextureId))
+                    {
+                        // binary-compatible with an int; the value is a bindless slot, so preview the
+                        // texture it points at instead of showing a meaningless number.
+                        ref var slot = ref Unsafe.AsRef<int>(ptr);
+                        DrawBindlessTexture(slot);
+                    }
                     else
                         throw new Exception("Unknown type " + uniform.type);
                     ImGui.NextColumn();
@@ -160,46 +174,8 @@ public class MeshRendererInspector : IRefInspectorDrawer<MeshRenderer>
             }
         }
 
-        // Texture uniforms
-        foreach (var textureUniform in material.textures)
-        {
-            var uniformName = Material.GetUniformName(textureUniform.Key);
-            if (uniformName != null)
-            {
-                var texture = textureUniform.Value;
-                if (texture != null)
-                {
-                    ImGui.TextUnformatted($"{uniformName} (texture)");
-                    ImGui.NextColumn();
-
-                    // Calculate thumbnail size (max 50px, keep aspect ratio)
-                    var maxSize = 50.0f;
-                    var aspectRatio = (float)texture.Width / texture.Height;
-                    var thumbnailWidth = aspectRatio > 1.0f ? maxSize : maxSize * aspectRatio;
-                    var thumbnailHeight = aspectRatio > 1.0f ? maxSize / aspectRatio : maxSize;
-
-                    var texturePtr = texture.Handle.ToRawIntPtr();
-                    ImGui.Image(texturePtr, new Vector2(thumbnailWidth, thumbnailHeight));
-
-                    // Show full resolution on hover
-                    if (ImGui.IsItemHovered())
-                    {
-                        ImGui.BeginTooltip();
-                        ImGui.Image(texturePtr, new Vector2(texture.Width, texture.Height));
-                        ImGui.EndTooltip();
-                    }
-
-                    ImGui.NextColumn();
-                }
-                else
-                {
-                    ImGui.TextUnformatted($"{uniformName} (texture)");
-                    ImGui.NextColumn();
-                    ImGui.TextUnformatted("Texture not found");
-                    ImGui.NextColumn();
-                }
-            }
-        }
+        // (textures are bindless now - they appear above as int "...Index" fields in the material data,
+        // not as set-1 sampler uniforms, so there's no per-material texture list to preview here)
 
         ImGui.Columns(1);
 
@@ -208,5 +184,28 @@ public class MeshRendererInspector : IRefInspectorDrawer<MeshRenderer>
         {
             mesh.SaveToObj("mesh.obj");
         }
+    }
+
+    private unsafe void DrawBindlessTexture(int slot)
+    {
+        var texture = engine.textureManager.TryGetTextureByBindlessIndex(slot);
+        if (texture == null)
+        {
+            ImGui.TextUnformatted($"bindless slot {slot} (no preview)");
+            return;
+        }
+
+        var texRef = new ImTextureRef(null, texture.Handle.ToRawIntPtr());
+        // native top-down render targets: no V-flip (uv0 top-left, uv1 bottom-right)
+        ImGui.Image(texRef, new Vector2(48, 48), new Vector2(0, 0), new Vector2(1, 1));
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.BeginTooltip();
+            ImGui.TextUnformatted($"slot {slot} - {texture.Width}x{texture.Height}");
+            ImGui.Image(texRef, new Vector2(256, 256), new Vector2(0, 0), new Vector2(1, 1));
+            ImGui.EndTooltip();
+        }
+        ImGui.SameLine();
+        ImGui.TextUnformatted($"slot {slot}");
     }
 }

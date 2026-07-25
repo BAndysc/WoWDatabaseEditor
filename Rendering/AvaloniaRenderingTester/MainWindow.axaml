@@ -4,9 +4,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:theEngine="clr-namespace:TheEngine;assembly=TheEngine"
         xmlns:avaloniaRenderingTester="clr-namespace:AvaloniaRenderingTester"
+        xmlns:theEngine1="clr-namespace:TheEngine;assembly=TheEngineAvalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="AvaloniaRenderingTester.MainWindow"
         x:DataType="avaloniaRenderingTester:MainWindow"
         Title="AvaloniaRenderingTester">
-    <theEngine:NativeTheEnginePanel Game="{CompiledBinding Game}" />
+    <theEngine1:ProperTheEnginePanel Game="{CompiledBinding Game}" />
 </Window>

@@ -1,10 +1,13 @@
 //#define DEBUG_ENTITY_CREATE_CALLSTACK
 
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System;
 using System.Collections.Generic;
 using TheEngine.Components;
+using TheEngine.Entities;
 using TheEngine.Managers;
+using TheEngine.Utils;
 #if DEBUG_ENTITY_CREATE_CALLSTACK
 using System.Diagnostics;
 #endif
@@ -20,9 +23,14 @@ namespace TheEngine.ECS
     internal class EntityManager : IEntityManager, System.IDisposable
     {
         private readonly EntityDataManager dataManager;
+        private readonly Engine engine;
         private readonly List<Entity> freeEntities = new();
         private Entity[] entities = new Entity[1];
         private ulong[] entitiesArchetype = new ulong[1];
+        // per-entity chunk reference so the hot accessors (GetComponent & co) skip the
+        // archetype-hash dictionary lookup; chunks are stable per archetype, so the cached
+        // reference only changes when the entity's archetype changes
+        private ChunkDataManager?[] entitiesChunk = new ChunkDataManager?[1];
         #if DEBUG_ENTITY_CREATE_CALLSTACK
         private StackTrace?[] entitySource = new StackTrace?[1];
         #endif
@@ -33,13 +41,45 @@ namespace TheEngine.ECS
         private readonly Dictionary<System.Type, int> typeToManagedIndexMapping = new();
         private readonly Dictionary<ulong, Archetype> archetypes = new();
 
+        // Head of the intrusive doubly-linked list of root entities (Parent == Empty).
+        private Entity firstRoot = Entity.Empty;
+        // Bumped on every structural hierarchy change (create, destroy, reparent). The
+        // editor hierarchy view uses it to know when to re-flatten the visible tree.
+        private int structuralVersion;
+
+        /// <summary>First root entity, or <see cref="Entity.Empty"/> if there are none.
+        /// Walk the tree via <see cref="Relationship.NextSibling"/> / <see cref="Relationship.FirstChild"/>.</summary>
+        public Entity HierarchyFirstRoot => firstRoot;
+
+        /// <summary>Monotonic counter incremented on any structural hierarchy change.</summary>
+        public int StructuralVersion => structuralVersion;
+
         internal EntityDataManager DataManager => dataManager;
         internal IEnumerable<Type> KnownTypes => typeToIndexMapping.Keys;
         internal IEnumerable<Type> KnownManagedTypes => typeToManagedIndexMapping.Keys;
 
+        public Archetype RelationshipArchetype { get; }
+
         public EntityManager(StatsManager statsManager, Engine engine)
         {
+            this.engine = engine;
             dataManager = new(statsManager, engine);
+            // preregister so they're addable in the scene view even if unused; also fixes their order
+            TypeData<EntityName>();
+            TypeData<LocalToWorld>();
+            TypeData<Relationship>();
+            TypeData<RenderEnabledBit>();
+            TypeData<DirtyPosition>();
+            TypeData<DisabledObjectBit>();
+            TypeData<MeshRenderer>();
+            TypeData<MeshBounds>();
+            TypeData<WorldMeshBounds>();
+            TypeData<CascadeShadowMap>();
+            TypeData<Decal>();
+            TypeData<Light>();
+            TypeData<AmbientOcclusion>();
+
+            RelationshipArchetype = NewArchetype().WithComponentData<CopyParentTransform>();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -49,6 +89,7 @@ namespace TheEngine.ECS
             {
                 Array.Resize(ref entities, entities.Length * 2 + 1);
                 Array.Resize(ref entitiesArchetype, entities.Length);
+                Array.Resize(ref entitiesChunk, entities.Length);
 #if DEBUG_ENTITY_CREATE_CALLSTACK
                 Array.Resize(ref entitySource, entities.Length);
 #endif
@@ -100,6 +141,10 @@ namespace TheEngine.ECS
             entitySource[newEntity.Id] = new StackTrace(1, true);
 #endif
             dataManager.AddEntity(newEntity, archetype);
+            entitiesChunk[newEntity.Id] = dataManager[archetype.Hash];
+            // Every entity starts life as a root (its Relationship is zeroed by AddEntity).
+            LinkIntoList(newEntity, Entity.Empty);
+            structuralVersion++;
             return newEntity;
         }
 
@@ -115,6 +160,7 @@ namespace TheEngine.ECS
             if (entityAlreadyHasComponent)
             {
                 Console.WriteLine($"The entity has already the component, consider using GetComponent<{typeof(T)}>() = value for more performance");
+                GetComponent<T>(entity) = component;
             }
             else
             {
@@ -122,8 +168,11 @@ namespace TheEngine.ECS
                 var newArchetype = oldArchetype.WithComponentData<T>();
                 dataManager.MoveEntity(entity, oldArchetype, newArchetype);
                 entitiesArchetype[entity.Id] = newArchetype.Hash;
+                entitiesChunk[entity.Id] = dataManager[newArchetype.Hash];
+                ref var comp = ref GetComponent<T>(entity);
+                comp = component;
+                componentTypeData.OnAddedAction?.Invoke(engine, entity, MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref comp, 1)));
             }
-            GetComponent<T>(entity) = component;
         }
         
         public void AddManagedComponent<T>(Entity entity, T component) where T : class, IManagedComponentData
@@ -145,6 +194,7 @@ namespace TheEngine.ECS
                 var newArchetype = oldArchetype.WithManagedComponentData<T>();
                 dataManager.MoveEntity(entity, oldArchetype, newArchetype);
                 entitiesArchetype[entity.Id] = newArchetype.Hash;
+                entitiesChunk[entity.Id] = dataManager[newArchetype.Hash];
             }
             SetManagedComponent<T>(entity, component);
         }
@@ -164,6 +214,7 @@ namespace TheEngine.ECS
                 var newArchetype = oldArchetype.WithComponentData<T>();
                 dataManager.MoveEntity(entity, oldArchetype, newArchetype);
                 entitiesArchetype[entity.Id] = newArchetype.Hash;
+                entitiesChunk[entity.Id] = dataManager[newArchetype.Hash];
             }
             GetEntityDataManagerByEntity(entity).AddArrayComponent<T>(entity, component);
         }
@@ -190,6 +241,20 @@ namespace TheEngine.ECS
                 return;
             if (entities[entity.Id].Version != entity.Version)
                 throw new Exception("Double remove entity, that's not allowed!");
+
+            // Cascade: destroying an entity destroys its whole subtree. Re-read FirstChild every
+            // iteration because each child's removal swap-relocates storage in the chunk.
+            while (true)
+            {
+                var child = GetComponent<Relationship>(entity).FirstChild;
+                if (child == Entity.Empty)
+                    break;
+                DestroyEntity(child);
+            }
+
+            // Detach from the hierarchy before removing storage, so neighbours' links stay valid.
+            UnlinkFromList(entity);
+
             var archetypeHash = entitiesArchetype[entity.Id];
             dataManager.RemoveEntity(entity, archetypeHash, true);
             freeEntities.Add(entity);
@@ -198,6 +263,8 @@ namespace TheEngine.ECS
             entitySource[entity.Id] = null;
 #endif
             entitiesArchetype[entity.Id] = 0;
+            entitiesChunk[entity.Id] = null;
+            structuralVersion++;
         }
 
         public bool Exist(Entity entity)
@@ -216,7 +283,7 @@ namespace TheEngine.ECS
 #if DEBUG
             VerifyEntity(entity);
 #endif
-            return dataManager[entitiesArchetype[entity.Id]].DataAccess<T>();
+            return entitiesChunk[entity.Id]!.DataAccess<T>();
         }
 
         public ComponentArrayDataAccess<T> GetArrayDataAccessByEntity<T>(Entity entity) where T : unmanaged, IComponentData
@@ -224,9 +291,9 @@ namespace TheEngine.ECS
 #if DEBUG
             VerifyEntity(entity);
 #endif
-            return dataManager[entitiesArchetype[entity.Id]].ArrayDataAccess<T>();
+            return entitiesChunk[entity.Id]!.ArrayDataAccess<T>();
         }
-        
+
         public ref T GetComponent<T>(Entity entity) where T : unmanaged, IComponentData
         {
 #if DEBUG
@@ -240,15 +307,16 @@ namespace TheEngine.ECS
 #if DEBUG
             VerifyEntity(entity);
 #endif
-            return dataManager[entitiesArchetype[entity.Id]].ManagedDataAccess<T>()[entity];
+            return entitiesChunk[entity.Id]!.ManagedDataAccess<T>()[entity];
         }
-        
+
         public T SetManagedComponent<T>(Entity entity, T value) where T : IManagedComponentData
         {
 #if DEBUG
             VerifyEntity(entity);
 #endif
-            dataManager[entitiesArchetype[entity.Id]].ManagedDataAccess<T>()[entity] = value;
+            var access = entitiesChunk[entity.Id]!.ManagedDataAccess<T>();
+            access[entity] = value;
             return value;
         }
 
@@ -263,6 +331,81 @@ namespace TheEngine.ECS
         public void InstallArchetype(Archetype archetype)
         {
             archetypes[archetype.Hash] = archetype;
+        }
+
+        public void SetParent(Entity child, Entity parent)
+        {
+#if DEBUG
+            VerifyEntity(child);
+            if (parent != Entity.Empty)
+                VerifyEntity(parent);
+            if (child == parent)
+                throw new Exception("Cannot parent an entity to itself");
+            // Reject cycles: parent must not be a descendant of child.
+            for (var p = parent; p != Entity.Empty; p = GetComponent<Relationship>(p).Parent)
+            {
+                if (p == child)
+                    throw new Exception("Cannot parent an entity to one of its descendants (cycle)");
+            }
+#endif
+            UnlinkFromList(child);
+            LinkIntoList(child, parent);
+            structuralVersion++;
+        }
+
+        // Splices child at the head of parent's child list (or the root list when parent is Empty).
+        // Assumes child is currently detached (Parent/siblings Empty), as left by UnlinkFromList
+        // or a freshly created entity.
+        private void LinkIntoList(Entity child, Entity parent)
+        {
+            var oldHead = parent == Entity.Empty ? firstRoot : GetComponent<Relationship>(parent).FirstChild;
+
+            ref var childRel = ref GetComponent<Relationship>(child);
+            childRel.Parent = parent;
+            childRel.PrevSibling = Entity.Empty;
+            childRel.NextSibling = oldHead;
+
+            if (oldHead != Entity.Empty)
+                GetComponent<Relationship>(oldHead).PrevSibling = child;
+
+            if (parent == Entity.Empty)
+            {
+                firstRoot = child;
+            }
+            else
+            {
+                ref var parentRel = ref GetComponent<Relationship>(parent);
+                parentRel.FirstChild = child;
+                parentRel.ChildCount++;
+            }
+        }
+
+        // Removes child from whatever list it currently belongs to (parent's children or the root
+        // list) and clears its own parent/sibling links.
+        private void UnlinkFromList(Entity child)
+        {
+            var rel = GetComponent<Relationship>(child);
+            var parent = rel.Parent;
+            var prev = rel.PrevSibling;
+            var next = rel.NextSibling;
+
+            if (prev != Entity.Empty)
+                GetComponent<Relationship>(prev).NextSibling = next;
+            else if (parent != Entity.Empty)
+                GetComponent<Relationship>(parent).FirstChild = next;
+            else
+                firstRoot = next;
+
+            if (next != Entity.Empty)
+                GetComponent<Relationship>(next).PrevSibling = prev;
+
+            if (parent != Entity.Empty)
+                GetComponent<Relationship>(parent).ChildCount--;
+
+            ref var childRel = ref GetComponent<Relationship>(child);
+            childRel.Parent = Entity.Empty;
+            childRel.PrevSibling = Entity.Empty;
+            childRel.NextSibling = Entity.Empty;
         }
 
         public bool HasComponent<T>(Entity entity) where T : unmanaged, IComponentData
@@ -283,9 +426,66 @@ namespace TheEngine.ECS
 
         public ChunkDataIterator ArchetypeIterator(Archetype archetype) => new ChunkDataIterator(this, archetype);
 
+        // GetComponent/HasComponent resolve type data on every call, so cache it per T in a static
+        // generic: the Dictionary<Type,...> lookup becomes one field read + reference compare.
+        // The entry pairs owner+data in one immutable object, so a reader never sees data from
+        // another EntityManager instance (only relevant when several managers coexist, e.g. tests).
+        private sealed class TypeDataCacheEntry
+        {
+            public required EntityManager Owner;
+            public required IComponentTypeData Data;
+
+            public TypeDataCacheEntry(EntityManager owner)
+            {
+                Owner = owner;
+                owner.RegisterTypeData(this);
+            }
+        }
+
+        private List<TypeDataCacheEntry> registeredUnmanagedCacheEntries = new();
+        
+        private void RegisterTypeData(TypeDataCacheEntry entry)
+        {
+            registeredUnmanagedCacheEntries.Add(entry);
+        }
+
+        private static class TypeDataCache<T> where T : unmanaged, IComponentData
+        {
+            public static TypeDataCacheEntry? Entry;
+        }
+
+        private sealed class ManagedTypeDataCacheEntry
+        {
+            public required EntityManager Owner;
+            public required IManagedComponentTypeData Data;
+
+            public ManagedTypeDataCacheEntry(EntityManager owner)
+            {
+                Owner = owner;
+                owner.Register(this);
+            }
+        }
+
+        private List<ManagedTypeDataCacheEntry> registeredCacheEntries = new();
+        
+        private void Register(ManagedTypeDataCacheEntry entry)
+        {
+            registeredCacheEntries.Add(entry);
+        }
+
+        private static class ManagedTypeDataCache<T> where T : class, IManagedComponentData
+        {
+            public static ManagedTypeDataCacheEntry? Entry;
+        }
+
         public IComponentTypeData TypeData<T>() where T : unmanaged, IComponentData
         {
-            return TypeData(typeof(T));
+            var entry = TypeDataCache<T>.Entry;
+            if (entry != null && ReferenceEquals(entry.Owner, this))
+                return entry.Data;
+            var data = TypeData(typeof(T));
+            TypeDataCache<T>.Entry = new TypeDataCacheEntry(this) { Owner = this, Data = data };
+            return data;
         }
         
         public IComponentTypeData TypeData(System.Type t)
@@ -317,7 +517,12 @@ namespace TheEngine.ECS
 
         public IManagedComponentTypeData ManagedTypeData<T>() where T : class, IManagedComponentData
         {
-            return ManagedTypeData(typeof(T));
+            var entry = ManagedTypeDataCache<T>.Entry;
+            if (entry != null && ReferenceEquals(entry.Owner, this))
+                return entry.Data;
+            var data = ManagedTypeData(typeof(T));
+            ManagedTypeDataCache<T>.Entry = new ManagedTypeDataCacheEntry(this) { Owner = this, Data = data };
+            return data;
         }
 
         public IManagedComponentTypeData ManagedTypeData(System.Type t)
@@ -336,7 +541,8 @@ namespace TheEngine.ECS
         public Archetype NewArchetype()
         {
             return new Archetype(this)
-                .WithComponentData<EntityName>();
+                .WithComponentData<EntityName>()
+                .WithComponentData<Relationship>();
         }
 
         public void Dispose()
@@ -354,7 +560,19 @@ namespace TheEngine.ECS
             freeEntities.Clear();
             entities = null!;
             entitiesArchetype = null!;
+            entitiesChunk = null!;
             dataManager.Dispose();
+            foreach (var registered in registeredCacheEntries)
+            {
+                registered.Owner = null!;
+            }
+
+            foreach (var registered in registeredUnmanagedCacheEntries)
+            {
+                registered.Owner = null!;
+            }
+            registeredCacheEntries.Clear();
+            registeredUnmanagedCacheEntries.Clear();
         }
         
         internal Archetype GetArchetypeByEntity(Entity entity)
@@ -370,7 +588,7 @@ namespace TheEngine.ECS
 #if DEBUG
             VerifyEntity(entity);
 #endif
-            return dataManager[entitiesArchetype[entity.Id]];
+            return entitiesChunk[entity.Id]!;
         }
     }
     

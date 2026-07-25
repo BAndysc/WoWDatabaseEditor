@@ -1,18 +1,20 @@
-#version 330 core
+#version 450
 #include "../internalShaders/theengine.cginc"
-in vec2 Barys;
-out vec4 FragColor;
 
-uniform vec4 color;
-uniform float width;
+layout(location = 0) out vec4 FragColor;
 
+layout(std140, set = 1, binding = 0) uniform MaterialData
+{
+    vec4 color;
+    float width;
+    int wf_padding1;
+    int wf_padding2;
+    int wf_padding3;
+};
+
+// MoltenVK has no geometry shaders, so the GL barycentric trick is gone: the
+// pipeline rasterizes in line polygon mode instead and the fragment is plain color
 void main()
 {
-    vec3 barys = vec3(Barys.xy, 1 - Barys.x - Barys.y);
-	vec3 deltas = fwidth(barys);
-	barys = smoothstep(vec3(0), deltas * width, barys);
-	float minBary = min(barys.x, min(barys.y, barys.z));
-	if (minBary > 0.5) 
-	    discard;
     FragColor = color;
 }

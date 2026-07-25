@@ -2,26 +2,42 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using TheAvaloniaOpenGL;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine;
+using TheEngine.Resources;
 using TheEngine.ECS;
 using TheEngine.Input;
 using TheEngine.Interfaces;
 using TheEngine.Managers;
+using TheEngine.Physics;
 using TheEngine.Utils;
+using TheEngine.Vulkan;
 
 [assembly: InternalsVisibleTo("TheEngine.Test")]
 [assembly: InternalsVisibleTo("SponzaDemo")]
+[assembly: InternalsVisibleTo("TheEngineAvalonia")]
 namespace TheEngine
 {
     public class Engine : IDisposable
     {
         internal int GameThreadId = Environment.CurrentManagedThreadId;
 
+        public bool IsOnGameThread => Environment.CurrentManagedThreadId == GameThreadId;
+
         internal Rendering.IRenderBackend Backend { get; }
 
-        /// <summary>The legacy GL resource factory; only valid with the GL backend (window/panel hosts).</summary>
-        internal TheDevice Device => ((Rendering.GLRenderBackend)Backend).TheDevice;
+        public string BackendName => Backend.Name;
+
+        /// <summary>False when the present is paced by an external compositor (the Avalonia
+        /// composition panel) - vsync is then effectively always on and <see cref="VSync"/>
+        /// ignores writes.</summary>
+        public bool SupportsVSyncControl => Backend.SupportsVSyncControl;
+
+        /// <summary>Desired vsync state; applied at the start of the next frame.</summary>
+        public bool VSync
+        {
+            get => Backend.VSync;
+            set => Backend.VSync = value;
+        }
 
         internal IConfiguration Configuration { get; }
 
@@ -45,7 +61,10 @@ namespace TheEngine
 
         internal LightManager lightManager { get; }
         public ILightManager LightManager => lightManager;
-        
+
+        internal DecalManager decalManager { get; }
+        public IDecalManager DecalManager => decalManager;
+
         internal TextureManager textureManager { get; }
         public ITextureManager TextureManager => textureManager;
 
@@ -59,7 +78,10 @@ namespace TheEngine
 
         internal EntityManager entityManager { get; }
         public IEntityManager EntityManager => entityManager;
-        
+
+        internal PhysicsManager physicsManager { get; }
+        public IPhysicsManager PhysicsManager => physicsManager;
+
         internal StatsManager statsManager { get; }
         public IStatsManager StatsManager => statsManager;
         
@@ -87,13 +109,9 @@ namespace TheEngine
 
         public long FrameCount { get; internal set; }
 
-        public Engine(IDevice device, IConfiguration configuration, IWindowHost host, bool flipY)
-            : this(new Rendering.GLRenderBackend(device, host), configuration, host, flipY)
-        {
-        }
-
         internal Engine(Rendering.IRenderBackend backend, IConfiguration configuration, IWindowHost host, bool flipY)
         {
+            Static.MainThreadId = Environment.CurrentManagedThreadId;
             WindowHost = host;
             //windowHost.Bind(this);
 
@@ -106,8 +124,10 @@ namespace TheEngine
 
             statsManager = new StatsManager();
             entityManager = new EntityManager(statsManager, this);
-            
+            physicsManager = new PhysicsManager(this);
+
             lightManager = new LightManager(this);
+            decalManager = new DecalManager(this);
             inputManager = new InputManager(this);
             cameraManger = new CameraManager(this);
 
@@ -133,6 +153,7 @@ namespace TheEngine
             // todo
             meshManager.Update();
             textureManager.Update();
+            materialManager.Update();
             Backend.CollectDisposedResources();
             statsManager.BufferBytes = Backend.TotalBufferBytes;
 
@@ -152,14 +173,41 @@ namespace TheEngine
             uiManager.Render();
         }
 
-        public INativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, ReadOnlySpan<T> data, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged => Backend.CreateBuffer<T>(bufferType, data, format);
-        public INativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, int size, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged => Backend.CreateBuffer<T>(bufferType, size, format);
+        public INativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, ReadOnlySpan<T> data) where T : unmanaged => Backend.CreateBuffer<T>(bufferType, data);
+        public INativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, int size) where T : unmanaged => Backend.CreateBuffer<T>(bufferType, size);
+
+        /// <summary>
+        /// Registers a per-frame (dynamic) global storage buffer at the given set-3 binding (must
+        /// match the shader's <c>set = 3, binding = N</c>). Must be called before the first draw.
+        /// The returned handle's <see cref="IGlobalBuffer{T}.BeginWrite"/> is valid only during the
+        /// render phase (post-BeginFrame fence wait).
+        /// </summary>
+        public IGlobalBuffer<T> CreateGlobalBuffer<T>(uint binding, int initialCapacity = 64) where T : unmanaged
+        {
+            if (Backend is not VulkanRenderBackend vk)
+                throw new NotSupportedException("Global buffers require the Vulkan backend.");
+            return vk.CreateGlobalBuffer<T>(binding, initialCapacity);
+        }
+
+        /// <summary>
+        /// Registers a STATIC global storage buffer at the given set-3 binding (must match the
+        /// shader's <c>set = 3, binding = N</c>). A single persistent backing handed out in
+        /// fixed-size slots, written only when contents change (e.g. terrain tile load/unload)
+        /// rather than per frame. See <see cref="IStaticGlobalBuffer{T}"/>.
+        /// </summary>
+        public IStaticGlobalBuffer<T> CreateStaticGlobalBuffer<T>(uint binding, int slotElementCount, int initialSlots = 8) where T : unmanaged
+        {
+            if (Backend is not VulkanRenderBackend vk)
+                throw new NotSupportedException("Global buffers require the Vulkan backend.");
+            return vk.CreateStaticGlobalBuffer<T>(binding, slotElementCount, initialSlots);
+        }
 
         public void Dispose()
         {
             uiManager.Dispose();
             fontManager.Dispose();
             lightManager.Dispose();
+            decalManager.Dispose();
             cameraManger.Dispose();
             materialManager.Dispose();
             renderManager.Dispose();
@@ -167,7 +215,8 @@ namespace TheEngine
             textureManager.Dispose();
             shaderManager.Dispose();
             entityManager.Dispose();
-            Device.Dispose();
+            physicsManager.Dispose();
+            Backend.Dispose();
         }
 
         private List<Action>[] nextFrameActions = [new List<Action>(), new List<Action>()];
@@ -206,6 +255,20 @@ namespace TheEngine
                 multithreadedActions.Enqueue(continuation);
             }
         }
+
+        public void BeginFrame()
+        {
+            InFrame = true;
+            Backend.BeginFrame();
+        }
+
+        public void EndFrame()
+        {
+            Backend.EndFrame();
+            InFrame = false;
+        }
+
+        public bool InFrame { get; private set; }
     }
 
     public class EnterGameLoopAwaitable
@@ -226,7 +289,13 @@ namespace TheEngine
             public void OnCompleted(Action continuation)
             {
                 if (Environment.CurrentManagedThreadId == engine.GameThreadId)
+                {
+                    if (!engine.Backend.InFrame)
+                    {
+                        throw new Exception("will crash!");
+                    }
                     continuation();
+                }
                 else
                     engine.PostNextFrame(continuation);
             }

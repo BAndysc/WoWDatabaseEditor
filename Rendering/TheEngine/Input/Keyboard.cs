@@ -1,5 +1,4 @@
-﻿using Avalonia.Input;
-using TheEngine.Interfaces;
+﻿using TheEngine.Interfaces;
 using TheMaths;
 
 namespace TheEngine.Input
@@ -58,7 +57,7 @@ namespace TheEngine.Input
             return downKeys[(int)keys];
         }
 
-        public bool IsDown(Key keys) => RawIsDown(keys) && engine.gameView.HasFocus;
+        public bool IsDown(Key keys) => RawIsDown(keys) && (engine.gameView.HasFocus || engine.gameView.IsHovered);
         
         public bool JustPressed(Key key)
         {
@@ -76,7 +75,7 @@ namespace TheEngine.Input
             return false;
         }
 
-        public Vector3 GetAxis(Vector3 axis, Key positive, Key negative) => engine.gameView.HasFocus
+        public Vector3 GetAxis(Vector3 axis, Key positive, Key negative) => (engine.gameView.HasFocus || engine.gameView.IsHovered)
             ? RawGetAxis(axis, positive, negative)
             : default;
         
@@ -87,8 +86,19 @@ namespace TheEngine.Input
 
         public void ReleaseAllKeys()
         {
+            // Called on focus loss to prevent stuck movement keys (their KeyUp will never arrive).
+            // Modifiers are KEPT: focus often blinks away for a moment mid-interaction (first spawn
+            // creates the hosted documents, a toast pops, ...) and modifiers don't autorepeat, so a
+            // force-released held Shift stayed "up" until physically re-pressed - which silently
+            // broke hold-Shift multi-placement after the first spawn. A modifier physically
+            // released while unfocused self-corrects on its next press.
             for (int i = 0; i < downKeys.Length; ++i)
+            {
+                var key = (Key)i;
+                if (key is Key.LeftShift or Key.RightShift or Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt)
+                    continue;
                 downKeys[i] = false;
+            }
         }
 
         public void OnTextInput(char c)

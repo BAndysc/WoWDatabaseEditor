@@ -3,7 +3,6 @@
     "Path": "internalShaders/unlit.frag"
   },
   "ZWrite": true,
-  "Instancing": false,
   "Vertex": {
     "Path": "internalShaders/unlit.vert",
     "Input": [

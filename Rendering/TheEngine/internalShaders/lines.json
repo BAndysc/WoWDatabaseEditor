@@ -3,7 +3,6 @@
     "Path": "internalShaders/lines.frag"
   },
   "ZWrite": false,
-  "Instancing": false,
   "Vertex": {
     "Path": "internalShaders/lines.vert",
     "Input": [

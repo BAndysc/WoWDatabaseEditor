@@ -33,8 +33,8 @@ var nativeWindowSettings = new NativeWindowSettings
 {
     Size = new Vector2i(1280, 720),
     Title = "TheEngine - Sponza demo",
-    // This is needed to run on macos
-    Flags = ContextFlags.ForwardCompatible,
+    // the Vulkan backend creates its own surface; GLFW must not create a GL context
+    API = ContextAPI.NoAPI,
 };
 
 AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
@@ -42,6 +42,6 @@ AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
     Console.WriteLine(eventArgs.ExceptionObject);
 };
 
-using (var window = new TheEngineOpenTkWindow(GameWindowSettings.Default, nativeWindowSettings, new SponzaGame(assetsPath, replayCaptures)))
+using (var window = new TheEngineVulkanOpenTkWindow(nativeWindowSettings, new SponzaGame(assetsPath, replayCaptures)))
     window.Run();
 TheEngine.TheEngine.Deinit();

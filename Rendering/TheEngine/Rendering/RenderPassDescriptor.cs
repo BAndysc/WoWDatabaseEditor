@@ -61,6 +61,9 @@ public readonly struct RenderPassDescriptor
     public LoadOp ColorLoadOp { get; init; }
     public Color4 ClearColor { get; init; }
 
+    /// <summary>Depth attachment load op override; defaults to <see cref="ColorLoadOp"/> when null.</summary>
+    public LoadOp? DepthLoadOp { get; init; }
+
     private readonly float viewportScale;
     /// <summary>Transitional: dynamic resolution scale applied to the render texture's viewport. Defaults to 1.</summary>
     public float ViewportScale

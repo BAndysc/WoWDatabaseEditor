@@ -23,6 +23,17 @@ namespace TheEngine.ECS
 
         void DestroyEntity(Entity entity);
         bool Exist(Entity entity);
+
+        /**
+         * Re-parents an entity. Pass Entity.Empty as parent to make it a root.
+         * Maintained via the intrusive Relationship linked list, so this is O(1) and does
+         * NOT move the entity to a new archetype (every entity already has Relationship).
+         */
+        void SetParent(Entity child, Entity parent);
+        /** First root entity (Parent == Empty), or Entity.Empty if none. */
+        Entity HierarchyFirstRoot { get; }
+        /** Monotonic counter bumped on every structural hierarchy change. */
+        int StructuralVersion { get; }
         ref T GetComponent<T>(Entity entity) where T : unmanaged, IComponentData;
         T GetManagedComponent<T>(Entity entity) where T : IManagedComponentData;
         T SetManagedComponent<T>(Entity entity, T value) where T : IManagedComponentData;
@@ -37,5 +48,7 @@ namespace TheEngine.ECS
         bool HasManagedComponent<T>(Entity entity) where T : class, IManagedComponentData;
         ComponentDataAccess<T> GetDataAccessByEntity<T>(Entity entity) where T : unmanaged, IComponentData;
         ComponentArrayDataAccess<T> GetArrayDataAccessByEntity<T>(Entity entity) where T : unmanaged, IComponentData;
+        
+        Archetype RelationshipArchetype { get; }
     }
 }

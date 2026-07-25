@@ -1,8 +1,7 @@
 using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using TheEngine.Components;
-using TheEngine.Entities;
 
 namespace TheEngine.ECS
 {
@@ -10,10 +9,13 @@ namespace TheEngine.ECS
     {
     }
 
+    /// <summary>Matched by name against a public static method on a component struct (see <see cref="ComponentTypeData{T}"/>).</summary>
+    public delegate void OnAddedDelegate<T>(Engine engine, Entity entity, ref T component) where T : unmanaged, IComponentData;
+    /// <summary>Matched by name against a public static method on a component struct (see <see cref="ComponentTypeData{T}"/>).</summary>
+    public delegate void OnRemovedDelegate<T>(Engine engine, Entity entity, ref T component) where T : unmanaged, IComponentData;
+
     public class ComponentTypeData<T> : IComponentTypeData where T : unmanaged, IComponentData
     {
-        public delegate void FreeDelegate(Engine engine, ref T component);
-
         public ComponentTypeData(int index)
         {
             Index = index;
@@ -22,26 +24,53 @@ namespace TheEngine.ECS
             // with sizeof(T) strides, and Marshal.SizeOf can differ (e.g. bool fields marshal as 4 bytes)
             SizeBytes = Unsafe.SizeOf<T>();
             IsArray = typeof(T).GetCustomAttributes(typeof(ArrayComponentAttribute), false).Length > 0;
-            // todo: more generic way to specify FreeAction
-            if (typeof(T) == typeof(MeshRenderer))
-            {
-                FreeAction = (engine, bytes) =>
-                {
-                    var meshRenderer = MemoryMarshal.Cast<byte, MeshRenderer>(bytes);
-                    meshRenderer[0].Mesh = null;
-                    meshRenderer[0].Material = null;
-                };
-            }
+            OnAddedAction = BindOnAdded();
+            OnRemovedAction = BindOnRemoved();
+        }
+
+        // T is already concrete here, so this stays Native AOT safe (no MakeGenericMethod needed)
+        private static MethodInfo? FindHookMethod(string name)
+        {
+            return typeof(T).GetMethod(name, BindingFlags.Public | BindingFlags.Static, null,
+                new[] { typeof(Engine), typeof(Entity), typeof(T).MakeByRefType() }, null);
+        }
+
+        private static IComponentTypeData.OnAddedActionDelegate? BindOnAdded()
+        {
+            var method = FindHookMethod("OnAdded");
+            if (method == null)
+                return null;
+            var typed = (OnAddedDelegate<T>)method.CreateDelegate(typeof(OnAddedDelegate<T>));
+            return (engine, entity, bytes) => typed(engine, entity, ref MemoryMarshal.Cast<byte, T>(bytes)[0]);
+        }
+
+        private static IComponentTypeData.OnRemovedActionDelegate? BindOnRemoved()
+        {
+            var method = FindHookMethod("OnRemoved");
+            if (method == null)
+                return null;
+            var typed = (OnRemovedDelegate<T>)method.CreateDelegate(typeof(OnRemovedDelegate<T>));
+            return (engine, entity, bytes) => typed(engine, entity, ref MemoryMarshal.Cast<byte, T>(bytes)[0]);
         }
 
         public int Index { get; }
         public ulong Hash => 1ul << Index;
         public ulong GlobalHash => Hash;
         public bool IsArray { get; }
-        public IComponentTypeData.FreeActionDelegate? FreeAction { get; set; }
+        public IComponentTypeData.OnAddedActionDelegate? OnAddedAction { get; }
+        public IComponentTypeData.OnRemovedActionDelegate? OnRemovedAction { get; }
         public Type DataType { get; }
         public int SizeBytes { get; }
-        public FreeDelegate? Free { get; }
+
+        public void AddDefault(IEntityManager em, Entity entity)
+        {
+            // CreateInstance, unlike default(T), runs T's parameterless constructor if it defines one
+            var value = Activator.CreateInstance<T>();
+            if (IsArray)
+                em.AddArrayComponent<T>(entity, value);
+            else
+                em.AddComponent<T>(entity, value);
+        }
 
         protected bool Equals(ComponentTypeData<T> other)
         {
@@ -84,6 +113,11 @@ namespace TheEngine.ECS
         public Type DataType { get; }
         public ulong Hash => 1ul << Index;
         public ulong GlobalHash => Hash << 32;
+
+        public void AddDefault(IEntityManager em, Entity entity)
+        {
+            em.AddManagedComponent<T>(entity, Activator.CreateInstance<T>());
+        }
 
         protected bool Equals(ManagedComponentTypeData<T> other)
         {

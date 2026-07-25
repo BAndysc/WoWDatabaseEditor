@@ -31,3 +31,6 @@
 [submodule "Rendering/veldrid"]
 	path = Rendering/veldrid
 	url = https://github.com/bandysc/veldrid/
+[submodule "Rendering/VMABindings"]
+	path = Rendering/VMABindings
+	url = https://github.com/JoeTwizzle/VMABindings.git

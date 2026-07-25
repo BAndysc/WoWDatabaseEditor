@@ -12,6 +12,20 @@ namespace TheEngine.Entities
         public float NearClip { get; set; }
         public float FarClip { get; set; }
         public float Aspect { get; set; }
+        public FogSettings Fog { get; set; }
+        public Color4 BackgroundColor { get; set; }
+
+        private float viewDistanceModifier = 8;
+        public float ViewDistanceModifier
+        {
+            get => viewDistanceModifier;
+            set
+            {
+                if (value > 0)
+                    viewDistanceModifier = value;
+            }
+        }
+
         public Matrix ProjectionMatrix => Matrix.CreatePerspectiveFieldOfView(MathUtil.DegreesToRadians(FOV), Aspect, NearClip, FarClip);
         public Matrix ViewMatrix => Transform.WorldToLocalMatrix;
         public Matrix InverseViewMatrix => Transform.LocalToWorldMatrix;
@@ -22,6 +36,8 @@ namespace TheEngine.Entities
             FOV = 60;
             NearClip = 1f;
             FarClip = 3660f;
+            Fog = new FogSettings() { Enabled = false };
+            BackgroundColor = new Color4(15 / 255f, 52 / 255f, 97 / 255f, 1);
         }
     }
 }

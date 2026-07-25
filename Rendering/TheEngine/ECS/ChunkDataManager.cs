@@ -26,10 +26,17 @@ namespace TheEngine.ECS
         public Archetype Archetype;
         private readonly StatsManager statsManager;
         private readonly Engine engine;
+        private readonly EntityManager entityManager;
         private int capacity;
         private int used;
         private readonly int componentsCount;
         private readonly int managedComponentsCount;
+
+        // global component-type index -> slot in this archetype (-1 = not present). Turns the
+        // per-access "linear scan comparing System.Type" into a single array read; both index
+        // spaces are hard-capped at 32 by EntityManager.
+        private readonly int[] slotByTypeIndex = new int[32];
+        private readonly int[] managedSlotByTypeIndex = new int[32];
 
         private Entity[] entityMapping;
         private int[] sparseReverseEntityMapping = new int[1];
@@ -39,6 +46,7 @@ namespace TheEngine.ECS
             Archetype = archetype;
             this.statsManager = statsManager;
             this.engine = engine;
+            entityManager = (EntityManager)archetype.EntityManager;
             componentsCount = archetype.Components.Count;
             managedComponentsCount = archetype.ManagedComponents.Count;
             componentData = new byte*[componentsCount];
@@ -46,6 +54,13 @@ namespace TheEngine.ECS
             arrayComponentCapacities = new int[componentsCount];
             arrayFreeBlocks = new HashSet<int>[componentsCount][];
             managedComponentData = new object?[managedComponentsCount][];
+
+            Array.Fill(slotByTypeIndex, -1);
+            Array.Fill(managedSlotByTypeIndex, -1);
+            for (int i = 0; i < componentsCount; i++)
+                slotByTypeIndex[archetype.Components[i].Index] = i;
+            for (int i = 0; i < managedComponentsCount; i++)
+                managedSlotByTypeIndex[archetype.ManagedComponents[i].Index] = i;
 
             // Initialize array component storage
             for (int i = 0; i < componentsCount; i++)
@@ -67,8 +82,68 @@ namespace TheEngine.ECS
 
         public unsafe void Dispose()
         {
+            if (disposed)
+                return;
             disposed = true;
+
+            // Fire OnRemoved hooks for every still-live entity, just like RemoveEntity(entity, isDestroyed: true)
+            // would. Freeing the backing memory without this leaks anything the hooks release.
+            for (int i = 0; i < componentsCount; ++i)
+            {
+                var comp = Archetype.Components[i];
+                if (comp.OnRemovedAction == null)
+                    continue;
+
+                if (comp.IsArray)
+                {
+                    var arrayIndex = (ComponentArrayIndex*)componentData[i];
+                    for (int e = 0; e < used; ++e)
+                    {
+                        var entityArrayInfo = arrayIndex[e];
+                        for (int k = 0; k < entityArrayInfo.Count; k++)
+                        {
+                            var componentPtr = arrayComponentData[i] + (entityArrayInfo.Index + k) * comp.SizeBytes;
+                            comp.OnRemovedAction(engine, entityMapping[e], new Span<byte>(componentPtr, comp.SizeBytes));
+                        }
+                    }
+                }
+                else
+                {
+                    var array = componentData[i];
+                    for (int e = 0; e < used; ++e)
+                        comp.OnRemovedAction(engine, entityMapping[e], new Span<byte>(array + e * comp.SizeBytes, comp.SizeBytes));
+                }
+            }
+
+            // give the stats back before the capacities are lost, so EntitiesUnmanagedBytes doesn't
+            // drift upwards with every destroyed archetype
+            for (int i = 0; i < componentsCount; ++i)
+            {
+                var component = Archetype.Components[i];
+                var sizeToUse = component.IsArray ? sizeof(ComponentArrayIndex) : component.SizeBytes;
+                if (componentData[i] != null)
+                    statsManager.EntitiesUnmanagedBytes -= (ulong)capacity * (ulong)sizeToUse;
+                if (arrayComponentData[i] != null)
+                    statsManager.EntitiesUnmanagedBytes -= (ulong)arrayComponentCapacities[i] * (ulong)component.SizeBytes;
+            }
+
             Archetype = null!;
+            FreeNativeBlocks();
+            for (int i = 0; i < managedComponentsCount; ++i)
+            {
+                managedComponentData[i] = null!;
+            }
+            componentData = null!;
+            arrayComponentData = null!;
+            arrayComponentCapacities = null!;
+            arrayFreeBlocks = null!;
+            managedComponentData = null!;
+            sparseReverseEntityMapping = null!;
+            GC.SuppressFinalize(this);
+        }
+
+        private unsafe void FreeNativeBlocks()
+        {
             for (int i = 0; i < componentsCount; ++i)
             {
                 if (componentData[i] != null)
@@ -82,24 +157,16 @@ namespace TheEngine.ECS
                     arrayComponentData[i] = null!;
                 }
             }
-            for (int i = 0; i < managedComponentsCount; ++i)
-            {
-                managedComponentData[i] = null!;
-            }
-            componentData = null!;
-            arrayComponentData = null!;
-            arrayComponentCapacities = null!;
-            arrayFreeBlocks = null!;
-            managedComponentData = null!;
-            sparseReverseEntityMapping = null!;
         }
 
         ~ChunkDataManager()
         {
             if (!disposed)
             {
+                // finalizer thread: only reclaim the native blocks, running the OnRemoved hooks
+                // (which touch the engine) is not safe here
                 Console.WriteLine("ChunkDataManger not disposed");
-                Dispose();
+                FreeNativeBlocks();
             }
         }
 
@@ -117,17 +184,10 @@ namespace TheEngine.ECS
 
         public ManagedComponentDataAccess<T>? OptionalManagedDataAccess<T>() where T : IManagedComponentData
         {
-            int i = 0;
-            // for to prevent allocations
-            for (var index = 0; index < Archetype.ManagedComponents.Count; index++)
-            {
-                var c = Archetype.ManagedComponents[index];
-                if (c.DataType == typeof(T))
-                    return new ManagedComponentDataAccess<T>(managedComponentData[i], sparseReverseEntityMapping);
-                i++;
-            }
-
-            return null;
+            var slot = managedSlotByTypeIndex[entityManager.ManagedTypeData(typeof(T)).Index];
+            if (slot < 0)
+                return null;
+            return new ManagedComponentDataAccess<T>(managedComponentData[slot], sparseReverseEntityMapping);
         }
 
         public ManagedComponentDataAccess<T> ManagedDataAccess<T>() where T : IManagedComponentData
@@ -137,36 +197,22 @@ namespace TheEngine.ECS
 
         public unsafe ComponentDataAccess<T>? OptionalDataAccess<T>() where T : unmanaged, IComponentData
         {
-            int i = 0;
-            var archComponentsCount = Archetype.Components.Count;
-            for (int j = 0; j < archComponentsCount; ++j)
-            {
-                var c = Archetype.Components[j];
-                if (c.DataType == typeof(T))
-                {
-                    if (c.IsArray)
-                        throw new Exception("Component " + typeof(T) + " is an array component, use OptionalArrayDataAccess instead");
-                    return new ComponentDataAccess<T>(componentData[i], sparseReverseEntityMapping);
-                }
-                i++;
-            }
-            return null;
+            var typeData = entityManager.TypeData<T>();
+            var slot = slotByTypeIndex[typeData.Index];
+            if (slot < 0)
+                return null;
+            if (typeData.IsArray)
+                throw new Exception("Component " + typeof(T) + " is an array component, use OptionalArrayDataAccess instead");
+            return new ComponentDataAccess<T>(componentData[slot], sparseReverseEntityMapping);
         }
 
         public unsafe ComponentArrayDataAccess<T>? OptionalArrayDataAccess<T>() where T : unmanaged, IComponentData
         {
-            int i = 0;
-            var archComponentsCount = Archetype.Components.Count;
-            for (int j = 0; j < archComponentsCount; ++j)
-            {
-                var c = Archetype.Components[j];
-                if (c.DataType == typeof(T) && c.IsArray)
-                {
-                    return new ComponentArrayDataAccess<T>(componentData[i], arrayComponentData[i], sparseReverseEntityMapping);
-                }
-                i++;
-            }
-            return null;
+            var typeData = entityManager.TypeData<T>();
+            var slot = slotByTypeIndex[typeData.Index];
+            if (slot < 0 || !typeData.IsArray)
+                return null;
+            return new ComponentArrayDataAccess<T>(componentData[slot], arrayComponentData[slot], sparseReverseEntityMapping);
         }
         
         public ComponentDataAccess<T> DataAccess<T>() where T : unmanaged, IComponentData
@@ -367,7 +413,8 @@ namespace TheEngine.ECS
             newArray[newEntityIndex] = oldArray[oldEntityIndex];
         }
         
-        public unsafe void AddEntity(Entity entity)
+        // invokeOnAddedHooks is false during archetype moves, to avoid re-firing OnAdded for existing components
+        public unsafe void AddEntity(Entity entity, bool invokeOnAddedHooks)
         {
             ResizeIfNeeded(entity);
             entityMapping[used] = entity;
@@ -387,6 +434,9 @@ namespace TheEngine.ECS
                     var array = componentData[index];
                     for (int j = 0; j < comp.SizeBytes; ++j)
                         array[used * comp.SizeBytes + j] = 0;
+
+                    if (invokeOnAddedHooks && comp.OnAddedAction != null)
+                        comp.OnAddedAction(engine, entity, new Span<byte>(array + used * comp.SizeBytes, comp.SizeBytes));
                 }
             }
             for (var index = 0; index < managedComponentsCount; index++)
@@ -419,13 +469,13 @@ namespace TheEngine.ECS
                     var entityArrayInfo = arrayIndex[index];
                     var swapWithArrayInfo = arrayIndex[swapWith];
 
-                    if (isDestroyed && comp.FreeAction != null && entityArrayInfo.Count > 0)
+                    if (isDestroyed && comp.OnRemovedAction != null && entityArrayInfo.Count > 0)
                     {
                         // Free all components for this entity
                         for (int k = 0; k < entityArrayInfo.Count; k++)
                         {
                             var componentPtr = arrayComponentData[i] + (entityArrayInfo.Index + k) * comp.SizeBytes;
-                            comp.FreeAction(engine, new Span<byte>(componentPtr, comp.SizeBytes));
+                            comp.OnRemovedAction(engine, entity, new Span<byte>(componentPtr, comp.SizeBytes));
                         }
                     }
 
@@ -442,9 +492,9 @@ namespace TheEngine.ECS
                 {
                     // Handle regular components
                     var array = componentData[i];
-                    if (isDestroyed && comp.FreeAction != null)
+                    if (isDestroyed && comp.OnRemovedAction != null)
                     {
-                        comp.FreeAction(engine, new Span<byte>(array + index * comp.SizeBytes, comp.SizeBytes));
+                        comp.OnRemovedAction(engine, entity, new Span<byte>(array + index * comp.SizeBytes, comp.SizeBytes));
                     }
                     // Copy component data from swapWith entity to removed entity's position
                     for (int j = 0; j < comp.SizeBytes; ++j)
@@ -465,20 +515,11 @@ namespace TheEngine.ECS
 
         public unsafe void AddArrayComponent<T>(Entity entity, T component) where T : unmanaged, IComponentData
         {
-            var componentType = typeof(T);
-            int componentIndex = -1;
-
-            for (int i = 0; i < componentsCount; i++)
-            {
-                if (Archetype.Components[i].DataType == componentType && Archetype.Components[i].IsArray)
-                {
-                    componentIndex = i;
-                    break;
-                }
-            }
+            var typeData = entityManager.TypeData<T>();
+            int componentIndex = typeData.IsArray ? slotByTypeIndex[typeData.Index] : -1;
 
             if (componentIndex == -1)
-                throw new Exception($"Component {componentType} is not an array component in this archetype");
+                throw new Exception($"Component {typeof(T)} is not an array component in this archetype");
 
             var entityIndex = sparseReverseEntityMapping[entity.Id] - 1;
             var arrayIndex = (ComponentArrayIndex*)componentData[componentIndex];
@@ -512,21 +553,15 @@ namespace TheEngine.ECS
 
             // Update the index structure
             arrayIndex[entityIndex] = currentInfo;
+
+            // every call here is a genuinely new array element, so OnAdded always fires
+            Archetype.Components[componentIndex].OnAddedAction?.Invoke(engine, entity, new Span<byte>(componentPtr, sizeof(T)));
         }
 
         public unsafe bool RemoveArrayComponent<T>(Entity entity, int componentIndex = 0) where T : unmanaged, IComponentData
         {
-            var componentType = typeof(T);
-            int arrayComponentIndex = -1;
-
-            for (int i = 0; i < componentsCount; i++)
-            {
-                if (Archetype.Components[i].DataType == componentType && Archetype.Components[i].IsArray)
-                {
-                    arrayComponentIndex = i;
-                    break;
-                }
-            }
+            var typeData = entityManager.TypeData<T>();
+            int arrayComponentIndex = typeData.IsArray ? slotByTypeIndex[typeData.Index] : -1;
 
             if (arrayComponentIndex == -1)
                 return false;
@@ -543,10 +578,10 @@ namespace TheEngine.ECS
 
             // Free the component if needed
             var componentTypeData = Archetype.Components[arrayComponentIndex];
-            if (componentTypeData.FreeAction != null)
+            if (componentTypeData.OnRemovedAction != null)
             {
                 var componentPtr = data + (long)removeAt * sizeof(T);
-                componentTypeData.FreeAction(engine, new Span<byte>(componentPtr, sizeof(T)));
+                componentTypeData.OnRemovedAction(engine, entity, new Span<byte>(componentPtr, sizeof(T)));
             }
 
             // Close the gap within the entity's own block, other entities are unaffected
@@ -571,17 +606,8 @@ namespace TheEngine.ECS
 
         public unsafe Span<T> GetArrayComponents<T>(Entity entity) where T : unmanaged, IComponentData
         {
-            var componentType = typeof(T);
-            int componentIndex = -1;
-
-            for (int i = 0; i < componentsCount; i++)
-            {
-                if (Archetype.Components[i].DataType == componentType && Archetype.Components[i].IsArray)
-                {
-                    componentIndex = i;
-                    break;
-                }
-            }
+            var typeData = entityManager.TypeData<T>();
+            int componentIndex = typeData.IsArray ? slotByTypeIndex[typeData.Index] : -1;
 
             if (componentIndex == -1)
                 return Span<T>.Empty;

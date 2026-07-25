@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using TheAvaloniaOpenGL;
+﻿using Silk.NET.Vulkan;
 using TheEngine.Handles;
 using TheMaths;
 
@@ -11,7 +9,6 @@ namespace TheEngine.Interfaces
         void SetIndices(ReadOnlySpan<ushort> indices, int submesh);
         void SetSubmeshIndicesRange(int submesh, int start, int length);
         void RebuildIndices();
-        void Activate();
 
         void SetSubmeshCount(int count);
         int IndexCount(int submesh);

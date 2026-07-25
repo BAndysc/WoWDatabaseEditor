@@ -16,6 +16,11 @@ namespace AvaloniaRenderingTester
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
+                // match LoaderAvalonia's compositor config so the interop path behaves identically
+                .With(new AvaloniaNativePlatformOptions()
+                {
+                    RenderingMode = new[] { AvaloniaNativeRenderingMode.Metal }
+                })
                 .LogToTrace();
     }
 }

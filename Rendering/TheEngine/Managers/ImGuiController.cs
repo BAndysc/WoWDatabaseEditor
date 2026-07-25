@@ -1,16 +1,23 @@
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Avalonia.Input;
-using ImGuiNET;
-using OpenGLBindings;
+using Hexa.NET.ImGui;
+using Hexa.NET.ImGuizmo;
+using Silk.NET.Vulkan;
 using SixLabors.ImageSharp.PixelFormats;
-using TheAvaloniaOpenGL;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine;
+using TheEngine.Resources;
 using TheEngine.Entities;
 using TheEngine.Handles;
+using TheEngine.Input;
 using TheEngine.Interfaces;
+using TheEngine.Utils;
 using Veldrid;
+using BlendFactor = Veldrid.BlendFactor;
+using FrontFace = Veldrid.FrontFace;
+using VkIndexType = Silk.NET.Vulkan.IndexType;
 using MouseButton = TheEngine.Input.MouseButton;
+using PrimitiveTopology = Veldrid.PrimitiveTopology;
 
 namespace TheEngine.Managers;
 
@@ -143,7 +150,7 @@ public class ImGuiController : IDisposable
     };
     
     private readonly Engine engine;
-    private readonly IntPtr imGuiContext;
+    private readonly ImGuiContextPtr imGuiContext;
     private readonly Material<ImGuiMaterialData_t> material;
     private readonly ITexture fontTexture;
     private ImDrawVert[] verts = Array.Empty<ImDrawVert>();
@@ -163,6 +170,15 @@ public class ImGuiController : IDisposable
         ImGui.SetCurrentContext(imGuiContext);
         var io = ImGui.GetIO();
         io.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+
+        // Default the docked game/scene tab to "3D". The game ("3D") and scene ("Scene View")
+        // windows share one dock node; only the active tab renders. The saved imgui.ini
+        // restores whichever tab was last selected, and that persisted Selected= can't be
+        // overridden by SetWindowFocus at runtime. So, before ImGui lazily loads the ini on
+        // the first NewFrame, we surgically drop just the central node's Selected= token,
+        // leaving the rest of the layout untouched; the SetWindowFocus("3D") in TheEngineUi
+        // then reliably selects 3D (as it already does on a fresh layout).
+        DefaultDockedTabToGameView();
         io.DisplaySize = new Vector2(1, 1); // init to something non zero
         var fonts = io.Fonts;
 
@@ -171,8 +187,17 @@ public class ImGuiController : IDisposable
         fonts.AddFontFromFileTTF("fonts/DroidSans-Bold.ttf", 15);
         fonts.AddFontFromFileTTF("fonts/DroidSans-Bold.ttf", 25);
 
-        io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset | ImGuiBackendFlags.HasSetMousePos;
+        io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset | ImGuiBackendFlags.HasSetMousePos | ImGuiBackendFlags.RendererHasTextures;
         ImGui.StyleColorsDark();
+
+        var style = ImGui.GetStyle();
+        style.FrameRounding = 4.0f;
+        style.FrameBorderSize = 1.0f;
+        style.Colors[(int)ImGuiCol.Button] = new Vector4(0.15f, 0.15f, 0.20f, 1.0f);
+        style.Colors[(int)ImGuiCol.ButtonHovered] = new Vector4(0.30f, 0.30f, 0.35f, 1.0f);
+        style.Colors[(int)ImGuiCol.ButtonActive] = new Vector4(0.15f, 0.15f, 0.20f, 1.0f);
+        style.Colors[(int)ImGuiCol.Border] = new Vector4(0.10f, 0.10f, 0.10f, 1.0f);
+        style.FramePadding = new Vector2(6, 6);
 
         var shaderHandle = engine.shaderManager.LoadShader("internalShaders/imgui.json");
         var desc = new GraphicsPipelineDescription()
@@ -190,17 +215,37 @@ public class ImGuiController : IDisposable
         var pipeline = engine.pipelineManager.CreatePipeline(shaderHandle, PrimitiveTopology.TriangleList, desc, true);
 
         material = engine.materialManager.CreateMaterial<ImGuiMaterialData_t>(pipeline);
-        fonts.GetTexDataAsRGBA32(out IntPtr pixels, out int width, out int height, out int bytesPerPixel);
+    }
 
-        // do not generate mips for fonts
-        fontTexture = engine.textureManager.CreateTexture((Rgba32*)pixels, width, height,  false);
-        fonts.SetTexID(new IntPtr(fontTexture.Handle.Handle));
+    private static void DefaultDockedTabToGameView()
+    {
+        // io.IniFilename defaults to "imgui.ini" (relative to the working directory); the
+        // engine never overrides it. Best-effort: never let a layout tweak crash startup.
+        try
+        {
+            const string iniPath = "imgui.ini";
+            if (!System.IO.File.Exists(iniPath))
+                return;
+            var text = System.IO.File.ReadAllText(iniPath);
+            // Remove the "Selected=0x........" token only on the central dock node line.
+            var updated = System.Text.RegularExpressions.Regex.Replace(
+                text,
+                @"(?m)^(.*CentralNode=1[^\r\n]*?)\s+Selected=0x[0-9A-Fa-f]+",
+                "$1");
+            if (updated != text)
+                System.IO.File.WriteAllText(iniPath, updated);
+        }
+        catch
+        {
+            // ignore - defaulting the tab is a convenience, not correctness
+        }
     }
 
     public void UpdateImGui(float delta)
     {
         ImGui.SetCurrentContext(imGuiContext);
         ImGuiIOPtr io = ImGui.GetIO();
+
         io.DisplaySize = new Vector2(Math.Max(1, engine.WindowHost.WindowWidth), Math.Max(1, engine.WindowHost.WindowHeight));
         io.DisplayFramebufferScale = new Vector2(engine.WindowHost.DpiScaling, engine.WindowHost.DpiScaling);
         io.DeltaTime = delta; // DeltaTime is in seconds.
@@ -208,6 +253,7 @@ public class ImGuiController : IDisposable
         io.MousePos = engine.inputManager.mouse.RawScreenPoint;
         io.MouseDown[0] = engine.inputManager.mouse.RawIsMouseDown(MouseButton.Left);
         io.MouseDown[1] = engine.inputManager.mouse.RawIsMouseDown(MouseButton.Right);
+        io.MouseDown[2] = engine.inputManager.mouse.RawIsMouseDown(MouseButton.Middle);
         io.MouseWheel = engine.inputManager.mouse.WheelDelta.Y;
         io.MouseWheelH = engine.inputManager.mouse.WheelDelta.X;
 
@@ -248,20 +294,43 @@ public class ImGuiController : IDisposable
         if (io.WantCaptureMouse && !engine.gameView.IsHovered && !engine.sceneView.IsHovered)
             engine.inputManager.mouse.PostUpdate();
 
-        if (io.WantCaptureKeyboard)
+        // if (io.WantCaptureKeyboard)
+        // {
+        //     Console.WriteLine("Want capture keyboard");
+        //     engine.inputManager.keyboard.PostUpdate();
+        //     engine.inputManager.keyboard.ReleaseAllKeys();
+        // }
+
+        for (int i = texturesToDelayedFree.Count - 1; i >= 0; --i)
         {
-            engine.inputManager.keyboard.PostUpdate();
-            engine.inputManager.keyboard.ReleaseAllKeys();
+            if (engine.FrameCount >= texturesToDelayedFree[i].frame)
+            {
+                textureReferences.Remove(texturesToDelayedFree[i].Item1);
+                texturesToDelayedFree[i].Item1.Free();
+                texturesToDelayedFree.RemoveAt(i);
+            }
         }
 
         ImGui.NewFrame();
+        ImGuizmo.SetImGuiContext(ImGui.GetCurrentContext());
+        ImGuizmo.BeginFrame();
     }
 
     public unsafe void Render()
     {
         ImGui.Render();
         var drawData = ImGui.GetDrawData();
-        
+
+        ref var textures = ref drawData.Textures;
+        for (int i = 0; i < textures.Size; ++i)
+        {
+            var texture = textures[i];
+            if (texture.Status != ImTextureStatus.Ok)
+            {
+                UpdateTexture(texture);
+            }
+        }
+
         uint vertexOffsetInBytes = 0;
         uint indexOffsetInBytes = 0;
 
@@ -301,7 +370,7 @@ public class ImGuiController : IDisposable
         // streamed buffers are bound like any other resource - the command list captures
         // the layout against the concrete buffer object in its own scratch VAO
         commandList.BindVertexBuffer(vertexBuffer);
-        commandList.BindIndexBuffer(indexBuffer, IndexType.Short);
+        commandList.BindIndexBuffer(indexBuffer, VkIndexType.Uint16);
 
         ImGuiMaterialData_t data = new ImGuiMaterialData_t() { projection_matrix = mvp };
         material.SetMaterialData(ref data);
@@ -318,20 +387,28 @@ public class ImGuiController : IDisposable
             ImDrawListPtr cmdList = drawData.CmdLists[n];
             for (int cmdI = 0; cmdI < cmdList.CmdBuffer.Size; cmdI++)
             {
-                ImDrawCmdPtr pcmd = cmdList.CmdBuffer[cmdI];
-                if (pcmd.UserCallback != IntPtr.Zero)
+                ImDrawCmd pcmd = cmdList.CmdBuffer[cmdI];
+                if (pcmd.UserCallback != null)
                 {
                     throw new NotImplementedException();
                 }
                 else
                 {
-                    if (pcmd.TextureId != IntPtr.Zero)
+                    var texId = pcmd.TexRef.TexID;
+                    if (pcmd.TexRef.TexData != null && pcmd.TexRef.TexData->TexID != IntPtr.Zero)
+                        texId = pcmd.TexRef.TexData->TexID;
+                    if (texId != IntPtr.Zero)
                     {
-                        var handle = TextureHandle.FromIntPtr(pcmd.TextureId);
+                        var handle = TextureHandle.FromIntPtr(texId);
                         if (prevHandle != handle)
                         {
-                            material.SetTexture("FontTexture", engine.textureManager[handle]);
-                            commandList.BindMaterialResources(material);
+                            // a render texture referenced here (e.g. the 3D viewport image) is disposed
+                            // and recreated on window resize, leaving ImGui with a stale handle for one
+                            // frame - fall back to the empty texture instead of dereferencing null.
+                            var texture = engine.textureManager[handle] ?? engine.textureManager.EmptyTexture;
+                            // bindless: just point the shader at this texture's slot via a push
+                            // constant - set 1 (the projection UBO) stays bound from before the loop.
+                            commandList.SetBindlessTextureIndex(engine.textureManager.GetBindlessIndex(texture));
                             prevHandle = handle;
                         }
                     }
@@ -349,8 +426,57 @@ public class ImGuiController : IDisposable
         }
     }
 
+    private List<(StaticReference, long frame)> texturesToDelayedFree = new();
+
+    private unsafe void UpdateTexture(ImTextureDataPtr tex)
+    {
+        var create = tex.Status == ImTextureStatus.WantCreate || tex.Status == ImTextureStatus.WantUpdates;
+        var destroy = tex.Status == ImTextureStatus.WantUpdates || tex.Status == ImTextureStatus.WantDestroy && tex.UnusedFrames > 0;
+
+        if (destroy)
+        {
+            var handle = tex.TexID;
+            var staticRef = StaticReference.FromIntPtr((IntPtr)tex.BackendUserData);
+            texturesToDelayedFree.Add((staticRef, engine.FrameCount + 2));
+
+            tex.SetTexID(default);
+            tex.BackendUserData = default;
+
+            tex.SetStatus(ImTextureStatus.Destroyed);
+        }
+
+        if (create)
+        {
+            void* pixels = tex.GetPixels();
+
+            int width = tex.Width;
+            int height = tex.Height;
+
+            var texture = engine.textureManager.CreateTexture(
+                (Rgba32*)pixels,
+                width,
+                height,
+                false); // no mipmaps for fonts
+
+            tex.SetTexID(new IntPtr(texture.Handle.Handle));
+
+            var reference = texture.GetStaticReference();
+            textureReferences.Add(reference);
+            
+            tex.BackendUserData = (void*)reference.AsIntPtr();
+
+            tex.SetStatus(ImTextureStatus.Ok);
+        }
+    }
+
+    private List<StaticReference> textureReferences = new();
+
     public void Dispose()
     {
+        foreach (var reference in textureReferences)
+        {
+            reference.Free();
+        }
         ImGui.DestroyContext(imGuiContext);
         engine.textureManager.DisposeTexture(fontTexture);
     }

@@ -1,8 +1,5 @@
 <#@ template debug="true" hostspecific="false" language="C#"  #>
 <#@ assembly name="System.Core" #>
-<#@ assembly name="System.Runtime" #>
-<#@ assembly name="System.Collections" #>
-<#@ assembly name="System.Linq" #>
 <#@ import namespace="System.Linq" #>
 <#@ output extension=".cs" #>
 
@@ -134,6 +131,7 @@ private static IChunkDataIterator? cachedItr;
                             }
 #>
             }
+            cachedItr = null;
         }
 <#
                         }

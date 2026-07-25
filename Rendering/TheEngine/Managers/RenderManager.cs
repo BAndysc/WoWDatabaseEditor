@@ -1,11 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Avalonia.Input;
-using ImGuiNET;
-using OpenGLBindings;
-using TheAvaloniaOpenGL;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine;
+using TheEngine.Resources;
 using TheEngine.Components;
 using TheEngine.Data;
 using TheEngine.ECS;
@@ -15,35 +12,44 @@ using TheEngine.Interfaces;
 using TheEngine.Primitives;
 using TheEngine.Rendering;
 using TheEngine.Structures;
+using TheEngine.Vulkan;
 using TheMaths;
 using Veldrid;
-using MouseButton = TheEngine.Input.MouseButton;
-using Pipeline = TheEngine.Resources.Pipeline;
-using PixelFormat = OpenGLBindings.PixelFormat;
-using Sampler = TheAvaloniaOpenGL.Resources.Sampler;
-using Shader = TheAvaloniaOpenGL.Resources.Shader;
 
 namespace TheEngine.Managers
 {
-    public class RenderManager : IRenderManager, IDisposable
+    public partial class RenderManager : IRenderManager, IDisposable
     {
         private readonly Engine engine;
         private readonly bool flipY;
         private readonly ICommandList immediateCommandList;
-        private readonly DeferredCommandList deferredCommandList;
         private readonly EngineCommandList immediateEngineCommandList;
-        private readonly EngineCommandList deferredEngineCommandList;
         private ICommandList commandList;
         private EngineCommandList engineCommandList;
-        private bool deferredRecording;
-        private bool? pendingDeferredRecording;
 
         private readonly ObjectDrawRenderStage objectDrawStage;
+        private readonly CustomObjectDrawRenderStage additionalRenderersStage;
         private readonly LinesRenderStage linesStage;
         private readonly List<IRenderStage> stages = new();
+        // Directional-light cascaded shadow maps - the depth maps are shared between the game and
+        // scene views, re-fit and re-rendered before each view's opaque pass (see RenderShadowCascades).
+        private readonly CascadedShadowMapManager csm;
+
+        // First enabled CascadeShadowMap entity, resolved per frame; null == shadows off this frame.
+        private CascadeShadowMap? activeShadowSettings;
+
+        /// <summary>Max distance shadow casters are collected to (0 when off); read by <see cref="ObjectDrawRenderStage"/>.</summary>
+        internal float ShadowDistance => activeShadowSettings?.Split3 ?? 0f;
+
+        /// <summary>What the views display: the final image, or a debug visualization of an intermediate
+        /// buffer (depth, shadow map, Forward+ light/decal complexity). Set from the per-view toolbar.</summary>
+        public DebugView DebugView { get; set; } = DebugView.FinalImage;
+
+        // "render once" requests scheduled via RenderOnce during Update; drained each frame by
+        // additionalRenderersStage and cleared in FinalizeRendering.
+        private readonly List<(LocalToWorld, MeshRenderer)> additionalRenderers = new();
 
         private SceneBuffer sceneData;
-        //private PixelShaderSceneBuffer scenePixelData;
 
         private ICameraManager cameraManager;
 
@@ -60,11 +66,16 @@ namespace TheEngine.Managers
         private ITexture opaqueRenderTexture;
         private ITexture mainObjectBuffer;
         private ITexture mainObjectDepthTexture;
+        private ITexture depthPrepassTexture;
         private ITexture mainObjectColorTexture;
         private ITexture mainObjectColor1Texture;
         private ITexture guiTexture;
         private ITexture sceneViewColor1Texture;
         private ITexture sceneViewTexture;
+        // depth-only alias of sceneViewDepthTexture2D, used purely to run a standalone depth
+        // prepass for the scene view's own Forward+ tile culling - mirrors depthPrepassTexture's
+        // relationship to mainObjectDepthTexture.
+        private ITexture sceneViewDepthPrepassTexture;
         private ITexture[] backBuffers = new ITexture[2];
         private int currentBackBufferIndex = -1;
         internal ITexture CurrentBackBuffer
@@ -103,6 +114,30 @@ namespace TheEngine.Managers
 
         private Material<BlitMaterialData_t> blitMaterial;
 
+        // debug-view fullscreen pass (depth / shadow / Forward+ complexity); rendered into the
+        // per-view debug textures when DebugView != FinalImage and displayed instead of the color.
+        private Material<DebugMaterialData_t> debugMaterial = null!;
+        private ITexture gameDebugTexture = null!;
+        private ITexture sceneDebugTexture = null!;
+        internal ITexture GameDebugTexture => gameDebugTexture;
+        internal ITexture SceneDebugTexture => sceneDebugTexture;
+        // set each frame by RenderDebugViews; the views only DISPLAY a debug texture that was actually
+        // rendered + transitioned to ShaderRead this frame (IsVisible lags a frame, so the render/display
+        // gates must agree or the GUI would sample a texture in the wrong layout -> Metal abort).
+        private bool gameDebugRendered;
+        private bool sceneDebugRendered;
+        internal bool GameDebugReady => DebugView != DebugView.FinalImage && gameDebugRendered;
+        internal bool SceneDebugReady => DebugView != DebugView.FinalImage && sceneDebugRendered;
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        private struct DebugMaterialData_t
+        {
+            public int mode;
+            public BindlessTextureId depthIndex;
+            public int padding2;
+            public int padding3;
+        }
+
         // utils
         private IMesh sphereMesh = null!;
         private Material<WireframeMaterialData_t> wireframe = null!;
@@ -118,6 +153,14 @@ namespace TheEngine.Managers
         public ITexture DepthTexture => depthTexture2D;
         public ITexture OpaqueTexture => opaqueTexture2D;
 
+        // Bindless slots of the scene opaque-color/depth render targets, registered when the targets
+        // are (re)created (see the resize block). Shaders that read the scene (e.g. water) sample these
+        // via SAMPLE_BINDLESS instead of a per-material texture binding.
+        private int opaqueTextureBindlessIndex;
+        private int depthTextureBindlessIndex;
+        public int OpaqueTextureBindlessIndex => opaqueTextureBindlessIndex;
+        public int DepthTextureBindlessIndex => depthTextureBindlessIndex;
+
         private RenderLayerData[] layers = Enumerable.Range(0, RenderLayer.MAX_LAYERS)
             .Select(layer => new RenderLayerData(){Layer = new RenderLayer((byte)layer, 0), Name = $"Unused {layer}"})
             .ToArray();
@@ -127,7 +170,7 @@ namespace TheEngine.Managers
         private struct BlitMaterialData_t
         {
             public int flipY;
-            public int padding1;
+            public BindlessTextureId texture1Index;
             public int padding2;
             public int padding3;
         }
@@ -147,12 +190,9 @@ namespace TheEngine.Managers
             this.engine = engine;
             this.flipY = flipY;
             immediateCommandList = engine.Backend.CreateExecutor(engine.textureManager);
-            deferredCommandList = new DeferredCommandList(immediateCommandList);
             immediateEngineCommandList = new EngineCommandList(immediateCommandList);
-            deferredEngineCommandList = new EngineCommandList(deferredCommandList);
-            deferredRecording = true;
-            commandList = deferredCommandList;
-            engineCommandList = deferredEngineCommandList;
+            commandList = immediateCommandList;
+            engineCommandList = immediateEngineCommandList;
 
             layers[0].Name = "(default)";
             freeLayers = layers.Skip(1).Reverse().Select(x => x.Layer).ToList();
@@ -185,6 +225,10 @@ namespace TheEngine.Managers
 
             objectDrawStage = new ObjectDrawRenderStage(engine, this);
             stages.Add(objectDrawStage);
+            csm = new CascadedShadowMapManager(engine);
+            // keep order: "render once" draws after the ECS objects, before the line overlay
+            additionalRenderersStage = new CustomObjectDrawRenderStage(engine, additionalRenderers);
+            stages.Add(additionalRenderersStage);
             linesStage = new LinesRenderStage(engine);
             stages.Add(linesStage);
 
@@ -194,7 +238,6 @@ namespace TheEngine.Managers
             commandList.CheckError("create mesh");
 
             var blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json");
-            // var blitDepthShader = engine.ShaderManager.LoadShader("internalShaders/blit_depth.json");
 
             var blitPipeline = this.engine.pipelineManager.CreatePipeline(blitShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
             {
@@ -203,15 +246,20 @@ namespace TheEngine.Managers
                     BlendAttachmentDescription.OverrideBlend),
                 DepthStencilState = new DepthStencilStateDescription(false, true, ComparisonKind.Always),
                 RasterizerState = new RasterizerStateDescription(FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise, false, false)
-            }, false);// todo veldrid, SwapChainOutput);
+            }, false);
 
             blitMaterial = engine.MaterialManager.CreateMaterial<BlitMaterialData_t>(blitPipeline);
-            // blitMaterial.SourceBlending = Blending.One;
-            // blitMaterial.DestinationBlending = Blending.Zero;
-            // blitMaterial.ZWrite = true;
-            // blitMaterial.DepthTesting = DepthCompare.Always;
             BlitMaterialData_t data = new() { flipY = flipY ? 1 : 0 };
             blitMaterial.SetMaterialData(ref data);
+
+            var debugShader = engine.ShaderManager.LoadShader("internalShaders/debug_view.json");
+            var debugPipeline = engine.pipelineManager.CreatePipeline(debugShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
+            {
+                BlendState = new BlendStateDescription(RgbaFloat.Clear, BlendAttachmentDescription.OverrideBlend),
+                DepthStencilState = new DepthStencilStateDescription(false, false, ComparisonKind.Always),
+                RasterizerState = new RasterizerStateDescription(FaceCullMode.None, PolygonFillMode.Solid, FrontFace.Clockwise, false, false)
+            }, false);
+            debugMaterial = engine.MaterialManager.CreateMaterial<DebugMaterialData_t>(debugPipeline);
 
             // utils
             sphereMesh = engine.meshManager.CreateMesh(ObjParser.LoadObj("meshes/sphere.obj").MeshData);
@@ -229,30 +277,30 @@ namespace TheEngine.Managers
             wireframe = engine.MaterialManager.CreateMaterial<WireframeMaterialData_t>(wireframePipeline);
             WireframeMaterialData_t wireframeData = new() { width = 1, color = new Vector4(1, 1, 1, 1) };
             wireframe.SetMaterialData(ref wireframeData);
-            // wireframe.ZWrite = false;
-            // wireframe.DepthTesting = DepthCompare.Always;
         }
 
         public void Dispose()
         {
+            csm.Dispose();
             objectDrawStage.Dispose();
+            additionalRenderersStage.Dispose();
             linesStage.Dispose();
             engine.meshManager.DisposeMesh(sphereMesh);
-            //outlineTexture.Dispose();
             engine.meshManager.DisposeMesh(planeMesh);
             engine.textureManager.DisposeTexture(mainObjectDepthTexture);
             engine.textureManager.DisposeTexture(mainObjectColorTexture);
             engine.textureManager.DisposeTexture(mainObjectColor1Texture);
             engine.textureManager.DisposeTexture(mainObjectBuffer);
+            engine.textureManager.DisposeTexture(depthPrepassTexture);
             engine.textureManager.DisposeTexture(guiTexture);
             engine.textureManager.DisposeTexture(sceneViewOpaqueTexture2D);
             engine.textureManager.DisposeTexture(sceneViewDepthTexture2D);
             engine.textureManager.DisposeTexture(sceneViewColor1Texture);
             engine.textureManager.DisposeTexture(sceneViewTexture);
+            engine.textureManager.DisposeTexture(sceneViewDepthPrepassTexture);
             foreach (var t in backBuffers)
                 engine.textureManager.DisposeTexture(t);
 
-            deferredCommandList.Dispose();
             immediateCommandList.Dispose();
         }
 
@@ -326,23 +374,8 @@ namespace TheEngine.Managers
             stages.Remove(stage);
         }
 
-
-        public bool DeferredRecording
-        {
-            get => deferredRecording;
-            set => pendingDeferredRecording = value;
-        }
-
         public void BeginFrame()
         {
-            // the recording mode can only change between frames, when no commands are in flight
-            if (pendingDeferredRecording.HasValue)
-            {
-                deferredRecording = pendingDeferredRecording.Value;
-                pendingDeferredRecording = null;
-                commandList = deferredRecording ? deferredCommandList : immediateCommandList;
-                engineCommandList = deferredRecording ? deferredEngineCommandList : immediateEngineCommandList;
-            }
             commandList.Begin();
             cameraManager.MainCamera.Aspect = engine.gameView.Aspect;
             cameraManager.SceneViewCamera.Aspect = engine.sceneView.Aspect;
@@ -353,11 +386,11 @@ namespace TheEngine.Managers
             engine.textureManager.ScreenshotRenderTexture(mainObjectBuffer, filename, colorAttachment);
         }
 
-        private Entity PickObject(Vector2 normalizedScreenPoint, ITexture renderTexture)
+        private Entity PickObject(Vector2 normalizedScreenPoint, ITexture renderTexture, bool sceneView = false)
         {
             if (renderTexture == null)
                 return Entity.Empty;
-            var rt = engine.textureManager.GetTextureByHandle(renderTexture.Handle) as RenderTexture;
+            var rt = engine.textureManager.GetTextureByHandle(renderTexture.Handle) as VulkanRenderTexture;
             if (rt == null)
             {
                 return Entity.Empty;
@@ -366,12 +399,39 @@ namespace TheEngine.Managers
             int x = (int)(normalizedScreenPoint.X * rt.Width * dynamicScale);
             int y = (int)(normalizedScreenPoint.Y * rt.Height * dynamicScale);
             commandList.ReadPixels(renderTexture, 1, x, y, 1, 1, buf);
-            var index = buf[0];
+            return ResolvePickIndex(buf[0], sceneView);
+        }
+
+        // maps a picked R32ui object-buffer value back to the entity that drew it
+        private Entity ResolvePickIndex(uint index, bool sceneView = false)
+        {
             if (index == 0)
                 return Entity.Empty;
-            if (index <= objectDrawStage.TotalToDraw)
+            // Scene-view gizmo icons reserve the highest fixed range (GizmoPickIdBase = 1<<25, above
+            // the decal range), mapping back to the light/decal entity each icon represents. Only the
+            // scene view draws them, so this never collides with the game-view picker.
+            if (index >= EngineSceneView.GizmoPickIdBase)
             {
-                var entity = objectDrawStage.EntityAtIndex(index - 1);
+                var iconEntity = engine.sceneView.EntityAtGizmoPickIndex((int)(index - EngineSceneView.GizmoPickIdBase));
+                if (engine.entityManager.Exist(iconEntity))
+                    return iconEntity;
+                return Entity.Empty;
+            }
+            // Decals reserve a high, fixed index range (see DecalManager.PickIdBase) that never
+            // overlaps a real ObjectDrawRenderStage mesh index, so it's checked first.
+            if (index >= DecalManager.PickIdBase)
+            {
+                var decalEntity = engine.decalManager.EntityAtPickIndex((int)(index - DecalManager.PickIdBase));
+                if (engine.entityManager.Exist(decalEntity))
+                    return decalEntity;
+                return Entity.Empty;
+            }
+            // resolve through whichever draw set actually produced this image (the scene view may have
+            // rendered its own independently-culled set, with a different index->entity mapping).
+            int total = sceneView ? objectDrawStage.SceneViewTotalToDraw : objectDrawStage.TotalToDraw;
+            if (index <= total)
+            {
+                var entity = sceneView ? objectDrawStage.SceneViewEntityAtIndex(index - 1) : objectDrawStage.EntityAtIndex(index - 1);
                 if (engine.entityManager.Exist(entity)) // it could be removed after rendering
                     return entity;
             }
@@ -379,6 +439,81 @@ namespace TheEngine.Managers
         }
 
         public Entity PickObject(Vector2 normalizedScreenPoint) => PickObject(normalizedScreenPoint, mainObjectBuffer);
+
+        // ReadPixelDeferred channels (independent per-frame readers must not share a slot)
+        private const int DeferredChannelObjectPick = 0;
+        private const int DeferredChannelDepthPick = 1;
+
+        /// <summary>
+        /// Stall-free variant of <see cref="PickObject"/> for continuous (per-frame) hover picking.
+        /// The pixel copy is recorded into the frame's command stream and read back frames-in-flight
+        /// frames later, so it never syncs the GPU - but the result is the pixel the user SAW a
+        /// couple frames ago (perfect for hover, wrong tool for pixel-perfect click checks paired
+        /// with this frame's state). Call every frame; returns Empty until the first result lands.
+        /// </summary>
+        public Entity PickObjectDeferred(Vector2 normalizedScreenPoint)
+        {
+            if (mainObjectBuffer == null)
+                return Entity.Empty;
+            var rt = engine.textureManager.GetTextureByHandle(mainObjectBuffer.Handle) as VulkanRenderTexture;
+            if (rt == null)
+                return Entity.Empty;
+            int x = (int)(normalizedScreenPoint.X * rt.Width * dynamicScale);
+            int y = (int)(normalizedScreenPoint.Y * rt.Height * dynamicScale);
+            var value = commandList.ReadPixelDeferred(mainObjectBuffer, 1, x, y, DeferredChannelObjectPick);
+            return value is { } index ? ResolvePickIndex(index) : Entity.Empty;
+        }
+
+        // Per-slot unprojection data for PickWorldPositionDeferred: the depth value returned by a
+        // slot was rendered by the camera of the frame BEFORE the one that recorded the copy (the
+        // copy is recorded during game update, before that frame renders), so each record stores the
+        // previous frame's inverse matrices, captured at the end of FinalizeRendering.
+        private readonly (Matrix invProj, Matrix invView, Vector2 ndc, bool valid)[] depthPickSlots = new (Matrix, Matrix, Vector2, bool)[8];
+        private Matrix lastRenderedInvProj;
+        private Matrix lastRenderedInvView;
+        private bool lastRenderedMatricesValid;
+
+        /// <summary>
+        /// Stall-free world-position picking straight from the depth buffer - the "what world point
+        /// is under the cursor" query without a physics raycast. Pixel-perfect against everything
+        /// RENDERED (no collider needed), O(1), same deferred mechanism as
+        /// <see cref="PickObjectDeferred"/>: call every frame, the result is a couple frames stale
+        /// (= the image the user sees) and null until the first result lands or when the pixel hit
+        /// the sky (cleared depth). Note it hits creatures/doodads too - it is NOT a drop-in for
+        /// masked raycasts (COLLISION_MASK_STATIC etc.).
+        /// </summary>
+        public Vector3? PickWorldPositionDeferred(Vector2 normalizedScreenPoint)
+        {
+            if (depthTexture2D == null)
+                return null;
+
+            int x = (int)(normalizedScreenPoint.X * depthTexture2D.Width * dynamicScale);
+            int y = (int)(normalizedScreenPoint.Y * depthTexture2D.Height * dynamicScale);
+
+            int slot = commandList.DeferredReadSlot;
+            var stored = depthPickSlots[slot % depthPickSlots.Length];
+            var raw = commandList.ReadPixelDeferred(depthTexture2D, 0, x, y, DeferredChannelDepthPick);
+
+            // ndc convention mirrors NormalizedScreenPointToRay (the proven picking math)
+            var ndc = new Vector2(2 * normalizedScreenPoint.X - 1f, 2 * (1 - normalizedScreenPoint.Y) - 1f);
+            if (lastRenderedMatricesValid)
+                depthPickSlots[slot % depthPickSlots.Length] = (lastRenderedInvProj, lastRenderedInvView, ndc, true);
+
+            if (raw is not { } bits || !stored.valid)
+                return null;
+
+            float depth = BitConverter.UInt32BitsToSingle(bits);
+            if (depth >= 0.99999f)
+                return null; // cleared depth - the cursor is on the sky
+
+            // unproject clip (ndc, depth) -> eye -> world with the matrices that rendered that depth
+            var eye = Vector4.Transform(new Vector4(stored.ndc.X, stored.ndc.Y, depth, 1f), stored.invProj);
+            if (MathF.Abs(eye.W) < 1e-12f)
+                return null;
+            eye /= eye.W;
+            var world = Vector4.Transform(new Vector4(eye.X, eye.Y, eye.Z, 1f), stored.invView);
+            return new Vector3(world.X, world.Y, world.Z);
+        }
 
         public Entity PickSceneViewObject()
         {
@@ -388,8 +523,8 @@ namespace TheEngine.Managers
                 return Entity.Empty;
             }
             var normalized = new Vector2((screenPoint.X - engine.sceneView.ViewRect.X) / engine.sceneView.ViewRect.Width,
-                1 - (screenPoint.Y - engine.sceneView.ViewRect.Y) / engine.sceneView.ViewRect.Height);
-            return PickObject(normalized, sceneViewTexture);
+                (screenPoint.Y - engine.sceneView.ViewRect.Y) / engine.sceneView.ViewRect.Height);
+            return PickObject(normalized, sceneViewTexture, sceneView: true);
         }
 
         private bool inRenderingLoop = false;
@@ -410,61 +545,10 @@ namespace TheEngine.Managers
 
             inRenderingLoop = true;
             commandList.CheckError("pre UpdateSceneBuffer");
-            
-            ActivateScene(null);
 
-            engineCommandList.ResetStats();
-            commandList.CheckError("Render begin");
-
-            if (currentBackBufferWidth != (int)engine.gameView.ViewRect.Width ||
-                currentBackBufferHeight != (int)engine.gameView.ViewRect.Height)
-            {
-                currentBackBufferWidth = (int)engine.gameView.ViewRect.Width;
-                currentBackBufferHeight = (int)engine.gameView.ViewRect.Height;
-                engine.textureManager.DisposeTexture(mainObjectDepthTexture);
-                engine.textureManager.DisposeTexture(mainObjectColorTexture);
-                engine.textureManager.DisposeTexture(mainObjectColor1Texture);
-                engine.textureManager.DisposeTexture(mainObjectBuffer);
-                engine.textureManager.DisposeTexture(opaqueRenderTexture);
-                engine.textureManager.DisposeTexture(opaqueTexture2D);
-                engine.textureManager.DisposeTexture(depthTexture2D);
-
-                mainObjectDepthTexture = engine.textureManager.CreateTexture(null, currentBackBufferWidth, currentBackBufferHeight, TextureFormat.DepthComponent);
-                mainObjectColorTexture = engine.textureManager.CreateTexture(null, currentBackBufferWidth, currentBackBufferHeight, TextureFormat.R8G8B8A8);
-                mainObjectColor1Texture = engine.textureManager.CreateTexture(null, currentBackBufferWidth, currentBackBufferHeight, TextureFormat.R32ui);
-                mainObjectBuffer = engine.textureManager.CreateRenderTexture(mainObjectColorTexture, mainObjectDepthTexture, mainObjectColor1Texture);
-                opaqueRenderTexture = engine.textureManager.CreateRenderTextureWithColorAndDepth(currentBackBufferWidth, currentBackBufferHeight, out opaqueTexture2D, out depthTexture2D);
-                for (var index = 0; index < backBuffers.Length; index++)
-                {
-                    engine.textureManager.DisposeTexture(backBuffers[index]);
-                    backBuffers[index] = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight);
-                }
-            }
-            if (currentSceneViewWidth != (int)engine.sceneView.ViewRect.Width ||
-                currentSceneViewHeight != (int)engine.sceneView.ViewRect.Height)
-            {
-                currentSceneViewWidth = (int)engine.sceneView.ViewRect.Width;
-                currentSceneViewHeight = (int)engine.sceneView.ViewRect.Height;
-                engine.textureManager.DisposeTexture(sceneViewOpaqueTexture2D);
-                engine.textureManager.DisposeTexture(sceneViewDepthTexture2D);
-                engine.textureManager.DisposeTexture(sceneViewColor1Texture);
-                engine.textureManager.DisposeTexture(sceneViewTexture);
-
-                sceneViewDepthTexture2D = engine.textureManager.CreateTexture(null, currentSceneViewWidth, currentSceneViewHeight, TextureFormat.DepthComponent);
-                sceneViewOpaqueTexture2D = engine.textureManager.CreateTexture(null, currentSceneViewWidth, currentSceneViewHeight, TextureFormat.R8G8B8A8);
-                sceneViewColor1Texture = engine.textureManager.CreateTexture(null, currentSceneViewWidth, currentSceneViewHeight, TextureFormat.R32ui);
-                sceneViewTexture = engine.textureManager.CreateRenderTexture(sceneViewOpaqueTexture2D, sceneViewDepthTexture2D, sceneViewColor1Texture);
-            }
-
-            if (currentGuiWidth != (int)engine.WindowHost.WindowWidth ||
-                currentGuiHeight != (int)engine.WindowHost.WindowHeight)
-            {
-                currentGuiWidth = (int)engine.WindowHost.WindowWidth;
-                currentGuiHeight = (int)engine.WindowHost.WindowHeight;
-                engine.textureManager.DisposeTexture(guiTexture);
-                guiTexture = engine.textureManager.CreateRenderTexture(currentGuiWidth, currentGuiHeight);
-            }
-
+            // apply a pending resolution-scale change before ActivateScene(null) below computes
+            // the Forward+ TilesX/TilesY from DynamicWidth/DynamicHeight - applying it later
+            // would leave the tile grid sized with the old scale for one frame
             if (pendingDynamicScale.HasValue)
             {
                 if (Math.Abs(pendingDynamicScale.Value - 1) < 0.01f)
@@ -479,19 +563,84 @@ namespace TheEngine.Managers
                 pendingDynamicScale = null;
             }
 
+            // resolve before the stages collect casters (they read ShadowDistance) and fit cascades.
+            activeShadowSettings = csm.TryResolveSettings(out var shadowSettings) ? shadowSettings : null;
+            if (activeShadowSettings is { } s)
+                csm.EnsureResources(s.Resolution);
+
+            ActivateScene(null);
+
+            engineCommandList.ResetStats();
+            commandList.CheckError("Render begin");
+
+            if (currentBackBufferWidth != (int)engine.gameView.ViewRect.Width ||
+                currentBackBufferHeight != (int)engine.gameView.ViewRect.Height)
+            {
+                currentBackBufferWidth = (int)engine.gameView.ViewRect.Width;
+                currentBackBufferHeight = (int)engine.gameView.ViewRect.Height;
+                engine.textureManager.DisposeTexture(mainObjectDepthTexture);
+                engine.textureManager.DisposeTexture(mainObjectColorTexture);
+                engine.textureManager.DisposeTexture(mainObjectColor1Texture);
+                engine.textureManager.DisposeTexture(mainObjectBuffer);
+                engine.textureManager.DisposeTexture(depthPrepassTexture);
+                engine.textureManager.DisposeTexture(opaqueRenderTexture);
+                engine.textureManager.DisposeTexture(opaqueTexture2D);
+                engine.textureManager.DisposeTexture(depthTexture2D);
+
+                mainObjectDepthTexture = engine.textureManager.CreateTexture(null, currentBackBufferWidth, currentBackBufferHeight, TextureFormat.DepthComponent);
+                mainObjectColorTexture = engine.textureManager.CreateTexture(null, currentBackBufferWidth, currentBackBufferHeight, TextureFormat.R8G8B8A8);
+                mainObjectColor1Texture = engine.textureManager.CreateTexture(null, currentBackBufferWidth, currentBackBufferHeight, TextureFormat.R32ui);
+                mainObjectBuffer = engine.textureManager.CreateRenderTexture(mainObjectColorTexture, mainObjectDepthTexture, mainObjectColor1Texture);
+                depthPrepassTexture = engine.textureManager.CreateDepthOnlyRenderTexture(mainObjectDepthTexture);
+                opaqueRenderTexture = engine.textureManager.CreateRenderTextureWithColorAndDepth(currentBackBufferWidth, currentBackBufferHeight, out opaqueTexture2D, out depthTexture2D);
+                // register the scene RTs bindless once at creation; the slots stay valid until the next
+                // resize recreates them (these textures are owned by RenderManager, so no GC hazard).
+                opaqueTextureBindlessIndex = engine.textureManager.GetBindlessIndex(opaqueTexture2D);
+                depthTextureBindlessIndex = engine.textureManager.GetBindlessIndex(depthTexture2D);
+                for (var index = 0; index < backBuffers.Length; index++)
+                {
+                    engine.textureManager.DisposeTexture(backBuffers[index]);
+                    backBuffers[index] = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight);
+                }
+                engine.textureManager.DisposeTexture(gameDebugTexture);
+                gameDebugTexture = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight);
+            }
+            if (currentSceneViewWidth != (int)engine.sceneView.ViewRect.Width ||
+                currentSceneViewHeight != (int)engine.sceneView.ViewRect.Height)
+            {
+                currentSceneViewWidth = (int)engine.sceneView.ViewRect.Width;
+                currentSceneViewHeight = (int)engine.sceneView.ViewRect.Height;
+                engine.textureManager.DisposeTexture(sceneViewOpaqueTexture2D);
+                engine.textureManager.DisposeTexture(sceneViewDepthTexture2D);
+                engine.textureManager.DisposeTexture(sceneViewColor1Texture);
+                engine.textureManager.DisposeTexture(sceneViewTexture);
+                engine.textureManager.DisposeTexture(sceneViewDepthPrepassTexture);
+
+                sceneViewDepthTexture2D = engine.textureManager.CreateTexture(null, currentSceneViewWidth, currentSceneViewHeight, TextureFormat.DepthComponent);
+                sceneViewOpaqueTexture2D = engine.textureManager.CreateTexture(null, currentSceneViewWidth, currentSceneViewHeight, TextureFormat.R8G8B8A8);
+                sceneViewColor1Texture = engine.textureManager.CreateTexture(null, currentSceneViewWidth, currentSceneViewHeight, TextureFormat.R32ui);
+                sceneViewTexture = engine.textureManager.CreateRenderTexture(sceneViewOpaqueTexture2D, sceneViewDepthTexture2D, sceneViewColor1Texture);
+                sceneViewDepthPrepassTexture = engine.textureManager.CreateDepthOnlyRenderTexture(sceneViewDepthTexture2D);
+                engine.textureManager.DisposeTexture(sceneDebugTexture);
+                sceneDebugTexture = engine.textureManager.CreateRenderTexture(currentSceneViewWidth, currentSceneViewHeight);
+            }
+
+            if (currentGuiWidth != (int)engine.WindowHost.WindowWidth ||
+                currentGuiHeight != (int)engine.WindowHost.WindowHeight)
+            {
+                currentGuiWidth = (int)engine.WindowHost.WindowWidth;
+                currentGuiHeight = (int)engine.WindowHost.WindowHeight;
+                engine.textureManager.DisposeTexture(guiTexture);
+                guiTexture = engine.textureManager.CreateRenderTexture(currentGuiWidth, currentGuiHeight);
+            }
+
             inCoreRenderingLoop = true;
             currentBackBufferIndex = -1;
 
             commandList.CheckError("Before set CurrentBackBuffer");
 
-            ActivateRenderTexture(CurrentBackBuffer, new Color4(15/255f,52/255f,97/255f, 1));
-
             commandList.BindTransientUniformBuffer(Constants.SCENE_BUFFER_INDEX, ref sceneData);
 
-            //commandList.BindTransientUniformBuffer(Constants.PIXEL_SCENE_BUFFER_INDEX, ref scenePixelData);
-
-            // bind last frame's leftover object data, so that the slot is never unbound
-            engineCommandList.RebindObjectData();
             commandList.CheckError("Before render all");
         }
 
@@ -513,7 +662,7 @@ namespace TheEngine.Managers
         private int DynamicWidth => useDynamicScale ? Math.Max(1, (int)(currentBackBufferWidth * dynamicScale)) : currentBackBufferWidth;
         private int DynamicHeight => useDynamicScale ? Math.Max(1, (int)(currentBackBufferHeight * dynamicScale)) : currentBackBufferHeight;
 
-        public void ActivateRenderTexture(ITexture rt, Color4? color = null)
+        public void ActivateRenderTexture(ITexture rt, Color4? color = null, LoadOp? depthLoadOp = null)
         {
             if (inRenderingLoop)
             {
@@ -526,7 +675,11 @@ namespace TheEngine.Managers
                     Target = rt,
                     ColorLoadOp = color.HasValue ? LoadOp.Clear : LoadOp.Load,
                     ClearColor = color ?? default,
-                    ViewportScale = inCoreRenderingLoop && rt == mainObjectBuffer && useDynamicScale ? dynamicScale : 1,
+                    DepthLoadOp = depthLoadOp,
+                    // the depth prepass aliases mainObjectBuffer's depth image, so it must rasterize
+                    // at the same scaled viewport - otherwise the opaque pass' Equal test (and the
+                    // Forward+ tile cull, which reads the DynamicWidth×DynamicHeight region) breaks
+                    ViewportScale = inCoreRenderingLoop && (rt == mainObjectBuffer || rt == depthPrepassTexture) && useDynamicScale ? dynamicScale : 1,
                 });
             }
         }
@@ -547,7 +700,9 @@ namespace TheEngine.Managers
             commandList.Barrier(destination, ResourceUsage.ShaderRead, ResourceUsage.TransferDestination);
             commandList.Blit(source, destination, 0, 0, source.Width, source.Height, 0, 0, destination.Width, destination.Height, BlitMask.Color, BlitFilter.Linear);
             commandList.Blit(source, destination, 0, 0, source.Width, source.Height, 0, 0, destination.Width, destination.Height, BlitMask.Depth, BlitFilter.Nearest);
-            commandList.Barrier(source, ResourceUsage.TransferSource, ResourceUsage.RenderTarget);
+            // both ends finish samplable: the caller (highlight postprocess) samples the source
+            // later in the frame; rendering to it again re-transitions at pass begin anyway
+            commandList.Barrier(source, ResourceUsage.TransferSource, ResourceUsage.ShaderRead);
             commandList.Barrier(destination, ResourceUsage.TransferDestination, ResourceUsage.ShaderRead);
         }
 
@@ -571,14 +726,81 @@ namespace TheEngine.Managers
 
         public void RenderFullscreenPlane(Material material)
         {
-            EnableMaterial(material, material.GetShaderPass(ShaderPassType.Forward, false)!);
+            // blit/ssao/grid_plane never read `model` (their vert never calls
+            // VERTEX_SETUP_INSTANCING) - no instancing buffers to prepare.
+            EnableMaterial(material, material.GetShaderPass(ShaderPassType.Forward)!);
             engineCommandList.DrawIndexed(planeMesh, 0);
+        }
+
+        /// <summary>When a debug visualization is selected, renders it into each visible view's debug
+        /// texture (sampling that view's depth/shadow/Forward+ grids) so the view can display it instead
+        /// of the final image. Called after the opaque+transparent passes, when those buffers are ready.</summary>
+        public void RenderDebugViews()
+        {
+            gameDebugRendered = false;
+            sceneDebugRendered = false;
+            if (DebugView == DebugView.FinalImage)
+                return;
+
+            if (engine.gameView.IsVisible && gameDebugTexture != null)
+            {
+                ActivateScene(null); // bind the main view's scene buffer (gridSet 0, cascade indices)
+                BindCascadesForDebugView();
+                RenderDebugView(gameDebugTexture, mainObjectDepthTexture);
+                gameDebugRendered = true;
+            }
+            if (engine.sceneView.IsVisible && sceneDebugTexture != null)
+            {
+                ActivateScene(new SceneData(cameraManager.SceneViewCamera, engine.lightManager.MainDirectional, engine.lightManager.SecondaryDirectional));
+                BindCascadesForDebugView();
+                RenderDebugView(sceneDebugTexture, sceneViewDepthTexture2D);
+                sceneDebugRendered = true;
+            }
+
+            // RenderDebugView leaves no active pass; reopen one on the back buffer so the rest of the
+            // frame (RenderPostProcess) sees the same state RenderTransparent normally leaves.
+            ActivateScene(null);
+            ActivateDefaultRenderTexture();
+        }
+
+        /// <summary>ActivateScene resets CascadeCount to 0, but the "Shadow map" view needs the cascade
+        /// indices, so re-apply and rebind them (still valid - the depth textures persist) before drawing.</summary>
+        private void BindCascadesForDebugView()
+        {
+            if (DebugView != DebugView.ShadowCascade || activeShadowSettings is not { } settings)
+                return;
+            if (!engine.lightManager.MainDirectional.Exists)
+                return;
+            ApplyCascadesToSceneBuffer(settings);
+            commandList.BindTransientUniformBuffer(Constants.SCENE_BUFFER_INDEX, ref sceneData);
+        }
+
+        private void RenderDebugView(ITexture debugTarget, ITexture depthTexture)
+        {
+            // the depth is a depth attachment after the opaque/transparent passes; sample it as a texture
+            if (commandList.InRenderingPass)
+                commandList.EndRenderingPass();
+            commandList.Barrier(depthTexture, ResourceUsage.RenderTarget, ResourceUsage.ShaderRead);
+
+            DebugMaterialData_t data = new() { mode = (int)DebugView, depthIndex = engine.textureManager.GetBindlessIndex(depthTexture) };
+            debugMaterial.SetMaterialData(ref data);
+
+            ActivateRenderTexture(debugTarget, Color4.Black);
+            RenderFullscreenPlane(debugMaterial);
+
+            // ready the debug texture for the GUI pass to sample (ImGui.Image)
+            commandList.EndRenderingPass();
+            commandList.Barrier(debugTarget, ResourceUsage.RenderTarget, ResourceUsage.ShaderRead);
         }
         
         public void FinalizeRendering(int dstFrameBuffer)
         {
             foreach (var stage in stages)
                 stage.EndFrame();
+
+            // the "render once" requests were scheduled in this frame's Update and drained by the
+            // stage above; clear them so next frame starts empty
+            additionalRenderers.Clear();
 
             ClearDirtyEntityBit();
 
@@ -595,7 +817,8 @@ namespace TheEngine.Managers
             });
 
             commandList.CheckError("Blitz");
-            blitMaterial.SetTexture("texture1", guiTexture);
+            BlitMaterialData_t blitData = new() { flipY = flipY ? 1 : 0, texture1Index = engine.TextureManager.GetBindlessIndex(guiTexture) };
+            blitMaterial.SetMaterialData(ref blitData);
             RenderFullscreenPlane(blitMaterial);
             commandList.EndRenderingPass();
 
@@ -609,13 +832,64 @@ namespace TheEngine.Managers
             var stats = engineCommandList.Stats;
             stats.ShaderSwitches += commandList.ShaderSwitches;
             stats.MeshSwitches += commandList.MeshSwitches;
+            stats.Set1CacheHits += commandList.Set1CacheHits;
+            stats.Set1CacheMisses += commandList.Set1CacheMisses;
             engine.statsManager.RenderStats = stats;
+
+            // for PickWorldPositionDeferred: a copy recorded during the NEXT frame's update reads the
+            // depth THIS frame just rendered - remember this camera's inverse matrices for it
+            Matrix.Invert(cameraManager.MainCamera.ProjectionMatrix, out lastRenderedInvProj);
+            lastRenderedInvView = cameraManager.MainCamera.InverseViewMatrix;
+            lastRenderedMatricesValid = true;
+
+            // snapshot this frame's GPU memory churn from our allocator, then reset for the next frame
+            engine.statsManager.GpuAllocationsPerFrame = VMASharp.Vma.Allocations;
+            engine.statsManager.GpuFreesPerFrame = VMASharp.Vma.Frees;
+            engine.statsManager.GpuDeviceAllocationsPerFrame = VMASharp.Vma.DeviceAllocations;
+            engine.statsManager.GpuDeviceFreesPerFrame = VMASharp.Vma.DeviceFrees;
+            VMASharp.Vma.ResetFrameStats();
         }
 
         internal void RenderOpaque(int dstFrameBuffer)
         {
             foreach (var stage in stages)
                 stage.PrepareFrame(cameraManager.MainCamera);
+
+            // When the scene view culls with its own camera, build a second draw set for it. Must run
+            // after the main PrepareFrame (it reuses the WorldMeshBounds refreshed there) and after the
+            // shadow casters were collected, since it overwrites the shared per-entity cull bit.
+            if (engine.sceneView.IsVisible && engine.sceneView.OwnCulling)
+                objectDrawStage.PrepareSceneFrame(cameraManager.SceneViewCamera);
+
+            if (engine.gameView.IsVisible)
+            {
+                ActivateRenderTexture(depthPrepassTexture, depthLoadOp: LoadOp.Clear);
+                objectDrawStage.Render(RenderPoint.DepthPrepass, engineCommandList, cameraManager.MainCamera);
+
+                // Forward+ tiled light/decal culling: cull point lights and decals against the
+                // depth prepass result, between the depth pass and opaque shading - the only
+                // point where both the depth texture (as a sampled image) and the light/decal
+                // grid/index SSBOs are accessible outside a rendering pass.
+                commandList.EndRenderingPass();
+                commandList.Barrier(mainObjectDepthTexture, ResourceUsage.RenderTarget, ResourceUsage.ShaderRead);
+                int depthBindlessIndex = engine.textureManager.GetBindlessIndex(mainObjectDepthTexture);
+                commandList.DispatchTileCullCompute(depthBindlessIndex, DynamicWidth, DynamicHeight, sceneData.TilesX, sceneData.TilesY);
+
+                // render the main camera's shadow cascades and rebind the main scene buffer (now with
+                // cascades) for the opaque pass below. Reuses the opaque set collected in PrepareFrame.
+                var mainLight = engine.lightManager.MainDirectional;
+                if (activeShadowSettings is { } shadowSettings && mainLight.Exists)
+                    RenderShadowCascades(cameraManager.MainCamera, mainLight, shadowSettings,
+                        new SceneData(cameraManager.MainCamera, mainLight, engine.lightManager.SecondaryDirectional));
+
+                // custom off-screen passes (e.g. the waypoint path projector) - run before opaque so
+                // their results can be sampled by the opaque pass / decals this frame. The scene buffer
+                // (main camera + cascades) is snapshotted/restored around each stage inside, so a stage
+                // that rebinds it for its own off-screen camera can't affect the others or the opaque pass.
+                RenderBeforeOpaque();
+            }
+
+            ActivateRenderTexture(CurrentBackBuffer, cameraManager.MainCamera.BackgroundColor, depthLoadOp: LoadOp.Load);
 
             RenderStages(RenderPoint.Opaque);
         }
@@ -655,8 +929,37 @@ namespace TheEngine.Managers
 
             if (engine.sceneView.IsVisible)
             {
-                ActivateScene(new SceneData(cameraManager.SceneViewCamera, new FogSettings(){Enabled = false}, engine.lightManager.MainLight, engine.lightManager.SecondaryLight));
-                ActivateRenderTexture(sceneViewTexture, point == RenderPoint.Opaque ? new Color4(15/255f,52/255f,97/255f, 1) : null);
+                ActivateScene(new SceneData(cameraManager.SceneViewCamera, engine.lightManager.MainDirectional, engine.lightManager.SecondaryDirectional));
+
+                if (point == RenderPoint.Opaque)
+                {
+                    // Forward+ tiled light/decal culling for the scene view's own camera - same
+                    // depth-prepass-then-dispatch shape as the main view's in RenderOpaque(), just
+                    // targeting the scene view's own depth alias and writing into the SCENE_*
+                    // grid/index buffers (isSceneView: true) instead of the main view's. Done once
+                    // per frame (gated on Opaque); the resulting grids stay valid for this view's
+                    // Transparent pass too, since nothing else writes into them in between.
+                    int sceneViewWidth = Math.Max(1, currentSceneViewWidth);
+                    int sceneViewHeight = Math.Max(1, currentSceneViewHeight);
+                    ActivateRenderTexture(sceneViewDepthPrepassTexture, depthLoadOp: LoadOp.Clear);
+                    objectDrawStage.Render(RenderPoint.DepthPrepass, engineCommandList, cameraManager.SceneViewCamera);
+
+                    commandList.EndRenderingPass();
+                    commandList.Barrier(sceneViewDepthTexture2D, ResourceUsage.RenderTarget, ResourceUsage.ShaderRead);
+                    int sceneDepthBindlessIndex = engine.textureManager.GetBindlessIndex(sceneViewDepthTexture2D);
+                    commandList.DispatchTileCullCompute(sceneDepthBindlessIndex, sceneViewWidth, sceneViewHeight, sceneData.TilesX, sceneData.TilesY, isSceneView: true);
+
+                    // render the scene-view camera's shadow cascades (re-using the shared cascade
+                    // textures) and rebind the scene-view scene buffer with cascades for its opaque pass.
+                    var sceneMainLight = engine.lightManager.MainDirectional;
+                    if (activeShadowSettings is { } sceneShadowSettings && sceneMainLight.Exists)
+                        RenderShadowCascades(cameraManager.SceneViewCamera, sceneMainLight, sceneShadowSettings,
+                            new SceneData(cameraManager.SceneViewCamera, sceneMainLight, engine.lightManager.SecondaryDirectional));
+                }
+
+                // depthLoadOp: Load - the depth prepass above already populated sceneViewDepthTexture2D
+                // for this frame's Opaque pass, and Transparent must preserve Opaque's depth test results.
+                ActivateRenderTexture(sceneViewTexture, point == RenderPoint.Opaque ? (Color4?)cameraManager.SceneViewCamera.BackgroundColor : null, depthLoadOp: LoadOp.Load);
 
                 foreach (var stage in stages)
                     if ((stage.RenderPoints & point) != 0)
@@ -737,10 +1040,16 @@ namespace TheEngine.Managers
             }
         }
 
-        public void UpdateTransforms()
+        private partial struct UpdateChildTransformsJob : IParallelJob
         {
-            var entityManager = engine.entityManager;
-            dynamicParentedEntitiesArchetype.ParallelForEach<CopyParentTransform, LocalToWorld, DirtyPosition>((itr, thread, start, end, parents, localToWorld, dirtyPosition) =>
+            private IChunkDataIterator itr;
+            private ComponentDataAccess<CopyParentTransform> parents;
+            private ComponentDataAccess<LocalToWorld> localToWorld;
+            private ComponentDataAccess<DirtyPosition> dirtyPosition;
+
+            public IEntityManager entityManager;
+
+            public void Execute(int thread, int start, int end)
             {
                 CachedComponentDataAccess<DirtyPosition> cachedDirtPosition = new CachedComponentDataAccess<DirtyPosition>(entityManager);
                 CachedComponentDataAccess<LocalToWorld> cacheLocalToWorld = new CachedComponentDataAccess<LocalToWorld>(entityManager);
@@ -756,7 +1065,13 @@ namespace TheEngine.Managers
                         localToWorld[i] = new LocalToWorld(){Matrix = parents[i].Local!.Value * localToWorld[i].Matrix};
                     dirtyPosition[i].Enable();
                 }
-            });
+            }
+        }
+
+        public void UpdateTransforms()
+        {
+            var entityManager = engine.entityManager;
+            new UpdateChildTransformsJob { entityManager = entityManager }.Run(dynamicParentedEntitiesArchetype);
         }
         
         private void ClearDirtyEntityBit()
@@ -768,9 +1083,9 @@ namespace TheEngine.Managers
             });
         }
 
-        private void EnableMaterial(Material material, IShaderPass shaderPass, MaterialInstanceRenderData? instanceData = null)
+        private void EnableMaterial(Material material, IShaderPass shaderPass)
         {
-            engineCommandList.SetMaterial(material, shaderPass, instanceData);
+            engineCommandList.SetMaterial(material, shaderPass);
         }
 
         public static WorldMeshBounds LocalToWorld(in MeshBounds local, in LocalToWorld localToWorld)
@@ -783,36 +1098,41 @@ namespace TheEngine.Managers
             return WorldMeshBounds.FromLocal(in local, in localToWorld, ref corners);
         }
         
-        private float viewDistanceModifier = 8;
-
-
         // for engine-internal renderers (UIManager, ImGuiController) that record their own commands
         internal ICommandList CommandList => commandList;
 
-        public void Render(MeshHandle meshHandle, MaterialHandle materialHandle, ShaderPassType shaderPassType, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null, Int4? instanceInt = null)
+        public void Render(MeshHandle meshHandle, MaterialHandle materialHandle, ShaderPassType shaderPassType, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, Int4? instanceInt = null)
         {
             var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
             var material = engine.materialManager.GetMaterialByHandle(materialHandle);
-            Render(mesh, material, shaderPassType, submesh, localToWorld, worldToLocal, instanceData, instanceInt);
+            Render(mesh, material, shaderPassType, submesh, localToWorld, worldToLocal, instanceInt);
         }
-        
-        public void Render(IMesh mesh, Material material, ShaderPassType shaderPass, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null, Int4? instanceInt = null)
+
+        public void Render(IMesh mesh, Material material, ShaderPassType shaderPass, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, Int4? instanceInt = null)
         {
             if (worldToLocal == null)
             {
                 Matrix.Invert(localToWorld, out var  worldToLocal_);
                 worldToLocal = worldToLocal_;
             }
-            
+
             Debug.Assert(inRenderingLoop);
-            EnableMaterial(material, material.GetShaderPass(shaderPass, false)!, instanceData);
-            engineCommandList.SetObjectData(localToWorld, worldToLocal.Value, 0, instanceInt);
+            engineCommandList.PrepareInstancingData(material, localToWorld, worldToLocal.Value, 0, instanceInt, 1);
+            EnableMaterial(material, material.GetShaderPass(shaderPass)!);
             engineCommandList.DrawIndexed(mesh, submesh);
         }
 
         public void DrawLine(Vector3 start, Vector3 end, Vector4 color)
         {
             linesStage.Add(start, end, color);
+        }
+
+        public void RenderOnce(LocalToWorld localToWorld, MeshRenderer renderer)
+        {
+            if (inRenderingLoop)
+                throw new Exception("Don't call RenderOnce in Render(), this is a schedule method, you are expected to call it in Update and the Engine will take care of everything.");
+
+            additionalRenderers.Add((localToWorld, renderer));
         }
 
         public void Render(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, Transform transform)
@@ -826,42 +1146,120 @@ namespace TheEngine.Managers
             Render(mesh, material, shaderPassType, submesh, matrix);
         }
 
-        public void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int instancesCount, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
+        /// <summary>Batched draw where each instance has its own transform and draw-data int4 (unlike
+        /// <see cref="RenderInstancedIndirect(IMesh, Material, ShaderPassType, int, int, Matrix, Matrix?)"/>,
+        /// which broadcasts one). For many distinct objects sharing a mesh - e.g. gizmo icons.</summary>
+        public void RenderInstanced(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh,
+            ReadOnlySpan<Matrix> models, ReadOnlySpan<Int4> drawData)
+        {
+            if (models.Length == 0)
+                return;
+
+            Debug.Assert(inRenderingLoop);
+            engineCommandList.PrepareInstancingData(material, models, drawData);
+            EnableMaterial(material, material.GetShaderPass(shaderPassType)!);
+            engineCommandList.DrawIndexedInstanced(mesh, submesh, models.Length);
+        }
+
+        public void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int instancesCount, Matrix localToWorld, Matrix? worldToLocal = null)
         {
             if (!worldToLocal.HasValue)
             {
                 Matrix.Invert(localToWorld, out var worldToLocal_);
                 worldToLocal = worldToLocal_;
             }
-            EnableMaterial(material, material.GetShaderPass(shaderPassType, false)!, instanceData);
-            engineCommandList.SetObjectData(localToWorld, worldToLocal.Value);
+            // every instance in this draw shares one world transform (e.g. UIManager's
+            // world-space glyph batches) - broadcast it into instancesCount identical SSBO slots.
+            engineCommandList.PrepareInstancingData(material, localToWorld, worldToLocal.Value, 0, null, instancesCount);
+            EnableMaterial(material, material.GetShaderPass(shaderPassType)!);
             engineCommandList.DrawIndexedInstanced(mesh, submesh, instancesCount);
         }
 
-        public void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int instancesCount, MaterialInstanceRenderData? instanceData = null)
+        public void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int instancesCount)
         {
-            EnableMaterial(material, material.GetShaderPass(shaderPassType, false)!, instanceData);
+            // screen-space glyph batches never read `model` - no instancing buffers to prepare.
+            EnableMaterial(material, material.GetShaderPass(shaderPassType)!);
             engineCommandList.DrawIndexedInstanced(mesh, submesh, instancesCount);
         }
 
-        public float ViewDistanceModifier
-        {
-            get => viewDistanceModifier;
-            set
-            {
-                if (value > 0)
-                    viewDistanceModifier = value;
-            }
-        }
 
         public void ActivateScene(in SceneData? scene)
         {
+            // Forward+ tiled light/decal culling: both the main game view and the editor's scene
+            // view get their own tile grid, tile-culled against their own camera/depth (see
+            // RenderStages, which dispatches the scene view's cull pass separately into the
+            // SCENE_*_BINDING buffers selected by GridSet). The raw Light/Decal arrays
+            // themselves are shared - only the per-tile grid/index results differ per view.
+            if (scene == null)
+            {
+                sceneData.GridSet = 0;
+                sceneData.TilesX = Math.Min((DynamicWidth + Constants.FORWARD_PLUS_TILE_SIZE - 1) / Constants.FORWARD_PLUS_TILE_SIZE, Constants.FORWARD_PLUS_MAX_TILES_X);
+                sceneData.TilesY = Math.Min((DynamicHeight + Constants.FORWARD_PLUS_TILE_SIZE - 1) / Constants.FORWARD_PLUS_TILE_SIZE, Constants.FORWARD_PLUS_MAX_TILES_Y);
+            }
+            else
+            {
+                sceneData.GridSet = 1;
+                int sceneViewWidth = Math.Max(1, currentSceneViewWidth);
+                int sceneViewHeight = Math.Max(1, currentSceneViewHeight);
+                sceneData.TilesX = Math.Min((sceneViewWidth + Constants.FORWARD_PLUS_TILE_SIZE - 1) / Constants.FORWARD_PLUS_TILE_SIZE, Constants.FORWARD_PLUS_MAX_TILES_X);
+                sceneData.TilesY = Math.Min((sceneViewHeight + Constants.FORWARD_PLUS_TILE_SIZE - 1) / Constants.FORWARD_PLUS_TILE_SIZE, Constants.FORWARD_PLUS_MAX_TILES_Y);
+            }
+
+            // GatherLights also resolves this frame's directional (sun) lights, so it must run
+            // before the scene buffer below is built from MainDirectional/SecondaryDirectional.
+            sceneData.LightCount = engine.lightManager.GatherLights(out var lights);
+            commandList.UploadLightData(lights.AsSpan(0, sceneData.LightCount));
+            sceneData.DecalCount = engine.decalManager.GatherDecals(out var decalsArr);
+            commandList.UploadDecalData(decalsArr.AsSpan(0, sceneData.DecalCount));
+
             var data = scene ?? new SceneData(engine.cameraManger.MainCamera,
-                engine.lightManager.Fog,
-                engine.lightManager.MainLight,
-                engine.lightManager.SecondaryLight);
+                engine.lightManager.MainDirectional,
+                engine.lightManager.SecondaryDirectional);
             UpdateSceneBuffer(in data);
+
             commandList.BindTransientUniformBuffer(Constants.SCENE_BUFFER_INDEX, ref sceneData);
+        }
+
+        public void SetSceneCameraOverride(in Matrix view, in Matrix projection, Vector3 cameraPosition)
+        {
+            sceneData.ViewMatrix = view;
+            sceneData.ProjectionMatrix = projection;
+            Matrix.Invert(view, out var vmInv);
+            Matrix.Invert(projection, out var projInv);
+            sceneData.ViewMatrixInverse = vmInv;
+            sceneData.ProjectionMatrixInverse = projInv;
+            sceneData.CameraPosition = new Vector4(cameraPosition, 1);
+            sceneData.CascadeCount = 0; // no shadow sampling for the off-screen preview
+            commandList.BindTransientUniformBuffer(Constants.SCENE_BUFFER_INDEX, ref sceneData);
+        }
+
+        public void DrawRenderers(EngineCommandList cl, ReadOnlySpan<(LocalToWorld, MeshRenderer)> renderers)
+        {
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                var l2w = renderers[i].Item1;
+                var mr = renderers[i].Item2;
+                var material = engine.materialManager.GetMaterialByHandle(mr.MaterialHandle);
+                var mesh = engine.meshManager.GetMeshByHandle(mr.MeshHandle);
+                var pass = material.GetShaderPass(ShaderPassType.Forward);
+                if (pass == null)
+                    continue;
+
+                // one instance per draw; each buffer holds a single element addressed at firstInstance 0
+                Span<Matrix> models = stackalloc Matrix[1]; models[0] = l2w.Matrix;
+                Span<Matrix> invModels = stackalloc Matrix[1]; invModels[0] = l2w.Inverse;
+                Span<uint> objIdx = stackalloc uint[1]; objIdx[0] = 0u;
+                Span<Int4> drawData = stackalloc Int4[1]; drawData[0] = mr.InstanceData ?? new Int4(-1, -1, -1, -1);
+                Span<int> matIdx = stackalloc int[1]; matIdx[0] = material.MaterialArrayIndex;
+
+                cl.SetBuffer(ShaderUniforms.InstancingModels, cl.UploadTransientBuffer((ReadOnlySpan<Matrix>)models));
+                cl.SetBuffer(ShaderUniforms.InstancingInverseModels, cl.UploadTransientBuffer((ReadOnlySpan<Matrix>)invModels));
+                cl.SetBuffer(ShaderUniforms.InstancingObjectIndices, cl.UploadTransientBuffer((ReadOnlySpan<uint>)objIdx));
+                cl.SetBuffer(ShaderUniforms.InstancingDrawData, cl.UploadTransientBuffer((ReadOnlySpan<Int4>)drawData));
+                cl.SetBuffer(ShaderUniforms.InstancingMaterialIndex, cl.UploadTransientBuffer((ReadOnlySpan<int>)matIdx));
+                cl.SetMaterial(material, pass);
+                cl.DrawIndexedInstanced(mesh, mr.SubMeshId, 1, 0);
+            }
         }
 
         private void UpdateSceneBuffer(in SceneData data)
@@ -876,24 +1274,120 @@ namespace TheEngine.Managers
             Matrix.Invert(proj, out var projInv);
             sceneData.ViewMatrixInverse = vmInv;
             sceneData.ProjectionMatrixInverse = projInv;
-            sceneData.LightPosition = data.MainLight.LightPosition;
+            sceneData.LightPosition = Vector3.Zero;
             sceneData.CameraPosition = new Vector4(camera.Transform.Position, 1);
-            sceneData.LightDirection = new Vector4(Vectors.Normalize((Vectors.Forward.Multiply(data.MainLight.LightRotation))), 0);
-            sceneData.LightColor = data.MainLight.LightColor.XYZ();
-            sceneData.LightIntensity = data.MainLight.LightIntensity; 
-            sceneData.SecondaryLightDirection = new Vector4(Vectors.Forward.Multiply(data.SecondaryLight.LightRotation), 0);
-            sceneData.SecondaryLightColor = data.SecondaryLight.LightColor.XYZ();
-            sceneData.SecondaryLightIntensity = data.SecondaryLight.LightIntensity;
+            // resolved directional lights (the first two directional Light entities); when absent,
+            // intensity 0 leaves the directional term dark. Ambient comes from the primary light.
+            sceneData.LightDirection = new Vector4(data.MainLight.Exists ? data.MainLight.Direction : Vectors.Down, 0);
+            sceneData.LightColor = data.MainLight.Color;
+            sceneData.LightIntensity = data.MainLight.Exists ? data.MainLight.Intensity : 0f;
+            sceneData.SecondaryLightDirection = new Vector4(data.SecondaryLight.Exists ? data.SecondaryLight.Direction : Vectors.Down, 0);
+            sceneData.SecondaryLightColor = data.SecondaryLight.Color;
+            sceneData.SecondaryLightIntensity = data.SecondaryLight.Exists ? data.SecondaryLight.Intensity : 0f;
             sceneData.AmbientColor = data.MainLight.AmbientColor;
-            sceneData.fogStart = data.Fog.Start;
-            sceneData.fogEnd = data.Fog.End;
-            sceneData.fogColor = data.Fog.Color;
-            sceneData.fogEnabled = data.Fog.Enabled ? 1 : 0;
+            var fog = camera.Fog;
+            sceneData.fogStart = fog.Start;
+            sceneData.fogEnd = fog.End;
+            sceneData.fogColor = fog.Color;
+            sceneData.fogEnabled = fog.Enabled ? 1 : 0;
             sceneData.Time = (float)engine.TotalTime;
             sceneData.ZNear = camera.NearClip;
             sceneData.ZFar = camera.FarClip;
             sceneData.ScreenWidth = engine.gameView.ViewRect.Width;
             sceneData.ScreenHeight = engine.gameView.ViewRect.Height;
+            // Shadows are disabled by default; only the per-view bind issued right after the cascades
+            // are rendered (RenderShadowCascades -> ApplyCascadesToSceneBuffer) turns them on. This
+            // keeps the depth prepass (and the shadow depth pass itself) from sampling the cascade
+            // textures while they're being written, and is safe before the first cascade render.
+            sceneData.CascadeCount = 0;
+        }
+
+        /// <summary>Binds the scene UBO with the light's view/ortho matrices in place of the camera's,
+        /// so the reused Depth pass renders geometry into a cascade depth map. Shadow sampling is
+        /// disabled (CascadeCount = 0) so the depth pass never reads the maps it is writing.</summary>
+        private void BindShadowSceneBuffer(in Matrix lightView, in Matrix lightProj)
+        {
+            sceneData.ViewMatrix = lightView;
+            sceneData.ProjectionMatrix = lightProj;
+            Matrix.Invert(lightView, out var vmInv);
+            Matrix.Invert(lightProj, out var projInv);
+            sceneData.ViewMatrixInverse = vmInv;
+            sceneData.ProjectionMatrixInverse = projInv;
+            sceneData.CascadeCount = 0;
+            commandList.BindTransientUniformBuffer(Constants.SCENE_BUFFER_INDEX, ref sceneData);
+        }
+
+        /// <summary>Copies the most recently fit cascades (matrices, view-space splits, bindless
+        /// texture indices) plus the configured sampling params into the scene buffer and enables
+        /// shadow sampling.</summary>
+        private void ApplyCascadesToSceneBuffer(in CascadeShadowMap settings)
+        {
+            sceneData.CascadeViewProj0 = csm.LightViewProj[0];
+            sceneData.CascadeViewProj1 = csm.LightViewProj[1];
+            sceneData.CascadeViewProj2 = csm.LightViewProj[2];
+            sceneData.CascadeViewProj3 = csm.LightViewProj[3];
+            sceneData.CascadeSplits = new Vector4(csm.SplitDistances[0], csm.SplitDistances[1], csm.SplitDistances[2], csm.SplitDistances[3]);
+            sceneData.CascadeTexture0 = csm.BindlessIndex(0);
+            sceneData.CascadeTexture1 = csm.BindlessIndex(1);
+            sceneData.CascadeTexture2 = csm.BindlessIndex(2);
+            sceneData.CascadeTexture3 = csm.BindlessIndex(3);
+            sceneData.CascadeCount = CascadedShadowMapManager.CascadeCount;
+            sceneData.ShadowMapResolution = csm.Resolution;
+            sceneData.ShadowNormalBias = settings.NormalBias;
+            sceneData.ShadowConstantBias = settings.ConstantBias;
+            sceneData.ShadowPcfRadius = settings.PcfRadius;
+            sceneData.ShadowBlur = settings.Blur;
+            sceneData.ShadowCascadeBlend = settings.CascadeBlend;
+        }
+
+        /// <summary>Fits and renders the directional-light shadow cascades for one camera, then
+        /// restores that camera's scene buffer (now carrying the cascades) ready for its opaque pass.
+        /// Reuses the opaque geometry collected by <see cref="ObjectDrawRenderStage.PrepareFrame"/>
+        /// as the shadow casters. Must run inside the rendering loop, after the camera's depth prepass.
+        /// </summary>
+        // Invokes every RenderPoint.BeforeOpaque stage just before the opaque pass, with no target
+        // active. Each stage owns its own off-screen render texture, pass and barriers (see
+        // EngineCommandList.BeginRenderTexture / BarrierToShaderRead) - the engine is target-agnostic
+        // here; it only guarantees this runs before opaque so the results can be sampled this frame.
+        private void RenderBeforeOpaque()
+        {
+            foreach (var stage in stages)
+                if ((stage.RenderPoints & RenderPoint.BeforeOpaque) != 0)
+                {
+                    // isolate each stage: it may rebind the scene buffer for its own off-screen camera
+                    // (SetSceneCameraOverride), so snapshot the shared scene (main camera + cascades) and
+                    // restore it after, keeping the other stages and the opaque pass on the main scene.
+                    var scene = sceneData;
+                    stage.Render(RenderPoint.BeforeOpaque, engineCommandList, cameraManager.MainCamera);
+                    sceneData = scene;
+                    commandList.BindTransientUniformBuffer(Constants.SCENE_BUFFER_INDEX, ref sceneData);
+                }
+        }
+
+        private void RenderShadowCascades(ICamera camera, in DirectionalLightData light, in CascadeShadowMap settings, in SceneData restoreData)
+        {
+            csm.ComputeCascades(camera, light.Direction, settings);
+
+            for (int i = 0; i < CascadedShadowMapManager.CascadeCount; i++)
+            {
+                // depth-only target, cleared to far; BeginRenderingPass resets depth bias to 0
+                ActivateRenderTexture(csm.RenderTarget(i), depthLoadOp: LoadOp.Clear);
+                BindShadowSceneBuffer(csm.LightView[i], csm.LightProj[i]);
+                // configured slope-scaled depth bias pushes the stored depth away from the light to
+                // suppress self-shadowing acne (combined with the shader's normal-offset bias).
+                commandList.SetDepthBias(settings.DepthBiasConstant, settings.DepthBiasSlope);
+                objectDrawStage.Render(RenderPoint.Shadow, engineCommandList, camera);
+            }
+
+            commandList.EndRenderingPass();
+            for (int i = 0; i < CascadedShadowMapManager.CascadeCount; i++)
+                commandList.Barrier(csm.DepthTexture(i), ResourceUsage.RenderTarget, ResourceUsage.ShaderRead);
+
+            // restore the camera's scene buffer (the shadow loop left the light's matrices bound),
+            // now carrying the fresh cascades for the opaque pass that follows.
+            UpdateSceneBuffer(restoreData);
+            ApplyCascadesToSceneBuffer(settings);
+            commandList.BindTransientUniformBuffer(Constants.SCENE_BUFFER_INDEX, ref sceneData);
         }
 
         public StaticRenderHandle RegisterStaticRenderer(MeshHandle mesh, Material material, int subMesh, Transform t)

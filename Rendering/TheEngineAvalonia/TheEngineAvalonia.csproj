@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <NoWarn>$(NoWarn),CS1570,CS1572,CS1574,CS1587,CS8625,CS8765,CS8767,CS8602,CS8601,CS8600,CS8603,CS8604,CS8618,CS8619</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TheEngine\TheEngine.csproj" />
+      <ProjectReference Include="..\TheMaths\TheMaths.csproj" />
+    </ItemGroup>
+
+    <Import Project="..\..\avalonia.props" />
+    <Import Project="..\lib3d.props" />
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" /> 
+      <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+      <!-- Vulkan + extensions flow transitively from TheEngine, but are declared explicitly so the
+           copied GpuInterop composition-interop files (Interop/*.cs) compile against the same 2.22 API. -->
+      <PackageReference Include="Silk.NET.Vulkan" Version="2.22.0" />
+      <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.22.0" />
+      <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.22.0" />
+      <!-- Windows interop only (D3DMemoryHelper); compiles cross-platform, used only on Windows. -->
+      <PackageReference Include="Silk.NET.Direct3D11" Version="2.22.0" />
+    </ItemGroup>
+
+</Project>

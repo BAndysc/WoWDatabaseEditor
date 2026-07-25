@@ -7,23 +7,14 @@ using WDE.Common.Services;
 
 namespace RenderingTester;
 
-public class GameStandaloneWindow : TheEngineOpenTkWindow, IClipboardService
+public class GameStandaloneWindow : TheEngineVulkanOpenTkWindow, IClipboardService
 {
     private readonly MainThread mainThreadImpl;
-    private readonly SingleThreadSynchronizationContext ctx;
 
-    public GameStandaloneWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings, IGame game, MainThread mainThreadImpl, SingleThreadSynchronizationContext ctx) :
-        base(gameWindowSettings, nativeWindowSettings, game)
+    public GameStandaloneWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings, IGame game, MainThread mainThreadImpl) :
+        base(nativeWindowSettings, game)
     {
         this.mainThreadImpl = mainThreadImpl;
-        this.ctx = ctx;
-    }
-
-    protected override void OnUpdateFrame(FrameEventArgs args)
-    {
-        base.OnUpdateFrame(args);
-        ctx.ExecuteTasks();
-        mainThreadImpl.Tick(TimeSpan.FromSeconds(args.Time));
     }
 
     public Task<string?> GetText()

@@ -23,6 +23,7 @@ public class LocalToWorldInspector : IRefInspectorDrawer<LocalToWorld>
             component = newLocalToWorld;
             if (engine.entityManager.HasComponent<DirtyPosition>(entity))
                 engine.entityManager.GetComponent<DirtyPosition>(entity).Enable();
+            engine.physicsManager.SyncDynamicPoseFromEditor(entity, newLocalToWorld.Position, newLocalToWorld.Rotation);
         }
     }
 }

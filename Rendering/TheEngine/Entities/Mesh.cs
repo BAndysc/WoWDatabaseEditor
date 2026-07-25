@@ -6,9 +6,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using OpenGLBindings;
-using TheAvaloniaOpenGL;
-using TheAvaloniaOpenGL.Resources;
+using Silk.NET.Vulkan;
+using TheEngine.Resources;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheEngine.Structures;
@@ -35,19 +34,11 @@ namespace TheEngine.Entities
 
         public BoundingBox Bounds => bounds;
         
-        public IndexType IndexType => bigIndices != null ? IndexType.Int : IndexType.Short;
+        public IndexType IndexType => bigIndices != null ? IndexType.Uint32 : IndexType.Uint16;
 
         ~Mesh()
         {
             engine.meshManager.AddToDisposeList(this);
-        }
-
-        public void Activate()
-        {
-            Debug.Assert(!managedOnly);
-            engine.Device.device.BindVertexArray(VertexArrayObject);
-            VerticesBuffer!.Activate(0);
-            IndicesBuffer!.Activate(0);
         }
 
         public int IndexCount(int submesh)
@@ -134,7 +125,6 @@ namespace TheEngine.Entities
             {
                 VerticesBuffer = engine.Backend.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, 1);
                 IndicesBuffer = engine.Backend.CreateBuffer<byte>(BufferTypeEnum.Index, 4);
-                engine.Backend.OnMeshCreated(this);
             }
         }
 
@@ -152,12 +142,15 @@ namespace TheEngine.Entities
             {
                 VerticesBuffer = engine.Backend.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, vertices);
                 IndicesBuffer = engine.Backend.CreateBuffer<byte>(BufferTypeEnum.Index, MemoryMarshal.AsBytes(indices.AsSpan(0, indicesCount)));
-                engine.Backend.OnMeshCreated(this);
             }
         }
 
         public void SetSubmeshCount(int count)
         {
+            // submesh ids are packed into a fixed-width field of the mesh renderer sort key (see SortKey).
+            if (count > SortKey.MaxSubMeshes)
+                throw new InvalidOperationException($"More than {SortKey.MaxSubMeshes} submeshes are not supported: the submesh id is packed into a fixed-width field of the mesh renderer sort key.");
+
             if (count == 1)
                 submeshesRange = null;
             else
@@ -227,7 +220,7 @@ namespace TheEngine.Entities
         public void SetIndices(ReadOnlySpan<uint> indices, int submesh)
         {
             if (shortIndices != null)
-                throw new Exception("Can't SetIndices(ushort) on a mesh that was created with SetIndices(uint)");
+                throw new Exception("Can't SetIndices(uint) on a mesh that was created with SetIndices(ushort)");
             
             if (submeshesRange == null && submesh == 0)
             {
@@ -242,7 +235,8 @@ namespace TheEngine.Entities
                 if (existingIndices.length == 0) // no indices so far
                 {
                     var newIndices = new uint[indicesCount + indices.Length];
-                    Array.Copy(this.shortIndices, newIndices, indicesCount);
+                    if (indicesCount > 0)
+                        Array.Copy(this.bigIndices!, newIndices, indicesCount);
                     indices.CopyTo(newIndices.AsSpan(indicesCount, indices.Length));
                     //Array.Copy(indices, 0, newIndices, this.indices.Length, indices.Length);
                     submeshesRange[submesh] = (indicesCount, indices.Length);

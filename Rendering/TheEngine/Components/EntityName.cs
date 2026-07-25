@@ -18,7 +18,11 @@ public struct EntityName : IComponentData
     {
         fixed (FixedString31* ptr = &bytes)
         {
-            return new Span<byte>(ptr, actualLength + 1);
+            // clamp defensively so a stale/corrupted length can't produce an unterminated span
+            var len = (int)Math.Min(actualLength, (byte)MaxLength);
+            var bytePtr = (byte*)ptr;
+            bytePtr[len] = 0;
+            return new Span<byte>(bytePtr, len + 1);
         }
     }
 

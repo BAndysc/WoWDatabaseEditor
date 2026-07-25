@@ -1,15 +1,15 @@
-#version 330 core
+#version 450
 #include "theengine.cginc"
 
-// vertex pulling: no vertex attributes, two float4 texels per vertex
-// [gl_VertexID * 2] = world position, [gl_VertexID * 2 + 1] = color
-uniform samplerBuffer LineVertices;
+// vertex pulling: no vertex attributes are read, two vec4 per vertex
+// [gl_VertexIndex * 2] = world position, [gl_VertexIndex * 2 + 1] = color
+layout(std430, set = 1, binding = 1) readonly buffer LineVertices { vec4 lineVerts[]; };
 
-out vec4 lineColor;
+layout(location = 0) out vec4 lineColor;
 
 void main()
 {
-    vec4 worldPos = texelFetch(LineVertices, gl_VertexID * 2);
-    lineColor = texelFetch(LineVertices, gl_VertexID * 2 + 1);
+    vec4 worldPos = lineVerts[gl_VertexIndex * 2];
+    lineColor = lineVerts[gl_VertexIndex * 2 + 1];
     gl_Position = projection * view * vec4(worldPos.xyz, 1.0);
 }

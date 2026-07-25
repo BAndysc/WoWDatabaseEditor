@@ -4,8 +4,8 @@ using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
 using WDE.MapRenderer.Managers.Entities;
 using WDE.MpqReader.DBC;
-using ImGuiNET;
-using TheAvaloniaOpenGL.Resources;
+using Hexa.NET.ImGui;
+using TheEngine.Resources;
 using TheEngine;
 using TheEngine.Components;
 using TheEngine.ECS;
@@ -162,7 +162,7 @@ public class TestModule : IGameModule
                         matches = true;
                     // Search by model name
                     else if (modelDataStore.TryGetValue((uint)displayInfo.ModelId, out var modelData) &&
-                        modelData.ModelName.ToString().Contains(displayInfoSearch, StringComparison.OrdinalIgnoreCase))
+                        modelData->ModelName.ToString().Contains(displayInfoSearch, StringComparison.OrdinalIgnoreCase))
                         matches = true;
                     if (matches)
                         filteredDisplayInfoIndices.Add(i);
@@ -179,8 +179,8 @@ public class TestModule : IGameModule
         if (ImGui.BeginListBox("##displayInfos", new System.Numerics.Vector2(400, 400)))
         {
             ImGuiListClipper clipper = new ImGuiListClipper();
-            ImGuiNative.ImGuiListClipper_Begin(&clipper, displayCount, ImGui.GetTextLineHeightWithSpacing());
-            while (ImGuiNative.ImGuiListClipper_Step(&clipper) != 0)
+            clipper.Begin(displayCount, ImGui.GetTextLineHeightWithSpacing());
+            while (clipper.Step())
             {
                 for (int idx = clipper.DisplayStart; idx < clipper.DisplayEnd; ++idx)
                 {
@@ -188,7 +188,7 @@ public class TestModule : IGameModule
                     var displayInfo = displayInfoStore.ElementAt(i);
                     string modelName = "Unknown";
                     if (modelDataStore.TryGetValue((uint)displayInfo.ModelId, out var modelData))
-                        modelName = modelData.ModelName.ToString();
+                        modelName = modelData->ModelName.ToString();
                     string label = $"{displayInfo.Id}: {modelName} (ModelId: {displayInfo.ModelId})";
                     bool isSelected = selectedDisplayInfoIndex == i;
                     if (ImGui.Selectable(label, isSelected))
@@ -207,7 +207,7 @@ public class TestModule : IGameModule
                         ImGui.SetItemDefaultFocus();
                 }
             }
-            ImGuiNative.ImGuiListClipper_End(&clipper);
+            clipper.End();
             ImGui.EndListBox();
         }
         ImGui.End(); // End Creature Display Infos window
@@ -299,9 +299,14 @@ public class TestModule : IGameModule
         HashSet<int> uniqueModels = new HashSet<int>();
         foreach (var disp in gameContext.DbcManager.CreatureDisplayInfoStore)
         {
-            if (!uniqueModels.Add(disp.ModelId))
-                continue;
-            creatureInstance = new CreatureInstance(gameContext, "", disp.Id, RenderLayer.Default);
+            uint dispId;
+            unsafe
+            {
+                dispId = disp->Id;
+                if (!uniqueModels.Add(disp->ModelId))
+                    continue;
+            }
+            creatureInstance = new CreatureInstance(gameContext, "", dispId, RenderLayer.Default);
             await creatureInstance.Load();
             if (creatureInstance.Model == null)
                 continue;
@@ -336,17 +341,10 @@ public class TestModule : IGameModule
         var m = await gameContext.MdxManager.LoadM2Mesh(new FileId(196342));
 
         Entity entity = Entity.Empty;
-        INativeBuffer<Matrix>? bones = null;
-        INativeBuffer<Vector4>? colors = null;
-        INativeBuffer<Matrix>? textureTransforms = null;
+        int wfBoneBase = 0, wfColorBase = 0, wfTexBase = 0;
         if (m.HasAnimations)
         {
-            bones = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
-            bones.UpdateBuffer(AnimationSystem.IdentityMatrix(m.model.bones.Length).Span);
-            colors = engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
-            colors.UpdateBuffer(AnimationSystem.IdentityColors(m.model.colors.Length).Span);
-            textureTransforms = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
-            textureTransforms.UpdateBuffer(AnimationSystem.IdentityMatrix(m.model.texture_transforms.Length + 1).Span);
+            (wfBoneBase, wfColorBase, wfTexBase) = gameContext.AnimationSystem.AllocateAnimationSlots(m.model);
         }
 
         bool first = true;
@@ -357,19 +355,17 @@ public class TestModule : IGameModule
             {
                 if (first)
                 {
-                    entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectAnimatedArchetype,"Waterfall");
+                    entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectAnimatedArchetype, "Waterfall");
                     entityManager.SetManagedComponent(entity, new M2AnimationComponentData(m.model)
                     {
                         SetNewAnimation = 0,
-                        _buffer = bones!,
-                        _colors = colors!,
-                        _textureTransforms = textureTransforms!
+                        BoneBase = wfBoneBase,
+                        ColorBase = wfColorBase,
+                        TexTransformBase = wfTexBase,
+                        _boneCache = AnimationSystem.IdentityMatrix(m.model.bones.Length).ToArray(),
+                        _colorCache = AnimationSystem.IdentityColors(m.model.colors.Length).ToArray(),
+                        _texTransformCache = AnimationSystem.IdentityMatrix(m.model.texture_transforms.Length + 1).ToArray(),
                     });
-                    var instanceRenderer = new MaterialInstanceRenderData();
-                    instanceRenderer.SetBuffer("boneMatrices", bones!);
-                    instanceRenderer.SetBuffer("vertexColors", colors!);
-                    instanceRenderer.SetBuffer("textureTransforms", textureTransforms!);
-                    entityManager.SetManagedComponent(entity, instanceRenderer);
                 }
             }
             else
@@ -379,7 +375,11 @@ public class TestModule : IGameModule
             }
 
             var t = new Transform();
-            var instanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
+            var instanceData = new Int4(
+                material.batch.colorIndex < 0 ? -1 : wfColorBase + material.batch.colorIndex,
+                material.batch.textureTransformIndex < 0 ? -1 : wfTexBase + material.batch.textureTransformIndex,
+                material.batch.textureTransformIndex2 < 0 ? -1 : wfTexBase + material.batch.textureTransformIndex2,
+                wfBoneBase);
             renderManager.SetupRendererEntity(entity, m.mesh.Handle, material.material, material.submesh, t.LocalToWorldMatrix, instanceData);
             entityManager.AddManagedComponent(entity, new MdxRenderer(m) { Owner = entity });
             first = false;

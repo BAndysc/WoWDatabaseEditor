@@ -19,10 +19,9 @@ namespace TheEngine.Components
 
         public static Entity GetRoot(this Entity entity, IEntityManager entityManager)
         {
-            var copyTransformArchetype = entityManager.NewArchetype().WithComponentData<CopyParentTransform>();
-            while (entityManager.Exist(entity) && entityManager.Is(entity, copyTransformArchetype))
+            while (entityManager.Exist(entity) && entityManager.Is(entity, entityManager.RelationshipArchetype))
             {
-                entity = entityManager.GetComponent<CopyParentTransform>(entity).Parent;
+                entity = entityManager.GetComponent<Relationship>(entity).Parent;
             }
 
             return entity;
@@ -78,6 +77,8 @@ namespace TheEngine.Components
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set => matrix = Utilities.TRS(Position, value, Scale);
         }
+
+        public static readonly LocalToWorld Identity = new(Matrix4x4.Identity);
 
         public static implicit operator Matrix(LocalToWorld d) => d.matrix;
         public static explicit operator LocalToWorld(Matrix b) => new LocalToWorld(b);

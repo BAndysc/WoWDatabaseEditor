@@ -13,11 +13,19 @@
     public struct PipelineHandle : IEquatable<PipelineHandle>
     {
         private int handle;
-        internal int Handle => handle - 1;
+        internal int Handle => (handle & 0xFFFFFF) - 1;
 
-        internal PipelineHandle(int id)
+        internal int SortKey => handle; // encoded pipeline handle and shader handle
+
+        // Decoded fields used to build MeshRenderer.SortKey. ShaderId is the top 8 bits;
+        // PipelineId is the raw pipeline index (== Handle), -1 when empty.
+        internal int ShaderId => (handle >> 24) & 0xFF;
+        internal int PipelineId => Handle;
+
+        // PipelineHandle has encoded shader handle in top 8 bits for fast sorting
+        internal PipelineHandle(int id, int shaderHandle)
         {
-            handle = id + 1;
+            handle = (id + 1) | (shaderHandle << 24);
         }
 
         public bool IsEmpty => handle == 0;

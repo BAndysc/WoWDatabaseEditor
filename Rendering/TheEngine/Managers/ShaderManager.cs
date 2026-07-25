@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using TheAvaloniaOpenGL;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine;
+using TheEngine.Resources;
 using TheEngine.Config;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
@@ -74,7 +74,6 @@ namespace TheEngine.Managers
                     }
                 }
 
-                engine.materialManager.InvalidateShaderCache();
                 reloadAllShaders = false;
             }
         }
@@ -95,6 +94,11 @@ namespace TheEngine.Managers
 
             if (shaderHandles.TryGetValue(path, out var shader))
                 return shader;
+
+            // the pipeline sort key (Pipeline.SortKey) packs the shader id into 8 bits, so the
+            // engine supports at most 255 distinct shaders.
+            if (byHandleShaders.Count >= 255)
+                throw new InvalidOperationException("More than 255 shaders are not supported: the shader id is packed into the top 8 bits of the pipeline sort key.");
 
             var newShader = engine.Backend.LoadShader(path, new string[] { Constants.SHADER_INCLUDE_DIR, shaderDir });
 

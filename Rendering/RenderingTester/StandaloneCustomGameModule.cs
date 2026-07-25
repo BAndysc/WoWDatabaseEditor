@@ -1,16 +1,16 @@
 using TheEngine.Coroutines;
 using System.Collections;
 using System.Windows.Input;
-using Avalonia.Input;
-using ImGuiNET;
+using Hexa.NET.ImGui;
 using JetBrains.Profiler.Api;
 using OpenTK.Platform.Windows;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine.Resources;
 using TheEngine;
 using TheEngine.Components;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
+using TheEngine.Input;
 using TheEngine.Interfaces;
 using TheEngine.Utils;
 using TheMaths;
@@ -94,6 +94,35 @@ public class StandaloneCustomGameModule : IGameModule
             MeasureProfiler.StartCollectingData();
             profiling = true;
         }
+
+        if ((inputManager.Mouse.HasJustReleased(MouseButton.Right)
+            &&
+               (inputManager.Mouse.LastClickScreenPosition - inputManager.Mouse.ScreenPoint).LengthSquared() < 10))
+        {
+            currentMenu = GenerateContextMenu();
+            ImGui.OpenPopup("contextmenu");
+        }
+
+        if (currentMenu != null)
+        {
+            if (ImGui.BeginPopup("contextmenu"))
+            {
+                foreach (var option in currentMenu)
+                {
+                    if (option.Item1 == "-")
+                        ImGui.Text("----");
+                    else
+                    {
+                        if (ImGui.Selectable(option.Item1))
+                        {
+                            option.Item2.Execute(option.Item3);
+                            ImGui.CloseCurrentPopup();
+                        }
+                    }
+                }
+                ImGui.EndPopup();
+            }
+        }
     }
 
     public void Render(float delta)
@@ -116,36 +145,4 @@ public class StandaloneCustomGameModule : IGameModule
     }
 
     private List<(string, ICommand, object?)>? currentMenu;
-    
-    public void RenderGUI()
-    {
-        if (inputManager.Mouse.HasJustClicked(MouseButton.Right))
-        {
-            currentMenu = GenerateContextMenu();
-            ImGui.OpenPopup("contextmenu");
-        }
-
-        if (currentMenu != null)
-        {
-            if (ImGui.BeginPopupContextItem("contextmenu"))
-            {
-                foreach (var option in currentMenu)
-                {
-                    if (option.Item1 == "-")
-                        ImGui.Text("----");
-                    else
-                    {
-                        if (ImGui.Selectable(option.Item1))
-                        {
-                            option.Item2.Execute(option.Item3);
-                            ImGui.CloseCurrentPopup();
-                        }   
-                    }
-                }
-                ImGui.EndPopup();
-            }
-            else
-                currentMenu = null;
-        }
-    }
 }

@@ -1,0 +1,21 @@
+#version 450
+#include "../internalShaders/theengine.cginc"
+
+#ifndef DEPTH_PASS
+layout(location = 3) out vec4 WorldPos;
+layout(location = 5) out vec3 Normal;
+layout(location = 7) flat out int instanceID;
+#endif
+
+void main()
+{
+    VERTEX_SETUP_INSTANCING;
+
+    vec4 worldPos = model * vec4(position.xyz, 1.0);
+    gl_Position = projection * view * worldPos;
+#ifndef DEPTH_PASS
+    instanceID = gl_InstanceIndex;
+    WorldPos = worldPos;
+    Normal = mat3(transpose(inverseModel)) * normalize(normal.xyz);
+#endif
+}

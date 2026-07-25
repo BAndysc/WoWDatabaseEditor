@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    <!-- Distinct assembly name so it never collides with the abandoned managed Rendering/VMASharp -->
+    <AssemblyName>VmaNative</AssemblyName>
+    <RootNamespace>VMASharp</RootNamespace>
+    <!-- Vendored generated bindings: silence doc/unused-field noise (this is not our source) -->
+    <NoWarn>$(NoWarn);CS1591;CS0649;CS0169;CA1416;CS0660;CS0661</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Silk.NET.Vulkan" Version="2.22.0" />
+    <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.22.0" />
+  </ItemGroup>
+
+  <!-- DIAGNOSTIC: the VMA P/Invoke bindings (Generated.cs) are disabled; NaiveVmaAllocator.cs
+       provides a one-allocation-per-resource backend instead, to rule VMA in or out. To restore
+       VMA, re-add the two Compile Includes below and delete NaiveVmaAllocator.cs. -->
+  <!--
+  <ItemGroup>
+    <Compile Include="..\VMABindings\VMABindings\Generated.cs" Link="Generated.cs" />
+    <Compile Include="..\VMABindings\VMABindings\NativeTypeNameAttribute.cs" Link="NativeTypeNameAttribute.cs" />
+  </ItemGroup>
+  -->
+
+
+</Project>

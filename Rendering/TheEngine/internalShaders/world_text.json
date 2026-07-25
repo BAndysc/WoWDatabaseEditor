@@ -1,6 +1,6 @@
 {
   "Pixel": {
-    "Path": "internalShaders/sdf.frag"
+    "Path": "internalShaders/world_text.frag"
   },
   "ZWrite": false,
   "Vertex": {

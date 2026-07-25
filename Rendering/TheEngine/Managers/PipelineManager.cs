@@ -15,12 +15,15 @@ public class PipelineManager : IPipelineManager
         this.engine = engine;
     }
 
-    public PipelineHandle MaxHandle => new PipelineHandle(pipelines.Count - 1);
-
     public Pipeline CreatePipeline(ShaderHandle shaderHandle, PrimitiveTopology topology,
         GraphicsPipelineDescription description, bool smallLayout, OutputDescription? outputDescription)
     {
-        var handle = new PipelineHandle(pipelines.Count);
+        // the pipeline id is packed into a fixed-width field of the mesh renderer sort key (see SortKey).
+        if (pipelines.Count >= SortKey.MaxPipelines)
+            throw new InvalidOperationException($"More than {SortKey.MaxPipelines} pipelines are not supported: the pipeline id is packed into a fixed-width field of the mesh renderer sort key.");
+
+        var handle = new PipelineHandle(pipelines.Count, shaderHandle.Handle);
+
         var pipeline = new Pipeline(handle, outputDescription ?? IRenderManager.DefaultOutput, shaderHandle, engine.shaderManager.GetShaderByHandle(shaderHandle), topology, description, smallLayout);
         pipelines.Add(pipeline);
         return pipeline;

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using TheAvaloniaOpenGL.Resources;
+using TheEngine.Resources;
 using TheEngine.fonts;
 using TheEngine.Handles;
 using TheEngine.Interfaces;

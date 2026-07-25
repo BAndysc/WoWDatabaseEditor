@@ -1,4 +1,4 @@
-using TheAvaloniaOpenGL.Resources;
+using TheEngine.Resources;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Interfaces;
@@ -7,51 +7,6 @@ using TheMaths;
 
 namespace TheEngine.Components
 {
-    public class MaterialInstanceRenderData : IManagedComponentData
-    {
-        public Dictionary<string, INativeBuffer>? bufferByName { get; private set; }
-        public Dictionary<GlobalUniformHandle, INativeBuffer>? structuredBuffers { get; private set; }
-
-        public INativeBuffer? GetBuffer(string name)
-        {
-            if (bufferByName != null && bufferByName.TryGetValue(name, out var buf))
-                return buf;
-            return null;
-        }
-        
-        public void SetBuffer(string name, INativeBuffer buffer)
-        {
-            var loc = Material.GetUniformLocation(name);
-            bufferByName ??= new();
-            bufferByName[name] = buffer;
-            structuredBuffers ??= new();
-            structuredBuffers[loc] = buffer;
-        }
-
-        public void Activate(ShaderPass pass, int slot)
-        {
-            if (structuredBuffers != null)
-            {
-                foreach (var buffer in structuredBuffers)
-                {
-                    if (!pass.HasGlobalUniform(buffer.Key))
-                        continue;
-                    buffer.Value.Activate(slot);
-                    pass.SetUniformInt(buffer.Key, slot);
-                    slot++;
-                }
-            }
-        }
-
-        public void Clear()
-        {
-            // ints?.Clear();
-            // instancedInts?.Clear();
-            structuredBuffers?.Clear();
-            bufferByName?.Clear();
-        }
-    }
-
     public struct ShareRenderEnabledBit : IComponentData
     {
         public Entity OtherEntity;
@@ -84,6 +39,11 @@ namespace TheEngine.Components
         public bool IsForceDisabled()
         {
             return (enabled & 0b10) == 0b10;
+        }
+
+        public void ForceDisableCulling()
+        {
+            IsCulled = false;
         }
 
         internal bool IsCulled

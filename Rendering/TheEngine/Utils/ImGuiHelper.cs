@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ImGuiNET;
+using Hexa.NET.ImGui;
+using Tedd;
 using TheMaths;
 
 namespace TheEngine.Utils.ImGuiHelper
@@ -148,6 +149,22 @@ namespace TheEngine.Utils.ImGuiHelper
             ImGui.SetNextWindowBgAlpha(this.Alpha);
             bool isopen = true;
             ImGui.Begin($"###Box{id}", ref isopen, boxFlags);
+            ImGui.Text(message);
+            ImGui.End();
+        }
+
+        public void Draw(ReadOnlySpan<byte> message)
+        {
+            UpdatePosition();
+            ImGui.SetNextWindowPos(this.Position, ImGuiCond.Always, this.Pivot);
+            ImGui.SetNextWindowBgAlpha(this.Alpha);
+            bool isopen = true;
+            Span<byte> boxId = stackalloc byte[6 + 20 + 1];
+            var cpy = boxId;
+            cpy.MoveWrite("###box"u8);
+            cpy.MoveWriteAsDecimal(id);
+            cpy.MoveWrite((byte)0);
+            ImGui.Begin(boxId, ref isopen, boxFlags);
             ImGui.Text(message);
             ImGui.End();
         }

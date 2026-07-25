@@ -38,19 +38,43 @@ namespace TheEngine.Structures
         public float ZNear;
 
         public float ZFar;
-        public float Align3;
-        public float Align4;
-        public float Align5;
-        
-        
-    }
+        public int LightCount;
+        public int TilesX;
+        public int TilesY;
+        public int DecalCount;
+        // 0 = main view's Light/DecalGrid+IndexList, 1 = the scene view's own independent set -
+        // see Constants.SCENE_*_BINDING and theengine.cginc's lighting()/ApplyDecals().
+        public int GridSet;
 
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ObjectBuffer
-    {
-        public Matrix WorldMatrix;
-        public Matrix InverseWorldMatrix;
-        public uint ObjectIndex;
-        public Int4 DrawData;
+        // std140 aligns the following mat4 array to a 16-byte boundary. GridSet ends at byte 440,
+        // so 8 bytes of explicit padding push CascadeViewProj0 to 448, matching the shader's std140
+        // layout. WITHOUT this the shader reads shifted garbage matrices and shadows break. Mirrors
+        // gridSetPad0/1 in theengine.cginc's SceneData block.
+        public int GridSetPad0;
+        public int GridSetPad1;
+
+        // Cascaded shadow maps - mirrors theengine.cginc's SceneData block (must match field order/layout).
+        // The four matrices map to `mat4 cascadeViewProj[NUM_CASCADES]` (std140 stride 64 == sizeof(Matrix)),
+        // so they MUST stay contiguous and in order. CascadeCount == 0 disables shadow sampling.
+        public Matrix CascadeViewProj0;
+        public Matrix CascadeViewProj1;
+        public Matrix CascadeViewProj2;
+        public Matrix CascadeViewProj3;
+        public Vector4 CascadeSplits;
+        public int CascadeTexture0;
+        public int CascadeTexture1;
+        public int CascadeTexture2;
+        public int CascadeTexture3;
+        public int CascadeCount;
+        public float ShadowMapResolution;
+        public float ShadowNormalBias;
+        public float ShadowConstantBias;
+        // PCF blur + cascade-blend controls (own std140 16-byte block, padded). ShadowPcfRadius =
+        // kernel half-size, ShadowBlur = per-tap texel spacing, ShadowCascadeBlend = cross-fade band
+        // fraction. Mirrors theengine.cginc's SceneData block.
+        public int ShadowPcfRadius;
+        public float ShadowBlur;
+        public float ShadowCascadeBlend;
+        public int ShadowPad1;
     }
 }

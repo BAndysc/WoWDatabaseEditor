@@ -9,10 +9,11 @@ namespace TheEngine.ECS
         private BitVector32 usedComponents = new BitVector32();
         private BitVector32 usedManagedComponents = new BitVector32();
         private readonly List<IComponentTypeData> components = new();
-        public IList<IComponentTypeData> Components => components;
+        public List<IComponentTypeData> Components => components;
         private readonly List<IManagedComponentTypeData> managedComponents = new();
-        public IList<IManagedComponentTypeData> ManagedComponents => managedComponents;
-        internal EntityManager EntityManager { get; }
+        public List<IManagedComponentTypeData> ManagedComponents => managedComponents;
+        private EntityManager entityManager;
+        public IEntityManager EntityManager => entityManager;
         public uint ComponentBitMask => (uint)usedComponents.Data;
         public uint ManagedComponentBitMask => (uint)usedManagedComponents.Data;
 
@@ -20,12 +21,12 @@ namespace TheEngine.ECS
         
         internal Archetype(EntityManager entityManager)
         {
-            EntityManager = entityManager;
+            this.entityManager = entityManager;
         }
         
         public Archetype WithManagedComponentData<T>() where T : class, IManagedComponentData
         {
-            var n = new Archetype(EntityManager);
+            var n = new Archetype(entityManager);
             n.components.AddRange(components);
             n.usedComponents = usedComponents;
             
@@ -42,12 +43,12 @@ namespace TheEngine.ECS
 
         public Archetype WithManagedComponentData(Type t)
         {
-            var n = new Archetype(EntityManager);
+            var n = new Archetype(entityManager);
             n.components.AddRange(components);
             n.usedComponents = usedComponents;
 
             n.managedComponents.AddRange(managedComponents);
-            var typeData = EntityManager.ManagedTypeData(t);
+            var typeData = entityManager.ManagedTypeData(t);
             n.managedComponents.Add(typeData);
             n.usedManagedComponents = usedManagedComponents;
             n.usedManagedComponents[(int)typeData.Hash] = true;
@@ -64,15 +65,15 @@ namespace TheEngine.ECS
         
         internal Archetype WithComponentData(System.Type t)
         {
-            var n = new Archetype(EntityManager);
+            var n = new Archetype(entityManager);
             n.managedComponents.AddRange(managedComponents);
             n.usedManagedComponents = usedManagedComponents;
 
             n.components.AddRange(components);
             // For regular components, create type data with isArray=false explicitly
-            var index = EntityManager.GetTypeIndex(t);
+            var index = entityManager.GetTypeIndex(t);
             var typeData = (IComponentTypeData)Activator.CreateInstance(typeof(ComponentTypeData<>).MakeGenericType(t), index)!;
-            EntityManager.RegisterTypeData(t, typeData);
+            entityManager.RegisterTypeData(t, typeData);
             n.components.Add(typeData);
             n.usedComponents = usedComponents;
             n.usedComponents[(int)typeData.Hash] = true;
@@ -84,7 +85,7 @@ namespace TheEngine.ECS
 
         public Archetype Includes(Archetype other)
         {
-            var n = new Archetype(EntityManager);
+            var n = new Archetype(entityManager);
             n.managedComponents.AddRange(managedComponents);
             n.usedManagedComponents = usedManagedComponents;
             n.components.AddRange(components);

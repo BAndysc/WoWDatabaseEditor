@@ -42,7 +42,7 @@ namespace TheEngine.ECS
         }
     }
     
-    public sealed class ManagedComponentDataAccess<T> where T : IManagedComponentData
+    public struct ManagedComponentDataAccess<T> where T : IManagedComponentData
     {
         private readonly object?[] data;
         private readonly int[] sparseReverseEntityMapping;

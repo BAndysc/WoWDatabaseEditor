@@ -1,5 +1,6 @@
-using ImGuiNET;
+using Hexa.NET.ImGui;
 using TheEngine.Input;
+using TheMaths;
 
 namespace TheEngine.Windows;
 
@@ -43,6 +44,7 @@ public class InputDebugWindow
         IsOpen = open;
 
         var mouse = engine.inputManager.mouse;
+        var keyboard = engine.inputManager.keyboard;
 
         if (mouse.RawHasJustClicked(MouseButton.Left)) LastRawEvents.LeftClick = engine.FrameCount;
         if (mouse.RawHasJustClicked(MouseButton.Right)) LastRawEvents.RightClick = engine.FrameCount;
@@ -54,6 +56,15 @@ public class InputDebugWindow
         if (mouse.HasJustReleased(MouseButton.Right)) LastGameEvents.RightRelease = engine.FrameCount;
 
         ImGui.Columns(2);
+        ImGuiEx.TextUnformatted("Axis\0"u8);
+        ImGui.NextColumn();
+        var axis = keyboard.GetAxis(Vectors.Down, Key.W, Key.S) +
+                       keyboard.GetAxis(Vectors.Backward, Key.A, Key.D) +
+                       keyboard.GetAxis(Vectors.Left, Key.E, Key.Q);
+        ImGui.TextUnformatted($"{axis.X:0.000}, {axis.Y:0.000}, {axis.Z:0.000}");
+        ImGui.NextColumn();
+
+        
         ImGuiEx.TextUnformatted("Mouse delta\0"u8);
         ImGui.NextColumn();
         ImGui.TextUnformatted($"{mouse.Delta.X:0.000}, {mouse.Delta.Y:0.000}");
@@ -65,7 +76,7 @@ public class InputDebugWindow
         ImGui.NextColumn();
 
         ImGui.Columns(1);
-        ImGui.PushFont(boldFont);
+        ImGui.PushFont(boldFont, 0);
         ImGui.TextUnformatted("Game view:");
         ImGui.PopFont();
         ImGui.Columns(2);
@@ -111,7 +122,7 @@ public class InputDebugWindow
         PrintLastEvents(in LastGameEvents);
 
         ImGui.Columns(1);
-        ImGui.PushFont(boldFont);
+        ImGui.PushFont(boldFont, 0);
         ImGui.TextUnformatted("Raw events:");
         ImGui.PopFont();
         ImGui.Columns(2);

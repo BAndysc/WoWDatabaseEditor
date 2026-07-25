@@ -18,5 +18,13 @@ namespace TheEngine.Managers
         public ulong EntitiesUnmanagedBytes { get; internal set; }
 
         public long BufferBytes { get; internal set; }
+
+        public int GpuAllocationsPerFrame { get; internal set; }
+
+        public int GpuFreesPerFrame { get; internal set; }
+
+        public int GpuDeviceAllocationsPerFrame { get; internal set; }
+
+        public int GpuDeviceFreesPerFrame { get; internal set; }
     }
 }

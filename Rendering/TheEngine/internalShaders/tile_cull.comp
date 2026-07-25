@@ -1,0 +1,181 @@
+#version 450
+#include "theengine.cginc"
+
+// One workgroup per screen tile; one thread per texel of the tile.
+layout(local_size_x = FORWARD_PLUS_TILE_SIZE, local_size_y = FORWARD_PLUS_TILE_SIZE) in;
+
+layout(push_constant) uniform PushConstants
+{
+    int depthTextureIndex;
+    int cullScreenWidth;
+    int cullScreenHeight;
+    // 0 = write the main view's LightGrid/DecalGrid+IndexList, 1 = write the scene view's own
+    // independent set (see SceneData.gridSet, read by lighting()/ApplyDecals()).
+    int isSceneView;
+};
+
+shared uint sMinDepth;
+shared uint sMaxDepth;
+shared uint sLightCount;
+shared uint sLightIndices[FORWARD_PLUS_MAX_LIGHTS_PER_TILE];
+shared uint sDecalCount;
+shared uint sDecalIndices[FORWARD_PLUS_MAX_DECALS_PER_TILE];
+
+// Direction (world space, from the camera) corresponding to a point in NDC space -
+// used to build the tile's side frustum planes from its screen-space bounds.
+vec3 UnprojectDir(vec2 ndc)
+{
+    vec4 viewSpace = projectionInv * vec4(ndc, 0.0, 1.0);
+    return normalize(mat3(viewInv) * viewSpace.xyz);
+}
+
+void main()
+{
+    uvec2 tile = gl_WorkGroupID.xy;
+    // isSceneView selects which GRID_SLOT_TILES-sized half of the grid/index buffers this
+    // dispatch's results land in (slot 0 = main view, slot 1 = scene view) - see
+    // TheAvaloniaOpenGL.Constants.FORWARD_PLUS_GRID_SLOTS. Folding the offset into tileIndex here
+    // means every other use below (the grid write and the index array's base offset) needs no
+    // further branching - it's already indexing into the correct half.
+    uint tileIndex = tile.y * uint(tilesX) + tile.x + uint(isSceneView) * uint(FORWARD_PLUS_GRID_SLOT_TILES);
+    uint localIndex = gl_LocalInvocationIndex;
+
+    if (localIndex == 0u)
+    {
+        sMinDepth = 0xFFFFFFFFu;
+        sMaxDepth = 0u;
+        sLightCount = 0u;
+        sDecalCount = 0u;
+    }
+    barrier();
+
+    ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy);
+    float depth = 1.0;
+    if (pixelCoord.x < cullScreenWidth && pixelCoord.y < cullScreenHeight)
+        depth = SAMPLE_BINDLESS_TEXEL(depthTextureIndex, pixelCoord);
+
+    uint depthBits = floatBitsToUint(depth);
+    atomicMin(sMinDepth, depthBits);
+    atomicMax(sMaxDepth, depthBits);
+    barrier();
+
+    // LinearEyeDepth (projectionInv reconstruction) is on the same view-space scale as the
+    // light's lightEyeZ below, so the depth slab is correctly calibrated against it.
+    float minEyeZ = LinearEyeDepth(uintBitsToFloat(sMinDepth));
+    float maxEyeZ = LinearEyeDepth(uintBitsToFloat(sMaxDepth));
+
+    // tile frustum side planes (left, right, top, bottom), each through the camera position
+    const uint tileSize = uint(FORWARD_PLUS_TILE_SIZE);
+    // Native top-down framebuffer (negative-height viewport): the depth texel grid is stored
+    // top-down, so texel row 0 == NDC y = +1. tile.y therefore maps to NDC y FLIPPED via
+    // 1.0 - ..., matching the geometry; the direct mapping would mirror each tile's frustum
+    // vertically and leave a tile-quantized staircase on lights.
+    vec2 ndcMin = vec2((float(tile.x * tileSize) / float(cullScreenWidth)) * 2.0 - 1.0,
+                        1.0 - (float((tile.y + 1u) * tileSize) / float(cullScreenHeight)) * 2.0);
+    vec2 ndcMax = vec2((float((tile.x + 1u) * tileSize) / float(cullScreenWidth)) * 2.0 - 1.0,
+                        1.0 - (float(tile.y * tileSize) / float(cullScreenHeight)) * 2.0);
+
+    vec3 corners[4];
+    corners[0] = UnprojectDir(vec2(ndcMin.x, ndcMin.y));
+    corners[1] = UnprojectDir(vec2(ndcMax.x, ndcMin.y));
+    corners[2] = UnprojectDir(vec2(ndcMax.x, ndcMax.y));
+    corners[3] = UnprojectDir(vec2(ndcMin.x, ndcMax.y));
+
+    vec4 planes[4]; // xyz = inward-facing normal (world space), w = -dot(normal, cameraPos)
+    for (int i = 0; i < 4; i++)
+    {
+        // corners are wound CCW in NDC, so cross(corner[i], corner[i+1]) points OUT of the
+        // frustum; reverse the operands so the normal faces inward (toward the tile interior),
+        // otherwise the side-plane test false-negatives lights deep inside the frustum and the
+        // per-tile light lists get hard sawtooth edges along screen-space directions.
+        vec3 n = normalize(cross(corners[(i + 1) & 3], corners[i]));
+        planes[i] = vec4(n, -dot(n, cameraPos.xyz));
+    }
+
+    // distribute lights across the workgroup's threads
+    for (uint i = localIndex; i < uint(lightCount); i += uint(FORWARD_PLUS_TILE_SIZE * FORWARD_PLUS_TILE_SIZE))
+    {
+        GpuPointLight light = lights[i];
+        vec3 pos = light.positionRange.xyz;
+        float radius = light.positionRange.w;
+
+        bool visible = true;
+        for (int p = 0; p < 4; p++)
+        {
+            if (dot(planes[p].xyz, pos) + planes[p].w + radius < 0.0)
+            {
+                visible = false;
+                break;
+            }
+        }
+
+        if (visible)
+        {
+            float lightEyeZ = -(view * vec4(pos, 1.0)).z;
+            if (lightEyeZ + radius < minEyeZ || lightEyeZ - radius > maxEyeZ)
+                visible = false;
+        }
+
+        if (visible)
+        {
+            uint idx = atomicAdd(sLightCount, 1u);
+            if (idx < uint(FORWARD_PLUS_MAX_LIGHTS_PER_TILE))
+                sLightIndices[idx] = i;
+        }
+    }
+    barrier();
+
+    // each tile owns a fixed MAX_LIGHTS_PER_TILE-sized slice of LightIndexList, so no
+    // global atomic offset counter is needed
+    uint count = min(sLightCount, uint(FORWARD_PLUS_MAX_LIGHTS_PER_TILE));
+    uint base = tileIndex * uint(FORWARD_PLUS_MAX_LIGHTS_PER_TILE);
+    for (uint i = localIndex; i < count; i += uint(FORWARD_PLUS_TILE_SIZE * FORWARD_PLUS_TILE_SIZE))
+        lightIndices[base + i] = sLightIndices[i];
+
+    if (localIndex == 0u)
+        lightGrid[tileIndex] = LightGridEntry(base, count);
+
+    // distribute decals across the workgroup's threads - same sphere-vs-frustum + depth-slab
+    // pre-test as lights above, reusing the same planes[4]/minEyeZ/maxEyeZ. This is deliberately
+    // conservative (sphere bound, not the exact OBB): it can only over-include a tile, never drop
+    // a visible decal, so the fragment shader's ApplyDecals() does the exact OBB test.
+    for (uint i = localIndex; i < uint(decalCount); i += uint(FORWARD_PLUS_TILE_SIZE * FORWARD_PLUS_TILE_SIZE))
+    {
+        GpuDecal decal = decals[i];
+        vec3 pos = decal.positionRadius.xyz;
+        float radius = decal.positionRadius.w;
+
+        bool visible = true;
+        for (int p = 0; p < 4; p++)
+        {
+            if (dot(planes[p].xyz, pos) + planes[p].w + radius < 0.0)
+            {
+                visible = false;
+                break;
+            }
+        }
+
+        if (visible)
+        {
+            float decalEyeZ = -(view * vec4(pos, 1.0)).z;
+            if (decalEyeZ + radius < minEyeZ || decalEyeZ - radius > maxEyeZ)
+                visible = false;
+        }
+
+        if (visible)
+        {
+            uint idx = atomicAdd(sDecalCount, 1u);
+            if (idx < uint(FORWARD_PLUS_MAX_DECALS_PER_TILE))
+                sDecalIndices[idx] = i;
+        }
+    }
+    barrier();
+
+    uint decalCountForTile = min(sDecalCount, uint(FORWARD_PLUS_MAX_DECALS_PER_TILE));
+    uint decalBase = tileIndex * uint(FORWARD_PLUS_MAX_DECALS_PER_TILE);
+    for (uint i = localIndex; i < decalCountForTile; i += uint(FORWARD_PLUS_TILE_SIZE * FORWARD_PLUS_TILE_SIZE))
+        decalIndices[decalBase + i] = sDecalIndices[i];
+
+    if (localIndex == 0u)
+        decalGrid[tileIndex] = DecalGridEntry(decalBase, decalCountForTile);
+}

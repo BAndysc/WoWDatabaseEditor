@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.Reactive.Disposables;
 using Prism.Ioc;
-using TheEngine.Utils;
 using Unity;
 using Unity.Extension;
 using Unity.Resolution;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Database.Counters;
 using WDE.Common.Disposables;
@@ -17,15 +17,21 @@ using WDE.Common.Services.QueryParser.Models;
 using WDE.Common.TableData;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
+using WDE.Common.Windows;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
 using WDE.MapRenderer.Modules;
 using WDE.MapSpawns;
 using WDE.MapSpawns.Rendering;
+using WDE.MapSpawns.Rendering.Formations;
+using WDE.MapSpawns.Rendering.SpawnGroups;
+using WDE.MapSpawns.Rendering.Waypoints;
 using WDE.Module;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 using WDE.SqlInterpreter;
+using WDE.WorldMap.Services;
+using MapViewModel = WDE.WorldMap.ViewModels.MapViewModel;
 
 namespace RenderingTester;
 
@@ -46,9 +52,13 @@ public class DummyGameView : IGameView
     [
         provider => provider.Resolve<StandaloneCustomGameModule>(),
         provider => provider.Resolve<DebugWindow>(),
+        provider => provider.Resolve<ViewSettingsToolbar>(),
         provider => provider.Resolve<SpawnViewer>(),
         provider => provider.Resolve<WorldMapGameModule>(),
-        provider => provider.Resolve<DebugInfoGameModule>()
+        provider => provider.Resolve<DebugInfoGameModule>(),
+        provider => provider.Resolve<WaypointEditorModule>(),
+        provider => provider.Resolve<FormationEditorModule>(),
+        provider => provider.Resolve<SpawnGroupEditorModule>()
     ];
 
     public IEnumerable<Func<IContainerProvider, IGameModule>> Modules => modules;
@@ -59,6 +69,11 @@ public class DummyGameView : IGameView
     public void AddModule<T>() where T : IGameModule
     {
         modules.Add(provider => provider.Resolve<T>());
+    }
+
+    public void AddModule(IGameModule module)
+    {
+        modules.Add(_ => module);
     }
 
     public Task<Game> Open()
@@ -76,7 +91,10 @@ public class DummyGameProperties : IGameProperties
     public Time CurrentTime { get; set; } = Time.FromMinutes(720);
     public float ViewDistanceModifier { get; set; } = 16;
     public bool ShowAreaTriggers { get; set; } = false;
+    public bool ShowStatusIcons { get; set; } = true;
+    public uint StatusIconsHiddenMask { get; set; } = 0;
     public int TextureQuality { get; set; } = 3;
+    public bool VSync { get; set; } = false;
     public float DynamicResolution { get; set; } = 1;
     public bool RenderGui { get; set; } = true;
     public bool LoadWorld { get; set; } = true;
@@ -92,15 +110,13 @@ public class DummyMessageBox : IMessageBoxService
     }
 }
 
-public class MainThread : IMainThread
+public class MainThread : IMainThread, IGameModule
 {
-    private readonly SingleThreadSynchronizationContext context;
     private List<(TimeSpan delay, Action action, long delayId)> delayed = new();
     private long delayId = 0;
 
-    public MainThread(SingleThreadSynchronizationContext context)
+    public MainThread()
     {
-        this.context = context;
     }
 
     public System.IDisposable Delay(Action action, TimeSpan delay)
@@ -116,7 +132,6 @@ public class MainThread : IMainThread
 
     public void Dispatch(Action action)
     {
-        SynchronizationContext.SetSynchronizationContext(context);
         action();
     }
 
@@ -128,6 +143,16 @@ public class MainThread : IMainThread
     public IDisposable StartTimer(Func<bool> action, TimeSpan interval)
     {
         throw new Exception("Operation not supported, but could be implemented");
+    }
+
+    public async Task<T> Schedule<T>(Func<Task<T>> func)
+    {
+        return await func();
+    }
+
+    public async Task<T> Schedule<T>(Func<T> func)
+    {
+        return func();
     }
 
     public void Tick(TimeSpan time)
@@ -152,6 +177,21 @@ public class MainThread : IMainThread
                 delayed[i] = (newDelay, delayed[i].action, delayed[i].delayId);
             }
         }
+    }
+
+    public void Dispose()
+    {
+    }
+
+    public object? ViewModel { get; set; }
+
+    public void Initialize()
+    {
+    }
+
+    public void Update(float delta)
+    {
+        Tick(TimeSpan.FromMilliseconds(delta));
     }
 }
 
@@ -269,6 +309,19 @@ public class DummyQueryEvaluator : IQueryEvaluator
     public IReadOnlyList<IBaseQuery> Extract(string query) => Array.Empty<IBaseQuery>();
 }
 
+public class DummyRemoteConnectorService : IRemoteConnectorService
+{
+    public event Action<string, TimeSpan, RemoteCommandType>? OnLog;
+    public bool IsConnected => false;
+    public bool HasValidSettings => false;
+    public async Task<string> ExecuteCommand(IRemoteCommand command) => "";
+    public async Task ExecuteCommands(IList<IRemoteCommand> commands) { }
+    public event Action<string>? EditorCommandReceived;
+    public event Action? EditorConnected;
+    public event Action? EditorDisconnected;
+    public IList<IRemoteCommand> Merge(IList<IRemoteCommand> commands) => commands;
+}
+
 public class DummyTableEditorPickerService : ITableEditorPickerService
 {
     public async Task<long?> PickByColumn(DatabaseTable table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null)
@@ -374,4 +427,67 @@ public class DummyDatabaseRowsCountProvider : IDatabaseRowsCountProvider
     {
         return 0;
     }
+}
+
+public class DummyViewLocator : IViewLocator
+{
+    public void Bind(Type viewModel, Type view)
+    {
+    }
+
+    public void Bind<T, R>()
+    {
+    }
+
+    public bool TryResolve(Type viewModel, out Type view, out string? failReason)
+    {
+        view = null!;
+        failReason = null!;
+        return false;
+    }
+
+    public void BindToolBar<T, R>()
+    {
+    }
+
+    public bool TryResolveToolBar(Type viewModel, out Type toolBar)
+    {
+        toolBar = null!;
+        return false;
+    }
+}
+
+public class DummyCreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderService
+{
+    public async Task<int?> GetEntryFromService(uint? entry = null, string? customCounterTable = null)
+    {
+        return 0;
+    }
+
+    public async Task<IReadOnlyCollection<int>> GetEntriesFromService(string? customCounterTable = null)
+    {
+        return [];
+    }
+}
+
+public class DummyQueryEntryProviderService : IQuestEntryProviderService
+{
+    public async Task<uint?> GetEntryFromService(uint? questId = null)
+    {
+        return 0;
+    }
+
+    public async Task<IReadOnlyCollection<uint>> GetEntriesFromService()
+    {
+        return [];
+    }
+}
+
+public class DummyMapDataProvider : IMapDataProvider
+{
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public string? Path => null;
+    public IReadOnlyList<MapViewModel> Maps => [];
+    public IEnumerable<string> MiniMaps => [];
+    public async Task LoadMaps(Progress<(long, long?)>? progress) { }
 }

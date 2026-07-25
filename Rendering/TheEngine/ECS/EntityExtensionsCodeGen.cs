@@ -1,4 +1,4 @@
-
+﻿
 namespace TheEngine.ECS;
 
 public static partial class EntityExtensions
@@ -17,6 +17,7 @@ private static IChunkDataIterator? cachedItr;
 cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, N0>(this Archetype archetype, S state, 
@@ -31,6 +32,7 @@ cachedItr.ManagedDataAccess<N0>()
 cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<N0>(this Archetype archetype, 
@@ -45,6 +47,7 @@ cachedItr.ManagedDataAccess<N0>()
 cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, N0>(this Archetype archetype, S state, 
@@ -59,6 +62,7 @@ cachedItr.ManagedDataAccess<N0>()
 cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRO<N0, N1>(this Archetype archetype, 
@@ -74,6 +78,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROState<S, N0, N1>(this Archetype archetype, S state, 
@@ -89,6 +94,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRO<N0, N1>(this Archetype archetype, 
@@ -104,6 +110,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROState<S, N0, N1>(this Archetype archetype, S state, 
@@ -119,6 +126,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRO<N0, T0>(this Archetype archetype, 
@@ -134,6 +142,7 @@ where T0 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROState<S, N0, T0>(this Archetype archetype, S state, 
@@ -149,6 +158,7 @@ where T0 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRO<N0, T0>(this Archetype archetype, 
@@ -164,6 +174,7 @@ where T0 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROState<S, N0, T0>(this Archetype archetype, S state, 
@@ -179,6 +190,7 @@ where T0 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROO<N0, T0, N1>(this Archetype archetype, 
@@ -195,6 +207,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOState<S, N0, T0, N1>(this Archetype archetype, S state, 
@@ -211,6 +224,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROO<N0, T0, N1>(this Archetype archetype, 
@@ -227,6 +241,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOState<S, N0, T0, N1>(this Archetype archetype, S state, 
@@ -243,6 +258,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROO<N0, T0, T1>(this Archetype archetype, 
@@ -259,6 +275,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOState<S, N0, T0, T1>(this Archetype archetype, S state, 
@@ -275,6 +292,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROO<N0, T0, T1>(this Archetype archetype, 
@@ -291,6 +309,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOState<S, N0, T0, T1>(this Archetype archetype, S state, 
@@ -307,6 +326,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOO<N0, T0, T1, N1>(this Archetype archetype, 
@@ -324,6 +344,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOState<S, N0, T0, T1, N1>(this Archetype archetype, S state, 
@@ -341,6 +362,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOO<N0, T0, T1, N1>(this Archetype archetype, 
@@ -358,6 +380,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOState<S, N0, T0, T1, N1>(this Archetype archetype, S state, 
@@ -375,6 +398,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOO<N0, T0, T1, T2>(this Archetype archetype, 
@@ -392,6 +416,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOState<S, N0, T0, T1, T2>(this Archetype archetype, S state, 
@@ -409,6 +434,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOO<N0, T0, T1, T2>(this Archetype archetype, 
@@ -426,6 +452,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOState<S, N0, T0, T1, T2>(this Archetype archetype, S state, 
@@ -443,6 +470,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOO<N0, T0, T1, T2, N1>(this Archetype archetype, 
@@ -461,6 +489,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOOState<S, N0, T0, T1, T2, N1>(this Archetype archetype, S state, 
@@ -479,6 +508,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOO<N0, T0, T1, T2, N1>(this Archetype archetype, 
@@ -497,6 +527,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOOState<S, N0, T0, T1, T2, N1>(this Archetype archetype, S state, 
@@ -515,6 +546,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<N0, N1>(this Archetype archetype, 
@@ -530,6 +562,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, N0, N1>(this Archetype archetype, S state, 
@@ -545,6 +578,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<N0, N1>(this Archetype archetype, 
@@ -560,6 +594,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, N0, N1>(this Archetype archetype, S state, 
@@ -575,6 +610,7 @@ where N1 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRO<N0, N1, N2>(this Archetype archetype, 
@@ -591,6 +627,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROState<S, N0, N1, N2>(this Archetype archetype, S state, 
@@ -607,6 +644,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRO<N0, N1, N2>(this Archetype archetype, 
@@ -623,6 +661,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROState<S, N0, N1, N2>(this Archetype archetype, S state, 
@@ -639,6 +678,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRO<N0, N1, T0>(this Archetype archetype, 
@@ -655,6 +695,7 @@ where T0 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROState<S, N0, N1, T0>(this Archetype archetype, S state, 
@@ -671,6 +712,7 @@ where T0 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRO<N0, N1, T0>(this Archetype archetype, 
@@ -687,6 +729,7 @@ where T0 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROState<S, N0, N1, T0>(this Archetype archetype, S state, 
@@ -703,6 +746,7 @@ where T0 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROO<N0, N1, T0, N2>(this Archetype archetype, 
@@ -720,6 +764,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOState<S, N0, N1, T0, N2>(this Archetype archetype, S state, 
@@ -737,6 +782,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROO<N0, N1, T0, N2>(this Archetype archetype, 
@@ -754,6 +800,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOState<S, N0, N1, T0, N2>(this Archetype archetype, S state, 
@@ -771,6 +818,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROO<N0, N1, T0, T1>(this Archetype archetype, 
@@ -788,6 +836,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOState<S, N0, N1, T0, T1>(this Archetype archetype, S state, 
@@ -805,6 +854,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROO<N0, N1, T0, T1>(this Archetype archetype, 
@@ -822,6 +872,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOState<S, N0, N1, T0, T1>(this Archetype archetype, S state, 
@@ -839,6 +890,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOO<N0, N1, T0, T1, N2>(this Archetype archetype, 
@@ -857,6 +909,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOState<S, N0, N1, T0, T1, N2>(this Archetype archetype, S state, 
@@ -875,6 +928,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOO<N0, N1, T0, T1, N2>(this Archetype archetype, 
@@ -893,6 +947,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOState<S, N0, N1, T0, T1, N2>(this Archetype archetype, S state, 
@@ -911,6 +966,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOO<N0, N1, T0, T1, T2>(this Archetype archetype, 
@@ -929,6 +985,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOState<S, N0, N1, T0, T1, T2>(this Archetype archetype, S state, 
@@ -947,6 +1004,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOO<N0, N1, T0, T1, T2>(this Archetype archetype, 
@@ -965,6 +1023,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOState<S, N0, N1, T0, T1, T2>(this Archetype archetype, S state, 
@@ -983,6 +1042,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOO<N0, N1, T0, T1, T2, N2>(this Archetype archetype, 
@@ -1002,6 +1062,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOOState<S, N0, N1, T0, T1, T2, N2>(this Archetype archetype, S state, 
@@ -1021,6 +1082,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOO<N0, N1, T0, T1, T2, N2>(this Archetype archetype, 
@@ -1040,6 +1102,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOOState<S, N0, N1, T0, T1, T2, N2>(this Archetype archetype, S state, 
@@ -1059,6 +1122,7 @@ where N2 : IManagedComponentData
 cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0>(this Archetype archetype, 
@@ -1073,6 +1137,7 @@ cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.
 cachedItr.DataAccess<T0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0>(this Archetype archetype, S state, 
@@ -1087,6 +1152,7 @@ cachedItr.DataAccess<T0>()
 cachedItr.DataAccess<T0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0>(this Archetype archetype, 
@@ -1101,6 +1167,7 @@ cachedItr.DataAccess<T0>()
 cachedItr.DataAccess<T0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0>(this Archetype archetype, S state, 
@@ -1115,6 +1182,7 @@ cachedItr.DataAccess<T0>()
 cachedItr.DataAccess<T0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRO<T0, N0>(this Archetype archetype, 
@@ -1130,6 +1198,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROState<S, T0, N0>(this Archetype archetype, S state, 
@@ -1145,6 +1214,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRO<T0, N0>(this Archetype archetype, 
@@ -1160,6 +1230,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROState<S, T0, N0>(this Archetype archetype, S state, 
@@ -1175,6 +1246,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRO<T0, T1>(this Archetype archetype, 
@@ -1190,6 +1262,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROState<S, T0, T1>(this Archetype archetype, S state, 
@@ -1205,6 +1278,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRO<T0, T1>(this Archetype archetype, 
@@ -1220,6 +1294,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROState<S, T0, T1>(this Archetype archetype, S state, 
@@ -1235,6 +1310,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROO<T0, T1, N0>(this Archetype archetype, 
@@ -1251,6 +1327,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -1267,6 +1344,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROO<T0, T1, N0>(this Archetype archetype, 
@@ -1283,6 +1361,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -1299,6 +1378,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROO<T0, T1, T2>(this Archetype archetype, 
@@ -1315,6 +1395,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -1331,6 +1412,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROO<T0, T1, T2>(this Archetype archetype, 
@@ -1347,6 +1429,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -1363,6 +1446,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOO<T0, T1, T2, N0>(this Archetype archetype, 
@@ -1380,6 +1464,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -1397,6 +1482,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOO<T0, T1, T2, N0>(this Archetype archetype, 
@@ -1414,6 +1500,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -1431,6 +1518,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOO<T0, T1, T2, T3>(this Archetype archetype, 
@@ -1448,6 +1536,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -1465,6 +1554,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOO<T0, T1, T2, T3>(this Archetype archetype, 
@@ -1482,6 +1572,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -1499,6 +1590,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOO<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -1517,6 +1609,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOOState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -1535,6 +1628,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOO<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -1553,6 +1647,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOOState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -1571,6 +1666,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, N0>(this Archetype archetype, 
@@ -1586,6 +1682,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, N0>(this Archetype archetype, S state, 
@@ -1601,6 +1698,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, N0>(this Archetype archetype, 
@@ -1616,6 +1714,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, N0>(this Archetype archetype, S state, 
@@ -1631,6 +1730,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRO<T0, N0, N1>(this Archetype archetype, 
@@ -1647,6 +1747,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROState<S, T0, N0, N1>(this Archetype archetype, S state, 
@@ -1663,6 +1764,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRO<T0, N0, N1>(this Archetype archetype, 
@@ -1679,6 +1781,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROState<S, T0, N0, N1>(this Archetype archetype, S state, 
@@ -1695,6 +1798,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRO<T0, N0, T1>(this Archetype archetype, 
@@ -1711,6 +1815,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROState<S, T0, N0, T1>(this Archetype archetype, S state, 
@@ -1727,6 +1832,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRO<T0, N0, T1>(this Archetype archetype, 
@@ -1743,6 +1849,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROState<S, T0, N0, T1>(this Archetype archetype, S state, 
@@ -1759,6 +1866,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROO<T0, N0, T1, N1>(this Archetype archetype, 
@@ -1776,6 +1884,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOState<S, T0, N0, T1, N1>(this Archetype archetype, S state, 
@@ -1793,6 +1902,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROO<T0, N0, T1, N1>(this Archetype archetype, 
@@ -1810,6 +1920,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOState<S, T0, N0, T1, N1>(this Archetype archetype, S state, 
@@ -1827,6 +1938,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROO<T0, N0, T1, T2>(this Archetype archetype, 
@@ -1844,6 +1956,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOState<S, T0, N0, T1, T2>(this Archetype archetype, S state, 
@@ -1861,6 +1974,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROO<T0, N0, T1, T2>(this Archetype archetype, 
@@ -1878,6 +1992,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOState<S, T0, N0, T1, T2>(this Archetype archetype, S state, 
@@ -1895,6 +2010,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOO<T0, N0, T1, T2, N1>(this Archetype archetype, 
@@ -1913,6 +2029,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOState<S, T0, N0, T1, T2, N1>(this Archetype archetype, S state, 
@@ -1931,6 +2048,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOO<T0, N0, T1, T2, N1>(this Archetype archetype, 
@@ -1949,6 +2067,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOState<S, T0, N0, T1, T2, N1>(this Archetype archetype, S state, 
@@ -1967,6 +2086,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOO<T0, N0, T1, T2, T3>(this Archetype archetype, 
@@ -1985,6 +2105,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOState<S, T0, N0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -2003,6 +2124,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOO<T0, N0, T1, T2, T3>(this Archetype archetype, 
@@ -2021,6 +2143,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOState<S, T0, N0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -2039,6 +2162,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOO<T0, N0, T1, T2, T3, N1>(this Archetype archetype, 
@@ -2058,6 +2182,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOOState<S, T0, N0, T1, T2, T3, N1>(this Archetype archetype, S state, 
@@ -2077,6 +2202,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOO<T0, N0, T1, T2, T3, N1>(this Archetype archetype, 
@@ -2096,6 +2222,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOOState<S, T0, N0, T1, T2, T3, N1>(this Archetype archetype, S state, 
@@ -2115,6 +2242,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, N0, N1>(this Archetype archetype, 
@@ -2131,6 +2259,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, N0, N1>(this Archetype archetype, S state, 
@@ -2147,6 +2276,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, N0, N1>(this Archetype archetype, 
@@ -2163,6 +2293,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, N0, N1>(this Archetype archetype, S state, 
@@ -2179,6 +2310,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRO<T0, N0, N1, N2>(this Archetype archetype, 
@@ -2196,6 +2328,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROState<S, T0, N0, N1, N2>(this Archetype archetype, S state, 
@@ -2213,6 +2346,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRO<T0, N0, N1, N2>(this Archetype archetype, 
@@ -2230,6 +2364,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROState<S, T0, N0, N1, N2>(this Archetype archetype, S state, 
@@ -2247,6 +2382,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRO<T0, N0, N1, T1>(this Archetype archetype, 
@@ -2264,6 +2400,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROState<S, T0, N0, N1, T1>(this Archetype archetype, S state, 
@@ -2281,6 +2418,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRO<T0, N0, N1, T1>(this Archetype archetype, 
@@ -2298,6 +2436,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROState<S, T0, N0, N1, T1>(this Archetype archetype, S state, 
@@ -2315,6 +2454,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROO<T0, N0, N1, T1, N2>(this Archetype archetype, 
@@ -2333,6 +2473,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOState<S, T0, N0, N1, T1, N2>(this Archetype archetype, S state, 
@@ -2351,6 +2492,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROO<T0, N0, N1, T1, N2>(this Archetype archetype, 
@@ -2369,6 +2511,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOState<S, T0, N0, N1, T1, N2>(this Archetype archetype, S state, 
@@ -2387,6 +2530,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROO<T0, N0, N1, T1, T2>(this Archetype archetype, 
@@ -2405,6 +2549,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOState<S, T0, N0, N1, T1, T2>(this Archetype archetype, S state, 
@@ -2423,6 +2568,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROO<T0, N0, N1, T1, T2>(this Archetype archetype, 
@@ -2441,6 +2587,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOState<S, T0, N0, N1, T1, T2>(this Archetype archetype, S state, 
@@ -2459,6 +2606,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOO<T0, N0, N1, T1, T2, N2>(this Archetype archetype, 
@@ -2478,6 +2626,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOState<S, T0, N0, N1, T1, T2, N2>(this Archetype archetype, S state, 
@@ -2497,6 +2646,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOO<T0, N0, N1, T1, T2, N2>(this Archetype archetype, 
@@ -2516,6 +2666,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOState<S, T0, N0, N1, T1, T2, N2>(this Archetype archetype, S state, 
@@ -2535,6 +2686,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOO<T0, N0, N1, T1, T2, T3>(this Archetype archetype, 
@@ -2554,6 +2706,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOState<S, T0, N0, N1, T1, T2, T3>(this Archetype archetype, S state, 
@@ -2573,6 +2726,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOO<T0, N0, N1, T1, T2, T3>(this Archetype archetype, 
@@ -2592,6 +2746,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOState<S, T0, N0, N1, T1, T2, T3>(this Archetype archetype, S state, 
@@ -2611,6 +2766,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOO<T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, 
@@ -2631,6 +2787,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOOState<S, T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, S state, 
@@ -2651,6 +2808,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOO<T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, 
@@ -2671,6 +2829,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOOState<S, T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, S state, 
@@ -2691,6 +2850,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0>(this Archetype archetype, 
@@ -2705,6 +2865,7 @@ cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.Managed
 cachedItr.ArrayDataAccess<T0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0>(this Archetype archetype, S state, 
@@ -2719,6 +2880,7 @@ cachedItr.ArrayDataAccess<T0>()
 cachedItr.ArrayDataAccess<T0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0>(this Archetype archetype, 
@@ -2733,6 +2895,7 @@ cachedItr.ArrayDataAccess<T0>()
 cachedItr.ArrayDataAccess<T0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0>(this Archetype archetype, S state, 
@@ -2747,6 +2910,7 @@ cachedItr.ArrayDataAccess<T0>()
 cachedItr.ArrayDataAccess<T0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROArray<T0, N0>(this Archetype archetype, 
@@ -2762,6 +2926,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROArrayState<S, T0, N0>(this Archetype archetype, S state, 
@@ -2777,6 +2942,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROArray<T0, N0>(this Archetype archetype, 
@@ -2792,6 +2958,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROArrayState<S, T0, N0>(this Archetype archetype, S state, 
@@ -2807,6 +2974,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROArray<T0, T1>(this Archetype archetype, 
@@ -2822,6 +2990,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROArrayState<S, T0, T1>(this Archetype archetype, S state, 
@@ -2837,6 +3006,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROArray<T0, T1>(this Archetype archetype, 
@@ -2852,6 +3022,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROArrayState<S, T0, T1>(this Archetype archetype, S state, 
@@ -2867,6 +3038,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOArray<T0, T1, N0>(this Archetype archetype, 
@@ -2883,6 +3055,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -2899,6 +3072,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOArray<T0, T1, N0>(this Archetype archetype, 
@@ -2915,6 +3089,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -2931,6 +3106,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOArray<T0, T1, T2>(this Archetype archetype, 
@@ -2947,6 +3123,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -2963,6 +3140,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOArray<T0, T1, T2>(this Archetype archetype, 
@@ -2979,6 +3157,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -2995,6 +3174,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOArray<T0, T1, T2, N0>(this Archetype archetype, 
@@ -3012,6 +3192,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -3029,6 +3210,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOArray<T0, T1, T2, N0>(this Archetype archetype, 
@@ -3046,6 +3228,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -3063,6 +3246,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOArray<T0, T1, T2, T3>(this Archetype archetype, 
@@ -3080,6 +3264,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -3097,6 +3282,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOArray<T0, T1, T2, T3>(this Archetype archetype, 
@@ -3114,6 +3300,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -3131,6 +3318,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -3149,6 +3337,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachROOOOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -3167,6 +3356,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -3185,6 +3375,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachROOOOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -3203,6 +3394,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, N0>(this Archetype archetype, 
@@ -3218,6 +3410,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, N0>(this Archetype archetype, S state, 
@@ -3233,6 +3426,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, N0>(this Archetype archetype, 
@@ -3248,6 +3442,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, N0>(this Archetype archetype, S state, 
@@ -3263,6 +3458,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROArray<T0, N0, N1>(this Archetype archetype, 
@@ -3279,6 +3475,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROArrayState<S, T0, N0, N1>(this Archetype archetype, S state, 
@@ -3295,6 +3492,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROArray<T0, N0, N1>(this Archetype archetype, 
@@ -3311,6 +3509,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROArrayState<S, T0, N0, N1>(this Archetype archetype, S state, 
@@ -3327,6 +3526,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROArray<T0, N0, T1>(this Archetype archetype, 
@@ -3343,6 +3543,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROArrayState<S, T0, N0, T1>(this Archetype archetype, S state, 
@@ -3359,6 +3560,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROArray<T0, N0, T1>(this Archetype archetype, 
@@ -3375,6 +3577,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROArrayState<S, T0, N0, T1>(this Archetype archetype, S state, 
@@ -3391,6 +3594,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOArray<T0, N0, T1, N1>(this Archetype archetype, 
@@ -3408,6 +3612,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOArrayState<S, T0, N0, T1, N1>(this Archetype archetype, S state, 
@@ -3425,6 +3630,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOArray<T0, N0, T1, N1>(this Archetype archetype, 
@@ -3442,6 +3648,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOArrayState<S, T0, N0, T1, N1>(this Archetype archetype, S state, 
@@ -3459,6 +3666,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOArray<T0, N0, T1, T2>(this Archetype archetype, 
@@ -3476,6 +3684,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOArrayState<S, T0, N0, T1, T2>(this Archetype archetype, S state, 
@@ -3493,6 +3702,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOArray<T0, N0, T1, T2>(this Archetype archetype, 
@@ -3510,6 +3720,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOArrayState<S, T0, N0, T1, T2>(this Archetype archetype, S state, 
@@ -3527,6 +3738,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOArray<T0, N0, T1, T2, N1>(this Archetype archetype, 
@@ -3545,6 +3757,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOArrayState<S, T0, N0, T1, T2, N1>(this Archetype archetype, S state, 
@@ -3563,6 +3776,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOArray<T0, N0, T1, T2, N1>(this Archetype archetype, 
@@ -3581,6 +3795,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOArrayState<S, T0, N0, T1, T2, N1>(this Archetype archetype, S state, 
@@ -3599,6 +3814,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOArray<T0, N0, T1, T2, T3>(this Archetype archetype, 
@@ -3617,6 +3833,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOArrayState<S, T0, N0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -3635,6 +3852,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOArray<T0, N0, T1, T2, T3>(this Archetype archetype, 
@@ -3653,6 +3871,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOArrayState<S, T0, N0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -3671,6 +3890,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOOArray<T0, N0, T1, T2, T3, N1>(this Archetype archetype, 
@@ -3690,6 +3910,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOOArrayState<S, T0, N0, T1, T2, T3, N1>(this Archetype archetype, S state, 
@@ -3709,6 +3930,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOOArray<T0, N0, T1, T2, T3, N1>(this Archetype archetype, 
@@ -3728,6 +3950,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOOArrayState<S, T0, N0, T1, T2, T3, N1>(this Archetype archetype, S state, 
@@ -3747,6 +3970,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, N0, N1>(this Archetype archetype, 
@@ -3763,6 +3987,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, N0, N1>(this Archetype archetype, S state, 
@@ -3779,6 +4004,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, N0, N1>(this Archetype archetype, 
@@ -3795,6 +4021,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, N0, N1>(this Archetype archetype, S state, 
@@ -3811,6 +4038,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArray<T0, N0, N1, N2>(this Archetype archetype, 
@@ -3828,6 +4056,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArrayState<S, T0, N0, N1, N2>(this Archetype archetype, S state, 
@@ -3845,6 +4074,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArray<T0, N0, N1, N2>(this Archetype archetype, 
@@ -3862,6 +4092,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArrayState<S, T0, N0, N1, N2>(this Archetype archetype, S state, 
@@ -3879,6 +4110,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArray<T0, N0, N1, T1>(this Archetype archetype, 
@@ -3896,6 +4128,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArrayState<S, T0, N0, N1, T1>(this Archetype archetype, S state, 
@@ -3913,6 +4146,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArray<T0, N0, N1, T1>(this Archetype archetype, 
@@ -3930,6 +4164,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArrayState<S, T0, N0, N1, T1>(this Archetype archetype, S state, 
@@ -3947,6 +4182,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArray<T0, N0, N1, T1, N2>(this Archetype archetype, 
@@ -3965,6 +4201,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArrayState<S, T0, N0, N1, T1, N2>(this Archetype archetype, S state, 
@@ -3983,6 +4220,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArray<T0, N0, N1, T1, N2>(this Archetype archetype, 
@@ -4001,6 +4239,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArrayState<S, T0, N0, N1, T1, N2>(this Archetype archetype, S state, 
@@ -4019,6 +4258,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArray<T0, N0, N1, T1, T2>(this Archetype archetype, 
@@ -4037,6 +4277,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArrayState<S, T0, N0, N1, T1, T2>(this Archetype archetype, S state, 
@@ -4055,6 +4296,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArray<T0, N0, N1, T1, T2>(this Archetype archetype, 
@@ -4073,6 +4315,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArrayState<S, T0, N0, N1, T1, T2>(this Archetype archetype, S state, 
@@ -4091,6 +4334,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArray<T0, N0, N1, T1, T2, N2>(this Archetype archetype, 
@@ -4110,6 +4354,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArrayState<S, T0, N0, N1, T1, T2, N2>(this Archetype archetype, S state, 
@@ -4129,6 +4374,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArray<T0, N0, N1, T1, T2, N2>(this Archetype archetype, 
@@ -4148,6 +4394,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArrayState<S, T0, N0, N1, T1, T2, N2>(this Archetype archetype, S state, 
@@ -4167,6 +4414,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArray<T0, N0, N1, T1, T2, T3>(this Archetype archetype, 
@@ -4186,6 +4434,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArrayState<S, T0, N0, N1, T1, T2, T3>(this Archetype archetype, S state, 
@@ -4205,6 +4454,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArray<T0, N0, N1, T1, T2, T3>(this Archetype archetype, 
@@ -4224,6 +4474,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArrayState<S, T0, N0, N1, T1, T2, T3>(this Archetype archetype, S state, 
@@ -4243,6 +4494,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOOArray<T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, 
@@ -4263,6 +4515,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOOArrayState<S, T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, S state, 
@@ -4283,6 +4536,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOOArray<T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, 
@@ -4303,6 +4557,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOOArrayState<S, T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, S state, 
@@ -4323,6 +4578,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1>(this Archetype archetype, 
@@ -4338,6 +4594,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1>(this Archetype archetype, S state, 
@@ -4353,6 +4610,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1>(this Archetype archetype, 
@@ -4368,6 +4626,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1>(this Archetype archetype, S state, 
@@ -4383,6 +4642,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRO<T0, T1, N0>(this Archetype archetype, 
@@ -4399,6 +4659,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -4415,6 +4676,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRO<T0, T1, N0>(this Archetype archetype, 
@@ -4431,6 +4693,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -4447,6 +4710,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRO<T0, T1, T2>(this Archetype archetype, 
@@ -4463,6 +4727,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -4479,6 +4744,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRO<T0, T1, T2>(this Archetype archetype, 
@@ -4495,6 +4761,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -4511,6 +4778,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROO<T0, T1, T2, N0>(this Archetype archetype, 
@@ -4528,6 +4796,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -4545,6 +4814,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROO<T0, T1, T2, N0>(this Archetype archetype, 
@@ -4562,6 +4832,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -4579,6 +4850,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROO<T0, T1, T2, T3>(this Archetype archetype, 
@@ -4596,6 +4868,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -4613,6 +4886,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROO<T0, T1, T2, T3>(this Archetype archetype, 
@@ -4630,6 +4904,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -4647,6 +4922,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOO<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -4665,6 +4941,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -4683,6 +4960,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOO<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -4701,6 +4979,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -4719,6 +4998,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOO<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -4737,6 +5017,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -4755,6 +5036,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOO<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -4773,6 +5055,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -4791,6 +5074,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOO<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -4810,6 +5094,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOOState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -4829,6 +5114,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOO<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -4848,6 +5134,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOOState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -4867,6 +5154,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, N0>(this Archetype archetype, 
@@ -4883,6 +5171,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -4899,6 +5188,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, N0>(this Archetype archetype, 
@@ -4915,6 +5205,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -4931,6 +5222,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRO<T0, T1, N0, N1>(this Archetype archetype, 
@@ -4948,6 +5240,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
@@ -4965,6 +5258,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRO<T0, T1, N0, N1>(this Archetype archetype, 
@@ -4982,6 +5276,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
@@ -4999,6 +5294,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRO<T0, T1, N0, T2>(this Archetype archetype, 
@@ -5016,6 +5312,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROState<S, T0, T1, N0, T2>(this Archetype archetype, S state, 
@@ -5033,6 +5330,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRO<T0, T1, N0, T2>(this Archetype archetype, 
@@ -5050,6 +5348,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROState<S, T0, T1, N0, T2>(this Archetype archetype, S state, 
@@ -5067,6 +5366,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROO<T0, T1, N0, T2, N1>(this Archetype archetype, 
@@ -5085,6 +5385,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOState<S, T0, T1, N0, T2, N1>(this Archetype archetype, S state, 
@@ -5103,6 +5404,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROO<T0, T1, N0, T2, N1>(this Archetype archetype, 
@@ -5121,6 +5423,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOState<S, T0, T1, N0, T2, N1>(this Archetype archetype, S state, 
@@ -5139,6 +5442,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROO<T0, T1, N0, T2, T3>(this Archetype archetype, 
@@ -5157,6 +5461,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOState<S, T0, T1, N0, T2, T3>(this Archetype archetype, S state, 
@@ -5175,6 +5480,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROO<T0, T1, N0, T2, T3>(this Archetype archetype, 
@@ -5193,6 +5499,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOState<S, T0, T1, N0, T2, T3>(this Archetype archetype, S state, 
@@ -5211,6 +5518,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOO<T0, T1, N0, T2, T3, N1>(this Archetype archetype, 
@@ -5230,6 +5538,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOState<S, T0, T1, N0, T2, T3, N1>(this Archetype archetype, S state, 
@@ -5249,6 +5558,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOO<T0, T1, N0, T2, T3, N1>(this Archetype archetype, 
@@ -5268,6 +5578,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOState<S, T0, T1, N0, T2, T3, N1>(this Archetype archetype, S state, 
@@ -5287,6 +5598,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOO<T0, T1, N0, T2, T3, T4>(this Archetype archetype, 
@@ -5306,6 +5618,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOState<S, T0, T1, N0, T2, T3, T4>(this Archetype archetype, S state, 
@@ -5325,6 +5638,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOO<T0, T1, N0, T2, T3, T4>(this Archetype archetype, 
@@ -5344,6 +5658,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOState<S, T0, T1, N0, T2, T3, T4>(this Archetype archetype, S state, 
@@ -5363,6 +5678,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOO<T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, 
@@ -5383,6 +5699,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOOState<S, T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, S state, 
@@ -5403,6 +5720,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOO<T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, 
@@ -5423,6 +5741,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOOState<S, T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, S state, 
@@ -5443,6 +5762,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, N0, N1>(this Archetype archetype, 
@@ -5460,6 +5780,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
@@ -5477,6 +5798,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, N0, N1>(this Archetype archetype, 
@@ -5494,6 +5816,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
@@ -5511,6 +5834,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRO<T0, T1, N0, N1, N2>(this Archetype archetype, 
@@ -5529,6 +5853,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROState<S, T0, T1, N0, N1, N2>(this Archetype archetype, S state, 
@@ -5547,6 +5872,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRO<T0, T1, N0, N1, N2>(this Archetype archetype, 
@@ -5565,6 +5891,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROState<S, T0, T1, N0, N1, N2>(this Archetype archetype, S state, 
@@ -5583,6 +5910,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRO<T0, T1, N0, N1, T2>(this Archetype archetype, 
@@ -5601,6 +5929,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROState<S, T0, T1, N0, N1, T2>(this Archetype archetype, S state, 
@@ -5619,6 +5948,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRO<T0, T1, N0, N1, T2>(this Archetype archetype, 
@@ -5637,6 +5967,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROState<S, T0, T1, N0, N1, T2>(this Archetype archetype, S state, 
@@ -5655,6 +5986,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROO<T0, T1, N0, N1, T2, N2>(this Archetype archetype, 
@@ -5674,6 +6006,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOState<S, T0, T1, N0, N1, T2, N2>(this Archetype archetype, S state, 
@@ -5693,6 +6026,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROO<T0, T1, N0, N1, T2, N2>(this Archetype archetype, 
@@ -5712,6 +6046,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOState<S, T0, T1, N0, N1, T2, N2>(this Archetype archetype, S state, 
@@ -5731,6 +6066,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROO<T0, T1, N0, N1, T2, T3>(this Archetype archetype, 
@@ -5750,6 +6086,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOState<S, T0, T1, N0, N1, T2, T3>(this Archetype archetype, S state, 
@@ -5769,6 +6106,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROO<T0, T1, N0, N1, T2, T3>(this Archetype archetype, 
@@ -5788,6 +6126,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOState<S, T0, T1, N0, N1, T2, T3>(this Archetype archetype, S state, 
@@ -5807,6 +6146,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOO<T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, 
@@ -5827,6 +6167,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOState<S, T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, S state, 
@@ -5847,6 +6188,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOO<T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, 
@@ -5867,6 +6209,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOState<S, T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, S state, 
@@ -5887,6 +6230,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOO<T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, 
@@ -5907,6 +6251,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOState<S, T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -5927,6 +6272,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOO<T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, 
@@ -5947,6 +6293,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOState<S, T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -5967,6 +6314,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOO<T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, 
@@ -5988,6 +6336,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOOState<S, T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, S state, 
@@ -6009,6 +6358,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOO<T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, 
@@ -6030,6 +6380,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOOState<S, T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, S state, 
@@ -6051,6 +6402,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1>(this Archetype archetype, 
@@ -6066,6 +6418,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1>(this Archetype archetype, S state, 
@@ -6081,6 +6434,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1>(this Archetype archetype, 
@@ -6096,6 +6450,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1>(this Archetype archetype, S state, 
@@ -6111,6 +6466,7 @@ where T1 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROArray<T0, T1, N0>(this Archetype archetype, 
@@ -6127,6 +6483,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -6143,6 +6500,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROArray<T0, T1, N0>(this Archetype archetype, 
@@ -6159,6 +6517,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -6175,6 +6534,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROArray<T0, T1, T2>(this Archetype archetype, 
@@ -6191,6 +6551,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -6207,6 +6568,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROArray<T0, T1, T2>(this Archetype archetype, 
@@ -6223,6 +6585,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -6239,6 +6602,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOArray<T0, T1, T2, N0>(this Archetype archetype, 
@@ -6256,6 +6620,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -6273,6 +6638,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOArray<T0, T1, T2, N0>(this Archetype archetype, 
@@ -6290,6 +6656,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -6307,6 +6674,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOArray<T0, T1, T2, T3>(this Archetype archetype, 
@@ -6324,6 +6692,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -6341,6 +6710,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOArray<T0, T1, T2, T3>(this Archetype archetype, 
@@ -6358,6 +6728,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -6375,6 +6746,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -6393,6 +6765,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -6411,6 +6784,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -6429,6 +6803,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -6447,6 +6822,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -6465,6 +6841,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -6483,6 +6860,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -6501,6 +6879,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -6519,6 +6898,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -6538,6 +6918,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRROOOOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -6557,6 +6938,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -6576,6 +6958,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRROOOOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -6595,6 +6978,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, N0>(this Archetype archetype, 
@@ -6611,6 +6995,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -6627,6 +7012,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, N0>(this Archetype archetype, 
@@ -6643,6 +7029,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
@@ -6659,6 +7046,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArray<T0, T1, N0, N1>(this Archetype archetype, 
@@ -6676,6 +7064,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArrayState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
@@ -6693,6 +7082,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArray<T0, T1, N0, N1>(this Archetype archetype, 
@@ -6710,6 +7100,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArrayState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
@@ -6727,6 +7118,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArray<T0, T1, N0, T2>(this Archetype archetype, 
@@ -6744,6 +7136,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArrayState<S, T0, T1, N0, T2>(this Archetype archetype, S state, 
@@ -6761,6 +7154,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArray<T0, T1, N0, T2>(this Archetype archetype, 
@@ -6778,6 +7172,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArrayState<S, T0, T1, N0, T2>(this Archetype archetype, S state, 
@@ -6795,6 +7190,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArray<T0, T1, N0, T2, N1>(this Archetype archetype, 
@@ -6813,6 +7209,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArrayState<S, T0, T1, N0, T2, N1>(this Archetype archetype, S state, 
@@ -6831,6 +7228,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArray<T0, T1, N0, T2, N1>(this Archetype archetype, 
@@ -6849,6 +7247,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArrayState<S, T0, T1, N0, T2, N1>(this Archetype archetype, S state, 
@@ -6867,6 +7266,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArray<T0, T1, N0, T2, T3>(this Archetype archetype, 
@@ -6885,6 +7285,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArrayState<S, T0, T1, N0, T2, T3>(this Archetype archetype, S state, 
@@ -6903,6 +7304,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArray<T0, T1, N0, T2, T3>(this Archetype archetype, 
@@ -6921,6 +7323,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArrayState<S, T0, T1, N0, T2, T3>(this Archetype archetype, S state, 
@@ -6939,6 +7342,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArray<T0, T1, N0, T2, T3, N1>(this Archetype archetype, 
@@ -6958,6 +7362,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArrayState<S, T0, T1, N0, T2, T3, N1>(this Archetype archetype, S state, 
@@ -6977,6 +7382,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArray<T0, T1, N0, T2, T3, N1>(this Archetype archetype, 
@@ -6996,6 +7402,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArrayState<S, T0, T1, N0, T2, T3, N1>(this Archetype archetype, S state, 
@@ -7015,6 +7422,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArray<T0, T1, N0, T2, T3, T4>(this Archetype archetype, 
@@ -7034,6 +7442,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArrayState<S, T0, T1, N0, T2, T3, T4>(this Archetype archetype, S state, 
@@ -7053,6 +7462,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArray<T0, T1, N0, T2, T3, T4>(this Archetype archetype, 
@@ -7072,6 +7482,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArrayState<S, T0, T1, N0, T2, T3, T4>(this Archetype archetype, S state, 
@@ -7091,6 +7502,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOOArray<T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, 
@@ -7111,6 +7523,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOOArrayState<S, T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, S state, 
@@ -7131,6 +7544,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOOArray<T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, 
@@ -7151,6 +7565,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOOArrayState<S, T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, S state, 
@@ -7171,6 +7586,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, N0, N1>(this Archetype archetype, 
@@ -7188,6 +7604,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
@@ -7205,6 +7622,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, N0, N1>(this Archetype archetype, 
@@ -7222,6 +7640,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
@@ -7239,6 +7658,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArray<T0, T1, N0, N1, N2>(this Archetype archetype, 
@@ -7257,6 +7677,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArrayState<S, T0, T1, N0, N1, N2>(this Archetype archetype, S state, 
@@ -7275,6 +7696,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArray<T0, T1, N0, N1, N2>(this Archetype archetype, 
@@ -7293,6 +7715,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArrayState<S, T0, T1, N0, N1, N2>(this Archetype archetype, S state, 
@@ -7311,6 +7734,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArray<T0, T1, N0, N1, T2>(this Archetype archetype, 
@@ -7329,6 +7753,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArrayState<S, T0, T1, N0, N1, T2>(this Archetype archetype, S state, 
@@ -7347,6 +7772,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArray<T0, T1, N0, N1, T2>(this Archetype archetype, 
@@ -7365,6 +7791,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArrayState<S, T0, T1, N0, N1, T2>(this Archetype archetype, S state, 
@@ -7383,6 +7810,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArray<T0, T1, N0, N1, T2, N2>(this Archetype archetype, 
@@ -7402,6 +7830,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArrayState<S, T0, T1, N0, N1, T2, N2>(this Archetype archetype, S state, 
@@ -7421,6 +7850,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArray<T0, T1, N0, N1, T2, N2>(this Archetype archetype, 
@@ -7440,6 +7870,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArrayState<S, T0, T1, N0, N1, T2, N2>(this Archetype archetype, S state, 
@@ -7459,6 +7890,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArray<T0, T1, N0, N1, T2, T3>(this Archetype archetype, 
@@ -7478,6 +7910,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArrayState<S, T0, T1, N0, N1, T2, T3>(this Archetype archetype, S state, 
@@ -7497,6 +7930,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArray<T0, T1, N0, N1, T2, T3>(this Archetype archetype, 
@@ -7516,6 +7950,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArrayState<S, T0, T1, N0, N1, T2, T3>(this Archetype archetype, S state, 
@@ -7535,6 +7970,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArray<T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, 
@@ -7555,6 +7991,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArrayState<S, T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, S state, 
@@ -7575,6 +8012,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArray<T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, 
@@ -7595,6 +8033,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArrayState<S, T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, S state, 
@@ -7615,6 +8054,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArray<T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, 
@@ -7635,6 +8075,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArrayState<S, T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -7655,6 +8096,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArray<T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, 
@@ -7675,6 +8117,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArrayState<S, T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -7695,6 +8138,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOOArray<T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, 
@@ -7716,6 +8160,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOOArrayState<S, T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, S state, 
@@ -7737,6 +8182,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOOArray<T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, 
@@ -7758,6 +8204,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOOArrayState<S, T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, S state, 
@@ -7779,6 +8226,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2>(this Archetype archetype, 
@@ -7795,6 +8243,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -7811,6 +8260,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2>(this Archetype archetype, 
@@ -7827,6 +8277,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -7843,6 +8294,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRO<T0, T1, T2, N0>(this Archetype archetype, 
@@ -7860,6 +8312,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -7877,6 +8330,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRO<T0, T1, T2, N0>(this Archetype archetype, 
@@ -7894,6 +8348,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -7911,6 +8366,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRO<T0, T1, T2, T3>(this Archetype archetype, 
@@ -7928,6 +8384,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -7945,6 +8402,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRO<T0, T1, T2, T3>(this Archetype archetype, 
@@ -7962,6 +8420,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -7979,6 +8438,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROO<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -7997,6 +8457,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -8015,6 +8476,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROO<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -8033,6 +8495,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -8051,6 +8514,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROO<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -8069,6 +8533,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -8087,6 +8552,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROO<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -8105,6 +8571,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -8123,6 +8590,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOO<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -8142,6 +8610,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -8161,6 +8630,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOO<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -8180,6 +8650,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -8199,6 +8670,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOO<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -8218,6 +8690,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -8237,6 +8710,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOO<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -8256,6 +8730,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -8275,6 +8750,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOO<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -8295,6 +8771,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOOState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -8315,6 +8792,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOO<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -8335,6 +8813,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOOState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -8355,6 +8834,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2, N0>(this Archetype archetype, 
@@ -8372,6 +8852,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -8389,6 +8870,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2, N0>(this Archetype archetype, 
@@ -8406,6 +8888,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -8423,6 +8906,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRO<T0, T1, T2, N0, N1>(this Archetype archetype, 
@@ -8441,6 +8925,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
@@ -8459,6 +8944,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRO<T0, T1, T2, N0, N1>(this Archetype archetype, 
@@ -8477,6 +8963,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
@@ -8495,6 +8982,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRO<T0, T1, T2, N0, T3>(this Archetype archetype, 
@@ -8513,6 +9001,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROState<S, T0, T1, T2, N0, T3>(this Archetype archetype, S state, 
@@ -8531,6 +9020,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRO<T0, T1, T2, N0, T3>(this Archetype archetype, 
@@ -8549,6 +9039,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROState<S, T0, T1, T2, N0, T3>(this Archetype archetype, S state, 
@@ -8567,6 +9058,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROO<T0, T1, T2, N0, T3, N1>(this Archetype archetype, 
@@ -8586,6 +9078,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOState<S, T0, T1, T2, N0, T3, N1>(this Archetype archetype, S state, 
@@ -8605,6 +9098,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROO<T0, T1, T2, N0, T3, N1>(this Archetype archetype, 
@@ -8624,6 +9118,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOState<S, T0, T1, T2, N0, T3, N1>(this Archetype archetype, S state, 
@@ -8643,6 +9138,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROO<T0, T1, T2, N0, T3, T4>(this Archetype archetype, 
@@ -8662,6 +9158,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOState<S, T0, T1, T2, N0, T3, T4>(this Archetype archetype, S state, 
@@ -8681,6 +9178,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROO<T0, T1, T2, N0, T3, T4>(this Archetype archetype, 
@@ -8700,6 +9198,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOState<S, T0, T1, T2, N0, T3, T4>(this Archetype archetype, S state, 
@@ -8719,6 +9218,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOO<T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, 
@@ -8739,6 +9239,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOState<S, T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, S state, 
@@ -8759,6 +9260,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOO<T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, 
@@ -8779,6 +9281,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOState<S, T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, S state, 
@@ -8799,6 +9302,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOO<T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, 
@@ -8819,6 +9323,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOState<S, T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, S state, 
@@ -8839,6 +9344,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOO<T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, 
@@ -8859,6 +9365,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOState<S, T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, S state, 
@@ -8879,6 +9386,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOO<T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, 
@@ -8900,6 +9408,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOOState<S, T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, S state, 
@@ -8921,6 +9430,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOO<T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, 
@@ -8942,6 +9452,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOOState<S, T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, S state, 
@@ -8963,6 +9474,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2, N0, N1>(this Archetype archetype, 
@@ -8981,6 +9493,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
@@ -8999,6 +9512,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2, N0, N1>(this Archetype archetype, 
@@ -9017,6 +9531,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
@@ -9035,6 +9550,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRO<T0, T1, T2, N0, N1, N2>(this Archetype archetype, 
@@ -9054,6 +9570,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROState<S, T0, T1, T2, N0, N1, N2>(this Archetype archetype, S state, 
@@ -9073,6 +9590,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRO<T0, T1, T2, N0, N1, N2>(this Archetype archetype, 
@@ -9092,6 +9610,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROState<S, T0, T1, T2, N0, N1, N2>(this Archetype archetype, S state, 
@@ -9111,6 +9630,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRO<T0, T1, T2, N0, N1, T3>(this Archetype archetype, 
@@ -9130,6 +9650,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROState<S, T0, T1, T2, N0, N1, T3>(this Archetype archetype, S state, 
@@ -9149,6 +9670,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRO<T0, T1, T2, N0, N1, T3>(this Archetype archetype, 
@@ -9168,6 +9690,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROState<S, T0, T1, T2, N0, N1, T3>(this Archetype archetype, S state, 
@@ -9187,6 +9710,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROO<T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, 
@@ -9207,6 +9731,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOState<S, T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, S state, 
@@ -9227,6 +9752,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROO<T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, 
@@ -9247,6 +9773,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOState<S, T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, S state, 
@@ -9267,6 +9794,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROO<T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, 
@@ -9287,6 +9815,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOState<S, T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, S state, 
@@ -9307,6 +9836,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROO<T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, 
@@ -9327,6 +9857,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOState<S, T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, S state, 
@@ -9347,6 +9878,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOO<T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, 
@@ -9368,6 +9900,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOState<S, T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, S state, 
@@ -9389,6 +9922,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOO<T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, 
@@ -9410,6 +9944,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOState<S, T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, S state, 
@@ -9431,6 +9966,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOO<T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, 
@@ -9452,6 +9988,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOState<S, T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, S state, 
@@ -9473,6 +10010,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOO<T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, 
@@ -9494,6 +10032,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOState<S, T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, S state, 
@@ -9515,6 +10054,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOO<T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, 
@@ -9537,6 +10077,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOOState<S, T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, S state, 
@@ -9559,6 +10100,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOO<T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, 
@@ -9581,6 +10123,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOOState<S, T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, S state, 
@@ -9603,6 +10146,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2>(this Archetype archetype, 
@@ -9619,6 +10163,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -9635,6 +10180,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2>(this Archetype archetype, 
@@ -9651,6 +10197,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
@@ -9667,6 +10214,7 @@ where T2 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArray<T0, T1, T2, N0>(this Archetype archetype, 
@@ -9684,6 +10232,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -9701,6 +10250,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArray<T0, T1, T2, N0>(this Archetype archetype, 
@@ -9718,6 +10268,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -9735,6 +10286,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArray<T0, T1, T2, T3>(this Archetype archetype, 
@@ -9752,6 +10304,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -9769,6 +10322,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArray<T0, T1, T2, T3>(this Archetype archetype, 
@@ -9786,6 +10340,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -9803,6 +10358,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -9821,6 +10377,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -9839,6 +10396,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -9857,6 +10415,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -9875,6 +10434,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -9893,6 +10453,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -9911,6 +10472,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -9929,6 +10491,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -9947,6 +10510,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -9966,6 +10530,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -9985,6 +10550,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -10004,6 +10570,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -10023,6 +10590,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -10042,6 +10610,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -10061,6 +10630,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -10080,6 +10650,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -10099,6 +10670,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -10119,6 +10691,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -10139,6 +10712,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -10159,6 +10733,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -10179,6 +10754,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2, N0>(this Archetype archetype, 
@@ -10196,6 +10772,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -10213,6 +10790,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2, N0>(this Archetype archetype, 
@@ -10230,6 +10808,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
@@ -10247,6 +10826,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArray<T0, T1, T2, N0, N1>(this Archetype archetype, 
@@ -10265,6 +10845,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArrayState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
@@ -10283,6 +10864,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArray<T0, T1, T2, N0, N1>(this Archetype archetype, 
@@ -10301,6 +10883,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArrayState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
@@ -10319,6 +10902,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArray<T0, T1, T2, N0, T3>(this Archetype archetype, 
@@ -10337,6 +10921,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArrayState<S, T0, T1, T2, N0, T3>(this Archetype archetype, S state, 
@@ -10355,6 +10940,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArray<T0, T1, T2, N0, T3>(this Archetype archetype, 
@@ -10373,6 +10959,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArrayState<S, T0, T1, T2, N0, T3>(this Archetype archetype, S state, 
@@ -10391,6 +10978,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArray<T0, T1, T2, N0, T3, N1>(this Archetype archetype, 
@@ -10410,6 +10998,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArrayState<S, T0, T1, T2, N0, T3, N1>(this Archetype archetype, S state, 
@@ -10429,6 +11018,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArray<T0, T1, T2, N0, T3, N1>(this Archetype archetype, 
@@ -10448,6 +11038,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArrayState<S, T0, T1, T2, N0, T3, N1>(this Archetype archetype, S state, 
@@ -10467,6 +11058,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArray<T0, T1, T2, N0, T3, T4>(this Archetype archetype, 
@@ -10486,6 +11078,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArrayState<S, T0, T1, T2, N0, T3, T4>(this Archetype archetype, S state, 
@@ -10505,6 +11098,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArray<T0, T1, T2, N0, T3, T4>(this Archetype archetype, 
@@ -10524,6 +11118,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArrayState<S, T0, T1, T2, N0, T3, T4>(this Archetype archetype, S state, 
@@ -10543,6 +11138,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArray<T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, 
@@ -10563,6 +11159,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArrayState<S, T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, S state, 
@@ -10583,6 +11180,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArray<T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, 
@@ -10603,6 +11201,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArrayState<S, T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, S state, 
@@ -10623,6 +11222,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArray<T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, 
@@ -10643,6 +11243,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArrayState<S, T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, S state, 
@@ -10663,6 +11264,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArray<T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, 
@@ -10683,6 +11285,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArrayState<S, T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, S state, 
@@ -10703,6 +11306,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOOArray<T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, 
@@ -10724,6 +11328,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOOArrayState<S, T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, S state, 
@@ -10745,6 +11350,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOOArray<T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, 
@@ -10766,6 +11372,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOOArrayState<S, T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, S state, 
@@ -10787,6 +11394,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2, N0, N1>(this Archetype archetype, 
@@ -10805,6 +11413,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
@@ -10823,6 +11432,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2, N0, N1>(this Archetype archetype, 
@@ -10841,6 +11451,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
@@ -10859,6 +11470,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArray<T0, T1, T2, N0, N1, N2>(this Archetype archetype, 
@@ -10878,6 +11490,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArrayState<S, T0, T1, T2, N0, N1, N2>(this Archetype archetype, S state, 
@@ -10897,6 +11510,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArray<T0, T1, T2, N0, N1, N2>(this Archetype archetype, 
@@ -10916,6 +11530,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, N0, N1, N2>(this Archetype archetype, S state, 
@@ -10935,6 +11550,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArray<T0, T1, T2, N0, N1, T3>(this Archetype archetype, 
@@ -10954,6 +11570,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArrayState<S, T0, T1, T2, N0, N1, T3>(this Archetype archetype, S state, 
@@ -10973,6 +11590,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArray<T0, T1, T2, N0, N1, T3>(this Archetype archetype, 
@@ -10992,6 +11610,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, N0, N1, T3>(this Archetype archetype, S state, 
@@ -11011,6 +11630,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArray<T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, 
@@ -11031,6 +11651,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArrayState<S, T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, S state, 
@@ -11051,6 +11672,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArray<T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, 
@@ -11071,6 +11693,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, S state, 
@@ -11091,6 +11714,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArray<T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, 
@@ -11111,6 +11735,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArrayState<S, T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, S state, 
@@ -11131,6 +11756,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArray<T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, 
@@ -11151,6 +11777,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, S state, 
@@ -11171,6 +11798,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArray<T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, 
@@ -11192,6 +11820,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, S state, 
@@ -11213,6 +11842,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArray<T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, 
@@ -11234,6 +11864,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, S state, 
@@ -11255,6 +11886,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArray<T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, 
@@ -11276,6 +11908,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, S state, 
@@ -11297,6 +11930,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArray<T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, 
@@ -11318,6 +11952,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, S state, 
@@ -11339,6 +11974,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOOArray<T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, 
@@ -11361,6 +11997,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, S state, 
@@ -11383,6 +12020,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOOArray<T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, 
@@ -11405,6 +12043,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, S state, 
@@ -11427,6 +12066,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2, T3>(this Archetype archetype, 
@@ -11444,6 +12084,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -11461,6 +12102,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2, T3>(this Archetype archetype, 
@@ -11478,6 +12120,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -11495,6 +12138,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRO<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -11513,6 +12157,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -11531,6 +12176,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRO<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -11549,6 +12195,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -11567,6 +12214,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRO<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -11585,6 +12233,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -11603,6 +12252,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRO<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -11621,6 +12271,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -11639,6 +12290,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROO<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -11658,6 +12310,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -11677,6 +12330,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROO<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -11696,6 +12350,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -11715,6 +12370,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROO<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -11734,6 +12390,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -11753,6 +12410,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROO<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -11772,6 +12430,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -11791,6 +12450,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOO<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -11811,6 +12471,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -11831,6 +12492,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOO<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -11851,6 +12513,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -11871,6 +12534,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOO<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -11891,6 +12555,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -11911,6 +12576,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOO<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -11931,6 +12597,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -11951,6 +12618,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOO<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -11972,6 +12640,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOOState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -11993,6 +12662,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOO<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -12014,6 +12684,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOOState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -12035,6 +12706,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -12053,6 +12725,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -12071,6 +12744,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -12089,6 +12763,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -12107,6 +12782,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRO<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
@@ -12126,6 +12802,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
@@ -12145,6 +12822,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRO<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
@@ -12164,6 +12842,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
@@ -12183,6 +12862,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRO<T0, T1, T2, T3, N0, T4>(this Archetype archetype, 
@@ -12202,6 +12882,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROState<S, T0, T1, T2, T3, N0, T4>(this Archetype archetype, S state, 
@@ -12221,6 +12902,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRO<T0, T1, T2, T3, N0, T4>(this Archetype archetype, 
@@ -12240,6 +12922,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROState<S, T0, T1, T2, T3, N0, T4>(this Archetype archetype, S state, 
@@ -12259,6 +12942,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROO<T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, 
@@ -12279,6 +12963,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOState<S, T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, S state, 
@@ -12299,6 +12984,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROO<T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, 
@@ -12319,6 +13005,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOState<S, T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, S state, 
@@ -12339,6 +13026,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROO<T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, 
@@ -12359,6 +13047,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOState<S, T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, S state, 
@@ -12379,6 +13068,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROO<T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, 
@@ -12399,6 +13089,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOState<S, T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, S state, 
@@ -12419,6 +13110,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOO<T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, 
@@ -12440,6 +13132,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOState<S, T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, S state, 
@@ -12461,6 +13154,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOO<T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, 
@@ -12482,6 +13176,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOState<S, T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, S state, 
@@ -12503,6 +13198,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOO<T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, 
@@ -12524,6 +13220,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOState<S, T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, S state, 
@@ -12545,6 +13242,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOO<T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, 
@@ -12566,6 +13264,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOState<S, T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, S state, 
@@ -12587,6 +13286,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOO<T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, 
@@ -12609,6 +13309,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOOState<S, T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, S state, 
@@ -12631,6 +13332,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOO<T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, 
@@ -12653,6 +13355,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOOState<S, T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, S state, 
@@ -12675,6 +13378,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
@@ -12694,6 +13398,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
@@ -12713,6 +13418,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
@@ -12732,6 +13438,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
@@ -12751,6 +13458,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRO<T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, 
@@ -12771,6 +13479,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROState<S, T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, S state, 
@@ -12791,6 +13500,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRO<T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, 
@@ -12811,6 +13521,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROState<S, T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, S state, 
@@ -12831,6 +13542,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRO<T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, 
@@ -12851,6 +13563,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROState<S, T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, S state, 
@@ -12871,6 +13584,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRO<T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, 
@@ -12891,6 +13605,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROState<S, T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, S state, 
@@ -12911,6 +13626,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROO<T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, 
@@ -12932,6 +13648,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOState<S, T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, S state, 
@@ -12953,6 +13670,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROO<T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, 
@@ -12974,6 +13692,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOState<S, T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, S state, 
@@ -12995,6 +13714,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROO<T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, 
@@ -13016,6 +13736,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOState<S, T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, S state, 
@@ -13037,6 +13758,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROO<T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, 
@@ -13058,6 +13780,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOState<S, T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, S state, 
@@ -13079,6 +13802,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOO<T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, 
@@ -13101,6 +13825,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOState<S, T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, S state, 
@@ -13123,6 +13848,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOO<T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, 
@@ -13145,6 +13871,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOState<S, T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, S state, 
@@ -13167,6 +13894,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOO<T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, 
@@ -13189,6 +13917,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, S state, 
@@ -13211,6 +13940,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOO<T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, 
@@ -13233,6 +13963,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, S state, 
@@ -13255,6 +13986,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOO<T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, 
@@ -13278,6 +14010,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOOState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, S state, 
@@ -13301,6 +14034,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOO<T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, 
@@ -13324,6 +14058,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOOState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, S state, 
@@ -13347,6 +14082,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2, T3>(this Archetype archetype, 
@@ -13364,6 +14100,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -13381,6 +14118,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2, T3>(this Archetype archetype, 
@@ -13398,6 +14136,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
@@ -13415,6 +14154,7 @@ where T3 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -13433,6 +14173,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -13451,6 +14192,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -13469,6 +14211,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -13487,6 +14230,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -13505,6 +14249,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -13523,6 +14268,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -13541,6 +14287,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -13559,6 +14306,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -13578,6 +14326,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -13597,6 +14346,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -13616,6 +14366,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -13635,6 +14386,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -13654,6 +14406,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -13673,6 +14426,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -13692,6 +14446,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -13711,6 +14466,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -13731,6 +14487,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -13751,6 +14508,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -13771,6 +14529,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -13791,6 +14550,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -13811,6 +14571,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -13831,6 +14592,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -13851,6 +14613,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -13871,6 +14634,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -13892,6 +14656,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -13913,6 +14678,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -13934,6 +14700,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -13955,6 +14722,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -13973,6 +14741,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -13991,6 +14760,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
@@ -14009,6 +14779,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
@@ -14027,6 +14798,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArray<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
@@ -14046,6 +14818,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArrayState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
@@ -14065,6 +14838,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArray<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
@@ -14084,6 +14858,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
@@ -14103,6 +14878,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArray<T0, T1, T2, T3, N0, T4>(this Archetype archetype, 
@@ -14122,6 +14898,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArrayState<S, T0, T1, T2, T3, N0, T4>(this Archetype archetype, S state, 
@@ -14141,6 +14918,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArray<T0, T1, T2, T3, N0, T4>(this Archetype archetype, 
@@ -14160,6 +14938,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, T3, N0, T4>(this Archetype archetype, S state, 
@@ -14179,6 +14958,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArray<T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, 
@@ -14199,6 +14979,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArrayState<S, T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, S state, 
@@ -14219,6 +15000,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArray<T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, 
@@ -14239,6 +15021,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, S state, 
@@ -14259,6 +15042,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArray<T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, 
@@ -14279,6 +15063,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArrayState<S, T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, S state, 
@@ -14299,6 +15084,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArray<T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, 
@@ -14319,6 +15105,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, S state, 
@@ -14339,6 +15126,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArray<T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, 
@@ -14360,6 +15148,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, S state, 
@@ -14381,6 +15170,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArray<T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, 
@@ -14402,6 +15192,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, S state, 
@@ -14423,6 +15214,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArray<T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, 
@@ -14444,6 +15236,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, S state, 
@@ -14465,6 +15258,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArray<T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, 
@@ -14486,6 +15280,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, S state, 
@@ -14507,6 +15302,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOOArray<T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, 
@@ -14529,6 +15325,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, S state, 
@@ -14551,6 +15348,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOOArray<T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, 
@@ -14573,6 +15371,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, S state, 
@@ -14595,6 +15394,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
@@ -14614,6 +15414,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
@@ -14633,6 +15434,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
@@ -14652,6 +15454,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
@@ -14671,6 +15474,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArray<T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, 
@@ -14691,6 +15495,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, S state, 
@@ -14711,6 +15516,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, 
@@ -14731,6 +15537,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, S state, 
@@ -14751,6 +15558,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArray<T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, 
@@ -14771,6 +15579,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, S state, 
@@ -14791,6 +15600,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, 
@@ -14811,6 +15621,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, S state, 
@@ -14831,6 +15642,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArray<T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, 
@@ -14852,6 +15664,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, S state, 
@@ -14873,6 +15686,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, 
@@ -14894,6 +15708,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, S state, 
@@ -14915,6 +15730,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArray<T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, 
@@ -14936,6 +15752,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, S state, 
@@ -14957,6 +15774,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, 
@@ -14978,6 +15796,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, S state, 
@@ -14999,6 +15818,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, 
@@ -15021,6 +15841,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, S state, 
@@ -15043,6 +15864,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, 
@@ -15065,6 +15887,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, S state, 
@@ -15087,6 +15910,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, 
@@ -15109,6 +15933,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, S state, 
@@ -15131,6 +15956,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, 
@@ -15153,6 +15979,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, S state, 
@@ -15175,6 +16002,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOOArray<T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, 
@@ -15198,6 +16026,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, S state, 
@@ -15221,6 +16050,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOOArray<T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, 
@@ -15244,6 +16074,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, S state, 
@@ -15267,6 +16098,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -15285,6 +16117,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -15303,6 +16136,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -15321,6 +16155,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -15339,6 +16174,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRO<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -15358,6 +16194,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -15377,6 +16214,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRO<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -15396,6 +16234,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -15415,6 +16254,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRO<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -15434,6 +16274,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -15453,6 +16294,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRO<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -15472,6 +16314,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -15491,6 +16334,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROO<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -15511,6 +16355,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -15531,6 +16376,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROO<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -15551,6 +16397,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -15571,6 +16418,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROO<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -15591,6 +16439,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -15611,6 +16460,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROO<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -15631,6 +16481,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -15651,6 +16502,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOO<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -15672,6 +16524,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -15693,6 +16546,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOO<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -15714,6 +16568,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -15735,6 +16590,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOO<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
@@ -15756,6 +16612,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
@@ -15777,6 +16634,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOO<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
@@ -15798,6 +16656,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
@@ -15819,6 +16678,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOO<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
@@ -15841,6 +16701,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOOState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
@@ -15863,6 +16724,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOO<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
@@ -15885,6 +16747,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOOState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
@@ -15907,6 +16770,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -15926,6 +16790,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -15945,6 +16810,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -15964,6 +16830,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -15983,6 +16850,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRO<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
@@ -16003,6 +16871,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
@@ -16023,6 +16892,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRO<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
@@ -16043,6 +16913,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
@@ -16063,6 +16934,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRO<T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, 
@@ -16083,6 +16955,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROState<S, T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, S state, 
@@ -16103,6 +16976,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRO<T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, 
@@ -16123,6 +16997,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROState<S, T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, S state, 
@@ -16143,6 +17018,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROO<T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, 
@@ -16164,6 +17040,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOState<S, T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, S state, 
@@ -16185,6 +17062,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROO<T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, 
@@ -16206,6 +17084,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOState<S, T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, S state, 
@@ -16227,6 +17106,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROO<T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, 
@@ -16248,6 +17128,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOState<S, T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, S state, 
@@ -16269,6 +17150,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROO<T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, 
@@ -16290,6 +17172,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOState<S, T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, S state, 
@@ -16311,6 +17194,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOO<T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, 
@@ -16333,6 +17217,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOState<S, T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, S state, 
@@ -16355,6 +17240,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOO<T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, 
@@ -16377,6 +17263,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOState<S, T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, S state, 
@@ -16399,6 +17286,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOO<T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, 
@@ -16421,6 +17309,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, S state, 
@@ -16443,6 +17332,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOO<T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, 
@@ -16465,6 +17355,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, S state, 
@@ -16487,6 +17378,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOO<T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, 
@@ -16510,6 +17402,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOOState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, S state, 
@@ -16533,6 +17426,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOO<T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, 
@@ -16556,6 +17450,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOOState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, S state, 
@@ -16579,6 +17474,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
@@ -16599,6 +17495,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
@@ -16619,6 +17516,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
@@ -16639,6 +17537,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
@@ -16659,6 +17558,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRO<T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, 
@@ -16680,6 +17580,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROState<S, T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, S state, 
@@ -16701,6 +17602,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRO<T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, 
@@ -16722,6 +17624,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROState<S, T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, S state, 
@@ -16743,6 +17646,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRO<T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, 
@@ -16764,6 +17668,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROState<S, T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, S state, 
@@ -16785,6 +17690,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRO<T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, 
@@ -16806,6 +17712,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROState<S, T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, S state, 
@@ -16827,6 +17734,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROO<T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, 
@@ -16849,6 +17757,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOState<S, T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, S state, 
@@ -16871,6 +17780,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROO<T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, 
@@ -16893,6 +17803,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOState<S, T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, S state, 
@@ -16915,6 +17826,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROO<T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, 
@@ -16937,6 +17849,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, S state, 
@@ -16959,6 +17872,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROO<T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, 
@@ -16981,6 +17895,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, S state, 
@@ -17003,6 +17918,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOO<T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, 
@@ -17026,6 +17942,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, S state, 
@@ -17049,6 +17966,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOO<T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, 
@@ -17072,6 +17990,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, S state, 
@@ -17095,6 +18014,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOO<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, 
@@ -17118,6 +18038,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, S state, 
@@ -17141,6 +18062,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOO<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, 
@@ -17164,6 +18086,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, S state, 
@@ -17187,6 +18110,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOO<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, 
@@ -17211,6 +18135,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOOState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, S state, 
@@ -17235,6 +18160,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOO<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, 
@@ -17259,6 +18185,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOOState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, S state, 
@@ -17283,6 +18210,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -17301,6 +18229,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -17319,6 +18248,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
@@ -17337,6 +18267,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
@@ -17355,6 +18286,7 @@ where T4 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -17374,6 +18306,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -17393,6 +18326,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -17412,6 +18346,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -17431,6 +18366,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -17450,6 +18386,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -17469,6 +18406,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -17488,6 +18426,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -17507,6 +18446,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -17527,6 +18467,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -17547,6 +18488,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -17567,6 +18509,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -17587,6 +18530,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -17607,6 +18551,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -17627,6 +18572,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -17647,6 +18593,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -17667,6 +18614,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -17688,6 +18636,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -17709,6 +18658,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -17730,6 +18680,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -17751,6 +18702,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
@@ -17772,6 +18724,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
@@ -17793,6 +18746,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
@@ -17814,6 +18768,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
@@ -17835,6 +18790,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
@@ -17857,6 +18813,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
@@ -17879,6 +18836,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
@@ -17901,6 +18859,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
@@ -17923,6 +18882,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -17942,6 +18902,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -17961,6 +18922,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
@@ -17980,6 +18942,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
@@ -17999,6 +18962,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArray<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
@@ -18019,6 +18983,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
@@ -18039,6 +19004,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
@@ -18059,6 +19025,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
@@ -18079,6 +19046,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArray<T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, 
@@ -18099,6 +19067,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, S state, 
@@ -18119,6 +19088,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, 
@@ -18139,6 +19109,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, S state, 
@@ -18159,6 +19130,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArray<T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, 
@@ -18180,6 +19152,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, S state, 
@@ -18201,6 +19174,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, 
@@ -18222,6 +19196,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, S state, 
@@ -18243,6 +19218,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArray<T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, 
@@ -18264,6 +19240,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, S state, 
@@ -18285,6 +19262,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, 
@@ -18306,6 +19284,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, S state, 
@@ -18327,6 +19306,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, 
@@ -18349,6 +19329,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, S state, 
@@ -18371,6 +19352,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, 
@@ -18393,6 +19375,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, S state, 
@@ -18415,6 +19398,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, 
@@ -18437,6 +19421,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, S state, 
@@ -18459,6 +19444,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, 
@@ -18481,6 +19467,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, S state, 
@@ -18503,6 +19490,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOOArray<T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, 
@@ -18526,6 +19514,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, S state, 
@@ -18549,6 +19538,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOOArray<T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, 
@@ -18572,6 +19562,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, S state, 
@@ -18595,6 +19586,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
@@ -18615,6 +19607,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
@@ -18635,6 +19628,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
@@ -18655,6 +19649,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
@@ -18675,6 +19670,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROArray<T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, 
@@ -18696,6 +19692,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, S state, 
@@ -18717,6 +19714,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROArray<T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, 
@@ -18738,6 +19736,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, S state, 
@@ -18759,6 +19758,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROArray<T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, 
@@ -18780,6 +19780,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, S state, 
@@ -18801,6 +19802,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROArray<T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, 
@@ -18822,6 +19824,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, S state, 
@@ -18843,6 +19846,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOArray<T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, 
@@ -18865,6 +19869,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, S state, 
@@ -18887,6 +19892,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOArray<T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, 
@@ -18909,6 +19915,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, S state, 
@@ -18931,6 +19938,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, 
@@ -18953,6 +19961,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, S state, 
@@ -18975,6 +19984,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, 
@@ -18997,6 +20007,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, S state, 
@@ -19019,6 +20030,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, 
@@ -19042,6 +20054,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, S state, 
@@ -19065,6 +20078,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, 
@@ -19088,6 +20102,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, S state, 
@@ -19111,6 +20126,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, 
@@ -19134,6 +20150,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, S state, 
@@ -19157,6 +20174,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, 
@@ -19180,6 +20198,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, S state, 
@@ -19203,6 +20222,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, 
@@ -19227,6 +20247,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, S state, 
@@ -19251,6 +20272,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, 
@@ -19275,6 +20297,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, S state, 
@@ -19299,6 +20322,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -19318,6 +20342,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -19337,6 +20362,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -19356,6 +20382,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -19375,6 +20402,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRO<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -19395,6 +20423,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -19415,6 +20444,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRO<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -19435,6 +20465,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -19455,6 +20486,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRO<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -19475,6 +20507,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -19495,6 +20528,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRO<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -19515,6 +20549,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -19535,6 +20570,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROO<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -19556,6 +20592,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -19577,6 +20614,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROO<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -19598,6 +20636,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -19619,6 +20658,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROO<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
@@ -19640,6 +20680,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
@@ -19661,6 +20702,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROO<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
@@ -19682,6 +20724,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
@@ -19703,6 +20746,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOO<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
@@ -19725,6 +20769,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
@@ -19747,6 +20792,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOO<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
@@ -19769,6 +20815,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
@@ -19791,6 +20838,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOO<T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, 
@@ -19813,6 +20861,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, S state, 
@@ -19835,6 +20884,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOO<T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, 
@@ -19857,6 +20907,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, S state, 
@@ -19879,6 +20930,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOO<T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, 
@@ -19902,6 +20954,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOOState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, S state, 
@@ -19925,6 +20978,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOO<T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, 
@@ -19948,6 +21002,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOOState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, S state, 
@@ -19971,6 +21026,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -19991,6 +21047,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -20011,6 +21068,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -20031,6 +21089,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -20051,6 +21110,7 @@ where N0 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRO<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
@@ -20072,6 +21132,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
@@ -20093,6 +21154,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRO<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
@@ -20114,6 +21176,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
@@ -20135,6 +21198,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRO<T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, 
@@ -20156,6 +21220,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROState<S, T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, S state, 
@@ -20177,6 +21242,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRO<T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, 
@@ -20198,6 +21264,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROState<S, T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, S state, 
@@ -20219,6 +21286,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROO<T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, 
@@ -20241,6 +21309,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOState<S, T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, S state, 
@@ -20263,6 +21332,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROO<T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, 
@@ -20285,6 +21355,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOState<S, T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, S state, 
@@ -20307,6 +21378,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROO<T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, 
@@ -20329,6 +21401,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, S state, 
@@ -20351,6 +21424,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROO<T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, 
@@ -20373,6 +21447,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, S state, 
@@ -20395,6 +21470,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOO<T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, 
@@ -20418,6 +21494,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, S state, 
@@ -20441,6 +21518,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOO<T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, 
@@ -20464,6 +21542,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, S state, 
@@ -20487,6 +21566,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOO<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, 
@@ -20510,6 +21590,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, S state, 
@@ -20533,6 +21614,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOO<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, 
@@ -20556,6 +21638,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, S state, 
@@ -20579,6 +21662,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOO<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, 
@@ -20603,6 +21687,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOOState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, S state, 
@@ -20627,6 +21712,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOO<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, 
@@ -20651,6 +21737,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOOState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, S state, 
@@ -20675,6 +21762,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEach<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
@@ -20696,6 +21784,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
@@ -20717,6 +21806,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEach<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
@@ -20738,6 +21828,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
@@ -20759,6 +21850,7 @@ where N1 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRRO<T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, 
@@ -20781,6 +21873,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROState<S, T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, S state, 
@@ -20803,6 +21896,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRRO<T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, 
@@ -20825,6 +21919,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROState<S, T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, S state, 
@@ -20847,6 +21942,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRRO<T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, 
@@ -20869,6 +21965,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, S state, 
@@ -20891,6 +21988,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRRO<T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, 
@@ -20913,6 +22011,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, S state, 
@@ -20935,6 +22034,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROO<T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, 
@@ -20958,6 +22058,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, S state, 
@@ -20981,6 +22082,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROO<T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, 
@@ -21004,6 +22106,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, S state, 
@@ -21027,6 +22130,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROO<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, 
@@ -21050,6 +22154,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, S state, 
@@ -21073,6 +22178,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROO<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, 
@@ -21096,6 +22202,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, S state, 
@@ -21119,6 +22226,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOO<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, 
@@ -21143,6 +22251,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, S state, 
@@ -21167,6 +22276,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOO<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, 
@@ -21191,6 +22301,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, S state, 
@@ -21215,6 +22326,7 @@ where N2 : IManagedComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOO<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, 
@@ -21239,6 +22351,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, S state, 
@@ -21263,6 +22376,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOO<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, 
@@ -21287,6 +22401,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOOState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, S state, 
@@ -21311,6 +22426,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -21330,6 +22446,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -21349,6 +22466,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
@@ -21368,6 +22486,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
@@ -21387,6 +22506,7 @@ where T5 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -21407,6 +22527,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -21427,6 +22548,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -21447,6 +22569,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -21467,6 +22590,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -21487,6 +22611,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -21507,6 +22632,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
@@ -21527,6 +22653,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
@@ -21547,6 +22674,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -21568,6 +22696,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -21589,6 +22718,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
@@ -21610,6 +22740,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
@@ -21631,6 +22762,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArray<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
@@ -21652,6 +22784,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
@@ -21673,6 +22806,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
@@ -21694,6 +22828,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
@@ -21715,6 +22850,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
@@ -21737,6 +22873,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
@@ -21759,6 +22896,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
@@ -21781,6 +22919,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
@@ -21803,6 +22942,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, 
@@ -21825,6 +22965,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, S state, 
@@ -21847,6 +22988,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, 
@@ -21869,6 +23011,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, S state, 
@@ -21891,6 +23034,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, 
@@ -21914,6 +23058,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, S state, 
@@ -21937,6 +23082,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, 
@@ -21960,6 +23106,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, S state, 
@@ -21983,6 +23130,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -22003,6 +23151,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -22023,6 +23172,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
@@ -22043,6 +23193,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
@@ -22063,6 +23214,7 @@ where N0 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
@@ -22084,6 +23236,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
@@ -22105,6 +23258,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
@@ -22126,6 +23280,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
@@ -22147,6 +23302,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, 
@@ -22168,6 +23324,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, S state, 
@@ -22189,6 +23346,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, 
@@ -22210,6 +23368,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, S state, 
@@ -22231,6 +23390,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, 
@@ -22253,6 +23413,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, S state, 
@@ -22275,6 +23436,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, 
@@ -22297,6 +23459,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, S state, 
@@ -22319,6 +23482,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, 
@@ -22341,6 +23505,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, S state, 
@@ -22363,6 +23528,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, 
@@ -22385,6 +23551,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, S state, 
@@ -22407,6 +23574,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, 
@@ -22430,6 +23598,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, S state, 
@@ -22453,6 +23622,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, 
@@ -22476,6 +23646,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, S state, 
@@ -22499,6 +23670,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, 
@@ -22522,6 +23694,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, S state, 
@@ -22545,6 +23718,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, 
@@ -22568,6 +23742,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, S state, 
@@ -22591,6 +23766,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, 
@@ -22615,6 +23791,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, S state, 
@@ -22639,6 +23816,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, 
@@ -22663,6 +23841,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, S state, 
@@ -22687,6 +23866,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachArray<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
@@ -22708,6 +23888,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
@@ -22729,6 +23910,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArray<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
@@ -22750,6 +23932,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
@@ -22771,6 +23954,7 @@ where N1 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, 
@@ -22793,6 +23977,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, S state, 
@@ -22815,6 +24000,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, 
@@ -22837,6 +24023,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, S state, 
@@ -22859,6 +24046,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, 
@@ -22881,6 +24069,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, S state, 
@@ -22903,6 +24092,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, 
@@ -22925,6 +24115,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, S state, 
@@ -22947,6 +24138,7 @@ where T6 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, 
@@ -22970,6 +24162,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, S state, 
@@ -22993,6 +24186,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, 
@@ -23016,6 +24210,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, S state, 
@@ -23039,6 +24234,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, 
@@ -23062,6 +24258,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, S state, 
@@ -23085,6 +24282,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, 
@@ -23108,6 +24306,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, S state, 
@@ -23131,6 +24330,7 @@ where T7 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, 
@@ -23155,6 +24355,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, S state, 
@@ -23179,6 +24380,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, 
@@ -23203,6 +24405,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, S state, 
@@ -23227,6 +24430,7 @@ where N2 : IManagedComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, 
@@ -23251,6 +24455,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ForEachRRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, S state, 
@@ -23275,6 +24480,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
                     );
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, 
@@ -23299,6 +24505,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
         public static void ParallelForEachRRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, S state, 
@@ -23323,6 +24530,7 @@ where T8 : unmanaged, IComponentData
 cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
+            cachedItr = null;
         }
 
 }

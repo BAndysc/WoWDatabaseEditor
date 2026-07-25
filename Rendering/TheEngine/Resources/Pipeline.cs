@@ -1,6 +1,7 @@
+using TheEngine.Resources;
 using TheEngine.Handles;
 using Veldrid;
-using IShader = TheAvaloniaOpenGL.Resources.IShader;
+using IShader = TheEngine.Resources.IShader;
 
 namespace TheEngine.Resources;
 
@@ -12,6 +13,12 @@ public class Pipeline : System.IDisposable
     public GraphicsPipelineDescription Description { get; }
     internal bool SmallLayout { get; }
     public PipelineHandle Handle { get; }
+
+    /// <summary>The per-type MaterialData SSBO (set 1 binding 0) shared by every material drawn with
+    /// this pipeline, or null if the shader has no MaterialDataArray. A pipeline's shader has exactly
+    /// one MaterialData layout, so this is 1:1 with the material struct type. Set by MaterialManager;
+    /// the set-1 bind reads it directly instead of a per-material field or a per-draw dictionary.</summary>
+    internal INativeBuffer? MaterialArrayBuffer;
 
     internal Pipeline(PipelineHandle pipelineHandle, OutputDescription output, ShaderHandle handle, IShader shader, PrimitiveTopology topology, GraphicsPipelineDescription description, bool smallLayout)
     {

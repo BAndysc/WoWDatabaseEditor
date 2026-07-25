@@ -17,7 +17,7 @@ namespace TheEngine
             // with love to https://antongerdelan.net/opengl/raycasting.html
             //step 1
             float x = 2 * normalized.X - 1.0f;
-            float y = 2 * normalized.Y - 1.0f;
+            float y = 2 * (1 - normalized.Y) - 1.0f;
             float z = 1.0f;
             Vector3 ray_nds = new Vector3(x, y, z);
                 

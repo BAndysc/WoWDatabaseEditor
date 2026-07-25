@@ -1,5 +1,4 @@
-﻿using Avalonia;
-using TheMaths;
+﻿using TheMaths;
 
 namespace TheEngine.Entities
 {
