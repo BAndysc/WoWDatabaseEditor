@@ -11,6 +11,11 @@ namespace WDE.MapRenderer.Utils;
 /// </summary>
 public static class ImGuiIconButtons
 {
+    /// <summary>Distance between the view edge and the OUTER edge (backdrop included) of every
+    /// in-view overlay - the tool strip, the view-settings strip, the inspector, the stats panel
+    /// and the camera coordinates box all share it so their edges line up.</summary>
+    public const float ViewMargin = 7f;
+
     public readonly struct IconButtonSlot
     {
         public required bool Clicked { get; init; }

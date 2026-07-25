@@ -78,7 +78,11 @@ public class DebugInfoGameModule : IGameModule
 
     private bool statsCollapsed = true;
     private const float StatsPanelWidth = 340f;
-    private const float Margin = 10f;
+    private const float Margin = Utils.ImGuiIconButtons.ViewMargin;
+
+    /// <summary>Screen-space rect of the stats panel/tab as of the last drawn frame (empty before
+    /// that). The spawn editor's hint bar dodges it instead of drawing over it.</summary>
+    public static TheMaths.RectangleF LastStatsRect { get; private set; }
 
     private void DrawStatsPanel(float right, float bottom, float fps)
     {
@@ -91,14 +95,14 @@ public class DebugInfoGameModule : IGameModule
         ImGui.SetNextWindowSizeConstraints(new Vector2(StatsPanelWidth, 0), new Vector2(StatsPanelWidth, float.MaxValue));
         ImGui.SetNextWindowBgAlpha(0.85f);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 6f);
-        if (ImGui.Begin("Stats", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize |
+        if (ImGui.Begin("Stats"u8, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize |
                        ImGuiWindowFlags.NoMove | ImGuiWindowFlags.AlwaysAutoResize |
                        ImGuiWindowFlags.NoSavedSettings))
         {
             // header: title + fps + right-aligned collapse arrow (same layout as the inspector panel)
             ImGui.TextDisabled($"Stats · {fps:0.0} fps");
             ImGui.SameLine(ImGui.GetWindowWidth() - ImGui.GetFrameHeight() - 8);
-            if (ImGui.ArrowButton("##collapsestats", ImGuiDir.Right))
+            if (ImGui.ArrowButton("##collapsestats"u8, ImGuiDir.Right))
                 statsCollapsed = true;
             ImGui.Separator();
 
@@ -127,6 +131,9 @@ public class DebugInfoGameModule : IGameModule
             ImGui.Text($"Buffers (MB): {statsManager.BufferBytes / 1024 / 1024:0.00}");
             ImGui.Text($"GPU alloc/free per frame: {statsManager.GpuAllocationsPerFrame}/{statsManager.GpuFreesPerFrame}");
             ImGui.Text($"GPU device blocks alloc/free: {statsManager.GpuDeviceAllocationsPerFrame}/{statsManager.GpuDeviceFreesPerFrame}");
+            var winPos = ImGui.GetWindowPos();
+            var winSize = ImGui.GetWindowSize();
+            LastStatsRect = new TheMaths.RectangleF(winPos.X, winPos.Y, winSize.X, winSize.Y);
         }
         ImGui.End();
         ImGui.PopStyleVar();
@@ -155,17 +162,18 @@ public class DebugInfoGameModule : IGameModule
         ImGui.SetNextWindowSize(size, ImGuiCond.Always);
         ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
         ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
-        if (ImGui.Begin("Stats", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize |
+        if (ImGui.Begin("Stats"u8, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize |
                        ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoSavedSettings |
                        ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoScrollbar))
         {
             var min = ImGui.GetWindowPos();
             var max = min + size;
-            if (ImGui.InvisibleButton("##expandstats", size))
+            LastStatsRect = new TheMaths.RectangleF(min.X, min.Y, size.X, size.Y);
+            if (ImGui.InvisibleButton("##expandstats"u8, size))
                 statsCollapsed = false;
             bool hovered = ImGui.IsItemHovered();
             if (hovered)
-                ImGui.SetTooltip("Show render stats");
+                ImGui.SetTooltip("Show render stats"u8);
 
             var dl = ImGui.GetWindowDrawList();
             dl.AddRectFilled(min, max, ImGui.GetColorU32(hovered ? ImGuiCol.ButtonHovered : ImGuiCol.WindowBg, hovered ? 1f : 0.85f), 6f);

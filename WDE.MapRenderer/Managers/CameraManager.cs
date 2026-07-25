@@ -60,8 +60,15 @@ namespace WDE.MapRenderer.Managers
             //     new Vector3(223.698f, -4745.11f, 10.1022f + 20) - Position, Vectors.Up);
             //
             engineCamera.MainCamera.FOV = 75;
-            this.coordNotificationBox = new SimpleBox(engine, BoxPlacement.BottomLeft);
+            this.coordNotificationBox = new SimpleBox(engine, BoxPlacement.BottomLeft)
+            {
+                EdgeMargin = Utils.ImGuiIconButtons.ViewMargin
+            };
         }
+
+        /// <summary>Screen-space rect of the coordinates box as of the last drawn frame (empty
+        /// before that). The spawn editor's hint bar dodges it instead of drawing over it.</summary>
+        public static RectangleF LastCoordBoxRect { get; private set; }
 
         public (int, int) CurrentChunk => Position.WoWPositionToChunk();
 
@@ -382,6 +389,7 @@ namespace WDE.MapRenderer.Managers
                     coordLabel += $"  ·  fly speed ×{userSpeedMultiplier:0.0#}";
             }
             coordNotificationBox.Draw(coordLabel);
+            LastCoordBoxRect = coordNotificationBox.LastDrawnRect;
         }
     }
 }

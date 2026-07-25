@@ -55,6 +55,24 @@ namespace TheEngine.Utils.ImGuiHelper
 
         public float Alpha { get; set; } = 0.4f;
 
+        /// <summary>Screen-space rect of the box as drawn last frame (empty until first drawn).
+        /// Lets other overlays dodge the box instead of hardcoding its size.</summary>
+        public RectangleF LastDrawnRect { get; private set; }
+
+        private float edgeMargin;
+
+        /// <summary>Insets edge-anchored placements from the view border by this many pixels
+        /// (centered axes are unaffected; None/CustomPosition ignore it entirely).</summary>
+        public float EdgeMargin
+        {
+            get => edgeMargin;
+            set
+            {
+                edgeMargin = value;
+                UpdatePlacement();
+            }
+        }
+
         public BoxPlacement Placement
         {
             get { return this.BPlacement; }
@@ -130,6 +148,10 @@ namespace TheEngine.Utils.ImGuiHelper
                     break;
             }
 
+            // pivot 0 = anchored to the low edge (inset inward, +), 1 = high edge (-), 0.5 = centered (0)
+            if (BPlacement != BoxPlacement.None && BPlacement != BoxPlacement.CustomPosition)
+                this.Position += edgeMargin * new Vector2(1 - 2 * Pivot.X, 1 - 2 * Pivot.Y);
+
             this.Position += new Vector2(DisplaySize.X, DisplaySize.Y);
         }
 
@@ -150,6 +172,9 @@ namespace TheEngine.Utils.ImGuiHelper
             bool isopen = true;
             ImGui.Begin($"###Box{id}", ref isopen, boxFlags);
             ImGui.Text(message);
+            var winPos = ImGui.GetWindowPos();
+            var winSize = ImGui.GetWindowSize();
+            LastDrawnRect = new RectangleF(winPos.X, winPos.Y, winSize.X, winSize.Y);
             ImGui.End();
         }
 
@@ -166,6 +191,9 @@ namespace TheEngine.Utils.ImGuiHelper
             cpy.MoveWrite((byte)0);
             ImGui.Begin(boxId, ref isopen, boxFlags);
             ImGui.Text(message);
+            var winPos = ImGui.GetWindowPos();
+            var winSize = ImGui.GetWindowSize();
+            LastDrawnRect = new RectangleF(winPos.X, winPos.Y, winSize.X, winSize.Y);
             ImGui.End();
         }
     }
