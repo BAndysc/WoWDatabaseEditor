@@ -1,15 +1,18 @@
 using System.Collections.Generic;
+using TheEngine.Managers;
 
 namespace TheEngine.ECS
 {
     internal class EntityDataManager : System.IDisposable
     {
+        private readonly StatsManager statsManager;
         private readonly Engine engine;
         private readonly Dictionary<ulong, int> archetypeToDataIndex = new();
         private readonly List<ChunkDataManager> data = new();
 
-        public EntityDataManager(Engine engine)
+        public EntityDataManager(StatsManager statsManager, Engine engine)
         {
+            this.statsManager = statsManager;
             this.engine = engine;
         }
 
@@ -18,7 +21,7 @@ namespace TheEngine.ECS
             var hash = archetype.Hash;
             if (!archetypeToDataIndex.TryGetValue(hash, out var dataIndex))
             {
-                data.Add(new ChunkDataManager(archetype, engine));
+                data.Add(new ChunkDataManager(archetype, statsManager, engine));
                 dataIndex = data.Count - 1;
                 archetypeToDataIndex[hash] = dataIndex;
             }

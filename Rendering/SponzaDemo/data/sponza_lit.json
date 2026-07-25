@@ -1,0 +1,17 @@
+{
+  "Pixel": {
+    "Path": "data/sponza_lit.frag"
+  },
+  "ZWrite": true,
+  "Instancing": false,
+  "Vertex": {
+    "Path": "data/sponza_lit.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

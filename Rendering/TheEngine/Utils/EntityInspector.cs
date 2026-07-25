@@ -85,17 +85,42 @@ public class EntityInspector
 
             var chunkDataManager = em.GetEntityDataManagerByEntity(inspectEntity.Value);
             var componentBytes = chunkDataManager.UnsafeDebugGetComponent(inspectEntity.Value, comp);
-            if (ImGui.CollapsingHeader(comp.DataType.Name))
+            if (comp.IsArray)
             {
-                if (RefInspectorDrawers.TryGetValue(comp.DataType, out var drawer))
+                ComponentArrayIndex arrayOffset = *(ComponentArrayIndex*)componentBytes;
+                var arrayData = chunkDataManager.UnsafeDebugGetArrayBytesComponent(inspectEntity.Value, comp);
+                for (int i = 0; i < arrayOffset.Count; ++i)
                 {
-                    var method = genericDrawHelper.MakeGenericMethod(comp.DataType);
-                    method.Invoke(null, [inspectEntity.Value, new IntPtr(componentBytes), comp.SizeBytes, drawer]);
+                    var elementBytes = arrayData + (i + arrayOffset.Index) * comp.SizeBytes;
+                    if (ImGui.CollapsingHeader(comp.DataType.Name + " [" + i + "]"))
+                    {
+                        if (RefInspectorDrawers.TryGetValue(comp.DataType, out var drawer))
+                        {
+                            var method = genericDrawHelper.MakeGenericMethod(comp.DataType);
+                            method.Invoke(null, [inspectEntity.Value, new IntPtr(elementBytes), comp.SizeBytes, drawer]);
+                        }
+                        else
+                        {
+                            var boxed = Marshal.PtrToStructure(new IntPtr(elementBytes), comp.DataType);
+                            DrawNestedObject(boxed);
+                        }
+                    }
                 }
-                else
+            }
+            else
+            {
+                if (ImGui.CollapsingHeader(comp.DataType.Name))
                 {
-                    var boxed = Marshal.PtrToStructure(new IntPtr(componentBytes), comp.DataType);
-                    DrawNestedObject(boxed);
+                    if (RefInspectorDrawers.TryGetValue(comp.DataType, out var drawer))
+                    {
+                        var method = genericDrawHelper.MakeGenericMethod(comp.DataType);
+                        method.Invoke(null, [inspectEntity.Value, new IntPtr(componentBytes), comp.SizeBytes, drawer]);
+                    }
+                    else
+                    {
+                        var boxed = Marshal.PtrToStructure(new IntPtr(componentBytes), comp.DataType);
+                        DrawNestedObject(boxed);
+                    }
                 }
             }
         }
@@ -271,6 +296,16 @@ public class EntityInspector
                 if (ImGuiEx.Selectable(selectableTextUtf8Span, isSelected))
                 {
                     inspectEntity = entity;
+                }
+                // If the current item is hovered and user double-clicks, center SceneView camera on entity if it has LocalToWorld
+                if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                {
+                    var hasTransform = em.NewArchetype().WithComponentData<LocalToWorld>();
+                    if (em.Is(entity, hasTransform))
+                    {
+                        var pos = em.GetComponent<LocalToWorld>(entity).Position;
+                        engine.sceneView.FocusOn(pos, 2f);
+                    }
                 }
             }
 

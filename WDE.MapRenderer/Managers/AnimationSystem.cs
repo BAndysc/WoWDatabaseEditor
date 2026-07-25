@@ -533,8 +533,8 @@ public class AnimationSystem
 
         ThreadLocal<long> counter = new(true);
         var cameraPosition = cameraManager.MainCamera.Transform.Position;
-        ThreadLocal<List<(NativeBuffer<Matrix>, int, Matrix[])>> updates = new ThreadLocal<List<(NativeBuffer<Matrix>, int, Matrix[])>>(() => new(), true);
-        ThreadLocal<List<(NativeBuffer<Vector4>, int, Vector4[])>> updateColors = new ThreadLocal<List<(NativeBuffer<Vector4>, int, Vector4[])>>(() => new(), true);
+        ThreadLocal<List<(INativeBuffer<Matrix>, int, Matrix[])>> updates = new ThreadLocal<List<(INativeBuffer<Matrix>, int, Matrix[])>>(() => new(), true);
+        ThreadLocal<List<(INativeBuffer<Vector4>, int, Vector4[])>> updateColors = new ThreadLocal<List<(INativeBuffer<Vector4>, int, Vector4[])>>(() => new(), true);
 
         var cameraViewMatrix = cameraManager.MainCamera.ViewMatrix;
 

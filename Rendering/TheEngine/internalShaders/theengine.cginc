@@ -30,7 +30,11 @@ layout (std140) uniform SceneData
 	float time;
 	float zNear;
 	float zFar;
-	float padding3[3];
+	// three scalars, not float[3]: a std140 scalar array has 16-byte element stride,
+	// which would make the block bigger than the CPU-side struct
+	float padding3;
+	float padding5;
+	float padding6;
 };
 
 // Voronoi

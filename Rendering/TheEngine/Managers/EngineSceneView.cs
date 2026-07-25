@@ -77,6 +77,30 @@ internal class EngineSceneView : BaseBaseView
         camera.Transform.Position = position;
     }
 
+    // Centers and orients the SceneView camera to look at the given target position from a given distance
+    public void FocusOn(in Vector3 targetPosition, float distance = 2f)
+    {
+        // Compute forward direction from camera to target
+        var forward = Vectors.Normalize(targetPosition - position);
+        if (forward.LengthSquared() < 1e-6f)
+            forward = Vectors.Forward;
+        // Compute rotation to look at the target
+        var newRotation = Utilities.LookRotation(forward, Vectors.Up);
+        rotation = newRotation;
+        // Place the camera "back" from the target along the viewing direction
+        position = targetPosition - forward * distance;
+
+        // Update yaw/pitch so UpdateCamera keeps this orientation next time it runs
+        var eulerDeg = Utilities.ToEulerDeg(rotation); // X=Pitch, Y=Yaw, Z=Roll
+        pitch = eulerDeg.Z; // roll becomes our 'pitch' arg in FromEuler(0, pitch, yaw)
+        yaw = eulerDeg.X;   // pitch becomes our 'yaw' arg in FromEuler(0, pitch, yaw)
+
+        // Also immediately push transform to the camera
+        var camera = engine.cameraManger.SceneViewCamera;
+        camera.Transform.Rotation = rotation;
+        camera.Transform.Position = position;
+    }
+
     public void OnSceneViewRender()
     {
         engine.EntityInspector.SceneViewRender();
@@ -102,12 +126,7 @@ internal class EngineSceneView : BaseBaseView
                     DepthStencilState = DepthStencilStateDescription.DepthOnlyLessEqual,
                     BlendState = BlendStateDescription.Empty with
                     {
-                        AttachmentStates = [new BlendAttachmentDescription()
-                        {
-                            BlendEnabled = true,
-                            SourceAlphaFactor = BlendFactor.SourceAlpha,
-                            DestinationAlphaFactor = BlendFactor.InverseSourceAlpha,
-                        }]
+                        AttachmentStates = [BlendAttachmentDescription.AlphaBlend]
                     }
                 }, false);
             material = engine.materialManager.CreateMaterial(pipeline);

@@ -69,7 +69,10 @@ namespace TheEngine.ECS
             n.usedManagedComponents = usedManagedComponents;
 
             n.components.AddRange(components);
-            var typeData = EntityManager.TypeData(t);
+            // For regular components, create type data with isArray=false explicitly
+            var index = EntityManager.GetTypeIndex(t);
+            var typeData = (IComponentTypeData)Activator.CreateInstance(typeof(ComponentTypeData<>).MakeGenericType(t), index)!;
+            EntityManager.RegisterTypeData(t, typeData);
             n.components.Add(typeData);
             n.usedComponents = usedComponents;
             n.usedComponents[(int)typeData.Hash] = true;

@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Avalonia.Input;
 using JetBrains.Profiler.Api;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -60,7 +59,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     protected override void OnRenderFrame(FrameEventArgs args)
     {
         presentStopwatch.Restart();
-        GL.Finish();
+        engine.Device.device.Finish();
         SwapBuffers();
         presentStopwatch.Stop();
         engine.statsManager.Counters.PresentTime.Add(presentStopwatch.Elapsed.Milliseconds);

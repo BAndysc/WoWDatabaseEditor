@@ -132,7 +132,32 @@ namespace TheAvaloniaOpenGL.Resources
         Shadow
     }
 
-    public class ShaderPass : IDisposable
+    /// <summary>
+    /// Backend-neutral view of a compiled shader pass: the identity bound together with a
+    /// <see cref="TheEngine.Resources.Pipeline"/> via ICommandList.SetPipeline, plus the
+    /// reflection queries shared recording code needs. Everything else (GL uniform setters,
+    /// Vulkan modules/layouts) lives on the backend's concrete type.
+    /// </summary>
+    public interface IShaderPass
+    {
+        bool Instancing { get; }
+        /// <summary>Whether this pass references the named resource (texture/buffer/uniform).</summary>
+        bool HasGlobalUniform(GlobalUniformHandle globalId);
+    }
+
+    /// <summary>Backend-neutral compiled shader: the set of passes loaded from one shader json.</summary>
+    internal interface IShader : IDisposable
+    {
+        IShaderPass ForwardPass { get; }
+        IShaderPass? ShadowPass { get; }
+        IShaderPass? ForwardInstancedPass { get; }
+        IShaderPass? ShadowInstancedPass { get; }
+        string ShaderFile { get; }
+        void Recompile();
+        IReadOnlyDictionary<string, ShaderVariableType> Uniforms { get; }
+    }
+
+    public class ShaderPass : IShaderPass, IDisposable
     {
         private readonly IDevice device;
         private readonly string shaderFile;
@@ -384,11 +409,12 @@ namespace TheAvaloniaOpenGL.Resources
         }
     }
 
-    public class Shader : IDisposable
+    public class Shader : IShader, IDisposable
     {
         private ShaderData shaderData;
         private readonly IDevice device;
         private readonly string shaderFile;
+        private readonly string[] includePaths;
 
         private ShaderPass forwardPass;
         //private ShaderPass depthPass;
@@ -406,6 +432,13 @@ namespace TheAvaloniaOpenGL.Resources
         public ShaderPass? ShadowInstancedPass => shadowInstancedPass;
 
         public string ShaderFile => shaderFile;
+
+        // IShader returns the backend-neutral pass view; GL-internal code keeps the concrete properties
+        IShaderPass IShader.ForwardPass => forwardPass;
+        IShaderPass? IShader.ShadowPass => shadowPass;
+        IShaderPass? IShader.ForwardInstancedPass => forwardInstancedPass;
+        IShaderPass? IShader.ShadowInstancedPass => shadowInstancedPass;
+        IReadOnlyDictionary<string, ShaderVariableType> IShader.Uniforms => uniformTypes;
 
         private Dictionary<string, ShaderVariableType> uniformTypes;
 
@@ -441,11 +474,15 @@ namespace TheAvaloniaOpenGL.Resources
             }
         }
 */
-        
-        internal Shader(IDevice device, string shaderFile, string[] includePaths)
+
+
+        public void Recompile()
         {
-            var shaderContent = File.ReadAllText(shaderFile);
-            shaderData = JsonConvert.DeserializeObject<ShaderData>(shaderContent) ?? throw new Exception("Failed to deserialize shader data from " + shaderFile);
+            forwardPass?.Dispose();
+            shadowPass?.Dispose();
+            forwardInstancedPass?.Dispose();
+            shadowInstancedPass?.Dispose();
+
             var pixelShader = File.ReadAllText(shaderData.Pixel.Path);
 
             forwardPass = new ShaderPass(device, false, shaderData, shaderFile, includePaths, "FORWARD_PASS");
@@ -463,38 +500,21 @@ namespace TheAvaloniaOpenGL.Resources
 
             if (!forwardInstancedPass.Instancing)
                 forwardInstancedPass = null;
-            
-            /*var shaderInclude = new ShaderInclude(includePaths);
-
-            var vertexMacros = new List<ShaderMacro> { new ShaderMacro("VERTEX_SHADER", 1) };
-            var pixelMacros = new List<ShaderMacro> { new ShaderMacro("PIXEL_SHADER", 1) };
-
-            WriteMask = shaderData.WriteMask;
-            if (Instancing)
-            {
-                vertexMacros.Add(new ShaderMacro("INSTANCING", 1));
-                pixelMacros.Add(new ShaderMacro("INSTANCING", 1));
-            }
-
-            ShaderBytecode vertexShaderByteCode = ShaderBytecode.CompileFromFile(shaderDir + "/" + shaderData.Vertex.Path, shaderData.Vertex.Entry, "vs_5_0", ShaderFlags.None, EffectFlags.None, vertexMacros.ToArray(), shaderInclude);
-            ShaderBytecode pixelShaderByteCode = ShaderBytecode.CompileFromFile(shaderDir + "/" + shaderData.Pixel.Path, shaderData.Pixel.Entry, "ps_5_0", ShaderFlags.None, EffectFlags.None, pixelMacros.ToArray(), shaderInclude);
-
-            InputElement[] inputElements = LoadInputs(shaderData.Vertex.Input, shaderData.Instancing);
-            ShaderInputLayout = new InputLayout(device, ShaderSignature.GetInputSignature(vertexShaderByteCode), inputElements);
-
-            VertexShader = new VertexShader(device, vertexShaderByteCode);
-            PixelShader = new PixelShader(device, pixelShaderByteCode);
-
-
-            vertexShaderByteCode.Dispose();
-            pixelShaderByteCode.Dispose();*/
-            this.device = device;
-            this.shaderFile = shaderFile;
 
             var allPasses = new[] { ForwardPass, forwardInstancedPass, ShadowPass, shadowInstancedPass };
             uniformTypes = allPasses.Where(x => x != null).SelectMany(x => x.Uniforms)
                 .DistinctBy(x => x.Key)
                 .ToDictionary();
+        }
+
+        internal Shader(IDevice device, string shaderFile, string[] includePaths)
+        {
+            var shaderContent = File.ReadAllText(shaderFile);
+            shaderData = JsonConvert.DeserializeObject<ShaderData>(shaderContent) ?? throw new Exception("Failed to deserialize shader data from " + shaderFile);
+            this.device = device;
+            this.shaderFile = shaderFile;
+            this.includePaths = includePaths;
+            Recompile();
         }
 
         internal IReadOnlyDictionary<string, ShaderVariableType> Uniforms => uniformTypes;

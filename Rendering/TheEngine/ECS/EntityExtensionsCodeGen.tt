@@ -1,6 +1,10 @@
-<#@ template language="C#" #>
-<#@ import namespace="System.Linq" #>
+<#@ template debug="true" hostspecific="false" language="C#"  #>
 <#@ assembly name="System.Core" #>
+<#@ assembly name="System.Runtime" #>
+<#@ assembly name="System.Collections" #>
+<#@ assembly name="System.Linq" #>
+<#@ import namespace="System.Linq" #>
+<#@ output extension=".cs" #>
 
 namespace TheEngine.ECS;
 
@@ -10,56 +14,79 @@ private static IChunkDataIterator? cachedItr;
 <#
     for (int UNMANAGED = 0; UNMANAGED <= 6; UNMANAGED++)
     {
-        for (int MANAGED = 0; MANAGED <= 2; MANAGED++)
+        for (int UNMANAGED_ARR = 0; UNMANAGED_ARR <= 1; UNMANAGED_ARR++)
         {
-            for (int UNMANAGED_OPTIONAL = 0; UNMANAGED_OPTIONAL <= 3; UNMANAGED_OPTIONAL++)
+            for (int MANAGED = 0; MANAGED <= 2; MANAGED++)
             {
-                for (int MANAGED_OPTIONAL = 0; MANAGED_OPTIONAL <= 1; MANAGED_OPTIONAL++)
+                for (int UNMANAGED_OPTIONAL = 0; UNMANAGED_OPTIONAL <= 3; UNMANAGED_OPTIONAL++)
                 {
-                    if (UNMANAGED + MANAGED == 0)
-                        continue;
-
-                    if (UNMANAGED + MANAGED + UNMANAGED_OPTIONAL + MANAGED_OPTIONAL > 11)
-                        continue;
-
-                    for (int mode = 0; mode <= 3; ++mode)
+                    for (int MANAGED_OPTIONAL = 0; MANAGED_OPTIONAL <= 1; MANAGED_OPTIONAL++)
                     {
-                        bool parallel = mode >= 2;
-                        bool withState = mode % 2 == 1;
-                        var suffix = "";
-                        if (UNMANAGED_OPTIONAL + MANAGED_OPTIONAL > 0)
+                        if (UNMANAGED + MANAGED == 0)
+                            continue;
+
+                        if (UNMANAGED < UNMANAGED_ARR)
+                            continue;
+
+                        if (UNMANAGED + MANAGED + UNMANAGED_OPTIONAL + MANAGED_OPTIONAL > 11)
+                            continue;
+
+                        for (int mode = 0; mode <= 3; ++mode)
                         {
-                            suffix = string.Join("",
-                                Enumerable.Range(0, UNMANAGED + MANAGED).Select(i => "R").Concat(
-                                    Enumerable.Range(0, MANAGED_OPTIONAL + UNMANAGED_OPTIONAL).Select(i => "O")));
-                        }
-                        if (withState)
-                            suffix += "State";
+                            bool parallel = mode >= 2;
+                            bool withState = mode % 2 == 1;
+                            var suffix = "";
+                            if (UNMANAGED_OPTIONAL + MANAGED_OPTIONAL > 0)
+                            {
+                                suffix += string.Join("",
+                                    Enumerable.Range(0, UNMANAGED + MANAGED).Select(i => "R").Concat(
+                                        Enumerable.Range(0, MANAGED_OPTIONAL + UNMANAGED_OPTIONAL).Select(i => "O")));
+                            }
+                            if (UNMANAGED_ARR > 0)
+                            {
+                                suffix += "Array";
+                            }
+                            if (withState)
+                                suffix += "State";
 #>
 
         public static void <#=
-                            parallel ? "ParallelForEach" + suffix : "ForEach" + suffix #><<#= withState ? "S, " : "" #><#=
-                            string.Join(", ",
-                                Enumerable.Range(0, UNMANAGED).Select(i => "T" + i).Concat(
-                                    Enumerable.Range(0, MANAGED).Select(i => "N" + i).Concat(
-                                        Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(i => "T" + (i + UNMANAGED)).Concat(
-                                            Enumerable.Range(0, MANAGED_OPTIONAL).Select(i => "N" + (i + MANAGED)))))) #>>(this Archetype archetype, <#= withState ? "S state, " :"" #>
+                                parallel ? "ParallelForEach" + suffix : "ForEach" + suffix #><<#= withState ? "S, " : "" #><#=
+                                string.Join(", ",
+                                    Enumerable.Range(0, UNMANAGED).Select(i => "T" + i).Concat(
+                                        Enumerable.Range(0, MANAGED).Select(i => "N" + i).Concat(
+                                            Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(i => "T" + (i + UNMANAGED))
+                                                .Concat(
+                                                    Enumerable.Range(0, MANAGED_OPTIONAL).Select(
+                                                        i => "N" + (i + MANAGED)))))) #>>(this Archetype archetype, <#=
+                                    withState ? "S state, " : "" #>
 <#
-                        string actionType = "Action<" + (withState ? "S, " : "") + "IChunkDataIterator, int, int, int, " + string.Join(", ",
-                            Enumerable.Range(0, UNMANAGED).Select(i => $"ComponentDataAccess<T{i}>").Concat(
-                                Enumerable.Range(0, MANAGED).Select(i => $"ManagedComponentDataAccess<N{i}>").Concat(
-                                    Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(i => $"ComponentDataAccess<T{i + UNMANAGED}>?").Concat(
-                                        Enumerable.Range(0, MANAGED_OPTIONAL).Select(i => $"ManagedComponentDataAccess<N{i + MANAGED}>?"))))) + ">";
+                            string actionType = "Action<" + (withState ? "S, " : "") +
+                                                "IChunkDataIterator, int, int, int, " + string.Join(", ",
+                                                    Enumerable.Range(0, UNMANAGED).Select(
+                                                        i => i < UNMANAGED_ARR ? $"ComponentArrayDataAccess<T{i}>" : $"ComponentDataAccess<T{i}>").Concat(
+                                                            Enumerable.Range(0, MANAGED).Select(
+                                                                i => $"ManagedComponentDataAccess<N{i}>").Concat(
+                                                                    Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(
+                                                                        i => $"ComponentDataAccess<T{i + UNMANAGED}>?")
+                                                                        .Concat(
+                                                                            Enumerable.Range(0, MANAGED_OPTIONAL).Select
+                                                                                (i =>
+                                                                                    $"ManagedComponentDataAccess<N{i +
+                                                                                                                   MANAGED}>?"))))) +
+                                                ">";
 #>
             <#= actionType #> process)<#=
-                            string.Join("\n",
-                                Enumerable.Range(0, UNMANAGED).Select(i => $"where T{i} : unmanaged, IComponentData")
-                                    .Concat
-                                    (Enumerable.Range(0, MANAGED).Select(i => $"where N{i} : IManagedComponentData"))
-                                    .Concat
-                                    (Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(i => $"where T{i + UNMANAGED} : unmanaged, IComponentData"))
-                                    .Concat
-                                    (Enumerable.Range(0, MANAGED_OPTIONAL).Select(i => $"where N{i + MANAGED} : IManagedComponentData"))) #>
+                                string.Join("\n",
+                                    Enumerable.Range(0, UNMANAGED).Select(i => $"where T{i} : unmanaged, IComponentData")
+                                        .Concat
+                                        (Enumerable.Range(0, MANAGED).Select(i => $"where N{i} : IManagedComponentData"))
+                                        .Concat
+                                        (Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(
+                                            i => $"where T{i + UNMANAGED} : unmanaged, IComponentData"))
+                                        .Concat
+                                        (Enumerable.Range(0, MANAGED_OPTIONAL).Select(
+                                            i => $"where N{i + MANAGED} : IManagedComponentData"))) #>
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
@@ -67,42 +94,49 @@ private static IChunkDataIterator? cachedItr;
             {
                 cachedItr = iterator.Current;
 <#
-                        if (parallel)
-                        {
+                            if (parallel)
+                            {
 #>
-                    RunThreads(0, cachedItr.Length, process, <#= withState ? "state" : "null" #>, (process, state, thread, s, e) => ((<#= actionType #>)process!)(<#= withState ? "(S)state, " : "" #>cachedItr, thread, s, e,
+                    RunThreads(0, cachedItr.Length, process, <#=
+                                        withState ? "state" : "null" #>, (process, state, thread, s, e) => ((<#= actionType #>)process!)(<#=
+                                        withState ? "(S)state, " : "" #>cachedItr, thread, s, e,
 <#
-                        }
-                        else
-                        {
+                            }
+                            else
+                            {
 #>
-                    process(<#= withState ? "state, " : "" #>cachedItr, 0, 0, cachedItr.Length,
+                    process(<#=
+                                        withState ? "state, " : "" #>cachedItr, 0, 0, cachedItr.Length,
 <#
-                        }
+                            }
 #>
 <#=
-                            string.Join(", ",
-                                Enumerable.Range(0, UNMANAGED).Select(i => $"cachedItr.DataAccess<T{i}>()").Concat(
-                                    Enumerable.Range(0, MANAGED).Select(i => $"cachedItr.ManagedDataAccess<N{i}>()")).Concat(
-                                        Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(i => $"cachedItr.OptionalDataAccess<T{i + UNMANAGED}>()")).Concat(
-                                            Enumerable.Range(0, MANAGED_OPTIONAL).Select(i => $"cachedItr.OptionalManagedDataAccess<N{i + MANAGED}>()"))) #>
+                                string.Join(", ",
+                                    Enumerable.Range(0, UNMANAGED).Select(i => i < UNMANAGED_ARR ? $"cachedItr.ArrayDataAccess<T{i}>()" : $"cachedItr.DataAccess<T{i}>()").Concat(
+                                        Enumerable.Range(0, MANAGED).Select(i => $"cachedItr.ManagedDataAccess<N{i}>()"))
+                                        .Concat(
+                                            Enumerable.Range(0, UNMANAGED_OPTIONAL).Select(
+                                                i => $"cachedItr.OptionalDataAccess<T{i + UNMANAGED}>()")).Concat(
+                                                    Enumerable.Range(0, MANAGED_OPTIONAL).Select(
+                                                        i => $"cachedItr.OptionalManagedDataAccess<N{i + MANAGED}>()"))) #>
 <#
-                        if (parallel)
-                        {
+                            if (parallel)
+                            {
 #>
 ));
 <#
-                        }
-                        else
-                        {
+                            }
+                            else
+                            {
 #>
                     );
 <#
-                        }
+                            }
 #>
             }
         }
 <#
+                        }
                     }
                 }
             }

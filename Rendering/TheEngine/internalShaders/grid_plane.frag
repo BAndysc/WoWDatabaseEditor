@@ -52,6 +52,8 @@ void main()
 
     vec3 worldPos = NearPoint + t * (FarPoint - NearPoint);
 
+    vec4 clipPos = projection * view * vec4(worldPos, 1.0);
+    gl_FragDepth = (clipPos.z / clipPos.w) * 0.5 + 0.5;
 
     float distZ = abs(pow(cameraPos.z, 0.4));
 
@@ -64,7 +66,7 @@ void main()
 
     float fading = clamp((fadeEnd - dist) / (fadeEnd - fadeStart), 0.0f, 1);//0.3f);
 
-    FragColor = Grid(worldPos, 1.0f, true) + Grid(worldPos, 10.0f, true)/* + Grid(worldPos, 0.01f, true)*/;
+    FragColor = Grid(worldPos, 1.0f, true) + Grid(worldPos, 10.0f, true) + Grid(worldPos, 100.0f, true)/* + Grid(worldPos, 0.01f, true)*/;
     // FragColor.a *= fading;
     //     FragColor = vec4(NearPoint / 1000, 1);
 

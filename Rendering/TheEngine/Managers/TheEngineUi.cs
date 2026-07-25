@@ -10,6 +10,7 @@ public class TheEngineUi
     private readonly EngineSceneView sceneView;
 
     private InputDebugWindow inputWindow;
+    private RenderTextureDebugWindow renderTextureDebugWindow;
 
     public TheEngineUi(Engine engine)
     {
@@ -17,6 +18,7 @@ public class TheEngineUi
         this.gameView = engine.gameView;
         this.sceneView = engine.sceneView;
         inputWindow = new InputDebugWindow(engine);
+        renderTextureDebugWindow = new RenderTextureDebugWindow(engine);
         engine.uiManager.OnMenuBarDraw += OnDrawMenuBar;
     }
 
@@ -29,6 +31,12 @@ public class TheEngineUi
             {
                 inputWindow.IsOpen = !inputWindow.IsOpen;
             }
+
+            isOpen = renderTextureDebugWindow.IsOpen;
+            if (ImGuiEx.MenuItem("Render texture debugger\0"u8, null, ref isOpen))
+            {
+                renderTextureDebugWindow.IsOpen = !renderTextureDebugWindow.IsOpen;
+            }
             ImGui.EndMenu();
         }
     }
@@ -40,5 +48,6 @@ public class TheEngineUi
         sceneView.Draw(delta);
 #endif
         inputWindow.Update(delta);
+        renderTextureDebugWindow.Update(delta);
     }
 }

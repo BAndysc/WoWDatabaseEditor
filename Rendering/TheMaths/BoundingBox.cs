@@ -560,5 +560,12 @@ namespace TheMaths
         {
             return FromCenterSize(Center, size);
         }
+
+        public static BoundingBox Union(BoundingBox a, BoundingBox b)
+        {
+            return new BoundingBox(
+                Vector3.Min(a.Minimum, b.Minimum),
+                Vector3.Max(a.Maximum, b.Maximum));
+        }
     }
 }

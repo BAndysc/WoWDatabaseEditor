@@ -37,6 +37,7 @@ namespace TheAvaloniaOpenGL.Resources
         {
             if (colorAttachments < 0 || colorAttachments >= 5)
                 throw new ArgumentOutOfRangeException(nameof(colorAttachments));
+            ColorAttachments = colorAttachments;
             handle = device.GenFramebuffer();
             device.BindFramebuffer(FramebufferTarget.Framebuffer, handle);
             ownsColorTexture = true;
@@ -106,6 +107,7 @@ namespace TheAvaloniaOpenGL.Resources
         }
 
         public int SizeInBytes => 0;
+        public int ColorAttachments { get; }
 
         public void Clear(float r, float g, float b, float a)
         {

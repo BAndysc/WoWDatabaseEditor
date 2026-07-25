@@ -138,7 +138,10 @@ public class SpawnViewer : IGameModule
                 return;
 
             pickedEntity = pickedEntity.GetRoot(entityManager);
-            
+
+            if (!entityManager.Exist(pickedEntity))
+                return;
+
             if (!entityManager.HasManagedComponent<SpawnInstance>(pickedEntity))
                 return;
             
@@ -168,7 +171,7 @@ public class SpawnViewer : IGameModule
 
     public void Render(float delta)
     {
-        postProcess.Render(spawnSelectionService.SelectedSpawn.Value?.WorldObject?.Renderers);
+        postProcess.Render([spawnSelectionService.SelectedSpawn.Value?.WorldObject?.WorldObjectEntity]);
     }
 
     public void RenderGUI()
@@ -256,7 +259,12 @@ public class SpawnViewer : IGameModule
                     await creatureInstance.SetVirtualItem(1, eq.Item2, cancellationToken);
                     await creatureInstance.SetVirtualItem(2, eq.Item3, cancellationToken);
                 }
-                
+
+                // the awaits above yield frames; a map change meanwhile disposes the spawn
+                // (destroying the creature's entities) and cancels the token
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
                 if (creatureSpawnInstance.Addon is {} addon)
                 {
                     creatureInstance.Animation = animationSystem.GetAnimationType(creatureInstance.Model,

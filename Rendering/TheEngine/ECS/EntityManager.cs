@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using TheEngine.Components;
+using TheEngine.Managers;
 #if DEBUG_ENTITY_CREATE_CALLSTACK
 using System.Diagnostics;
 #endif
@@ -28,6 +29,7 @@ namespace TheEngine.ECS
         private uint used;
         private readonly Dictionary<System.Type, int> typeToIndexMapping = new();
         private readonly Dictionary<System.Type, IComponentTypeData> typeToTypeDataMapping = new();
+        private readonly Dictionary<System.Type, IManagedComponentTypeData> typeToManagedTypeDataMapping = new();
         private readonly Dictionary<System.Type, int> typeToManagedIndexMapping = new();
         private readonly Dictionary<ulong, Archetype> archetypes = new();
 
@@ -35,9 +37,9 @@ namespace TheEngine.ECS
         internal IEnumerable<Type> KnownTypes => typeToIndexMapping.Keys;
         internal IEnumerable<Type> KnownManagedTypes => typeToManagedIndexMapping.Keys;
 
-        public EntityManager(Engine engine)
+        public EntityManager(StatsManager statsManager, Engine engine)
         {
-            dataManager = new(engine);
+            dataManager = new(statsManager, engine);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -147,8 +149,45 @@ namespace TheEngine.ECS
             SetManagedComponent<T>(entity, component);
         }
 
+        public void AddArrayComponent<T>(Entity entity, in T component) where T : unmanaged, IComponentData
+        {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
+            ulong currentArchetypeHash = entitiesArchetype[entity.Id];
+            var componentTypeData = TypeData<T>();
+
+            // unlike AddComponent, having the component already is the common case here (adding another element)
+            if ((currentArchetypeHash & componentTypeData.GlobalHash) == 0)
+            {
+                var oldArchetype = archetypes[currentArchetypeHash];
+                var newArchetype = oldArchetype.WithComponentData<T>();
+                dataManager.MoveEntity(entity, oldArchetype, newArchetype);
+                entitiesArchetype[entity.Id] = newArchetype.Hash;
+            }
+            GetEntityDataManagerByEntity(entity).AddArrayComponent<T>(entity, component);
+        }
+
+        public bool RemoveArrayComponent<T>(Entity entity, int componentIndex = 0) where T : unmanaged, IComponentData
+        {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
+            return GetEntityDataManagerByEntity(entity).RemoveArrayComponent<T>(entity, componentIndex);
+        }
+
+        public Span<T> GetArrayComponents<T>(Entity entity) where T : unmanaged, IComponentData
+        {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
+            return GetEntityDataManagerByEntity(entity).GetArrayComponents<T>(entity);
+        }
+
         public void DestroyEntity(Entity entity)
         {
+            if (entity == Entity.Empty)
+                return;
             if (entities[entity.Id].Version != entity.Version)
                 throw new Exception("Double remove entity, that's not allowed!");
             var archetypeHash = entitiesArchetype[entity.Id];
@@ -179,9 +218,20 @@ namespace TheEngine.ECS
 #endif
             return dataManager[entitiesArchetype[entity.Id]].DataAccess<T>();
         }
+
+        public ComponentArrayDataAccess<T> GetArrayDataAccessByEntity<T>(Entity entity) where T : unmanaged, IComponentData
+        {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
+            return dataManager[entitiesArchetype[entity.Id]].ArrayDataAccess<T>();
+        }
         
         public ref T GetComponent<T>(Entity entity) where T : unmanaged, IComponentData
         {
+#if DEBUG
+            VerifyEntity(entity);
+#endif
             return ref GetDataAccessByEntity<T>(entity)[entity];
         }
 
@@ -249,6 +299,22 @@ namespace TheEngine.ECS
             return typeToTypeDataMapping[t] = (IComponentTypeData)Activator.CreateInstance(typeof(ComponentTypeData<>).MakeGenericType(t), index)!;
         }
 
+        internal int GetTypeIndex(System.Type t)
+        {
+            if (!typeToIndexMapping.TryGetValue(t, out var index))
+            {
+                index = typeToIndexMapping[t] = typeToIndexMapping.Count;
+                if (index >= 32)
+                    throw new Exception("Currently there is limit of 32 different component datas. If you need more, change BitVector32 to BitVector64 or BitArray");
+            }
+            return index;
+        }
+
+        internal void RegisterTypeData(System.Type t, IComponentTypeData typeData)
+        {
+            typeToTypeDataMapping[t] = typeData;
+        }
+
         public IManagedComponentTypeData ManagedTypeData<T>() where T : class, IManagedComponentData
         {
             return ManagedTypeData(typeof(T));
@@ -256,11 +322,15 @@ namespace TheEngine.ECS
 
         public IManagedComponentTypeData ManagedTypeData(System.Type t)
         {
+            if (typeToManagedTypeDataMapping.TryGetValue(t, out var typeData))
+                return typeData;
             if (!typeToManagedIndexMapping.TryGetValue(t, out var index))
                 index = typeToManagedIndexMapping[t] = typeToManagedIndexMapping.Count;
             if (index >= 32)
                 throw new Exception("Currently there is limit of 32 different component datas. If you need more, change BitVector32 to BitVector64 or BitArray");
-            return (IManagedComponentTypeData)Activator.CreateInstance(typeof(ManagedComponentTypeData<>).MakeGenericType(t), index)!;
+            typeData = (IManagedComponentTypeData)Activator.CreateInstance(typeof(ManagedComponentTypeData<>).MakeGenericType(t), index)!;
+            typeToManagedTypeDataMapping[t] = typeData;
+            return typeData;
         }
 
         public Archetype NewArchetype()

@@ -1,4 +1,5 @@
 using ImGuiNET;
+using TheEngine;
 using TheEngine.Interfaces;
 using TheEngine.Utils.ImGuiHelper;
 using TheMaths;
@@ -21,12 +22,13 @@ namespace WDE.MapRenderer.Managers
 
         private SimpleBox timeNotificationBox;
 
-        public TimeManager(IUIManager uiManager,
+        public TimeManager(Engine engine,
+            IUIManager uiManager,
             IGameProperties gameProperties)
         {
             this.uiManager = uiManager;
             this.gameProperties = gameProperties;
-            this.timeNotificationBox = new SimpleBox(BoxPlacement.TopLeft);
+            this.timeNotificationBox = new SimpleBox(engine, BoxPlacement.TopLeft);
         }
         
         private int TimeSpeedMultiplier

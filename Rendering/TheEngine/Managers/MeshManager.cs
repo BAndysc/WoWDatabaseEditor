@@ -1,4 +1,4 @@
-﻿//#define TRACK_ALLOCATIONS
+﻿// #define TRACK_ALLOCATIONS
 
 using System;
 using System.Buffers;
@@ -23,6 +23,7 @@ namespace TheEngine.Managers
 
         #if TRACK_ALLOCATIONS
         private List<System.Diagnostics.StackTrace> allocations = new();
+        private List<System.Diagnostics.StackTrace> deallocations = new();
         #endif
 
         internal MeshManager(Engine engine)
@@ -43,7 +44,8 @@ namespace TheEngine.Managers
 
             meshes.Add(new WeakReference<Mesh>(mesh));
             #if TRACK_ALLOCATIONS
-            allocations.Add(new System.Diagnostics.StackTrace(2));
+            allocations.Add(new System.Diagnostics.StackTrace(0, true));
+            deallocations.Add(null!);
             #endif
 
             return mesh;
@@ -61,7 +63,8 @@ namespace TheEngine.Managers
 
             meshes.Add(new WeakReference<Mesh>(mesh));
             #if TRACK_ALLOCATIONS
-            allocations.Add(new System.Diagnostics.StackTrace(2));
+            allocations.Add(new System.Diagnostics.StackTrace(0, true));
+            deallocations.Add(null!);
             #endif
 
             return mesh;
@@ -91,21 +94,19 @@ namespace TheEngine.Managers
             meshes.Add(new WeakReference<Mesh>(mesh));
 
 #if TRACK_ALLOCATIONS
-            allocations.Add(new System.Diagnostics.StackTrace(2));
+            allocations.Add(new System.Diagnostics.StackTrace(0, true));
+            deallocations.Add(null!);
 #endif
             return mesh;
         }
         
         public void DisposeMesh(IMesh mesh)
         {
-            if (!meshes[mesh.Handle.Handle].TryGetTarget(out var storedMesh))
-                throw new Exception("Invalid handle to dispose!");
-            if (storedMesh != mesh)
-                throw new Exception("Invalid handle to dispose 2!");
-            ((Mesh)mesh).Dispose();
+            ((Mesh)mesh).InternalDispose();
             meshes[mesh.Handle.Handle] = null!;
 #if TRACK_ALLOCATIONS
             allocations[mesh.Handle.Handle] = null!;
+            deallocations[mesh.Handle.Handle] = new System.Diagnostics.StackTrace(0, true);
 #endif
         }
 
@@ -121,6 +122,7 @@ namespace TheEngine.Managers
             meshes.Add(new WeakReference<Mesh>(mesh));
             #if TRACK_ALLOCATIONS
             allocations.Add(null!);
+            deallocations.Add(null!);
             #endif
 
             return mesh;
@@ -135,12 +137,6 @@ namespace TheEngine.Managers
                     continue;
                 if (mesh == null || mesh.IsManagedOnly)
                     continue;
-#if TRACK_ALLOCATIONS
-                Console.WriteLine("Mesh not disposed! Allocated here: ");                
-                Console.WriteLine(allocations[index]);
-#else
-                Console.WriteLine("Mesh not disposed!");
-#endif
                 mesh.Dispose();
             }
 
@@ -149,7 +145,7 @@ namespace TheEngine.Managers
 
         internal Mesh GetMeshByHandle(MeshHandle mesh)
         {
-            if (meshes[mesh.Handle].TryGetTarget(out var meshInstane))
+            if (meshes[mesh.Handle]?.TryGetTarget(out var meshInstane) ?? false)
                 return meshInstane;
             return null;
         }
@@ -168,8 +164,7 @@ namespace TheEngine.Managers
                 if (mesh.IsManagedOnly)
                     continue;
 
-                meshes[mesh.Handle.Handle] = null!;
-                mesh.Dispose();
+                DisposeMesh(mesh);
             }
             toDispose.Clear();
         }

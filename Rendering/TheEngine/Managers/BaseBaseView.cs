@@ -21,7 +21,9 @@ public abstract class BaseBaseView : IEngineView
             // ImGui.SetNextWindowPos(new Vector2(0, 0));
             // ImGui.SetNextWindowSize(viewport.Size / ImGui.GetIO().DisplayFramebufferScale);
         }
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, Vector2.Zero);
         IsVisible = ImGuiEx.Begin(title, flags);
+        ImGui.PopStyleVar();
         var contentSize = ImGui.GetContentRegionAvail();
         ViewRect = new RectangleF(ImGui.GetCursorScreenPos().X, ImGui.GetCursorScreenPos().Y,
             Math.Max(1, contentSize.X), Math.Max(1, contentSize.Y));

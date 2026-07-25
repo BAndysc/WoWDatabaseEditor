@@ -68,6 +68,18 @@ namespace TheEngine.Managers
             }
         }
 
+        internal IEnumerable<Texture> AllTextures
+        {
+            get
+            {
+                foreach (var tex in allTextures)
+                {
+                    if (tex != null && tex.TryGetTarget(out var target))
+                        yield return target;
+                }
+            }
+        }
+
         public void Dispose()
         {
             emptyTextureImpl.Dispose();
@@ -148,37 +160,37 @@ namespace TheEngine.Managers
         
         public ITexture CreateTexture(Vector4[] pixels, int width, int height)
         {
-            var texture = engine.Device.CreateTexture(width, height, pixels);
+            var texture = engine.Backend.CreateTexture(width, height, pixels);
             return AddTexture(texture);
         }
 
         public ITexture CreateTexture(float[] pixels, int width, int height)
         {
-            var texture = engine.Device.CreateTexture(width, height, pixels);
+            var texture = engine.Backend.CreateTexture(width, height, pixels);
             return AddTexture(texture);
         }
 
         public ITexture CreateTexture(uint[]? pixels, int width, int height, TextureFormat format = TextureFormat.R8G8B8A8)
         {
-            var texture = engine.Device.CreateTexture(width, height, pixels, format);
+            var texture = engine.Backend.CreateTexture(width, height, pixels, format);
             return AddTexture(texture);
         }
         
         public ITexture CreateTexture(Rgba32[][] pixels, int width, int height, bool generateMips)
         {
-            var texture = engine.Device.CreateTexture(width, height, pixels, generateMips);
+            var texture = engine.Backend.CreateTexture(width, height, pixels, generateMips);
             return AddTexture(texture);
         }
         
         public unsafe ITexture CreateTexture(Rgba32* pixels, int width, int height, bool generateMips)
         {
-            var texture = engine.Device.CreateTexture(width, height, pixels, generateMips);
+            var texture = engine.Backend.CreateTexture(width, height, pixels, generateMips);
             return AddTexture(texture);
         }
         
         public ITexture CreateTextureArray(Rgba32[][][] textures, int width, int height)
         {
-            var texture = engine.Device.CreateTextureArray(width, height, textures);
+            var texture = engine.Backend.CreateTextureArray(width, height, textures);
             return AddTexture(texture);
         }
         
@@ -186,14 +198,14 @@ namespace TheEngine.Managers
         {
             width = Math.Max(1, width);
             height = Math.Max(1, height);
-            var texture = engine.Device.CreateRenderTexture(width, height, colorAttachments);
+            var texture = engine.Backend.CreateRenderTexture(width, height, colorAttachments);
             return AddTexture(texture);
         }
         
         public ITexture CreateRenderTextureWithDepth(int width, int height, out ITexture depthTexture, int colorAttachments = 1)
         {
             depthTexture = CreateTexture(null, width, height, TextureFormat.DepthComponent);
-            var texture = engine.Device.CreateRenderTexture(width, height, colorAttachments, (Texture2D)GetTextureByHandle(depthTexture.Handle)!);
+            var texture = engine.Backend.CreateRenderTexture(width, height, colorAttachments, GetTextureByHandle(depthTexture.Handle)!);
             return AddTexture(texture);
         }
         
@@ -201,7 +213,7 @@ namespace TheEngine.Managers
         {
             depthTexture = CreateTexture(null, width, height, TextureFormat.DepthComponent);
             colorTexture = CreateTexture(null, width, height, TextureFormat.R8G8B8A8);
-            var texture = engine.Device.CreateRenderTexture((Texture2D)GetTextureByHandle(colorTexture.Handle)!, (Texture2D)GetTextureByHandle(depthTexture.Handle)!);
+            var texture = engine.Backend.CreateRenderTexture(GetTextureByHandle(colorTexture.Handle)!, GetTextureByHandle(depthTexture.Handle)!);
             return AddTexture(texture);
         }
 
@@ -214,18 +226,14 @@ namespace TheEngine.Managers
                 throw new ArgumentException("Color texture and color1 texture must have the same dimensions.");
             if (color.Width != depth.Width || color.Height != depth.Height)
                 throw new ArgumentException("Color texture and depth texture must have the same dimensions.");
-            var texture = engine.Device.CreateRenderTexture((Texture2D)color, (Texture2D)depth, (Texture2D)color1);
+            var texture = engine.Backend.CreateRenderTexture(color, depth, color1);
             return AddTexture(texture);
         }
         
         public void ScreenshotRenderTexture(ITexture handle, string fileName, int colorAttachmentIndex = 0)
         {
-            var rt = ((Texture)handle).NativeTexture as RenderTexture;
-            rt.ActivateSourceFrameBuffer(colorAttachmentIndex);
-            Rgba32[] pixels = new Rgba32[rt.Width * rt.Height];
-            engine.Device.device.ReadPixels(0, 0, rt.Width, rt.Height, PixelFormat.Rgba, PixelType.UnsignedByte, pixels.AsSpan());
-            using Image<Rgba32> image = Image.LoadPixelData<Rgba32>(pixels, rt.Width, rt.Height);
-            image.SaveAsPng(fileName);
+            // the backend writes a correctly oriented (top-down) PNG
+            engine.Backend.ScreenshotRenderTexture(((Texture)handle).NativeTexture, fileName, colorAttachmentIndex);
         }
 
         internal INativeTexture? GetTextureByHandle(TextureHandle handle)
@@ -251,17 +259,6 @@ namespace TheEngine.Managers
             srcTex!.ActivateSourceFrameBuffer(0);
             dstTex!.ActivateRenderFrameBuffer();
             engine.Device.device.BlitFramebuffer(srcX0, srcY0, srcX1, srcY1,  dstX0, dstY0,  dstX1,  dstY1, mask, filter);
-        }
-        
-        public void BlitRenderTextures(ITexture src, ITexture dst)
-        {
-            var srcTex = ((Texture)src).NativeTexture as RenderTexture;
-            var dstTex = ((Texture)dst).NativeTexture as RenderTexture;
-            
-            srcTex!.ActivateSourceFrameBuffer(0);
-            dstTex!.ActivateRenderFrameBuffer();
-            engine.Device.device.BlitFramebuffer(0, 0, srcTex.Width, srcTex.Height, 0, 0, dstTex.Width, dstTex.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
-            engine.Device.device.BlitFramebuffer(0, 0, srcTex.Width, srcTex.Height, 0, 0, dstTex.Width, dstTex.Height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
         }
 
         public bool TextureExists(TextureHandle handle)

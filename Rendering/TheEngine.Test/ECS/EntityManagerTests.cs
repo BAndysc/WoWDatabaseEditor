@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using TheEngine.ECS;
+using TheEngine.Managers;
 
 namespace TheEngine.Test.ECS
 {
@@ -11,7 +12,7 @@ namespace TheEngine.Test.ECS
         [SetUp]
         public void Setup()
         {
-            entityManager = new EntityManager();
+            entityManager = new EntityManager(new StatsManager(), null!);
             empty = entityManager.NewArchetype();
         }
         

@@ -1,0 +1,20 @@
+{
+  "Pixel": {
+    "Path": "internalShaders/wireframe.frag"
+  },
+  "Geometry": {
+    "Path": "internalShaders/wireframe.hull"
+  },
+  "ZWrite": true,
+  "Instancing": false,
+  "Vertex": {
+    "Path": "internalShaders/wireframe.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

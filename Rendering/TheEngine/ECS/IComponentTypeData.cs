@@ -9,6 +9,7 @@ namespace TheEngine.ECS
         int Index { get; }
         ulong Hash { get; }
         ulong GlobalHash { get; }
+        bool IsArray { get; }
         FreeActionDelegate? FreeAction { get; }
 
         public delegate void FreeActionDelegate(Engine engine, Span<byte> component);

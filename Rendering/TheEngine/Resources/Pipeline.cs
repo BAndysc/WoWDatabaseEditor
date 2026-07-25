@@ -1,23 +1,19 @@
 using TheEngine.Handles;
-using TheEngine.Interfaces;
 using Veldrid;
-using Shader = TheAvaloniaOpenGL.Resources.Shader;
-using GraphicsDevice = TheAvaloniaOpenGL.TheDevice;
+using IShader = TheAvaloniaOpenGL.Resources.IShader;
 
 namespace TheEngine.Resources;
 
 public class Pipeline : System.IDisposable
 {
     private readonly ShaderHandle handle;
-    // private Veldrid.Pipeline forwardPipeline;
-    // private Veldrid.Pipeline? shadowPipeline;
 
-    internal Shader Shader { get; }
+    internal IShader Shader { get; }
     public GraphicsPipelineDescription Description { get; }
     internal bool SmallLayout { get; }
     public PipelineHandle Handle { get; }
 
-    internal Pipeline(PipelineHandle pipelineHandle, GraphicsDevice device, OutputDescription output, ShaderHandle handle, Shader shader, PrimitiveTopology topology, GraphicsPipelineDescription description, bool smallLayout)
+    internal Pipeline(PipelineHandle pipelineHandle, OutputDescription output, ShaderHandle handle, IShader shader, PrimitiveTopology topology, GraphicsPipelineDescription description, bool smallLayout)
     {
         this.Handle = pipelineHandle;
         this.handle = handle;
@@ -54,37 +50,19 @@ public class Pipeline : System.IDisposable
                 new VertexElementDescription("color2", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Byte4, 52));
         }
 
-        // todo: veldrid
-        // description.ShaderSet = new ShaderSetDescription(
-        //     vertexLayouts: new VertexLayoutDescription[] { vertexLayout },
-        //     shaders: shader.ForwardPass.Shaders);
-        // description.ResourceLayouts = shader.layouts;
+        // shaders are resolved via ShaderHandle at draw time (GL); only the vertex layout is part of the description for now
+        description.ShaderSet = new ShaderSetDescription(new[] { vertexLayout }, System.Array.Empty<Veldrid.Shader>());
+        // NOT authoritative: the same pipeline legitimately draws into targets with different
+        // attachment sets (game view, scene view, gui). A Vulkan executor must derive the real
+        // output formats from the active rendering pass and cache pipeline variants per format set.
         description.Outputs = output;
         Description = description;
         SmallLayout = smallLayout;
-        // forwardPipeline = device.ResourceFactory.CreateGraphicsPipeline(description);
-        // forwardPipeline.Name = "Forward Pipeline " + shader.ForwardPass.Name;
-
-        if (shader.ShadowPass != null)
-        {
-            // todo: veldrid
-            // description.ShaderSet = new ShaderSetDescription(
-            //     vertexLayouts: new VertexLayoutDescription[] { vertexLayout },
-            //     shaders: shader.ShadowPass.Shaders);
-            description.Outputs = IRenderManager.ShadowPassOutput;
-            description.RasterizerState = description.RasterizerState with { DepthClipEnabled = false };
-            // shadowPipeline = device.ResourceFactory.CreateGraphicsPipeline(description);
-            // shadowPipeline.Name = "Shadow Pipeline " + shader.ShadowPass.Name;
-        }
     }
 
     public ShaderHandle ShaderHandle => handle;
-    // public Veldrid.Pipeline ForwardPipeline => forwardPipeline;
-    // public Veldrid.Pipeline? ShadowPipeline => shadowPipeline;
 
     public void Dispose()
     {
-        // forwardPipeline.Dispose();
-        // shadowPipeline?.Dispose();
     }
 }

@@ -21,7 +21,7 @@ public class PipelineManager : IPipelineManager
         GraphicsPipelineDescription description, bool smallLayout, OutputDescription? outputDescription)
     {
         var handle = new PipelineHandle(pipelines.Count);
-        var pipeline = new Pipeline(handle, engine.Device, outputDescription ?? IRenderManager.DefaultOutput, shaderHandle, engine.shaderManager.GetShaderByHandle(shaderHandle), topology, description, smallLayout);
+        var pipeline = new Pipeline(handle, outputDescription ?? IRenderManager.DefaultOutput, shaderHandle, engine.shaderManager.GetShaderByHandle(shaderHandle), topology, description, smallLayout);
         pipelines.Add(pipeline);
         return pipeline;
     }
@@ -31,15 +31,6 @@ public class PipelineManager : IPipelineManager
     {
         return CreatePipeline(shaderHandle, topology, description, smallLayout, null);
     }
-
-    // public void InvalidateAllPipelines()
-    // {
-    //     for (int i = 0; i < pipelines.Count; ++i)
-    //     {
-    //         var oldPipeline = pipelines[i];
-    //         pipelines[i] = new Pipeline(oldPipeline.Handle, engine.Device, oldPipeline.Description.Outputs, oldPipeline.ShaderHandle, engine.shaderManager.GetShaderByHandle(oldPipeline.ShaderHandle), oldPipeline.Description.PrimitiveTopology, oldPipeline.Description, oldPipeline.SmallLayout);
-    //     }
-    // }
 
     public Pipeline GetPipelineByHandle(PipelineHandle handle)
     {

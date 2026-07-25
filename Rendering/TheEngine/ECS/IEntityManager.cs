@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace TheEngine.ECS
@@ -14,6 +15,12 @@ namespace TheEngine.ECS
          */
         void AddComponent<T>(Entity entity, in T component) where T : unmanaged, IComponentData;
         void AddManagedComponent<T>(Entity entity, T component) where T : class, IManagedComponentData;
+
+        // Array component methods
+        void AddArrayComponent<T>(Entity entity, in T component) where T : unmanaged, IComponentData;
+        bool RemoveArrayComponent<T>(Entity entity, int componentIndex = 0) where T : unmanaged, IComponentData;
+        Span<T> GetArrayComponents<T>(Entity entity) where T : unmanaged, IComponentData;
+
         void DestroyEntity(Entity entity);
         bool Exist(Entity entity);
         ref T GetComponent<T>(Entity entity) where T : unmanaged, IComponentData;
@@ -29,5 +36,6 @@ namespace TheEngine.ECS
         bool HasComponent<T>(Entity entity) where T : unmanaged, IComponentData;
         bool HasManagedComponent<T>(Entity entity) where T : class, IManagedComponentData;
         ComponentDataAccess<T> GetDataAccessByEntity<T>(Entity entity) where T : unmanaged, IComponentData;
+        ComponentArrayDataAccess<T> GetArrayDataAccessByEntity<T>(Entity entity) where T : unmanaged, IComponentData;
     }
 }

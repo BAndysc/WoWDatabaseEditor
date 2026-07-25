@@ -142,11 +142,8 @@ public class ImGuiController : IDisposable
         ImGuiKey.RightAlt, // 121
     };
     
-    private readonly NativeBuffer<ImDrawVert> verticesBuffer;
-    private readonly NativeBuffer<ushort> indicesBuffer;
     private readonly Engine engine;
     private readonly IntPtr imGuiContext;
-    private readonly int vertexArrayObject;
     private readonly Material<ImGuiMaterialData_t> material;
     private readonly ITexture fontTexture;
     private ImDrawVert[] verts = Array.Empty<ImDrawVert>();
@@ -160,7 +157,6 @@ public class ImGuiController : IDisposable
 
     public unsafe ImGuiController(Engine engine)
     {
-        var device = engine.Device.device;
         this.engine = engine;
         
         imGuiContext = ImGui.CreateContext();
@@ -177,23 +173,6 @@ public class ImGuiController : IDisposable
 
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset | ImGuiBackendFlags.HasSetMousePos;
         ImGui.StyleColorsDark();
-        
-        verticesBuffer = engine.CreateBuffer<ImDrawVert>(BufferTypeEnum.Vertex, 1);
-        indicesBuffer = engine.CreateBuffer<ushort>(BufferTypeEnum.Index, 1);
-        vertexArrayObject = device.GenVertexArray();
-        device.BindVertexArray(vertexArrayObject);
-        verticesBuffer.Activate(0);
-        indicesBuffer.Activate(0);
-        int stride = 2 * 4 + 2 * 4 + 4;
-        device.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(0));
-        device.EnableVertexAttribArray(0);
-
-        device.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(8));
-        device.EnableVertexAttribArray(1);
-
-        device.VertexAttribPointer(2, 4, VertexAttribPointerType.UnsignedByte, true, stride, new IntPtr(16));
-        device.EnableVertexAttribArray(2);
-        device.BindVertexArray(0);
 
         var shaderHandle = engine.shaderManager.LoadShader("internalShaders/imgui.json");
         var desc = new GraphicsPipelineDescription()
@@ -280,7 +259,6 @@ public class ImGuiController : IDisposable
 
     public unsafe void Render()
     {
-        var device = engine.Device.device;
         ImGui.Render();
         var drawData = ImGui.GetDrawData();
         
@@ -310,43 +288,25 @@ public class ImGuiController : IDisposable
             indexOffsetInBytes += (uint)(cmdList.IdxBuffer.Size * sizeof(ushort));
         }
         
-        verticesBuffer.UpdateBuffer(verts.AsSpan(0, drawData.TotalVtxCount));
-        indicesBuffer.UpdateBuffer(indices.AsSpan(0, drawData.TotalIdxCount));
-        
+        var commandList = engine.renderManager.CommandList;
+        var vertexBuffer = commandList.UploadTransientBuffer(BufferTypeEnum.Vertex, (ReadOnlySpan<ImDrawVert>)verts.AsSpan(0, drawData.TotalVtxCount));
+        var indexBuffer = commandList.UploadTransientBuffer(BufferTypeEnum.Index, (ReadOnlySpan<ushort>)indices.AsSpan(0, drawData.TotalIdxCount));
+
         ImGuiIOPtr io = ImGui.GetIO();
         Matrix4x4 mvp = Matrix4x4.CreateOrthographicOffCenter(0f, io.DisplaySize.X / io.DisplayFramebufferScale.X, io.DisplaySize.Y / io.DisplayFramebufferScale.Y, 0.0f, -1.0f, 1.0f);
-        
-        BlendingFactorSrc lastBlendSrcRgb = (BlendingFactorSrc)device.GetInteger(GetPName.BlendSrcRgb);
-        BlendingFactorDest lastBlendDstRgb = (BlendingFactorDest)device.GetInteger(GetPName.BlendDstRgb);
-        BlendingFactorSrc lastBlendSrcAlpha = (BlendingFactorSrc)device.GetInteger(GetPName.BlendSrcAlpha);
-        BlendingFactorDest lastBlendDstAlpha = (BlendingFactorDest)device.GetInteger(GetPName.BlendDstAlpha);
-        int lastBlendEqRgb = device.GetInteger(GetPName.BlendEquationRgb);
-        int lastBlendEqAlpha = device.GetInteger(GetPName.BlendEquationAlpha);
-        bool lastEnableBlend = device.GetInteger(GetPName.Blend) != 0;
-        bool lastEnableCullFace = device.GetInteger(GetPName.CullFace) != 0;
-        bool lastEnableDepthTest = device.GetInteger(GetPName.DepthTest) != 0;
-        bool lastEnableStencilTest = device.GetInteger(GetPName.StencilTest) != 0;
-        bool lastEnableScissorTest = device.GetInteger(GetPName.ScissorTest) != 0;
-        
-        device.BindVertexArray(vertexArrayObject);
-        verticesBuffer.Activate(0);
-        indicesBuffer.Activate(0);
 
         var shader = material.Pipeline.Shader;
-        shader.ForwardPass.Activate();
+        commandList.SetPipeline(material.Pipeline, shader.ForwardPass);
+        // the vertex input layout comes from the pipeline (the "small layout"), so the
+        // streamed buffers are bound like any other resource - the command list captures
+        // the layout against the concrete buffer object in its own scratch VAO
+        commandList.BindVertexBuffer(vertexBuffer);
+        commandList.BindIndexBuffer(indexBuffer, IndexType.Short);
 
         ImGuiMaterialData_t data = new ImGuiMaterialData_t() { projection_matrix = mvp };
         material.SetMaterialData(ref data);
-        material.ActivateUniforms(ShaderPassType.Forward, false, null);
+        commandList.BindMaterialResources(material);
 
-        device.Enable(EnableCap.Blend);
-        device.BlendEquation(BlendEquationMode.FuncAdd);
-        device.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
-        device.Disable(EnableCap.CullFace);
-        device.Disable(EnableCap.DepthTest);
-        device.Disable(EnableCap.StencilTest);
-        device.Enable(EnableCap.ScissorTest);
-        
         drawData.ScaleClipRects(io.DisplayFramebufferScale);
 
         // Render command lists
@@ -371,37 +331,27 @@ public class ImGuiController : IDisposable
                         if (prevHandle != handle)
                         {
                             material.SetTexture("FontTexture", engine.textureManager[handle]);
-                            material.ActivateUniforms(ShaderPassType.Forward, false, null);
+                            commandList.BindMaterialResources(material);
                             prevHandle = handle;
                         }
                     }
                     Vector2 clipMin = new(pcmd.ClipRect.X, pcmd.ClipRect.Y);
                     Vector2 clipMax = new(pcmd.ClipRect.Z, pcmd.ClipRect.W);
 
-                    device.Scissor((int)clipMin.X, (int)(io.DisplaySize.Y - clipMax.Y), (int)(clipMax.X - clipMin.X), (int)(clipMax.Y - clipMin.Y));
+                    // top-left origin (the command list's convention matches ImGui's)
+                    commandList.SetScissor((int)clipMin.X, (int)clipMin.Y, (int)(clipMax.X - clipMin.X), (int)(clipMax.Y - clipMin.Y));
 
-                    engine.Device.DrawIndexed((int)pcmd.ElemCount, (int)pcmd.IdxOffset + (int)idxOffset, (int)pcmd.VtxOffset + vtxOffset, IndexType.Short);
+                    commandList.DrawIndexed((int)pcmd.ElemCount, (int)pcmd.IdxOffset + idxOffset, (int)pcmd.VtxOffset + vtxOffset);
                 }
             }
             vtxOffset += cmdList.VtxBuffer.Size;
             idxOffset += cmdList.IdxBuffer.Size;
         }
-        
-        device.BlendEquation((BlendEquationMode)lastBlendEqRgb);
-        device.BlendFuncSeparate(lastBlendSrcRgb, lastBlendDstRgb, lastBlendSrcAlpha, lastBlendDstAlpha);
-        device.Toggle(EnableCap.Blend, lastEnableBlend);
-        device.Toggle(EnableCap.DepthTest, lastEnableDepthTest);
-        device.Toggle(EnableCap.CullFace, lastEnableCullFace);
-        device.Toggle(EnableCap.StencilTest, lastEnableStencilTest);
-        device.Toggle(EnableCap.ScissorTest, lastEnableScissorTest);
-        engine.renderManager.SetMesh(null);
     }
 
     public void Dispose()
     {
         ImGui.DestroyContext(imGuiContext);
         engine.textureManager.DisposeTexture(fontTexture);
-        verticesBuffer.Dispose();
-        indicesBuffer.Dispose();
     }
 }

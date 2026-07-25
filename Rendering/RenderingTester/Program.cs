@@ -99,6 +99,11 @@ var game = provider.Resolve<Game>();
 // gameView.AddModule<TestModule>();
 gameProperties.LoadWorld = true;
 
+AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+{
+    Console.WriteLine(args.ExceptionObject);
+};
+
 using var window = new GameStandaloneWindow(GameWindowSettings.Default, nativeWindowSettings, game, mainThread, context);
 registry.RegisterInstance<IClipboardService>(window);
 window.Run();

@@ -21,9 +21,9 @@ namespace TheEngine.Entities
         private readonly Engine engine;
         private readonly bool managedOnly;
 
-        internal int VertexArrayObject { get; private set; }
-        internal NativeBuffer<UniversalVertex>? VerticesBuffer { get; private set; }
-        internal NativeBuffer<byte>? IndicesBuffer { get; private set; }
+        internal int VertexArrayObject { get; set; } // GL backend only (set via IRenderBackend.OnMeshCreated)
+        internal INativeBuffer<UniversalVertex>? VerticesBuffer { get; private set; }
+        internal INativeBuffer<byte>? IndicesBuffer { get; private set; }
 
         private BoundingBox bounds;
         private Vector3[]? positions = null;
@@ -132,9 +132,9 @@ namespace TheEngine.Entities
             indicesCount = 0;
             if (!managedOnly)
             {
-                VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, 1);
-                IndicesBuffer = engine.Device.CreateBuffer<byte>(BufferTypeEnum.Index, 4);
-                SetupDeviceBuffers(engine);
+                VerticesBuffer = engine.Backend.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, 1);
+                IndicesBuffer = engine.Backend.CreateBuffer<byte>(BufferTypeEnum.Index, 4);
+                engine.Backend.OnMeshCreated(this);
             }
         }
 
@@ -150,39 +150,10 @@ namespace TheEngine.Entities
             BuildBoundingBox();
             if (!managedOnly)
             {
-                VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, vertices);
-                IndicesBuffer = engine.Device.CreateBuffer<byte>(BufferTypeEnum.Index, MemoryMarshal.AsBytes(indices.AsSpan(0, indicesCount)));
-                SetupDeviceBuffers(engine);
+                VerticesBuffer = engine.Backend.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, vertices);
+                IndicesBuffer = engine.Backend.CreateBuffer<byte>(BufferTypeEnum.Index, MemoryMarshal.AsBytes(indices.AsSpan(0, indicesCount)));
+                engine.Backend.OnMeshCreated(this);
             }
-        }
-
-        private unsafe void SetupDeviceBuffers(Engine engine)
-        {
-            VertexArrayObject = engine.Device.device.GenVertexArray();
-            engine.Device.device.BindVertexArray(VertexArrayObject);
-            VerticesBuffer.Activate(0);
-            IndicesBuffer.Activate(0);
-            int stride = 3 * sizeof(float) + 3 * sizeof(float) + 2 * sizeof(float) + 2 * sizeof(float) + 4 * sizeof(byte) + 4 * sizeof(byte); // 4 * 4 * 3 + 2 * 4 * 2;
-            if (sizeof(UniversalVertex) != stride)
-                throw new Exception($"UniversalVertex size is {sizeof(UniversalVertex)}, but stride is {stride}, they should be equal!");
-            engine.Device.device.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride, new IntPtr(0));
-            engine.Device.device.EnableVertexAttribArray(0);
-
-            engine.Device.device.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, stride, new IntPtr(12));
-            engine.Device.device.EnableVertexAttribArray(1);
-
-            engine.Device.device.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(24));
-            engine.Device.device.EnableVertexAttribArray(2);
-
-            engine.Device.device.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(32));
-            engine.Device.device.EnableVertexAttribArray(3);
-
-            engine.Device.device.VertexAttribPointer(4, 4, VertexAttribPointerType.UnsignedByte, true, stride, new IntPtr(40));
-            engine.Device.device.EnableVertexAttribArray(4);
-
-            engine.Device.device.VertexAttribPointer(5, 4, VertexAttribPointerType.UnsignedByte, true, stride, new IntPtr(44));
-            engine.Device.device.EnableVertexAttribArray(5);
-            engine.Device.device.BindVertexArray(0);
         }
 
         public void SetSubmeshCount(int count)
@@ -376,6 +347,11 @@ namespace TheEngine.Entities
         private bool disposed;
 
         public void Dispose()
+        {
+            engine.meshManager.DisposeMesh(this);
+        }
+
+        internal void InternalDispose()
         {
             disposed = true;
             VerticesBuffer?.Dispose();

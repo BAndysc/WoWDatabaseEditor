@@ -5,6 +5,7 @@ namespace TheAvaloniaOpenGL
 {
     public interface IDevice
     {
+        public static long FrameCount;
         void Begin();
         void DeleteVertexArrays(int count, int[] buffers);
         void BindVertexArray(int array);
@@ -98,7 +99,7 @@ namespace TheAvaloniaOpenGL
         void Flush();
         void Finish();
         void Debug(string msg);
-        void AddToDispose(INativeBuffer nativeBuffer);
+        void AddToDispose(NativeBufferBase nativeBuffer);
         void DisposeBuffers();
         long TotalBufferBytes { get; set; }
     }

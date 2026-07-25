@@ -10,13 +10,11 @@ public abstract class WorldObjectInstance : System.IDisposable
 {
     protected readonly IGameContext gameContext;
     protected List<Entity> handles = new();
-    protected List<Entity> renderers = new();
     protected List<Entity> colliders = new();
     protected List<MdxManager.MdxInstance> mdxInstances = new();
     protected List<WmoManager.WmoInstance> wmoInstances = new();
     protected readonly RenderLayer renderLayer;
-    public IReadOnlyList<Entity> Renderers => renderers;
-    
+
     public abstract void Dispose();
 
     public WorldObjectInstance(IGameContext gameContext, RenderLayer renderLayer)

@@ -52,60 +52,60 @@ public class WorldMapGameModule : IGameModule
         const int ButtonWidth = 8;
         if (mapOpened)
         {
-            if (!ImGui.Begin("Map", ImGuiWindowFlags.AlwaysAutoResize))
-                return;
-
-            var contentPosition = /* ImGui.GetWindowContentRegionMin() + */ImGui.GetWindowPos();
-            var localSpaceCursorPosition = ImGui.GetIO().MousePos - contentPosition;
-            var percentCursorPosition = new Vector2(1, 1) - localSpaceCursorPosition / (Constants.Blocks * ButtonWidth);
-            var wowCursorPosition = new Vector2(percentCursorPosition.Y * Constants.MapSize - Constants.MapSize/2, percentCursorPosition.X * Constants.MapSize - Constants.MapSize / 2);
-            
-            var currentCameraPosition = cameraManager.Position;
-            var pctCurrentCameraPosition = new Vector2(currentCameraPosition.Y / Constants.MapSize + 0.5f, currentCameraPosition.X / Constants.MapSize + 0.5f);
-            var localSpaceCurrentCameraPosition = (new Vector2(1, 1) - pctCurrentCameraPosition) * Constants.Blocks * ButtonWidth;
-            var globalSpaceCurrentCameraPosition = localSpaceCurrentCameraPosition + contentPosition;
-            
-            ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 0));
-            if (ImGui.BeginTable("worldmap", Constants.Blocks, ImGuiTableFlags.NoPadInnerX))
+            if (ImGui.Begin("Map", ImGuiWindowFlags.AlwaysAutoResize))
             {
-                for (int y = 0; y < Constants.Blocks; ++y)
+                var contentPosition = /* ImGui.GetWindowContentRegionMin() + */ImGui.GetWindowPos();
+                var localSpaceCursorPosition = ImGui.GetIO().MousePos - contentPosition;
+                var percentCursorPosition = new Vector2(1, 1) - localSpaceCursorPosition / (Constants.Blocks * ButtonWidth);
+                var wowCursorPosition = new Vector2(percentCursorPosition.Y * Constants.MapSize - Constants.MapSize/2, percentCursorPosition.X * Constants.MapSize - Constants.MapSize / 2);
+
+                var currentCameraPosition = cameraManager.Position;
+                var pctCurrentCameraPosition = new Vector2(currentCameraPosition.Y / Constants.MapSize + 0.5f, currentCameraPosition.X / Constants.MapSize + 0.5f);
+                var localSpaceCurrentCameraPosition = (new Vector2(1, 1) - pctCurrentCameraPosition) * Constants.Blocks * ButtonWidth;
+                var globalSpaceCurrentCameraPosition = localSpaceCurrentCameraPosition + contentPosition;
+
+                ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(0, 0));
+                if (ImGui.BeginTable("worldmap", Constants.Blocks, ImGuiTableFlags.NoPadInnerX))
                 {
-                    ImGui.TableNextRow();
-
-                    for (int x = 0; x < Constants.Blocks; ++x)
+                    for (int y = 0; y < Constants.Blocks; ++y)
                     {
-                        ImGui.TableNextColumn();
-                        var hasAdt = worldManager.IsChunkPresent(x, y, out var adtType);
-                        ImGui.BeginDisabled(!hasAdt);
-                        var color = adtType == AdtChunkType.AllWater ? new Vector4(0, 0, 1, 1) : 
-                                (adtType == AdtChunkType.None ? new Vector4(0, 0, 0, 1) : new Vector4(0.5f, 0.2f, 0.3f, 1));
-                        ImGui.PushStyleColor(ImGuiCol.Button, color);
-                        
-                        ImGui.PushID(new IntPtr(x << 8 | y));
-                        if (ImGui.Button("", new Vector2(ButtonWidth, ButtonWidth)))
+                        ImGui.TableNextRow();
+
+                        for (int x = 0; x < Constants.Blocks; ++x)
                         {
-                            cameraManager.Relocate(new Vector3(wowCursorPosition, 300));
+                            ImGui.TableNextColumn();
+                            var hasAdt = worldManager.IsChunkPresent(x, y, out var adtType);
+                            ImGui.BeginDisabled(!hasAdt);
+                            var color = adtType == AdtChunkType.AllWater ? new Vector4(0, 0, 1, 1) :
+                                    (adtType == AdtChunkType.None ? new Vector4(0, 0, 0, 1) : new Vector4(0.5f, 0.2f, 0.3f, 1));
+                            ImGui.PushStyleColor(ImGuiCol.Button, color);
+
+                            ImGui.PushID(new IntPtr(x << 8 | y));
+                            if (ImGui.Button("", new Vector2(ButtonWidth, ButtonWidth)))
+                            {
+                                cameraManager.Relocate(new Vector3(wowCursorPosition, 300));
+                            }
+                            ImGui.PopID();
+
+                            ImGui.PopStyleColor();
+                            ImGui.EndDisabled();
                         }
-                        ImGui.PopID();
-                        
-                        ImGui.PopStyleColor();
-                        ImGui.EndDisabled();
                     }
+                    ImGui.EndTable();
                 }
-                ImGui.EndTable();
+                ImGui.PopStyleVar();
+
+                ImGui.Text($"{wowCursorPosition.X:0.00} {wowCursorPosition.Y:0.00}");
+                var hoveredZone = worldMapAreaStore.FindClosest(gameContext.CurrentMap.Id, wowCursorPosition.X, wowCursorPosition.Y);
+                if (hoveredZone != null)
+                {
+                    if (areaTableStore.TryGetValue(hoveredZone.ZoneId, out var zone))
+                        ImGui.Text(zone.Name);
+                }
+
+                ImGui.GetWindowDrawList().AddCircleFilled(globalSpaceCurrentCameraPosition, 4, 0xFF0000FF);
+
             }
-            ImGui.PopStyleVar();
-            
-            ImGui.Text($"{wowCursorPosition.X:0.00} {wowCursorPosition.Y:0.00}");
-            var hoveredZone = worldMapAreaStore.FindClosest(gameContext.CurrentMap.Id, wowCursorPosition.X, wowCursorPosition.Y);
-            if (hoveredZone != null)
-            {
-                if (areaTableStore.TryGetValue(hoveredZone.ZoneId, out var zone))
-                    ImGui.Text(zone.Name);
-            }
-            
-            ImGui.GetWindowDrawList().AddCircleFilled(globalSpaceCurrentCameraPosition, 4, 0xFF0000FF);
-            
             ImGui.End();
         }
     }

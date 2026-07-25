@@ -1,4 +1,5 @@
 using ImGuiNET;
+using TheEngine;
 using TheEngine.Interfaces;
 using TheEngine.Utils.ImGuiHelper;
 using TheMaths;
@@ -14,10 +15,10 @@ namespace WDE.MapRenderer.Managers
 
         public const float Padding = 20;
 
-        public NotificationsCenter(IUIManager uiManager)
+        public NotificationsCenter(Engine engine, IUIManager uiManager)
         {
             this.uiManager = uiManager;
-            this.notificationBox = new SimpleBox(BoxPlacement.ScreenCenter);
+            this.notificationBox = new SimpleBox(engine, BoxPlacement.ScreenCenter);
         }
 
         public void ShowMessage(string message, float time = 4000)

@@ -528,7 +528,7 @@ namespace TheAvaloniaOpenGL
             commands.Add(msg);
         }
 
-        public void AddToDispose(INativeBuffer nativeBuffer)
+        public void AddToDispose(NativeBufferBase nativeBuffer)
         {
             device.AddToDispose(nativeBuffer);
         }

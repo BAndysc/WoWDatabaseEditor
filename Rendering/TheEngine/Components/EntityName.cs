@@ -43,6 +43,11 @@ public struct EntityName : IComponentData
         return fixedString;
     }
 
+    public string DebugToString()
+    {
+        return Encoding.UTF8.GetString(AsSpan().Slice(0, actualLength));
+    }
+
     [InlineArray(31)]
     private struct FixedString31
     {

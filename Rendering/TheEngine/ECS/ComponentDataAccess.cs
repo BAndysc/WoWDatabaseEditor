@@ -25,7 +25,7 @@ namespace TheEngine.ECS
             get
             {
                 //fixed (byte* p = data)
-                return ref *(T*)(data + index * sizeof(T));
+                return ref ((T*)data)[index];
                 //return ref Unsafe.AsRef<T>(p + index * sizeof(T));
             }
         }
@@ -37,7 +37,7 @@ namespace TheEngine.ECS
             {
                 var indexInArray = sparseReverseEntityMapping[index.Id] - 1;
                 //fixed(byte* p = data)
-                return ref Unsafe.AsRef<T>(data + indexInArray * sizeof(T));
+                return ref this[indexInArray];
             }
         }
     }

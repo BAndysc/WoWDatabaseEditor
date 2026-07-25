@@ -67,8 +67,8 @@ public class GlobalWorldMapObjectManager
                 {
                     var entity = entityManager.CreateEntity(Archetypes.CollisionOnlyArchetype, $"Global WMO collider");
                     entityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
-                    entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
-                    entityManager.GetComponent<MeshRenderer>(entity).Mesh = mesh.Item1;
+                    var meshRenderer = new MeshRenderer() { Mesh = mesh.Item1, SubMeshId = i - 1 };
+                    entityManager.AddArrayComponent(entity, meshRenderer);
                     entityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });   
                     entities.Add(entity);
                 }

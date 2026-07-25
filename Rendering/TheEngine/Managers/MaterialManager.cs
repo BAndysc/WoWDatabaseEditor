@@ -10,7 +10,7 @@ namespace TheEngine.Managers
     {
         private Engine engine;
         private List<WeakReference<Material>> materials = new();
-        private NativeBuffer<Vector4> smallEmptyBuffer;
+        private INativeBuffer<Vector4> smallEmptyBuffer;
 
         public MaterialManager(Engine engine)
         {

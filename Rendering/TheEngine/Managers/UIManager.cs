@@ -19,10 +19,10 @@ namespace TheEngine.Managers
         private readonly Material<SdfMaterialData_t> material;
         private readonly Material<SdfMaterialData_t> worldMaterial;
         private readonly IMesh quad;
-        private readonly NativeBuffer<Vector4> glyphUVsBuffer;
-        private readonly NativeBuffer<Vector4> glyphPositionsBuffer;
         private Vector4[] glyphUVs = new Vector4[1];
         private Vector4[] glyphPositions = new Vector4[1];
+        // glyph data is streamed per draw as transient slices, bound through this instance data
+        private readonly MaterialInstanceRenderData glyphRenderData = new();
         private ImGuiController imGuiController;
 
         private float Scaling => engine.WindowHost.DpiScaling;
@@ -122,13 +122,6 @@ namespace TheEngine.Managers
                 new(1, 0),
                 new(0, 0),
             }, new ushort[] { 0, 1,2, 2, 3, 0 }));
-            glyphPositionsBuffer = engine.Device.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
-            glyphUVsBuffer = engine.Device.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
-            material.SetBuffer("glpyhUVs", glyphUVsBuffer);
-            material.SetBuffer("glyphPositions", glyphPositionsBuffer);
-            
-            worldMaterial.SetBuffer("glpyhUVs", glyphUVsBuffer);
-            worldMaterial.SetBuffer("glyphPositions", glyphPositionsBuffer);
 
             imGuiController = new ImGuiController(engine);
         }
@@ -136,9 +129,16 @@ namespace TheEngine.Managers
         public void Dispose()
         {
             engine.MeshManager.DisposeMesh(quad);
-            glyphUVsBuffer.Dispose();
-            glyphPositionsBuffer.Dispose();
             imGuiController.Dispose();
+        }
+
+        private MaterialInstanceRenderData UploadGlyphs(int glyphsCount)
+        {
+            var commandList = engine.renderManager.CommandList;
+            glyphRenderData.Clear();
+            glyphRenderData.SetBuffer("glyphPositions", commandList.UploadTransientBuffer(BufferInternalFormat.Float4, (ReadOnlySpan<Vector4>)glyphPositions.AsSpan(0, glyphsCount)));
+            glyphRenderData.SetBuffer("glpyhUVs", commandList.UploadTransientBuffer(BufferInternalFormat.Float4, (ReadOnlySpan<Vector4>)glyphUVs.AsSpan(0, glyphsCount)));
+            return glyphRenderData;
         }
 
         private void SetupDocking()
@@ -219,9 +219,7 @@ namespace TheEngine.Managers
             
             glyphPositions[0] = new Vector4(x, y + h, w, h);
             glyphUVs[0] = new Vector4(0);
-            glyphPositionsBuffer.UpdateBuffer(glyphPositions);
-            glyphUVsBuffer.UpdateBuffer(glyphUVs);
-            engine.RenderManager.RenderInstancedIndirect(quad, material, ShaderPassType.Forward, 0, 1);
+            engine.RenderManager.RenderInstancedIndirect(quad, material, ShaderPassType.Forward, 0, 1, UploadGlyphs(1));
         }
 
         public Entity DrawPersistentWorldText(string font, Vector2 pivot, string text, float fontSize, Matrix localToWorld, float visibilityDistance, Vector4? fontColor = null,
@@ -257,9 +255,7 @@ namespace TheEngine.Managers
             glyphUVs[0] = glyphUv;
             glyphPositions[0]  = glyphPosition;
 
-            glyphPositionsBuffer.UpdateBuffer(glyphPositions);
-            glyphUVsBuffer.UpdateBuffer(glyphUVs);
-            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, ShaderPassType.Forward, 0, 1, localToWorld);
+            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, ShaderPassType.Forward, 0, 1, localToWorld, instanceData: UploadGlyphs(1));
         }
 
         public void DrawWorldText(string font, Vector2 pivot, ReadOnlySpan<char> text, float fontSize, Matrix localToWorld, Vector4 foreColor, Vector4? backgroundColor)
@@ -309,9 +305,7 @@ namespace TheEngine.Managers
                 xPixel += charDef.xAdv * fontSize;
             }
             
-            glyphPositionsBuffer.UpdateBuffer(glyphPositions);
-            glyphUVsBuffer.UpdateBuffer(glyphUVs);
-            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, ShaderPassType.Forward, 0, glyphsCount, localToWorld);
+            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, ShaderPassType.Forward, 0, glyphsCount, localToWorld, instanceData: UploadGlyphs(glyphsCount));
         }
 
         public void DrawText(string font, ReadOnlySpan<char> text, float fontSize, float x, float y, float? maxWidth, Vector4 color)
@@ -356,10 +350,8 @@ namespace TheEngine.Managers
                 xPixel += charDef.xAdv * fontSize;
             }
             
-            glyphPositionsBuffer.UpdateBuffer(glyphPositions);
-            glyphUVsBuffer.UpdateBuffer(glyphUVs);
-            engine.RenderManager.RenderInstancedIndirect(quad, material, ShaderPassType.Forward, 0, glyphsCount);
-            engine.RenderManager.Render(quad, material, ShaderPassType.Forward, 0,  Matrix.Identity);
+            engine.RenderManager.RenderInstancedIndirect(quad, material, ShaderPassType.Forward, 0, glyphsCount, UploadGlyphs(glyphsCount));
+            engine.RenderManager.Render(quad, material, ShaderPassType.Forward, 0,  Matrix.Identity, instanceData: glyphRenderData);
         }
 
         public Vector2 MeasureText(string font, ReadOnlySpan<char> text, float fontSize)

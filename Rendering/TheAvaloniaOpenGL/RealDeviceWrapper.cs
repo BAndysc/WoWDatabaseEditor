@@ -433,10 +433,10 @@ namespace TheAvaloniaOpenGL
             
         }
 
-        private List<INativeBuffer>[] buffersToDispose = [new(), new()];
+        private List<NativeBufferBase>[] buffersToDispose = [new(), new()];
         private int currentBufferDisposeIndex = 0;
 
-        public void AddToDispose(INativeBuffer nativeBuffer)
+        public void AddToDispose(NativeBufferBase nativeBuffer)
         {
             lock (this)
             {
@@ -446,7 +446,7 @@ namespace TheAvaloniaOpenGL
 
         public void DisposeBuffers()
         {
-            List<INativeBuffer> toDispose;
+            List<NativeBufferBase> toDispose;
             lock (this)
             {
                 toDispose = buffersToDispose[currentBufferDisposeIndex];
@@ -454,11 +454,7 @@ namespace TheAvaloniaOpenGL
             }
             foreach (var buffer in toDispose)
             {
-                if (buffer is NativeBufferBase bufferBase && bufferBase.BufferHandle != -1)
-                {
-                    Console.WriteLine("Buffer not disposed! Allocated here: " + bufferBase.AllocationStackTrace);
-                }
-                buffer.Dispose();
+                buffer.InternalDispose();
             }
             toDispose.Clear();
         }

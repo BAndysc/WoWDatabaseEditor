@@ -1,4 +1,4 @@
-﻿
+
 namespace TheEngine.ECS;
 
 public static partial class EntityExtensions
@@ -2693,6 +2693,1638 @@ cachedItr.DataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.Managed
             }
         }
 
+        public static void ForEachArray<T0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>> process)where T0 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>> process)where T0 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>> process)where T0 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>> process)where T0 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>()
+));
+            }
+        }
+
+        public static void ForEachROArray<T0, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachROArrayState<S, T0, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachROArray<T0, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachROArrayState<S, T0, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachROArray<T0, T1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
+                    );
+            }
+        }
+
+        public static void ForEachROArrayState<S, T0, T1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachROArray<T0, T1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
+));
+            }
+        }
+
+        public static void ParallelForEachROArrayState<S, T0, T1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>()
+));
+            }
+        }
+
+        public static void ForEachROOArray<T0, T1, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachROOArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachROOArray<T0, T1, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachROOArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachROOArray<T0, T1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ForEachROOArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachROOArray<T0, T1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ParallelForEachROOArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ForEachROOOArray<T0, T1, T2, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachROOOArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachROOOArray<T0, T1, T2, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachROOOArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachROOOArray<T0, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ForEachROOOArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachROOOArray<T0, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ParallelForEachROOOArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ForEachROOOOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachROOOOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachROOOOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachROOOOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRROArray<T0, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRROArrayState<S, T0, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROArray<T0, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROArrayState<S, T0, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRROArray<T0, N0, T1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
+                    );
+            }
+        }
+
+        public static void ForEachRROArrayState<S, T0, N0, T1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROArray<T0, N0, T1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROArrayState<S, T0, N0, T1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>()
+));
+            }
+        }
+
+        public static void ForEachRROOArray<T0, N0, T1, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRROOArrayState<S, T0, N0, T1, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROOArray<T0, N0, T1, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROOArrayState<S, T0, N0, T1, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRROOArray<T0, N0, T1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ForEachRROOArrayState<S, T0, N0, T1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROOArray<T0, N0, T1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROOArrayState<S, T0, N0, T1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ForEachRROOOArray<T0, N0, T1, T2, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRROOOArrayState<S, T0, N0, T1, T2, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROOOArray<T0, N0, T1, T2, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROOOArrayState<S, T0, N0, T1, T2, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRROOOArray<T0, N0, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ForEachRROOOArrayState<S, T0, N0, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROOOArray<T0, N0, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROOOArrayState<S, T0, N0, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ForEachRROOOOArray<T0, N0, T1, T2, T3, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRROOOOArrayState<S, T0, N0, T1, T2, T3, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROOOOArray<T0, N0, T1, T2, T3, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROOOOArrayState<S, T0, N0, T1, T2, T3, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRROArray<T0, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROArrayState<S, T0, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROArray<T0, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROArrayState<S, T0, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRROArray<T0, N0, N1, T1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROArrayState<S, T0, N0, N1, T1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROArray<T0, N0, N1, T1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROArrayState<S, T0, N0, N1, T1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>()
+));
+            }
+        }
+
+        public static void ForEachRRROOArray<T0, N0, N1, T1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOArrayState<S, T0, N0, N1, T1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOArray<T0, N0, N1, T1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOArrayState<S, T0, N0, N1, T1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRROOArray<T0, N0, N1, T1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOArrayState<S, T0, N0, N1, T1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOArray<T0, N0, N1, T1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOArrayState<S, T0, N0, N1, T1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ForEachRRROOOArray<T0, N0, N1, T1, T2, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOOArrayState<S, T0, N0, N1, T1, T2, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOOArray<T0, N0, N1, T1, T2, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOOArrayState<S, T0, N0, N1, T1, T2, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRROOOArray<T0, N0, N1, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOOArrayState<S, T0, N0, N1, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOOArray<T0, N0, N1, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOOArrayState<S, T0, N0, N1, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ForEachRRROOOOArray<T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOOOArrayState<S, T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOOOArray<T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOOOArrayState<S, T0, N0, N1, T1, T2, T3, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T1>?, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
         public static void ForEach<T0, T1>(this Archetype archetype, 
             Action<IChunkDataIterator, int, int, int, ComponentDataAccess<T0>, ComponentDataAccess<T1>> process)where T0 : unmanaged, IComponentData
 where T1 : unmanaged, IComponentData
@@ -4417,6 +6049,1734 @@ where N2 : IManagedComponentData
                 cachedItr = iterator.Current;
                     RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>()
+));
+            }
+        }
+
+        public static void ForEachRROArray<T0, T1, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRROArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROArray<T0, T1, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRROArray<T0, T1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ForEachRROArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROArray<T0, T1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ForEachRROOArray<T0, T1, T2, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRROOArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROOArray<T0, T1, T2, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROOArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRROOArray<T0, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ForEachRROOArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROOArray<T0, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROOArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ForEachRROOOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRROOOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROOOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROOOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRROOOArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ForEachRROOOArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROOOArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROOOArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ForEachRROOOOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRROOOOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRROOOOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRROOOOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRROArray<T0, T1, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROArrayState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROArray<T0, T1, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROArrayState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRROArray<T0, T1, N0, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROArrayState<S, T0, T1, N0, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROArray<T0, T1, N0, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROArrayState<S, T0, T1, N0, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ForEachRRROOArray<T0, T1, N0, T2, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOArrayState<S, T0, T1, N0, T2, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOArray<T0, T1, N0, T2, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOArrayState<S, T0, T1, N0, T2, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRROOArray<T0, T1, N0, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOArrayState<S, T0, T1, N0, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOArray<T0, T1, N0, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOArrayState<S, T0, T1, N0, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ForEachRRROOOArray<T0, T1, N0, T2, T3, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOOArrayState<S, T0, T1, N0, T2, T3, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOOArray<T0, T1, N0, T2, T3, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOOArrayState<S, T0, T1, N0, T2, T3, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRROOOArray<T0, T1, N0, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOOArrayState<S, T0, T1, N0, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOOArray<T0, T1, N0, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOOArrayState<S, T0, T1, N0, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ForEachRRROOOOArray<T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOOOArrayState<S, T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOOOArray<T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOOOArrayState<S, T0, T1, N0, T2, T3, T4, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRROArray<T0, T1, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROArrayState<S, T0, T1, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROArray<T0, T1, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROArrayState<S, T0, T1, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRROArray<T0, T1, N0, N1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROArrayState<S, T0, T1, N0, N1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROArray<T0, T1, N0, N1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROArrayState<S, T0, T1, N0, N1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOArray<T0, T1, N0, N1, T2, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOArrayState<S, T0, T1, N0, N1, T2, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOArray<T0, T1, N0, N1, T2, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOArrayState<S, T0, T1, N0, N1, T2, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOArray<T0, T1, N0, N1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOArrayState<S, T0, T1, N0, N1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOArray<T0, T1, N0, N1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOArrayState<S, T0, T1, N0, N1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOOArray<T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOOArrayState<S, T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArray<T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArrayState<S, T0, T1, N0, N1, T2, T3, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOOArray<T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOOArrayState<S, T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArray<T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArrayState<S, T0, T1, N0, N1, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOOOArray<T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOOOArrayState<S, T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOOOArray<T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOOOArrayState<S, T0, T1, N0, N1, T2, T3, T4, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T2>?, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
         }
@@ -6241,6 +9601,1830 @@ where N2 : IManagedComponentData
                 cachedItr = iterator.Current;
                     RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>()
+));
+            }
+        }
+
+        public static void ForEachRRROArray<T0, T1, T2, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROArray<T0, T1, T2, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRROArray<T0, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROArray<T0, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ForEachRRROOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRROOArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ForEachRRROOOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRROOOArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOOArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOOArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOOArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ForEachRRROOOOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRROOOOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, T2, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRROArray<T0, T1, T2, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROArrayState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROArray<T0, T1, T2, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROArrayState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRROArray<T0, T1, T2, N0, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROArrayState<S, T0, T1, T2, N0, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROArray<T0, T1, T2, N0, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROArrayState<S, T0, T1, T2, N0, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOArray<T0, T1, T2, N0, T3, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOArrayState<S, T0, T1, T2, N0, T3, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOArray<T0, T1, T2, N0, T3, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOArrayState<S, T0, T1, T2, N0, T3, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOArray<T0, T1, T2, N0, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOArrayState<S, T0, T1, T2, N0, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOArray<T0, T1, T2, N0, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOArrayState<S, T0, T1, T2, N0, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOOArray<T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOOArrayState<S, T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArray<T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArrayState<S, T0, T1, T2, N0, T3, T4, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOOArray<T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOOArrayState<S, T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArray<T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArrayState<S, T0, T1, T2, N0, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOOOArray<T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOOOArrayState<S, T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOOOArray<T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOOOArrayState<S, T0, T1, T2, N0, T3, T4, T5, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, T2, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROArray<T0, T1, T2, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROArrayState<S, T0, T1, T2, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROArray<T0, T1, T2, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROArray<T0, T1, T2, N0, N1, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROArrayState<S, T0, T1, T2, N0, N1, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROArray<T0, T1, T2, N0, N1, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, N0, N1, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOArray<T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOArrayState<S, T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArray<T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, N0, N1, T3, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOArray<T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOArrayState<S, T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArray<T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, N0, N1, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOOArray<T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArray<T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOOArray<T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArray<T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOOOArray<T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOOArray<T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOOArrayState<S, T0, T1, T2, N0, N1, T3, T4, T5, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T3>?, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
         }
@@ -8161,6 +13345,1926 @@ where N2 : IManagedComponentData
                 cachedItr = iterator.Current;
                     RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2, T3>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2, T3>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>()
+));
+            }
+        }
+
+        public static void ForEachRRRROArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRROArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOOArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ForEachRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2, T3, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2, T3, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROArray<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROArrayState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROArray<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROArray<T0, T1, T2, T3, N0, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROArrayState<S, T0, T1, T2, T3, N0, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROArray<T0, T1, T2, T3, N0, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, T3, N0, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOArray<T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOArrayState<S, T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArray<T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, T3, N0, T4, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOArray<T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOArrayState<S, T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArray<T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, T3, N0, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOOArray<T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArray<T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOOArray<T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArray<T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOOOArray<T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOOArray<T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOOArrayState<S, T0, T1, T2, T3, N0, T4, T5, T6, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2, T3, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2, T3, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROArray<T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROArray<T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, N0, N1, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOArray<T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, N0, N1, T4, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOArray<T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOOOArray<T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOOArray<T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, N0, N1, T4, T5, T6, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T4>?, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
 ));
             }
         }
@@ -10181,6 +17285,2022 @@ cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>
             }
         }
 
+        public static void ForEachArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2, T3, T4>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ForEachRRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2, T3, T4, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROArray<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROArray<T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOArray<T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, T5, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOArray<T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOOOArray<T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOOArray<T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, N0, T5, T6, T7, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROArray<T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROArray<T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROArray<T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROArray<T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROOArray<T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOArray<T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROOOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOOArray<T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, N0, N1, T5, T6, T7, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T5>?, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
         public static void ForEach<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
             Action<IChunkDataIterator, int, int, int, ComponentDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>> process)where T0 : unmanaged, IComponentData
 where T1 : unmanaged, IComponentData
@@ -12189,6 +21309,2018 @@ where T8 : unmanaged, IComponentData
                 cachedItr = iterator.Current;
                     RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?>)process!)((S)state, cachedItr, thread, s, e,
 cachedItr.DataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4, T5>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArray<T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOArray<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArray<T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArray<T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOOArray<T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N0>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, T6, T7, T8, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N0>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N0>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4, T5, N0>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRROOOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOOArray<T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N1>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRROOOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, T6, T7, T8, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N1>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?, ManagedComponentDataAccess<N1>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>(), cachedItr.OptionalManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachArray<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ForEachArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachArray<T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ParallelForEachArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROArray<T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, N2>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where N2 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ManagedComponentDataAccess<N2>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalManagedDataAccess<N2>()
+));
+            }
+        }
+
+        public static void ForEachRRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+                    );
+            }
+        }
+
+        public static void ForEachRRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    process(state, cachedItr, 0, 0, cachedItr.Length,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+                    );
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROOOArray<T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, null, (process, state, thread, s, e) => ((Action<IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?>)process!)(cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
+));
+            }
+        }
+
+        public static void ParallelForEachRRRRRRRROOOArrayState<S, T0, T1, T2, T3, T4, T5, N0, N1, T6, T7, T8>(this Archetype archetype, S state, 
+            Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?> process)where T0 : unmanaged, IComponentData
+where T1 : unmanaged, IComponentData
+where T2 : unmanaged, IComponentData
+where T3 : unmanaged, IComponentData
+where T4 : unmanaged, IComponentData
+where T5 : unmanaged, IComponentData
+where N0 : IManagedComponentData
+where N1 : IManagedComponentData
+where T6 : unmanaged, IComponentData
+where T7 : unmanaged, IComponentData
+where T8 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            while (iterator.MoveNext())
+            {
+                cachedItr = iterator.Current;
+                    RunThreads(0, cachedItr.Length, process, state, (process, state, thread, s, e) => ((Action<S, IChunkDataIterator, int, int, int, ComponentArrayDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>, ComponentDataAccess<T5>, ManagedComponentDataAccess<N0>, ManagedComponentDataAccess<N1>, ComponentDataAccess<T6>?, ComponentDataAccess<T7>?, ComponentDataAccess<T8>?>)process!)((S)state, cachedItr, thread, s, e,
+cachedItr.ArrayDataAccess<T0>(), cachedItr.DataAccess<T1>(), cachedItr.DataAccess<T2>(), cachedItr.DataAccess<T3>(), cachedItr.DataAccess<T4>(), cachedItr.DataAccess<T5>(), cachedItr.ManagedDataAccess<N0>(), cachedItr.ManagedDataAccess<N1>(), cachedItr.OptionalDataAccess<T6>(), cachedItr.OptionalDataAccess<T7>(), cachedItr.OptionalDataAccess<T8>()
 ));
             }
         }

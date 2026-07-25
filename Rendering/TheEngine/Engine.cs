@@ -11,13 +11,17 @@ using TheEngine.Managers;
 using TheEngine.Utils;
 
 [assembly: InternalsVisibleTo("TheEngine.Test")]
+[assembly: InternalsVisibleTo("SponzaDemo")]
 namespace TheEngine
 {
     public class Engine : IDisposable
     {
         internal int GameThreadId = Environment.CurrentManagedThreadId;
 
-        internal TheDevice Device { get; }
+        internal Rendering.IRenderBackend Backend { get; }
+
+        /// <summary>The legacy GL resource factory; only valid with the GL backend (window/panel hosts).</summary>
+        internal TheDevice Device => ((Rendering.GLRenderBackend)Backend).TheDevice;
 
         internal IConfiguration Configuration { get; }
 
@@ -84,6 +88,11 @@ namespace TheEngine
         public long FrameCount { get; internal set; }
 
         public Engine(IDevice device, IConfiguration configuration, IWindowHost host, bool flipY)
+            : this(new Rendering.GLRenderBackend(device, host), configuration, host, flipY)
+        {
+        }
+
+        internal Engine(Rendering.IRenderBackend backend, IConfiguration configuration, IWindowHost host, bool flipY)
         {
             WindowHost = host;
             //windowHost.Bind(this);
@@ -93,12 +102,10 @@ namespace TheEngine
             NextFrame = new NextFrameAwaitable(this);
 
             Configuration = configuration;
-            Device = new TheDevice(host, device, false);
-
-            Device.Initialize();
+            Backend = backend;
 
             statsManager = new StatsManager();
-            entityManager = new EntityManager(this);
+            entityManager = new EntityManager(statsManager, this);
             
             lightManager = new LightManager(this);
             inputManager = new InputManager(this);
@@ -126,8 +133,8 @@ namespace TheEngine
             // todo
             meshManager.Update();
             textureManager.Update();
-            Device.device.DisposeBuffers();
-            statsManager.BufferBytes = Device.device.TotalBufferBytes;
+            Backend.CollectDisposedResources();
+            statsManager.BufferBytes = Backend.TotalBufferBytes;
 
             uiManager.UpdateGui(delta);
             EntityInspector.UpdateGui(delta);
@@ -135,19 +142,19 @@ namespace TheEngine
 
         internal void Render3DGUI()
         {
-            Device.device.Debug("  Rendering 3D GUI");
+            renderManager.CommandList.InsertDebugMarker("  Rendering 3D GUI");
             uiManager.Render3D();
         }
 
         internal void RenderGUI()
         {
-            Device.device.Debug("  Rendering GUI");
+            renderManager.CommandList.InsertDebugMarker("  Rendering GUI");
             uiManager.Render();
         }
-        
-        public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, ReadOnlySpan<T> data, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged => Device.CreateBuffer<T>(bufferType, data, format);
-        public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, int size, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged => Device.CreateBuffer<T>(bufferType, size, format);
-        
+
+        public INativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, ReadOnlySpan<T> data, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged => Backend.CreateBuffer<T>(bufferType, data, format);
+        public INativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, int size, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged => Backend.CreateBuffer<T>(bufferType, size, format);
+
         public void Dispose()
         {
             uiManager.Dispose();

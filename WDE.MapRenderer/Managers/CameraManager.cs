@@ -1,5 +1,6 @@
 using Avalonia.Input;
 using ImGuiNET;
+using TheEngine;
 using TheEngine.Interfaces;
 using TheEngine.Utils.ImGuiHelper;
 using TheMaths;
@@ -24,20 +25,21 @@ namespace WDE.MapRenderer.Managers
 
         private float currentSpeed = 0;
 
-        public CameraManager(ICameraManager engineCamera,
+        public CameraManager(Engine engine,
+            ICameraManager engineCamera,
             IInputManager inputManager,
             IUIManager uiManager)
         {
             this.engineCamera = engineCamera;
             this.inputManager = inputManager;
             this.uiManager = uiManager;
-
-            Position = new Vector3(285.396f, -4746.17f, 9.48428f + 20);
-            Rotation = Utilities.LookRotation(
-                new Vector3(223.698f, -4745.11f, 10.1022f + 20) - Position, Vectors.Up);
-            
+            //
+            // Position = new Vector3(285.396f, -4746.17f, 9.48428f + 20);
+            // Rotation = Utilities.LookRotation(
+            //     new Vector3(223.698f, -4745.11f, 10.1022f + 20) - Position, Vectors.Up);
+            //
             engineCamera.MainCamera.FOV = 75;
-            this.coordNotificationBox = new SimpleBox(BoxPlacement.BottomLeft);
+            this.coordNotificationBox = new SimpleBox(engine, BoxPlacement.BottomLeft);
         }
 
         public (int, int) CurrentChunk => Position.WoWPositionToChunk();

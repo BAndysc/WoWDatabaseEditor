@@ -21,12 +21,12 @@ public class ScreenRenderTexture : System.IDisposable
 
     public void Update()
     {
-        if (width != (int)engine.WindowHost.WindowWidth ||
-            height != (int)engine.WindowHost.WindowHeight ||
+        if (width != (int)engine.gameView.ViewRect.Width ||
+            height != (int)engine.gameView.ViewRect.Height ||
             Texure == null)
         {
-            width = (int)engine.WindowHost.WindowWidth;
-            height = (int)engine.WindowHost.WindowHeight;
+            width = (int)engine.gameView.ViewRect.Width;
+            height = (int)engine.gameView.ViewRect.Height;
             engine.TextureManager.DisposeTexture(Texure);
             Texure = engine.textureManager.CreateRenderTexture(Math.Max(1, (int)(width * scale)),Math.Max(1, (int)(height * scale)));
         }

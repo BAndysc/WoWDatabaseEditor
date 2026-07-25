@@ -1,4 +1,4 @@
-﻿#define DEBUG_CREATE_CALLSTACK
+﻿// #define DEBUG_CREATE_CALLSTACK
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using OpenGLBindings;
@@ -31,17 +31,36 @@ namespace TheAvaloniaOpenGL.Resources
         void Activate(int slot);
     }
 
+    /// <summary>
+    /// Backend-neutral typed GPU buffer. Updating while a frame is in flight has
+    /// orphaning semantics: draws already recorded keep reading the previous contents,
+    /// draws recorded afterwards read the new contents (on GL via glBufferData orphaning,
+    /// on Vulkan via buffer versioning).
+    /// </summary>
+    public interface INativeBuffer<T> : INativeBuffer where T : unmanaged
+    {
+        BufferTypeEnum BufferType { get; }
+        int Length { get; }
+        void UpdateBuffer(ReadOnlySpan<T> newData);
+        void UpdateBuffer(ref T newData);
+    }
+
     public abstract class NativeBufferBase : INativeBuffer
     {
         public int BufferHandle { get; protected set; }
         public abstract void Dispose();
         public abstract void Activate(int slot);
+
+        internal abstract void InternalDispose();
 #if DEBUG_CREATE_CALLSTACK
         internal StackTrace AllocationStackTrace { get; } = new StackTrace(2, true);
+        internal StackTrace? DeallocationStackTrace { get; set; }
+        internal long FrameAllocated = IDevice.FrameCount;
+        internal long FrameDisposed = -1;
 #endif
     }
 
-    public sealed class NativeBuffer<T> : NativeBufferBase where T : unmanaged
+    public sealed class NativeBuffer<T> : NativeBufferBase, INativeBuffer<T> where T : unmanaged
     {
         private static bool UseStorageBuffer = false;
         
@@ -82,6 +101,10 @@ namespace TheAvaloniaOpenGL.Resources
         {
             if (BufferHandle != -1)
             {
+#if DEBUG_CREATE_CALLSTACK
+                DeallocationStackTrace = new StackTrace(0, true);
+                FrameDisposed = IDevice.FrameCount;
+#endif
                 device.AddToDispose(this);
             }
         }
@@ -141,7 +164,7 @@ namespace TheAvaloniaOpenGL.Resources
         private BufferUsageHint UsageHint =>
             IsStructuredBuffer ? BufferUsageHint.DynamicDraw : BufferUsageHint.StaticDraw;
 
-        public unsafe void UpdateBuffer(Span<T> newData)
+        public unsafe void UpdateBuffer(ReadOnlySpan<T> newData)
         {
             device.BindBuffer(GlBufferType, BufferHandle);
             var oldLength = Length;
@@ -205,7 +228,11 @@ namespace TheAvaloniaOpenGL.Resources
         {
             if (BufferHandle <= -1)
             {
-                throw new Exception("Trying to activate that has been disposed!!!1!");
+#if DEBUG_CREATE_CALLSTACK
+                throw new Exception($"[now = {IDevice.FrameCount}] Trying to activate that has been disposed!!!1! Alloc here (frame {FrameAllocated}):\n" + AllocationStackTrace + $"\nDealloc here ({FrameDisposed}):\n" + DeallocationStackTrace);
+#else
+                throw new Exception("Trying to activate that has been disposed!!!1! (enable DEBUG_CREATE_CALLSTACK to get more info)");
+#endif
             }
             if (BufferType == BufferTypeEnum.Vertex)
             {
@@ -239,15 +266,27 @@ namespace TheAvaloniaOpenGL.Resources
             }
         }
 
+        internal override void InternalDispose()
+        {
+            if (BufferHandle <= -1)
+                return;
+            if (IsUsingBufferTexture)
+                device.DeleteTexture(TextureBufferHandle);
+            device.DeleteBuffer(BufferHandle);
+            device.TotalBufferBytes -= Length * SizeOfT;
+            BufferHandle = -1;
+        }
+
         public override void Dispose()
         {
-             if (BufferHandle <= -1)
-                 return;
-             if (IsUsingBufferTexture)
-                 device.DeleteTexture(TextureBufferHandle);
-             device.DeleteBuffer(BufferHandle);
-             device.TotalBufferBytes -= Length * SizeOfT;
-             BufferHandle = -1;
+            if (BufferHandle != -1)
+            {
+#if DEBUG_CREATE_CALLSTACK
+                DeallocationStackTrace = new StackTrace(0, true);
+                FrameDisposed = IDevice.FrameCount;
+#endif
+                device.AddToDispose(this);
+            }
         }
     }
 }

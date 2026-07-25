@@ -2,9 +2,14 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using TheEngine.Components;
+using TheEngine.Entities;
 
 namespace TheEngine.ECS
 {
+    public class ArrayComponentAttribute : Attribute
+    {
+    }
+
     public class ComponentTypeData<T> : IComponentTypeData where T : unmanaged, IComponentData
     {
         public delegate void FreeDelegate(Engine engine, ref T component);
@@ -13,28 +18,26 @@ namespace TheEngine.ECS
         {
             Index = index;
             DataType = typeof(T);
-            SizeBytes = Marshal.SizeOf(typeof(T));
+            // must be the managed size: ComponentDataAccess/ComponentArrayDataAccess index the storage
+            // with sizeof(T) strides, and Marshal.SizeOf can differ (e.g. bool fields marshal as 4 bytes)
+            SizeBytes = Unsafe.SizeOf<T>();
+            IsArray = typeof(T).GetCustomAttributes(typeof(ArrayComponentAttribute), false).Length > 0;
             // todo: more generic way to specify FreeAction
             if (typeof(T) == typeof(MeshRenderer))
             {
                 FreeAction = (engine, bytes) =>
                 {
                     var meshRenderer = MemoryMarshal.Cast<byte, MeshRenderer>(bytes);
-                    if (meshRenderer[0].meshGcHandle != default)
-                    {
-                        meshRenderer[0].meshGcHandle.Free();
-                    }
-                    if (meshRenderer[0].materialGcHandle != default)
-                    {
-                        meshRenderer[0].materialGcHandle.Free();
-                    }
+                    meshRenderer[0].Mesh = null;
+                    meshRenderer[0].Material = null;
                 };
             }
         }
 
         public int Index { get; }
-        public ulong Hash => (ulong)(1 << Index);
+        public ulong Hash => 1ul << Index;
         public ulong GlobalHash => Hash;
+        public bool IsArray { get; }
         public IComponentTypeData.FreeActionDelegate? FreeAction { get; set; }
         public Type DataType { get; }
         public int SizeBytes { get; }
@@ -79,7 +82,7 @@ namespace TheEngine.ECS
 
         public int Index { get; }
         public Type DataType { get; }
-        public ulong Hash => (ulong)(1 << Index);
+        public ulong Hash => 1ul << Index;
         public ulong GlobalHash => Hash << 32;
 
         protected bool Equals(ManagedComponentTypeData<T> other)

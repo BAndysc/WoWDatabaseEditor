@@ -31,8 +31,8 @@ namespace WDE.MapRenderer.Managers
         public int Z { get; }
         public ITexture splatMapTex;
         public ITexture holesMapTex;
-        public NativeBuffer<VectorByte4>? chunkToSplatBuffer;
-        public NativeBuffer<Vector4>? heightsNormalBuffer;
+        public INativeBuffer<VectorByte4>? chunkToSplatBuffer;
+        public INativeBuffer<Vector4>? heightsNormalBuffer;
         public float[,] heights;
         public Material<ChunkManager.LitMaterialData_t>? material;
         public bool terrainLoaded;
@@ -41,12 +41,10 @@ namespace WDE.MapRenderer.Managers
         public Task? chunkLoading;
 
         public Entity terrainEntity;
-        public List<StaticRenderHandle> renderHandles = new();
         public List<Entity> entities = new();
         public List<IMesh> meshes = new();
-        public List<INativeBuffer> animationBuffers = new();
-        public List<MdxManager.MdxInstance> mdx = new();
-        public List<WmoManager.WmoInstance> wmos = new();
+        public List<M2Id> mdx = new();
+        public List<WmoId> wmos = new();
 
         public ChunkInstance(int x, int z)
         {
@@ -62,9 +60,6 @@ namespace WDE.MapRenderer.Managers
             textureManager.DisposeTexture(splatMapTex);
             textureManager.DisposeTexture(holesMapTex);
             heightsNormalBuffer?.Dispose();
-            foreach (var buffer in animationBuffers)
-                buffer.Dispose();
-            animationBuffers.Clear();
         }
 
         public uint GetAreaId(Vector3 wowPosition)
@@ -422,8 +417,8 @@ namespace WDE.MapRenderer.Managers
                     var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype, "Terrain collider"u8);
                     entityManager.GetComponent<Collider>(entity).CollisionMask = Collisions.COLLISION_MASK_TERRAIN;
                     entityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
-                    entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = 0;
-                    entityManager.GetComponent<MeshRenderer>(entity).Mesh = subChunkMesh;
+                    var meshRenderer = new MeshRenderer() { Mesh = subChunkMesh, SubMeshId = 0 };
+                    entityManager.AddArrayComponent(entity, meshRenderer);
                     entityManager.GetComponent<WorldMeshBounds>(entity) = (WorldMeshBounds)subChunkMesh.Bounds;
                     chunk.entities.Add(entity);
 
@@ -483,7 +478,6 @@ namespace WDE.MapRenderer.Managers
             var t = new Transform();
             t.Position = new Vector3(chunksEnumerator.Current.BasePosition.X, chunksEnumerator.Current.BasePosition.Y, 0);
             t.Scale = new Vector3(1);
-            chunkMesh.Activate();
         
             chunk.splatMapTex = textureManager.CreateTextureArray(splatMaps, 64, 64);
             textureManager.SetFiltering(chunk.splatMapTex, FilteringMode.Linear);
@@ -549,7 +543,7 @@ namespace WDE.MapRenderer.Managers
         
 
             chunk.chunkToSplatBuffer = engine.CreateBuffer<VectorByte4>(BufferTypeEnum.StructuredBufferVertexOnly, chunkToSplatIdx, BufferInternalFormat.Byte4);
-            chunk.heightsNormalBuffer = engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal, BufferInternalFormat.Float4);// new NativeBuffer<Vector4>(device.device, BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal);
+            chunk.heightsNormalBuffer = engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal, BufferInternalFormat.Float4);// new INativeBuffer<Vector4>(device.device, BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal);
         
             material.SetBuffer("chunkToSplat", chunk.chunkToSplatBuffer);
             material.SetBuffer("heightsNormalBuffer", chunk.heightsNormalBuffer);
@@ -558,13 +552,10 @@ namespace WDE.MapRenderer.Managers
             
             var terrainEntity = entityManager.CreateEntity(archetypes.TerrainEntityArchetype, "Terrain renderer"u8);
             entityManager.GetComponent<LocalToWorld>(terrainEntity).Matrix = t.LocalToWorldMatrix;
-            entityManager.GetComponent<MeshRenderer>(terrainEntity).SubMeshId = 0;
-            entityManager.GetComponent<MeshRenderer>(terrainEntity).Material = material;
-            entityManager.GetComponent<MeshRenderer>(terrainEntity).Mesh = chunkMesh;
-            entityManager.GetComponent<MeshRenderer>(terrainEntity).Opaque = !material.BlendingEnabled; 
+            entityManager.AddArrayComponent(terrainEntity, new MeshRenderer() { Mesh = chunkMesh, SubMeshId = 0, Material = material, Opaque = !material.BlendingEnabled });
             var localBounds = new BoundingBox(
-                new Vector3(chunkMesh.Bounds.Minimum.X, chunkMesh.Bounds.Minimum.Y, minHeight),
-                new Vector3(chunkMesh.Bounds.Maximum.X, chunkMesh.Bounds.Maximum.Y, maxHeight));
+                chunkMesh.Bounds.Minimum with { Z = minHeight },
+                chunkMesh.Bounds.Maximum with { Z = maxHeight });
             entityManager.GetComponent<WorldMeshBounds>(terrainEntity) = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = t.LocalToWorldMatrix });
             terrainEntity.SetForceDisabledRendering(entityManager, !RenderTerrain);
             chunk.terrainEntity = terrainEntity;
@@ -639,11 +630,8 @@ namespace WDE.MapRenderer.Managers
                 var trsMatrix = Utilities.TRS(meshPosition, Quaternion.Identity, Vectors.One);
                 var waterEntity = entityManager.CreateEntity(archetypes.TerrainEntityArchetype, "Water renderer"u8);
                 entityManager.GetComponent<LocalToWorld>(waterEntity).Matrix = trsMatrix;
-                            
-                entityManager.GetComponent<MeshRenderer>(waterEntity).SubMeshId = 0;
-                entityManager.GetComponent<MeshRenderer>(waterEntity).Material = woWMeshManager.WaterMaterial;
-                entityManager.GetComponent<MeshRenderer>(waterEntity).Mesh = waterMesh;
-                entityManager.GetComponent<MeshRenderer>(waterEntity).Opaque = false;
+                var meshRenderer = new MeshRenderer() { Mesh = waterMesh, SubMeshId = 0, Material = woWMeshManager.WaterMaterial, Opaque = false };
+                entityManager.AddArrayComponent(waterEntity, meshRenderer);
                 localBounds = waterMesh.Bounds;
                 localBounds = localBounds.WithSize(localBounds.Size with { Z = Math.Max(localBounds.Size.Z, 10) });
                 var worldBounds = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = trsMatrix });
@@ -688,13 +676,19 @@ namespace WDE.MapRenderer.Managers
             await LoadM2(adt, chunk, cancellationToken);
         }
 
-        public struct Adt_M2Object : IComponentData
+        private Dictionary<M2Id, LoadedM2> loadedM2s = new();
+
+        private record struct LoadedM2
         {
-            public Vector3 AbsolutePosition;
-            public Vector3 Rotation;
-            public float Scale;
-            public MDDFFlags Flags;
             public M2Id Id;
+            public int RefCount;
+            public Entity Entity;
+
+            public LoadedM2(M2Id id, int refCount)
+            {
+                Id = id;
+                RefCount = refCount;
+            }
         }
 
         private async ValueTask LoadM2(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
@@ -705,13 +699,21 @@ namespace WDE.MapRenderer.Managers
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
+                if (loadedM2s.TryGetValue(m2.Id, out var refCount))
+                {
+                    loadedM2s[m2.Id] = refCount with { RefCount = refCount.RefCount + 1 };
+                    continue;
+                }
+                var loadedM2 = new LoadedM2(m2.Id, 1);
+                loadedM2s[m2.Id] = loadedM2;
+
                 var m = await mdxManager.LoadM2Mesh(m2.M2Path);
                 if (m == null)
                 {
                     Console.WriteLine(m2.M2Path + " is null");
                     continue;
                 }
-                chunk.mdx.Add(m);
+                chunk.mdx.Add(m2.Id);
 
                 var t = new Transform();
                 t.Position = new Vector3(32 * Constants.BlockSize - m2.AbsolutePosition.Z, (32 * Constants.BlockSize - m2.AbsolutePosition.X), m2.AbsolutePosition.Y);
@@ -719,20 +721,17 @@ namespace WDE.MapRenderer.Managers
                 t.Rotation = Utilities.FromEuler(m2.Rotation.X, m2.Rotation.Y + 180,  m2.Rotation.Z);
 
                 Entity entity = Entity.Empty;
-                NativeBuffer<Matrix>? bones = null;
-                NativeBuffer<Vector4>? colors = null;
-                NativeBuffer<Matrix>? textureTransforms = null;
+                INativeBuffer<Matrix>? bones = null;
+                INativeBuffer<Vector4>? colors = null;
+                INativeBuffer<Matrix>? textureTransforms = null;
                 if (m.HasAnimations)
                 {
                     bones = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
                     bones.UpdateBuffer(AnimationSystem.IdentityMatrix(m.model.bones.Length).Span);
-                    chunk.animationBuffers.Add(bones);
                     colors = engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
                     colors.UpdateBuffer(AnimationSystem.IdentityColors(m.model.colors.Length).Span);
-                    chunk.animationBuffers.Add(colors);
                     textureTransforms = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
                     textureTransforms.UpdateBuffer(AnimationSystem.IdentityMatrix(m.model.texture_transforms.Length + 1).Span);
-                    chunk.animationBuffers.Add(textureTransforms);
                 }
 
                 bool first = true;
@@ -741,10 +740,10 @@ namespace WDE.MapRenderer.Managers
                 {
                     if (m.HasAnimations)
                     {
-                        entity = entityManager.CreateEntity(first ? archetypes.StaticM2WorldObjectAnimatedMasterArchetype : archetypes.StaticM2WorldObjectAnimatedArchetype, m2.Id.ToString());
-                        // only one renderer has to update the animation, because the animation is the same among all renderers
                         if (first)
                         {
+                            entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectAnimatedArchetype, m2.Id.ToString());
+                            // only one renderer has to update the animation, because the animation is the same among all renderers
                             entityManager.SetManagedComponent(entity, new M2AnimationComponentData(m.model)
                             {
                                 SetNewAnimation = 0,
@@ -752,40 +751,59 @@ namespace WDE.MapRenderer.Managers
                                 _colors = colors!,
                                 _textureTransforms = textureTransforms!
                             });
+                            var instanceRenderer = new MaterialInstanceRenderData();
+                            instanceRenderer.SetBuffer("boneMatrices", bones!);
+                            instanceRenderer.SetBuffer("vertexColors", colors!);
+                            instanceRenderer.SetBuffer("textureTransforms", textureTransforms!);
+                            entityManager.SetManagedComponent(entity, instanceRenderer);
                         }
-                        var instanceRenderer = new MaterialInstanceRenderData();
-                        instanceRenderer.SetBuffer("boneMatrices", bones!);
-                        instanceRenderer.SetBuffer("vertexColors", colors!);
-                        instanceRenderer.SetBuffer("textureTransforms", textureTransforms!);
-                        instanceRenderer.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
-                        entityManager.SetManagedComponent(entity, instanceRenderer);
                     }
                     else
-                        entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectArchetype, m2.Id.ToString());
+                    {
+                        if (first)
+                            entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectArchetype, m2.Id.ToString());
+                    }
+                    var instanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
+                    renderManager.SetupRendererEntity(entity, m.mesh.Handle, material.material, material.submesh, t.LocalToWorldMatrix, instanceData);
                     
-                    renderManager.SetupRendererEntity(entity, m.mesh.Handle, material.material, material.submesh, t.LocalToWorldMatrix);
-                    
-                    chunk.entities.Add(entity);
                     first = false;
                 }
 
                 if (entity != Entity.Empty)
                 {
-                    entityManager.AddManagedComponent(entity, new MdxRenderer(m){});
-                    entityManager.AddComponent(entity, new Adt_M2Object()
+                    loadedM2.Entity = entity;
+                    loadedM2s[m2.Id] = loadedM2;
+                    entityManager.SetManagedComponent(entity, new MdxRenderer(m){ Owner = entity });
+                    entityManager.GetComponent<Adt_M2Object>(entity) = new Adt_M2Object()
                     {
                         AbsolutePosition = m2.AbsolutePosition,
                         Rotation = m2.Rotation,
                         Scale = m2.Scale,
                         Flags = m2.Flags,
                         Id = m2.Id
-                    });
+                    };
                 }
 
                 index++;
 
                 if (index % 10 == 0)
                     await engine.NextFrame;
+            }
+        }
+
+        private Dictionary<WmoId, LoadedWmo> loadedWmos = new();
+
+        private record struct LoadedWmo
+        {
+            public WmoId Id;
+            public int RefCount;
+            public Entity Entity;
+            public Entity ColliderEntity;
+
+            public LoadedWmo(WmoId id, int refCount)
+            {
+                Id = id;
+                RefCount = refCount;
             }
         }
 
@@ -797,6 +815,15 @@ namespace WDE.MapRenderer.Managers
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
+
+                if (loadedWmos.TryGetValue(wmoReference.Id, out var loadedWmo))
+                {
+                    loadedWmos[wmoReference.Id] = loadedWmo with { RefCount = loadedWmo.RefCount + 1 };
+                    continue;
+                }
+
+                loadedWmo = new LoadedWmo(wmoReference.Id, 1);
+                loadedWmos[wmoReference.Id] = loadedWmo;
                 
                 var wmoTransform = new Transform();
                 wmoTransform.Position = new Vector3((32 * Constants.BlockSize - wmoReference.AbsolutePosition.Z), (32 * Constants.BlockSize - wmoReference.AbsolutePosition.X), wmoReference.AbsolutePosition.Y);
@@ -806,24 +833,28 @@ namespace WDE.MapRenderer.Managers
                 if (wmoInstance == null)
                     continue;
 
-                chunk.wmos.Add(wmoInstance);
+                chunk.wmos.Add(wmoReference.Id);
+                Entity entityCollider = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype, $"{wmoReference.Id} collider");
+                var entity = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype, $"{wmoReference.Id}");
+
+                var l2w = new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix };
+                engine.EntityManager.GetComponent<LocalToWorld>(entity) = l2w;
+
+                entityManager.GetComponent<LocalToWorld>(entityCollider).Matrix = wmoTransform.LocalToWorldMatrix;
+                entityManager.GetComponent<Collider>(entityCollider).CollisionMask = Collisions.COLLISION_MASK_WMO;
+
+                loadedWmos[wmoReference.Id] = loadedWmo with { Entity = entity, ColliderEntity = entityCollider };
 
                 foreach (var mesh in wmoInstance.Meshes)
                 {
                     int i = 0;
                     foreach (var material in mesh.Item2)
                     {
-                        chunk.renderHandles.Add(renderManager.RegisterStaticRenderer(mesh.Item1.Handle, material, i++, wmoTransform));
+                        entity.SetRenderer(entityManager, mesh.Item1, i++, material);
 
                         if (!material.BlendingEnabled)
                         {
-                            var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype, $"{wmoReference.Id} collider");
-                            entityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
-                            entityManager.GetComponent<Collider>(entity).CollisionMask = Collisions.COLLISION_MASK_WMO;
-                            entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
-                            entityManager.GetComponent<MeshRenderer>(entity).Mesh = mesh.Item1;
-                            entityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });   
-                            chunk.entities.Add(entity);
+                            entityCollider.SetRenderer(entityManager, mesh.Item1, i - 1, null);
                         }
                     }
                 }
@@ -857,7 +888,7 @@ namespace WDE.MapRenderer.Managers
             {
                 for (int j = -D; j <= D; ++j)
                 {
-                    LoadChunk(chunk.x + i, chunk.y + j, false);
+                    LoadChunk(chunk.x + i, chunk.y + j, false).FireAndForget();
                 }
             }
             
@@ -895,19 +926,43 @@ namespace WDE.MapRenderer.Managers
             }
             
             await moduleManager.ForEach(UnloadModuleChunk);
-            
+
             chunk.terrainEntity = Entity.Empty;
-            foreach (var obj in chunk.renderHandles)
-                renderManager.UnregisterStaticRenderer(obj);
             foreach (var entity in chunk.entities)
                 entityManager.DestroyEntity(entity);
-            foreach (var buffer in chunk.animationBuffers)
-                buffer.Dispose();
-            
             foreach (var obj in chunk.meshes)
                 meshManager.DisposeMesh(obj);
-                
-            chunk.animationBuffers.Clear();
+            foreach (var m2Id in chunk.mdx)
+            {
+                if (loadedM2s.TryGetValue(m2Id, out var loadedM2))
+                {
+                    if (loadedM2.RefCount == 1)
+                    {
+                        loadedM2s.Remove(m2Id);
+                        entityManager.DestroyEntity(loadedM2.Entity);
+                    }
+                    else
+                    {
+                        loadedM2s[m2Id] = loadedM2 with { RefCount = loadedM2.RefCount - 1 };
+                    }
+                }
+            }
+            foreach (var wmoId in chunk.wmos)
+            {
+                if (loadedWmos.TryGetValue(wmoId, out var loadedWmo))
+                {
+                    if (loadedWmo.RefCount == 1)
+                    {
+                        loadedWmos.Remove(wmoId);
+                        entityManager.DestroyEntity(loadedWmo.Entity);
+                        entityManager.DestroyEntity(loadedWmo.ColliderEntity);
+                    }
+                    else
+                    {
+                        loadedWmos[wmoId] = loadedWmo with { RefCount = loadedWmo.RefCount - 1 };
+                    }
+                }
+            }
 
             chunk.Dispose(textureManager);
         }

@@ -101,21 +101,24 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
         RT_downscaled = new ScreenRenderTexture(engine, 0.25f);
     }
 
-    public void Render(IReadOnlyList<Entity>? renderers)
+    public void Render(IReadOnlyList<Entity?> renderers)
     {
         RT.Update();
         RT_downscaled.Update();
         var entityManager = engine.EntityManager;
         engine.RenderManager.ActivateRenderTexture(RT.Texure, Color4.TransparentBlack);
 
-        if (renderers != null)
+        foreach (var maybeEntity in renderers)
         {
-            foreach (var entity in renderers)
-            {
-                var localToWorld = entityManager.GetComponent<LocalToWorld>(entity);
-                var renderer = entityManager.GetComponent<MeshRenderer>(entity);
-                var instanceData = entityManager.GetManagedComponent<MaterialInstanceRenderData>(entity);
+            if (maybeEntity is not { } entity)
+                continue;
+            var localToWorld = entityManager.GetComponent<LocalToWorld>(entity);
+            var renderers_ = entityManager.GetArrayComponents<MeshRenderer>(entity);
+            var instanceData = entityManager.GetManagedComponent<MaterialInstanceRenderData>(entity);
 
+            for (int j = 0; j < renderers_.Length; ++j)
+            {
+                ref var renderer = ref renderers_[j];
                 var oldMaterial = engine.MaterialManager.GetMaterialByHandle(renderer.MaterialHandle);
                 var oldCullMode = oldMaterial.Pipeline.Description.RasterizerState.CullMode;
 
@@ -141,11 +144,14 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
 
                 material.SetMaterialData(ref replacementData);
 
-                engine.RenderManager.Render(renderer.MeshHandle, material.Handle, ShaderPassType.Forward, renderer.SubMeshId, localToWorld.Matrix, localToWorld.Inverse);
+                engine.RenderManager.Render(renderer.MeshHandle, material.Handle, ShaderPassType.Forward, renderer.SubMeshId, localToWorld.Matrix, localToWorld.Inverse, instanceInt: renderer.InstanceData);
+
             }
         }
         
-        engine.TextureManager.BlitRenderTextures(RT.Texure, RT_downscaled.Texure);
+        // through the render manager, so the blit is recorded in order with the draws above
+        // (the texture-manager blit executes immediately and would copy last frame's content)
+        engine.RenderManager.BlitRenderTextures(RT.Texure, RT_downscaled.Texure);
         engine.RenderManager.ActivateDefaultRenderTexture();
     }
 

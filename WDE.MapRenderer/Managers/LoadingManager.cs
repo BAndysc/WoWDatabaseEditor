@@ -69,7 +69,7 @@ public class LoadingManager : IDisposable
         this.engine = engine;
         this.gameProperties = gameProperties;
 
-        this.loadingNotificationBox = new SimpleBox(BoxPlacement.BottomCenter);
+        this.loadingNotificationBox = new SimpleBox(engine, BoxPlacement.BottomCenter);
     }
 
     public void Update(float delta)

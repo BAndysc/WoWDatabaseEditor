@@ -17,7 +17,6 @@ namespace TheEngine.Interfaces
         ITexture CreateTexture(Vector4[] pixels, int width, int height);
         ITexture CreateRenderTexture(int width, int height, int colorAttachments = 1);
         void ScreenshotRenderTexture(ITexture rt, string fileName, int colorAttachmentIndex = 0);
-        void BlitRenderTextures(ITexture src, ITexture dst);
         void DisposeTexture(ITexture? tex);
         void SetFiltering(ITexture texture, FilteringMode mode);
         void SetWrapping(ITexture texture, WrapMode mode);

@@ -28,9 +28,9 @@ public class M2AnimationComponentData : IManagedComponentData
     public uint _length;
     public int _animInternalIndex;
     public float _time;
-    public NativeBuffer<Matrix> _buffer = null!;
-    public NativeBuffer<Vector4> _colors = null!;
-    public NativeBuffer<Matrix> _textureTransforms = null!;
+    public INativeBuffer<Matrix> _buffer = null!;
+    public INativeBuffer<Vector4> _colors = null!;
+    public INativeBuffer<Matrix> _textureTransforms = null!;
 
     public M2AnimationComponentData(M2 model, M2AnimationComponentData? attachedTo = null, M2AttachmentType? attachmentType = null)
     {
@@ -50,7 +50,6 @@ public class Archetypes
     public Archetype AnimatedEntityArchetype;
     public Archetype StaticM2WorldObjectArchetype;                // <- renderer which is not animated
     public Archetype StaticM2WorldObjectAnimatedArchetype;       // <-- renderer which is animated
-    public Archetype StaticM2WorldObjectAnimatedMasterArchetype; // <-- actually updates animation
 
     public Archetype CullingArchetype; // objects that are culled by AABB
     public Archetype DynamicObjectArchetype; // object that can move around (DirtyPosition)
@@ -59,7 +58,7 @@ public class Archetypes
 
     public Archetype AnimatedWorldObjectArchetype;
     public Archetype WorldObjectArchetype;
-    public Archetype AttachmentsAnimationRootArchetype;
+    public Archetype AttachmentArchetype;
     public Archetype WorldObjectMeshRendererArchetype;
 
     
@@ -70,21 +69,21 @@ public class Archetypes
             .WithComponentData<RenderEnabledBit>()
             .WithComponentData<LocalToWorld>()
             .WithManagedComponentData<M2AnimationComponentData>();
-                
+
         StaticM2WorldObjectArchetype = entityManager.NewArchetype()
-                .WithComponentData<RenderEnabledBit>()
-                .WithComponentData<LocalToWorld>()
-                .WithComponentData<PerformCullingBit>()
-                .WithComponentData<WorldMeshBounds>()
-                .WithComponentData<MeshBounds>()
-                .WithComponentData<MeshRenderer>();
+            .WithComponentData<RenderEnabledBit>()
+            .WithComponentData<LocalToWorld>()
+            .WithComponentData<PerformCullingBit>()
+            .WithComponentData<WorldMeshBounds>()
+            .WithComponentData<MeshBounds>()
+            .WithComponentData<MeshRenderer>()
+            .WithComponentData<Adt_M2Object>()
+            .WithManagedComponentData<MdxRenderer>();
 
         StaticM2WorldObjectAnimatedArchetype = StaticM2WorldObjectArchetype
-            .WithManagedComponentData<MaterialInstanceRenderData>();
-
-        StaticM2WorldObjectAnimatedMasterArchetype = StaticM2WorldObjectAnimatedArchetype
+            .WithManagedComponentData<MaterialInstanceRenderData>()
             .WithManagedComponentData<M2AnimationComponentData>();
-                
+
         CollisionOnlyArchetype = entityManager.NewArchetype()
             .WithComponentData<LocalToWorld>()
             .WithComponentData<Collider>()
@@ -126,26 +125,33 @@ public class Archetypes
             .WithComponentData<RenderEnabledBit>()
             .WithComponentData<PerformCullingBit>()
             .WithComponentData<WorldMeshBounds>()
-            .WithComponentData<LocalToWorld>();
+            .WithComponentData<LocalToWorld>()
+            .WithComponentData<MeshRenderer>()
+            .WithManagedComponentData<MaterialInstanceRenderData>();
 
         AnimatedWorldObjectArchetype = WorldObjectArchetype
             .WithManagedComponentData<M2AnimationComponentData>()
             .WithManagedComponentData<MdxRenderer>();
         
-        AttachmentsAnimationRootArchetype = entityManager.NewArchetype()
+        AttachmentArchetype = entityManager.NewArchetype()
             .Includes(CullingArchetype)
             .Includes(DynamicObjectArchetype)
+            .Includes(RenderEntityArchetype)
             .WithComponentData<LocalToWorld>()
             .WithComponentData<CopyParentTransform>()
             .WithComponentData<MeshBounds>()
+            .WithManagedComponentData<MaterialInstanceRenderData>()
             .WithManagedComponentData<M2AnimationComponentData>();
-        
+
+        // Creature/attachment per-renderer child entities no longer use this archetype (renderers are array
+        // components on the parent entity now), but ChunkManager still uses it for WMO render entities.
         WorldObjectMeshRendererArchetype = entityManager.NewArchetype()
             .Includes(DynamicObjectArchetype)
             .Includes(CullingArchetype)
             .Includes(RenderEntityArchetype)
-            .Includes(StaticM2WorldObjectAnimatedArchetype)
-            .WithComponentData<CopyParentTransform>();
+            .Includes(StaticM2WorldObjectArchetype)
+            .WithComponentData<CopyParentTransform>()
+            .WithManagedComponentData<MaterialInstanceRenderData>();
     }
 }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImGuiNET;
+using TheMaths;
 
 namespace TheEngine.Utils.ImGuiHelper
 {
@@ -15,14 +16,16 @@ namespace TheEngine.Utils.ImGuiHelper
     public class SimpleBox
     {
         private Vector2 Pivot = new Vector2();
+        private readonly Engine engine;
         private Vector2 Position = new Vector2();
-        private Vector2 DisplaySize = new Vector2();
+        private RectangleF DisplaySize = new RectangleF();
         private BoxPlacement BPlacement = BoxPlacement.None;
         private int id = 0;
 
-        public SimpleBox(Vector2 customPos)
+        public SimpleBox(Engine engine, Vector2 customPos)
         {
             BPlacement = BoxPlacement.CustomPosition;
+            this.engine = engine;
             this.Position = customPos;
             UpdatePosition();
             count++;
@@ -31,8 +34,9 @@ namespace TheEngine.Utils.ImGuiHelper
 
         static int count = 0;
 
-        public SimpleBox(BoxPlacement bPosition)
+        public SimpleBox(Engine engine, BoxPlacement bPosition)
         {
+            this.engine = engine;
             BPlacement = bPosition;
             UpdatePosition();
             count++;
@@ -43,6 +47,7 @@ namespace TheEngine.Utils.ImGuiHelper
                                           | ImGuiWindowFlags.NoMove
                                           | ImGuiWindowFlags.NoTitleBar
                                           | ImGuiWindowFlags.AlwaysAutoResize
+                                          | ImGuiWindowFlags.NoInputs
                                           | ImGuiWindowFlags.NoNav
                                           | ImGuiWindowFlags.NoFocusOnAppearing
                                           | ImGuiWindowFlags.NoDecoration;
@@ -71,49 +76,49 @@ namespace TheEngine.Utils.ImGuiHelper
                     break;
                 case BoxPlacement.BottomLeft:
                     this.Position.X = 0;
-                    this.Position.Y = this.DisplaySize.Y;
+                    this.Position.Y = this.DisplaySize.Height;
                     this.Pivot.X = 0;
                     this.Pivot.Y = 1;
                     break;
                 case BoxPlacement.TopRight:
-                    this.Position.X = this.DisplaySize.X;
+                    this.Position.X = this.DisplaySize.Width;
                     this.Position.Y = 0;
                     this.Pivot.X = 1;
                     this.Pivot.Y = 0;
                     break;
                 case BoxPlacement.BottomRight:
-                    this.Position.X = this.DisplaySize.X;
-                    this.Position.Y = this.DisplaySize.Y;
+                    this.Position.X = this.DisplaySize.Width;
+                    this.Position.Y = this.DisplaySize.Height;
                     this.Pivot.X = 1;
                     this.Pivot.Y = 1;
                     break;
                 case BoxPlacement.LeftCenter:
                     this.Position.X = 0;
-                    this.Position.Y = this.DisplaySize.Y / 2;
+                    this.Position.Y = this.DisplaySize.Height / 2;
                     this.Pivot.X = 0;
                     this.Pivot.Y = 0.5f;
                     break;
                 case BoxPlacement.RightCenter:
-                    this.Position.X = this.DisplaySize.X;
-                    this.Position.Y = this.DisplaySize.Y / 2;
+                    this.Position.X = this.DisplaySize.Width;
+                    this.Position.Y = this.DisplaySize.Height / 2;
                     this.Pivot.X = 1;
                     this.Pivot.Y = 0.5f;
                     break;
                 case BoxPlacement.TopCenter:
-                    this.Position.X = this.DisplaySize.X / 2;
+                    this.Position.X = this.DisplaySize.Width / 2;
                     this.Position.Y = 0;
                     this.Pivot.X = 0.5f;
                     this.Pivot.Y = 0;
                     break;
                 case BoxPlacement.BottomCenter:
-                    this.Position.X = this.DisplaySize.X / 2;
-                    this.Position.Y = this.DisplaySize.Y;
+                    this.Position.X = this.DisplaySize.Width / 2;
+                    this.Position.Y = this.DisplaySize.Height;
                     this.Pivot.X = 0.5f;
                     this.Pivot.Y = 1;
                     break;
                 case BoxPlacement.ScreenCenter:
-                    this.Position.X = this.DisplaySize.X / 2;
-                    this.Position.Y = this.DisplaySize.Y / 2;
+                    this.Position.X = this.DisplaySize.Width / 2;
+                    this.Position.Y = this.DisplaySize.Height / 2;
                     this.Pivot.X = 0.5f;
                     this.Pivot.Y = 0.5f;
                     break;
@@ -123,14 +128,16 @@ namespace TheEngine.Utils.ImGuiHelper
                     this.Pivot.Y = 0;
                     break;
             }
+
+            this.Position += new Vector2(DisplaySize.X, DisplaySize.Y);
         }
 
         public void UpdatePosition()
         {
             var io = ImGui.GetIO();
-            if (this.DisplaySize == io.DisplaySize)
+            if (this.DisplaySize == engine.gameView.ViewRect)
                 return;
-            this.DisplaySize = io.DisplaySize / io.DisplayFramebufferScale;
+            this.DisplaySize = engine.gameView.ViewRect;
             UpdatePlacement();
         }
 

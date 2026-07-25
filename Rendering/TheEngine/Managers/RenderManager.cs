@@ -13,6 +13,7 @@ using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheEngine.Primitives;
+using TheEngine.Rendering;
 using TheEngine.Structures;
 using TheMaths;
 using Veldrid;
@@ -28,30 +29,23 @@ namespace TheEngine.Managers
     {
         private readonly Engine engine;
         private readonly bool flipY;
+        private readonly ICommandList immediateCommandList;
+        private readonly DeferredCommandList deferredCommandList;
+        private readonly EngineCommandList immediateEngineCommandList;
+        private readonly EngineCommandList deferredEngineCommandList;
+        private ICommandList commandList;
+        private EngineCommandList engineCommandList;
+        private bool deferredRecording;
+        private bool? pendingDeferredRecording;
 
-        private NativeBuffer<SceneBuffer> sceneBuffer;
-        private NativeBuffer<ObjectBuffer> objectBuffer;
-        //private NativeBuffer<PixelShaderSceneBuffer> pixelShaderSceneBuffer;
-        private NativeBuffer<Matrix> instancesBuffer;
-        private NativeBuffer<Matrix> instancesInverseBuffer;
-        private NativeBuffer<uint> instancesObjectIndicesBuffer;
-        private NativeBuffer<Int4> instancesObjectDataBuffer;
-        private MaterialInstanceRenderData instancingRenderData = new();
+        private readonly ObjectDrawRenderStage objectDrawStage;
+        private readonly LinesRenderStage linesStage;
+        private readonly List<IRenderStage> stages = new();
 
-        private ObjectBuffer objectData;
         private SceneBuffer sceneData;
         //private PixelShaderSceneBuffer scenePixelData;
-        private Matrix[] instancesArray;
-        private Matrix[] inverseInstancesArray;
-        private uint[] instancesObjectInddicesArray;
-        private Int4[] instancesObjectDataArray;
 
         private ICameraManager cameraManager;
-        
-        private Sampler defaultSampler;
-
-        private DepthStencil depthStencilZWrite;
-        private DepthStencil depthStencilNoZWrite;
 
         private int currentBackBufferWidth = -1;
         private int currentBackBufferHeight = -1;
@@ -109,32 +103,13 @@ namespace TheEngine.Managers
 
         private Material<BlitMaterialData_t> blitMaterial;
 
-        private Material<UnlitMaterialData_t> unlitMaterial;
-        
         // utils
         private IMesh sphereMesh = null!;
         private Material<WireframeMaterialData_t> wireframe = null!;
         // end utils
 
-        private Mesh? currentMesh = null;
-
-        private PipelineHandle currentPipeline;
-
-        private Mesh? lineMesh = null;
-        
-        private ShaderPass? currentShader = null;
-        private DepthCompare? currentDepthTest;
-        private bool? currentZwrite;
-        private bool? currentDepthTestEnabled;
-        private CullingMode? currentCulling;
-        private (bool enabled, Blending? source, Blending? dest)? currentBlending;
-
-        private Archetype toCullArchetype;
-        private Archetype entitiesSharingRenderingArchetype;
-        private Archetype toRenderArchetype;
-        private Archetype updateWorldBoundsArchetype;
         private Archetype dirtEntities;
-        
+
         private Archetype staticRendererArchetype;
         private Archetype dynamicRendererArchetype;
 
@@ -167,16 +142,17 @@ namespace TheEngine.Managers
             public int padding3;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
-        private struct UnlitMaterialData_t
-        {
-            public Vector4 color;
-        }
-
         internal RenderManager(Engine engine, bool flipY)
         {
             this.engine = engine;
             this.flipY = flipY;
+            immediateCommandList = engine.Backend.CreateExecutor(engine.textureManager);
+            deferredCommandList = new DeferredCommandList(immediateCommandList);
+            immediateEngineCommandList = new EngineCommandList(immediateCommandList);
+            deferredEngineCommandList = new EngineCommandList(deferredCommandList);
+            deferredRecording = true;
+            commandList = deferredCommandList;
+            engineCommandList = deferredEngineCommandList;
 
             layers[0].Name = "(default)";
             freeLayers = layers.Skip(1).Reverse().Select(x => x.Layer).ToList();
@@ -185,10 +161,6 @@ namespace TheEngine.Managers
 
             dirtEntities = engine.entityManager.NewArchetype()
                 .WithComponentData<DirtyPosition>();
-
-            entitiesSharingRenderingArchetype = engine.entityManager.NewArchetype()
-                .WithComponentData<ShareRenderEnabledBit>()
-                .WithComponentData<RenderEnabledBit>();
 
             dynamicParentedEntitiesArchetype = engine.entityManager.NewArchetype()
                 .WithComponentData<CopyParentTransform>()
@@ -210,54 +182,19 @@ namespace TheEngine.Managers
                 .WithComponentData<DirtyPosition>()
                 .WithComponentData<WorldMeshBounds>()
                 .WithComponentData<MeshRenderer>();
-            
-            updateWorldBoundsArchetype = engine.entityManager.NewArchetype()
-                .WithComponentData<LocalToWorld>()
-                .WithComponentData<WorldMeshBounds>()
-                .WithComponentData<DirtyPosition>()
-                .WithComponentData<MeshBounds>();
 
-            toCullArchetype = engine.entityManager.NewArchetype()
-                    .WithComponentData<RenderEnabledBit>()
-                    .WithComponentData<LocalToWorld>()
-                    .WithComponentData<PerformCullingBit>()
-                    .WithComponentData<WorldMeshBounds>();
-
-            toRenderArchetype = engine.entityManager.NewArchetype()
-                .WithComponentData<RenderEnabledBit>()
-                .WithComponentData<LocalToWorld>()
-                .WithComponentData<WorldMeshBounds>()
-                .WithComponentData<MeshRenderer>();
-
-            sceneBuffer = engine.Device.CreateBuffer<SceneBuffer>(BufferTypeEnum.ConstVertex, 1);
-            objectBuffer = engine.Device.CreateBuffer<ObjectBuffer>(BufferTypeEnum.ConstVertex, 1);
-            //pixelShaderSceneBuffer = engine.Device.CreateBuffer<PixelShaderSceneBuffer>(BufferTypeEnum.ConstPixel, 1);
-            instancesObjectIndicesBuffer = engine.Device.CreateBuffer<uint>(BufferTypeEnum.StructuredBufferPixelOnly, 1, BufferInternalFormat.UInt);
-            instancesObjectDataBuffer = engine.Device.CreateBuffer<Int4>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Int4);
-            instancesBuffer = engine.Device.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
-            instancesInverseBuffer = engine.Device.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
-            engine.Device.device.CheckError("created buffers");
-
-            instancesArray = new Matrix[1];
-            inverseInstancesArray = new Matrix[1];
+            objectDrawStage = new ObjectDrawRenderStage(engine, this);
+            stages.Add(objectDrawStage);
+            linesStage = new LinesRenderStage(engine);
+            stages.Add(linesStage);
 
             sceneData = new SceneBuffer();
 
-            defaultSampler = engine.Device.CreateSampler();
-            engine.Device.device.CheckError("create sampler");
-
-            depthStencilZWrite = engine.Device.CreateDepthStencilState(true);
-            depthStencilNoZWrite = engine.Device.CreateDepthStencilState(false);
-            engine.Device.device.CheckError("create depth stencil");
-
             planeMesh = engine.MeshManager.CreateMesh(in ScreenPlane.Instance);
-            engine.Device.device.CheckError("create mesh");
-
-            lineMesh = (Mesh)engine.MeshManager.CreateMesh(new Vector3[2]{Vector3.Zero, Vector3.Zero}, new ushort[]{});
+            commandList.CheckError("create mesh");
 
             var blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json");
             // var blitDepthShader = engine.ShaderManager.LoadShader("internalShaders/blit_depth.json");
-            var unlitShader = engine.ShaderManager.LoadShader("internalShaders/unlit.json");
 
             var blitPipeline = this.engine.pipelineManager.CreatePipeline(blitShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
             {
@@ -276,21 +213,12 @@ namespace TheEngine.Managers
             BlitMaterialData_t data = new() { flipY = flipY ? 1 : 0 };
             blitMaterial.SetMaterialData(ref data);
 
-            var unlitPipeline = engine.pipelineManager.CreatePipeline(unlitShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
-            {
-                BlendState = BlendStateDescription.SingleDisabled,
-                RasterizerState = RasterizerStateDescription.CullNone with {FillMode = PolygonFillMode.Wireframe},
-                DepthStencilState = new DepthStencilStateDescription(true, false, ComparisonKind.LessEqual)
-            }, false);
-
-            unlitMaterial = engine.MaterialManager.CreateMaterial<UnlitMaterialData_t>(unlitPipeline);
-            // unlitMaterial.ZWrite = false;
-            // unlitMaterial.DepthTesting = DepthCompare.Lequal; // Always to render above the meshes
-            
             // utils
             sphereMesh = engine.meshManager.CreateMesh(ObjParser.LoadObj("meshes/sphere.obj").MeshData);
 
-            var wireframeShader = engine.shaderManager.LoadShader("data/wireframe.json");
+            // the engine must be self-contained: its shaders live in internalShaders
+            // (games may ship their own copy in data/ for their own materials)
+            var wireframeShader = engine.shaderManager.LoadShader("internalShaders/wireframe.json");
             var wireframePipeline = engine.pipelineManager.CreatePipeline(wireframeShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
             {
                 BlendState = BlendStateDescription.SingleDisabled,
@@ -307,9 +235,10 @@ namespace TheEngine.Managers
 
         public void Dispose()
         {
+            objectDrawStage.Dispose();
+            linesStage.Dispose();
             engine.meshManager.DisposeMesh(sphereMesh);
             //outlineTexture.Dispose();
-            engine.meshManager.DisposeMesh(lineMesh);
             engine.meshManager.DisposeMesh(planeMesh);
             engine.textureManager.DisposeTexture(mainObjectDepthTexture);
             engine.textureManager.DisposeTexture(mainObjectColorTexture);
@@ -323,16 +252,8 @@ namespace TheEngine.Managers
             foreach (var t in backBuffers)
                 engine.textureManager.DisposeTexture(t);
 
-            depthStencilZWrite.Dispose();
-            depthStencilNoZWrite.Dispose();
-            defaultSampler.Dispose();
-            instancesInverseBuffer.Dispose();
-            instancesBuffer.Dispose();
-            instancesObjectIndicesBuffer.Dispose();
-            instancesObjectDataBuffer.Dispose();
-            //pixelShaderSceneBuffer.Dispose();
-            objectBuffer.Dispose();
-            sceneBuffer.Dispose();
+            deferredCommandList.Dispose();
+            immediateCommandList.Dispose();
         }
 
         public RenderLayer RegisterRenderLayer(string layerName)
@@ -385,214 +306,44 @@ namespace TheEngine.Managers
 
         public IReadOnlyList<RenderLayerData> RenderLayers => layers;
 
+        internal RenderLayerData[] LayersArray => layers;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsRenderLayerEnabled(byte layer)
         {
             return !layers[layer].IsDisabled;
         }
 
-
-        private void SetBlending(bool enabled, Blending source, Blending dest)
+        public void RegisterRenderStage(IRenderStage stage)
         {
-            if (currentBlending.HasValue && currentBlending.Value.enabled == enabled &&
-                currentBlending.Value.source == source && currentBlending.Value.dest == dest)
-                return;
-
-            if (currentBlending.HasValue && currentBlending.Value.enabled == enabled)
-            {
-                engine.Device.device.BlendFunc((BlendingFactorSrc)source, ((BlendingFactorDest)dest));
-                currentBlending = (enabled, source, dest);
-            }
-            else if (enabled)
-            {
-                engine.Device.device.Enable(EnableCap.Blend);
-                engine.Device.device.BlendFunc((BlendingFactorSrc)source, ((BlendingFactorDest)dest));
-                currentBlending = (enabled, source, dest);
-            }
-            else
-            {
-                engine.Device.device.Disable(EnableCap.Blend);
-                currentBlending = (enabled, null, null);
-            }
+            Debug.Assert(!inRenderingLoop, "render stages must be (un)registered outside the render loop");
+            stages.Add(stage);
         }
 
-        private void SetCulling(CullingMode culling)
+        public void UnregisterRenderStage(IRenderStage stage)
         {
-            if (!currentCulling.HasValue || currentCulling.Value != culling)
-            {
-                if (culling == CullingMode.Off)
-                {
-                    engine.Device.device.Disable(EnableCap.CullFace);
-                }
-                else
-                {
-                    if (!currentCulling.HasValue || currentCulling == CullingMode.Off)
-                        engine.Device.device.Enable(EnableCap.CullFace);
-                    engine.Device.device.CullFace(currentCulling == CullingMode.Front ? CullFaceMode.Front : CullFaceMode.Back);
-                }
-                currentCulling = culling;
-            }
+            Debug.Assert(!inRenderingLoop, "render stages must be (un)registered outside the render loop");
+            stages.Remove(stage);
         }
 
-        private void SetDepth(bool zwrite, DepthCompare depthCompare)
+
+        public bool DeferredRecording
         {
-            if (zwrite == false && depthCompare == DepthCompare.Always)
-            {
-                if (!currentDepthTestEnabled.HasValue || currentDepthTestEnabled.Value)
-                {
-                    engine.Device.device.Disable(EnableCap.DepthTest);
-                    currentDepthTestEnabled = false;
-                    currentZwrite = null;
-                    currentDepthTest = null;
-                }
-            }
-            else
-            {
-                if (!currentDepthTestEnabled.HasValue || !currentDepthTestEnabled.Value)
-                {
-                    engine.Device.device.Enable(EnableCap.DepthTest);
-                    currentDepthTestEnabled = true;
-                }
-
-                if (!currentZwrite.HasValue || currentZwrite.Value != zwrite)
-                {
-                    if (zwrite)
-                        engine.Device.device.DepthMask(true);
-                    else
-                        engine.Device.device.DepthMask(false);
-                    currentZwrite = zwrite;
-                }
-
-                if (!currentDepthTest.HasValue || currentDepthTest.Value != depthCompare)
-                {
-                    engine.Device.device.DepthFunction((DepthFunction)depthCompare);
-                    currentDepthTest = depthCompare;
-                }
-            }
-        }
-
-        private void ActivatePipeline(Pipeline pipeline)
-        {
-            //engine.Device.device.Enable(EnableCap.DepthTest);
-            // engine.Device.device.Enable(EnableCap.CullFace);
-            // engine.Device.device.Enable(EnableCap.Blend);
-            // engine.Device.device.Disable(EnableCap.Blend);
-            // engine.Device.device.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-            // engine.Device.device.DepthMask(true);
-            //engine.Device.device.DepthFunction(DepthFunction.Lequal);
-
-            if (currentPipeline == pipeline.Handle)
-                return;
-            currentPipeline = pipeline.Handle;
-            var d = pipeline.Description;
-            // depth testing
-
-            if (d.DepthStencilState.DepthTestEnabled)
-            {
-                engine.Device.device.Enable(EnableCap.DepthTest);
-            }
-            else
-            {
-                engine.Device.device.Disable(EnableCap.DepthTest);
-            }
-
-            if (d.DepthStencilState.DepthWriteEnabled)
-                engine.Device.device.DepthMask(true);
-            else
-                engine.Device.device.DepthMask(false);
-
-            engine.Device.device.DepthFunction(d.DepthStencilState.DepthComparison switch
-            {
-                ComparisonKind.Never => DepthFunction.Never,
-                ComparisonKind.Less => DepthFunction.Less,
-                ComparisonKind.Equal => DepthFunction.Equal,
-                ComparisonKind.LessEqual => DepthFunction.Lequal,
-                ComparisonKind.Greater => DepthFunction.Greater,
-                ComparisonKind.NotEqual => DepthFunction.Notequal,
-                ComparisonKind.GreaterEqual => DepthFunction.Gequal,
-                ComparisonKind.Always => DepthFunction.Always,
-                _ => throw new ArgumentOutOfRangeException()
-            });
-
-            // return;
-
-            // culling
-
-            if (d.RasterizerState.CullMode == FaceCullMode.None)
-            {
-                engine.Device.device.Disable(EnableCap.CullFace);
-            }
-            else
-            {
-                engine.Device.device.Enable(EnableCap.CullFace);
-                // yeah, it is reversed, counterclockwise vs clockwise?
-                engine.Device.device.CullFace(d.RasterizerState.CullMode == FaceCullMode.Front ? CullFaceMode.Back : CullFaceMode.Front);
-            }
-
-            // blending
-
-            if (d.BlendState.AttachmentStates[0].BlendEnabled)
-            {
-                engine.Device.device.Enable(EnableCap.Blend);
-                var source = d.BlendState.AttachmentStates[0].SourceAlphaFactor switch
-                {
-                    BlendFactor.Zero => BlendingFactorSrc.Zero,
-                    BlendFactor.One => BlendingFactorSrc.One,
-                    BlendFactor.SourceAlpha => BlendingFactorSrc.SrcAlpha,
-                    BlendFactor.InverseSourceAlpha => BlendingFactorSrc.OneMinusSrcAlpha,
-                    BlendFactor.DestinationAlpha => BlendingFactorSrc.DstAlpha,
-                    BlendFactor.InverseDestinationAlpha => BlendingFactorSrc.OneMinusDstAlpha,
-                    BlendFactor.SourceColor => BlendingFactorSrc.SrcColor,
-                    BlendFactor.InverseSourceColor => BlendingFactorSrc.OneMinusSrcColor,
-                    BlendFactor.DestinationColor => BlendingFactorSrc.DstColor,
-                    BlendFactor.InverseDestinationColor => BlendingFactorSrc.OneMinusSrcColor,
-                    BlendFactor.BlendFactor => throw new NotImplementedException(),
-                    BlendFactor.InverseBlendFactor => throw new NotImplementedException(),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-                var dst = d.BlendState.AttachmentStates[0].DestinationAlphaFactor switch
-                {
-                    BlendFactor.Zero => BlendingFactorDest.Zero,
-                    BlendFactor.One => BlendingFactorDest.One,
-                    BlendFactor.SourceAlpha => BlendingFactorDest.SrcAlpha,
-                    BlendFactor.InverseSourceAlpha => BlendingFactorDest.OneMinusSrcAlpha,
-                    BlendFactor.DestinationAlpha => BlendingFactorDest.DstAlpha,
-                    BlendFactor.InverseDestinationAlpha => BlendingFactorDest.OneMinusDstAlpha,
-                    BlendFactor.SourceColor => BlendingFactorDest.SrcColor,
-                    BlendFactor.InverseSourceColor => BlendingFactorDest.OneMinusSrcColor,
-                    BlendFactor.DestinationColor => BlendingFactorDest.DstColor,
-                    BlendFactor.InverseDestinationColor => BlendingFactorDest.OneMinusSrcColor,
-                    BlendFactor.BlendFactor => throw new NotImplementedException(),
-                    BlendFactor.InverseBlendFactor => throw new NotImplementedException(),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-                engine.Device.device.BlendFunc(source, dst);
-            }
-            else
-            {
-                engine.Device.device.Disable(EnableCap.Blend);
-            }
-        }
-
-        private void DeviceEnableOrDisable(EnableCap enableCap, bool enable)
-        {
-            if (enable)
-                engine.Device.device.Enable(enableCap);
-            else
-                engine.Device.device.Disable(enableCap);
+            get => deferredRecording;
+            set => pendingDeferredRecording = value;
         }
 
         public void BeginFrame()
         {
-            // better not assume state was saved from the previous frame...
-            currentMesh = null;
-            currentPipeline = PipelineHandle.Empty;
-            currentShader = null;
-            currentCulling = null;
-            currentZwrite = null;
-            currentDepthTest = null;
-            currentDepthTest = null;
-            currentBlending = null;
+            // the recording mode can only change between frames, when no commands are in flight
+            if (pendingDeferredRecording.HasValue)
+            {
+                deferredRecording = pendingDeferredRecording.Value;
+                pendingDeferredRecording = null;
+                commandList = deferredRecording ? deferredCommandList : immediateCommandList;
+                engineCommandList = deferredRecording ? deferredEngineCommandList : immediateEngineCommandList;
+            }
+            commandList.Begin();
             cameraManager.MainCamera.Aspect = engine.gameView.Aspect;
             cameraManager.SceneViewCamera.Aspect = engine.sceneView.Aspect;
         }
@@ -611,17 +362,16 @@ namespace TheEngine.Managers
             {
                 return Entity.Empty;
             }
-            rt.ActivateSourceFrameBuffer(1);
             Span<uint> buf = stackalloc uint[1];
             int x = (int)(normalizedScreenPoint.X * rt.Width * dynamicScale);
             int y = (int)(normalizedScreenPoint.Y * rt.Height * dynamicScale);
-            engine.Device.device.ReadPixels(x, y, 1, 1, PixelFormat.RedInteger, PixelType.UnsignedInt, buf);
+            commandList.ReadPixels(renderTexture, 1, x, y, 1, 1, buf);
             var index = buf[0];
             if (index == 0)
                 return Entity.Empty;
-            if (index <= totalToDraw)
+            if (index <= objectDrawStage.TotalToDraw)
             {
-                var entity = renderersData[index - 1].Item3;
+                var entity = objectDrawStage.EntityAtIndex(index - 1);
                 if (engine.entityManager.Exist(entity)) // it could be removed after rendering
                     return entity;
             }
@@ -659,12 +409,12 @@ namespace TheEngine.Managers
             engine.shaderManager.Update();
 
             inRenderingLoop = true;
-            engine.Device.device.CheckError("pre UpdateSceneBuffer");
+            commandList.CheckError("pre UpdateSceneBuffer");
             
             ActivateScene(null);
-            
-            Stats = default;
-            engine.Device.device.CheckError("Render begin");
+
+            engineCommandList.ResetStats();
+            commandList.CheckError("Render begin");
 
             if (currentBackBufferWidth != (int)engine.gameView.ViewRect.Width ||
                 currentBackBufferHeight != (int)engine.gameView.ViewRect.Height)
@@ -732,24 +482,28 @@ namespace TheEngine.Managers
             inCoreRenderingLoop = true;
             currentBackBufferIndex = -1;
 
-            engine.Device.device.CheckError("Before set CurrentBackBuffer");
+            commandList.CheckError("Before set CurrentBackBuffer");
 
             ActivateRenderTexture(CurrentBackBuffer, new Color4(15/255f,52/255f,97/255f, 1));
 
-            sceneBuffer.UpdateBuffer(ref sceneData);
-            sceneBuffer.Activate(Constants.SCENE_BUFFER_INDEX);
+            commandList.BindTransientUniformBuffer(Constants.SCENE_BUFFER_INDEX, ref sceneData);
 
-            //pixelShaderSceneBuffer.UpdateBuffer(ref scenePixelData);
-            //pixelShaderSceneBuffer.Activate(Constants.PIXEL_SCENE_BUFFER_INDEX);
+            //commandList.BindTransientUniformBuffer(Constants.PIXEL_SCENE_BUFFER_INDEX, ref scenePixelData);
 
-            objectBuffer.Activate(Constants.OBJECT_BUFFER_INDEX);
-            engine.Device.device.CheckError("Before render all");
-            engine.Device.device.BlendEquation(BlendEquationMode.FuncAdd);
+            // bind last frame's leftover object data, so that the slot is never unbound
+            engineCommandList.RebindObjectData();
+            commandList.CheckError("Before render all");
         }
 
         public void PrepareRenderGui(float delta)
         {
-            engine.Device.device.CheckError("PrepareRenderGui");
+            commandList.CheckError("PrepareRenderGui");
+            // the gui pass samples the game/scene view images through ImGui draws
+            if (commandList.InRenderingPass)
+                commandList.EndRenderingPass();
+            commandList.Barrier(CurrentBackBuffer, ResourceUsage.RenderTarget, ResourceUsage.ShaderRead);
+            if (engine.sceneView.IsVisible && sceneViewTexture != null)
+                commandList.Barrier(sceneViewTexture, ResourceUsage.RenderTarget, ResourceUsage.ShaderRead);
             ActivateRenderTexture(guiTexture, new Color4(0, 0, 0, 0));
         }
 
@@ -763,16 +517,38 @@ namespace TheEngine.Managers
         {
             if (inRenderingLoop)
             {
-                var tex = engine.textureManager.GetTextureByHandle(rt.Handle) as RenderTexture;
-                tex!.ActivateFrameBuffer(inCoreRenderingLoop && rt == mainObjectBuffer && useDynamicScale ? dynamicScale : 1);
-                if (color.HasValue)
-                    tex!.Clear(color.Value.Red, color.Value.Green, color.Value.Blue, color.Value.Alpha);
+                // transitional convenience: a target switch implicitly ends the current pass,
+                // so callers don't have to manage pass boundaries themselves yet
+                if (commandList.InRenderingPass)
+                    commandList.EndRenderingPass();
+                commandList.BeginRenderingPass(new RenderPassDescriptor
+                {
+                    Target = rt,
+                    ColorLoadOp = color.HasValue ? LoadOp.Clear : LoadOp.Load,
+                    ClearColor = color ?? default,
+                    ViewportScale = inCoreRenderingLoop && rt == mainObjectBuffer && useDynamicScale ? dynamicScale : 1,
+                });
             }
         }
         
         public void ActivateDefaultRenderTexture()
         {
             ActivateRenderTexture(CurrentBackBuffer);
+        }
+
+        public void BlitRenderTextures(ITexture source, ITexture destination)
+        {
+            Debug.Assert(inRenderingLoop);
+            // blits are only legal outside a rendering pass; the caller activates
+            // the next render target (= begins the next pass) afterwards
+            if (commandList.InRenderingPass)
+                commandList.EndRenderingPass();
+            commandList.Barrier(source, ResourceUsage.RenderTarget, ResourceUsage.TransferSource);
+            commandList.Barrier(destination, ResourceUsage.ShaderRead, ResourceUsage.TransferDestination);
+            commandList.Blit(source, destination, 0, 0, source.Width, source.Height, 0, 0, destination.Width, destination.Height, BlitMask.Color, BlitFilter.Linear);
+            commandList.Blit(source, destination, 0, 0, source.Width, source.Height, 0, 0, destination.Width, destination.Height, BlitMask.Depth, BlitFilter.Nearest);
+            commandList.Barrier(source, ResourceUsage.TransferSource, ResourceUsage.RenderTarget);
+            commandList.Barrier(destination, ResourceUsage.TransferDestination, ResourceUsage.ShaderRead);
         }
 
         private readonly List<IPostProcess> postProcesses = new();
@@ -795,73 +571,151 @@ namespace TheEngine.Managers
 
         public void RenderFullscreenPlane(Material material)
         {
-            SetShader(material.GetShaderPass(ShaderPassType.Forward, false));
-            EnableMaterial(material, ShaderPassType.Forward, false, null);
-            SetMesh((Mesh)planeMesh);
-            engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0, planeMesh.IndexType);
+            EnableMaterial(material, material.GetShaderPass(ShaderPassType.Forward, false)!);
+            engineCommandList.DrawIndexed(planeMesh, 0);
         }
         
         public void FinalizeRendering(int dstFrameBuffer)
         {
+            foreach (var stage in stages)
+                stage.EndFrame();
+
             ClearDirtyEntityBit();
 
-            engine.Device.SetRenderTexture(null, dstFrameBuffer);
-            engine.Device.device.Viewport(0, 0, (int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
-            
-            engine.Device.device.CheckError("Blitz");
+            if (commandList.InRenderingPass)
+                commandList.EndRenderingPass();
+            commandList.Barrier(guiTexture, ResourceUsage.RenderTarget, ResourceUsage.ShaderRead);
+            commandList.BeginRenderingPass(new RenderPassDescriptor
+            {
+                Target = null,
+                DefaultFramebuffer = dstFrameBuffer,
+                Width = (int)engine.WindowHost.WindowWidth,
+                Height = (int)engine.WindowHost.WindowHeight,
+                ColorLoadOp = LoadOp.Load,
+            });
+
+            commandList.CheckError("Blitz");
             blitMaterial.SetTexture("texture1", guiTexture);
             RenderFullscreenPlane(blitMaterial);
-            
-            inRenderingLoop = false;
-            engine.statsManager.RenderStats = Stats;
+            commandList.EndRenderingPass();
 
-            engine.Device.device.CheckError("Post rendering");
+            inRenderingLoop = false;
+
+            commandList.CheckError("Post rendering");
+            // with deferred recording the frame actually executes inside End (record + replay),
+            // so the executor's switch counters are only meaningful afterwards
+            commandList.End();
+
+            var stats = engineCommandList.Stats;
+            stats.ShaderSwitches += commandList.ShaderSwitches;
+            stats.MeshSwitches += commandList.MeshSwitches;
+            engine.statsManager.RenderStats = stats;
         }
 
-        private RenderStats Stats;
-        
         internal void RenderOpaque(int dstFrameBuffer)
         {
-            //defaultSampler.Activate(Constants.DEFAULT_SAMPLER);
-            RenderEntities();
+            foreach (var stage in stages)
+                stage.PrepareFrame(cameraManager.MainCamera);
 
-            //engine.Device.RenderClearBuffer();
-            //engine.Device.SetRenderTexture(outlineTexture);
-            //outlineTexture.Clear(0, 0, 0, 0);
-
-            //RenderAll(unlitMaterial);
-            //engine.Device.RenderBlitBuffer();
+            RenderStages(RenderPoint.Opaque);
         }
-        
+
         internal void RenderTransparent(int dstFrameBuffer)
         {
-            RenderTransparent();
+            // copy the opaque result aside, so transparent shaders can sample the opaque color/depth
+            commandList.EndRenderingPass();
+            commandList.Barrier(mainObjectBuffer, ResourceUsage.RenderTarget, ResourceUsage.TransferSource);
+            commandList.Barrier(opaqueRenderTexture, ResourceUsage.ShaderRead, ResourceUsage.TransferDestination);
+            commandList.Blit(mainObjectBuffer, opaqueRenderTexture, 0, 0, currentBackBufferWidth, currentBackBufferHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, BlitMask.Color | BlitMask.Depth, BlitFilter.Nearest);
+            commandList.Barrier(opaqueRenderTexture, ResourceUsage.TransferDestination, ResourceUsage.ShaderRead);
+            commandList.Barrier(mainObjectBuffer, ResourceUsage.TransferSource, ResourceUsage.RenderTarget);
+            ActivateDefaultRenderTexture();
+
+            RenderStages(RenderPoint.Transparent);
+        }
+
+        /// <summary>
+        /// Invokes every stage subscribed to the given render point, once per visible view
+        /// (game view with the main camera, scene view with the scene camera). The scene
+        /// view's target, scene data and clear are managed here, so stages just record draws.
+        /// </summary>
+        private void RenderStages(RenderPoint point)
+        {
+            if (engine.gameView.IsVisible)
+            {
+                foreach (var stage in stages)
+                    if ((stage.RenderPoints & point) != 0)
+                        stage.Render(point, engineCommandList, cameraManager.MainCamera);
+            }
+
+            // the old immediate DrawLine drew into the back buffer regardless of the game view's
+            // visibility, so pending lines are flushed there even when the stage loop was skipped
+            if (point == RenderPoint.Transparent)
+                linesStage.Flush(engineCommandList);
+
+            if (engine.sceneView.IsVisible)
+            {
+                ActivateScene(new SceneData(cameraManager.SceneViewCamera, new FogSettings(){Enabled = false}, engine.lightManager.MainLight, engine.lightManager.SecondaryLight));
+                ActivateRenderTexture(sceneViewTexture, point == RenderPoint.Opaque ? new Color4(15/255f,52/255f,97/255f, 1) : null);
+
+                foreach (var stage in stages)
+                    if ((stage.RenderPoints & point) != 0)
+                        stage.Render(point, engineCommandList, cameraManager.SceneViewCamera);
+
+                if (point == RenderPoint.Transparent)
+                {
+                    var mainCamFrustum = new BoundingFrustum(cameraManager.MainCamera.ViewMatrix * cameraManager.MainCamera.ProjectionMatrix);
+                    this.DrawFrustum(mainCamFrustum, Vector4.One);
+                    engine.sceneView.OnSceneViewRender();
+                    // the frustum and the scene-view overlay only queue lines - flush them
+                    // into the scene view before its target is deactivated
+                    linesStage.Flush(engineCommandList);
+                }
+
+                // restore current back buffer and scene
+                ActivateScene(null);
+                ActivateRenderTexture(CurrentBackBuffer);
+            }
         }
 
         internal void RenderPostProcess()
         {
-            engine.Device.device.Debug("  Rendering postprocesses");
+            // the game's translucent callback (gizmos, path visualizers) runs after
+            // RenderTransparent, so its lines are flushed here, before the upscale
+            linesStage.Flush(engineCommandList);
+
+            commandList.InsertDebugMarker("  Rendering postprocesses");
             inCoreRenderingLoop = false;
             if (useDynamicScale)
             {
-                engine.textureManager.BlitFramebuffers(CurrentBackBuffer, OtherBackBuffer, 0, 0, DynamicWidth, DynamicHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
-                engine.textureManager.BlitFramebuffers(CurrentBackBuffer, OtherBackBuffer, 0, 0, DynamicWidth, DynamicHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+                // upscale the dynamically-scaled image to a full resolution back buffer
+                commandList.EndRenderingPass();
+                commandList.Barrier(CurrentBackBuffer, ResourceUsage.RenderTarget, ResourceUsage.TransferSource);
+                commandList.Barrier(OtherBackBuffer, ResourceUsage.ShaderRead, ResourceUsage.TransferDestination);
+                commandList.Blit(CurrentBackBuffer, OtherBackBuffer, 0, 0, DynamicWidth, DynamicHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, BlitMask.Color, BlitFilter.Linear);
+                commandList.Blit(CurrentBackBuffer, OtherBackBuffer, 0, 0, DynamicWidth, DynamicHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, BlitMask.Depth, BlitFilter.Nearest);
+                commandList.Barrier(OtherBackBuffer, ResourceUsage.TransferDestination, ResourceUsage.RenderTarget);
 
                 SwapBackBuffers();
                 ActivateDefaultRenderTexture(); // to make sure we set the correct viewport
             }
-            
+
             foreach (var post in postProcesses)
             {
-                engine.Device.device.Debug("  Rendering postprocess");
+                commandList.InsertDebugMarker("  Rendering postprocess");
+                if (commandList.InRenderingPass)
+                    commandList.EndRenderingPass();
+                // the previous back buffer is sampled by the postprocess while the other one is rendered to
+                commandList.Barrier(CurrentBackBuffer, ResourceUsage.RenderTarget, ResourceUsage.ShaderRead);
+                commandList.Barrier(OtherBackBuffer, ResourceUsage.ShaderRead, ResourceUsage.RenderTarget);
                 ActivateRenderTexture(OtherBackBuffer, Color4.White);
                 post.RenderPostprocess(this, CurrentBackBuffer);
                 SwapBackBuffers();
             }
-            engine.Device.device.Debug("  Finished rendering postprocesses");
+            commandList.InsertDebugMarker("  Finished rendering postprocesses");
         }
 
-        private struct CachedComponentDataAccess<T> where T : unmanaged, IComponentData
+        internal struct CachedComponentDataAccess<T> where T : unmanaged, IComponentData
         {
             private IEntityManager entityManager;
             private ComponentDataAccess<T> cache = default;
@@ -892,6 +746,8 @@ namespace TheEngine.Managers
                 CachedComponentDataAccess<LocalToWorld> cacheLocalToWorld = new CachedComponentDataAccess<LocalToWorld>(entityManager);
                 for (int i = start; i < end; ++i)
                 {
+                    if (parents[i].Parent == Entity.Empty)
+                        continue;
                     if (!dirtyPosition[i] && !cachedDirtPosition[parents[i].Parent])
                         continue;
                     ref var parentLocalToWorld = ref cacheLocalToWorld[parents[i].Parent];
@@ -912,437 +768,35 @@ namespace TheEngine.Managers
             });
         }
 
-        private void EnableMaterial(Material material, ShaderPassType type, bool instancing, MaterialInstanceRenderData? instanceData = null)
+        private void EnableMaterial(Material material, IShaderPass shaderPass, MaterialInstanceRenderData? instanceData = null)
         {
-            ActivatePipeline(material.Pipeline);
-            material.ActivateUniforms(type, instancing, instanceData);
-            Stats.MaterialActivations++;
+            engineCommandList.SetMaterial(material, shaderPass, instanceData);
         }
 
         public static WorldMeshBounds LocalToWorld(in MeshBounds local, in LocalToWorld localToWorld)
         {
-            Span<Vector3> corners = stackalloc Vector3[8];
-            return LocalToWorld(in local, in localToWorld, ref corners);
+            return WorldMeshBounds.FromLocal(in local, in localToWorld);
         }
-        
+
         internal static WorldMeshBounds LocalToWorld(in MeshBounds local, in LocalToWorld localToWorld, ref Span<Vector3> corners)
         {
-            var matrix = localToWorld.Matrix;
-            var min = local.box.Minimum;
-            var max = local.box.Maximum;
-            corners[0] = new Vector3(min.X, max.Y, max.Z);
-            corners[1] = new Vector3(max.X, max.Y, max.Z);
-            corners[2] = new Vector3(max.X, min.Y, max.Z);
-            corners[3] = new Vector3(min.X, min.Y, max.Z);
-            corners[4] = new Vector3(min.X, max.Y, min.Z);
-            corners[5] = new Vector3(max.X, max.Y, min.Z);
-            corners[6] = new Vector3(max.X, min.Y, min.Z);
-            corners[7] = new Vector3(min.X, min.Y, min.Z);
-            for (int j = 0; j < 8; ++j)
-            {
-                var vec4 = new Vector4(corners[j], 1);
-                var worldspace = Vector4.Transform(vec4, matrix);
-                corners[j] = worldspace.XYZ();
-            }
-
-            min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-            max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-            for (int j = 0; j < 8; ++j)
-            {
-                min.X = Math.Min(min.X, corners[j].X);
-                min.Y = Math.Min(min.Y, corners[j].Y);
-                min.Z = Math.Min(min.Z, corners[j].Z);
-                            
-                max.X = Math.Max(max.X, corners[j].X);
-                max.Y = Math.Max(max.Y, corners[j].Y);
-                max.Z = Math.Max(max.Z, corners[j].Z);
-            }
-
-            return (WorldMeshBounds)new BoundingBox(min, max);
+            return WorldMeshBounds.FromLocal(in local, in localToWorld, ref corners);
         }
         
-        Stopwatch culler = new Stopwatch();
-        Stopwatch boundsUpdate = new Stopwatch();
-        Stopwatch sw = new Stopwatch();
-        Stopwatch shadertimer = new Stopwatch();
-        Stopwatch meshtimer = new Stopwatch();
-        Stopwatch materialtimer = new Stopwatch();
-        Stopwatch buffertimer = new Stopwatch();
-        Stopwatch draw = new Stopwatch();
-        Stopwatch sorting = new Stopwatch();
         private float viewDistanceModifier = 8;
 
-        private (LocalToWorld, MaterialInstanceRenderData?, Entity)[] renderersData = new (LocalToWorld, MaterialInstanceRenderData?, Entity)[10000];
-        //private MaterialInstanceRenderData?[] materialInstanceData = new MaterialInstanceRenderData?[10000];
-        private MeshRenderer[] renderers = new MeshRenderer[10000];
-        private int opaque;
-        private int transparent;
-        private int totalToDraw;
 
-        private void RenderEntities()
-        {
-            var cameraPosition = cameraManager.MainCamera.Transform.Position;
-            var frustum = new BoundingFrustum(cameraManager.MainCamera.ViewMatrix * cameraManager.MainCamera.ProjectionMatrix);
-            var entityManager = engine.EntityManager;
+        // for engine-internal renderers (UIManager, ImGuiController) that record their own commands
+        internal ICommandList CommandList => commandList;
 
-            boundsUpdate.Restart();
-            updateWorldBoundsArchetype.ParallelForEach<LocalToWorld, MeshBounds, WorldMeshBounds, DirtyPosition>((itr, thread, start, end, l2w, meshBounds, worldMeshBounds, dirtyBit) =>
-            {
-                Span<Vector3> corners = stackalloc Vector3[8];
-                for (int i = start; i < end; ++i)
-                {
-                    if (!dirtyBit[i])
-                        continue;
-
-                    worldMeshBounds[i] = LocalToWorld(in meshBounds[i], in l2w[i], ref corners);
-                }
-            });
-            boundsUpdate.Stop();
-            engine.statsManager.Counters.BoundsCalc.Add(boundsUpdate.Elapsed.TotalMilliseconds);
-            
-            culler.Restart();
-            float mod = viewDistanceModifier * viewDistanceModifier;
-            toCullArchetype.ParallelForEach<LocalToWorld, PerformCullingBit, RenderEnabledBit, WorldMeshBounds>((itr, thread, start, end, l2w, _ , bits, worldMeshBounds) =>
-            {
-                for (int i = start; i < end; ++i)
-                {
-                    if (bits[i].IsForceDisabled())
-                        continue;
-
-                    if (bits[i].Layer > 0 && layers[bits[i].Layer].IsDisabled)
-                        continue;
-                    
-                    ref var boundingBox = ref worldMeshBounds[i].box;
-                    var pos = boundingBox.Center;
-                    var boundingBoxSize = boundingBox.Size;
-                    var size = boundingBoxSize.X + boundingBoxSize.Y + boundingBoxSize.Z;
-                    size = MathF.Sqrt(Math.Max(size, 10));
-                    bool doRender = (pos - cameraPosition).LengthSquared() < (size) * (size) * (size) * mod;
-                    if (doRender)
-                    {
-                        bits[i].IsCulled = frustum.Contains(ref boundingBox) == ContainmentType.Disjoint;
-                    }
-                    else
-                        bits[i].IsCulled = true;
-                }
-            });
-            dynamicParentedEntitiesArchetype.WithComponentData<RenderEnabledBit>().ParallelForEach<RenderEnabledBit, CopyParentTransform>((itr, thread, start, end, renderBit, cpt) =>
-            {
-                CachedComponentDataAccess<RenderEnabledBit> cache = new CachedComponentDataAccess<RenderEnabledBit>(entityManager);
-                for (int i = start; i < end; ++i)
-                {
-                    var parent = cpt[i];
-                    if (parent.Parent != Entity.Empty)
-                    {
-                        var forceDisabled = renderBit[i].IsForceDisabled();
-                        renderBit[i] = cache[parent.Parent];
-                        if (forceDisabled)
-                            renderBit[i].SetDisabled(true);
-                    }
-                }
-            });
-            entitiesSharingRenderingArchetype.ParallelForEach<RenderEnabledBit, ShareRenderEnabledBit>(
-                (itr, thread, start, end, renderBits, shareRenderBits) =>
-                {
-                    CachedComponentDataAccess<RenderEnabledBit> cache = new CachedComponentDataAccess<RenderEnabledBit>(entityManager);
-                    for (int i = start; i < end; ++i)
-                    {
-                        if (!renderBits[i] && shareRenderBits[i].OtherEntity != Entity.Empty)
-                        {
-                            renderBits[i] = cache[shareRenderBits[i].OtherEntity];
-                        }
-                    }
-                });
-            culler.Stop();
-            engine.statsManager.Counters.Culling.Add(culler.Elapsed.TotalMilliseconds);
-
-            ThreadLocal<(int opaque, int transparent)> count = new(true);
-            toRenderArchetype.ParallelForEach<RenderEnabledBit, MeshRenderer>((itr, thread, start, end, renderBit, renderers) =>
-            {
-                int opaque = 0;
-                int transparent = 0;
-                for (int i = start; i < end; ++i)
-                {
-                    if (!renderBit[i])
-                        continue;
-
-                    if (renderBit[i].Layer > 0 && layers[renderBit[i].Layer].IsDisabled)
-                        continue;
-
-                    if (renderers[i].Opaque)
-                        opaque++;
-                    else
-                        transparent++;
-                }
-                if (count.IsValueCreated)
-                    count.Value = (opaque + count.Value.opaque, transparent + count.Value.transparent);
-                else
-                    count.Value = (opaque, transparent);
-            });
-            opaque = count.Values.Sum(i => i.opaque);
-            transparent = count.Values.Sum(i => i.transparent);
-            totalToDraw = opaque + transparent;
-            if (renderersData.Length < totalToDraw)
-            {
-                renderersData = new (LocalToWorld, MaterialInstanceRenderData?, Entity)[totalToDraw];
-                renderers = new MeshRenderer[totalToDraw];
-                //materialInstanceData = new MaterialInstanceRenderData[totalToDraw];
-            }
-            int opaqueIndex = 0;
-            int transparentIndex = opaque;
-            toRenderArchetype.ForEachRRRO<LocalToWorld, RenderEnabledBit, MeshRenderer, MaterialInstanceRenderData>((itr, thread, start, end, l2w, render, meshRenderer, materialData) =>
-            {
-                for (int i = start; i < end; ++i)
-                {
-                    if (!render[i])
-                        continue;
-
-                    if (render[i].Layer > 0 && layers[render[i].Layer].IsDisabled)
-                        continue;
-
-                    var renderer = meshRenderer[i];
-
-                    if (renderer.Opaque)
-                    {
-                        renderers[opaqueIndex] = renderer;
-                        //materialInstanceData[opaqueIndex] = materialData?[i];
-                        renderersData[opaqueIndex++] = (l2w[i], materialData?[i], itr[i]);
-                    }
-                    else
-                    {
-                        renderers[transparentIndex] = renderer;
-                        //materialInstanceData[transparentIndex] = materialData?[i];
-                        renderersData[transparentIndex++] = (l2w[i], materialData?[i], itr[i]);
-                    }
-                }
-            });
-
-            sorting.Restart();
-            SortRenderersByMesh(0, opaque);
-            SortRenderersByMesh(opaque + 1, totalToDraw);
-            sorting.Stop();
-            engine.statsManager.Counters.Sorting.Add(sorting.Elapsed.TotalMilliseconds);
-
-            if (engine.gameView.IsVisible)
-            {
-                Render(ShaderPassType.Forward, 0, opaque, false);
-            }
-
-            if (engine.sceneView.IsVisible)
-            {
-                ActivateScene(new SceneData(cameraManager.SceneViewCamera, new FogSettings(){Enabled = false}, engine.lightManager.MainLight, engine.lightManager.SecondaryLight));
-                ActivateRenderTexture(sceneViewTexture, new Color4(15/255f,52/255f,97/255f, 1));
-                Render(ShaderPassType.Forward, 0, opaque, false);
-                // restore current back buffer and scene
-                ActivateScene(null);
-                ActivateRenderTexture(CurrentBackBuffer);
-            }
-        }
-
-        private void SortRenderersByMesh(int start, int end)
-        {
-            if (end <= start)
-                return;
-            Array.Sort(renderers, renderersData, start, end - start, Comparer<MeshRenderer>.Create((a, b) =>
-            {
-                if (a.PipelineHandle != b.PipelineHandle)
-                {
-                    return a.PipelineHandle.Handle.CompareTo(b.PipelineHandle.Handle);
-                }
-                if (a.MeshHandle == b.MeshHandle)
-                {
-                    if (a.SubMeshId == b.SubMeshId)
-                        return a.MaterialHandle.Handle.CompareTo(b.MaterialHandle.Handle);
-                    return a.SubMeshId.CompareTo(b.SubMeshId);
-                }
-                return a.MeshHandle.Handle.CompareTo(b.MeshHandle.Handle);
-            }));
-        }
-
-        private void RenderTransparent()
-        {
-            engine.textureManager.BlitFramebuffers(mainObjectBuffer, opaqueRenderTexture, 0, 0, currentBackBufferWidth, currentBackBufferHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
-            ActivateDefaultRenderTexture();
-
-            if (engine.gameView.IsVisible)
-            {
-                Render(ShaderPassType.Forward, opaque, totalToDraw, true);
-            }
-
-            if (engine.sceneView.IsVisible)
-            {
-                ActivateScene(new SceneData(cameraManager.SceneViewCamera, new FogSettings(){Enabled = false}, engine.lightManager.MainLight, engine.lightManager.SecondaryLight));
-                ActivateRenderTexture(sceneViewTexture, null);
-                Render(ShaderPassType.Forward, opaque, totalToDraw, true);
-                var mainCamFrustum = new BoundingFrustum(cameraManager.MainCamera.ViewMatrix * cameraManager.MainCamera.ProjectionMatrix);
-                this.DrawFrustum(mainCamFrustum, Vector4.One);
-                engine.sceneView.OnSceneViewRender();
-                // restore current back buffer and scene
-                ActivateScene(null);
-                ActivateRenderTexture(CurrentBackBuffer);
-            }
-        }
-
-        private bool enableInstancing = true;
-
-        private void Render(ShaderPassType shaderPassType, int start, int end, bool transparent)
-        {
-            engine.Device.device.Debug(transparent ? "  Rendering translucent" : "  Rendering opaque");
-            sw.Restart();
-            int savedByInstancing = 0;
-            for (int i = start; i < end; ++i)
-            {
-                var mr = renderers[i];
-                var material = engine.materialManager.GetMaterialByHandle(mr.MaterialHandle);
-                var shader = material.GetShaderPass(shaderPassType, false);
-                var shaderInstanced = material.GetShaderPass(shaderPassType, true);
-                var mesh = engine.meshManager.GetMeshByHandle(mr.MeshHandle);
-                var meshId = mr.SubMeshId;
-
-                var toBatch = 0;
-                if (shaderInstanced != null && // shader supports instancing
-                    enableInstancing &&                 // instancing is enabled
-                    renderersData[i].Item2 == null)     // no material per instance data
-                {
-                    int j = i + 1;
-                    while (j < end && renderers[j].MeshHandle == mr.MeshHandle &&
-                           renderers[j].SubMeshId == mr.SubMeshId &&
-                           renderers[j].MaterialHandle == mr.MaterialHandle &&
-                           renderersData[j].Item2 == null)
-                    {
-                        toBatch++;
-                        j++;
-                    }   
-                }
-
-                if (toBatch <= 2)
-                {
-                    SetShader(shader);
-                    SetMesh(mesh);
-                
-                    //materialtimer.Start();
-                    EnableMaterial(material, ShaderPassType.Forward, false, renderersData[i].Item2);
-                    //materialtimer.Stop();
-                    
-                    //buffertimer.Start();
-                    objectData.WorldMatrix = renderersData[i].Item1;
-                    objectData.InverseWorldMatrix = renderersData[i].Item1.Inverse;
-                    objectData.ObjectIndex = (uint)i + 1;
-                    objectData.DrawData = renderersData[i].Item2?.InstanceData ?? new Int4(-1, -1, -1, -1);
-                    objectBuffer.UpdateBuffer(ref objectData);
-                    //buffertimer.Stop();
-#if DEBUG
-                currentShader.Validate();
-#endif
-                    //draw.Start();
-                    var indicesCount = mesh.IndexCount(meshId);
-                    Stats.IndicesDrawn += indicesCount;
-                    Stats.TrianglesDrawn += indicesCount / 3;
-                    Stats.NonInstancedDraws++;
-                    engine.Device.DrawIndexed(indicesCount, mesh.IndexStart(meshId), 0, mesh.IndexType);
-                    //draw.Stop();
-                }
-                else
-                {
-                    savedByInstancing += toBatch;
-                    if (renderers[i + toBatch].MaterialHandle != renderers[i].MaterialHandle)
-                    {
-                        Console.WriteLine(" no zjebane xd");
-                    }
-
-                    if (instancesArray.Length < toBatch + 1)
-                    {
-                        instancesArray = new Matrix[toBatch + 1];
-                        inverseInstancesArray = new Matrix[toBatch + 1];
-                        instancesObjectInddicesArray = new uint[toBatch + 1];
-                        instancesObjectDataArray = new Int4[toBatch + 1];
-                    }
-
-                    for (int k = 0; k < toBatch + 1; ++k)
-                    {
-                        instancesArray[k] = renderersData[i + k].Item1.Matrix;
-                        inverseInstancesArray[k] = renderersData[i + k].Item1.Inverse;
-                        instancesObjectInddicesArray[k] = (uint)(i + k);
-                        instancesObjectDataArray[k] = renderersData[i + k].Item2?.InstanceData ?? new Int4(-1, -1, -1, -1);
-                    }
-
-                    //buffertimer.Start();
-                    //var instancesBuffer =
-                    //    engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, worldMatrices, BufferInternalFormat.Float4);
-                    //var instancesInverseBuffer =
-                    //    engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, inerseWorldMatrices, BufferInternalFormat.Float4);
-                    instancesBuffer.UpdateBuffer(instancesArray.AsSpan(0, toBatch + 1));
-                    instancesInverseBuffer.UpdateBuffer(inverseInstancesArray.AsSpan(0, toBatch + 1));
-                    instancesObjectIndicesBuffer.UpdateBuffer(instancesObjectInddicesArray.AsSpan(0, toBatch + 1));
-                    instancesObjectDataBuffer.UpdateBuffer(instancesObjectDataArray.AsSpan(0, toBatch + 1));
-                    //buffertimer.Stop();
-
-                    shader = shaderInstanced;
-
-                    SetShader(shader);
-
-                    SetMesh(mesh);
-
-                    //materialtimer.Start();
-                    instancingRenderData.Clear();
-                    instancingRenderData.SetBuffer("InstancingModels", instancesBuffer);
-                    instancingRenderData.SetBuffer("InstancingInverseModels", instancesInverseBuffer);
-                    instancingRenderData.SetBuffer("ObjectIndices", instancesObjectIndicesBuffer);
-                    instancingRenderData.SetBuffer("DrawData", instancesObjectDataBuffer);
-
-                    EnableMaterial(material, ShaderPassType.Forward,  true, instancingRenderData);
-                    //materialtimer.Stop();
-
-#if DEBUG
-                    currentShader.Validate();
-#endif
-                    //draw.Start();
-                    var indicesCount = mesh.IndexCount(meshId);
-                    Stats.IndicesDrawn += indicesCount * (toBatch + 1);
-                    Stats.TrianglesDrawn += (indicesCount / 3) * (toBatch + 1);
-                    Stats.InstancedDraws++;
-                    engine.Device.DrawIndexedInstanced(indicesCount,  toBatch + 1, mesh.IndexStart(meshId), 0, 0, mesh.IndexType);
-
-                    i += toBatch;
-                }
-            }
-            sw.Stop();
-            engine.statsManager.Counters.Drawing.Add(sw.Elapsed.TotalMilliseconds);
-            Stats.InstancedDrawSaved += savedByInstancing;
-        }
-
-        private void SetShader(ShaderPass shader)
-        {
-            if (currentShader != shader)
-            {
-                Stats.ShaderSwitches++;
-                currentShader = shader;
-                //shadertimer.Start();
-                shader.Activate();
-                //shadertimer.Stop();
-            }
-        }
-
-        internal void SetMesh(Mesh? mesh)
-        {
-            if (currentMesh != mesh)
-            {
-                Stats.MeshSwitches++;
-                currentMesh = mesh;
-                //meshtimer.Start();
-                mesh?.Activate();
-                //meshtimer.Stop();
-            }
-        }
-
-        public void Render(MeshHandle meshHandle, MaterialHandle materialHandle, ShaderPassType shaderPassType, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
+        public void Render(MeshHandle meshHandle, MaterialHandle materialHandle, ShaderPassType shaderPassType, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null, Int4? instanceInt = null)
         {
             var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
             var material = engine.materialManager.GetMaterialByHandle(materialHandle);
-            Render(mesh, material, shaderPassType, submesh, localToWorld, worldToLocal, instanceData);
+            Render(mesh, material, shaderPassType, submesh, localToWorld, worldToLocal, instanceData, instanceInt);
         }
         
-        public void Render(IMesh mesh, Material material, ShaderPassType shaderPass, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
+        public void Render(IMesh mesh, Material material, ShaderPassType shaderPass, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null, Int4? instanceInt = null)
         {
             if (worldToLocal == null)
             {
@@ -1351,30 +805,14 @@ namespace TheEngine.Managers
             }
             
             Debug.Assert(inRenderingLoop);
-            SetShader(material.GetShaderPass(shaderPass, false));
-            EnableMaterial(material, shaderPass, false, instanceData);
-            SetMesh((Mesh)mesh);
-            objectData.WorldMatrix = localToWorld;
-            objectData.InverseWorldMatrix = worldToLocal.Value;
-            objectBuffer.UpdateBuffer(ref objectData);
-            var start = mesh.IndexStart(submesh);
-            var count = mesh.IndexCount(submesh);
-            engine.Device.DrawIndexed(count, start, 0, mesh.IndexType);
+            EnableMaterial(material, material.GetShaderPass(shaderPass, false)!, instanceData);
+            engineCommandList.SetObjectData(localToWorld, worldToLocal.Value, 0, instanceInt);
+            engineCommandList.DrawIndexed(mesh, submesh);
         }
 
         public void DrawLine(Vector3 start, Vector3 end, Vector4 color)
         {
-            lineMesh.SetVertices(start, end);
-            lineMesh.RebuildIndices();
-            SetShader(unlitMaterial.GetShaderPass(ShaderPassType.Forward, false));
-            UnlitMaterialData_t data = new() { color = color };
-            unlitMaterial.SetMaterialData(ref data);
-            EnableMaterial(unlitMaterial, ShaderPassType.Forward, false);
-            SetMesh(lineMesh);
-            objectData.WorldMatrix = Matrix.Identity;
-            objectData.InverseWorldMatrix = Matrix.Identity;
-            objectBuffer.UpdateBuffer(ref objectData);
-            engine.Device.DrawLineMesh(2, 0);
+            linesStage.Add(start, end, color);
         }
 
         public void Render(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, Transform transform)
@@ -1388,32 +826,22 @@ namespace TheEngine.Managers
             Render(mesh, material, shaderPassType, submesh, matrix);
         }
 
-        public void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int instancesCount, Matrix localToWorld, Matrix? worldToLocal = null)
+        public void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int instancesCount, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
         {
             if (!worldToLocal.HasValue)
             {
                 Matrix.Invert(localToWorld, out var worldToLocal_);
                 worldToLocal = worldToLocal_;
             }
-            SetShader(material.GetShaderPass(shaderPassType, false));
-            EnableMaterial(material, shaderPassType, false);
-            objectData.WorldMatrix = localToWorld;
-            objectData.InverseWorldMatrix = worldToLocal.Value;
-            objectBuffer.UpdateBuffer(ref objectData);
-            SetMesh((Mesh)mesh);
-            var start = mesh.IndexStart(submesh);
-            var count = mesh.IndexCount(submesh);
-            engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0, mesh.IndexType);
+            EnableMaterial(material, material.GetShaderPass(shaderPassType, false)!, instanceData);
+            engineCommandList.SetObjectData(localToWorld, worldToLocal.Value);
+            engineCommandList.DrawIndexedInstanced(mesh, submesh, instancesCount);
         }
 
-        public void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int instancesCount)
+        public void RenderInstancedIndirect(IMesh mesh, Material material, ShaderPassType shaderPassType, int submesh, int instancesCount, MaterialInstanceRenderData? instanceData = null)
         {
-            SetShader(material.GetShaderPass(shaderPassType, false));
-            EnableMaterial(material, shaderPassType, false);
-            SetMesh((Mesh)mesh);
-            var start = mesh.IndexStart(submesh);
-            var count = mesh.IndexCount(submesh);
-            engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0, mesh.IndexType);
+            EnableMaterial(material, material.GetShaderPass(shaderPassType, false)!, instanceData);
+            engineCommandList.DrawIndexedInstanced(mesh, submesh, instancesCount);
         }
 
         public float ViewDistanceModifier
@@ -1433,8 +861,7 @@ namespace TheEngine.Managers
                 engine.lightManager.MainLight,
                 engine.lightManager.SecondaryLight);
             UpdateSceneBuffer(in data);
-            sceneBuffer.UpdateBuffer(ref sceneData);
-            sceneBuffer.Activate(Constants.SCENE_BUFFER_INDEX);
+            commandList.BindTransientUniformBuffer(Constants.SCENE_BUFFER_INDEX, ref sceneData);
         }
 
         private void UpdateSceneBuffer(in SceneData data)
@@ -1474,15 +901,13 @@ namespace TheEngine.Managers
             return RegisterStaticRenderer(mesh, material, subMesh, t.LocalToWorldMatrix);
         }
 
-        public void SetupRendererEntity(Entity entity, MeshHandle meshHandle, Material material, int subMesh, Matrix localToWorld)
+        public void SetupRendererEntity(Entity entity, MeshHandle meshHandle, Material material, int subMesh, Matrix localToWorld, Int4? instanceData = null)
         {
             var l2w = new LocalToWorld() { Matrix = localToWorld };
             var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
             engine.EntityManager.GetComponent<LocalToWorld>(entity) = l2w;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = subMesh;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).Material = material;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).Mesh = mesh;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).Opaque = !material.BlendingEnabled;
+            MeshRenderer renderer = new() { SubMeshId = subMesh, Material = material, Mesh = mesh, Opaque = !material.BlendingEnabled, InstanceData = instanceData};
+            engine.EntityManager.AddArrayComponent(entity, renderer);
             engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = LocalToWorld((MeshBounds)mesh.Bounds, l2w);
             if (engine.EntityManager.HasComponent<MeshBounds>(entity))
                 engine.EntityManager.GetComponent<MeshBounds>(entity).box = mesh.Bounds;
@@ -1511,10 +936,8 @@ namespace TheEngine.Managers
             var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
             var entity = engine.EntityManager.CreateEntity(dynamicRendererArchetype);
             engine.EntityManager.GetComponent<LocalToWorld>(entity) = l2w;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = subMesh;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).Material = material;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).Mesh = mesh;
-            engine.EntityManager.GetComponent<MeshRenderer>(entity).Opaque = !material.BlendingEnabled;
+            MeshRenderer renderer = new() { SubMeshId = subMesh, Material = material, Mesh = mesh, Opaque = !material.BlendingEnabled };
+            engine.EntityManager.AddArrayComponent(entity, renderer);
             engine.EntityManager.GetComponent<DirtyPosition>(entity).Enable();
             engine.EntityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)mesh.Bounds;
             return new DynamicRenderHandle(entity);

@@ -6,11 +6,12 @@ internal class KMP
 
     internal static unsafe long KmpSearch(ReadOnlySpan<byte> haystack, ReadOnlySpan<byte> needle, ReadOnlySpan<int> partialMatchTable)
     {
+        static byte ToLowerAscii(byte b) => (b >= 65 && b <= 90) ? (byte)(b + 32) : b;
         int i = 0; // index for txt[]
         int j = 0; // index for pat[]
         while ((haystack.Length - i) >= (needle.Length - j))
         {
-            if (needle[j] == haystack[i])
+            if (ToLowerAscii(needle[j]) == ToLowerAscii(haystack[i]))
             {
                 j++;
                 i++;
@@ -23,7 +24,7 @@ internal class KMP
             }
 
             // mismatch after j matches
-            else if (i < haystack.Length && needle[j] != haystack[i]) {
+            else if (i < haystack.Length && ToLowerAscii(needle[j]) != ToLowerAscii(haystack[i])) {
                 // Do not match lps[0..lps[j-1]] characters,
                 // they will match anyway
                 if (j != 0)

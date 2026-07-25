@@ -20,7 +20,7 @@ namespace TheEngine.Components
         public static Entity GetRoot(this Entity entity, IEntityManager entityManager)
         {
             var copyTransformArchetype = entityManager.NewArchetype().WithComponentData<CopyParentTransform>();
-            while (entityManager.Is(entity, copyTransformArchetype))
+            while (entityManager.Exist(entity) && entityManager.Is(entity, copyTransformArchetype))
             {
                 entity = entityManager.GetComponent<CopyParentTransform>(entity).Parent;
             }

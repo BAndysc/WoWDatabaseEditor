@@ -13,6 +13,7 @@ using TheEngine.Entities;
 using TheEngine.Structures;
 using TheEngine.Utils;
 using TheMaths;
+using WDE.MapRenderer.Utils;
 using WDE.MpqReader.Structures;
 using Plane = TheMaths.Plane;
 
@@ -68,6 +69,10 @@ public class TestModule : IGameModule
 
     public void Render(float delta)
     {
+        if (pp != null && creatureInstance is {} ci && ci.WorldObjectEntity != Entity.Empty)
+        {
+            pp.Render([ci.WorldObjectEntity]);
+        }
         // var camera = cameraManager.MainCamera;
         // var view = camera.ViewMatrix;
         // var projection = camera.ProjectionMatrix;
@@ -244,11 +249,15 @@ public class TestModule : IGameModule
 //         await instance.LoadMount(17694);
     }
 
+    HighlightPostProcess? pp;
     private async ValueTask LoadCreatureAndModel(CreatureInstance instance)
     {
         await instance.Load();
 //         await instance.LoadMount(17694);
+        pp = new HighlightPostProcess(engine, Color.AliceBlue);
+        engine.RenderManager.AddPostprocess(pp);
     }
+
 
     public void Update(float delta)
     {
@@ -260,12 +269,12 @@ public class TestModule : IGameModule
 
         if (creatureInstance == null)
         {
-            creatureInstance = new CreatureInstance(gameContext,"aa", 474, RenderLayer.Default);
+            creatureInstance = new CreatureInstance(gameContext,"aa", 13, RenderLayer.Default);
             LoadCreatureAndModel(creatureInstance).FireAndForget();
         }
         if (creatureInstance != null && creatureInstance.WorldObjectEntity != Entity.Empty)
         {
-            gameContext.Engine.EntityInspector.InspectEntity(creatureInstance.WorldObjectEntity);
+            // gameContext.Engine.EntityInspector.InspectEntity(creatureInstance.WorldObjectEntity);
         }
 
         if (!loadAllModels)
@@ -326,10 +335,10 @@ public class TestModule : IGameModule
     {
         var m = await gameContext.MdxManager.LoadM2Mesh(new FileId(196342));
 
-        Entity entity;
-        NativeBuffer<Matrix>? bones = null;
-        NativeBuffer<Vector4>? colors = null;
-        NativeBuffer<Matrix>? textureTransforms = null;
+        Entity entity = Entity.Empty;
+        INativeBuffer<Matrix>? bones = null;
+        INativeBuffer<Vector4>? colors = null;
+        INativeBuffer<Matrix>? textureTransforms = null;
         if (m.HasAnimations)
         {
             bones = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
@@ -346,11 +355,9 @@ public class TestModule : IGameModule
         {
             if (m.HasAnimations)
             {
-                entity = entityManager.CreateEntity(first ? archetypes.StaticM2WorldObjectAnimatedMasterArchetype
-                    : archetypes.StaticM2WorldObjectAnimatedArchetype,"Waterfall");
-                // only one renderer has to update the animation, because the animation is the same among all renderers
                 if (first)
                 {
+                    entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectAnimatedArchetype,"Waterfall");
                     entityManager.SetManagedComponent(entity, new M2AnimationComponentData(m.model)
                     {
                         SetNewAnimation = 0,
@@ -358,20 +365,23 @@ public class TestModule : IGameModule
                         _colors = colors!,
                         _textureTransforms = textureTransforms!
                     });
+                    var instanceRenderer = new MaterialInstanceRenderData();
+                    instanceRenderer.SetBuffer("boneMatrices", bones!);
+                    instanceRenderer.SetBuffer("vertexColors", colors!);
+                    instanceRenderer.SetBuffer("textureTransforms", textureTransforms!);
+                    entityManager.SetManagedComponent(entity, instanceRenderer);
                 }
-                var instanceRenderer = new MaterialInstanceRenderData();
-                instanceRenderer.SetBuffer("boneMatrices", bones!);
-                instanceRenderer.SetBuffer("vertexColors", colors!);
-                instanceRenderer.SetBuffer("textureTransforms", textureTransforms!);
-                instanceRenderer.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
-                entityManager.SetManagedComponent(entity, instanceRenderer);
             }
             else
-                entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectArchetype, "waterfall");
+            {
+                if (first)
+                    entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectArchetype, "waterfall");
+            }
 
             var t = new Transform();
-            renderManager.SetupRendererEntity(entity, m.mesh.Handle, material.material, material.submesh, t.LocalToWorldMatrix);
-            entityManager.AddManagedComponent(entity, new MdxRenderer(m));
+            var instanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
+            renderManager.SetupRendererEntity(entity, m.mesh.Handle, material.material, material.submesh, t.LocalToWorldMatrix, instanceData);
+            entityManager.AddManagedComponent(entity, new MdxRenderer(m) { Owner = entity });
             first = false;
         }
     }

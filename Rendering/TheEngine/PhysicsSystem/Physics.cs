@@ -52,7 +52,7 @@ namespace TheEngine.PhysicsSystem
         public void RaycastAll(Ray ray, Vector3? customOrigin, List<(Entity, Vector3)> destinationList, uint collisionMask = 0)
         {
             ThreadLocal<List<(Entity, Vector3)>?> localEntities = new ThreadLocal<List<(Entity, Vector3)>?>(true);
-            colliders.ParallelForEachRRRRO<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld, DisabledObjectBit>((itr, thread, start, end, colliders, meshBounds, renderer, localToWorld, disableAccess) =>
+            colliders.ParallelForEachRRRROArray<MeshRenderer, Collider, WorldMeshBounds, LocalToWorld, DisabledObjectBit>((itr, thread, start, end, renderers, colliders, meshBounds, localToWorld, disableAccess) =>
             {
                 List<(Entity, Vector3)>? result = null;
                 for (int i = start; i < end; ++i)
@@ -66,11 +66,16 @@ namespace TheEngine.PhysicsSystem
                     var intersects = IntersectsBoundingBox(in ray, ref meshBounds[i]);
                     if (intersects)
                     {
-                        var mesh = meshManager.GetMeshByHandle(renderer[i].MeshHandle);
-                        if (Physics.RayIntersectsObject(mesh, renderer[i].SubMeshId, localToWorld[i], ray, customOrigin, out var inter))
+                        var renderers_ = renderers[i];
+                        for (int j = 0; j < renderers_.Length; ++j)
                         {
-                            result ??= new();
-                            result.Add((itr[i], inter));
+                            var mesh = meshManager.GetMeshByHandle(renderers_[j].MeshHandle);
+                            if (Physics.RayIntersectsObject(mesh, renderers_[j].SubMeshId, localToWorld[i], ray,
+                                    customOrigin, out var inter))
+                            {
+                                result ??= new();
+                                result.Add((itr[i], inter));
+                            }
                         }
                     }
                 }
@@ -104,7 +109,7 @@ namespace TheEngine.PhysicsSystem
         public (Entity, Vector3)? Raycast(Ray ray, Vector3? customOrigin, bool onlyRendered = false, uint collisionMask = 0)
         {
             ThreadLocal<(Entity, float, Vector3)> localEntities = new ThreadLocal<(Entity, float, Vector3)>(true);
-            colliders.ParallelForEachRRRROO<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld, RenderEnabledBit, DisabledObjectBit>((itr, thread, start, end, colliders, meshBounds, renderer, localToWorld, renderEnabledAccess, disabledAccess) =>
+            colliders.ParallelForEachRRRROOArray<MeshRenderer, Collider, WorldMeshBounds, LocalToWorld, RenderEnabledBit, DisabledObjectBit>((itr, thread, start, end, renderers, colliders, meshBounds, localToWorld, renderEnabledAccess, disabledAccess) =>
             {
                 Entity? touchEntity = null;
                 float minDist = float.MaxValue;
@@ -120,15 +125,19 @@ namespace TheEngine.PhysicsSystem
                     var intersects = IntersectsBoundingBox(in ray, ref meshBounds[i]);
                     if (intersects)
                     {
-                        var mesh = meshManager.GetMeshByHandle(renderer[i].MeshHandle);
-                        if (Physics.RayIntersectsObject(mesh, renderer[i].SubMeshId, localToWorld[i], ray, customOrigin, out var inter))
+                        var renderers_ = renderers[i];
+                        for (int j = 0; j < renderers_.Length; ++j)
                         {
-                            var dist = (ray.Position - inter).LengthSquared();
-                            if (dist < minDist)
+                            var mesh = meshManager.GetMeshByHandle(renderers_[j].MeshHandle);
+                            if (Physics.RayIntersectsObject(mesh, renderers_[j].SubMeshId, localToWorld[i], ray, customOrigin, out var inter))
                             {
-                                minDist = dist;
-                                touchEntity = itr[i];
-                                intersectionPoint = inter;
+                                var dist = (ray.Position - inter).LengthSquared();
+                                if (dist < minDist)
+                                {
+                                    minDist = dist;
+                                    touchEntity = itr[i];
+                                    intersectionPoint = inter;
+                                }
                             }
                         }
                     }
@@ -197,28 +206,33 @@ namespace TheEngine.PhysicsSystem
             int index = 1;
             StringBuilder vertices = new();
             StringBuilder indices = new();
-            colliders.ForEach<Collider, MeshRenderer, LocalToWorld>((itr, thread, start, end, colliders, renderer, localToWorld) =>
+            colliders.ForEachArray<MeshRenderer, Collider, LocalToWorld>((itr, thread, start, end, renderers, colliders, localToWorld) =>
             {
                 for (int i = start; i < end; ++i)
                 {
-                    var mesh = meshManager.GetMeshByHandle(renderer[i].MeshHandle);
-                    int submesh = renderer[i].SubMeshId;
+                    var renderers_ = renderers[i];
                     var l2w = localToWorld[i].Matrix;
-
-                    foreach (var face in mesh.GetFaces(submesh))
+                    for (int j = 0; j < renderers_.Length; ++j)
                     {
-                        var v1 = face.Item1;
-                        var v2 = face.Item2;
-                        var v3 = face.Item3;
-                        var v1_w = Vector4.Transform(v1, l2w);
-                        var v2_w = Vector4.Transform(v2, l2w);
-                        var v3_w = Vector4.Transform(v3, l2w);
+                        ref var renderer = ref renderers_[j];
+                        var mesh = meshManager.GetMeshByHandle(renderer.MeshHandle);
+                        int submesh = renderer.SubMeshId;
 
-                        vertices.AppendLine($"v {v1_w.X} {v1_w.Y} {v1_w.Z}");
-                        vertices.AppendLine($"v {v2_w.X} {v2_w.Y} {v2_w.Z}");
-                        vertices.AppendLine($"v {v3_w.X} {v3_w.Y} {v3_w.Z}");
-                        indices.AppendLine($"f {index}// {index + 1}// {index + 2}//");
-                        index += 3;
+                        foreach (var face in mesh.GetFaces(submesh))
+                        {
+                            var v1 = face.Item1;
+                            var v2 = face.Item2;
+                            var v3 = face.Item3;
+                            var v1_w = Vector4.Transform(v1, l2w);
+                            var v2_w = Vector4.Transform(v2, l2w);
+                            var v3_w = Vector4.Transform(v3, l2w);
+
+                            vertices.AppendLine($"v {v1_w.X} {v1_w.Y} {v1_w.Z}");
+                            vertices.AppendLine($"v {v2_w.X} {v2_w.Y} {v2_w.Z}");
+                            vertices.AppendLine($"v {v3_w.X} {v3_w.Y} {v3_w.Z}");
+                            indices.AppendLine($"f {index}// {index + 1}// {index + 2}//");
+                            index += 3;
+                        }
                     }
                 }
             });

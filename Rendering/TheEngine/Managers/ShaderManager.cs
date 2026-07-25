@@ -12,7 +12,7 @@ namespace TheEngine.Managers
     public class ShaderManager : IShaderManager, IDisposable
     {
         private Dictionary<string, ShaderHandle> shaderHandles;
-        private List<Shader> byHandleShaders;
+        private List<IShader> byHandleShaders;
 
         private readonly Engine engine;
 
@@ -24,7 +24,7 @@ namespace TheEngine.Managers
         internal ShaderManager(Engine engine)
         {
             shaderHandles = new ();
-            byHandleShaders = new List<Shader>();
+            byHandleShaders = new List<IShader>();
             this.engine = engine;
 
             watcher = new FileSystemWatcher();
@@ -55,27 +55,28 @@ namespace TheEngine.Managers
 
         internal void Update()
         {
-            // if (reloadAllShaders)
-            // {
-            //     foreach (var usedShader in shaderHandles.Keys)
-            //     {
-            //         var handle = shaderHandles[usedShader];
-            //
-            //         try
-            //         {
-            //             var recompiled = engine.Device.CreateShader(usedShader.path, new string[] { Constants.SHADER_INCLUDE_DIR, RemoveFileName(usedShader.path) }, usedShader.instancing);
-            //             byHandleShaders[handle.Handle].Dispose();
-            //             byHandleShaders[handle.Handle] = recompiled;
-            //         }
-            //         catch (Exception e)
-            //         {
-            //             Console.WriteLine("Couldn't compile reshader " + usedShader.path + " " + e.Message);
-            //         }
-            //     }
-            //
-            //     engine.materialManager.InvalidateShaderCache();
-            //     reloadAllShaders = false;
-            // }
+            if (reloadAllShaders)
+            {
+                foreach (var usedShader in shaderHandles.Keys)
+                {
+                    var handle = shaderHandles[usedShader];
+
+                    try
+                    {
+                        byHandleShaders[handle.Handle].Recompile();
+                        // var recompiled = engine.Device.CreateShader(usedShader.path, new string[] { Constants.SHADER_INCLUDE_DIR, RemoveFileName(usedShader.path) }, usedShader.instancing);
+                        // byHandleShaders[handle.Handle].Dispose();
+                        // byHandleShaders[handle.Handle] = recompiled;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Couldn't compile reshader " + usedShader + " " + e.Message);
+                    }
+                }
+
+                engine.materialManager.InvalidateShaderCache();
+                reloadAllShaders = false;
+            }
         }
 
         private string RemoveFileName(string path)
@@ -95,7 +96,7 @@ namespace TheEngine.Managers
             if (shaderHandles.TryGetValue(path, out var shader))
                 return shader;
 
-            var newShader = new Shader(engine.Device.device, path, new string[] { Constants.SHADER_INCLUDE_DIR, shaderDir });
+            var newShader = engine.Backend.LoadShader(path, new string[] { Constants.SHADER_INCLUDE_DIR, shaderDir });
 
             byHandleShaders.Add(newShader);
 
@@ -118,7 +119,7 @@ namespace TheEngine.Managers
             watcher2.Dispose();
         }
 
-        internal Shader GetShaderByHandle(ShaderHandle materialHandle)
+        internal IShader GetShaderByHandle(ShaderHandle materialHandle)
         {
             return byHandleShaders[materialHandle.Handle];
         }

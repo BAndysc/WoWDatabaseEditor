@@ -278,7 +278,7 @@ namespace WDE.MapRenderer.Managers
         private readonly IUIManager uiManager;
         private readonly IPipelineManager pipelineManager;
 
-        private NativeBuffer<Matrix> identityBonesBuffer;
+        private INativeBuffer<Matrix> identityBonesBuffer;
 
         private ShaderHandle m2shader;
 
@@ -402,6 +402,13 @@ namespace WDE.MapRenderer.Managers
             {
                 Console.WriteLine("Unspported blend mode " + blend);
             }
+
+            // the alpha channel blends with the same factors as color (like the old glBlendFunc
+            // did for both channels). Leaving the alpha factors at their default (Zero) writes
+            // alpha = 0, and since the view texture is composited by ImGui with alpha blending,
+            // that punches black holes into the presented image.
+            blending.SourceAlphaFactor = blending.SourceColorFactor;
+            blending.DestinationAlphaFactor = blending.DestinationColorFactor;
 
             return pipelineManager.CreatePipeline(m2shader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
             {
@@ -1581,6 +1588,10 @@ namespace WDE.MapRenderer.Managers
         {
             if (internalMeshes.TryGetValue(path, out var internalMesh))
             {
+                if (internalMesh == null)
+                {
+                    return null;
+                }
                 if (internalMesh.TryGetTarget(out var target))
                 {
                     return target;

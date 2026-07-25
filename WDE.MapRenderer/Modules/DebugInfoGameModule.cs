@@ -1,6 +1,7 @@
 using Avalonia.Input;
 using ImGuiNET;
 using JetBrains.Profiler.Api;
+using TheEngine;
 using TheEngine.Coroutines;
 using TheEngine.Interfaces;
 using IInputManager = TheEngine.Interfaces.IInputManager;
@@ -13,17 +14,20 @@ public class DebugInfoGameModule : IGameModule
     private readonly CoroutineManager coroutineManager;
     private readonly IStatsManager statsManager;
     private readonly IInputManager inputManager;
+    private readonly Engine engine;
     public object? ViewModel => null;
 
     public DebugInfoGameModule(IUIManager uiManager,
         CoroutineManager coroutineManager,
         IStatsManager statsManager,
-        IInputManager inputManager)
+        IInputManager inputManager,
+        Engine engine)
     {
         this.uiManager = uiManager;
         this.coroutineManager = coroutineManager;
         this.statsManager = statsManager;
         this.inputManager = inputManager;
+        this.engine = engine;
     }
 
     public void Dispose()
@@ -59,15 +63,16 @@ public class DebugInfoGameModule : IGameModule
     {
         var fps = 1000 / statsManager.Counters.FrameTime.Average;
 
+        var gameView = engine.GameView.ViewRect;
+
         // Top-left FPS window
-        ImGui.SetNextWindowPos(new System.Numerics.Vector2(10, 10), ImGuiCond.Always);
+        ImGui.SetNextWindowPos(new System.Numerics.Vector2(gameView.Right - 10, 10 + gameView.Y), ImGuiCond.Always, new Vector2(1, 0));
         ImGui.SetNextWindowBgAlpha(1.0f);
         if (ImGui.Begin("FPS", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize |
                        ImGuiWindowFlags.NoMove | ImGuiWindowFlags.AlwaysAutoResize |
                        ImGuiWindowFlags.NoSavedSettings))
         {
             ImGui.Text($"{fps:0.00}");
-            ImGui.Text($"{coroutineManager.PendingCoroutines} active tasks");
             ImGui.End();
         }
 
@@ -78,7 +83,7 @@ public class DebugInfoGameModule : IGameModule
         float w = statsManager.PixelSize.X;
         float h = statsManager.PixelSize.Y;
 
-        ImGui.SetNextWindowPos(new System.Numerics.Vector2(viewport.X - 10, viewport.Y - 10), ImGuiCond.Always, new System.Numerics.Vector2(1.0f, 1.0f));
+        ImGui.SetNextWindowPos(new System.Numerics.Vector2(gameView.Right - 10, gameView.Bottom - 10), ImGuiCond.Always, new System.Numerics.Vector2(1.0f, 1.0f));
         ImGui.SetNextWindowBgAlpha(0.5f);
         if (ImGui.Begin("Stats", ImGuiWindowFlags.NoResize |
                        ImGuiWindowFlags.NoMove | ImGuiWindowFlags.AlwaysAutoResize |

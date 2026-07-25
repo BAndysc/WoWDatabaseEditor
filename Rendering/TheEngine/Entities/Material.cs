@@ -8,6 +8,7 @@ using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
+using TheEngine.Rendering;
 using TheEngine.Resources;
 using TheMaths;
 
@@ -98,11 +99,11 @@ namespace TheEngine.Entities
             bytesSpan.CopyTo(this.materialDataBytes);
         }
 
-        protected override unsafe void ActivateMoreUniforms(ShaderPass shaderPass)
+        protected override unsafe void ActivateMoreUniforms(ShaderPass shaderPass, ReadOnlySpan<byte> materialData)
         {
             foreach (var uniform in uniformData)
             {
-                var data = materialDataBytes.AsSpan((int)uniform.offset, uniform.size);
+                var data = materialData.Slice((int)uniform.offset, uniform.size);
                 var loc = uniform.globalLocation;
                 if (!shaderPass.HasGlobalUniform(loc))
                 {
@@ -281,11 +282,13 @@ namespace TheEngine.Entities
             return structuredBuffers[GetUniformLocation(name)];
         }
 
-        protected virtual void ActivateMoreUniforms(ShaderPass shaderPass)
+        // the data span is passed in (rather than read from materialDataBytes) so the
+        // deferred path can activate from a record-time snapshot of the same bytes
+        protected virtual void ActivateMoreUniforms(ShaderPass shaderPass, ReadOnlySpan<byte> materialData)
         {
         }
 
-        public ShaderPass? GetShaderPass(ShaderPassType passType, bool instanced)
+        public IShaderPass? GetShaderPass(ShaderPassType passType, bool instanced)
         {
             return (passType, instanced) switch
             {
@@ -297,14 +300,12 @@ namespace TheEngine.Entities
             };
         }
 
-        public virtual void ActivateUniforms(ShaderPassType passType, bool instanced, MaterialInstanceRenderData? instanceData = null)
+        // called by the command list when binding material resources (BindMaterialResources);
+        // on GL the material's textures/buffers/constants are bound as loose uniforms,
+        // on Vulkan they will become a descriptor set + push constants
+        internal void ActivateUniforms(ShaderPass shaderPass, MaterialInstanceRenderData? instanceData = null)
         {
             int slot = 0;
-            // done in RenderManager
-            // shader.Activate();
-
-            var shaderPass = GetShaderPass(passType, instanced);
-            if (shaderPass == null) throw new Exception("Unsupported shader pass type or instancing mode");
 
             foreach (var buffer in structuredBuffers)
             {
@@ -337,9 +338,28 @@ namespace TheEngine.Entities
                 slot++;
             }
 
-            ActivateMoreUniforms(shaderPass);
+            ActivateMoreUniforms(shaderPass, materialDataBytes);
 
             instanceData?.Activate(shaderPass, slot);
+        }
+
+        // the deferred-recording path: the dictionary walks and shader-uniform checks already
+        // happened when the snapshot was captured, this just executes the recorded binds
+        internal void ActivateUniforms(ShaderPass shaderPass, MaterialSnapshot snapshot)
+        {
+            foreach (var (uniform, slot, buffer) in snapshot.Buffers)
+            {
+                buffer.Activate(slot);
+                shaderPass.SetUniformInt(uniform, slot);
+            }
+            foreach (var (uniform, slot, texture) in snapshot.Textures)
+            {
+                var resolved = texture == null ? null : engine.textureManager.GetTextureByHandle(texture.Handle);
+                resolved ??= engine.textureManager.GetTextureByHandle(engine.textureManager.EmptyTexture.Handle);
+                resolved.Activate(slot);
+                shaderPass.SetUniformInt(uniform, slot);
+            }
+            ActivateMoreUniforms(shaderPass, snapshot.MaterialData.AsSpan(0, snapshot.MaterialDataLength));
         }
         
         public enum StructuredBufferMode

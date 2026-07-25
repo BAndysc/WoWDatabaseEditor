@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Runtime.InteropServices;
+using TheEngine;
 using TheEngine.Data;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -19,6 +20,7 @@ namespace WDE.MapRenderer.Managers
         private readonly IMaterialManager materialManager;
         private readonly WoWMeshManager woWMeshManager;
         private readonly IPipelineManager pipelineManager;
+        private readonly Engine engine;
 
         [StructLayout(LayoutKind.Sequential, Pack = 4)]
         public struct WmoMaterialData
@@ -63,7 +65,8 @@ namespace WDE.MapRenderer.Managers
             IMaterialManager materialManager,
             WoWMeshManager woWMeshManager,
             IShaderManager shaderManager,
-            IPipelineManager pipelineManager)
+            IPipelineManager pipelineManager,
+            Engine engine)
         {
             this.gameFiles = gameFiles;
             this.meshManager = meshManager;
@@ -71,6 +74,7 @@ namespace WDE.MapRenderer.Managers
             this.materialManager = materialManager;
             this.woWMeshManager = woWMeshManager;
             this.pipelineManager = pipelineManager;
+            this.engine = engine;
 
             wmoShader = shaderManager.LoadShader("data/wmo.json");
 
@@ -131,6 +135,11 @@ namespace WDE.MapRenderer.Managers
                 blending.BlendEnabled = false;
                 //mat.SetUniform("notSupported", 1);
             }
+
+            // the alpha channel blends with the same factors as color (like the old glBlendFunc
+            // did for both channels), see the same logic in MdxManager
+            blending.SourceAlphaFactor = blending.SourceColorFactor;
+            blending.DestinationAlphaFactor = blending.DestinationColorFactor;
 
             pipelines[(blendMode, unculled)] = pipelineManager.CreatePipeline(wmoShader, PrimitiveTopology.TriangleList, new GraphicsPipelineDescription()
             {
@@ -203,8 +212,11 @@ namespace WDE.MapRenderer.Managers
                 if (bytesGroup == null)
                     continue;
 
+                await engine.EnterThreadPool;
                 var group = new WorldMapObjectGroup(new MemoryBinaryReader(bytesGroup), in wmo.Header);
                 bytesGroup.Dispose();
+                await engine.EnterGameLoop;
+
                 // bazaarfacade03 and cathy_facade01 - LODs for stormwind used by portal culling,
                 // but gives poor results without portal culling
                 if (group.Header.uniqueID is 2625 or 2624)
@@ -221,14 +233,16 @@ namespace WDE.MapRenderer.Managers
                     group.Dispose();
                     continue;
                 }
-                
+
+                await engine.EnterThreadPool;
                 ushort[] indices = new ushort[group.Indices.Length + group.CollisionOnlyIndices.Length];
                 Array.Copy(group.Indices.AsArray(), indices, group.Indices.Length);
                 Array.Copy(group.CollisionOnlyIndices, 0, indices, group.Indices.Length, group.CollisionOnlyIndices.Length);
                 var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs.Count >= 1 ? group.UVs[0].AsArray() : null,
                     indices, group.Vertices.Length, group.Indices.Length,
                     group.UVs.Count >= 2 ? group.UVs[1].AsArray() : null, group.VertexColors?.AsArray());
-                
+                await engine.EnterGameLoop;
+
                 var wmoMesh = meshManager.CreateMesh(wmoMeshData);
                 
                 wmoMesh.SetSubmeshCount(group.Batches.Length + 1); // + 1 for collision only submesh

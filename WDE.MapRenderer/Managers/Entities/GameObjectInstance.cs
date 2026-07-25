@@ -82,28 +82,22 @@ public class GameObjectInstance : WorldObjectInstance
                 _textureTransforms = textureTransformsBuffer
             };
             entityManager.SetManagedComponent(objectEntity, masterAnimation);
-            entityManager.SetManagedComponent(objectEntity, new MdxRenderer(m2Instance));
+            entityManager.SetManagedComponent(objectEntity, new MdxRenderer(m2Instance) { Owner = objectEntity });
 
             // optimization here, we can share the render data, because we know all the materials will be the same shader
             BaseMaterial = m2Instance.materials[0].material;
 
+            var materialInstanceRenderData = new MaterialInstanceRenderData();
+            materialInstanceRenderData.SetBuffer("boneMatrices", boneMatricesBuffer);
+            materialInstanceRenderData.SetBuffer("vertexColors", colorBuffer);
+            materialInstanceRenderData.SetBuffer("textureTransforms", textureTransformsBuffer);
+            entityManager.SetManagedComponent(objectEntity, materialInstanceRenderData);
+
             foreach (var material in m2Instance.materials)
             {
-                var materialInstanceRenderData = new MaterialInstanceRenderData();
-                materialInstanceRenderData.SetBuffer("boneMatrices", boneMatricesBuffer);
-                materialInstanceRenderData.SetBuffer("vertexColors", colorBuffer);
-                materialInstanceRenderData.SetBuffer("textureTransforms", textureTransformsBuffer);
-                materialInstanceRenderData.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
-
-                var renderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype, $"Renderer of {gameObjectTemplate?.Name}");
-                renderer.SetRenderer(entityManager, m2Instance.mesh, material.submesh, material.material);
-                renderer.SetCopyParentTransform(entityManager, objectEntity);
-                renderer.SetDirtyPosition(entityManager);
-                renderer.SetRenderLayer(entityManager, renderLayer);
-                entityManager.SetManagedComponent(renderer, materialInstanceRenderData);
-            
-                renderers.Add(renderer);
-            }            
+                objectEntity.SetRenderer(entityManager, m2Instance.mesh, material.submesh, material.material,
+                    new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0));
+            }
         }
         else if (wmoInstance != null)
         {
@@ -115,16 +109,8 @@ public class GameObjectInstance : WorldObjectInstance
                     var material = batch.Item2[index];
                     // optimization here, we can share the render data, because we know all the materials will be the same shader
                     BaseMaterial = material;
-                    
-                    var renderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype, $"Renderer of {gameObjectTemplate?.Name}");
-                    renderer.SetRenderer(entityManager, batch.Item1, index, material);
-                    renderer.SetCopyParentTransform(entityManager, objectEntity);
-                    renderer.SetDirtyPosition(entityManager);
-                    renderer.SetRenderLayer(entityManager, renderLayer);
-                    var materialInstanceRenderData = new MaterialInstanceRenderData();
-                    entityManager.SetManagedComponent(renderer, materialInstanceRenderData);
-            
-                    renderers.Add(renderer);
+
+                    objectEntity.SetRenderer(entityManager, batch.Item1, index, material);
                 }
             }
         }
@@ -148,15 +134,11 @@ public class GameObjectInstance : WorldObjectInstance
         foreach (var entity in handles)
             entityManager.DestroyEntity(entity);
 
-        foreach (var entity in renderers)
-            entityManager.DestroyEntity(entity);
-        
         foreach (var collider in colliders)
             entityManager.DestroyEntity(collider);
         
         colliders.Clear();
         handles.Clear();
-        renderers.Clear();
         
         foreach (var buf in bonesBuffers)
         {

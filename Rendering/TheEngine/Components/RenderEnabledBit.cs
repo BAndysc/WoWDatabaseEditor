@@ -11,7 +11,6 @@ namespace TheEngine.Components
     {
         public Dictionary<string, INativeBuffer>? bufferByName { get; private set; }
         public Dictionary<GlobalUniformHandle, INativeBuffer>? structuredBuffers { get; private set; }
-        public Int4 InstanceData { get; set; }
 
         public INativeBuffer? GetBuffer(string name)
         {

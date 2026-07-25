@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using NUnit.Framework;
 using TheEngine.ECS;
+using TheEngine.Managers;
 using TheMaths;
 
 namespace TheEngine.Test.ECS
@@ -47,7 +48,7 @@ namespace TheEngine.Test.ECS
         [SetUp]
         public void Setup()
         {
-            entityManager = new EntityManager();
+            entityManager = new EntityManager(new StatsManager(), null!);
             archetype = entityManager.NewArchetype()
                 .WithComponentData<Position>()
                 .WithComponentData<Velocity>();
@@ -63,7 +64,7 @@ namespace TheEngine.Test.ECS
                 });
             }
             
-            archetype.ForEach<Position, Velocity>((itr, start, end, positions, velocities) =>
+            archetype.ForEach<Position, Velocity>((itr, thread, start, end, positions, velocities) =>
             {
                 for (int i = start; i < end; ++i)
                 {
@@ -78,7 +79,7 @@ namespace TheEngine.Test.ECS
         public void EcsFasterThanOop()
         {
             // warmup
-            archetype.ForEach<Position, Velocity>((itr, start, end, positions, velocities) =>
+            archetype.ForEach<Position, Velocity>((itr, thread, start, end, positions, velocities) =>
             {
                 for (int i = start; i < end; ++i)
                 {
@@ -91,7 +92,7 @@ namespace TheEngine.Test.ECS
             var stopWatch = new Stopwatch();
             stopWatch.Start();
             
-            archetype.ForEach<Position, Velocity>((itr, start, end, positions, velocities) =>
+            archetype.ForEach<Position, Velocity>((itr, thread, start, end, positions, velocities) =>
             {
                 for (int i = start; i < end; ++i)
                 {
@@ -117,7 +118,7 @@ namespace TheEngine.Test.ECS
         public void ParallelForFasterThanSequential()
         {
             // warmup
-            archetype.ForEach<Position, Velocity>((itr, start, end, positions, velocities) =>
+            archetype.ForEach<Position, Velocity>((itr, thread, start, end, positions, velocities) =>
             {
                 for (int i = start; i < end; ++i)
                     positions[i].position += velocities[i].velocity;
@@ -130,7 +131,7 @@ namespace TheEngine.Test.ECS
             
             var stopWatch = new Stopwatch();
             stopWatch.Start();
-            archetype.ForEach<Position, Velocity>((itr, start, end, positions, velocities) =>
+            archetype.ForEach<Position, Velocity>((itr, thread, start, end, positions, velocities) =>
             {
                 for (int i = start; i < end; ++i)
                     positions[i].position += velocities[i].velocity;

@@ -22,7 +22,9 @@ namespace WDE.MapRenderer.Managers.Entities;
 public class MdxRenderer : IManagedComponentData
 {
     public readonly M2 Model;
-    public List<(int, Entity)> Geosets = new();
+    // maps a geoset id to an index within the Owner's MeshRenderer array component
+    public List<(int geoset, int rendererIndex)> Geosets = new();
+    public Entity Owner;
     public readonly FileId ModelFileId;
     public readonly uint DisplayId;
 
@@ -57,16 +59,20 @@ public class MdxRendererInspector : IInspectorDrawer<MdxRenderer>
         Encoding.ASCII.GetBytes(component.ModelFileId.ToString(), ModelBufferString);
         ImGui.InputText("Model: ", ModelBufferString, (uint)ModelBufferString.Length);
         ImGui.Text($"Display ID: {component.DisplayId}");
-        var groupedGeosets = component.Geosets.GroupBy(x => x.Item1).OrderBy(x => x.Key).ToList();
-        foreach (var group in groupedGeosets)
+        if (component.Owner != Entity.Empty && component.Geosets.Count > 0)
         {
-            var geoset = group.Key;
-            var isRendered = !entityManager.GetComponent<RenderEnabledBit>(group.First().Item2).IsForceDisabled();
-            if (ImGui.Checkbox($"Geoset {geoset}", ref isRendered))
+            var renderers = entityManager.GetArrayComponents<MeshRenderer>(component.Owner);
+            var groupedGeosets = component.Geosets.GroupBy(x => x.geoset).OrderBy(x => x.Key).ToList();
+            foreach (var group in groupedGeosets)
             {
-                foreach (var (_, entity) in group)
+                var geoset = group.Key;
+                var isRendered = !renderers[group.First().rendererIndex].Hidden;
+                if (ImGui.Checkbox($"Geoset {geoset}", ref isRendered))
                 {
-                    entityManager.GetComponent<RenderEnabledBit>(entity).SetDisabled(!isRendered);
+                    foreach (var (_, rendererIndex) in group)
+                    {
+                        renderers[rendererIndex].Hidden = !isRendered;
+                    }
                 }
             }
         }
@@ -192,10 +198,10 @@ public class CreatureInstance : WorldObjectInstance
     private class MountData
     {
         public MdxManager.MdxInstance mdxInstance; // to keep reference to the mesh
-        public NativeBuffer<Matrix4x4> boneMatricesBuffer;
-        public NativeBuffer<Matrix4x4> textureTransformsBuffer;
-        public NativeBuffer<Vector4> colorBuffer;
-        public Entity mountAnimationEntity;
+        public INativeBuffer<Matrix4x4> boneMatricesBuffer;
+        public INativeBuffer<Matrix4x4> textureTransformsBuffer;
+        public INativeBuffer<Vector4> colorBuffer;
+        public Entity mountEntity;
         public SmallList<Entity> renderers;
 
         public void Destroy(IEntityManager entityManager)
@@ -204,7 +210,7 @@ public class CreatureInstance : WorldObjectInstance
             {
                 entityManager.DestroyEntity(entity);
             }
-            entityManager.DestroyEntity(mountAnimationEntity);
+            entityManager.DestroyEntity(mountEntity);
             boneMatricesBuffer.Dispose();
             textureTransformsBuffer.Dispose();
             colorBuffer.Dispose();
@@ -237,39 +243,33 @@ public class CreatureInstance : WorldObjectInstance
             mountData.textureTransformsBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferPixelOnly, 1, BufferInternalFormat.Float4);
             mountData.textureTransformsBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(value.model.texture_transforms.Length + 1).Span);
 
-            mountData.mountAnimationEntity = entityManager.CreateEntity(archetypes.AttachmentsAnimationRootArchetype, "Mount"u8);
-            mountData.mountAnimationEntity.SetCopyParentTransform(entityManager, objectEntity);
-            mountData.mountAnimationEntity.SetDirtyPosition(entityManager);
-            mountData.mountAnimationEntity.SetRenderLayer(entityManager, renderLayer);
-            var mountAnimationData = entityManager.SetManagedComponent(mountData.mountAnimationEntity, new M2AnimationComponentData(value.model)
+            mountData.mountEntity = entityManager.CreateEntity(archetypes.AttachmentArchetype, "Mount"u8);
+            mountData.mountEntity.SetCopyParentTransform(entityManager, objectEntity);
+            mountData.mountEntity.SetDirtyPosition(entityManager);
+            mountData.mountEntity.SetRenderLayer(entityManager, renderLayer);
+            var mountAnimationData = entityManager.SetManagedComponent(mountData.mountEntity, new M2AnimationComponentData(value.model)
             {
                 SetNewAnimation = 0,
                 _buffer = mountData.boneMatricesBuffer,
                 _colors = mountData.colorBuffer,
                 _textureTransforms = mountData.textureTransformsBuffer
             });
-            entityManager.AddComponent(mountData.mountAnimationEntity, new ShareRenderEnabledBit(){OtherEntity = WorldObjectEntity});
-            entityManager.AddComponent(WorldObjectEntity, new ShareRenderEnabledBit(){OtherEntity = mountData.mountAnimationEntity});
-            entityManager.AddManagedComponent(mountData.mountAnimationEntity, new MdxRenderer(value));
+            entityManager.AddComponent(mountData.mountEntity, new ShareRenderEnabledBit(){OtherEntity = WorldObjectEntity});
+            entityManager.AddComponent(WorldObjectEntity, new ShareRenderEnabledBit(){OtherEntity = mountData.mountEntity});
+            entityManager.AddManagedComponent(mountData.mountEntity, new MdxRenderer(value) { Owner = mountData.mountEntity });
+            MaterialInstanceRenderData itemMaterialInstanceRenderData = new MaterialInstanceRenderData();
+            itemMaterialInstanceRenderData.SetBuffer("boneMatrices", mountData.boneMatricesBuffer);
+            itemMaterialInstanceRenderData.SetBuffer("vertexColors", mountData.colorBuffer);
+            itemMaterialInstanceRenderData.SetBuffer("textureTransforms", mountData.textureTransformsBuffer);
+            entityManager.SetManagedComponent(mountData.mountEntity, itemMaterialInstanceRenderData);
+            if (!isRenderingEnabled)
+                mountData.mountEntity.SetForceDisabledRendering(entityManager, true);
 
             foreach (var material in value.materials)
             {
-                MaterialInstanceRenderData itemMaterialInstanceRenderData = new MaterialInstanceRenderData();
-                itemMaterialInstanceRenderData.SetBuffer("boneMatrices", mountData.boneMatricesBuffer);
-                itemMaterialInstanceRenderData.SetBuffer("vertexColors", mountData.colorBuffer);
-                itemMaterialInstanceRenderData.SetBuffer("textureTransforms", mountData.textureTransformsBuffer);
-                itemMaterialInstanceRenderData.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
+                var instanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
 
-                var mountRenderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype, "Mount renderer"u8);
-                mountRenderer.SetRenderer(entityManager, value.mesh, material.submesh, material.material);
-                mountRenderer.SetCopyParentTransform(entityManager, objectEntity);
-                mountRenderer.SetDirtyPosition(entityManager);
-                mountRenderer.SetRenderLayer(entityManager, renderLayer);
-                entityManager.SetManagedComponent(mountRenderer, itemMaterialInstanceRenderData);
-                if (!isRenderingEnabled)
-                    mountRenderer.SetForceDisabledRendering(entityManager, true);
-
-                mountData.renderers.Add(mountRenderer);
+                mountData.mountEntity.SetRenderer(entityManager, value.mesh, material.submesh, material.material, instanceData);
             }
 
             masterAnimation.AttachedTo = mountAnimationData;
@@ -298,8 +298,6 @@ public class CreatureInstance : WorldObjectInstance
         }
 
         Mdx = instance;
-
-        instance.mesh.SaveToObj("object.obj");
 
         objectEntity = entityManager.CreateEntity(archetypes.AnimatedWorldObjectArchetype, unitName);
         objectEntity.SetTRS(entityManager, Vector3.Zero, Quaternion.Identity, instance.scale * (creatureTemplate?.Scale ?? 1) * Vector3.One);
@@ -334,26 +332,21 @@ public class CreatureInstance : WorldObjectInstance
                 AddAttachment(attachmentType, itemModel);
         }
 
-        var mdxRenderer = new MdxRenderer(instance);
+        materialInstanceRenderData = new MaterialInstanceRenderData();
+        materialInstanceRenderData.SetBuffer("boneMatrices", boneMatricesBuffer);
+        materialInstanceRenderData.SetBuffer("vertexColors", colorBuffer);
+        materialInstanceRenderData.SetBuffer("textureTransforms", textureTransformsBuffer);
+        entityManager.SetManagedComponent(objectEntity, materialInstanceRenderData);
+
+        var mdxRenderer = new MdxRenderer(instance) { Owner = objectEntity };
         entityManager.SetManagedComponent(objectEntity, mdxRenderer);
         foreach (var material in instance.materials)
         {
-            materialInstanceRenderData = new MaterialInstanceRenderData();
-            materialInstanceRenderData.SetBuffer("boneMatrices", boneMatricesBuffer);
-            materialInstanceRenderData.SetBuffer("vertexColors", colorBuffer);
-            materialInstanceRenderData.SetBuffer("textureTransforms", textureTransformsBuffer);
-            materialInstanceRenderData.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
+            var instanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
 
-            var renderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype, $"Renderer of {unitName}");
-            renderer.SetRenderer(entityManager, instance.mesh, material.submesh, material.material);
-            renderer.SetCopyParentTransform(entityManager, objectEntity);
-            renderer.SetDirtyPosition(entityManager);
-            renderer.SetRenderLayer(entityManager, renderLayer);
-            renderer.SetForceDisabledRendering(entityManager, !material.batch.activeByDefault);
-            entityManager.SetManagedComponent(renderer, materialInstanceRenderData);
-
-            mdxRenderer.Geosets.Add((material.batch.geoset, renderer));
-            renderers.Add(renderer);
+            var rendererIndex = objectEntity.SetRenderer(entityManager, instance.mesh, material.submesh, material.material, instanceData,
+                hidden: !material.batch.activeByDefault);
+            mdxRenderer.Geosets.Add((material.batch.geoset, rendererIndex));
         }
 
         var size = instance.mesh.Bounds.Size / 2;
@@ -445,37 +438,30 @@ public class CreatureInstance : WorldObjectInstance
         bonesBuffers.Add(itemTextureTransformsBuffer);
         itemTextureTransformsBuffer.UpdateBuffer(AnimationSystem.IdentityMatrix(itemModel.model.texture_transforms.Length + 1).Span);
 
-        var itemAnimationEntity = entityManager.CreateEntity(archetypes.AttachmentsAnimationRootArchetype, $"Item of {unitName}");
-        itemAnimationEntity.SetCopyParentTransform(entityManager, objectEntity);
-        itemAnimationEntity.SetDirtyPosition(entityManager);
-        itemAnimationEntity.SetRenderLayer(entityManager, renderLayer);
-        entityManager.SetManagedComponent(itemAnimationEntity, new M2AnimationComponentData(itemModel.model, masterAnimation, attachmentType)
+        var itemEntity = entityManager.CreateEntity(archetypes.AttachmentArchetype, $"Item of {unitName}");
+        itemEntity.SetCopyParentTransform(entityManager, objectEntity);
+        itemEntity.SetDirtyPosition(entityManager);
+        itemEntity.SetRenderLayer(entityManager, renderLayer);
+        entityManager.SetManagedComponent(itemEntity, new M2AnimationComponentData(itemModel.model, masterAnimation, attachmentType)
         {
             SetNewAnimation = 0,
             _buffer = itemBoneMatricesBuffer,
             _colors = itemColorBuffer,
             _textureTransforms = itemTextureTransformsBuffer
         });
-        handles.Add(itemAnimationEntity);
-        
+        handles.Add(itemEntity);
+        MaterialInstanceRenderData itemMaterialInstanceRenderData = new MaterialInstanceRenderData();
+        itemMaterialInstanceRenderData.SetBuffer("boneMatrices", itemBoneMatricesBuffer);
+        itemMaterialInstanceRenderData.SetBuffer("vertexColors", itemColorBuffer);
+        itemMaterialInstanceRenderData.SetBuffer("textureTransforms", itemTextureTransformsBuffer);
+        entityManager.SetManagedComponent(itemEntity, itemMaterialInstanceRenderData);
+        if (!isRenderingEnabled)
+            itemEntity.SetForceDisabledRendering(entityManager, true);
+
         foreach (var material in itemModel.materials)
         {
-            MaterialInstanceRenderData itemMaterialInstanceRenderData = new MaterialInstanceRenderData();
-            itemMaterialInstanceRenderData.SetBuffer("boneMatrices", itemBoneMatricesBuffer);
-            itemMaterialInstanceRenderData.SetBuffer("vertexColors", itemColorBuffer);
-            itemMaterialInstanceRenderData.SetBuffer("textureTransforms", itemTextureTransformsBuffer);
-            itemMaterialInstanceRenderData.InstanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
-
-            var itemRenderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype, $"Item renderer of {unitName}");
-            itemRenderer.SetRenderer(entityManager, itemModel.mesh, material.submesh, material.material);
-            itemRenderer.SetCopyParentTransform(entityManager, objectEntity);
-            itemRenderer.SetDirtyPosition(entityManager);
-            itemRenderer.SetRenderLayer(entityManager, renderLayer);
-            entityManager.SetManagedComponent(itemRenderer, itemMaterialInstanceRenderData);
-            if (!isRenderingEnabled)
-                itemRenderer.SetForceDisabledRendering(entityManager, true);
-
-            renderers.Add(itemRenderer);
+            var instanceData = new Int4(material.batch.colorIndex, material.batch.textureTransformIndex, material.batch.textureTransformIndex2, 0);
+            itemEntity.SetRenderer(entityManager, itemModel.mesh, material.submesh, material.material, instanceData);
         }
     }
 
@@ -525,15 +511,11 @@ public class CreatureInstance : WorldObjectInstance
         foreach (var entity in handles)
             entityManager.DestroyEntity(entity);
 
-        foreach (var entity in renderers)
-            entityManager.DestroyEntity(entity);
-        
         foreach (var collider in colliders)
             entityManager.DestroyEntity(collider);
         
         colliders.Clear();
         handles.Clear();
-        renderers.Clear();
         
         foreach (var buf in bonesBuffers)
         {
