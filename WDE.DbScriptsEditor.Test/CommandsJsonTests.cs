@@ -42,6 +42,81 @@ namespace WDE.DbScriptsEditor.Test
         }
 
         [Test]
+        public void ValueZeroVariants_ReadContextually()
+        {
+            // faction 0 => reset (engine ClearTemporaryFaction), morph/mount 0 => demorph/dismount,
+            // kill-credit 0 => dynamic. The readable must reflect the value, not say "… 0".
+            void Check(uint command, long datalong, string expectContains)
+            {
+                var (_, description, variant) = manager.GetCommand(command).Resolve(new FakeLine { Command = command, DataLong = (uint)datalong });
+                Assert.IsNotNull(variant, $"command {command} datalong={datalong} should resolve a variant");
+                StringAssert.Contains(expectContains, description);
+            }
+            Check(22, 0, "Reset faction");
+            Check(23, 0, "Demorph");
+            Check(24, 0, "Dismount");
+            Check(8, 0, "{creature}"); // involved-creature variant resolves the source-or-target creature
+
+            var (_, faction5, v5) = manager.GetCommand(22).Resolve(new FakeLine { Command = 22, DataLong = 5 });
+            Assert.IsNull(v5, "nonzero faction should be the base 'Set faction' reading");
+            StringAssert.Contains("Set faction", faction5);
+
+            // morph entry 0 wins over the 0x8 display-id variant (engine checks entry==0 first)
+            var (_, demorph, _) = manager.GetCommand(23).Resolve(new FakeLine { Command = 23, DataLong = 0, DataFlags = 0x8 });
+            StringAssert.Contains("Demorph", demorph);
+        }
+
+        [Test]
+        public void LoneTargetCommands_AreTargetOnly()
+        {
+            // drives the editor's "present lone target as source" swap (settings-gated)
+            foreach (var id in new uint[] { 40, 41, 43, 52 })
+            {
+                var def = manager.GetCommand(id);
+                Assert.IsTrue(def.EffectiveUsesTarget(null), $"command {id} should use a target");
+                Assert.IsFalse(def.EffectiveUsesSource(null), $"command {id} should not use a source");
+            }
+            Assert.IsTrue(manager.GetCommand(13).EffectiveUsesSource(null), "ACTIVATE_OBJECT uses both");
+            Assert.IsTrue(manager.GetCommand(0).EffectiveUsesSource(null), "TALK uses a source");
+        }
+
+        [Test]
+        public void AcceptsNoSource_MatchesDeclaredTypes()
+        {
+            // drives the wizard's "(none)" source filter
+            Assert.IsTrue(manager.GetCommand(9).AcceptsNoSource,  "RESPAWN_GO declares ['GameObject','None']");
+            Assert.IsTrue(manager.GetCommand(31).AcceptsNoSource, "TERMINATE declares ['WorldObject','None']");
+            Assert.IsTrue(manager.GetCommand(53).AcceptsNoSource, "SET_WORLDSTATE declares ['None']");
+            Assert.IsFalse(manager.GetCommand(22).AcceptsNoSource, "SET_FACTION requires a creature source");
+            Assert.IsFalse(manager.GetCommand(0).AcceptsNoSource,  "TALK requires a source");
+        }
+
+        [Test]
+        public void Movement_TargetOnlyForWaypointAndSplineVariants()
+        {
+            var def = manager.GetCommand(20);
+            Assert.IsFalse(def.EffectiveUsesTarget(null), "base movement should not use a target");
+
+            (string variant, uint datalong, bool usesTarget)[] cases =
+            {
+                ("Movement: Idle", 0, false),
+                ("Movement: Random", 1, false),
+                ("Movement: Waypoint", 2, true),
+                ("Movement: Spline path", 3, true),
+                ("Movement: Linear waypoint", 4, false),
+                ("Movement: Jump", 15, false),
+                ("Movement: Fall", 18, false),
+            };
+            foreach (var (name, datalong, usesTarget) in cases)
+            {
+                var (_, _, variant) = def.Resolve(new FakeLine { Command = 20, DataLong = datalong });
+                Assert.IsNotNull(variant, $"variant for datalong {datalong} not resolved");
+                Assert.AreEqual(name, variant!.NameReadable);
+                Assert.AreEqual(usesTarget, def.EffectiveUsesTarget(variant), $"{name} target usage");
+            }
+        }
+
+        [Test]
         public void MoveTo_AdditionalFlag_ResolvesTeleportVariant()
         {
             var def = manager.GetCommand(3);

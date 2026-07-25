@@ -16,6 +16,9 @@ namespace WDE.DbScriptsEditor.Settings
     public interface IDbScriptEditorSettings
     {
         DbScriptAddFlow AddFlow { get; set; }
+        // Presentation-only: commands that use only a target (no source) show that single actor as
+        // the "source" in the editor (the DB row still uses the target slot). Default on; opt-out.
+        bool PresentLoneTargetAsSource { get; set; }
         void Apply();
     }
 
@@ -26,6 +29,8 @@ namespace WDE.DbScriptsEditor.Settings
         private struct Data : ISettings
         {
             public DbScriptAddFlow AddFlow;
+            // stored inverted so the serialized default (false) means the feature is ON
+            public bool DisableLoneTargetAsSource;
         }
 
         private readonly IUserSettings userSettings;
@@ -41,6 +46,12 @@ namespace WDE.DbScriptsEditor.Settings
         {
             get => currentData.AddFlow;
             set => currentData.AddFlow = value;
+        }
+
+        public bool PresentLoneTargetAsSource
+        {
+            get => !currentData.DisableLoneTargetAsSource;
+            set => currentData.DisableLoneTargetAsSource = !value;
         }
 
         public void Apply() => userSettings.Update(currentData);

@@ -42,7 +42,7 @@
         "destination": "datalong"
       }
     ],
-    "description": "{source}: Say {Random template:choose(0):{Text}|{Random template}} to {target}"
+    "description": "{source}: Say {datalongValue:choose(0):{dataint}{dataint2Value:choose(0):| or {dataint2}}{dataint3Value:choose(0):| or {dataint3}}{dataint4Value:choose(0):| or {dataint4}}|{datalong}} to {target}"
   },
   {
     "id": 1,
@@ -55,7 +55,6 @@
       "Unit"
     ],
     "target_types": [
-      "Unit",
       "None"
     ],
     "buddy": "creature",
@@ -87,7 +86,7 @@
         "destination": "dataint4"
       }
     ],
-    "description": "{source}: Play emote {Emote}"
+    "description": "{source}: Play emote {datalong}{dataintValue:choose(0):| or {dataint}}{dataint2Value:choose(0):| or {dataint2}}{dataint3Value:choose(0):| or {dataint3}}{dataint4Value:choose(0):| or {dataint4}}"
   },
   {
     "id": 2,
@@ -116,7 +115,7 @@
         "destination": "datalong2"
       }
     ],
-    "description": "{source}: Set field {Field id} to {Value}"
+    "description": "{source}: Set field {datalong} to {datalong2}"
   },
   {
     "id": 3,
@@ -126,9 +125,10 @@
     "search_tags": "move goto position point walk teleport respawn home",
     "group": "Movement",
     "source_types": [
-      "Creature"
+      "Unit"
     ],
     "target_types": [
+      "Unit",
       "None"
     ],
     "buddy": "creature",
@@ -185,14 +185,14 @@
         "destination": "dataint2"
       }
     ],
-    "description": "{source}: Move to ({X}, {Y}, {Z})",
+    "description": "{source}: Move to ({x}, {y}, {z})",
     "variants": [
       {
         "name_readable": "Teleport to position",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "{source}: Teleport to ({X}, {Y}, {Z})"
+        "description": "{source}: Teleport to ({x}, {y}, {z})"
       },
       {
         "name_readable": "Move to respawn position",
@@ -265,7 +265,7 @@
         "destination": "datalong2"
       }
     ],
-    "description": "{source}: {Field id} |= {Bitmask}"
+    "description": "{source}: Set flag {datalong2} on field {datalong}"
   },
   {
     "id": 5,
@@ -294,7 +294,7 @@
         "destination": "datalong2"
       }
     ],
-    "description": "{source}: Remove flag {Bitmask} from field {Field id}"
+    "description": "{source}: Remove flag {datalong2} from field {datalong}"
   },
   {
     "id": 6,
@@ -339,7 +339,8 @@
         "destination": "o"
       }
     ],
-    "description": "{source}: Teleport to {Map} ({X}, {Y}, {Z}, {O})"
+    "description": "{player}: Teleport to map {datalong} at ({x}, {y}, {z})",
+    "player_source_or_target": true
   },
   {
     "id": 7,
@@ -368,7 +369,8 @@
         "destination": "datalong2"
       }
     ],
-    "description": "{source}: Give quest explored credit for {Quest}{Max distance:choose(0):| (within {Max distance} yd)}"
+    "description": "{player}: Gain quest explored credit for {datalong}{datalong2Value:choose(0):| (within {datalong2} yd)}",
+    "player_source_or_target": true
   },
   {
     "id": 8,
@@ -381,6 +383,7 @@
       "Player"
     ],
     "target_types": [
+      "Unit",
       "None"
     ],
     "buddy": "creature",
@@ -396,7 +399,17 @@
         "destination": "datalong2"
       }
     ],
-    "description": "Give player kill credit for {Creature}"
+    "description": "{player}: Gain {datalong2Value:choose(0):solo|group} kill credit for {datalong}",
+    "player_source_or_target": true,
+    "variants": [
+      {
+        "name_readable": "Kill credit (involved creature)",
+        "preset": {
+          "datalong": "0"
+        },
+        "description": "{player}: Gain {datalong2Value:choose(0):solo|group} kill credit for {creature}"
+      }
+    ]
   },
   {
     "id": 9,
@@ -406,10 +419,10 @@
     "search_tags": "respawn spawn gameobject go chest",
     "group": "GameObjects",
     "source_types": [
-      "WorldObject"
+      "GameObject",
+      "None"
     ],
     "target_types": [
-      "GameObject",
       "None"
     ],
     "buddy": "gameobject",
@@ -425,7 +438,16 @@
         "destination": "datalong2"
       }
     ],
-    "description": "Respawn gameobject {Gameobject}"
+    "description": "{datalong}: Respawn",
+    "variants": [
+      {
+        "name_readable": "Respawn the source gameobject",
+        "preset": {
+          "datalong": "0"
+        },
+        "description": "{source}: Respawn"
+      }
+    ]
   },
   {
     "id": 10,
@@ -438,6 +460,7 @@
       "WorldObject"
     ],
     "target_types": [
+      "WorldObject",
       "None"
     ],
     "buddy": "creature",
@@ -495,14 +518,14 @@
         "destination": "o"
       }
     ],
-    "description": "Summon creature {Creature} at ({X}, {Y}, {Z})",
+    "description": "{source}: Summon creature {datalong} at ({x}, {y}, {z})",
     "variants": [
       {
         "name_readable": "Summon creature (as active object)",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "Summon creature {Creature} at ({X}, {Y}, {Z}) as active object"
+        "description": "{source}: Summon creature {datalong} at ({x}, {y}, {z}) as active object"
       }
     ]
   },
@@ -514,7 +537,8 @@
     "search_tags": "open door button gameobject gate",
     "group": "GameObjects",
     "source_types": [
-      "WorldObject"
+      "GameObject",
+      "None"
     ],
     "target_types": [
       "GameObject",
@@ -538,7 +562,16 @@
         "destination": "datalong3"
       }
     ],
-    "description": "Open door {Gameobject}"
+    "description": "{datalong}: Open door",
+    "variants": [
+      {
+        "name_readable": "Open the source door",
+        "preset": {
+          "datalong": "0"
+        },
+        "description": "{source}: Open door"
+      }
+    ]
   },
   {
     "id": 12,
@@ -548,7 +581,8 @@
     "search_tags": "close door button gameobject gate",
     "group": "GameObjects",
     "source_types": [
-      "WorldObject"
+      "GameObject",
+      "None"
     ],
     "target_types": [
       "GameObject",
@@ -572,7 +606,16 @@
         "destination": "datalong3"
       }
     ],
-    "description": "Close door {Gameobject}"
+    "description": "{datalong}: Close door",
+    "variants": [
+      {
+        "name_readable": "Close the source door",
+        "preset": {
+          "datalong": "0"
+        },
+        "description": "{source}: Close door"
+      }
+    ]
   },
   {
     "id": 13,
@@ -609,7 +652,7 @@
             "destination": "datalong"
           }
         ],
-        "description": "{target}: Play custom anim {Anim id}"
+        "description": "{target}: Play custom anim {datalong}"
       }
     ]
   },
@@ -624,6 +667,7 @@
       "Unit"
     ],
     "target_types": [
+      "Unit",
       "None"
     ],
     "buddy": "creature",
@@ -657,14 +701,14 @@
         }
       }
     ],
-    "description": "{source}: Remove aura {Spell}",
+    "description": "{source}: Remove {datalong2Value:choose(1|2):one charge of |one stack of |}aura {datalong}",
     "variants": [
       {
         "name_readable": "Remove aura cast by script target",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "{source}: Remove aura {Spell} cast by {target}"
+        "description": "{source}: Remove aura {datalong} cast by {target}"
       }
     ]
   },
@@ -676,10 +720,10 @@
     "search_tags": "cast spell trigger",
     "group": "Spells & Auras",
     "source_types": [
-      "Unit"
+      "WorldObject"
     ],
     "target_types": [
-      "Unit",
+      "WorldObject",
       "None"
     ],
     "buddy": "creature",
@@ -722,14 +766,14 @@
         "destination": "dataint4"
       }
     ],
-    "description": "{source}: Cast {Spell} on {target}",
+    "description": "{source}: Cast {datalong}{dataintValue:choose(0):| or {dataint}}{dataint2Value:choose(0):| or {dataint2}}{dataint3Value:choose(0):| or {dataint3}}{dataint4Value:choose(0):| or {dataint4}} on {target}",
     "variants": [
       {
         "name_readable": "Cast spell (without target)",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "{source}: Cast {Spell} without a target"
+        "description": "{source}: Cast {datalong} without a target"
       }
     ]
   },
@@ -772,14 +816,14 @@
         "destination": "datalong3"
       }
     ],
-    "description": "{source}: Play sound {Sound}",
+    "description": "{source}: Play sound {datalong}",
     "variants": [
       {
         "name_readable": "Play music",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "{source}: Play music {Sound}"
+        "description": "{source}: Play music {datalong}"
       }
     ]
   },
@@ -818,16 +862,17 @@
         "required": true
       }
     ],
-    "description": "Give player {Amount}x {Item}",
+    "description": "{player}: Receive {datalong2}x {datalong}",
     "variants": [
       {
         "name_readable": "Take item",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "Take {Amount}x {Item} from player"
+        "description": "{player}: Lose {datalong2}x {datalong}"
       }
-    ]
+    ],
+    "player_source_or_target": true
   },
   {
     "id": 18,
@@ -837,7 +882,7 @@
     "search_tags": "despawn self remove creature",
     "group": "Spawning & Despawning",
     "source_types": [
-      "WorldObject",
+      "Creature",
       "None"
     ],
     "target_types": [
@@ -851,7 +896,7 @@
         "destination": "datalong"
       }
     ],
-    "description": "{target}: Despawn"
+    "description": "{target}: Despawn{datalongValue:choose(0):| after {datalong}}"
   },
   {
     "id": 19,
@@ -876,7 +921,8 @@
         "required": true
       }
     ],
-    "description": "Play movie {Movie} for player"
+    "description": "{player}: Watch movie {datalong}",
+    "player_source_or_target": true
   },
   {
     "id": 20,
@@ -889,7 +935,6 @@
       "Creature"
     ],
     "target_types": [
-      "WorldObject",
       "None"
     ],
     "buddy": "creature",
@@ -958,9 +1003,14 @@
         "name": "Speed",
         "type": "FloatParameter",
         "destination": "speed"
+      },
+      {
+        "name": "Replace current movement",
+        "type": "BoolParameter",
+        "destination": "dataint2"
       }
     ],
-    "description": "{source}: Set movement type {Movement type}",
+    "description": "{source}: Change movement generator to type {datalong}",
     "variants": [
       {
         "name_readable": "Movement: Idle",
@@ -968,7 +1018,7 @@
           "datalong": "0"
         },
         "parameters": [],
-        "description": "{source}: Stop movement (idle)"
+        "description": "{source}: Stop moving and stand idle"
       },
       {
         "name_readable": "Movement: Random",
@@ -997,7 +1047,7 @@
             "destination": "dataint2"
           }
         ],
-        "description": "{source}: Random movement (wander {Wander distance})"
+        "description": "{source}: Wander randomly within {datalong2} yd{dataint2Value:choose(0):| replacing current movement}"
       },
       {
         "name_readable": "Movement: Waypoint",
@@ -1021,7 +1071,11 @@
             "destination": "dataint"
           }
         ],
-        "description": "{source}: Waypoint movement (path {Path id})"
+        "description": "{source}: Follow waypoint path {datalong2}",
+        "target_types": [
+          "WorldObject",
+          "None"
+        ]
       },
       {
         "name_readable": "Movement: Spline path",
@@ -1060,7 +1114,11 @@
             "destination": "datafloat"
           }
         ],
-        "description": "{source}: Spline path movement (path {Path id})"
+        "description": "{source}: Follow spline path {datalong2}",
+        "target_types": [
+          "WorldObject",
+          "None"
+        ]
       },
       {
         "name_readable": "Movement: Linear waypoint",
@@ -1084,7 +1142,7 @@
             "destination": "dataint"
           }
         ],
-        "description": "{source}: Linear waypoint movement (path {Path id})"
+        "description": "{source}: Follow linear waypoint path {datalong2}"
       },
       {
         "name_readable": "Movement: Jump",
@@ -1123,7 +1181,7 @@
             "destination": "datalong2"
           }
         ],
-        "description": "{source}: Jump to ({X}, {Y}, {Z})"
+        "description": "{source}: Jump to ({x}, {y}, {z})"
       },
       {
         "name_readable": "Movement: Fall",
@@ -1149,7 +1207,8 @@
     "search_tags": "active object grid keep loaded",
     "group": "Advanced/Raw",
     "source_types": [
-      "WorldObject"
+      "Creature",
+      "GameObject"
     ],
     "target_types": [
       "None"
@@ -1162,7 +1221,7 @@
         "destination": "datalong"
       }
     ],
-    "description": "{source}: Set active object = {Active}"
+    "description": "{source}: {datalongValue:choose(0):Clear|Set} active-object state"
   },
   {
     "id": 22,
@@ -1190,7 +1249,16 @@
         "destination": "datalong2"
       }
     ],
-    "description": "{source}: Set faction {Faction}"
+    "description": "{source}: Set faction {datalong}",
+    "variants": [
+      {
+        "name_readable": "Reset faction",
+        "preset": {
+          "datalong": "0"
+        },
+        "description": "{source}: Reset faction to default"
+      }
+    ]
   },
   {
     "id": 23,
@@ -1219,8 +1287,15 @@
         "destination": "datalong"
       }
     ],
-    "description": "{source}: Morph into creature {Creature}",
+    "description": "{source}: Morph into creature {datalong}",
     "variants": [
+      {
+        "name_readable": "Demorph",
+        "preset": {
+          "datalong": "0"
+        },
+        "description": "{source}: Demorph (restore default model)"
+      },
       {
         "name_readable": "Morph to display id",
         "preset": {
@@ -1233,7 +1308,7 @@
             "destination": "datalong"
           }
         ],
-        "description": "{source}: Morph into model {Display id}"
+        "description": "{source}: Morph into model {datalong}"
       }
     ]
   },
@@ -1269,8 +1344,15 @@
         "destination": "datalong2"
       }
     ],
-    "description": "{source}: Mount on creature {Creature}",
+    "description": "{source}: Mount on creature {datalong}",
     "variants": [
+      {
+        "name_readable": "Dismount",
+        "preset": {
+          "datalong": "0"
+        },
+        "description": "{source}: Dismount"
+      },
       {
         "name_readable": "Mount to display id",
         "preset": {
@@ -1288,7 +1370,7 @@
             "destination": "datalong2"
           }
         ],
-        "description": "{source}: Mount on model {Display id}"
+        "description": "{source}: Mount on model {datalong}"
       }
     ]
   },
@@ -1313,7 +1395,7 @@
         "destination": "datalong"
       }
     ],
-    "description": "{source}: Set run = {Run}"
+    "description": "{source}: Switch to {datalongValue:choose(0):walking|running}"
   },
   {
     "id": 26,
@@ -1354,7 +1436,7 @@
         "required": true
       }
     ],
-    "description": "{source}: Set lock state {Lock state}"
+    "description": "{source}: Set lock state {datalong}"
   },
   {
     "id": 28,
@@ -1377,7 +1459,7 @@
         "destination": "datalong"
       }
     ],
-    "description": "{source}: Set stand state {Stand state}"
+    "description": "{source}: Set stand state {datalong}"
   },
   {
     "id": 29,
@@ -1417,7 +1499,7 @@
         }
       }
     ],
-    "description": "{source}: {Mode} NPC flags {NPC flags}"
+    "description": "{source}: {datalong2Value:choose(0|1):Remove|Add|Toggle} NPC flags {datalong}"
   },
   {
     "id": 30,
@@ -1442,7 +1524,8 @@
         "required": true
       }
     ],
-    "description": "Send player on taxi path {Taxi path}"
+    "description": "{player}: Take taxi path {datalong}",
+    "player_source_or_target": true
   },
   {
     "id": 31,
@@ -1487,14 +1570,14 @@
         "destination": "dataint"
       }
     ],
-    "description": "Terminate script",
+    "description": "Terminate script{datalongValue:choose(0):| unless {datalong} is alive}{datalong2Value:choose(0):| within {datalong2} yd}{datalong3Value:choose(0):| (unless pool {datalong3} has a live creature)}",
     "variants": [
       {
         "name_readable": "Terminate script if creature found",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "Terminate script if {Search creature} is found within {Search distance} yd"
+        "description": "Terminate script{datalongValue:choose(0):| if {datalong} is alive}{datalong2Value:choose(0):| within {datalong2} yd}{datalong3Value:choose(0):| (if pool {datalong3} has a live creature)}"
       }
     ]
   },
@@ -1527,7 +1610,7 @@
         }
       }
     ],
-    "description": "{source}: {Pause} waypoint movement"
+    "description": "{source}: {datalong} waypoint movement"
   },
   {
     "id": 33,
@@ -1559,7 +1642,8 @@
         }
       }
     ],
-    "description": "{XP gain} XP gain for player"
+    "description": "{player}: {datalong} XP gain",
+    "player_source_or_target": true
   },
   {
     "id": 34,
@@ -1595,14 +1679,14 @@
         "destination": "datalong2"
       }
     ],
-    "description": "Terminate script when {Condition} is true",
+    "description": "Terminate script when {datalong} is true",
     "variants": [
       {
         "name_readable": "Terminate when condition is false",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "Terminate script when {Condition} is false"
+        "description": "Terminate script when {datalong} is false"
       }
     ]
   },
@@ -1638,7 +1722,7 @@
         "destination": "datalong3"
       }
     ],
-    "description": "{source}: Send AI event {AI event type} to {target}"
+    "description": "{source}: Send AI event {datalong} {datalong2Value:choose(0):to {target}|to friendly units within {datalong2} yd}"
   },
   {
     "id": 36,
@@ -1725,7 +1809,7 @@
         "destination": "o"
       }
     ],
-    "description": "{source}: Move to {target}"
+    "description": "{source}: {datalongValue:choose(0):Move next to {target}|Move to a random point {datalong2}-{datalong} yd from {target}}"
   },
   {
     "id": 38,
@@ -1735,7 +1819,7 @@
     "search_tags": "mail send letter money post",
     "group": "Quests & Players",
     "source_types": [
-      "WorldObject",
+      "Creature",
       "None"
     ],
     "target_types": [
@@ -1765,7 +1849,7 @@
         "destination": "dataint"
       }
     ],
-    "description": "Send mail {Mail template} to player"
+    "description": "Send mail {datalong} to {target}"
   },
   {
     "id": 39,
@@ -1794,14 +1878,14 @@
         "destination": "datalong"
       }
     ],
-    "description": "{source}: Set hover = {Hover}",
+    "description": "{source}: {datalongValue:choose(0):Disable|Enable} hovering",
     "variants": [
       {
         "name_readable": "Set hover and fly animation",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "{source}: Set hover and fly animation = {Hover}"
+        "description": "{source}: {datalongValue:choose(0):Disable|Enable} hovering and fly animation"
       }
     ]
   },
@@ -1813,7 +1897,6 @@
     "search_tags": "despawn gameobject go remove",
     "group": "GameObjects",
     "source_types": [
-      "WorldObject",
       "None"
     ],
     "target_types": [
@@ -1827,7 +1910,7 @@
         "destination": "datalong"
       }
     ],
-    "description": "Despawn gameobject {target}"
+    "description": "{target}: Despawn"
   },
   {
     "id": 41,
@@ -1837,7 +1920,6 @@
     "search_tags": "respawn revive creature spawn",
     "group": "Spawning & Despawning",
     "source_types": [
-      "WorldObject",
       "None"
     ],
     "target_types": [
@@ -1845,7 +1927,7 @@
     ],
     "buddy": "creature",
     "parameters": [],
-    "description": "Respawn {target}"
+    "description": "{target}: Respawn"
   },
   {
     "id": 42,
@@ -1883,7 +1965,16 @@
         "destination": "dataint3"
       }
     ],
-    "description": "{source}: Set equipment"
+    "description": "{source}: Equip main {dataint}, off {dataint2}, ranged {dataint3}",
+    "variants": [
+      {
+        "name_readable": "Reset to default",
+        "preset": {
+          "datalong": "1"
+        },
+        "description": "{source}: Reset equipment to creature_template"
+      }
+    ]
   },
   {
     "id": 43,
@@ -1893,7 +1984,6 @@
     "search_tags": "reset gameobject door button",
     "group": "GameObjects",
     "source_types": [
-      "WorldObject",
       "None"
     ],
     "target_types": [
@@ -1901,7 +1991,7 @@
     ],
     "buddy": "gameobject",
     "parameters": [],
-    "description": "Reset gameobject {target}"
+    "description": "{target}: Reset"
   },
   {
     "id": 44,
@@ -1925,7 +2015,7 @@
         "required": true
       }
     ],
-    "description": "{source}: Change entry to {New creature}"
+    "description": "{source}: Change entry to {datalong}"
   },
   {
     "id": 45,
@@ -1955,7 +2045,7 @@
         "destination": "datalong2"
       }
     ],
-    "description": "{Random template:choose(0):Start relay script {Relay}|Start {Random template}}"
+    "description": "{datalong2Value:choose(0):Start relay script {datalong}|Start {datalong2}}"
   },
   {
     "id": 46,
@@ -1999,7 +2089,7 @@
         "destination": "dataint3"
       }
     ],
-    "description": "{source}: Cast {Spell} on {target} with custom values"
+    "description": "{source}: Cast {datalong} on {target} with custom values"
   },
   {
     "id": 47,
@@ -2036,7 +2126,7 @@
         }
       }
     ],
-    "description": "{source}: Interrupt {Cast slot} spell"
+    "description": "{source}: Interrupt its {datalong} cast"
   },
   {
     "id": 48,
@@ -2076,7 +2166,7 @@
         }
       }
     ],
-    "description": "{source}: {Mode} unit flags {Unit flags}"
+    "description": "{source}: {datalong2} unit flags {datalong}"
   },
   {
     "id": 49,
@@ -2105,7 +2195,7 @@
         "destination": "datalong2"
       }
     ],
-    "description": "Set instance data {Data id} = {Value}"
+    "description": "Set instance data {datalong} = {datalong2}"
   },
   {
     "id": 50,
@@ -2122,7 +2212,7 @@
     ],
     "buddy": "creature",
     "parameters": [],
-    "description": "{source}: Pulse zone combat"
+    "description": "{source}: Enter combat with the whole zone"
   },
   {
     "id": 51,
@@ -2174,7 +2264,7 @@
         "destination": "datalong3"
       }
     ],
-    "description": "{target}: Spawn group subcommand {Subcommand}",
+    "description": "{target}: Spawn group subcommand {datalong}",
     "variants": [
       {
         "name_readable": "Formation: create",
@@ -2203,7 +2293,7 @@
             "destination": "x"
           }
         ],
-        "description": "{target}: Create formation for spawn group {Spawn group}"
+        "description": "{target}: Create {dataint} formation with spread {x} for {datalong2Value:choose(0):its own creature group|spawn group {datalong2}}"
       },
       {
         "name_readable": "Formation: remove",
@@ -2217,7 +2307,7 @@
             "destination": "datalong2"
           }
         ],
-        "description": "{target}: Remove formation from spawn group {Spawn group}"
+        "description": "{target}: Remove formation from {datalong2Value:choose(0):its own creature group|spawn group {datalong2}}"
       },
       {
         "name_readable": "Formation: switch shape",
@@ -2231,7 +2321,7 @@
             "destination": "datalong2"
           }
         ],
-        "description": "{target}: Switch formation shape to {Shape}"
+        "description": "{target}: Switch formation shape to {datalong2}"
       },
       {
         "name_readable": "Formation: set spread",
@@ -2245,7 +2335,7 @@
             "destination": "x"
           }
         ],
-        "description": "{target}: Set formation spread to {Spread}"
+        "description": "{target}: Set formation spread to {x}"
       },
       {
         "name_readable": "Formation: set options",
@@ -2259,7 +2349,7 @@
             "destination": "datalong2"
           }
         ],
-        "description": "{target}: Set formation options {Options}"
+        "description": "{target}: Set formation options to {datalong2}"
       }
     ]
   },
@@ -2271,7 +2361,6 @@
     "search_tags": "gossip menu set dialog",
     "group": "Unit State & Flags",
     "source_types": [
-      "WorldObject",
       "None"
     ],
     "target_types": [
@@ -2286,7 +2375,7 @@
         "required": true
       }
     ],
-    "description": "{target}: Set gossip menu {Gossip menu}"
+    "description": "{target}: Set gossip menu {datalong}"
   },
   {
     "id": 53,
@@ -2296,7 +2385,6 @@
     "search_tags": "worldstate set variable map",
     "group": "Advanced/Raw",
     "source_types": [
-      "WorldObject",
       "None"
     ],
     "target_types": [
@@ -2316,7 +2404,7 @@
         "destination": "dataint2"
       }
     ],
-    "description": "Set worldstate {Worldstate} = {Value}"
+    "description": "Set worldstate {dataint} = {dataint2}"
   },
   {
     "id": 54,
@@ -2339,7 +2427,7 @@
         "destination": "datalong"
       }
     ],
-    "description": "{source}: Set sheathe state {Sheathe state}"
+    "description": "{source}: Sheathe weapon as {datalong}"
   },
   {
     "id": 55,
@@ -2376,7 +2464,7 @@
         }
       }
     ],
-    "description": "{source}: {Action} string id {String id}"
+    "description": "{source}: {datalong2} string id {datalong}"
   },
   {
     "id": 56,
@@ -2422,7 +2510,7 @@
         "defaultVal": -1
       }
     ],
-    "description": "{source}: {Mode} vehicle accessories {Seat index:choose(-1):in all seats|in seat {Seat index}}{Mode:choose(2):| in {Recall radius} yd}"
+    "description": "{source}: {datalong} vehicle accessories {dataintValue:choose(-1):in all seats|in seat {dataint}}{datalongValue:choose(2):| in {datalong2} yd}"
   },
   {
     "id": 57,
@@ -2445,6 +2533,6 @@
         "destination": "datalong"
       }
     ],
-    "description": "{source}: Set anim tier {Anim tier}"
+    "description": "{source}: Set anim tier {datalong}"
   }
 ]

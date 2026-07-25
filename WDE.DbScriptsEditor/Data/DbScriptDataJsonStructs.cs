@@ -72,6 +72,14 @@ namespace WDE.DbScriptsEditor.Data
 
         [JsonProperty(PropertyName = "description")]
         public string? Description { get; set; }
+
+        // Override the command's source/target types for this variant (e.g. movement "Idle" has no
+        // target, while "Waypoint" does). Null (omitted) inherits the base command's types.
+        [JsonProperty(PropertyName = "source_types")]
+        public IList<string>? SourceTypes { get; set; }
+
+        [JsonProperty(PropertyName = "target_types")]
+        public IList<string>? TargetTypes { get; set; }
     }
 
     [ExcludeFromCodeCoverage]
@@ -107,6 +115,11 @@ namespace WDE.DbScriptsEditor.Data
 
         [JsonProperty(PropertyName = "buddy")]
         public string? Buddy { get; set; }
+
+        // The command acts on "the player" resolved as target-if-player-else-source (the core's
+        // GetPlayerTargetOrSourceAndLog). Lets the readable use the {player} token accurately.
+        [JsonProperty(PropertyName = "player_source_or_target")]
+        public bool PlayerSourceOrTarget { get; set; }
 
         [JsonProperty(PropertyName = "supports_additional_flag")]
         public bool SupportsAdditionalFlag { get; set; }

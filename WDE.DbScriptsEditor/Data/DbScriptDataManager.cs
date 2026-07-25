@@ -152,6 +152,8 @@ namespace WDE.DbScriptsEditor.Data
                         Presets = presets,
                         Parameters = v.Parameters != null ? vParams : null,
                         Description = v.Description,
+                        SourceTypes = v.SourceTypes?.ToList(),
+                        TargetTypes = v.TargetTypes?.ToList(),
                     });
                 }
                 // Most-specific first so Resolve() picks the tightest match.
@@ -170,6 +172,7 @@ namespace WDE.DbScriptsEditor.Data
                 SourceTypes = json.SourceTypes?.ToList() ?? new List<string>(),
                 TargetTypes = json.TargetTypes?.ToList() ?? new List<string>(),
                 Buddy = DbScriptBuddyCapabilities.Parse(json.Buddy),
+                PlayerFromSourceOrTarget = json.PlayerSourceOrTarget,
                 SupportsAdditionalFlag = json.SupportsAdditionalFlag,
                 AdditionalFlag = BuildAdditionalFlag(json, variants),
                 Parameters = baseParams,
@@ -291,14 +294,25 @@ namespace WDE.DbScriptsEditor.Data
         {
             if (string.IsNullOrEmpty(description))
                 return;
+            // Descriptions are SmartFormat templates that reference parameters by destination column
+            // ({datalong} for display, {datalongValue} for the raw value used by choose()).
+            var paramColumns = new HashSet<string>(
+                parameters.Select(p => DbScriptDestinations.ColumnName(p.Destination)), StringComparer.OrdinalIgnoreCase);
             foreach (Match m in TokenRegex.Matches(description))
             {
                 var token = m.Groups[1].Value.Trim();
-                if (token is "source" or "target")
+                // actor tokens: {source}/{target}, and {player}/{creature} which resolve to whichever
+                // of source/target is a player (target-preferred) / creature (source-preferred).
+                if (token is "source" or "target" or "player" or "creature")
                     continue;
-                if (parameters.Any(p => string.Equals(p.Name, token, StringComparison.OrdinalIgnoreCase)))
+                var col = token.EndsWith("Value", StringComparison.Ordinal) ? token[..^5] : token;
+                if (DbScriptDestinations.TryParse(col, out _))
+                {
+                    if (!paramColumns.Contains(col))
+                        warnings.Add($"{command.Name} ({where}): references column '{col}' but no parameter maps to it.");
                     continue;
-                warnings.Add($"{command.Name} ({where}): description references '{{{token}}}' which is not a parameter.");
+                }
+                warnings.Add($"{command.Name} ({where}): description references '{{{token}}}' which is not a parameter column.");
             }
         }
 

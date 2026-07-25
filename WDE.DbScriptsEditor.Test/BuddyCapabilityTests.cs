@@ -56,13 +56,15 @@ namespace WDE.DbScriptsEditor.Test
         private static BuddyDescriptor Buddy(bool isGameObject) =>
             new(BuddyFindMode.NearestByEntry, isGameObject, entry: 100, searchValue: 5, includeDespawned: false, allEligible: false);
 
-        private static readonly ScriptDirection PlainDirection =
-            new(SourceTargetKind.OriginalSource, SourceTargetKind.OriginalTarget);
+        // A step whose buddy occupies the source slot (so no dangling-buddy warning); inert bits 0.
+        private static DecodedFlags Decoded(BuddyDescriptor buddy) =>
+            new(new ScriptDirection(SourceTargetKind.Buddy, SourceTargetKind.OriginalTarget),
+                false, buddy, 0, DbScriptBuddyCapability.Both, 0);
 
         [Test]
         public void Validate_CreatureCommand_WarnsOnGameObjectBuddy()
         {
-            var warnings = DbScriptStructuralValidator.Validate(PlainDirection, Buddy(isGameObject: true),
+            var warnings = DbScriptStructuralValidator.Validate(Decoded(Buddy(isGameObject: true)),
                 Command(DbScriptBuddyCapability.Creature));
             CollectionAssert.Contains(warnings, "This command's buddy must be a creature, not a gameobject.");
         }
@@ -70,7 +72,7 @@ namespace WDE.DbScriptsEditor.Test
         [Test]
         public void Validate_GameObjectCommand_WarnsOnCreatureBuddy()
         {
-            var warnings = DbScriptStructuralValidator.Validate(PlainDirection, Buddy(isGameObject: false),
+            var warnings = DbScriptStructuralValidator.Validate(Decoded(Buddy(isGameObject: false)),
                 Command(DbScriptBuddyCapability.GameObject));
             CollectionAssert.Contains(warnings, "This command's buddy must be a gameobject, not a creature.");
         }
@@ -78,9 +80,9 @@ namespace WDE.DbScriptsEditor.Test
         [Test]
         public void Validate_BothCommand_NeverWarnsOnBuddyKind()
         {
-            var creatureWarnings = DbScriptStructuralValidator.Validate(PlainDirection, Buddy(isGameObject: false),
+            var creatureWarnings = DbScriptStructuralValidator.Validate(Decoded(Buddy(isGameObject: false)),
                 Command(DbScriptBuddyCapability.Both));
-            var goWarnings = DbScriptStructuralValidator.Validate(PlainDirection, Buddy(isGameObject: true),
+            var goWarnings = DbScriptStructuralValidator.Validate(Decoded(Buddy(isGameObject: true)),
                 Command(DbScriptBuddyCapability.Both));
             CollectionAssert.IsEmpty(creatureWarnings);
             CollectionAssert.IsEmpty(goWarnings);

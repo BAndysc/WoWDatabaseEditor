@@ -9,14 +9,30 @@ namespace WDE.DbScriptsEditor.Models
         public bool CommandAdditional { get; }     // 0x8 per-command switch
         public BuddyDescriptor Buddy { get; }
         public uint UnmodeledBits { get; }          // exotic bits outside ModeledMask, passed through
+        // The command's declared buddy kind (creature / gameobject / both). Needed to encode
+        // BUDDY_BY_GO correctly, since creature-vs-GO is command-dependent, not a free flag.
+        public DbScriptBuddyCapability BuddyKind { get; }
+        // Buddy-region bits the decoded descriptor does not itself account for (0x400 on a fixed-kind
+        // command, a locator bit on a buddy_entry == 0 row, duplicate locator bits...). Re-emitted
+        // verbatim so a raw row keeps its exact data_flags even though the core ignores these bits.
+        public uint InertBuddyBits { get; }
 
-        public DecodedFlags(ScriptDirection direction, bool commandAdditional, BuddyDescriptor buddy, uint unmodeledBits)
+        public DecodedFlags(ScriptDirection direction, bool commandAdditional, BuddyDescriptor buddy,
+            uint unmodeledBits, DbScriptBuddyCapability buddyKind = DbScriptBuddyCapability.Creature,
+            uint inertBuddyBits = 0)
         {
             Direction = direction;
             CommandAdditional = commandAdditional;
             Buddy = buddy;
             UnmodeledBits = unmodeledBits;
+            BuddyKind = buddyKind;
+            InertBuddyBits = inertBuddyBits;
         }
+
+        public DecodedFlags With(ScriptDirection? direction = null, bool? commandAdditional = null,
+            BuddyDescriptor? buddy = null, uint? inertBuddyBits = null) =>
+            new(direction ?? Direction, commandAdditional ?? CommandAdditional, buddy ?? Buddy,
+                UnmodeledBits, BuddyKind, inertBuddyBits ?? InertBuddyBits);
     }
 
     // Compiler/decompiler between the raw (data_flags, buddy_entry, search_radius) triple and the
@@ -24,13 +40,18 @@ namespace WDE.DbScriptsEditor.Models
     // no UI/DB dependencies, so the property tests can hammer it exhaustively.
     public static class DbScriptFlagsCodec
     {
-        public static DecodedFlags Decode(uint dataFlags, long buddyEntry, long searchRadius)
+        public static DecodedFlags Decode(uint dataFlags, long buddyEntry, long searchRadius,
+            DbScriptBuddyCapability buddyKind = DbScriptBuddyCapability.Creature)
         {
-            var buddy = BuddyDescriptor.Decode(dataFlags, buddyEntry, searchRadius);
+            var buddy = BuddyDescriptor.Decode(dataFlags, buddyEntry, searchRadius, buddyKind);
             var direction = DecodeDirection(dataFlags & DbScriptFlags.DirectionMask, buddy.Provided);
             var commandAdditional = (dataFlags & DbScriptFlags.CommandAdditional) != 0;
             var unmodeled = dataFlags & ~DbScriptFlags.ModeledMask;
-            return new DecodedFlags(direction, commandAdditional, buddy, unmodeled);
+            // Whatever buddy-region bits the descriptor does not re-emit are inert; keep them so the
+            // raw data_flags survives a re-encode byte-for-byte.
+            var canonicalBuddyBits = buddy.Encode(buddyKind).flagBits;
+            var inert = dataFlags & DbScriptFlags.BuddyRegionMask & ~canonicalBuddyBits;
+            return new DecodedFlags(direction, commandAdditional, buddy, unmodeled, buddyKind, inert);
         }
 
         // Rebuilds the raw triple. Returns false when the requested direction cannot be expressed
@@ -42,7 +63,7 @@ namespace WDE.DbScriptsEditor.Models
             buddyEntry = 0;
             searchRadius = 0;
 
-            var (buddyBits, entry, radius) = decoded.Buddy.Encode();
+            var (buddyBits, entry, radius) = decoded.Buddy.Encode(decoded.BuddyKind);
 
             // A direction that acts as/on the buddy is only meaningful when a buddy is actually
             // located. The UI enforces this; guard here so an inconsistent state can't silently
@@ -53,7 +74,7 @@ namespace WDE.DbScriptsEditor.Models
             if (!TryEncodeDirection(decoded.Direction, decoded.Buddy.Provided, out var directionBits))
                 return false;
 
-            dataFlags = directionBits | buddyBits | decoded.UnmodeledBits;
+            dataFlags = directionBits | buddyBits | decoded.InertBuddyBits | decoded.UnmodeledBits;
             if (decoded.CommandAdditional)
                 dataFlags |= DbScriptFlags.CommandAdditional;
 

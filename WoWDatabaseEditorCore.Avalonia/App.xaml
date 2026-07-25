@@ -26,6 +26,11 @@
                 <ComboBox Margin="10,0,0,0" ItemsSource="{CompiledBinding Options}" SelectedItem="{CompiledBinding SelectedOption}"></ComboBox>
             </SettingItem>
         </DataTemplate>
+        <DataTemplate DataType="settings:IButtonGenericSetting">
+            <SettingItem Help="{CompiledBinding Help}" Header="{CompiledBinding Name}">
+                <Button Content="{CompiledBinding ButtonText}" Command="{CompiledBinding Command}" />
+            </SettingItem>
+        </DataTemplate>
         <DataTemplate DataType="settings:IFloatSliderGenericSetting">
             <SettingItem Help="{CompiledBinding Help}" Header="{CompiledBinding Name}">
                 <Grid ColumnDefinitions="*,10,Auto">

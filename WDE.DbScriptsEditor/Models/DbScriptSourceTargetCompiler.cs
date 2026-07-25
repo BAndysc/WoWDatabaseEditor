@@ -24,6 +24,17 @@ namespace WDE.DbScriptsEditor.Models
         }
     }
 
+    // Context marker for the clickable "terminate if <buddy> found" token on TERMINATE_SCRIPT.
+    // Clicking it opens the buddy leaf picker to set/clear a dangling condition buddy.
+    public sealed class DbScriptBuddyConditionSlot
+    {
+        public EditableDbScriptStep Step { get; }
+        public DbScriptBuddyConditionSlot(EditableDbScriptStep step)
+        {
+            Step = step;
+        }
+    }
+
     // Turns a high-level "set this slot to X" request into a new DecodedFlags, keeping the other
     // slot and all non-direction state. Enforces the codec invariant that a buddy is provided iff
     // one of the two slots is the buddy, so the (source,target) pair always round-trips.
@@ -44,7 +55,29 @@ namespace WDE.DbScriptsEditor.Models
             else
                 buddy = current.Buddy.Provided ? current.Buddy : newBuddy; // other slot owns the buddy
 
-            return new DecodedFlags(direction, current.CommandAdditional, buddy, current.UnmodeledBits);
+            // A fresh buddy choice starts from clean canonical bits; an unchanged buddy keeps the
+            // raw row's inert bits.
+            var inert = buddy.Equals(current.Buddy) ? current.InertBuddyBits : 0u;
+            return current.With(direction, buddy: buddy, inertBuddyBits: inert);
+        }
+
+        // Sets or clears a "condition" buddy — one that is located but occupies neither slot (the
+        // core's buddyFound fallback, used by TERMINATE_SCRIPT's "terminate if found"). A dangling
+        // buddy is only representable with a self direction (combos 5/6); any other combo would
+        // decode the buddy back into a slot, so force source→source unless a self direction is
+        // already in place.
+        public static DecodedFlags SetConditionBuddy(in DecodedFlags current, BuddyDescriptor buddy)
+        {
+            var direction = current.Direction;
+            var isSelf = direction.Source == direction.Target &&
+                         direction.Source != SourceTargetKind.Buddy;
+            if (buddy.Provided && !isSelf)
+                direction = new ScriptDirection(SourceTargetKind.OriginalSource, SourceTargetKind.OriginalSource);
+            else if (!buddy.Provided && direction.UsesBuddy)
+                direction = new ScriptDirection(SourceTargetKind.OriginalSource, SourceTargetKind.OriginalTarget);
+
+            var inert = buddy.Equals(current.Buddy) ? current.InertBuddyBits : 0u;
+            return current.With(direction, buddy: buddy, inertBuddyBits: inert);
         }
     }
 }

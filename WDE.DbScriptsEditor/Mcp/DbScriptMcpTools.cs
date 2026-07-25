@@ -150,7 +150,7 @@ public sealed class DbScriptParamJson
 
 public sealed class DbScriptBuddyJson
 {
-    [Description("How the buddy object is located: NearestByEntry, ByGuid (searchValue = guid), ByPool (searchValue = pool id), BySpawnGroup, ByStringId, Pet")]
+    [Description("How the buddy object is located: NearestByEntry, ByGuid (searchValue = guid), ByPool (searchValue = pool id, creature only), BySpawnGroup (entry = spawn group id, searchValue unused), ByStringId (entry = string id, searchValue = optional max distance, 0 = any), Pet")]
     public required BuddyFindMode Mode { get; init; }
 
     [Description("True when the buddy is a gameobject instead of a creature")]
@@ -212,6 +212,9 @@ public sealed class DbScriptRowJson
 
     [Description("Step rows: exotic unmodeled data_flags bits passthrough; normally omit")]
     public uint? UnmodeledFlagBits { get; init; }
+
+    [Description("Step rows: buddy-region data_flags bits the core ignores for this command/locator, kept so a raw row round-trips; normally omit")]
+    public uint? InertFlagBits { get; init; }
 }
 
 public sealed class DbScriptGetInput
@@ -365,7 +368,8 @@ public abstract class DbScriptModelToolBase<TInput, TOutput> : McpTool<TInput, T
             Source = decoded.Direction.Source,
             Target = decoded.Direction.Target,
             Buddy = buddy,
-            UnmodeledFlagBits = decoded.UnmodeledBits != 0 ? decoded.UnmodeledBits : null
+            UnmodeledFlagBits = decoded.UnmodeledBits != 0 ? decoded.UnmodeledBits : null,
+            InertFlagBits = decoded.InertBuddyBits != 0 ? decoded.InertBuddyBits : null
         };
     }
 
@@ -403,8 +407,10 @@ public abstract class DbScriptModelToolBase<TInput, TOutput> : McpTool<TInput, T
         else
             throw new McpToolException("Step row requires command or commandName");
 
-        if (DataManager.Value.TryGetCommand(commandId) == null)
+        var commandDef = DataManager.Value.TryGetCommand(commandId);
+        if (commandDef == null)
             throw new McpToolException($"Unknown command id {commandId} (see dbscript_commands)");
+        var buddyKind = commandDef.Buddy;
 
         var step = script.MakeStep(new AbstractDbScriptLine { Id = script.ScriptId, Command = commandId });
 
@@ -415,12 +421,18 @@ public abstract class DbScriptModelToolBase<TInput, TOutput> : McpTool<TInput, T
         var buddy = BuddyDescriptor.None;
         if (row.Buddy is { } buddyJson)
         {
+            // creature-vs-GO is command-dependent; a contradicting IsGameObject is a caller error
+            if (buddyKind == DbScriptBuddyCapability.Creature && buddyJson.IsGameObject)
+                throw new McpToolException("This command's buddy must be a creature, not a gameobject");
+            if (buddyKind == DbScriptBuddyCapability.GameObject && !buddyJson.IsGameObject)
+                throw new McpToolException("This command's buddy must be a gameobject, not a creature");
             buddy = new BuddyDescriptor(buddyJson.Mode, buddyJson.IsGameObject, buddyJson.Entry,
                 buddyJson.SearchValue, buddyJson.IncludeDespawned, buddyJson.AllEligible);
         }
         if (direction.UsesBuddy && !buddy.Provided)
             throw new McpToolException("Source/target uses Buddy but no buddy locator was given");
-        var decoded = new DecodedFlags(direction, false, buddy, row.UnmodeledFlagBits ?? 0);
+        var decoded = new DecodedFlags(direction, false, buddy, row.UnmodeledFlagBits ?? 0,
+            buddyKind, row.InertFlagBits ?? 0);
         if (!DbScriptFlagsCodec.TryEncode(decoded, out _, out _, out _))
             throw new McpToolException($"Source/target combination {source} -> {target} is not representable");
         step.ApplyDecodedFlags(decoded);

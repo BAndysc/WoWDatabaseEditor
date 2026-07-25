@@ -53,7 +53,7 @@ namespace WDE.DbScriptsEditor.Models
                 var diags = result[i];
                 var command = step.Command;
                 var line = step.ToLine();
-                var decoded = DbScriptFlagsCodec.Decode(line.DataFlags, line.BuddyEntry, line.SearchRadius);
+                var decoded = DbScriptFlagsCodec.Decode(line.DataFlags, line.BuddyEntry, line.SearchRadius, step.BuddyCapability);
 
                 // a) nonzero value in a column the command/variant doesn't use
                 foreach (var col in step.UnusedColumns)
@@ -84,6 +84,11 @@ namespace WDE.DbScriptsEditor.Models
                 if (command != null && IsPlayerOnlyTarget(command.TargetTypes) && PlayerlessScriptTypes.Contains(typeInfo.Type))
                     diags.Add(new DbScriptDiagnostic(DbScriptDiagnosticSeverity.Warning,
                         $"This command acts on a player, but '{typeInfo.ReadableName}' scripts may run without one."));
+
+                // g) structural source/target/buddy advisories (inert bits, ineffective flags,
+                // kind mismatch, dangling condition buddy on the wrong command...)
+                foreach (var warning in DbScriptStructuralValidator.Validate(decoded, command))
+                    diags.Add(new DbScriptDiagnostic(DbScriptDiagnosticSeverity.Warning, warning));
             }
 
             // e) steps that can never run because an earlier unconditional TERMINATE_SCRIPT cancels them
@@ -128,7 +133,7 @@ namespace WDE.DbScriptsEditor.Models
             var line = step.ToLine();
             if (line.ConditionId != 0)
                 return false;
-            var decoded = DbScriptFlagsCodec.Decode(line.DataFlags, line.BuddyEntry, line.SearchRadius);
+            var decoded = DbScriptFlagsCodec.Decode(line.DataFlags, line.BuddyEntry, line.SearchRadius, step.BuddyCapability);
             return !decoded.Buddy.Provided; // a buddy search makes the terminate conditional
         }
 

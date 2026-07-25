@@ -10,16 +10,10 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
     {
         public EditableDbScriptStep Step { get; }
 
-        // Phase-3 structural source/target/buddy editor for this step.
-        public StepSourceTargetViewModel SourceTarget { get; }
-
-        public DbScriptStepViewModel(EditableDbScriptStep step,
-            System.Func<bool, long, System.Threading.Tasks.Task<(long value, bool ok)>>? buddyEntryPicker = null)
+        public DbScriptStepViewModel(EditableDbScriptStep step)
             : base(step)
         {
             Step = step;
-            SourceTarget = new StepSourceTargetViewModel(step, buddyEntryPicker);
-            AutoDispose(SourceTarget);
             step.PropertyChanged += OnStepChanged;
             step.ConditionId.PropertyChanged += OnConditionChanged;
             AutoDispose(new ActionDisposable(() =>

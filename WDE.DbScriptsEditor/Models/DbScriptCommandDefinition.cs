@@ -43,6 +43,10 @@ namespace WDE.DbScriptsEditor.Models
         // null => inherit the base command's parameters
         public IReadOnlyList<DbScriptCommandParameter>? Parameters { get; init; }
         public string? Description { get; init; }
+        // null => inherit the base command's source/target types (e.g. movement "Idle" overrides the
+        // target to none, while "Waypoint" keeps an optional target).
+        public IReadOnlyList<string>? SourceTypes { get; init; }
+        public IReadOnlyList<string>? TargetTypes { get; init; }
 
         public bool Matches(IDbScriptLine row)
         {
@@ -85,17 +89,45 @@ namespace WDE.DbScriptsEditor.Models
                                   SourceTypes.Any(t => !string.Equals(t, "None", System.StringComparison.OrdinalIgnoreCase));
         public bool UsesTarget => TargetTypes.Any(t => !string.Equals(t, "None", System.StringComparison.OrdinalIgnoreCase));
 
+        // Whether the command can run without a resolved source: it either ignores its source
+        // entirely, or explicitly declares "None" among its source types (optional source).
+        public bool AcceptsNoSource => !UsesSource ||
+            SourceTypes.Any(t => string.Equals(t, "None", System.StringComparison.OrdinalIgnoreCase));
+
         // Kind masks of the declared source/target type lists (for actor↔command compatibility).
         private DbScriptActorKind? sourceKindMask, targetKindMask;
         public DbScriptActorKind SourceKindMask => sourceKindMask ??= DbScriptActorKinds.FromList(SourceTypes);
         public DbScriptActorKind TargetKindMask => targetKindMask ??= DbScriptActorKinds.FromList(TargetTypes);
         public DbScriptBuddyCapability Buddy { get; init; } = DbScriptBuddyCapability.Creature;
+        // The command acts on "the player", resolved by the core as target-if-player-else-source
+        // (GetPlayerTargetOrSourceAndLog). Enables the {player} readable token.
+        public bool PlayerFromSourceOrTarget { get; init; }
         public bool SupportsAdditionalFlag { get; init; }
         // Non-null when SupportsAdditionalFlag: the labels for the inline 0x8 switch parameter.
         public DbScriptAdditionalFlag? AdditionalFlag { get; init; }
         public required IReadOnlyList<DbScriptCommandParameter> Parameters { get; init; }
         public required string Description { get; init; }
         public IReadOnlyList<DbScriptCommandVariant> Variants { get; init; } = new List<DbScriptCommandVariant>();
+
+        // Variant-effective source/target types (a variant may narrow them, e.g. movement "Idle"
+        // has no target). Falls back to the base command's types when the variant doesn't override.
+        public IReadOnlyList<string> EffectiveSourceTypes(DbScriptCommandVariant? variant) =>
+            variant?.SourceTypes ?? SourceTypes;
+        public IReadOnlyList<string> EffectiveTargetTypes(DbScriptCommandVariant? variant) =>
+            variant?.TargetTypes ?? TargetTypes;
+
+        public bool EffectiveUsesSource(DbScriptCommandVariant? variant)
+        {
+            var types = EffectiveSourceTypes(variant);
+            return types.Count == 0 || types.Any(t => !string.Equals(t, "None", System.StringComparison.OrdinalIgnoreCase));
+        }
+        public bool EffectiveUsesTarget(DbScriptCommandVariant? variant) =>
+            EffectiveTargetTypes(variant).Any(t => !string.Equals(t, "None", System.StringComparison.OrdinalIgnoreCase));
+
+        public DbScriptActorKind EffectiveSourceKindMask(DbScriptCommandVariant? variant) =>
+            variant?.SourceTypes == null ? SourceKindMask : DbScriptActorKinds.FromList(variant.SourceTypes);
+        public DbScriptActorKind EffectiveTargetKindMask(DbScriptCommandVariant? variant) =>
+            variant?.TargetTypes == null ? TargetKindMask : DbScriptActorKinds.FromList(variant.TargetTypes);
 
         // Resolves the effective definition (parameters + description) for a concrete row,
         // by picking the most-specific matching variant (already sorted). Falls back to base.

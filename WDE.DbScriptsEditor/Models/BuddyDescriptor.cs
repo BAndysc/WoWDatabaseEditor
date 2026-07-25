@@ -2,14 +2,15 @@ using System;
 
 namespace WDE.DbScriptsEditor.Models
 {
-    // How a step's buddy object is located. Materializes §1.3 of the plan.
+    // How a step's buddy object is located. Mirrors the locator branches of the core's
+    // ScriptAction::GetScriptProcessTargets.
     public enum BuddyFindMode
     {
         None,          // no buddy
         NearestByEntry,// nearest creature/GO with entry=buddy_entry within search_radius yards
         ByGuid,        // search_radius IS the guid; buddy_entry is the expected entry
         ByPool,        // search_radius IS the pool id; buddy_entry is the pool's entry
-        BySpawnGroup,  // NYI in core; buddy_entry is the spawn group id
+        BySpawnGroup,  // buddy_entry is the spawn group id; kind decided by the group itself
         ByStringId,    // object tagged with string id = buddy_entry
         Pet,           // pet of entry buddy_entry
     }
@@ -40,10 +41,42 @@ namespace WDE.DbScriptsEditor.Models
 
         public bool Provided => Mode != BuddyFindMode.None;
 
-        // Reconstructs the buddy descriptor from the three physical columns + the buddy flag bits.
-        public static BuddyDescriptor Decode(uint dataFlags, long buddyEntry, long searchRadius)
+        // Whether the alive/dead (BUDDY_IS_DESPAWNED) toggle has any effect for this locator. The
+        // core only liveness-filters creature matches: creature by-entry / by-guid, pooled creatures
+        // and string-id creature matches. GO locators, spawn groups and pets ignore it.
+        public bool SupportsLiveness => Mode switch
         {
-            var isGo = (dataFlags & DbScriptFlags.BuddyByGo) != 0;
+            BuddyFindMode.NearestByEntry => !IsGameObject,
+            BuddyFindMode.ByGuid => !IsGameObject,
+            BuddyFindMode.ByPool => true,
+            BuddyFindMode.ByStringId => true,
+            _ => false,
+        };
+
+        // Whether the closest-vs-all (ALL_ELIGIBLE_BUDDIES) toggle has any effect. GUID / pool / pet
+        // always yield a single object; by-entry, spawn group and string id can yield many.
+        public bool SupportsAllEligible =>
+            Mode is BuddyFindMode.NearestByEntry or BuddyFindMode.BySpawnGroup or BuddyFindMode.ByStringId;
+
+        // Whether search_radius is a yard distance (by entry / pet always, string id optionally).
+        // GUID and pool reinterpret the column as an id; spawn group never reads it.
+        public bool UsesRadius =>
+            Mode is BuddyFindMode.NearestByEntry or BuddyFindMode.ByStringId or BuddyFindMode.Pet;
+
+        // Reconstructs the buddy descriptor from the three physical columns + the buddy flag bits.
+        // The command's buddy kind decides creature-vs-GO: fixed-kind commands ignore BUDDY_BY_GO,
+        // dual commands read it. Mirrors the resolution gate in GetScriptProcessTargets — the buddy
+        // block only runs when buddy_entry != 0 or the guid/pool locator bits are set, so a stray
+        // spawn-group / string-id / pet / despawned bit with buddy_entry == 0 locates nothing.
+        public static BuddyDescriptor Decode(uint dataFlags, long buddyEntry, long searchRadius,
+            DbScriptBuddyCapability kind)
+        {
+            var isGo = kind switch
+            {
+                DbScriptBuddyCapability.GameObject => true,
+                DbScriptBuddyCapability.Both => (dataFlags & DbScriptFlags.BuddyByGo) != 0,
+                _ => false,
+            };
             var despawned = (dataFlags & DbScriptFlags.BuddyIsDespawned) != 0;
             var all = (dataFlags & DbScriptFlags.AllEligibleBuddies) != 0;
 
@@ -52,23 +85,25 @@ namespace WDE.DbScriptsEditor.Models
                 mode = BuddyFindMode.ByGuid;
             else if ((dataFlags & DbScriptFlags.BuddyByPool) != 0)
                 mode = BuddyFindMode.ByPool;
+            else if (buddyEntry == 0)
+                return None; // no entry and no guid/pool locator → the core searches nothing
             else if ((dataFlags & DbScriptFlags.BuddyBySpawnGroup) != 0)
                 mode = BuddyFindMode.BySpawnGroup;
             else if ((dataFlags & DbScriptFlags.BuddyByStringId) != 0)
                 mode = BuddyFindMode.ByStringId;
             else if ((dataFlags & DbScriptFlags.BuddyIsPet) != 0)
                 mode = BuddyFindMode.Pet;
-            else if (buddyEntry != 0)
-                mode = BuddyFindMode.NearestByEntry;
             else
-                return None;
+                mode = BuddyFindMode.NearestByEntry;
 
             return new BuddyDescriptor(mode, isGo, buddyEntry, searchRadius, despawned, all);
         }
 
         // Produces (buddy flag bits, buddy_entry, search_radius). The direction/command bits are
-        // added separately by the codec; here we only own the 0xFF0 buddy region.
-        public (uint flagBits, long buddyEntry, long searchRadius) Encode()
+        // added separately by the codec; here we only own the 0xFF0 buddy region. BUDDY_BY_GO is
+        // emitted only for dual (Both) commands — for fixed-kind commands the kind is implicit, so
+        // emitting the bit would be a no-op the core ignores.
+        public (uint flagBits, long buddyEntry, long searchRadius) Encode(DbScriptBuddyCapability kind)
         {
             if (Mode == BuddyFindMode.None)
                 return (0, 0, 0);
@@ -82,7 +117,7 @@ namespace WDE.DbScriptsEditor.Models
                 BuddyFindMode.Pet => DbScriptFlags.BuddyIsPet,
                 _ => 0, // NearestByEntry has no locator bit
             };
-            if (IsGameObject)
+            if (kind == DbScriptBuddyCapability.Both && IsGameObject)
                 bits |= DbScriptFlags.BuddyByGo;
             if (IncludeDespawned)
                 bits |= DbScriptFlags.BuddyIsDespawned;

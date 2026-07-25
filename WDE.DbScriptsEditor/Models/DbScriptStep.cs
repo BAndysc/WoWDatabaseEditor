@@ -12,8 +12,6 @@ namespace WDE.DbScriptsEditor.Models
     // untouched script roundtrips byte-identically; overlays the resolved command meaning.
     public class DbScriptStep
     {
-        private static readonly Regex TokenRegex = new(@"\{([A-Za-z0-9 _]+?)\}", RegexOptions.Compiled);
-
         private static readonly DbScriptDestination[] DataColumns =
         {
             DbScriptDestination.DataLong, DbScriptDestination.DataLong2, DbScriptDestination.DataLong3,
@@ -51,70 +49,50 @@ namespace WDE.DbScriptsEditor.Models
             CommandName = definition.NameReadable;
             VariantName = variant?.NameReadable;
 
-            Readable = RenderReadable(description, parameters, typeInfo, factory);
+            Readable = RenderReadable(description, parameters, typeInfo, factory, definition);
             UnusedColumns = ComputeUnusedColumns(parameters, variant);
         }
 
         private string RenderReadable(string description, IReadOnlyList<DbScriptCommandParameter> parameters,
-            DbScriptTypeInfo typeInfo, IParameterFactory factory)
+            DbScriptTypeInfo typeInfo, IParameterFactory factory, DbScriptCommandDefinition definition)
         {
-            var (source, target) = DbScriptActorResolver.Resolve(Raw, typeInfo);
-            var friendly = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-            {
-                ["source"] = source,
-                ["target"] = target,
-            };
+            var hasActorColon = DbScriptReadableCase.StartsWithActorToken(description);
+            var decoded = DbScriptFlagsCodec.Decode(Raw.DataFlags, Raw.BuddyEntry, Raw.SearchRadius, definition.Buddy);
+            var (source, target) = BuddyDescriptorFormatter.ResolveActors(Raw, typeInfo, definition.Buddy);
 
-            // per-parameter friendly value + whether the raw column is non-default
-            var nonDefault = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            // SmartFormat data object: raw column values + a plain formatted display per parameter,
+            // keyed by destination column. Same template as the editable renderer, no clickable links.
+            var data = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            DbScriptSmartFormat.SeedColumns(data, Raw);
+            data["source"] = source;
+            data["target"] = target;
+            // {player} / {creature}: the actual actor the core resolves from source/target.
+            if (description.Contains("{player}", StringComparison.Ordinal))
+                data["player"] = BuddyDescriptorFormatter.ResolveActorOfKind(decoded, typeInfo, DbScriptActorKind.Player, preferTarget: true).label;
+            if (description.Contains("{creature}", StringComparison.Ordinal))
+                data["creature"] = BuddyDescriptorFormatter.ResolveActorOfKind(decoded, typeInfo, DbScriptActorKind.Creature, preferTarget: false).label;
+
             foreach (var p in parameters)
             {
-                if (DbScriptDestinations.IsFloat(p.Destination))
-                {
-                    var value = DbScriptDestinations.ReadFloat(Raw, p.Destination);
-                    friendly[p.Name] = value.ToString("0.###", CultureInfo.InvariantCulture);
-                    if (Math.Abs(value - p.DefaultVal) > float.Epsilon)
-                        nonDefault.Add(p.Name);
-                }
-                else
-                {
-                    var value = DbScriptDestinations.ReadLong(Raw, p.Destination);
-                    friendly[p.Name] = SafeToString(factory.Factory(p.Type), value);
-                    if (value != p.DefaultVal)
-                        nonDefault.Add(p.Name);
-                }
+                var col = DbScriptDestinations.ColumnName(p.Destination);
+                data[col] = DbScriptDestinations.IsFloat(p.Destination)
+                    ? DbScriptDestinations.ReadFloat(Raw, p.Destination).ToString("0.###", CultureInfo.InvariantCulture)
+                    : SafeToString(factory.Factory(p.Type), DbScriptDestinations.ReadLong(Raw, p.Destination));
             }
 
-            // referenced is computed from the un-expanded description on purpose: a parameter
-            // mentioned only inside a non-chosen choose branch still counts as "mentioned".
-            var referenced = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (Match m in TokenRegex.Matches(description))
-                referenced.Add(m.Groups[1].Value.Trim());
+            var rendered = DbScriptSmartFormat.Format(description, data);
 
-            description = DbScriptDescriptionChoose.Expand(description, name =>
+            // A buddy that occupies neither slot (TERMINATE_SCRIPT's buddyFound condition, or an
+            // existence gate on other commands) is invisible in the source/target sentence — show it.
+            if (decoded.Buddy.Provided && !decoded.Direction.UsesBuddy)
             {
-                var p = parameters.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
-                if (p == null)
-                    return null;
-                return DbScriptDestinations.IsFloat(p.Destination)
-                    ? DbScriptDestinations.ReadFloat(Raw, p.Destination).ToString("0.###", CultureInfo.InvariantCulture)
-                    : DbScriptDestinations.ReadLong(Raw, p.Destination).ToString(CultureInfo.InvariantCulture);
-            });
+                var label = BuddyDescriptorFormatter.Format(decoded.Buddy);
+                rendered += Raw.Command == DbScriptInspections.TerminateScriptCommandId
+                    ? $" · condition: {label}"
+                    : $" · only if {label} present";
+            }
 
-            var rendered = TokenRegex.Replace(description, m =>
-            {
-                var token = m.Groups[1].Value.Trim();
-                return friendly.TryGetValue(token, out var value) ? value : m.Value;
-            });
-
-            // Enrich: append any non-default parameter the sentence didn't already mention,
-            // so nothing meaningful is hidden (e.g. TERMINATE_SCRIPT's search creature/distance).
-            var extras = parameters
-                .Where(p => nonDefault.Contains(p.Name) && !referenced.Contains(p.Name))
-                .Select(p => $"{p.Name}: {friendly[p.Name]}")
-                .ToList();
-
-            return extras.Count > 0 ? $"{rendered} · {string.Join(", ", extras)}" : rendered;
+            return DbScriptReadableCase.SentenceCase(rendered, hasActorColon);
         }
 
         private static string SafeToString(IParameter<long> parameter, long value)

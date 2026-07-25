@@ -9,13 +9,27 @@ namespace WDE.DbScriptsEditor.Models
     {
         public const uint RespawnCommandId = 41;
 
-        public static IReadOnlyList<string> Validate(
-            ScriptDirection direction, BuddyDescriptor buddy, DbScriptCommandDefinition? command)
+        public static IReadOnlyList<string> Validate(in DecodedFlags decoded, DbScriptCommandDefinition? command)
         {
             var warnings = new List<string>();
+            var buddy = decoded.Buddy;
+            var direction = decoded.Direction;
 
-            if (buddy.Mode == BuddyFindMode.BySpawnGroup)
-                warnings.Add("Spawn-group buddy lookup is not implemented in the core (NYI).");
+            // Bits the core ignores for this locator/command (0x400 on a fixed-kind command, a stray
+            // locator bit, buddy bits on a buddy_entry == 0 row...). Kept in the raw row but inert.
+            if (decoded.InertBuddyBits != 0)
+                warnings.Add($"data_flags has buddy bits the core ignores here (0x{decoded.InertBuddyBits:X}).");
+
+            if (buddy.Provided)
+            {
+                if (buddy.IncludeDespawned && !buddy.SupportsLiveness)
+                    warnings.Add("The dead/despawned flag has no effect on this buddy locator.");
+                if (buddy.AllEligible && !buddy.SupportsAllEligible)
+                    warnings.Add("The 'all eligible' flag has no effect on this buddy locator (it yields a single object).");
+                if (buddy.Entry == 0 && buddy.Mode is BuddyFindMode.NearestByEntry or BuddyFindMode.Pet
+                        or BuddyFindMode.BySpawnGroup or BuddyFindMode.ByStringId)
+                    warnings.Add("The buddy search never runs when buddy_entry is 0.");
+            }
 
             if (command != null)
             {
@@ -25,6 +39,9 @@ namespace WDE.DbScriptsEditor.Models
                         warnings.Add("This command's buddy must be a creature, not a gameobject.");
                     else if (!command.Buddy.AllowsCreature() && !buddy.IsGameObject)
                         warnings.Add("This command's buddy must be a gameobject, not a creature.");
+
+                    if (buddy.Mode == BuddyFindMode.ByPool && !command.Buddy.AllowsCreature())
+                        warnings.Add("Pool lookup only finds creatures, but this command needs a gameobject buddy.");
                 }
 
                 if (command.Id == RespawnCommandId && buddy.Provided && !buddy.IncludeDespawned)
@@ -32,6 +49,12 @@ namespace WDE.DbScriptsEditor.Models
 
                 if (direction.Target == SourceTargetKind.Buddy && IsNoneOnly(command.TargetTypes))
                     warnings.Add("This command ignores its target, so targeting the buddy has no effect.");
+
+                // A buddy located but occupying neither slot is only meaningful for TERMINATE_SCRIPT
+                // (its buddyFound fallback); elsewhere it just gates the step on the buddy existing.
+                if (buddy.Provided && !direction.UsesBuddy &&
+                    command.Id != DbScriptInspections.TerminateScriptCommandId)
+                    warnings.Add("The buddy is used as neither source nor target; the step is skipped when it isn't found.");
             }
 
             return warnings;

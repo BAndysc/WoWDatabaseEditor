@@ -16,7 +16,7 @@ namespace WDE.DbScriptsEditor.Models
         public const uint BuddyIsPet = 0x020;
         public const uint BuddyIsDespawned = 0x040;
         public const uint BuddyByPool = 0x080;
-        public const uint BuddyBySpawnGroup = 0x100; // NYI in core
+        public const uint BuddyBySpawnGroup = 0x100; // buddy_entry is the spawn group id
         public const uint AllEligibleBuddies = 0x200;
         public const uint BuddyByGo = 0x400;
         public const uint BuddyByStringId = 0x800;
@@ -26,6 +26,12 @@ namespace WDE.DbScriptsEditor.Models
         public const uint ModeledMask = 0xFFF;
 
         public const uint DirectionMask = 0x7;
+
+        // The whole buddy bit region (0x010..0x800). Bits here that the decoded buddy descriptor
+        // does not account for (e.g. 0x400 on a creature-only command, or a locator bit on a row
+        // with buddy_entry == 0) are captured as "inert" and re-emitted verbatim so raw rows keep
+        // their exact data_flags. See DbScriptFlagsCodec.
+        public const uint BuddyRegionMask = 0xFF0;
 
         // Any bit that means "a buddy is being located" (independent of buddy_entry != 0).
         public const uint AnyBuddyLocator =

@@ -1,0 +1,38 @@
+<UserControl x:Class="WDE.DbScriptsEditor.Avalonia.Editor.Views.DbScriptRoundtripTestView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:WDE.DbScriptsEditor.Editor.ViewModels;assembly=WDE.DbScriptsEditor"
+             x:DataType="viewModels:DbScriptRoundtripTestViewModel">
+    <Grid RowDefinitions="Auto,2*,5,3*" Margin="10">
+        <DockPanel Grid.Row="0" Margin="0,0,0,8">
+            <Button DockPanel.Dock="Right" Content="Run again" Command="{CompiledBinding RunCommand}" />
+            <TextBlock Text="{CompiledBinding Progress}" VerticalAlignment="Center" TextWrapping="Wrap" />
+        </DockPanel>
+
+        <ListBox Grid.Row="1"
+                 ItemsSource="{CompiledBinding Failures}"
+                 SelectedItem="{CompiledBinding SelectedFailure}">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="viewModels:DbScriptRoundtripTestViewModel+Result">
+                    <TextBlock Text="{CompiledBinding Script}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" />
+
+        <Grid Grid.Row="3" ColumnDefinitions="*,5,*">
+            <DockPanel Grid.Column="0">
+                <TextBlock DockPanel.Dock="Top" Text="Expected (raw rows)" FontWeight="Bold" Margin="0,0,0,4" />
+                <TextBox Text="{CompiledBinding SelectedFailure.Expected, FallbackValue=''}"
+                         IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" FontFamily="Consolas,Menlo,monospace" />
+            </DockPanel>
+            <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" />
+            <DockPanel Grid.Column="2">
+                <TextBlock DockPanel.Dock="Top" Text="Actual (editor roundtrip)" FontWeight="Bold" Margin="0,0,0,4" />
+                <TextBox Text="{CompiledBinding SelectedFailure.Actual, FallbackValue=''}"
+                         IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap" FontFamily="Consolas,Menlo,monospace" />
+            </DockPanel>
+        </Grid>
+    </Grid>
+</UserControl>

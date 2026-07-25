@@ -313,7 +313,7 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
         {
             DbScriptRowViewModel vm = row switch
             {
-                EditableDbScriptStep step => new DbScriptStepViewModel(step, PickBuddyEntry),
+                EditableDbScriptStep step => new DbScriptStepViewModel(step),
                 DbScriptWaitRow wait => new DbScriptWaitViewModel(wait),
                 DbScriptCommentRow comment => new DbScriptCommentViewModel(comment),
                 DbScriptIfRow ifRow => new DbScriptIfViewModel(ifRow, GetConditionReadable),
@@ -536,7 +536,8 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
         // with that source → WHO is acted upon (only when the command uses a target, and only
         // choices the command's target types accept) → the parameters dialog. The step lands in
         // the document only when the dialog is accepted; cancelling any stage aborts the whole
-        // add. Wait/Comment stay reachable as structural entries of the first picker.
+        // add. Wait/Comment are structural entries of the COMMAND picker (stage 2), available
+        // under any source choice.
         private async Task AddStepWizard()
         {
             if (script == null)
@@ -544,40 +545,47 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
             var info = script.TypeInfo;
 
             // 1. source
-            var sourceItems = BuildActorItems(null, info, isSource: true, includeStructural: true);
+            var sourceItems = BuildActorItems(null, info, isSource: true, offerNoSourceFilter: true);
             var sourceKey = await PickActorKey("Add action — pick source (who acts)", sourceItems, null);
             if (!sourceKey.HasValue)
                 return;
-            if (sourceKey.Value == DbScriptSelectViewModel.WaitKey)
-            {
-                await InsertWaitRow();
-                return;
-            }
-            if (sourceKey.Value == DbScriptSelectViewModel.CommentKey)
-            {
-                await InsertCommentRow();
-                return;
-            }
 
-            // gather the source's locator values right away (entry/guid/pool follow-up prompts)
-            var sourceChoice = await ResolveActorChoice(sourceKey.Value, BuddyDescriptor.None);
+            var sourceChoice = ResolveActorChoice(sourceKey.Value, BuddyDescriptor.None);
             if (sourceChoice == null)
                 return;
 
             // 2. command, filtered to what the picked source can execute (and what has any
-            // pickable target in this script type)
+            // pickable target in this script type). Wait/Comment ride along regardless of source.
             using var commandDialog = new DbScriptSelectViewModel("Pick action", null, dataManager, favouriteCommands,
-                def => SourceCompatibleWithCommand(sourceKey.Value, def, info) && CommandTargetSatisfiable(def, sourceKey.Value, info));
+                def => WizardCommandFits(sourceKey.Value, def, info),
+                includeStructural: true);
             if (!await windowManager.ShowDialog(commandDialog) || commandDialog.SelectedItem == null)
                 return;
-            var (commandId, variant) = DecodeCommandKey(commandDialog.SelectedItem.Key);
+            var pickedKey = commandDialog.SelectedItem.Key;
+            if (pickedKey == DbScriptSelectViewModel.WaitKey)
+            {
+                await InsertWaitRow();
+                return;
+            }
+            if (pickedKey == DbScriptSelectViewModel.CommentKey)
+            {
+                await InsertCommentRow();
+                return;
+            }
+            var (commandId, variant) = DecodeCommandKey(pickedKey);
             var def = dataManager.TryGetCommand(commandId);
 
-            // 3. target (only when the command uses one)
+            // A lone-target command (swapped presentation): the stage-1 actor IS the target — skip
+            // the target stage and compile the choice into the target slot.
+            var swapped = IsSwappedPresentation(def, variant);
+
+            // 3. target — only when the command (for the chosen variant) uses one. A variant can
+            // drop the target (e.g. movement "Idle" acts on a single object), so honour it here.
             long? targetKey = null;
-            if (def != null && def.UsesTarget)
+            if (!swapped && def != null && def.EffectiveUsesTarget(variant))
             {
-                var targetItems = BuildActorItems(def, info, isSource: false, includeStructural: false, buddySourceKey: sourceKey);
+                var targetItems = BuildActorItems(def, info, isSource: false,
+                    sourceActorKey: sourceKey, requiredOverride: def.EffectiveTargetKindMask(variant));
                 targetKey = await PickActorKey("Pick target (acted upon)", targetItems, null);
                 if (!targetKey.HasValue)
                     return;
@@ -591,19 +599,26 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
             draft.ApplyParameterDefaults();
 
             var flags = draft.DecodeFlags();
-            flags = DbScriptSourceTargetCompiler.SetSlot(flags, true, sourceChoice.Value.kind, sourceChoice.Value.buddy);
-            if (targetKey.HasValue)
+            if (swapped)
             {
-                if (targetKey.Value == ActorSameBuddy)
+                flags = DbScriptSourceTargetCompiler.SetSlot(flags, false, sourceChoice.Value.kind, sourceChoice.Value.buddy);
+            }
+            else
+            {
+                flags = DbScriptSourceTargetCompiler.SetSlot(flags, true, sourceChoice.Value.kind, sourceChoice.Value.buddy);
+                if (targetKey.HasValue)
                 {
-                    flags = DbScriptSourceTargetCompiler.SetSlot(flags, false, SourceTargetKind.Buddy, flags.Buddy);
-                }
-                else
-                {
-                    var targetChoice = await ResolveActorChoice(targetKey.Value, flags.Buddy);
-                    if (targetChoice == null)
-                        return;
-                    flags = DbScriptSourceTargetCompiler.SetSlot(flags, false, targetChoice.Value.kind, targetChoice.Value.buddy);
+                    if (targetKey.Value == KeySameAsSource)
+                    {
+                        flags = DbScriptSourceTargetCompiler.SetSlot(flags, false, flags.Direction.Source, flags.Buddy);
+                    }
+                    else
+                    {
+                        var targetChoice = ResolveActorChoice(targetKey.Value, flags.Buddy);
+                        if (targetChoice == null)
+                            return;
+                        flags = DbScriptSourceTargetCompiler.SetSlot(flags, false, targetChoice.Value.kind, targetChoice.Value.buddy);
+                    }
                 }
             }
             draft.ApplyDecodedFlags(flags);
@@ -1004,14 +1019,22 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
 
             var actionRows = new List<EditableActionData>
             {
+                // Show the resolved variant ("Movement: Idle"), not just the base command name
+                // ("Set movement") — the two differ and both change when the user re-picks the type.
                 new("Type", "Command", () => ChangeStepCommand(copy).ListenErrors(),
-                    copy.ToObservable(s => s.CommandName)),
-                new("Source", "Command", () => EditActorSlotCommand(new DbScriptActorSlot(copy, true)).ListenErrors(),
-                    copy.ToObservable(s => s.FormattedReadable).Select(_ => copy.ResolveActors().source),
-                    copy.ToObservable(s => s.FormattedReadable).Select(_ => !(copy.Command?.UsesSource ?? true))),
+                    copy.ToObservable(s => s.FormattedReadable).Select(_ => copy.VariantName ?? copy.CommandName)),
+                // Lone-target commands (settings-gated) present their single actor as "Source": the
+                // row edits the TARGET slot underneath and the real Target row hides.
+                new("Source", "Command",
+                    () => EditActorSlotCommand(new DbScriptActorSlot(copy, isSource: !IsSwappedPresentation(copy))).ListenErrors(),
+                    Merged(copy.ToObservable(s => s.ResolvedSource), copy.ToObservable(s => s.ResolvedTarget))
+                        .Select(_ => IsSwappedPresentation(copy) ? copy.ResolvedTarget : copy.ResolvedSource),
+                    copy.ToObservable(s => s.FormattedReadable)
+                        .Select(_ => !(copy.Command?.UsesSource ?? true) && !IsSwappedPresentation(copy))),
                 new("Target", "Command", () => EditActorSlotCommand(new DbScriptActorSlot(copy, false)).ListenErrors(),
-                    copy.ToObservable(s => s.FormattedReadable).Select(_ => copy.ResolveActors().target),
-                    copy.ToObservable(s => s.FormattedReadable).Select(_ => !(copy.Command?.UsesTarget ?? true))),
+                    copy.ToObservable(s => s.ResolvedTarget),
+                    copy.ToObservable(s => s.FormattedReadable)
+                        .Select(_ => !(copy.Command?.UsesTarget ?? true) || IsSwappedPresentation(copy))),
             };
 
             var longParams = new List<(ParameterValueHolder<long>, string)>();
@@ -1058,13 +1081,6 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
             copy.PendingConditionEdits = null;
             conditionReadableCache.Clear();
             RefreshConditionReadables();
-        }
-
-        // Opens the creature/GO entity picker for a buddy entry (used by the structural editor).
-        public async Task<(long value, bool ok)> PickBuddyEntry(bool isGameObject, long current)
-        {
-            var parameter = parameterFactory.Factory(isGameObject ? "GameobjectParameter" : "CreatureParameter");
-            return await parameterPickerService.PickParameter(parameter, current);
         }
 
         private async Task EditParameterCommand(DbScriptEditableParameter? p)
@@ -1117,6 +1133,9 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
                     break;
                 case DbScriptActorSlot slot:
                     await EditActorSlotCommand(slot);
+                    break;
+                case DbScriptBuddyConditionSlot buddyCondition:
+                    await EditBuddyConditionCommand(buddyCondition);
                     break;
                 case DbScriptConditionSlot conditionSlot:
                     await EditConditionCommand(conditionSlot.IfRow);
@@ -1302,47 +1321,89 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
         }
 
         // High-level source/target picking. The user chooses a semantic actor (original source /
-        // target, or a nearby creature / GO / pet / by-guid / pool / string-id buddy); the compiler
-        // + codec turn it into the data_flags direction combo and buddy locator. Raw flags are never
-        // shown.
-        private const long ActorOriginalSource = 0;
-        private const long ActorOriginalTarget = 1;
-        private const long ActorNearbyCreature = 2;
-        private const long ActorNearbyGameobject = 3;
-        private const long ActorCreatureByGuid = 4;
-        private const long ActorPet = 5;
-        private const long ActorByPool = 6;
-        private const long ActorByStringId = 7;
-        // Target-picker-only: reuse the buddy the source slot already located (a step has one
-        // buddy locator, so a buddy source and a different buddy target cannot coexist).
-        private const long ActorSameBuddy = 8;
+        // target, or one of the buddy "leaves" — a fully specified locator × kind × liveness ×
+        // all/closest); the compiler + codec turn it into the data_flags direction combo and buddy
+        // locator. Raw flags are never shown.
+        private const long KeyOriginalSource = 1000;
+        private const long KeyOriginalTarget = 1001;
+        // Target-picker-only: act on the same object chosen as the source (whatever it is — the
+        // script's source/target actor, or the located buddy). A step has one buddy locator, so a
+        // buddy source and a different buddy target can't coexist; this mirrors instead.
+        private const long KeySameAsSource = 1002;
+        // "No condition" tile in the TERMINATE_SCRIPT condition-buddy picker.
+        private const long NoBuddyConditionKey = 1003;
+        // Wizard-source-stage-only: "no source" filter. Purely visual — picking it lists the commands
+        // that can run without a source, but the created row keeps the default flags (the original
+        // source), so under the hood there IS a source; the command just doesn't require one.
+        private const long KeyNoSource = 1004;
+        // Buddy leaf i (DbScriptBuddyLeaves.All[i]) is offered under key LeafKeyBase + i.
+        private const long LeafKeyBase = 2000;
 
-        private static bool IsBuddyActor(long key) => key is >= ActorNearbyCreature and <= ActorByStringId;
+        private static bool IsLeafKey(long key) => key >= LeafKeyBase;
+        private static DbScriptBuddyLeaf LeafOfKey(long key) => DbScriptBuddyLeaves.All[(int)(key - LeafKeyBase)];
 
         // The static kind(s) an actor choice can resolve to.
         private static DbScriptActorKind KindsOfActor(long key, DbScriptTypeInfo info) => key switch
         {
-            ActorOriginalSource => info.SourceKinds,
-            ActorOriginalTarget => info.TargetKinds,
-            ActorNearbyCreature or ActorCreatureByGuid or ActorPet => DbScriptActorKind.Creature,
-            ActorNearbyGameobject => DbScriptActorKind.GameObject,
-            ActorByPool or ActorByStringId => DbScriptActorKind.Creature | DbScriptActorKind.GameObject,
-            _ => DbScriptActorKind.WorldObject,
+            KeyOriginalSource => info.SourceKinds,
+            KeyOriginalTarget => info.TargetKinds,
+            KeySameAsSource => DbScriptActorKind.WorldObject,
+            KeyNoSource => DbScriptActorKind.WorldObject,
+            _ => LeafOfKey(key).KindMask,
         };
 
-        private static bool BuddyActorAllowed(DbScriptCommandDefinition def, long key) => key switch
+        // Presentation-only swap (settings-gated, default on): a command that uses ONLY a target
+        // (e.g. Despawn gameobject, Set gossip menu) shows that single actor as the "source" — the
+        // natural way to read it — while the row still compiles into the target slot underneath.
+        private bool IsSwappedPresentation(DbScriptCommandDefinition? def, DbScriptCommandVariant? variant = null) =>
+            editorSettings.PresentLoneTargetAsSource && def != null &&
+            def.EffectiveUsesTarget(variant) && !def.EffectiveUsesSource(variant);
+
+        private bool IsSwappedPresentation(EditableDbScriptStep step)
         {
-            ActorNearbyCreature or ActorCreatureByGuid or ActorPet => def.Buddy.AllowsCreature(),
-            ActorNearbyGameobject => def.Buddy.AllowsGameObject(),
-            _ => true, // pool / string id locate either kind
-        };
+            var def = step.Command;
+            if (def == null || !editorSettings.PresentLoneTargetAsSource)
+                return false;
+            var (_, _, variant) = def.Resolve(step.ToLine());
+            return def.EffectiveUsesTarget(variant) && !def.EffectiveUsesSource(variant);
+        }
+
+        // Minimal two-source merge (no Rx dependency): re-emits from either underlying observable so
+        // a computed row value refreshes whichever slot changed.
+        private static IObservable<T> Merged<T>(IObservable<T> a, IObservable<T> b) => new MergedObservable<T>(a, b);
+
+        private sealed class MergedObservable<T> : IObservable<T>
+        {
+            private readonly IObservable<T> a, b;
+            public MergedObservable(IObservable<T> a, IObservable<T> b) { this.a = a; this.b = b; }
+            public IDisposable Subscribe(IObserver<T> observer)
+            {
+                var d1 = a.Subscribe(observer);
+                var d2 = b.Subscribe(observer);
+                return new Common.Disposables.ActionDisposable(() => { d1.Dispose(); d2.Dispose(); });
+            }
+        }
+
+        // Wizard stage-2 command filter for a picked stage-1 actor. Lone-target commands (swapped
+        // presentation) match when the actor fits their TARGET — the actor will land in the target
+        // slot; they need a concrete actor, so the "(none)" filter excludes them.
+        private bool WizardCommandFits(long sourceKey, DbScriptCommandDefinition def, DbScriptTypeInfo info)
+        {
+            if (IsSwappedPresentation(def))
+                return sourceKey != KeyNoSource &&
+                       (!IsLeafKey(sourceKey) || LeafOfKey(sourceKey).ValidFor(def.Buddy)) &&
+                       DbScriptActorKinds.Compatible(KindsOfActor(sourceKey, info), def.TargetKindMask);
+            return SourceCompatibleWithCommand(sourceKey, def, info) && CommandTargetSatisfiable(def, sourceKey, info);
+        }
 
         // Can the picked source actor execute this command?
         private static bool SourceCompatibleWithCommand(long sourceKey, DbScriptCommandDefinition def, DbScriptTypeInfo info)
         {
+            if (sourceKey == KeyNoSource)
+                return def.AcceptsNoSource; // the "no source" filter: commands that run without one
             if (!def.UsesSource)
-                return sourceKey == ActorOriginalSource; // command ignores its source — only the neutral default keeps it listed
-            if (IsBuddyActor(sourceKey) && !BuddyActorAllowed(def, sourceKey))
+                return sourceKey == KeyOriginalSource; // command ignores its source — only the neutral default keeps it listed
+            if (IsLeafKey(sourceKey) && !LeafOfKey(sourceKey).ValidFor(def.Buddy))
                 return false;
             return DbScriptActorKinds.Compatible(KindsOfActor(sourceKey, info), def.SourceKindMask);
         }
@@ -1356,21 +1417,28 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
                 DbScriptActorKinds.Compatible(info.TargetKinds, def.TargetKindMask))
                 return true;
             // a buddy target: the source's own buddy reused, or a fresh locator
-            var buddyKinds = IsBuddyActor(sourceKey)
+            var buddyKinds = IsLeafKey(sourceKey)
                 ? KindsOfActor(sourceKey, info)
                 : DbScriptActorKind.Creature | DbScriptActorKind.GameObject;
             return DbScriptActorKinds.Compatible(buddyKinds, def.TargetKindMask);
         }
 
         // Builds the actor tiles for one slot. When def is known the list is narrowed to actors
-        // its source/target types accept (e.g. a GameObject-target command never offers players).
+        // its source/target types accept and its buddy kind allows (e.g. a GameObject-target command
+        // never offers players, pools or pets). Each buddy leaf is a fully-specified locator.
+        // When picking a target, sourceActorKey identifies what the source is so the picker can offer
+        // "Same as source" (and, if the source owns the buddy, suppress a conflicting second buddy).
         private List<DbScriptCommandItem> BuildActorItems(DbScriptCommandDefinition? def, DbScriptTypeInfo info,
-            bool isSource, bool includeStructural, long? buddySourceKey = null)
+            bool isSource, bool offerNoSourceFilter = false, long? sourceActorKey = null,
+            DbScriptActorKind? requiredOverride = null)
         {
-            var required = def == null
+            var required = requiredOverride ?? (def == null
                 ? DbScriptActorKind.WorldObject
-                : (isSource ? def.SourceKindMask : def.TargetKindMask);
+                : (isSource ? def.SourceKindMask : def.TargetKindMask));
+            // When the command is not yet known (wizard source stage) offer the union of leaves.
+            var cap = def?.Buddy ?? DbScriptBuddyCapability.Both;
             bool Fits(long key) => DbScriptActorKinds.Compatible(KindsOfActor(key, info), required);
+            bool FitsKind(DbScriptActorKind mask) => DbScriptActorKinds.Compatible(mask, required);
 
             var items = new List<DbScriptCommandItem>();
             var order = 0;
@@ -1382,54 +1450,63 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
                     SearchName = $"{name} {searchTags}",
                     Help = help,
                     Order = order++,
-                    IsWait = key == DbScriptSelectViewModel.WaitKey,
                 });
 
-            if (includeStructural)
-            {
-                Add(DbScriptSelectViewModel.WaitKey, "Wait", "Timing",
-                    "A time gap: every following row executes this much later (squashed into the delay column on save).", "wait delay time gap pause");
-                Add(DbScriptSelectViewModel.CommentKey, "Comment", "Timing",
-                    "A standalone comment row (saved into the comments column of the next action).", "comment note text");
-            }
-
             const string actorsGroup = "Script actors";
-            const string buddyGroup = "A found object (buddy)";
-            if (Fits(ActorOriginalSource))
-                Add(ActorOriginalSource, info.SourceLabel, actorsGroup, "The script's original source.", "original source self");
-            if (Fits(ActorOriginalTarget))
-                Add(ActorOriginalTarget, info.TargetLabel, actorsGroup, "The script's original target.", "original target");
+            // "Same as source" leads the target picker: act on whatever the source is. Not offered
+            // when the source was the visual "(none)" filter — mirroring "no source" is meaningless.
+            var sourceIsBuddy = sourceActorKey.HasValue && IsLeafKey(sourceActorKey.Value);
+            if (!isSource && sourceActorKey.HasValue && sourceActorKey.Value != KeyNoSource &&
+                FitsKind(KindsOfActor(sourceActorKey.Value, info)))
+                Add(KeySameAsSource, "Same as source", actorsGroup,
+                    "Act on the same object chosen as the source.", "same as source self identical");
 
-            if (buddySourceKey.HasValue && IsBuddyActor(buddySourceKey.Value))
+            if (Fits(KeyOriginalSource))
+                Add(KeyOriginalSource, info.SourceLabel, actorsGroup, "The script's original source.", "original source");
+            if (Fits(KeyOriginalTarget))
+                Add(KeyOriginalTarget, info.TargetLabel, actorsGroup, "The script's original target.", "original target");
+
+            // Wizard source stage only: a purely visual "no source" filter — lists the commands that
+            // can run without a source. The created row keeps the default source flags underneath.
+            if (isSource && offerNoSourceFilter)
+                Add(KeyNoSource, "(none)", actorsGroup,
+                    "Commands that don't need a source. The row keeps the default source under the hood.",
+                    "none no source without sourceless");
+
+            // A fresh buddy for this slot. Suppressed on the target when the source already owns the
+            // one buddy locator — "Same as source" reuses it instead.
+            if (!sourceIsBuddy)
             {
-                if (Fits(buddySourceKey.Value))
-                    Add(ActorSameBuddy, "The found object (buddy)", buddyGroup,
-                        "The same buddy object the source locates.", "buddy same found");
-            }
-            else
-            {
-                var allowCreature = def == null || def.Buddy.AllowsCreature();
-                var allowGo = def == null || def.Buddy.AllowsGameObject();
-                if (allowCreature && Fits(ActorNearbyCreature))
+                for (var i = 0; i < DbScriptBuddyLeaves.All.Count; i++)
                 {
-                    Add(ActorNearbyCreature, "A nearby creature (by entry)", buddyGroup,
-                        "The nearest creature of a given entry within a search radius.", "buddy nearest npc");
-                    Add(ActorCreatureByGuid, "A creature (by GUID)", buddyGroup,
-                        "A specific spawned creature, located by its spawn GUID.", "buddy guid npc");
-                    Add(ActorPet, "A pet", buddyGroup,
-                        "The pet of the original actor (optionally of a given entry).", "buddy pet");
+                    var leaf = DbScriptBuddyLeaves.All[i];
+                    if (leaf.ValidFor(cap) && FitsKind(leaf.KindMask))
+                        Add(LeafKeyBase + i, leaf.Label, leaf.Group, leaf.Help, leaf.SearchTags);
                 }
-                if (allowGo && Fits(ActorNearbyGameobject))
-                    Add(ActorNearbyGameobject, "A nearby gameobject (by entry)", buddyGroup,
-                        "The nearest gameobject of a given entry within a search radius.", "buddy nearest go object");
-                if (Fits(ActorByPool))
-                    Add(ActorByPool, "A pooled spawn (by pool id)", buddyGroup,
-                        "The currently spawned object of a spawn pool.", "buddy pool");
-                if (Fits(ActorByStringId))
-                    Add(ActorByStringId, "An object (by string id)", buddyGroup,
-                        "An object tagged with a string id.", "buddy string id tag");
             }
 
+            return items;
+        }
+
+        // The buddy leaf tiles for the TERMINATE_SCRIPT condition picker (plus a "no condition"
+        // tile). No original-source/target rows — the condition buddy occupies neither slot.
+        private List<DbScriptCommandItem> BuildConditionBuddyItems(DbScriptCommandDefinition? def)
+        {
+            var cap = def?.Buddy ?? DbScriptBuddyCapability.Both;
+            var items = new List<DbScriptCommandItem>();
+            var order = 0;
+            void Add(long key, string name, string group, string help, string tags) =>
+                items.Add(new DbScriptCommandItem(group, false, null)
+                    { Key = key, Name = name, SearchName = $"{name} {tags}", Help = help, Order = order++ });
+
+            Add(NoBuddyConditionKey, "No condition (always terminate)", "Condition",
+                "Terminate unconditionally — do not look for any object.", "none no condition always");
+            for (var i = 0; i < DbScriptBuddyLeaves.All.Count; i++)
+            {
+                var leaf = DbScriptBuddyLeaves.All[i];
+                if (leaf.ValidFor(cap))
+                    Add(LeafKeyBase + i, leaf.Label, leaf.Group, leaf.Help, leaf.SearchTags);
+            }
             return items;
         }
 
@@ -1449,98 +1526,102 @@ namespace WDE.DbScriptsEditor.Editor.ViewModels
         // The actor key a slot's current state corresponds to (for preselecting in the picker).
         private static long ActorKeyOf(SourceTargetKind kind, BuddyDescriptor buddy) => kind switch
         {
-            SourceTargetKind.OriginalSource => ActorOriginalSource,
-            SourceTargetKind.OriginalTarget => ActorOriginalTarget,
-            _ => buddy.Mode switch
-            {
-                BuddyFindMode.ByGuid => ActorCreatureByGuid,
-                BuddyFindMode.Pet => ActorPet,
-                BuddyFindMode.ByPool => ActorByPool,
-                BuddyFindMode.ByStringId => ActorByStringId,
-                _ => buddy.IsGameObject ? ActorNearbyGameobject : ActorNearbyCreature,
-            },
+            SourceTargetKind.OriginalSource => KeyOriginalSource,
+            SourceTargetKind.OriginalTarget => KeyOriginalTarget,
+            _ => DbScriptBuddyLeaves.Match(buddy) is { } leaf
+                ? LeafKeyBase + DbScriptBuddyLeaves.IndexOf(leaf)
+                : KeyOriginalSource,
         };
 
         private async Task EditActorSlotCommand(DbScriptActorSlot slot)
         {
             var step = slot.Step;
             var current = step.DecodeFlags();
+            // A lone-target command presents its target slot as the "source" — same slot editing,
+            // different wording, and no "Same as source" mirror (there is no separate source).
+            var swappedPresentation = !slot.IsSource && IsSwappedPresentation(step);
 
-            var items = BuildActorItems(step.Command, step.TypeInfo, slot.IsSource, includeStructural: false);
+            long? sourceActorKey = slot.IsSource || swappedPresentation
+                ? null
+                : ActorKeyOf(current.Direction.Source, current.Buddy);
+
+            var items = BuildActorItems(step.Command, step.TypeInfo, slot.IsSource, sourceActorKey: sourceActorKey);
             var currentKind = slot.IsSource ? current.Direction.Source : current.Direction.Target;
-            var title = slot.IsSource ? "Pick source (who acts)" : "Pick target (acted upon)";
-            var picked = await PickActorKey(title, items, ActorKeyOf(currentKind, current.Buddy));
+            // Preselect "Same as source" when the target already mirrors the source.
+            var preselect = !slot.IsSource && !swappedPresentation && current.Direction.Target == current.Direction.Source
+                ? KeySameAsSource
+                : ActorKeyOf(currentKind, current.Buddy);
+            var title = slot.IsSource || swappedPresentation ? "Pick source (who acts)" : "Pick target (acted upon)";
+            var picked = await PickActorKey(title, items, preselect);
             if (!picked.HasValue)
                 return;
 
-            var choice = await ResolveActorChoice(picked.Value, current.Buddy);
-            if (choice == null)
-                return; // cancelled while entering a value
-
-            var updated = DbScriptSourceTargetCompiler.SetSlot(current, slot.IsSource, choice.Value.kind, choice.Value.buddy);
+            DecodedFlags updated;
+            if (!slot.IsSource && picked.Value == KeySameAsSource)
+            {
+                updated = DbScriptSourceTargetCompiler.SetSlot(current, isSource: false,
+                    current.Direction.Source, current.Buddy);
+            }
+            else
+            {
+                var choice = ResolveActorChoice(picked.Value, current.Buddy);
+                if (choice == null)
+                    return;
+                updated = DbScriptSourceTargetCompiler.SetSlot(current, slot.IsSource, choice.Value.kind, choice.Value.buddy);
+            }
             step.ApplyDecodedFlags(updated);
         }
 
-        // Turns a picked option into (kind, buddy). Gathers the entry/guid/pool/id the option needs;
-        // returns null if the user cancels that follow-up pick. Carries over the current buddy's
-        // radius/despawned/all-eligible flags when the locator mode is unchanged.
-        private async Task<(SourceTargetKind kind, BuddyDescriptor buddy)?> ResolveActorChoice(long option, BuddyDescriptor currentBuddy)
+        // TERMINATE_SCRIPT's "terminate if <buddy> found / not found": a buddy located but occupying
+        // neither slot (the core's buddyFound fallback). Setting / clearing goes through the codec's
+        // condition-buddy path (a self direction keeps the buddy dangling).
+        private async Task EditBuddyConditionCommand(DbScriptBuddyConditionSlot slot)
         {
-            switch (option)
+            var step = slot.Step;
+            var current = step.DecodeFlags();
+            var hasCondition = current.Buddy.Provided && !current.Direction.UsesBuddy;
+
+            var items = BuildConditionBuddyItems(step.Command);
+            var preselect = hasCondition ? ActorKeyOf(SourceTargetKind.Buddy, current.Buddy) : NoBuddyConditionKey;
+            var picked = await PickActorKey("Terminate condition — object to look for", items, preselect);
+            if (!picked.HasValue)
+                return;
+
+            if (picked.Value == NoBuddyConditionKey)
             {
-                case ActorOriginalSource:
-                    return (SourceTargetKind.OriginalSource, BuddyDescriptor.None);
-                case ActorOriginalTarget:
-                    return (SourceTargetKind.OriginalTarget, BuddyDescriptor.None);
-                case ActorNearbyCreature:
-                {
-                    var same = Same(currentBuddy, BuddyFindMode.NearestByEntry, false);
-                    var (entry, ok) = await PickBuddyEntry(false, same ? currentBuddy.Entry : 0);
-                    if (!ok) return null;
-                    // a stale guid/pool value must not leak into the new mode as a bogus radius
-                    return (SourceTargetKind.Buddy, WithMode(currentBuddy, BuddyFindMode.NearestByEntry, false, entry, same ? currentBuddy.SearchValue : 0));
-                }
-                case ActorNearbyGameobject:
-                {
-                    var same = Same(currentBuddy, BuddyFindMode.NearestByEntry, true);
-                    var (entry, ok) = await PickBuddyEntry(true, same ? currentBuddy.Entry : 0);
-                    if (!ok) return null;
-                    return (SourceTargetKind.Buddy, WithMode(currentBuddy, BuddyFindMode.NearestByEntry, true, entry, same ? currentBuddy.SearchValue : 0));
-                }
-                case ActorPet:
-                {
-                    var (entry, ok) = await PickBuddyEntry(false, Same(currentBuddy, BuddyFindMode.Pet, false) ? currentBuddy.Entry : 0);
-                    if (!ok) return null;
-                    return (SourceTargetKind.Buddy, WithMode(currentBuddy, BuddyFindMode.Pet, false, entry, 0));
-                }
-                case ActorCreatureByGuid:
-                {
-                    var (guid, ok) = await PickNumber("Creature GUID", Same(currentBuddy, BuddyFindMode.ByGuid, false) ? currentBuddy.SearchValue : 0);
-                    if (!ok) return null;
-                    return (SourceTargetKind.Buddy, WithMode(currentBuddy, BuddyFindMode.ByGuid, false, currentBuddy.Entry, guid));
-                }
-                case ActorByPool:
-                {
-                    var (pool, ok) = await PickNumber("Pool id", Same(currentBuddy, BuddyFindMode.ByPool, false) ? currentBuddy.SearchValue : 0);
-                    if (!ok) return null;
-                    return (SourceTargetKind.Buddy, WithMode(currentBuddy, BuddyFindMode.ByPool, false, currentBuddy.Entry, pool));
-                }
-                case ActorByStringId:
-                {
-                    var (id, ok) = await PickNumber("String id", Same(currentBuddy, BuddyFindMode.ByStringId, false) ? currentBuddy.Entry : 0);
-                    if (!ok) return null;
-                    return (SourceTargetKind.Buddy, WithMode(currentBuddy, BuddyFindMode.ByStringId, false, id, 0));
-                }
-                default:
-                    return null;
+                step.ApplyDecodedFlags(DbScriptSourceTargetCompiler.SetConditionBuddy(current, BuddyDescriptor.None));
+                return;
             }
+
+            var choice = ResolveActorChoice(picked.Value, current.Buddy);
+            if (choice == null || choice.Value.kind != SourceTargetKind.Buddy)
+                return;
+            step.ApplyDecodedFlags(DbScriptSourceTargetCompiler.SetConditionBuddy(current, choice.Value.buddy));
         }
 
-        private static bool Same(BuddyDescriptor b, BuddyFindMode mode, bool isGo) =>
-            b.Mode == mode && b.IsGameObject == isGo;
+        // Turns a picked option into (kind, buddy). No follow-up popup: the entry / radius / guid /
+        // pool / id keep the current value when the locator is unchanged (else a sensible default),
+        // and are edited afterwards in the action edit window and as clickable values in the readable.
+        private static (SourceTargetKind kind, BuddyDescriptor buddy)? ResolveActorChoice(long option, BuddyDescriptor currentBuddy)
+        {
+            if (option == KeyOriginalSource)
+                return (SourceTargetKind.OriginalSource, BuddyDescriptor.None);
+            if (option == KeyOriginalTarget)
+                return (SourceTargetKind.OriginalTarget, BuddyDescriptor.None);
+            if (option == KeyNoSource)
+                return (SourceTargetKind.OriginalSource, BuddyDescriptor.None);
+            if (!IsLeafKey(option))
+                return null; // KeySameAsSource is resolved by the caller (needs the source kind)
 
-        private static BuddyDescriptor WithMode(BuddyDescriptor prev, BuddyFindMode mode, bool isGo, long entry, long searchValue) =>
-            new(mode, isGo, entry, searchValue, prev.IncludeDespawned, prev.AllEligible);
+            var leaf = LeafOfKey(option);
+            var carry = currentBuddy.Provided && currentBuddy.Mode == leaf.Mode &&
+                        currentBuddy.IsGameObject == leaf.IsGameObject;
+            var entry = carry ? currentBuddy.Entry : 0;
+            // a search radius defaults to 10 yd (0 would match nothing); guid/pool/id start empty
+            var search = carry ? currentBuddy.SearchValue
+                : leaf.SearchPrompt == LeafPrompt.RadiusYd ? 10 : 0;
+            return (SourceTargetKind.Buddy, leaf.ToDescriptor(entry, search));
+        }
 
         // A plain numeric input (guid / pool / string id / wait ms). The generic "Parameter" type
         // gives a number entry picker; the label is advisory only (the picker has its own chrome).

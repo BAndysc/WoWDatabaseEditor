@@ -87,6 +87,14 @@ namespace WDE.DbScriptsEditor.Models
         private string readable = "";
         public string Readable { get => readable; private set => SetProperty(ref readable, value); }
 
+        // Resolved "who acts / acted upon" labels. Separate change-notifying properties (not derived
+        // from the readable), so the source/target buttons refresh even when a command's sentence
+        // doesn't render {source}/{target} and the readable string is unchanged by the edit.
+        private string resolvedSource = "";
+        public string ResolvedSource { get => resolvedSource; private set => SetProperty(ref resolvedSource, value); }
+        private string resolvedTarget = "";
+        public string ResolvedTarget { get => resolvedTarget; private set => SetProperty(ref resolvedTarget, value); }
+
         // Readable with FormattedTextBlock markup: parameters become clickable [p=N] links whose N
         // indexes ReadableContext; source/target render as styled (non-clickable) [s] spans.
         private string formattedReadable = "";
@@ -94,8 +102,6 @@ namespace WDE.DbScriptsEditor.Models
 
         private IReadOnlyList<object> readableContext = Array.Empty<object>();
         public IReadOnlyList<object> ReadableContext { get => readableContext; private set => SetProperty(ref readableContext, value); }
-
-        private static readonly Regex TokenRegex = new(@"\{([A-Za-z0-9 _]+?)\}", RegexOptions.Compiled);
 
         private IReadOnlyList<string> unusedColumns = Array.Empty<string>();
         public IReadOnlyList<string> UnusedColumns { get => unusedColumns; private set => SetProperty(ref unusedColumns, value); }
@@ -238,7 +244,8 @@ namespace WDE.DbScriptsEditor.Models
         public Func<uint, IReadOnlyList<IMangosConditionLine>?>? ConditionClosureProvider { get; set; }
 
         // Human-readable resolved source/target ("who acts on whom") for display.
-        public (string source, string target) ResolveActors() => DbScriptActorResolver.Resolve(ToLine(), typeInfo, ResolveBuddyName);
+        public (string source, string target) ResolveActors() =>
+            BuddyDescriptorFormatter.ResolveActors(ToLine(), typeInfo, BuddyCapability, ResolveBuddyName);
 
         // Resolves a buddy entry to a creature/GO name (CreatureParameter / GameobjectParameter),
         // so "buddy 1234" shows the creature's name instead of a raw id.
@@ -254,9 +261,14 @@ namespace WDE.DbScriptsEditor.Models
             return param.ToString(entry);
         }
 
+        // The command's declared buddy kind (creature / gameobject / both), or the core's creature
+        // default when the command is unknown. Needed so creature-vs-GO buddies decode correctly.
+        public DbScriptBuddyCapability BuddyCapability =>
+            dataManager.TryGetCommand(CommandId)?.Buddy ?? DbScriptBuddyCapability.Creature;
+
         // Structural source/target/buddy state, decoded from the physical columns.
         public DecodedFlags DecodeFlags() =>
-            DbScriptFlagsCodec.Decode((uint)DataFlags.Value, BuddyEntry.Value, SearchRadius.Value);
+            DbScriptFlagsCodec.Decode((uint)DataFlags.Value, BuddyEntry.Value, SearchRadius.Value, BuddyCapability);
 
         // Writes a compiled structural view back to the three physical columns in one undo step.
         public void ApplyDecodedFlags(in DecodedFlags decoded)
@@ -373,29 +385,28 @@ namespace WDE.DbScriptsEditor.Models
             var entityParam = factory.Factory(isGo ? "GameobjectParameter" : "CreatureParameter");
             var plain = factory.Factory(null);
 
-            // search_radius is reinterpreted per locator mode (yards / guid / pool id); null = unused
-            (string entryName, IParameter<long> entryParam, string? searchName) = mode switch
+            // buddy_entry and search_radius are reinterpreted per locator mode. GUID / pool ignore
+            // buddy_entry (the id lives in search_radius); spawn group ignores search_radius.
+            (string entryName, IParameter<long> entryParam, bool entryUsed, string searchName, bool searchUsed) = mode switch
             {
-                BuddyFindMode.ByGuid => ("Buddy expected entry (0 = any)", entityParam, "Buddy GUID"),
-                BuddyFindMode.ByPool => ("Buddy expected entry (0 = any)", entityParam, "Pool id"),
-                BuddyFindMode.BySpawnGroup => ("Spawn group id", plain, "Search radius (yd)"),
-                BuddyFindMode.ByStringId => ("String id", plain, "Search radius (yd)"),
-                BuddyFindMode.Pet => ("Pet of (creature entry)", entityParam, null),
-                _ => (isGo ? "Buddy gameobject entry" : "Buddy creature entry", entityParam, "Search radius (yd)"),
+                BuddyFindMode.ByGuid => ("Buddy expected entry", entityParam, false, "Buddy GUID", true),
+                BuddyFindMode.ByPool => ("Buddy expected entry", entityParam, false, "Pool id", true),
+                BuddyFindMode.BySpawnGroup => ("Spawn group id", plain, true, "Search radius", false),
+                BuddyFindMode.ByStringId => ("String id", plain, true, "Max distance (0 = any)", true),
+                BuddyFindMode.Pet => (isGo ? "Pet gameobject entry" : "Pet creature entry", entityParam, true, "Search radius (yd)", true),
+                _ => (isGo ? "Buddy gameobject entry" : "Buddy creature entry", entityParam, true, "Search radius (yd)", true),
             };
 
             BuddyEntry.Name = entryName;
-            BuddyEntry.Parameter = entryParam;
-            BuddyEntry.IsUsed = true;
+            BuddyEntry.Parameter = entryUsed ? entryParam : plain;
+            BuddyEntry.IsUsed = entryUsed;
 
-            SearchRadius.Name = searchName ?? "Search radius";
+            SearchRadius.Name = searchName;
             SearchRadius.Parameter = plain;
-            SearchRadius.IsUsed = searchName != null;
+            SearchRadius.IsUsed = searchUsed;
 
-            buddyEntryParam = new DbScriptEditableParameter(entryName, null, false, BuddyEntry, null);
-            buddySearchParam = searchName != null
-                ? new DbScriptEditableParameter(searchName, null, false, SearchRadius, null)
-                : null;
+            buddyEntryParam = entryUsed ? new DbScriptEditableParameter(entryName, null, false, BuddyEntry, null) : null;
+            buddySearchParam = searchUsed ? new DbScriptEditableParameter(searchName, null, false, SearchRadius, null) : null;
         }
 
         private void Recompute()
@@ -408,6 +419,11 @@ namespace WDE.DbScriptsEditor.Models
             VariantName = step.VariantName;
             Readable = step.Readable;
             UnusedColumns = step.UnusedColumns;
+
+            var (rs, rt) = BuddyDescriptorFormatter.ResolveActors(
+                line, typeInfo, def?.Buddy ?? DbScriptBuddyCapability.Creature, ResolveBuddyName);
+            ResolvedSource = rs;
+            ResolvedTarget = rt;
 
             IReadOnlyList<DbScriptCommandParameter> parameters = Array.Empty<DbScriptCommandParameter>();
             DbScriptCommandVariant? variant = null;
@@ -479,55 +495,51 @@ namespace WDE.DbScriptsEditor.Models
         private void BuildFormattedReadable(string description)
         {
             var context = new List<object>();
-            var friendly = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var hasActorColon = DbScriptReadableCase.StartsWithActorToken(description);
 
             // Source and target render as green [s=N] spans that are ALSO clickable (the shared
             // FormattedTextBlock makes any span with a context id a link) — clicking opens the
             // high-level actor picker, which compiles the choice down to flags + buddy. A buddy
             // slot additionally embeds its own values (entry, radius/guid/pool) as separate [p]
-            // parameter links, SmartScript-style, so they edit directly without re-picking the
-            // kind. Commands that don't consume an actor render it as plain, non-clickable text.
+            // parameter links, SmartScript-style, so they edit directly without re-picking the kind.
             var def2 = dataManager.TryGetCommand(CommandId);
             var decoded = DecodeFlags();
-            friendly["source"] = RenderActorSlot(context, def2, decoded, true);
-            friendly["target"] = RenderActorSlot(context, def2, decoded, false);
+
+            // SmartFormat data object: raw column values + a clickable [p=N] link per parameter,
+            // keyed by destination column. The description references them via {datalong} etc.
+            var data = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            DbScriptSmartFormat.SeedColumns(data, ToLine());
+            data["source"] = RenderActorSlot(context, def2, decoded, true);
+            data["target"] = RenderActorSlot(context, def2, decoded, false);
+            // {player} / {creature}: the actual actor the core resolves from source/target (player is
+            // target-preferred, creature source-preferred). Clickable — editing opens the picker for
+            // whichever slot it resolves to. Only added when the description uses the token.
+            void AddResolvedActor(string token, DbScriptActorKind wanted, bool preferTarget)
+            {
+                if (!description.Contains("{" + token + "}", StringComparison.Ordinal))
+                    return;
+                var (label, isSource) = BuddyDescriptorFormatter.ResolveActorOfKind(decoded, typeInfo, wanted, preferTarget, ResolveBuddyName);
+                var index = context.Count;
+                context.Add(new DbScriptActorSlot(this, isSource));
+                data[token] = $"[s={index}]{Escape(label)}[/s]";
+            }
+            AddResolvedActor("player", DbScriptActorKind.Player, preferTarget: true);
+            AddResolvedActor("creature", DbScriptActorKind.Creature, preferTarget: false);
 
             foreach (var p in UsedParameters)
             {
                 var index = context.Count;
-                friendly[p.Name] = $"[p={index}]{Escape(p.Holder.String)}[/p]";
+                var link = $"[p={index}]{Escape(p.Holder.String)}[/p]";
                 context.Add(p);
+                if (p.Destination is { } dest)
+                {
+                    var col = DbScriptDestinations.ColumnName(dest);
+                    data[col] = link;
+                    data[col + "Value"] = p.IsFloat ? (object)p.FloatHolder!.Value : p.LongHolder!.Value;
+                }
             }
 
-            // referenced is computed from the un-expanded description on purpose: a parameter
-            // mentioned only inside a non-chosen choose branch still counts as "mentioned".
-            var referenced = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (Match m in TokenRegex.Matches(description))
-                referenced.Add(m.Groups[1].Value.Trim());
-
-            description = DbScriptDescriptionChoose.Expand(description, name =>
-            {
-                var p = UsedParameters.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
-                if (p == null)
-                    return null;
-                return p.IsFloat
-                    ? p.FloatHolder!.Value.ToString("0.###", CultureInfo.InvariantCulture)
-                    : p.LongHolder!.Value.ToString(CultureInfo.InvariantCulture);
-            });
-
-            var rendered = TokenRegex.Replace(description, m =>
-            {
-                var token = m.Groups[1].Value.Trim();
-                return friendly.TryGetValue(token, out var value) ? value : m.Value;
-            });
-
-            // Append any set-but-unmentioned parameter as an extra clickable chip so nothing hides.
-            var extras = UsedParameters
-                .Where(p => !referenced.Contains(p.Name) && IsNonDefault(p))
-                .Select(p => $"{p.Name}: {friendly[p.Name]}")
-                .ToList();
-            if (extras.Count > 0)
-                rendered = $"{rendered} · {string.Join(", ", extras)}";
+            var rendered = DbScriptSmartFormat.Format(description, data);
 
             // The 0x8 switch shows as a trailing clickable token only when the flag is SET and the
             // resolved variant's sentence doesn't already express it (commands 20/37 have no 0x8
@@ -540,8 +552,28 @@ namespace WDE.DbScriptsEditor.Models
                 rendered = $"{rendered} · [p={index}]{Escape(additionalFlagHolder.String)}[/p]";
             }
 
+            // TERMINATE_SCRIPT can gate termination on a buddy that occupies neither slot (the core's
+            // buddyFound fallback). Render it as a clickable token — set / clear via the condition
+            // picker — even when absent, so it can be added.
+            var danglingBuddy = decoded.Buddy.Provided && !decoded.Direction.UsesBuddy;
+            if (CommandId == DbScriptInspections.TerminateScriptCommandId)
+            {
+                var index = context.Count;
+                context.Add(new DbScriptBuddyConditionSlot(this));
+                var condText = danglingBuddy
+                    ? $"condition: {BuddyDescriptorFormatter.Format(decoded.Buddy, ResolveBuddyName)}"
+                    : "no buddy condition";
+                rendered = $"{rendered} · [s={index}]{Escape(condText)}[/s]";
+            }
+            else if (danglingBuddy)
+            {
+                // On other commands a dangling buddy just gates the step (the core skips it when the
+                // buddy isn't found). It occupies no slot, so show it as a plain suffix.
+                rendered = $"{rendered} · [s]only if {Escape(BuddyDescriptorFormatter.Format(decoded.Buddy, ResolveBuddyName))} present[/s]";
+            }
+
             ReadableContext = context;
-            FormattedReadable = rendered;
+            FormattedReadable = DbScriptReadableCase.SentenceCase(rendered, hasActorColon);
         }
 
         // One source/target slot of the sentence: the kind label is the actor-picker link, a buddy
@@ -570,27 +602,47 @@ namespace WDE.DbScriptsEditor.Models
             return RenderBuddy(context, decoded.Buddy, open, clickable);
         }
 
+        // The buddy phrase for one slot: the descriptive words (locator, creature/GO, alive/dead,
+        // closest/all) are the clickable [s] span, the entry/guid/pool/radius are [p] value links.
+        // Mirrors BuddyDescriptorFormatter's wording. Only qualifiers the locator actually honours
+        // are shown (a GO buddy never says "dead", a spawn group never shows a radius).
         private string RenderBuddy(List<object> context, in BuddyDescriptor buddy, string open, bool clickable)
         {
-            var entry = Link(context, buddyEntryParam, BuddyEntry);
+            string EntryLink() => Link(context, buddyEntryParam, BuddyEntry);
             string SearchLink() => Link(context, buddySearchParam, SearchRadius);
+            var all = buddy.AllEligible && buddy.SupportsAllEligible;
+            var dead = buddy.IncludeDespawned && buddy.SupportsLiveness;
 
-            var mode = buddy.Provided ? buddy.Mode : BuddyFindMode.NearestByEntry;
-            var core = mode switch
+            switch (buddy.Provided ? buddy.Mode : BuddyFindMode.NearestByEntry)
             {
-                BuddyFindMode.ByGuid => $"{open}buddy by guid[/s] {SearchLink()} (entry {entry})",
-                BuddyFindMode.ByPool => $"{open}buddy from pool[/s] {SearchLink()} (entry {entry})",
-                BuddyFindMode.BySpawnGroup => $"{open}buddy from spawn group[/s] {entry} (within {SearchLink()} yd)",
-                BuddyFindMode.ByStringId => $"{open}buddy by string id[/s] {entry} (within {SearchLink()} yd)",
-                BuddyFindMode.Pet => $"{open}pet of[/s] {entry}",
-                _ => $"{open}nearest{(buddy.IsGameObject ? " GO" : "")}[/s] {entry} (within {SearchLink()} yd)",
-            };
-
-            if (buddy.AllEligible)
-                core += " (all eligible)";
-            if (buddy.IncludeDespawned)
-                core += " (incl. dead)";
-            return core;
+                case BuddyFindMode.ByGuid:
+                    return buddy.IsGameObject
+                        ? $"{open}gameobject by guid[/s] {SearchLink()}"
+                        : $"{open}creature by guid[/s] {SearchLink()}{(dead ? " (despawned)" : "")}";
+                case BuddyFindMode.ByPool:
+                    return $"{open}pooled creature[/s] (pool {SearchLink()}){(dead ? " (dead)" : "")}";
+                case BuddyFindMode.BySpawnGroup:
+                    return all
+                        ? $"{open}all members of spawn group[/s] {EntryLink()}"
+                        : $"{open}closest member of spawn group[/s] {EntryLink()}";
+                case BuddyFindMode.ByStringId:
+                {
+                    var label = all ? "all objects tagged" : "closest object tagged";
+                    var s = $"{open}{label}[/s] {EntryLink()}";
+                    if (dead) s += " (incl. dead)";
+                    return s + $" (max dist {SearchLink()})";
+                }
+                case BuddyFindMode.Pet:
+                    return $"{open}pet[/s] {EntryLink()} (within {SearchLink()} yd)";
+                default: // NearestByEntry
+                {
+                    var noun = buddy.IsGameObject ? (all ? "gameobjects" : "gameobject")
+                                                  : (all ? "creatures" : "creature");
+                    var lead = all ? "all" : "nearest";
+                    var deadWord = dead ? " dead" : "";
+                    return $"{open}{lead}{deadWord} {noun}[/s] {EntryLink()} (within {SearchLink()} yd)";
+                }
+            }
         }
 
         // A clickable [p=N] value link for a buddy holder; plain text when the wrapper is absent
@@ -603,9 +655,6 @@ namespace WDE.DbScriptsEditor.Models
             context.Add(param);
             return $"[p={index}]{Escape(holder.String)}[/p]";
         }
-
-        private static bool IsNonDefault(DbScriptEditableParameter p) =>
-            p.IsFloat ? Math.Abs(p.FloatHolder!.Value - p.DefaultVal) > float.Epsilon : p.LongHolder!.Value != p.DefaultVal;
 
         // FormattedTextBlock uses '[' and '\\' as markup control characters; escape them in values.
         private static string Escape(string value) =>
