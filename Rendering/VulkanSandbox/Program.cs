@@ -265,7 +265,7 @@ internal static unsafe class Program
             Check(vk.CreateImageView(device, &viewCreateInfo, null, out views[i]), "vkCreateImageView");
         }
 
-        // ---- triangle pipeline (SPIR-V from glslc, dynamic rendering, push constants) ----
+        // ---- triangle pipeline (SPIR-V from shaderc, dynamic rendering, push constants) ----
         var vertSpirv = CompileGlsl(Path.Combine(AppContext.BaseDirectory, "shaders/tri.vert"));
         var fragSpirv = CompileGlsl(Path.Combine(AppContext.BaseDirectory, "shaders/tri.frag"));
         var vertModule = CreateShaderModule(device, vertSpirv);
@@ -707,29 +707,36 @@ internal static unsafe class Program
 
     private static byte[] CompileGlsl(string path)
     {
-        // dev-machine toolchain for now; in-process compilation (Veldrid.SPIRV/shaderc)
-        // is an M3 decision
-        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        var candidates = new List<string> { "/usr/local/bin/glslc", "/opt/homebrew/bin/glslc" };
-        var sdkRoot = Path.Combine(home, "VulkanSDK");
-        if (Directory.Exists(sdkRoot))
-            candidates.AddRange(Directory.GetDirectories(sdkRoot)
-                .OrderByDescending(d => d)
-                .Select(d => Path.Combine(d, "macOS/bin/glslc")));
-        var glslc = candidates.FirstOrDefault(File.Exists)
-                    ?? throw new Exception("glslc not found (looked in /usr/local/bin and ~/VulkanSDK)");
-
-        var spvPath = path + ".spv";
-        var startInfo = new ProcessStartInfo(glslc, $"--target-env=vulkan1.3 \"{path}\" -o \"{spvPath}\"")
+        var source = File.ReadAllText(path);
+        var kind = Path.GetExtension(path) switch
         {
-            RedirectStandardError = true,
+            ".vert" => Silk.NET.Shaderc.ShaderKind.VertexShader,
+            ".frag" => Silk.NET.Shaderc.ShaderKind.FragmentShader,
+            ".comp" => Silk.NET.Shaderc.ShaderKind.ComputeShader,
+            var ext => throw new Exception($"unsupported shader extension {ext}"),
         };
-        using var process = Process.Start(startInfo)!;
-        var stderr = process.StandardError.ReadToEnd();
-        process.WaitForExit();
-        if (process.ExitCode != 0)
-            throw new Exception($"glslc failed for {path}:\n{stderr}");
-        return File.ReadAllBytes(spvPath);
+
+        var api = Silk.NET.Shaderc.Shaderc.GetApi();
+        var compiler = api.CompilerInitialize();
+        var options = api.CompileOptionsInitialize();
+        api.CompileOptionsSetSourceLanguage(options, Silk.NET.Shaderc.SourceLanguage.Glsl);
+        api.CompileOptionsSetTargetEnv(options, Silk.NET.Shaderc.TargetEnv.Vulkan, (uint)Silk.NET.Shaderc.EnvVersion.Vulkan13);
+        var result = api.CompileIntoSpv(compiler, source, (nuint)System.Text.Encoding.UTF8.GetByteCount(source),
+            kind, path, "main", options);
+        try
+        {
+            if (api.ResultGetCompilationStatus(result) != Silk.NET.Shaderc.CompilationStatus.Success)
+                throw new Exception($"shaderc failed for {path}:\n{api.ResultGetErrorMessageS(result)}");
+            var spirv = new byte[(int)api.ResultGetLength(result)];
+            new ReadOnlySpan<byte>(api.ResultGetBytes(result), spirv.Length).CopyTo(spirv);
+            return spirv;
+        }
+        finally
+        {
+            api.ResultRelease(result);
+            api.CompileOptionsRelease(options);
+            api.CompilerRelease(compiler);
+        }
     }
 
     private static ShaderModule CreateShaderModule(Device device, byte[] spirv)
