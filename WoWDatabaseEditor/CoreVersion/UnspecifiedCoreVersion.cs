@@ -13,6 +13,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
     {
         public string Tag => "unspecified";
         public string FriendlyName => "Unspecified";
+        public string EditorTitle => "Database Editor";
         public ImageUri Icon { get; } = new ImageUri("Icons/core_unknown.png");
         public IDatabaseFeatures DatabaseFeatures => this;
         public ISmartScriptFeatures SmartScriptFeatures => this;

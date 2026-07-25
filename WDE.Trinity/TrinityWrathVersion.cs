@@ -13,6 +13,7 @@ namespace WDE.Trinity
     {
         public string Tag => "TrinityWrath";
         public string FriendlyName => "TrinityCore Wrath of the Lich King";
+        public string EditorTitle => "Trinity Database Editor";
         public ImageUri Icon { get; } = new ImageUri("Icons/core_tc.png");
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;

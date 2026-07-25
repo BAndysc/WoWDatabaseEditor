@@ -59,8 +59,8 @@ public class TimelineViewModel : ObservableBase, IDocument
         this.windowManager = windowManager;
         this.messageBoxService = messageBoxService;
 
-        Cards.Add(new CardViewModel("WoW Database Editor :: 2021 Summary", 
-            new TextContentItem("2021 has been a busy year, no doubt. But did you know that WoW Database Editor is already 5 years old?! And in fact, the development of it begun in 2015?"),
+        Cards.Add(new CardViewModel("Database Editor :: 2021 Summary", 
+            new TextContentItem("2021 has been a busy year, no doubt. But did you know that the editor is already 5 years old?! And in fact, the development of it begun in 2015?"),
             new TextContentItem("Fasten your belts and take a look at history of the development!"),
             new TextContentItem(""),
             new TextContentItem("(NOTE: things here are downloaded from the Internet, if nothing appears here, it means there is some internet connection problem)"),

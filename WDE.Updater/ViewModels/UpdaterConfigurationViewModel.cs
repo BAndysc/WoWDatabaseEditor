@@ -75,7 +75,7 @@ namespace WDE.Updater.ViewModels
         public ImageUri Icon { get; } = new ImageUri("Icons/document_update_big.png");
         public string Name => "Editor updates";
         public string ShortDescription =>
-            "WoW Database Editor can automatically check for updates. No personal data is sent during checking. You can change the behaviour or check for updates manually here."; 
+            "The editor can automatically check for updates. No personal data is sent during checking. You can change the behaviour or check for updates manually here."; 
         public bool IsModified => disableAutoUpdates != settings.Settings.DisableAutoUpdates || enableSilentUpdates != settings.Settings.EnableSilentUpdates || enableReadyToInstallPopup != settings.Settings.EnableReadyToInstallPopup;
         public bool IsRestartRequired => false;
         public ConfigurableGroup Group => ConfigurableGroup.Basic;

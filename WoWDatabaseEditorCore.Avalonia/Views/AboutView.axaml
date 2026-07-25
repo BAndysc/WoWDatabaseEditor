@@ -14,12 +14,12 @@
                 <Border BorderThickness="0,0,0,2" BorderBrush="{DynamicResource AccentColorMedium}">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                         <Image Source="../Icon.png" Width="56" Height="56" />
-                        <TextBlock VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow">WoW Database Editor 2024.1</TextBlock>
+                        <TextBlock VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow" Text="{CompiledBinding ProgramTitle}" />
                     </StackPanel>
                 </Border>
                 <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
-                    <TextBlock FontWeight="Bold" Text="WoW Database Editor" />
-                    <TextBlock TextWrapping="WrapWithOverflow" Text=" is an application used to create scripts (behaviours) in TrinityCore based servers." />
+                    <TextBlock FontWeight="Bold" Text="{CompiledBinding ProgramName}" />
+                    <TextBlock TextWrapping="WrapWithOverflow" Text=" is an application used to create scripts (behaviours) for supported server cores." />
                 </WrapPanel>
                 <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
                     <TextBlock  TextWrapping="WrapWithOverflow" Text="To start work, add new &quot;file&quot; to the solution - File -&gt; Add. To edit script, double click on selected item in Solution Explorer." />

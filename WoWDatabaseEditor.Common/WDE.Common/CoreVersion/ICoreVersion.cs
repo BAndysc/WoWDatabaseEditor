@@ -11,6 +11,10 @@ namespace WDE.Common.CoreVersion
     {
         string Tag { get; }
         string FriendlyName { get; }
+        /// <summary>Product name shown in the window title and start page, branded per core
+        /// (e.g. "Trinity Database Editor"). Deliberately has no default so a new core
+        /// cannot forget to pick its branding.</summary>
+        string EditorTitle { get; }
         ImageUri Icon { get; }
         IDatabaseFeatures DatabaseFeatures { get; }
         ISmartScriptFeatures SmartScriptFeatures { get; }

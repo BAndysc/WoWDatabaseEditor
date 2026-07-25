@@ -13,6 +13,7 @@ public class CMangosTbcVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFe
 {
     public string Tag => "CMaNGOS-TBC";
     public string FriendlyName => "CMaNGOS The Burning Crusade";
+    public string EditorTitle => "CMaNGOS Database Editor";
     public ImageUri Icon { get; } = new ImageUri("Icons/core_cmangos.png");
     public ISmartScriptFeatures SmartScriptFeatures => this;
     public IConditionFeatures ConditionFeatures => this;

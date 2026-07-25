@@ -152,7 +152,7 @@ namespace WDE.PacketViewer.ViewModels
         public ImageUri Icon { get; } = new ImageUri("Icons/document_index_big.png");
         public string Name => "Packet viewer";
         public string? ShortDescription =>
-            "WoW Database Editor has builtin integration with TrinityCore's Packet Parser.";
+            "The editor has builtin integration with TrinityCore's Packet Parser.";
         public bool IsRestartRequired => false;
         public ConfigurableGroup Group => ConfigurableGroup.Advanced;
     }

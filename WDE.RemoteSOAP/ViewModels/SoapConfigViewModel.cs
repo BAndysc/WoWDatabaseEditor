@@ -114,7 +114,7 @@ namespace WDE.RemoteSOAP.ViewModels
         public string Name => "Soap connector";
 
         public string ShortDescription =>
-            "WoW Database Editor can connect to the TrinityCore or CMaNGOS based server console and execute reload commands for you.\n\nFirstly you have to enable SOAP in worldserver configuration, set `SOAP.Enabled` to `1` in order to do so. Then put your GM account username and password to execute commands on your behalf.";
+            "The editor can connect to the TrinityCore or CMaNGOS based server console and execute reload commands for you.\n\nFirstly you have to enable SOAP in worldserver configuration, set `SOAP.Enabled` to `1` in order to do so. Then put your GM account username and password to execute commands on your behalf.";
 
         public AsyncAutoCommand TestConnection { get; }
 

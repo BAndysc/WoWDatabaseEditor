@@ -58,7 +58,7 @@
             </ItemsControl.ItemsPanel>
         </ItemsControl>
 
-        <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.MultipleActionsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Multiple actions in one event">In the WoW Database Editor you can have many actions in a single event. You do not have to copy-paste events.</controls:TeachingTip>
+        <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.MultipleActionsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Multiple actions in one event">In the editor you can have many actions in a single event. You do not have to copy-paste events.</controls:TeachingTip>
         <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.YouCanNameStoredTargetsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Stored object source/target name">You can name stored object variables to make writing script easier. To add named stored object, use right click on 'Add Event'.</controls:TeachingTip>
         <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.ControlToCopyOpened}" VerticalAlignment="Bottom" Margin="20" Header="Drag + control key to copy">You can hold control key while dragging event/action/condition to duplicate them.</controls:TeachingTip>
         <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.SaveDefaultScaleOpened}" VerticalAlignment="Bottom" Margin="20" Header="Right mouse button to save">You can save the default script scale using the context menu of the slider.</controls:TeachingTip>

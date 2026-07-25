@@ -17,7 +17,7 @@
                 BorderBrush="{DynamicResource EventScript_WarningBorderBrush}"
                 Padding="8"
                 >
-            <TextBlock>WoW Database Editor can only view the script in the read only mode.</TextBlock>
+            <TextBlock>The editor can only view the script in the read only mode.</TextBlock>
         </Border>
         <ScrollViewer Padding="10">
             <ItemsRepeater ItemsSource="{CompiledBinding Lines}">

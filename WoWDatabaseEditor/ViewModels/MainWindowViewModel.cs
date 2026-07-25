@@ -239,9 +239,9 @@ namespace WoWDatabaseEditorCore.ViewModels
             DocumentManager.OpenDocument(textDocumentCreator().Set("Crash log", log));
             
             messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                .SetTitle("WoW Database Editor has been closed due to the fatal error")
+                .SetTitle("The editor has been closed due to the fatal error")
                 .SetIcon(MessageBoxIcon.Error)
-                .SetMainInstruction("WoW Database Editor has been closed due to the fatal error")
+                .SetMainInstruction("The editor has been closed due to the fatal error")
                 .SetContent("Sorry, the editor has been closed to the fatal error, a log with the error is now opened, you can report the bug via Help -> Report a bug and attach the log")
                 .WithOkButton(true)
                 .Build());

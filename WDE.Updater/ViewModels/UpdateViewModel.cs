@@ -189,7 +189,7 @@ namespace WDE.Updater.ViewModels
                         await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                             .SetTitle("Your platform doesn't support self updates")
                             .SetContent(
-                                "Sadly, self updater is not available on your operating system yet.\n\nA new version of WoW Database Editor has been downloaded, but you have to manually copy new version to the Applications folder")
+                                "Sadly, self updater is not available on your operating system yet.\n\nA new version of the editor has been downloaded, but you have to manually copy new version to the Applications folder")
                             .Build());
                         var physPath = fileSystem.ResolvePhysicalPath(platformService.UpdateZipFilePath);
 

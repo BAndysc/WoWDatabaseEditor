@@ -13,6 +13,7 @@ public class CMangosClassicVersion : ICoreVersion, IDatabaseFeatures, ISmartScri
 {
     public string Tag => "CMaNGOS-Classic";
     public string FriendlyName => "CMaNGOS (Classic)";
+    public string EditorTitle => "CMaNGOS Database Editor";
     public ImageUri Icon { get; } = new ImageUri("Icons/core_cmangos.png");
     public ISmartScriptFeatures SmartScriptFeatures => this;
     public IConditionFeatures ConditionFeatures => this;

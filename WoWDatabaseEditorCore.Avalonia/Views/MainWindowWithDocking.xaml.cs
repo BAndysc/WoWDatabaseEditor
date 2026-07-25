@@ -253,7 +253,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 {
                     DispatcherTimer.RunOnce(() =>
                     {
-                        ShowTooltipFlyout(this.GetControl<Button>("OpenSQLDocument"), "SQL editor is now available!", "WoW Database Editor now features a complete SQL editor just like MySql Workbench, HeidiSQL or SQLyog. Press the button to open.");
+                        ShowTooltipFlyout(this.GetControl<Button>("OpenSQLDocument"), "SQL editor is now available!", "The editor now features a complete SQL editor just like MySql Workbench, HeidiSQL or SQLyog. Press the button to open.");
                     }, TimeSpan.FromSeconds(1));
                 }
                 if (vm.ShowGlobalSearchNotification())

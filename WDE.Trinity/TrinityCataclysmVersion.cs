@@ -13,6 +13,7 @@ namespace WDE.Trinity
     {
         public string Tag => "TrinityCata";
         public string FriendlyName => "The Cataclysm Preservation Project";
+        public string EditorTitle => "Trinity Database Editor";
         public ImageUri Icon { get; } = new ImageUri("Icons/core_tc.png");
 
         public IDatabaseFeatures DatabaseFeatures => this;

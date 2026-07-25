@@ -13,6 +13,7 @@ public class CMangosWrathVersion : ICoreVersion, IDatabaseFeatures, ISmartScript
 {
     public string Tag => "CMaNGOS-WoTLK";
     public string FriendlyName => "CMaNGOS Wrath of the Lich King";
+    public string EditorTitle => "CMaNGOS Database Editor";
     public ImageUri Icon { get; } = new ImageUri("Icons/core_cmangos.png");
     public ISmartScriptFeatures SmartScriptFeatures => this;
     public IConditionFeatures ConditionFeatures => this;

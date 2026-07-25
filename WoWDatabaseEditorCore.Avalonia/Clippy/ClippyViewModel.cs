@@ -51,7 +51,7 @@ public partial class ClippyViewModel : ObservableBase, IWindowViewModel
             //     "Dragonflight",
             //     "The War Within"
             // });
-            Question = new ClippyQuestion("Welcome to 1998! How do you like the latest WoW Database Editor '97?", new List<string>()
+            Question = new ClippyQuestion("Welcome to 1998! How do you like the latest Database Editor '97?", new List<string>()
             {
                 "I love it!",
                 "It's okay",

@@ -1,3 +1,4 @@
+using WDE.Common.CoreVersion;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Services;
 
@@ -7,7 +8,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Services
     [SingleInstance]
     public class ProgramNameService : IProgramNameService
     {
-        public string Title => Program.ApplicationName;
+        private readonly ICurrentCoreVersion currentCoreVersion;
+
+        public ProgramNameService(ICurrentCoreVersion currentCoreVersion)
+        {
+            this.currentCoreVersion = currentCoreVersion;
+        }
+
+        public string Title => $"{currentCoreVersion.Current.EditorTitle} {Program.ApplicationVersion}";
         public string Subtitle => "";
     }
 }

@@ -13,6 +13,7 @@ namespace WDE.Trinity
     {
         public string Tag => "TrinityMaster";
         public string FriendlyName => "TrinityCore Master (Retail)";
+        public string EditorTitle => "Trinity Database Editor";
         public ImageUri Icon { get; } = new ImageUri("Icons/core_tc.png");
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;

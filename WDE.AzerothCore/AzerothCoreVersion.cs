@@ -13,6 +13,7 @@ namespace WDE.AzerothCore
     {
         public string Tag => "Azeroth";
         public string FriendlyName => "AzerothCore Wrath of the Lich King";
+        public string EditorTitle => "Azeroth Database Editor";
         public ImageUri Icon { get; } = new ImageUri("Icons/core_ac.png");
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;

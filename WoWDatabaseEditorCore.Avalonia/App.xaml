@@ -12,7 +12,7 @@
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              x:Class="WoWDatabaseEditorCore.Avalonia.App"
              RequestedThemeVariant="Light"
-             Name="WoW Database Editor">
+             Name="Database Editor">
      <Application.DataTemplates>
         <avalonia:AvaloniaViewLocator />
 

@@ -139,7 +139,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
         public ICommand Save { get; }
         public ImageUri Icon { get; } = new ImageUri("Icons/document_brush_big.png");
         public string Name => "Appearance";
-        public string ShortDescription => "Wow Database Editor is supplied with few looks, check them out!";
+        public string ShortDescription => "The editor is supplied with few looks, check them out!";
         public bool IsRestartRequired => true;
         public ConfigurableGroup Group => ConfigurableGroup.Basic;
 

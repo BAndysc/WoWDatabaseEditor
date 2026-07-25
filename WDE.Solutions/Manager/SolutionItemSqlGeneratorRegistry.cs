@@ -78,7 +78,7 @@ namespace WDE.Solutions.Manager
             }
             else
             {
-                return Queries.Raw(DataDatabaseType.World, $"--- INTERNAL WoW Database Editor ERROR ---\n\n{item.GetType()} unknown SQL generator. Development info: You need to register class implementing ISolutionItemSqlProvider<T> interface");
+                return Queries.Raw(DataDatabaseType.World, $"--- INTERNAL EDITOR ERROR ---\n\n{item.GetType()} unknown SQL generator. Development info: You need to register class implementing ISolutionItemSqlProvider<T> interface");
             }
         }
     }

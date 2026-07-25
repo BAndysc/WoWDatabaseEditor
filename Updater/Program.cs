@@ -18,7 +18,7 @@ namespace Updater
             Console.WriteLine("@@@@@@@@@@@@@@@@@");
             Console.WriteLine("@");
             Console.WriteLine("@");
-            Console.WriteLine("@    ERROR WHILE INSTALLING THE WoW Database Editor UPDATE");
+            Console.WriteLine("@    ERROR WHILE INSTALLING THE EDITOR UPDATE");
             Console.WriteLine("@");
             Console.WriteLine("@         " + message);
             Console.WriteLine("@");
@@ -28,7 +28,7 @@ namespace Updater
         static void Main(string[] args)
         {
             Console.WriteLine();
-            Console.WriteLine(" --- WoW Database Editor Updater ---");
+            Console.WriteLine(" --- Database Editor Updater ---");
             Console.WriteLine("    (sorry it is that ugly)");
             Console.WriteLine();
             var excludeFiles = new HashSet<string>()
@@ -63,7 +63,7 @@ namespace Updater
 
             if (!WaitUntilCantWriteExecutable(executable, out var exception))
             {
-                PrintError(exception, "Can't write the .EXE file. Please close the WoW Database Editor and try again (No update has been installed).");
+                PrintError(exception, "Can't write the .EXE file. Please close the editor and try again (No update has been installed).");
                 Thread.Sleep(10000);
                 LaunchWowDatabaseEditor(executable, args);
                 return;
