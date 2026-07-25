@@ -15,6 +15,7 @@ namespace WDE.Common.Database
         string ScriptName { get; }
         uint this[int dataIndex] { get; }
         uint DataCount { get; }
+        ushort Faction { get; }
     }
     
     public class AbstractGameObjectTemplate : IGameObjectTemplate
@@ -29,6 +30,7 @@ namespace WDE.Common.Database
         public string ScriptName { get; init; } = "";
         public uint this[int dataIndex] => 0;
         public uint DataCount => 0;
+        public ushort Faction { get; init; } = 0;
     }
     
     public enum GameobjectType
