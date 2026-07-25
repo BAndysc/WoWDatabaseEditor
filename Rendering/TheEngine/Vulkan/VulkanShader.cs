@@ -1,14 +1,15 @@
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using Silk.NET.Shaderc;
 using Silk.NET.Vulkan;
 using TheEngine.Resources;
 using TheEngine.Entities;
+using Compiler = Silk.NET.Shaderc.Compiler;
 
 namespace TheEngine.Vulkan;
 
 /// <summary>
-/// Vulkan shader pass: SPIR-V modules (compiled by shelling out to glslc) plus the
+/// Vulkan shader pass: SPIR-V modules (compiled in-process by shaderc) plus the
 /// reflected material resource interface.
 ///
 /// Descriptor convention (fixed across the whole engine):
@@ -65,7 +66,7 @@ internal sealed unsafe class VulkanShaderPass : IShaderPass, IDisposable
         FragmentModule = Compile(fragmentSource, "frag", shaderData.Pixel.Path);
 
         // reflection must not see declarations in inactive #ifdef blocks (e.g. SHADOW_PASS-only
-        // bindings when compiling the FORWARD_PASS variant) - glslc evaluates the defines
+        // bindings when compiling the FORWARD_PASS variant) - shaderc evaluates the defines
         // during compilation, mirror that here
         Reflect(StripInactiveBlocks(vertexSource, vertexDefines));
         Reflect(StripInactiveBlocks(fragmentSource, fragmentDefines));
@@ -298,69 +299,56 @@ internal sealed unsafe class VulkanShaderPass : IShaderPass, IDisposable
     }
 }
 
-/// <summary>Compiles our Vulkan-GLSL dialect to SPIR-V by shelling out to glslc (interim until a vendored compiler).</summary>
-internal static class GlslCompiler
+/// <summary>Compiles our Vulkan-GLSL dialect to SPIR-V in-process via shaderc (same engine as glslc).</summary>
+internal static unsafe class GlslCompiler
 {
-    private static string? glslcPath;
-
-    private static string FindGlslc()
-    {
-        if (glslcPath != null)
-            return glslcPath;
-        var candidates = new List<string> { "glslc", "/usr/local/bin/glslc", "/opt/homebrew/bin/glslc" };
-        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        var sdkRoot = Path.Combine(home, "VulkanSDK");
-        if (Directory.Exists(sdkRoot))
-            foreach (var version in Directory.GetDirectories(sdkRoot))
-                candidates.Add(Path.Combine(version, "macOS", "bin", "glslc"));
-        foreach (var candidate in candidates)
-        {
-            try
-            {
-                using var probe = Process.Start(new ProcessStartInfo(candidate, "--version")
-                    { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false });
-                probe!.WaitForExit();
-                if (probe.ExitCode == 0)
-                    return glslcPath = candidate;
-            }
-            catch
-            {
-                // try the next candidate
-            }
-        }
-        throw new Exception("glslc not found - install the Vulkan SDK or shaderc");
-    }
+    // shaderc_compiler_t is thread-safe, but shared shaderc_compile_options_t is not documented
+    // as such - compilation only happens on shader (re)load, so a single lock is cheap enough
+    private static readonly object gate = new();
+    private static Shaderc? api;
+    private static Compiler* compiler;
+    private static CompileOptions* options;
 
     public static byte[] Compile(string source, string stage, string fileName)
     {
-        var inFile = Path.GetTempFileName();
-        var outFile = Path.GetTempFileName();
-        try
+        lock (gate)
         {
-            File.WriteAllText(inFile, source);
-            var psi = new ProcessStartInfo(FindGlslc(),
-                $"-fshader-stage={stage} --target-env=vulkan1.3 \"{inFile}\" -o \"{outFile}\"")
+            if (api == null)
             {
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-            };
-            using var process = Process.Start(psi)!;
-            var stderr = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-            if (process.ExitCode != 0)
-            {
-                int lineNo = 0;
-                foreach (var line in source.Split('\n'))
-                    Console.WriteLine($"{++lineNo,5}: {line}");
-                throw new Exception($"glslc failed for {fileName} ({stage}):\n{stderr}");
+                api = Shaderc.GetApi();
+                compiler = api.CompilerInitialize();
+                options = api.CompileOptionsInitialize();
+                api.CompileOptionsSetSourceLanguage(options, SourceLanguage.Glsl);
+                api.CompileOptionsSetTargetEnv(options, TargetEnv.Vulkan, (uint)EnvVersion.Vulkan13);
             }
-            return File.ReadAllBytes(outFile);
-        }
-        finally
-        {
-            File.Delete(inFile);
-            File.Delete(outFile);
+
+            var kind = stage switch
+            {
+                "vert" => ShaderKind.VertexShader,
+                "frag" => ShaderKind.FragmentShader,
+                "comp" => ShaderKind.ComputeShader,
+                _ => throw new Exception($"unsupported shader stage {stage}"),
+            };
+
+            var result = api.CompileIntoSpv(compiler, source, (nuint)System.Text.Encoding.UTF8.GetByteCount(source),
+                kind, fileName, "main", options);
+            try
+            {
+                if (api.ResultGetCompilationStatus(result) != CompilationStatus.Success)
+                {
+                    int lineNo = 0;
+                    foreach (var line in source.Split('\n'))
+                        Console.WriteLine($"{++lineNo,5}: {line}");
+                    throw new Exception($"shaderc failed for {fileName} ({stage}):\n{api.ResultGetErrorMessageS(result)}");
+                }
+                var spirv = new byte[(int)api.ResultGetLength(result)];
+                new ReadOnlySpan<byte>(api.ResultGetBytes(result), spirv.Length).CopyTo(spirv);
+                return spirv;
+            }
+            finally
+            {
+                api.ResultRelease(result);
+            }
         }
     }
 }

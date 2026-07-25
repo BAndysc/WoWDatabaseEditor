@@ -337,7 +337,7 @@ internal unsafe class VulkanContext : IDisposable
             SType = StructureType.PhysicalDeviceVulkan13Features,
             DynamicRendering = true,
             Synchronization2 = true,
-            // required in core 1.3; glslc compiles `discard` to OpDemoteToHelperInvocation
+            // required in core 1.3; shaderc/glslang compiles `discard` to OpDemoteToHelperInvocation
             ShaderDemoteToHelperInvocation = true,
         };
 
