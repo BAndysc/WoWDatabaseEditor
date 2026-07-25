@@ -502,7 +502,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             }
         }
 
-        protected override async Task<IQuery> GenerateSaveQuery()
+        public override async Task<IQuery> GenerateSaveQuery()
         {
             IMultiQuery multi = Queries.BeginTransaction(tableDefinition.DataDatabaseType);
             multi.Add(await base.GenerateSaveQuery());

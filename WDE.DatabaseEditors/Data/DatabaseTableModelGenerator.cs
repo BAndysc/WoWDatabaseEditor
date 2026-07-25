@@ -95,7 +95,7 @@ namespace WDE.DatabaseEditors.Data
                     }
                     else if (columnType == typeof(decimal))
                     {
-                        valueHolder = new ValueHolder<float>(value as float? ?? 0, isNull);
+                        valueHolder = new ValueHolder<float>((float)(value as decimal? ?? 0), isNull);
                     }
                     else if (columnType == typeof(uint))
                     {

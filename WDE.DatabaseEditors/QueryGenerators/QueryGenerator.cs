@@ -27,6 +27,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
         private readonly IParameterFactory parameterFactory;
         private readonly IQueryGenerator<ConditionDeleteModel> conditionDeleteGenerator;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
+        private readonly IMangosConditionQueryGenerator mangosConditionQueryGenerator;
+        private readonly IMangosUnitConditionQueryGenerator mangosUnitConditionQueryGenerator;
         private readonly ICurrentCoreVersion currentCoreVersion;
 
         private Dictionary<DatabaseTable, ICustomQueryGeneratorAppend> customQueryAppenders = new();
@@ -36,6 +38,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
             IParameterFactory parameterFactory,
             IQueryGenerator<ConditionDeleteModel> conditionDeleteGenerator,
             IConditionQueryGenerator conditionQueryGenerator,
+            IMangosConditionQueryGenerator mangosConditionQueryGenerator,
+            IMangosUnitConditionQueryGenerator mangosUnitConditionQueryGenerator,
             ICurrentCoreVersion currentCoreVersion,
             IEnumerable<ICustomQueryGeneratorAppend> customQueryAppenders,
             IEnumerable<ICustomFullQueryGenerator> customQueryGenerators)
@@ -44,6 +48,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
             this.parameterFactory = parameterFactory;
             this.conditionDeleteGenerator = conditionDeleteGenerator;
             this.conditionQueryGenerator = conditionQueryGenerator;
+            this.mangosConditionQueryGenerator = mangosConditionQueryGenerator;
+            this.mangosUnitConditionQueryGenerator = mangosUnitConditionQueryGenerator;
             this.currentCoreVersion = currentCoreVersion;
             foreach (var gen in customQueryAppenders)
             {
@@ -64,11 +70,73 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
             if (tableData.TableDefinition.IsOnlyConditionsTable is OnlyConditionMode.IgnoreTableCompletely or OnlyConditionMode.TableReadOnly)
                 return BuildConditions(keys, tableData);
+
+            IQuery tableQuery;
             if (tableData.TableDefinition.RecordMode == RecordMode.MultiRecord)
-                return GenerateInsertQuery(keys, tableData);
-            if (tableData.TableDefinition.RecordMode == RecordMode.SingleRow)
-                return GenerateSingleRecordQuery(keys, deletedKeys, tableData);
-            return GenerateUpdateQuery(tableData);
+                tableQuery = GenerateInsertQuery(keys, tableData);
+            else if (tableData.TableDefinition.RecordMode == RecordMode.SingleRow)
+                tableQuery = GenerateSingleRecordQuery(keys, deletedKeys, tableData);
+            else
+                tableQuery = GenerateUpdateQuery(tableData);
+
+            var mangosConditions = BuildMangosConditions(keys, tableData);
+            var mangosUnitConditions = BuildMangosUnitConditions(keys, tableData);
+            if (mangosConditions == null && mangosUnitConditions == null)
+                return tableQuery;
+
+            var query = Queries.BeginTransaction(tableData.TableDefinition.DataDatabaseType);
+            query.Add(tableQuery);
+            if (mangosConditions != null)
+                query.Add(mangosConditions);
+            if (mangosUnitConditions != null)
+                query.Add(mangosUnitConditions);
+            return query.Close();
+        }
+
+        // pending cmangos condition tree edits ("mangos_conditions:<column>" meta columns),
+        // exported as delete + reinsert of each edited tree's closure
+        private IQuery? BuildMangosConditions(IReadOnlyList<DatabaseKey> keys, IDatabaseTableData tableData)
+        {
+            IMultiQuery? query = null;
+            foreach (var entity in tableData.Entities)
+            {
+                if (entity.MangosConditions == null || entity.MangosConditions.Count == 0)
+                    continue;
+
+                if (keys.Count > 0 && !entity.Phantom && !keys.Contains(entity.Key))
+                    continue;
+
+                foreach (var change in entity.MangosConditions.Values)
+                {
+                    query ??= Queries.BeginTransaction(tableData.TableDefinition.DataDatabaseType);
+                    query.Add(mangosConditionQueryGenerator.BuildDeleteQuery(change.AffectedEntries));
+                    query.Add(mangosConditionQueryGenerator.BuildInsertQuery(change.Lines));
+                }
+            }
+            return query?.Close();
+        }
+
+        // pending cmangos unit_condition row edits ("mangos_unit_conditions:<column>" meta
+        // columns), exported as delete + reinsert of each edited row
+        private IQuery? BuildMangosUnitConditions(IReadOnlyList<DatabaseKey> keys, IDatabaseTableData tableData)
+        {
+            IMultiQuery? query = null;
+            foreach (var entity in tableData.Entities)
+            {
+                if (entity.MangosUnitConditions == null || entity.MangosUnitConditions.Count == 0)
+                    continue;
+
+                if (keys.Count > 0 && !entity.Phantom && !keys.Contains(entity.Key))
+                    continue;
+
+                foreach (var change in entity.MangosUnitConditions.Values)
+                {
+                    query ??= Queries.BeginTransaction(tableData.TableDefinition.DataDatabaseType);
+                    query.Add(mangosUnitConditionQueryGenerator.BuildDeleteQuery(change.AffectedIds));
+                    query.Add(mangosUnitConditionQueryGenerator.BuildInsertQuery(new[] { change.Line }));
+                }
+            }
+            return query?.Close();
         }
 
         public IQuery GenerateSingleRecordQuery(IReadOnlyList<DatabaseKey> keys, IReadOnlyList<DatabaseKey>? deletedKeys, IDatabaseTableData tableData)

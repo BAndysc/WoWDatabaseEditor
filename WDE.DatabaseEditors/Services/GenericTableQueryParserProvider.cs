@@ -110,6 +110,10 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
                 {
                     if (key.Count != defi.GroupByKeys.Count)
                         continue;
+                    // only a row that exists RIGHT NOW is a session deletion - a DELETE of a
+                    // never-existing row (e.g. the defensive delete before this query's own
+                    // INSERT) must not surface in the session output. This means callers must
+                    // parse BEFORE executing the query, never after.
                     var old = await loader.Load(defi.Id, null,null,null, new[]{key});
                     if (old != null && old.Entities.Count > 0)
                     {
@@ -117,7 +121,7 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
                             toDelete = byTableToDelete[defi.Id] = new();
 
                         toDelete.Add(key);
-                    }   
+                    }
                 }
             }
         }

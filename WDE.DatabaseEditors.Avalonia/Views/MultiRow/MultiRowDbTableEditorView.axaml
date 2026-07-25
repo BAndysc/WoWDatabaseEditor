@@ -118,7 +118,7 @@
             <Setter Property="RevertCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}" />
             <Setter Property="DuplicateCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.DuplicateCommand, Mode=OneTime}" />
             <Setter Property="RemoveTemplateCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}" />
-            <Setter Property="CanBeNull" Value="{Binding CanBeSetToNull, Mode=OneTime}" />
+            <Setter Property="CanBeNull" Value="{ReflectionBinding CanBeSetToNull, Mode=OneTime}" />
         </Style>
     </UserControl.Styles>
     <UserControl.DataTemplates>
@@ -153,7 +153,7 @@
                 <DataTemplate x:DataType="vm:DatabaseCellViewModel">
                     <controls2:FastItemCellView
                         Height="24"
-                        Value="{Binding ParameterValue.Value}"
+                        Value="{ReflectionBinding ParameterValue.Value}"
                         SelectedItem="{CompiledBinding OptionValue, Mode=TwoWay}"
                         Items="{CompiledBinding Items}"
                         Padding="5,0,0,0"
@@ -166,9 +166,9 @@
                     <controls2:FastCellView Height="24"
                         ToolTip.Tip="{CompiledBinding OriginalValueTooltip}"
                         IsActive="True"
-                        ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
+                        ShowChooseButton="{ReflectionBinding ParameterValue.Parameter.HasItems, Mode=OneTime}"
                         IsReadOnly="{CompiledBinding IsReadOnly, Mode=OneTime}"
-                        Value="{Binding ParameterValue.Value}"
+                        Value="{ReflectionBinding ParameterValue.Value}"
                         Padding="5,0,0,0"
                         ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
                         StringValue="{CompiledBinding ParameterValue.String, FallbackValue=''}">

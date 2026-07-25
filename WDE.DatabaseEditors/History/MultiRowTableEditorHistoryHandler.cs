@@ -43,9 +43,13 @@ namespace WDE.DatabaseEditors.History
                         {
                             inner.Item.FieldValueChanged += FieldValueChanged;
                             inner.Item.OnConditionsChanged += OnConditionsChanged;
+                            inner.Item.OnMangosConditionsChanged += OnMangosConditionsChanged;
+                            inner.Item.OnMangosUnitConditionsChanged += OnMangosUnitConditionsChanged;
                         }
                         else if (inner.Type == CollectionEventType.Remove)
                         {
+                            inner.Item.OnMangosUnitConditionsChanged -= OnMangosUnitConditionsChanged;
+                            inner.Item.OnMangosConditionsChanged -= OnMangosConditionsChanged;
                             inner.Item.OnConditionsChanged -= OnConditionsChanged;
                             inner.Item.FieldValueChanged -= FieldValueChanged;
                         }
@@ -80,6 +84,16 @@ namespace WDE.DatabaseEditors.History
         private void OnConditionsChanged(DatabaseEntity entity, IReadOnlyList<ICondition>? old, IReadOnlyList<ICondition>? @new)
         {
             PushAction(new DatabaseEntityConditionsChangedHistoryAction(entity, old, @new, viewModel));
+        }
+
+        private void OnMangosConditionsChanged(DatabaseEntity entity, ColumnFullName column, MangosConditionsChange? old, MangosConditionsChange? @new)
+        {
+            PushAction(new DatabaseEntityMangosConditionsChangedHistoryAction(entity, column, old, @new, viewModel));
+        }
+
+        private void OnMangosUnitConditionsChanged(DatabaseEntity entity, ColumnFullName column, MangosUnitConditionChange? old, MangosUnitConditionChange? @new)
+        {
+            PushAction(new DatabaseEntityMangosUnitConditionsChangedHistoryAction(entity, column, old, @new, viewModel));
         }
 
         private void UnbindTableData()

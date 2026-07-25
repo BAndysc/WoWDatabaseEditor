@@ -37,8 +37,10 @@ using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
-    public abstract class ViewModelBase : ObservableBase, ISolutionItemDocument, ISplitSolutionItemQueryGenerator, ITableContext
+    public abstract class ViewModelBase : ObservableBase, ISolutionItemDocument, ISplitSolutionItemQueryGenerator, ITableContext, IAnalyticsNameProvider
     {
+        public string? AnalyticsName => tableDefinition is null ? null : "table/" + tableDefinition.Id;
+
         protected readonly ISolutionItemNameRegistry solutionItemName;
         protected readonly ISolutionManager solutionManager;
         protected readonly ISolutionTasksService solutionTasksService;
@@ -153,7 +155,7 @@ namespace WDE.DatabaseEditors.ViewModels
             return taskRunner.ScheduleTask($"Loading {Title}..", InternalLoadData);
         }
 
-        protected virtual Task<IQuery> GenerateSaveQuery() => GenerateQuery();
+        public virtual Task<IQuery> GenerateSaveQuery() => GenerateQuery();
         
         public virtual Task<IQuery> GenerateQuery()
         {
@@ -199,6 +201,7 @@ namespace WDE.DatabaseEditors.ViewModels
                     {
                         await mySqlExecutor.ExecuteSql(tableDefinition, query);
                         History.MarkAsSaved();
+                        USAGE.Count("document_saved", ("document", AnalyticsName ?? "table"));
                         await AfterSave();
                         statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));
                     }

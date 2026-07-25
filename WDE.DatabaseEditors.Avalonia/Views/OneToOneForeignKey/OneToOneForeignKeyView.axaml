@@ -76,7 +76,7 @@
             <Setter Property="IsModified" Value="{Binding IsModified}" />
             <Setter Property="SetNullCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}" />
             <Setter Property="RevertCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}" />
-            <Setter Property="CanBeNull" Value="{Binding CanBeSetToNull, Mode=OneTime}" />
+            <Setter Property="CanBeNull" Value="{ReflectionBinding CanBeSetToNull, Mode=OneTime}" />
         </Style>
         <Style Selector=":is(controls|FastCellView)">
             <Setter Property="ChooseParameterCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}" />

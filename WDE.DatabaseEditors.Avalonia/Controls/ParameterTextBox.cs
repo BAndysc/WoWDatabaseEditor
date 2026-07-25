@@ -10,7 +10,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
     {
         private DateTime lastFocusTime;
         
-        protected override void OnGotFocus(GotFocusEventArgs e)
+        protected override void OnGotFocus(FocusChangedEventArgs e)
         {
             base.OnGotFocus(e);
             lastFocusTime = DateTime.Now;

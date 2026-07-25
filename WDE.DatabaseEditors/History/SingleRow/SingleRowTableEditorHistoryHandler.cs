@@ -43,11 +43,15 @@ public class SingleRowTableEditorHistoryHandler : HistoryHandler, IDisposable
             {
                 e.Item.FieldValueChanged += FieldValueChanged;
                 e.Item.OnConditionsChanged += OnConditionsChanged;
+                e.Item.OnMangosConditionsChanged += OnMangosConditionsChanged;
+                e.Item.OnMangosUnitConditionsChanged += OnMangosUnitConditionsChanged;
             }
             else if (e.Type == CollectionEventType.Remove)
             {
                 e.Item.FieldValueChanged -= FieldValueChanged;
                 e.Item.OnConditionsChanged -= OnConditionsChanged;
+                e.Item.OnMangosConditionsChanged -= OnMangosConditionsChanged;
+                e.Item.OnMangosUnitConditionsChanged -= OnMangosUnitConditionsChanged;
             }
         });
     }
@@ -62,6 +66,16 @@ public class SingleRowTableEditorHistoryHandler : HistoryHandler, IDisposable
     private void OnConditionsChanged(DatabaseEntity entity, IReadOnlyList<ICondition>? old, IReadOnlyList<ICondition>? @new)
     {
         PushAction(new DatabaseEntityConditionsChangedHistoryAction(entity, old, @new, viewModel));
+    }
+
+    private void OnMangosConditionsChanged(DatabaseEntity entity, ColumnFullName column, MangosConditionsChange? old, MangosConditionsChange? @new)
+    {
+        PushAction(new DatabaseEntityMangosConditionsChangedHistoryAction(entity, column, old, @new, viewModel));
+    }
+
+    private void OnMangosUnitConditionsChanged(DatabaseEntity entity, ColumnFullName column, MangosUnitConditionChange? old, MangosUnitConditionChange? @new)
+    {
+        PushAction(new DatabaseEntityMangosUnitConditionsChangedHistoryAction(entity, column, old, @new, viewModel));
     }
 
     private void OnAction(IHistoryAction action)

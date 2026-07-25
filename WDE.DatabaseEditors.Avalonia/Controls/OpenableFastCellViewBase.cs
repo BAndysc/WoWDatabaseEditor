@@ -73,7 +73,13 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 return;
 
             var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
-            var text = clipboard == null ? null : await clipboard.GetTextAsync();
+            if (clipboard == null)
+            {
+                return;
+            }
+
+            if (!(await clipboard.TryGetTextAsync() is { } text))
+                return;
 
             if (string.IsNullOrEmpty(text))
                 return;
@@ -152,7 +158,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             AdornerLayer.SetAdornedElement(editingControl, this);
             editingControl.Focus();
             
-            var toplevel = this.GetVisualRoot() as TopLevel;
+            var toplevel = TopLevel.GetTopLevel(this);
             if (toplevel != null)
             {
                 subscriptionsOnOpen = toplevel.AddDisposableHandler(PointerPressedEvent, (s, ev) =>

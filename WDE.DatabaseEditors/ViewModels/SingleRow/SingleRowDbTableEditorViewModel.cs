@@ -24,6 +24,7 @@ using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
+using WDE.Common.Services.IdGenerator;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Sessions;
 using WDE.Common.Solution;
@@ -54,7 +55,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private readonly IDatabaseEditorsSettings editorSettings;
         private readonly ITableEditorPickerService tableEditorPickerService;
         private readonly IMainThread mainThread;
-        private readonly IPersonalGuidRangeService personalGuidRangeService;
+        private readonly IIdGeneratorService idGenerator;
         private readonly IMetaColumnsSupportService metaColumnsSupportService;
         private readonly ITablePersonalSettings personalSettings;
         private readonly DocumentMode mode;
@@ -62,6 +63,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         private HashSet<DatabaseKey> keys = new HashSet<DatabaseKey>();
         private HashSet<DatabaseKey> removedKeys = new HashSet<DatabaseKey>();
+        // subset of removedKeys whose rows never existed in the original DB (they were created by this
+        // document, e.g. a new row materialized by an earlier save). Their DELETE must run on Save (a
+        // previous save inserted them live), but is omitted from the generated/exported (session)
+        // query, so add-then-delete nets to nothing there.
+        private HashSet<DatabaseKey> removedSelfCreatedKeys = new HashSet<DatabaseKey>();
         private HashSet<DatabaseKey> forceInsertKeys = new HashSet<DatabaseKey>();
         private HashSet<DatabaseKey> forceDeleteKeys = new HashSet<DatabaseKey>();
         private HashSet<(DatabaseKey key, ColumnFullName columnName)> forceUpdateCells = new HashSet<(DatabaseKey, ColumnFullName)>();
@@ -189,7 +195,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             IDatabaseTableCommandService commandService,
             IParameterPickerService parameterPickerService,
             IStatusBar statusBar, ITableEditorPickerService tableEditorPickerService,
-            IMainThread mainThread, IPersonalGuidRangeService personalGuidRangeService,
+            IMainThread mainThread, IIdGeneratorService idGenerator,
             IClipboardService clipboardService, IMetaColumnsSupportService metaColumnsSupportService,
             ITablePersonalSettings personalSettings,
             DocumentMode mode = DocumentMode.Editor)
@@ -206,7 +212,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             this.editorSettings = editorSettings;
             this.tableEditorPickerService = tableEditorPickerService;
             this.mainThread = mainThread;
-            this.personalGuidRangeService = personalGuidRangeService;
+            this.idGenerator = idGenerator;
             this.metaColumnsSupportService = metaColumnsSupportService;
             this.personalSettings = personalSettings;
             this.mode = mode;
@@ -432,11 +438,17 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         private async Task SetupPersonalGuidValue(DatabaseEntity entity)
         {
-            if (TableDefinition.AutoKeyValue.HasValue && personalGuidRangeService.IsConfigured)
+            if (TableDefinition.AutoKeyValue.HasValue)
             {
-                var nextGuid = await personalGuidRangeService.GetNextGuidOrShowError(TableDefinition.AutoKeyValue.Value, statusBar);
+                IIdType request = TableDefinition.AutoKeyValue.Value == GuidType.Creature
+                    ? new CreatureGuidIdType()
+                    : new GameObjectGuidIdType();
+                // no usable source set up = keep the old silent behavior (the user types the key manually)
+                if (idGenerator.GetActiveSource(request.GetType()) is not { IsConfigured: true })
+                    return;
+                var nextGuid = await idGenerator.GetNextOrShowError(request, statusBar);
                 if (nextGuid.HasValue)
-                    entity.SetTypedCellOrThrow(TableDefinition.PrimaryKey[0], (long)nextGuid.Value);
+                    entity.SetTypedCellOrThrow(TableDefinition.PrimaryKey[0], nextGuid.Value);
             }
         }
 
@@ -527,7 +539,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         protected override IReadOnlyList<DatabaseKey>? GenerateDeletedKeys() => GenerateDeletedKeys(false);
         protected IReadOnlyList<DatabaseKey> GenerateDeletedKeys(bool saveQuery)
         {
-            return removedKeys.Count == 0 ? forceDeleteKeys.ToList() : removedKeys.Union(forceDeleteKeys).ToList();
+            var deleted = removedKeys.Count == 0 ? forceDeleteKeys.ToList() : removedKeys.Union(forceDeleteKeys).ToList();
+            // the exported query never saw the self-created rows' INSERTs, so it must not delete them
+            if (!saveQuery && removedSelfCreatedKeys.Count > 0)
+                deleted.RemoveAll(removedSelfCreatedKeys.Contains);
+            return deleted;
         }
 
         protected override async Task<DatabaseTableData?> LoadData()
@@ -581,6 +597,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             await sessionService.UpdateQuery(this);
             MaterializePhantomEntities();
             History.MarkAsSaved();
+            USAGE.Count("document_saved", ("document", AnalyticsName ?? "table"));
             return true;
         }
 
@@ -690,6 +707,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 keys.Remove(entity.Key);
                 removedKeys.Add(entity.Key);
+                if (!entity.ExistInDatabase)
+                    removedSelfCreatedKeys.Add(entity.Key);
                 forceInsertKeys.Remove(entity.Key);
             }
 
@@ -711,6 +730,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 if (undoing)
                     forceInsertKeys.Add(entity.Key);
                 removedKeys.Remove(entity.Key);
+                removedSelfCreatedKeys.Remove(entity.Key);
                 forceDeleteKeys.Remove(entity.Key);
                 var pseudoItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
                 var savedItem = sessionService.Find(pseudoItem);
@@ -898,7 +918,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return entity;
         }
 
-        protected override Task<IQuery> GenerateSaveQuery()
+        public override Task<IQuery> GenerateSaveQuery()
         {
             return GenerateQueryImpl(true);
         }

@@ -64,9 +64,9 @@
                 <DataTemplate x:DataType="viewModels:DatabaseCellViewModel">
                     <controls:FastCellView MinWidth="300" Margin="0,0,10,0"
                                            ToolTip.Tip="{CompiledBinding OriginalValueTooltip}"
-                                           Value="{Binding ParameterValue.Value}"
+                                           Value="{ReflectionBinding ParameterValue.Value}"
                                            ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
-                                           ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
+                                           ShowChooseButton="{ReflectionBinding ParameterValue.Parameter.HasItems, Mode=OneTime}"
                                            StringValue="{CompiledBinding ParameterValue.String}">
                     </controls:FastCellView>
                 </DataTemplate>

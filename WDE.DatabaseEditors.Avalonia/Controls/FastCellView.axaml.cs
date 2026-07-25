@@ -71,7 +71,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             };
             textBox.Classes.Add("GridViewPlainTextBox");
             textBox.DataContext = this;
-            textBox.Bind(TextBox.TextProperty, new Binding("Value", BindingMode.OneTime));
+            textBox.Bind(TextBox.TextProperty, new ReflectionBinding("Value"){Mode = BindingMode.OneTime});
             textBox.MinWidth = 0;
             textBox.MinHeight = 0;
             textBox.Margin = new Thickness(partText?.Margin.Left ?? 0,partText?.Margin.Top ?? 0, 0, 0);

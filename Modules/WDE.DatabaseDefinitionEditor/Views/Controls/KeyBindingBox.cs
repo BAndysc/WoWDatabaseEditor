@@ -57,9 +57,9 @@ public class KeyBindingBox : TemplatedControl
         keyDisposable = null;
     }
 
-    private void TextBoxOnGotFocus(object? sender, GotFocusEventArgs e)
+    private void TextBoxOnGotFocus(object? sender, FocusChangedEventArgs e)
     {
-        var root = (this.GetVisualRoot() as InputElement);
+        var root = (TopLevel.GetTopLevel(this) as InputElement);
         keyDisposable = root!.AddDisposableHandler(KeyDownEvent, Handler, RoutingStrategies.Tunnel);
     }
 

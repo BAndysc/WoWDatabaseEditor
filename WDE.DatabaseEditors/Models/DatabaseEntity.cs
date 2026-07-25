@@ -39,10 +39,58 @@ namespace WDE.DatabaseEditors.Models
 
         public IEnumerable<IDatabaseField> Fields => Cells.Values;
 
+        // pending, unsaved cmangos condition tree edits, keyed by the condition_id-style
+        // column that references the tree (meta type "mangos_conditions:<column>")
+        private Dictionary<ColumnFullName, MangosConditionsChange>? mangosConditions;
+
+        public IReadOnlyDictionary<ColumnFullName, MangosConditionsChange>? MangosConditions => mangosConditions;
+
+        public MangosConditionsChange? GetMangosConditions(ColumnFullName column)
+        {
+            return mangosConditions?.GetValueOrDefault(column);
+        }
+
+        public void SetMangosConditions(ColumnFullName column, MangosConditionsChange? change)
+        {
+            var old = GetMangosConditions(column);
+            if (change == null)
+                mangosConditions?.Remove(column);
+            else
+                (mangosConditions ??= new Dictionary<ColumnFullName, MangosConditionsChange>())[column] = change;
+            OnMangosConditionsChanged?.Invoke(this, column, old, change);
+            OnPropertyChanged(nameof(MangosConditions));
+        }
+
+        // pending, unsaved cmangos unit_condition row edits, keyed by the id column that
+        // references the row (meta type "mangos_unit_conditions:<column>")
+        private Dictionary<ColumnFullName, MangosUnitConditionChange>? mangosUnitConditions;
+
+        public IReadOnlyDictionary<ColumnFullName, MangosUnitConditionChange>? MangosUnitConditions => mangosUnitConditions;
+
+        public MangosUnitConditionChange? GetMangosUnitConditions(ColumnFullName column)
+        {
+            return mangosUnitConditions?.GetValueOrDefault(column);
+        }
+
+        public void SetMangosUnitConditions(ColumnFullName column, MangosUnitConditionChange? change)
+        {
+            var old = GetMangosUnitConditions(column);
+            if (change == null)
+                mangosUnitConditions?.Remove(column);
+            else
+                (mangosUnitConditions ??= new Dictionary<ColumnFullName, MangosUnitConditionChange>())[column] = change;
+            OnMangosUnitConditionsChanged?.Invoke(this, column, old, change);
+            OnPropertyChanged(nameof(MangosUnitConditions));
+        }
+
         public event System.Action<IHistoryAction>? OnAction;
         public event Action<DatabaseEntity, ColumnFullName, Action<IValueHolder>, Action<IValueHolder>>? FieldValueChanged;
-        
+
         public event System.Action<DatabaseEntity, IReadOnlyList<ICondition>?, IReadOnlyList<ICondition>?>? OnConditionsChanged;
+
+        public event System.Action<DatabaseEntity, ColumnFullName, MangosConditionsChange?, MangosConditionsChange?>? OnMangosConditionsChanged;
+
+        public event System.Action<DatabaseEntity, ColumnFullName, MangosUnitConditionChange?, MangosUnitConditionChange?>? OnMangosUnitConditionsChanged;
         
         public bool ExistInDatabase { get; set; }
 
@@ -163,8 +211,13 @@ namespace WDE.DatabaseEditors.Models
             var fields = new Dictionary<ColumnFullName, IDatabaseField>(ColumnFullNameIgnoreCaseComparer.Instance);
             foreach (var field in Cells)
                 fields[field.Key] = field.Value.Clone();
-            
-            return new DatabaseEntity(existInDatabase ?? ExistInDatabase, newKey ?? Key, fields, Conditions == null ? null : CloneConditions(Conditions));
+
+            var clone = new DatabaseEntity(existInDatabase ?? ExistInDatabase, newKey ?? Key, fields, Conditions == null ? null : CloneConditions(Conditions));
+            if (mangosConditions != null)
+                clone.mangosConditions = new Dictionary<ColumnFullName, MangosConditionsChange>(mangosConditions);
+            if (mangosUnitConditions != null)
+                clone.mangosUnitConditions = new Dictionary<ColumnFullName, MangosUnitConditionChange>(mangosUnitConditions);
+            return clone;
         }
 
         private IReadOnlyList<ICondition> CloneConditions(IReadOnlyList<ICondition> conditions)

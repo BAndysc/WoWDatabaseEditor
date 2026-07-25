@@ -36,12 +36,14 @@ public class OnReleaseListBox : ListBox
 
             if (point.Properties.PointerUpdateKind is PointerUpdateKind.LeftButtonReleased or PointerUpdateKind.RightButtonReleased)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 e.Handled = UpdateSelectionFromEventSource(
                     e.Source,
                     true,
                     e.KeyModifiers.HasFlagFast(KeyModifiers.Shift),
                     e.KeyModifiers.HasFlagFast(KeyModifiers.Control),
                     point.Properties.IsRightButtonPressed);
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
     }

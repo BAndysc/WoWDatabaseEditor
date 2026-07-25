@@ -34,6 +34,8 @@ namespace WDE.DatabaseEditors.History
                 {
                     e.Item.OnAction += PushAction;
                     e.Item.OnConditionsChanged += OnConditionsChanged;
+                    e.Item.OnMangosConditionsChanged += OnMangosConditionsChanged;
+                    e.Item.OnMangosUnitConditionsChanged += OnMangosUnitConditionsChanged;
                     PushAction(new TemplateDatabaseEntityAddedHistoryAction(e.Item, e.Index, viewModel));
                 }
                 else if (e.Type == CollectionEventType.Remove)
@@ -41,6 +43,8 @@ namespace WDE.DatabaseEditors.History
                     PushAction(new TemplateDatabaseEntityRemovedHistoryAction(e.Item, e.Index, viewModel));
                     e.Item.OnAction -= PushAction;
                     e.Item.OnConditionsChanged -= OnConditionsChanged;
+                    e.Item.OnMangosConditionsChanged -= OnMangosConditionsChanged;
+                    e.Item.OnMangosUnitConditionsChanged -= OnMangosUnitConditionsChanged;
                 }
             });
         }
@@ -48,6 +52,16 @@ namespace WDE.DatabaseEditors.History
         private void OnConditionsChanged(DatabaseEntity entity, IReadOnlyList<ICondition>? old, IReadOnlyList<ICondition>? @new)
         {
             PushAction(new DatabaseEntityConditionsChangedHistoryAction(entity, old, @new, viewModel));
+        }
+
+        private void OnMangosConditionsChanged(DatabaseEntity entity, Data.Structs.ColumnFullName column, MangosConditionsChange? old, MangosConditionsChange? @new)
+        {
+            PushAction(new DatabaseEntityMangosConditionsChangedHistoryAction(entity, column, old, @new, viewModel));
+        }
+
+        private void OnMangosUnitConditionsChanged(DatabaseEntity entity, Data.Structs.ColumnFullName column, MangosUnitConditionChange? old, MangosUnitConditionChange? @new)
+        {
+            PushAction(new DatabaseEntityMangosUnitConditionsChangedHistoryAction(entity, column, old, @new, viewModel));
         }
         
         private void UnbindTableData()
