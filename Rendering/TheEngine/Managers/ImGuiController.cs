@@ -182,10 +182,15 @@ public class ImGuiController : IDisposable
         io.DisplaySize = new Vector2(1, 1); // init to something non zero
         var fonts = io.Fonts;
 
-        // default font
+        // default font, each with the Lucide icon font merged in (MergeMode appends the icon
+        // glyphs to the PREVIOUSLY added font, so text and icons mix freely in one string -
+        // use the TheEngine.Lucide constants, e.g. $"{Lucide.Save} Save")
         fonts.AddFontFromFileTTF("fonts/DroidSans.ttf", 15);
+        MergeIconFont(fonts, 15);
         fonts.AddFontFromFileTTF("fonts/DroidSans-Bold.ttf", 15);
+        MergeIconFont(fonts, 15);
         fonts.AddFontFromFileTTF("fonts/DroidSans-Bold.ttf", 25);
+        MergeIconFont(fonts, 25);
 
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset | ImGuiBackendFlags.HasSetMousePos | ImGuiBackendFlags.RendererHasTextures;
         ImGui.StyleColorsDark();
@@ -215,6 +220,26 @@ public class ImGuiController : IDisposable
         var pipeline = engine.pipelineManager.CreatePipeline(shaderHandle, PrimitiveTopology.TriangleList, desc, true);
 
         material = engine.materialManager.CreateMaterial<ImGuiMaterialData_t>(pipeline);
+    }
+
+    /// <summary>Merges the Lucide icon glyphs (U+E038..U+E6FD, see <see cref="Lucide"/>) into the
+    /// font added just before it (MergeMode). Icons render slightly smaller than the text size and
+    /// are nudged down so they sit on the text baseline instead of floating above it.</summary>
+    private static unsafe void MergeIconFont(ImFontAtlasPtr fonts, float textSize)
+    {
+        // an explicitly-initialized config: a zeroed struct is NOT a valid ImFontConfig
+        // (RasterizerMultiply/Density 0 and GlyphMaxAdvanceX 0 produce invisible glyphs)
+        var cfg = new ImFontConfig(
+            name: (byte*)null,
+            fontDataOwnedByAtlas: true,
+            mergeMode: true,
+            pixelSnapH: true,
+            rasterizerMultiply: 1f,
+            rasterizerDensity: 1f,
+            glyphMaxAdvanceX: float.MaxValue,
+            glyphMinAdvanceX: textSize, // icons align like a column of monospaced glyphs
+            glyphOffset: new Vector2(0, MathF.Round(textSize * 0.14f)));
+        fonts.AddFontFromFileTTF("fonts/lucide.ttf", textSize - 2, &cfg);
     }
 
     private static void DefaultDockedTabToGameView()

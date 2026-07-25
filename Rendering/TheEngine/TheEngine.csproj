@@ -59,6 +59,9 @@
       <None Update="fonts\DroidSans-Bold.ttf">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="fonts\lucide.ttf">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
       <None Update="ECS\EntityExtensionsCodeGen.tt">
         <LastGenOutput>EntityExtensionsCodeGen.cs</LastGenOutput>
         <Generator>TextTemplatingFileGenerator</Generator>
