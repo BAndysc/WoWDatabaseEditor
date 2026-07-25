@@ -34,8 +34,10 @@ namespace WDE.HttpDatabase.Models
         public uint ActionPoiId { get; set; }
 
         public uint ActionScriptId => 0;
+        public uint CharShipmentId => 0;
+        public uint LfgDungeonId => 0;
 
-        
+
         public uint BoxCoded { get; set; }
         
         
@@ -82,8 +84,10 @@ namespace WDE.HttpDatabase.Models
         public uint ActionPoiId { get; set; }
 
         public uint ActionScriptId => 0;
+        public uint CharShipmentId => 0;
+        public uint LfgDungeonId => 0;
 
-        
+
         public uint BoxCoded { get; set; }
         
         
