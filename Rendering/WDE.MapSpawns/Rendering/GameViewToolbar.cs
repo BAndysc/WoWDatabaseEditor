@@ -9,6 +9,7 @@ using WDE.Common;
 using WDE.Common.Utils;
 using WDE.MVVM.Observable;
 using WDE.MapSpawns.Models;
+using WDE.MapSpawns.Models.AreaTriggers;
 using WDE.MapSpawns.Models.CreatureLinking;
 using WDE.MapSpawns.Models.Formations;
 using WDE.MapSpawns.Models.Pools;
@@ -40,6 +41,7 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
     private readonly ISafeLocEditorService safeLocService;
     private readonly ISpellTargetEditorService spellTargetService;
     private readonly ICreatureLinkEditorService linkService;
+    private readonly IAreaTriggerEditorService areaTriggerService;
     private readonly IWorldSpawnEditService editService;
     private readonly IGameNotificationService notifications;
     private readonly SpawnEditorTutorial tutorial;
@@ -69,6 +71,7 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
         ISafeLocEditorService safeLocService,
         ISpellTargetEditorService spellTargetService,
         ICreatureLinkEditorService linkService,
+        IAreaTriggerEditorService areaTriggerService,
         IWorldSpawnEditService editService,
         IGameNotificationService notifications,
         SpawnEditorTutorial tutorial)
@@ -83,6 +86,7 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
         this.safeLocService = safeLocService;
         this.spellTargetService = spellTargetService;
         this.linkService = linkService;
+        this.areaTriggerService = areaTriggerService;
         this.editService = editService;
         this.notifications = notifications;
     }
@@ -136,8 +140,12 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
                 : "Spell target positions - not supported for this database core", 7);
         ImGui.SameLine(0, 4);
         ToolButton("##tool_creaturelink", ToolIcon.CreatureLink, SpawnEditorTool.CreatureLink, linkService.IsSupported,
-            linkService.IsSupported ? "Creature linking - drag a creature onto another to link slave → master\n(guid or entry mode in the panel)"
+            linkService.IsSupported ? "Creature linking - drag a creature onto another to link slave -> master\n(guid or entry mode in the panel)"
                 : "Creature linking - not supported for this database core", 8);
+        ImGui.SameLine(0, 4);
+        ToolButton("##tool_areatrigger", ToolIcon.AreaTrigger, SpawnEditorTool.AreaTrigger, areaTriggerService.IsSupported,
+            areaTriggerService.IsSupported ? "Area triggers - click a trigger shape to edit its teleport\ndestination, tavern flag, exploration quest and script"
+                : "Area triggers - not supported for this database core", 9);
 
         VerticalSeparator(dl);
         GizmoModeDropdown(dl);
@@ -383,6 +391,8 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
             Section("Spell targets", spellTargetService.BuildSaveQuery());
         if (linkService.AnyDirty)
             Section("Creature linking", linkService.BuildSaveQuery());
+        if (areaTriggerService.AnyDirty)
+            Section("Area triggers", areaTriggerService.BuildSaveQuery());
 
         return sb.Length == 0 ? null : sb.ToString();
     }
@@ -395,7 +405,8 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
         || waypointService.AnyDirty
         || safeLocService.AnyDirty
         || spellTargetService.AnyDirty
-        || linkService.AnyDirty;
+        || linkService.AnyDirty
+        || areaTriggerService.AnyDirty;
 
     /// <summary>Starts a SaveAll unless one is already running - the document save and the Ctrl+S
     /// shortcut both go through here so they share the busy guard.</summary>
@@ -445,6 +456,8 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
             await TrySave("Spell targets", spellTargetService.Save);
         if (linkService.AnyDirty)
             await TrySave("Creature linking", linkService.Save);
+        if (areaTriggerService.AnyDirty)
+            await TrySave("Area triggers", areaTriggerService.Save);
 
         if (failures != null)
         {

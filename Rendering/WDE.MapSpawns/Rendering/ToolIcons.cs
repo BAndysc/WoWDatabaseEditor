@@ -14,6 +14,7 @@ public enum ToolIcon
     Graveyard,
     SpellTarget,
     CreatureLink,
+    AreaTrigger,
     Save,
     Undo,
     Redo,
@@ -142,6 +143,16 @@ public static class ToolIcons
                 dl.AddCircle(P(0.62f, 0.60f), s * 0.20f, col, 0, th);
                 var a = P(0.16f, 0.86f);
                 var b = P(0.84f, 0.16f);
+                dl.AddLine(a, b, col, th);
+                ArrowHead(dl, b, Vector2.Normalize(b - a), s, col);
+                break;
+            }
+            case ToolIcon.AreaTrigger:
+            {
+                // trigger volume (box) with a teleport arrow leaving it
+                dl.AddRect(P(0.06f, 0.34f), P(0.58f, 0.94f), col, 0, 0, th);
+                var a = P(0.32f, 0.64f);
+                var b = P(0.90f, 0.14f);
                 dl.AddLine(a, b, col, th);
                 ArrowHead(dl, b, Vector2.Normalize(b - a), s, col);
                 break;

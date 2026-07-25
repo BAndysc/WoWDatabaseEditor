@@ -124,6 +124,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IReadOnlyList<IWorldSafeLoc>?> GetWorldSafeLocsAsync() => impl.GetWorldSafeLocsAsync();
         public Task<IReadOnlyList<IGraveyardLink>?> GetGraveyardLinksAsync() => impl.GetGraveyardLinksAsync();
         public Task<IReadOnlyList<ISpellTargetPosition>?> GetSpellTargetPositionsAsync() => impl.GetSpellTargetPositionsAsync();
+        public Task<IReadOnlyList<IAreaTriggerTeleport>?> GetAreaTriggerTeleportsAsync() => impl.GetAreaTriggerTeleportsAsync();
+        public Task<IReadOnlyList<IAreaTriggerTavern>?> GetAreaTriggerTavernsAsync() => impl.GetAreaTriggerTavernsAsync();
+        public Task<IReadOnlyList<IAreaTriggerQuestRelation>?> GetAreaTriggerQuestRelationsAsync() => impl.GetAreaTriggerQuestRelationsAsync();
+        public Task<IReadOnlyList<IScriptedAreaTrigger>?> GetScriptedAreaTriggersAsync() => impl.GetScriptedAreaTriggersAsync();
         
         public Task<IReadOnlyList<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) => impl.GetGossipMenuOptionsAsync(menuId);
         public Task<INpcText?> GetNpcText(uint entry) => impl.GetNpcText(entry);

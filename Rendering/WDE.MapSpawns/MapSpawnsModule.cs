@@ -4,6 +4,7 @@ using WDE.Common.Events;
 using WDE.Common.Parameters;
 using WDE.MapRenderer;
 using WDE.MapSpawns.Rendering;
+using WDE.MapSpawns.Rendering.AreaTriggers;
 using WDE.MapSpawns.Rendering.CreatureLinking;
 using WDE.MapSpawns.Rendering.Formations;
 using WDE.MapSpawns.Rendering.Pools;
@@ -32,6 +33,7 @@ public class MapSpawnsModule : ModuleBase
                     gameView.RegisterGameModule(c => c.Resolve<PoolEditorModule>());
                     gameView.RegisterGameModule(c => c.Resolve<SafeLocEditorModule>());
                     gameView.RegisterGameModule(c => c.Resolve<SpellTargetEditorModule>());
+                    gameView.RegisterGameModule(c => c.Resolve<AreaTriggerEditorModule>());
                     gameView.RegisterGameModule(c => c.Resolve<CreatureLinkEditorModule>());
                     gameView.RegisterGameModule(c => c.Resolve<SpawnViewer>());
                 },

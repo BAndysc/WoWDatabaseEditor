@@ -5,6 +5,7 @@ using TheEngine.Input;
 using TheMaths;
 using WDE.MapRenderer.Managers;
 using WDE.MapSpawns.Models;
+using WDE.MapSpawns.Models.AreaTriggers;
 using WDE.MapSpawns.Models.CreatureLinking;
 using WDE.MapSpawns.Models.Formations;
 using WDE.MapSpawns.Models.Pools;
@@ -55,6 +56,7 @@ public class SpawnEditorKeymap
     private readonly ISafeLocEditorService safeLocService;
     private readonly ISpellTargetEditorService spellTargetService;
     private readonly ICreatureLinkEditorService linkService;
+    private readonly IAreaTriggerEditorService areaTriggerService;
     private readonly SpawnEditorTutorial tutorial;
 
     private GameViewToolbar? toolbar;
@@ -83,6 +85,7 @@ public class SpawnEditorKeymap
         ISafeLocEditorService safeLocService,
         ISpellTargetEditorService spellTargetService,
         ICreatureLinkEditorService linkService,
+        IAreaTriggerEditorService areaTriggerService,
         SpawnEditorTutorial tutorial)
     {
         this.engine = engine;
@@ -98,6 +101,7 @@ public class SpawnEditorKeymap
         this.safeLocService = safeLocService;
         this.spellTargetService = spellTargetService;
         this.linkService = linkService;
+        this.areaTriggerService = areaTriggerService;
         this.tutorial = tutorial;
 
         BuildBindings();
@@ -177,7 +181,7 @@ public class SpawnEditorKeymap
         if (busy)
             return;
 
-        for (int digit = 1; digit <= 8; digit++)
+        for (int digit = 1; digit <= 9; digit++)
         {
             if (kb.JustPressed((Key)((int)Key.D1 + digit - 1)))
             {
@@ -206,6 +210,7 @@ public class SpawnEditorKeymap
             6 => (SpawnEditorTool.Graveyard, safeLocService.IsSupported),
             7 => (SpawnEditorTool.SpellTarget, spellTargetService.IsSupported),
             8 => (SpawnEditorTool.CreatureLink, linkService.IsSupported),
+            9 => (SpawnEditorTool.AreaTrigger, areaTriggerService.IsSupported),
             _ => (SpawnEditorTool.Select, false),
         };
         if (supported)
@@ -243,6 +248,7 @@ public class SpawnEditorKeymap
             new() { Keys = "6", Name = "Graveyards tool", Enabled = () => safeLocService.IsSupported, Execute = () => SelectTool(6) },
             new() { Keys = "7", Name = "Spell targets tool", Enabled = () => spellTargetService.IsSupported, Execute = () => SelectTool(7) },
             new() { Keys = "8", Name = "Creature linking tool", Enabled = () => linkService.IsSupported, Execute = () => SelectTool(8) },
+            new() { Keys = "9", Name = "Area triggers tool", Enabled = () => areaTriggerService.IsSupported, Execute = () => SelectTool(9) },
             new() { Keys = "Esc", Name = "Step out: back to the Select tool, then deselect", Description = "Innermost thing first: an open popup, a grab, a placement, pen mode, the point selection" },
             new() { Keys = "Ctrl+S", Name = "Save all 3D editors", Execute = () => toolbar?.RequestSaveAll() },
             new() { Keys = "Ctrl+Z", Name = "Undo spawn edit", Enabled = EditAvailable, Execute = () => editService.Undo() },
@@ -308,7 +314,7 @@ public class SpawnEditorKeymap
 
         groups.Add(("Formations & creature links", new List<KeyBinding>
         {
-            new() { Keys = "Drag creature → creature", Name = "Create the link (member → leader / slave → master)" },
+            new() { Keys = "Drag creature -> creature", Name = "Create the link (member -> leader / slave -> master)" },
             new() { Keys = "Click an arrow", Name = "Select the link" },
             new() { Keys = "Del", Name = "Remove the selected link" },
         }));

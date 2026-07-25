@@ -881,6 +881,27 @@ namespace WDE.CMMySqlDatabase.Database
             return await model.SpellTargetPositions.ToListAsync<ISpellTargetPosition>();
         }
 
+        // areatrigger_teleport columns differ per expansion - each provider queries its own model
+        public abstract Task<IReadOnlyList<IAreaTriggerTeleport>?> GetAreaTriggerTeleportsAsync();
+
+        public async Task<IReadOnlyList<IAreaTriggerTavern>?> GetAreaTriggerTavernsAsync()
+        {
+            await using var model = Database();
+            return await model.AreaTriggerTaverns.ToListAsync<IAreaTriggerTavern>();
+        }
+
+        public async Task<IReadOnlyList<IAreaTriggerQuestRelation>?> GetAreaTriggerQuestRelationsAsync()
+        {
+            await using var model = Database();
+            return await model.AreaTriggerQuestRelations.ToListAsync<IAreaTriggerQuestRelation>();
+        }
+
+        public async Task<IReadOnlyList<IScriptedAreaTrigger>?> GetScriptedAreaTriggersAsync()
+        {
+            await using var model = Database();
+            return await model.ScriptedAreaTriggers.ToListAsync<IScriptedAreaTrigger>();
+        }
+
         public async Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type)
         {
             await using var model = Database();

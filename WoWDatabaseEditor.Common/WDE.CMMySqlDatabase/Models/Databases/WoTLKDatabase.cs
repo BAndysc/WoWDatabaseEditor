@@ -18,5 +18,7 @@ public class WoTLKDatabase : BaseDatabaseTables
     public ITable<CreatureModelInfoWoTLK> CreatureModelInfo => this.GetTable<CreatureModelInfoWoTLK>();
     public ITable<CreatureClassLevelStatWoTLK> CreatureClassLevelStats => this.GetTable<CreatureClassLevelStatWoTLK>();
 
+    public ITable<AreaTriggerTeleportWoTLK> AreaTriggerTeleports => this.GetTable<AreaTriggerTeleportWoTLK>();
+
     public ITable<CmangosString> Strings => this.GetTable<CmangosString>();
 }

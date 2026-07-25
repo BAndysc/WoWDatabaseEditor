@@ -151,7 +151,13 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
         await using var model = Database();
         return await model.SpellDbc.ToListAsync<IDatabaseSpellDbc>();
     }
-    
+
+    public override async Task<IReadOnlyList<IAreaTriggerTeleport>?> GetAreaTriggerTeleportsAsync()
+    {
+        await using var model = Database();
+        return await model.AreaTriggerTeleports.ToListAsync<IAreaTriggerTeleport>();
+    }
+
     protected override async Task SetCreatureTemplateAI(WoTLKDatabase model, uint entry, string ainame, string scriptname)
     {
         await model.CreatureTemplate.Where(p => p.Entry == entry)

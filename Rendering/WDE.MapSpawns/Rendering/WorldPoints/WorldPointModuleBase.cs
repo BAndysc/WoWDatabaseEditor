@@ -110,6 +110,24 @@ public abstract class WorldPointModuleBase : IGameModule
     protected abstract void PlaceAt(Vector3 position);
     /// <summary>Delete/Backspace on the selected point (applied on Save, like the inspector's delete).</summary>
     protected abstract void DeleteSelected(uint key);
+    /// <summary>Extra pickables beyond the point markers (e.g. the area trigger DBC shapes). Tried
+    /// after the point pick and the armed placement, before click-deselect.</summary>
+    protected virtual bool TryPickExtra(Ray ray, out uint key)
+    {
+        key = 0;
+        return false;
+    }
+    /// <summary>Whether the selection survives a data/map rebuild. By default the key must be among
+    /// the rendered points; subclasses may accept extra keys (e.g. DBC shapes on the map).</summary>
+    protected virtual bool SelectionStillExists(uint key)
+    {
+        foreach (var p in points)
+        {
+            if (p.Key == key)
+                return true;
+        }
+        return false;
+    }
 
     protected WorldPointModuleBase(Engine engine,
         IGameContext gameContext,
@@ -160,20 +178,8 @@ public abstract class WorldPointModuleBase : IGameModule
             builtForMap = CurrentMapId;
             points.Clear();
             CollectPoints(points);
-            if (SelectedKey.HasValue)
-            {
-                bool selectionStillExists = false;
-                foreach (var p in points)
-                {
-                    if (p.Key == SelectedKey.Value)
-                    {
-                        selectionStillExists = true;
-                        break;
-                    }
-                }
-                if (!selectionStillExists)
-                    SelectedKey = null; // deleted, or the camera moved to another map
-            }
+            if (SelectedKey.HasValue && !SelectionStillExists(SelectedKey.Value))
+                SelectedKey = null; // deleted, or the camera moved to another map
         }
 
         if (SelectedKey != lastSelectedKey)
@@ -188,7 +194,9 @@ public abstract class WorldPointModuleBase : IGameModule
         if (interaction.IsCaptured && !dragger.IsActive)
             return;
 
-        if (SelectedKey.HasValue && dragger.Update(dragTarget))
+        // a selection without a draggable transform (e.g. a trigger whose destination is on
+        // another map) must not feed the dragger a zero position
+        if (SelectedKey.HasValue && TryGetSelectedTransform(out _, out _) && dragger.Update(dragTarget))
             return;
 
         // Back(space) too: on macOS the physical delete key reports as Backspace
@@ -230,6 +238,13 @@ public abstract class WorldPointModuleBase : IGameModule
             return;
         }
 
+        if (TryPickExtra(ray, out var extraKey))
+        {
+            SelectedKey = extraKey;
+            interaction.UsePointerThisFrame();
+            return;
+        }
+
         SelectedKey = null;
     }
 
@@ -249,7 +264,7 @@ public abstract class WorldPointModuleBase : IGameModule
         placementPreviewValid = true;
     }
 
-    public void Render(float delta)
+    public virtual void Render(float delta)
     {
         if (toolService.ActiveTool != Tool)
             return;

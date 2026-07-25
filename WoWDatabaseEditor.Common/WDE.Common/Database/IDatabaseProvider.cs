@@ -128,6 +128,13 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<IGraveyardLink>?> GetGraveyardLinksAsync() => Task.FromResult<IReadOnlyList<IGraveyardLink>?>(null);
         Task<IReadOnlyList<ISpellTargetPosition>?> GetSpellTargetPositionsAsync() => Task.FromResult<IReadOnlyList<ISpellTargetPosition>?>(null);
 
+        // CMaNGOS-only areatrigger side tables (the trigger shapes themselves live in AreaTrigger.dbc);
+        // null on cores without the tables
+        Task<IReadOnlyList<IAreaTriggerTeleport>?> GetAreaTriggerTeleportsAsync() => Task.FromResult<IReadOnlyList<IAreaTriggerTeleport>?>(null);
+        Task<IReadOnlyList<IAreaTriggerTavern>?> GetAreaTriggerTavernsAsync() => Task.FromResult<IReadOnlyList<IAreaTriggerTavern>?>(null);
+        Task<IReadOnlyList<IAreaTriggerQuestRelation>?> GetAreaTriggerQuestRelationsAsync() => Task.FromResult<IReadOnlyList<IAreaTriggerQuestRelation>?>(null);
+        Task<IReadOnlyList<IScriptedAreaTrigger>?> GetScriptedAreaTriggersAsync() => Task.FromResult<IReadOnlyList<IScriptedAreaTrigger>?>(null);
+
         Task<IReadOnlyList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IReadOnlyList<IItem>?>(null);
 
         Task<IReadOnlyList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions);

@@ -18,5 +18,7 @@ public class TBCDatabase : BaseDatabaseTables
     public ITable<CreatureModelInfoWoTLK> CreatureModelInfo => this.GetTable<CreatureModelInfoWoTLK>();
     public ITable<CreatureClassLevelStatTBC> CreatureClassLevelStats => this.GetTable<CreatureClassLevelStatTBC>();
 
+    public ITable<AreaTriggerTeleportTBC> AreaTriggerTeleports => this.GetTable<AreaTriggerTeleportTBC>();
+
     public ITable<CmangosString> Strings => this.GetTable<CmangosString>();
 }

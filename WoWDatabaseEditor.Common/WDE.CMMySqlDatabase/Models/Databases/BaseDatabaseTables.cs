@@ -51,6 +51,9 @@ namespace WDE.CMMySqlDatabase.Models
         public ITable<WorldSafeLoc> WorldSafeLocs => this.GetTable<WorldSafeLoc>();
         public ITable<GraveyardLink> GraveyardLinks => this.GetTable<GraveyardLink>();
         public ITable<SpellTargetPosition> SpellTargetPositions => this.GetTable<SpellTargetPosition>();
+        public ITable<AreaTriggerTavern> AreaTriggerTaverns => this.GetTable<AreaTriggerTavern>();
+        public ITable<AreaTriggerQuestRelation> AreaTriggerQuestRelations => this.GetTable<AreaTriggerQuestRelation>();
+        public ITable<ScriptedAreaTrigger> ScriptedAreaTriggers => this.GetTable<ScriptedAreaTrigger>();
         public ITable<ReferenceLootTemplateName> ReferenceLootTemplateNames => this.GetTable<ReferenceLootTemplateName>();
         public ITable<ItemLootTemplate> ItemLootTemplate => this.GetTable<ItemLootTemplate>();
         public ITable<CreatureLootTemplate> CreatureLootTemplate => this.GetTable<CreatureLootTemplate>();

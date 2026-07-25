@@ -13,6 +13,7 @@ public enum SpawnEditorTool
     Graveyard,
     SpellTarget,
     CreatureLink,
+    AreaTrigger,
 }
 
 /// <summary>Which transform the manipulation gizmo edits. Orthogonal to <see cref="SpawnEditorTool"/> -
@@ -34,16 +35,18 @@ public static class SpawnEditorToolGizmoSupport
         SpawnEditorTool.Select => mode != GizmoMode.Scale,
         // a path point has no orientation
         SpawnEditorTool.Waypoint => mode == GizmoMode.Translate,
-        // world points (graveyards / spell targets) have a position and an orientation
+        // world points (graveyards / spell targets / teleport destinations) have a position and an orientation
         SpawnEditorTool.Graveyard => mode != GizmoMode.Scale,
         SpawnEditorTool.SpellTarget => mode != GizmoMode.Scale,
+        SpawnEditorTool.AreaTrigger => mode != GizmoMode.Scale,
         // formations / spawn groups have no transform gizmo at all
         _ => false,
     };
 
     public static bool SupportsAnyGizmo(this SpawnEditorTool tool) =>
         tool is SpawnEditorTool.Select or SpawnEditorTool.Waypoint
-            or SpawnEditorTool.Graveyard or SpawnEditorTool.SpellTarget;
+            or SpawnEditorTool.Graveyard or SpawnEditorTool.SpellTarget
+            or SpawnEditorTool.AreaTrigger;
 }
 
 /// <summary>

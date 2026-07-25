@@ -1,6 +1,7 @@
 using Prism.Ioc;
 using WDE.MapRenderer;
 using WDE.MapSpawns.Models;
+using WDE.MapSpawns.Models.AreaTriggers;
 using WDE.MapSpawns.Models.CreatureLinking;
 using WDE.MapSpawns.Models.Formations;
 using WDE.MapSpawns.Models.Pools;
@@ -38,6 +39,7 @@ public class MapSpawnsGameScopeRegistrar : IGameScopeRegistrar
         gameScope.RegisterSingleton<ISpawnGroupEditorService, SpawnGroupEditorService>();
         gameScope.RegisterSingleton<ISafeLocEditorService, SafeLocEditorService>();
         gameScope.RegisterSingleton<ISpellTargetEditorService, SpellTargetEditorService>();
+        gameScope.RegisterSingleton<IAreaTriggerEditorService, AreaTriggerEditorService>();
         gameScope.RegisterSingleton<EntryPickerService>();
         gameScope.RegisterSingleton<SpawnEditorTutorial>();
     }

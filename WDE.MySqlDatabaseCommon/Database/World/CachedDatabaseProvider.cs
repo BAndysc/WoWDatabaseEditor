@@ -438,6 +438,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IReadOnlyList<IWorldSafeLoc>?> GetWorldSafeLocsAsync() => WaitForCache(nonCachedDatabase.GetWorldSafeLocsAsync());
         public Task<IReadOnlyList<IGraveyardLink>?> GetGraveyardLinksAsync() => WaitForCache(nonCachedDatabase.GetGraveyardLinksAsync());
         public Task<IReadOnlyList<ISpellTargetPosition>?> GetSpellTargetPositionsAsync() => WaitForCache(nonCachedDatabase.GetSpellTargetPositionsAsync());
+        public Task<IReadOnlyList<IAreaTriggerTeleport>?> GetAreaTriggerTeleportsAsync() => WaitForCache(nonCachedDatabase.GetAreaTriggerTeleportsAsync());
+        public Task<IReadOnlyList<IAreaTriggerTavern>?> GetAreaTriggerTavernsAsync() => WaitForCache(nonCachedDatabase.GetAreaTriggerTavernsAsync());
+        public Task<IReadOnlyList<IAreaTriggerQuestRelation>?> GetAreaTriggerQuestRelationsAsync() => WaitForCache(nonCachedDatabase.GetAreaTriggerQuestRelationsAsync());
+        public Task<IReadOnlyList<IScriptedAreaTrigger>?> GetScriptedAreaTriggersAsync() => WaitForCache(nonCachedDatabase.GetScriptedAreaTriggersAsync());
 
         public Task<IReadOnlyList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => WaitForCache(nonCachedDatabase.GetLinesCallingSmartTimedActionList(timedActionList));
 

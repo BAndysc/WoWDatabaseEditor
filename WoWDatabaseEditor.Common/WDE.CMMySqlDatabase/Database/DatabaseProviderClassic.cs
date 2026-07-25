@@ -151,7 +151,13 @@ public class DatabaseProviderClassic : BaseDatabaseProvider<ClassicDatabase>
         await using var model = Database();
         return await model.SpellDbc.ToListAsync<IDatabaseSpellDbc>();
     }
-    
+
+    public override async Task<IReadOnlyList<IAreaTriggerTeleport>?> GetAreaTriggerTeleportsAsync()
+    {
+        await using var model = Database();
+        return await model.AreaTriggerTeleports.ToListAsync<IAreaTriggerTeleport>();
+    }
+
     protected override async Task SetCreatureTemplateAI(ClassicDatabase model, uint entry, string ainame, string scriptname)
     {
         await model.CreatureTemplate.Where(p => p.Entry == entry)

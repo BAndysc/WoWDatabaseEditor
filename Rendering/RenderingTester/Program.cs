@@ -51,7 +51,7 @@ SynchronizationContext.SetSynchronizationContext(customSc);
 var nativeWindowSettings = new NativeWindowSettings()
 {
     Size = new Vector2i(1280, 720),
-    Title = "WoW Database Editor - 3D Debug view",
+    Title = "Database Editor - 3D Debug view",
     // This is needed to run on macos
     API = ContextAPI.NoAPI
 };
@@ -111,8 +111,13 @@ void SetupModules(params ModuleBase[] modules)
         // spawn_group, ...) to register, which the formation/spawn-group editor tools need.
         module.InitializeCore("TrinityMaster");
         module.RegisterTypes(registry);
-        module.OnInitialized(registry);
     }
+    // same second pass the real app does: [FallbackAutoRegister] services fill the gaps left by
+    // core-gated registrations (e.g. NullAreaTriggerEditorConfig on non-mangos cores)
+    foreach (var module in modules)
+        module.RegisterFallbackTypes(registry);
+    foreach (var module in modules)
+        module.OnInitialized(registry);
 }
 
 var game = provider.Resolve<Game>();

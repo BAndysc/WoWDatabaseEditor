@@ -19,5 +19,7 @@ public class ClassicDatabase : BaseDatabaseTables
     public ITable<CreatureModelInfoWoTLK> CreatureModelInfo => this.GetTable<CreatureModelInfoWoTLK>();
     public ITable<CreatureClassLevelStatClassic> CreatureClassLevelStats => this.GetTable<CreatureClassLevelStatClassic>();
 
+    public ITable<AreaTriggerTeleportClassic> AreaTriggerTeleports => this.GetTable<AreaTriggerTeleportClassic>();
+
     public ITable<CmangosString> Strings => this.GetTable<CmangosString>();
 }
