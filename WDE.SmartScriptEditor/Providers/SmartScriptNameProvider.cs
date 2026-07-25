@@ -145,6 +145,8 @@ namespace WDE.SmartScriptEditor.Providers
                         return "Battle pet " + entry;
                     case SmartScriptType.Conversation:
                         return "Conversation " + entry;
+                    case SmartScriptType.Movie:
+                        return "Movie " + entry;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
