@@ -395,7 +395,7 @@
                                 <MenuItem.IsVisible>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <CompiledBinding Converter="{x:Static converters:IsQuestConverter.Instance}" />
-                                        <CompiledBinding x:DataType="viewModels:QuestViewModel" Path="ExclusiveGroup" FallbackValue="{x:False}" Converter="{x:Static NullConverter.IsNotNull}" />
+                                        <Binding x:DataType="viewModels:QuestViewModel" Path="ExclusiveGroup" FallbackValue="{x:False}" Converter="{x:Static NullConverter.IsNotNull}" />
                                     </MultiBinding>
                                 </MenuItem.IsVisible>
                             </MenuItem>
@@ -407,7 +407,7 @@
                                 <MenuItem.IsVisible>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <CompiledBinding Converter="{x:Static converters:IsQuestConverter.Instance}" />
-                                        <CompiledBinding x:DataType="viewModels:QuestViewModel" Path="ExclusiveGroup" FallbackValue="{x:False}" Converter="{x:Static NullConverter.IsNotNull}" />
+                                        <Binding x:DataType="viewModels:QuestViewModel" Path="ExclusiveGroup" FallbackValue="{x:False}" Converter="{x:Static NullConverter.IsNotNull}" />
                                     </MultiBinding>
                                 </MenuItem.IsVisible>
                             </MenuItem>
@@ -687,15 +687,15 @@
                                     <WdeImage Width="16" Height="16" IsVisible="{CompiledBinding PlayerCanStartChecks, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <WdeImage.Image>
                                             <MultiBinding Converter="{x:Static converters:QuestStatusToIconConverter.Instance}">
-                                                <CompiledBinding Path="PlayerQuestStatus" />
-                                                <CompiledBinding Path="PlayerCanStart" />
+                                                <Binding Path="PlayerQuestStatus" />
+                                                <Binding Path="PlayerCanStart" />
                                             </MultiBinding>
                                         </WdeImage.Image>
                                         <ToolTip.Tip>
                                             <MultiBinding Converter="{x:Static converters:QuestStatusToToolTipConverter.Instance}">
-                                                <CompiledBinding Path="PlayerQuestStatus" />
-                                                <CompiledBinding Path="PlayerCanStart" />
-                                                <CompiledBinding Path="PlayerCanStartChecks" />
+                                                <Binding Path="PlayerQuestStatus" />
+                                                <Binding Path="PlayerCanStart" />
+                                                <Binding Path="PlayerCanStartChecks" />
                                             </MultiBinding>
                                         </ToolTip.Tip>
                                     </WdeImage>
@@ -779,8 +779,8 @@
         <Border Background="{DynamicResource SlightlyHighlightedBackground}" Opacity="0.5" IsHitTestVisible="False">
             <Border.IsVisible>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
-                    <CompiledBinding Path="IsEmpty" />
-                    <CompiledBinding Path="IsLoading" Converter="{x:Static BoolConverters.Not}" />
+                    <Binding Path="IsEmpty" />
+                    <Binding Path="IsLoading" Converter="{x:Static BoolConverters.Not}" />
                 </MultiBinding>
             </Border.IsVisible>
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Press a spacebar or open the context menu to load a quest.</TextBlock>

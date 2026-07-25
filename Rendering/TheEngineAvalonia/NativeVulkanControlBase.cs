@@ -60,13 +60,25 @@ public partial class NativeVulkanControlBase : NativeControlHost
         throw new PlatformNotSupportedException();
     }
 
+    /// <summary>Converts a pointer position reported by the embedded native child window
+    /// (physical pixels, relative to the child = this control) into the logical TopLevel
+    /// coordinates Avalonia 12's PointerEventArgs expects: the position argument is stored in
+    /// presentation-source (window) space and GetPosition(control) subtracts the control's
+    /// offset - feeding a control-relative point directly would subtract that offset twice.</summary>
+    private Point ToPresentationSourcePosition(long x, long y)
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+        var scaling = topLevel?.RenderScaling ?? 1;
+        var local = new Point(x / scaling, y / scaling);
+        return topLevel != null ? this.TranslatePoint(local, topLevel) ?? local : local;
+    }
+
     private void OnEmbeddedPointerPressed(long x, long y, bool isLeft, bool isRight)
     {
         if (isHidden)
             return;
-        
-        var scaling = TopLevel.GetTopLevel(VisualRoot)?.RenderScaling ?? 1;
-        Point rootVisualPosition = this.TranslatePoint(new Point(x / scaling, y / scaling), this) ?? default;
+
+        Point rootVisualPosition = ToPresentationSourcePosition(x, y);
         Pointer pointer = new(0, PointerType.Mouse, true);
         
         RawInputModifiers pointerPointModifier = isLeft ? RawInputModifiers.LeftMouseButton : RawInputModifiers.RightMouseButton;
@@ -88,9 +100,8 @@ public partial class NativeVulkanControlBase : NativeControlHost
     {
         if (isHidden)
             return;
-        
-        var scaling = TopLevel.GetTopLevel(VisualRoot)?.RenderScaling ?? 1;
-        Point rootVisualPosition = this.TranslatePoint(new Point(x / scaling, y / scaling), this) ?? default;
+
+        Point rootVisualPosition = ToPresentationSourcePosition(x, y);
         Pointer pointer = new(0, PointerType.Mouse, true);
         
         RawInputModifiers pointerPointModifier = isLeft ? RawInputModifiers.LeftMouseButton : RawInputModifiers.RightMouseButton;
@@ -113,9 +124,8 @@ public partial class NativeVulkanControlBase : NativeControlHost
     {
         if (isHidden)
             return;
-        
-        var scaling = TopLevel.GetTopLevel(VisualRoot)?.RenderScaling ?? 1;
-        Point rootVisualPosition = this.TranslatePoint(new Point(x / scaling, y / scaling), this) ?? default;
+
+        Point rootVisualPosition = ToPresentationSourcePosition(x, y);
         Pointer pointer = new(0, PointerType.Mouse, true);
         
         var evnt = new PointerEventArgs(
