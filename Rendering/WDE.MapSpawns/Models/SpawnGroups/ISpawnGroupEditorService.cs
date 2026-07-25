@@ -69,6 +69,12 @@ public interface ISpawnGroupEditorService
     /// null). Null = no pending request.</summary>
     uint? RequestedEditGroup { get; set; }
 
+    /// <summary>The explicit membership pick mode: while armed (and the spawn-group tool is
+    /// active), world clicks add/remove members instead of selecting. Armed/disarmed by the
+    /// inspector toggle and Esc/right-click in the tool module; the Escape step-out chain treats
+    /// an armed pick mode as "a tool interaction owns Escape".</summary>
+    bool MemberPickArmed { get; set; }
+
     /// <summary>Fills <paramref name="output"/> (cleared first) with the group's current members.
     /// Allocation-free for callers that reuse the list - use this on hot paths.</summary>
     void CollectMembers(uint templateId, List<SpawnGroupMember> output);

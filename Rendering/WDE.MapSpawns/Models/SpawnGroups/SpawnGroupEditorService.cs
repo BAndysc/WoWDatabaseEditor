@@ -47,6 +47,7 @@ public class SpawnGroupEditorService : ISpawnGroupEditorService
     private readonly HashSet<uint> deletedGroups = new();
 
     public uint? RequestedEditGroup { get; set; }
+    public bool MemberPickArmed { get; set; }
     public int LoadedMap { get; private set; } = -1;
     public bool AnyDirty => dirty.Count > 0;
     public bool HasData { get; private set; }

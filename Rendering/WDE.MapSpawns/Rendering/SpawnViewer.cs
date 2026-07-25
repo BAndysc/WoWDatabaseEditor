@@ -161,9 +161,13 @@ public class SpawnViewer : IGameModule
         IGameNotificationService notificationService,
         IChangesManager changesManager,
         Models.Waypoints.IWaypointEditorService waypointService,
+        Models.SpawnGroups.ISpawnGroupEditorService spawnGroupEditorService,
+        Models.Pools.IPoolEditorService poolEditorService,
         SpawnEditorKeymap keymap)
     {
         this.keymap = keymap;
+        this.spawnGroupEditorService = spawnGroupEditorService;
+        this.poolEditorService = poolEditorService;
         this.notificationService = notificationService;
         // the toolbar aggregates every 3D editor's dirty state; registering it makes the hosting
         // document's IsModified (tab asterisk) and Save command work
@@ -197,6 +201,9 @@ public class SpawnViewer : IGameModule
         this.spawnDragger = spawnDragger;
         this.spawnContextMenu = spawnContextMenu;
         postProcess = new HighlightPostProcess(gameContext.Engine, Color.Aqua);
+        // the same outline in a dimmer aqua for the spawn under the cursor - "this is what a click
+        // would hit" - registered only while something is actually hovered (zero idle cost)
+        hoverPostProcess = new HighlightPostProcess(gameContext.Engine, new Color(0.30f, 0.62f, 0.62f));
 
         // executed on the UI thread by the native menu; OpenFor only flips picker flags
         addCreatureCommand = new Prism.Commands.DelegateCommand(() => spawnPicker.OpenFor(creatures: true));
@@ -296,6 +303,10 @@ public class SpawnViewer : IGameModule
         disposables.Clear();
         gameContext.Engine.RenderManager.RemovePostprocess(postProcess);
         postProcess.Dispose();
+        if (hoverPostRegistered)
+            gameContext.Engine.RenderManager.RemovePostprocess(hoverPostProcess);
+        hoverPostRegistered = false;
+        hoverPostProcess.Dispose();
         pendingSpawnInstances.Clear();
         pendingSpawnLoads.Clear();
 
@@ -529,16 +540,41 @@ public class SpawnViewer : IGameModule
         };
         highlightEntities[0] = highlighted?.WorldObject?.WorldObjectEntity;
         postProcess.Render(highlightEntities);
+
+        // hover outline: the already-selected spawn keeps only its bright outline. The postprocess
+        // is (un)registered here, before the render manager's composite loop runs this frame.
+        var hoverEntity = hoveredSpawn != null && !ReferenceEquals(hoveredSpawn, highlighted)
+            ? hoveredSpawn.WorldObject?.WorldObjectEntity
+            : null;
+        bool wantHover = hoverEntity != null;
+        if (wantHover != hoverPostRegistered)
+        {
+            if (wantHover)
+                gameContext.Engine.RenderManager.AddPostprocess(hoverPostProcess);
+            else
+                gameContext.Engine.RenderManager.RemovePostprocess(hoverPostProcess);
+            hoverPostRegistered = wantHover;
+        }
+        if (wantHover)
+        {
+            hoverHighlightEntities[0] = hoverEntity;
+            hoverPostProcess.Render(hoverHighlightEntities);
+        }
     }
 
     // hover feedback (Select tool): stall-free per-frame deferred GPU pick -> tooltip in RenderGUI
+    // + a dim outline through hoverPostProcess (see Render)
     private SpawnInstance? hoveredSpawn;
+    private readonly HighlightPostProcess hoverPostProcess;
+    private readonly List<Entity?> hoverHighlightEntities = new(1) { null };
+    private bool hoverPostRegistered;
 
     /// <summary>Non-Select tools ignore clicks on spawns; a click on an unselected spawn there gets
-    /// a small toast so the no-op is explained. The SpawnGroup tool is exempt - it selects itself.</summary>
+    /// a small toast so the no-op is explained. The SpawnGroup and Pool tools are exempt - their
+    /// clicks select/toggle spawns themselves.</summary>
     private void NotifySelectionLockedClick()
     {
-        if (toolService.ActiveTool == SpawnEditorTool.SpawnGroup)
+        if (toolService.ActiveTool is SpawnEditorTool.SpawnGroup or SpawnEditorTool.Pool)
             return;
         if (!inputManager.Mouse.HasJustClicked(MouseButton.Left))
             return;
@@ -614,6 +650,8 @@ public class SpawnViewer : IGameModule
     /// ImGui field can't trigger any of it: the ImGui controller clears the engine key queue
     /// whenever ImGui wants the keyboard, and IsDown is focus-gated to the 3D view.</summary>
     private readonly Models.Waypoints.IWaypointEditorService waypointService;
+    private readonly Models.SpawnGroups.ISpawnGroupEditorService spawnGroupEditorService;
+    private readonly Models.Pools.IPoolEditorService poolEditorService;
     private bool escapeBlockedLastFrame;
 
     private void HandleGlobalShortcuts()
@@ -642,7 +680,10 @@ public class SpawnViewer : IGameModule
             || keymap.AnyOverlayOpen
             || spawnPicker.ConsumesEscape
             || ImGuiEx.AnyPopupOpen
-            || waypointToolOwnsEscape;
+            || waypointToolOwnsEscape
+            // an armed membership pick mode consumes Escape in its tool module (disarm)
+            || spawnGroupEditorService.MemberPickArmed
+            || poolEditorService.MemberPickArmed;
 
         if (kb.JustPressed(Key.Escape) && !blocked && !escapeBlockedLastFrame)
         {

@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Input;
+using Prism.Commands;
 using TheEngine.Components;
 using WDE.Common.Database;
 using TheEngine.ECS;
@@ -36,7 +40,13 @@ public class PoolEditorModule : IGameModule
     private readonly IInputManager inputManager;
     private readonly IWorldInteractionService interaction;
     private readonly IGameViewOverlayService overlays;
+    private readonly IGameNotificationService notifications;
     private readonly PoolInspector inspector;
+
+    // context-menu commands run on the UI thread - engine/service mutations hop back via this queue
+    private readonly ConcurrentQueue<Action> engineActions = new();
+    // built at right-press on the engine thread, consumed by GenerateContextMenu on the UI thread
+    private List<(string, ICommand, object?)>? contextMenuItems;
 
     // internal: PoolInspector draws a legend with the exact same colors
     internal static readonly Vector4 PendingDecalColor = new(0.30f, 0.90f, 0.45f, 0.9f);   // green
@@ -85,9 +95,11 @@ public class PoolEditorModule : IGameModule
         IGameViewOverlayService overlays,
         ICachedDatabaseProvider cachedDatabase,
         EntryPickerService entryPicker,
-        ISpawnSelectionService spawnSelectionService)
+        ISpawnSelectionService spawnSelectionService,
+        IGameNotificationService notifications)
     {
         this.spawnSelectionService = spawnSelectionService;
+        this.notifications = notifications;
         this.gameContext = gameContext;
         this.toolService = toolService;
         this.service = service;
@@ -122,12 +134,15 @@ public class PoolEditorModule : IGameModule
     {
         service.PumpPendingLoads();
         SyncMap();
+        while (engineActions.TryDequeue(out var action))
+            action();
         frameCounter++;
 
         if (toolService.ActiveTool != SpawnEditorTool.Pool)
         {
             if (pending.Count > 0)
                 pending.Clear();
+            service.MemberPickArmed = false;
             DisableDecalsFrom(0);
             return;
         }
@@ -137,6 +152,18 @@ public class PoolEditorModule : IGameModule
         if (interaction.IsCaptured)
             return;
 
+        // Esc / right-click steps out of the armed pick mode (one level, before anything else
+        // reads those inputs; the Escape chain in SpawnViewer sees the armed flag as blocked)
+        if (service.MemberPickArmed &&
+            (inputManager.Keyboard.JustPressed(TheEngine.Input.Key.Escape) ||
+             inputManager.Mouse.HasJustClicked(MouseButton.Right)))
+        {
+            service.MemberPickArmed = false;
+            if (inputManager.Mouse.HasJustClicked(MouseButton.Right))
+                interaction.UsePointerThisFrame(); // the exit click must not also open the menu
+            return;
+        }
+
         if (inputManager.Mouse.HasJustClicked(MouseButton.Left))
         {
             var spawn = PickSpawnUnderCursor();
@@ -144,16 +171,130 @@ public class PoolEditorModule : IGameModule
             {
                 bool isCreature = spawn is CreatureSpawnInstance;
                 var member = new PoolMember(isCreature, spawn.Guid);
-                // clicking a pooled spawn edits its pool - direct membership wins over entry-wide
-                if (service.PoolOf(member) is { } poolId)
-                    SelectedPoolId = poolId;
-                else if (service.PoolOfEntry(new PoolEntryKey(isCreature, spawn.Entry)) is { } entryPoolId)
-                    SelectedPoolId = entryPoolId;
-                else
-                    Toggle(spawn);
+                var memberPool = service.PoolOf(member);
+                var entryPool = service.PoolOfEntry(new PoolEntryKey(isCreature, spawn.Entry));
+                if (service.MemberPickArmed)
+                {
+                    // armed: the click IS the membership verb
+                    if (SelectedPoolId != 0)
+                    {
+                        if (memberPool == SelectedPoolId)
+                            service.RemoveMember(SelectedPoolId, member);
+                        else if (entryPool != null)
+                            notifications.Notify(GameNotificationType.Info,
+                                $"Its entry is pooled entry-wide in pool {entryPool} - edit that instead");
+                        else if (memberPool is { } other)
+                            notifications.Notify(GameNotificationType.Info,
+                                $"Already in pool {other} - remove it from that pool first");
+                        else
+                            service.AddToPool(SelectedPoolId, new[] { member });
+                    }
+                    else if (memberPool is { } p)
+                        notifications.Notify(GameNotificationType.Info,
+                            $"Already in pool {p} - stop picking and click it to edit that pool");
+                    else if (entryPool is { } ep)
+                        notifications.Notify(GameNotificationType.Info,
+                            $"Its entry is pooled entry-wide in pool {ep}");
+                    else
+                        Toggle(spawn);
+                }
+                else if (SelectedPoolId == 0)
+                {
+                    // clicking a pooled spawn opens its pool - direct membership wins over entry-wide
+                    if (memberPool is { } poolId)
+                        SelectedPoolId = poolId;
+                    else if (entryPool is { } entryPoolId)
+                        SelectedPoolId = entryPoolId;
+                }
+                // not armed: the click otherwise just selects/inspects
+                spawnSelectionService.SelectedSpawn.Value = spawn;
                 interaction.UsePointerThisFrame();
             }
         }
+
+        // right press over a spawn: remember the pool context menu for the release-time
+        // Avalonia menu (and target the spawn with the shared selection)
+        if (inputManager.Mouse.HasJustClicked(MouseButton.Right))
+        {
+            var spawn = PickSpawnUnderCursor();
+            contextMenuItems = spawn == null ? null : BuildContextItems(spawn);
+            if (spawn != null)
+                spawnSelectionService.SelectedSpawn.Value = spawn;
+        }
+    }
+
+    public IEnumerable<(string, ICommand, object?)>? GenerateContextMenu()
+    {
+        if (toolService.ActiveTool != SpawnEditorTool.Pool)
+            return null;
+        var items = contextMenuItems;
+        contextMenuItems = null;
+        return items;
+    }
+
+    private ICommand GameCommand(Action action) => new DelegateCommand(() => engineActions.Enqueue(action));
+
+    private List<(string, ICommand, object?)> BuildContextItems(SpawnInstance spawn)
+    {
+        var items = new List<(string, ICommand, object?)>();
+        bool isCreature = spawn is CreatureSpawnInstance;
+        var member = new PoolMember(isCreature, spawn.Guid);
+        var entryPool = service.PoolOfEntry(new PoolEntryKey(isCreature, spawn.Entry));
+
+        if (service.PoolOf(member) is { } poolId)
+        {
+            string name = service.PoolNames.TryGetValue(poolId, out var n) ? n : "";
+            items.Add(($"{DescribeSpawn(spawn)} — pool {poolId} {name}", AlwaysDisabledCommand.Command, null));
+            items.Add(("-", AlwaysDisabledCommand.Command, null));
+            if (SelectedPoolId != poolId)
+                items.Add(("Edit this spawn pool", GameCommand(() => SelectedPoolId = poolId), null));
+            items.Add(("Remove from the pool", GameCommand(() => service.RemoveMember(poolId, member)), null));
+        }
+        else if (entryPool is { } entryPoolId)
+        {
+            string name = service.PoolNames.TryGetValue(entryPoolId, out var n) ? n : "";
+            items.Add(($"{DescribeSpawn(spawn)} — entry-wide in pool {entryPoolId} {name}", AlwaysDisabledCommand.Command, null));
+            items.Add(("-", AlwaysDisabledCommand.Command, null));
+            if (SelectedPoolId != entryPoolId)
+                items.Add(("Edit this spawn pool", GameCommand(() => SelectedPoolId = entryPoolId), null));
+        }
+        else
+        {
+            items.Add((DescribeSpawn(spawn), AlwaysDisabledCommand.Command, null));
+            items.Add(("-", AlwaysDisabledCommand.Command, null));
+            if (SelectedPoolId != 0 && service.PoolNames.TryGetValue(SelectedPoolId, out var selName))
+            {
+                uint targetPool = SelectedPoolId;
+                items.Add(($"Add to pool {targetPool} {selName}",
+                    GameCommand(() => service.AddToPool(targetPool, new[] { member })), null));
+            }
+            bool inPending = pending.Any(p => p.Guid == spawn.Guid &&
+                                              p is CreatureSpawnInstance == isCreature);
+            items.Add((inPending ? "Remove from the selection" : "Add to the selection",
+                GameCommand(() => Toggle(spawn)), null));
+        }
+
+        return items;
+    }
+
+    /// <summary>The inspector's "add member by guid" row: resolves the guid against the loaded
+    /// map's spawns (creature first) and adds it as a direct pool member. Returns null on success,
+    /// otherwise the error to show in the panel.</summary>
+    public string? TryAddMemberByGuid(uint poolId, uint guid)
+    {
+        var spawn = FindSpawn(new PoolMember(true, guid)) ?? FindSpawn(new PoolMember(false, guid));
+        if (spawn == null)
+            return $"No spawn with guid {guid} on this map";
+        bool isCreature = spawn is CreatureSpawnInstance;
+        var member = new PoolMember(isCreature, spawn.Guid);
+        if (service.PoolOfEntry(new PoolEntryKey(isCreature, spawn.Entry)) is { } entryPool)
+            return $"Its entry is pooled entry-wide in pool {entryPool} - the core rejects entries pooled both ways";
+        if (service.PoolOf(member) is { } existing)
+            return existing == poolId
+                ? "Already a member of this pool"
+                : $"Already in pool {existing} - remove it from that pool first";
+        service.AddToPool(poolId, new[] { member });
+        return null;
     }
 
     public void Render(float delta)

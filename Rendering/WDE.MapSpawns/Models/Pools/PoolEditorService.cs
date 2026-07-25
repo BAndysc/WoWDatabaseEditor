@@ -14,6 +14,8 @@ namespace WDE.MapSpawns.Models.Pools;
 
 public class PoolEditorService : IPoolEditorService
 {
+    public bool MemberPickArmed { get; set; }
+
     private readonly IDatabaseProvider databaseProvider;
     private readonly IMySqlExecutor mySqlExecutor;
     private readonly IMainThread mainThread;

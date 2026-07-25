@@ -60,11 +60,33 @@ public sealed class SpawnGroupInspector : IInspectorSection
         {
             if (!service.IsSupported)
                 return "The current core has no spawn_group tables";
+            if (service.MemberPickArmed)
+                return module.SelectedGroupId != 0
+                    ? "PICKING MEMBERS — click a spawn: add/remove it from the group · Esc/right-click: stop"
+                    : "PICKING MEMBERS — click spawns: add/remove from the selection · Esc/right-click: stop";
             if (module.SelectedGroupId != 0)
-                return "Click a grouped spawn: select its group · click ungrouped spawns: pick members to add";
-            return module.Pending.Count == 0
-                ? "Click spawns in the world to select them · click a grouped spawn to edit its group"
-                : "Click: add/remove from the selection · \"New group...\" in the panel creates a group";
+                return "Click: select a spawn · \"Add/remove members\" in the panel edits membership · right-click: menu";
+            return "Click a grouped spawn: edit its group · \"Pick members\" in the panel starts a new group";
+        }
+    }
+
+    /// <summary>The armed pick-mode toggle both panel states share - green while armed (same
+    /// language as the waypoint pen button).</summary>
+    private void DrawPickToggle(string idleLabel, string armedLabel)
+    {
+        if (service.MemberPickArmed)
+        {
+            EditorTheme.PushArmedButton();
+            if (ImGui.Button($"{Lucide.MousePointerClick} {armedLabel}  (Esc)", new Vector2(-1, 0)))
+                service.MemberPickArmed = false;
+            EditorTheme.PopButtonColors();
+        }
+        else
+        {
+            if (ImGui.Button($"{Lucide.MousePointerClick} {idleLabel}", new Vector2(-1, 0)))
+                service.MemberPickArmed = true;
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("While picking, world clicks add/remove instead of selecting.\nEsc or right-click stops picking."u8);
         }
     }
 
@@ -72,7 +94,7 @@ public sealed class SpawnGroupInspector : IInspectorSection
     {
         if (!service.IsSupported)
         {
-            ImGui.TextDisabled("The current core has no\nspawn_group tables.");
+            ImGui.TextDisabled("The current core has no\nspawn_group tables."u8);
             return;
         }
 
@@ -110,10 +132,8 @@ public sealed class SpawnGroupInspector : IInspectorSection
         uint selected = module.SelectedGroupId;
         if (selected != 0)
         {
-            if (ImGui.SmallButton($"{Lucide.ArrowLeft}##stopeditgroup"))
+            if (EditorWidgets.BackRow("All groups", "Stop editing this group"))
                 module.SelectedGroupId = 0;
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Stop editing this group");
             ImGui.SameLine();
             string name = service.GroupNames.TryGetValue(selected, out var n) ? n : "";
             ImGui.TextColored(EditorTheme.SelectionGold, $"{selected} {name}");
@@ -129,18 +149,18 @@ public sealed class SpawnGroupInspector : IInspectorSection
     private void DrawPendingBuilder()
     {
         var pending = module.Pending;
-        ImGui.TextDisabled($"{pending.Count} selected — click objects in the world");
+        DrawPickToggle("Pick members (click spawns)", "Picking members — click spawns");
+        ImGui.TextDisabled(pending.Count == 0 && !service.MemberPickArmed
+            ? "No spawns picked yet."
+            : $"{pending.Count} selected");
 
         for (int i = pending.Count - 1; i >= 0; --i)
         {
             var s = pending[i];
             ImGui.PushID(i);
-            if (ImGui.SmallButton(Lucide.X))
-                pending.RemoveAt(i);
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Remove from the selection (the spawn itself is untouched)");
-            ImGui.SameLine();
             ImGui.TextUnformatted(SpawnGroupEditorModule.DescribeSpawn(s));
+            if (EditorWidgets.TrailingRemoveButton("Remove from the selection (the spawn itself is untouched)"))
+                pending.RemoveAt(i);
             ImGui.PopID();
         }
 
@@ -213,9 +233,9 @@ public sealed class SpawnGroupInspector : IInspectorSection
     private void DrawDeleteGroup(uint groupId)
     {
         if (ImGui.Button($"{Lucide.Trash2} Delete group...", new Vector2(-1, 0)))
-            ImGui.OpenPopup("Delete spawn group");
+            ImGui.OpenPopup("Delete spawn group"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Deletes the group with its formation, random entries, links and squads.\nMember spawns stay in the world, just ungrouped. Applied on Save.");
+            ImGui.SetTooltip("Deletes the group with its formation, random entries, links and squads.\nMember spawns stay in the world, just ungrouped. Applied on Save."u8);
 
         bool open = true;
         if (!ImGuiEx.BeginPopupModal("Delete spawn group", ref open, ImGuiWindowFlags.AlwaysAutoResize))
@@ -223,16 +243,16 @@ public sealed class SpawnGroupInspector : IInspectorSection
 
         string name = service.GroupNames.TryGetValue(groupId, out var n) ? n : "";
         ImGui.TextUnformatted($"Delete group {groupId} \"{name}\"?");
-        ImGui.TextDisabled("Member spawns stay in the world, just ungrouped.\nThe database rows are removed when you Save.");
+        ImGui.TextDisabled("Member spawns stay in the world, just ungrouped.\nThe database rows are removed when you Save."u8);
         ImGui.Separator();
-        if (ImGui.Button("Delete", new Vector2(120, 0)))
+        if (ImGui.Button("Delete"u8, new Vector2(120, 0)))
         {
             service.DeleteGroup(groupId);
             module.SelectedGroupId = 0;
             ImGui.CloseCurrentPopup();
         }
         ImGui.SameLine();
-        if (ImGui.Button("Cancel", new Vector2(120, 0)))
+        if (ImGui.Button("Cancel"u8, new Vector2(120, 0)))
             ImGui.CloseCurrentPopup();
         ImGui.EndPopup();
     }
@@ -241,7 +261,7 @@ public sealed class SpawnGroupInspector : IInspectorSection
     {
         // basic cores: the name is the only editable template property, and only for new groups -
         // existing template rows aren't rewritten there
-        ImGui.TextDisabled(service.GroupNames.TryGetValue(groupId, out var n) ? n : "");
+        EditorWidgets.WrappedHint(service.GroupNames.TryGetValue(groupId, out var n) ? n : "");
     }
 
     private void DrawProperties(SpawnGroupDetails d)
@@ -249,15 +269,16 @@ public sealed class SpawnGroupInspector : IInspectorSection
         bool changed = false;
 
         string name = d.Name;
-        if (ImGui.InputText("Name", ref name, 200))
+        EditorWidgets.FitNextItem("Name"u8);
+        if (ImGui.InputText("Name"u8, ref name, 200))
         {
             d.Name = name;
             changed = true;
         }
 
-        ImGui.TextDisabled(d.Type == SpawnGroupTemplateType.Creature ? "Creature group" : "GameObject group");
+        ImGui.TextDisabled(d.Type == SpawnGroupTemplateType.Creature ? "Creature group"u8 : "GameObject group"u8);
 
-        if (service.GroupFlags.Count > 0 && ImGui.TreeNodeEx("Flags", ImGuiTreeNodeFlags.None))
+        if (service.GroupFlags.Count > 0 && ImGui.TreeNodeEx("Flags"u8, ImGuiTreeNodeFlags.None))
         {
             foreach (var flag in service.GroupFlags)
             {
@@ -276,42 +297,46 @@ public sealed class SpawnGroupInspector : IInspectorSection
             ImGui.TreePop();
         }
 
-        if (ImGui.TreeNodeEx("Spawning", ImGuiTreeNodeFlags.None))
+        if (ImGui.TreeNodeEx("Spawning"u8, ImGuiTreeNodeFlags.None))
         {
             int maxCount = d.MaxCount;
-            if (ImGui.InputInt("Max alive", ref maxCount))
+            EditorWidgets.FitNextItem("Max alive"u8);
+            if (ImGui.InputInt("Max alive"u8, ref maxCount))
             {
                 d.MaxCount = Math.Max(0, maxCount);
                 changed = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Maximum active alive entities spawned in the world (0 = all)");
+                ImGui.SetTooltip("Maximum active alive entities spawned in the world (0 = all)"u8);
 
             int worldState = d.WorldState;
-            if (ImGui.InputInt("WorldState", ref worldState))
+            EditorWidgets.FitNextItem("WorldState"u8);
+            if (ImGui.InputInt("WorldState"u8, ref worldState))
             {
                 d.WorldState = worldState;
                 changed = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Condition id enabling spawning (0 = always; exclusive with the expression)");
+                ImGui.SetTooltip("Condition id enabling spawning (0 = always; exclusive with the expression)"u8);
 
             int wsExpression = d.WorldStateExpression;
-            if (ImGui.InputInt("WS expression", ref wsExpression))
+            EditorWidgets.FitNextItem("WS expression"u8);
+            if (ImGui.InputInt("WS expression"u8, ref wsExpression))
             {
                 d.WorldStateExpression = wsExpression;
                 changed = true;
             }
 
             int stringId = (int)d.StringId;
-            if (ImGui.InputInt("String id", ref stringId))
+            EditorWidgets.FitNextItem("String id"u8);
+            if (ImGui.InputInt("String id"u8, ref stringId))
             {
                 d.StringId = (uint)Math.Max(0, stringId);
                 changed = true;
             }
 
             bool overrideRespawn = d.RespawnOverrideMin.HasValue || d.RespawnOverrideMax.HasValue;
-            if (ImGui.Checkbox("Override respawn time", ref overrideRespawn))
+            if (ImGui.Checkbox("Override respawn time"u8, ref overrideRespawn))
             {
                 d.RespawnOverrideMin = overrideRespawn ? d.RespawnOverrideMin ?? 0 : null;
                 d.RespawnOverrideMax = overrideRespawn ? d.RespawnOverrideMax : null;
@@ -320,20 +345,22 @@ public sealed class SpawnGroupInspector : IInspectorSection
             if (overrideRespawn)
             {
                 int min = (int)(d.RespawnOverrideMin ?? 0);
-                if (ImGui.InputInt("Respawn min (s)", ref min))
+                EditorWidgets.FitNextItem("Respawn min (s)"u8);
+                if (ImGui.InputInt("Respawn min (s)"u8, ref min))
                 {
                     d.RespawnOverrideMin = (uint)Math.Max(0, min);
                     changed = true;
                 }
                 int max = (int)(d.RespawnOverrideMax ?? d.RespawnOverrideMin ?? 0);
-                if (ImGui.InputInt("Respawn max (s)", ref max))
+                EditorWidgets.FitNextItem("Respawn max (s)"u8);
+                if (ImGui.InputInt("Respawn max (s)"u8, ref max))
                 {
                     d.RespawnOverrideMax = (uint)Math.Max(0, max);
                     changed = true;
                 }
                 if (d.RespawnOverrideMin.HasValue && d.RespawnOverrideMax.HasValue &&
                     d.RespawnOverrideMin > d.RespawnOverrideMax)
-                    ImGui.TextColored(EditorTheme.Warning, "Respawn min exceeds max");
+                    ImGui.TextColored(EditorTheme.Warning, "Respawn min exceeds max"u8);
             }
             ImGui.TreePop();
         }
@@ -362,18 +389,18 @@ public sealed class SpawnGroupInspector : IInspectorSection
         bool changed = false;
 
         var tableFlags = ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp;
-        if (ImGui.BeginTable("members", slots ? 5 : 2, tableFlags))
+        if (ImGui.BeginTable("members"u8, slots ? 5 : 2, tableFlags))
         {
             // explicit weight: a long creature name must not inflate this column's share and
             // squeeze the fixed slot/chance inputs (or push the table past the panel width)
-            ImGui.TableSetupColumn("Member", ImGuiTableColumnFlags.WidthStretch, 1f);
+            ImGui.TableSetupColumn("Member"u8, ImGuiTableColumnFlags.WidthStretch, 1f);
             if (slots)
             {
-                ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 28);   // make-leader
-                ImGui.TableSetupColumn("Slot", ImGuiTableColumnFlags.WidthFixed, 52);
-                ImGui.TableSetupColumn("Chance", ImGuiTableColumnFlags.WidthFixed, 52);
+                ImGui.TableSetupColumn(""u8, ImGuiTableColumnFlags.WidthFixed, 28);   // make-leader
+                ImGui.TableSetupColumn("Slot"u8, ImGuiTableColumnFlags.WidthFixed, 52);
+                ImGui.TableSetupColumn("Chance"u8, ImGuiTableColumnFlags.WidthFixed, 52);
             }
-            ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 28);
+            ImGui.TableSetupColumn(""u8, ImGuiTableColumnFlags.WidthFixed, 28);
 
             SpawnGroupMember? removeTarget = null;
             for (int i = 0; i < members.Count; ++i)
@@ -397,7 +424,7 @@ public sealed class SpawnGroupInspector : IInspectorSection
                     {
                         if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                             module.HighlightSpawn(spawn, flyTo: true);
-                        ImGui.SetTooltip("Click: highlight in the world · double-click: fly camera to it");
+                        ImGui.SetTooltip("Click: highlight in the world · double-click: fly camera to it"u8);
                     }
                 }
                 else
@@ -413,24 +440,24 @@ public sealed class SpawnGroupInspector : IInspectorSection
                         module.MakeLeader(groupId, m.Guid);
                     ImGui.EndDisabled();
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip(isLeader ? "Already the leader" : "Make this member the formation leader (slot 0)");
+                        ImGui.SetTooltip(isLeader ? "Already the leader"u8 : "Make this member the formation leader (slot 0)"u8);
 
                     ImGui.TableNextColumn();
                     int slotId = slot.SlotId;
                     ImGui.SetNextItemWidth(-1);
-                    if (ImGui.InputInt("##slot", ref slotId, 0, 0))
+                    if (ImGui.InputInt("##slot"u8, ref slotId, 0, 0))
                     {
                         slot.SlotId = Math.Max(-1, slotId);
                         details.MemberSlots[m.Guid] = slot;
                         changed = true;
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Formation slot: 0 = leader, -1 = not part of the formation");
+                        ImGui.SetTooltip("Formation slot: 0 = leader, -1 = not part of the formation"u8);
 
                     ImGui.TableNextColumn();
                     int chance = (int)slot.Chance;
                     ImGui.SetNextItemWidth(-1);
-                    if (ImGui.InputInt("##chance", ref chance, 0, 0))
+                    if (ImGui.InputInt("##chance"u8, ref chance, 0, 0))
                     {
                         if (chance is < 0 or > 100)
                             clampNote.Set($"Member chance is 0-100 - {chance} was clamped to {Math.Clamp(chance, 0, 100)}");
@@ -439,14 +466,14 @@ public sealed class SpawnGroupInspector : IInspectorSection
                         changed = true;
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Chance for this spawn to occur (0 = always)");
+                        ImGui.SetTooltip("Chance for this spawn to occur (0 = always)"u8);
                 }
 
                 ImGui.TableNextColumn();
                 if (ImGui.SmallButton(Lucide.X))
                     removeTarget = m;
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Remove from the group (the spawn stays in the world; applied on Save)");
+                    ImGui.SetTooltip("Remove from the group (the spawn stays in the world; applied on Save)"u8);
 
                 ImGui.PopID();
             }
@@ -475,7 +502,7 @@ public sealed class SpawnGroupInspector : IInspectorSection
                 changed = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Assign formation slots to every member in the shown order");
+                ImGui.SetTooltip("Assign formation slots to every member in the shown order"u8);
             ImGui.SameLine();
             if (ImGui.SmallButton($"{Lucide.X} Clear formation"))
             {
@@ -488,33 +515,59 @@ public sealed class SpawnGroupInspector : IInspectorSection
                 changed = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Take every member out of the formation (slot -1)");
+                ImGui.SetTooltip("Take every member out of the formation (slot -1)"u8);
         }
 
-        if (module.Pending.Count > 0)
+        DrawPickToggle("Add/remove members (click spawns)", "Adding/removing members — click spawns");
+
+        if (module.Pending.Count > 0 &&
+            ImGui.Button($"Add {module.Pending.Count} selected spawn{(module.Pending.Count > 1 ? "s" : "")} to this group"))
         {
-            if (ImGui.Button($"Add {module.Pending.Count} selected spawn{(module.Pending.Count > 1 ? "s" : "")} to this group"))
-            {
-                service.AddToGroup(groupId, module.CollectPending());
-                module.Pending.Clear();
-            }
+            service.AddToGroup(groupId, module.CollectPending());
+            module.Pending.Clear();
         }
-        else
-        {
-            ImGui.TextDisabled("Click ungrouped spawns in the world to add them.");
-        }
+
+        DrawAddByGuid(groupId);
 
         if (changed)
             service.NotifyDetailsChanged(groupId);
     }
 
+    private int addMemberGuid;
+    private string? addMemberError;
+    private uint addMemberErrorGroup;
+
+    // typing a guid covers members the click gesture can't reach (unloaded areas, occluded,
+    // inside buildings) - same affordance the formation editor already has
+    private void DrawAddByGuid(uint groupId)
+    {
+        ImGui.SetNextItemWidth(90);
+        ImGui.InputInt("##addbyguid"u8, ref addMemberGuid, 0, 0);
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip("Guid of a spawn on this map"u8);
+        ImGui.SameLine();
+        ImGui.BeginDisabled(addMemberGuid <= 0);
+        if (ImGui.SmallButton($"{Lucide.Plus} Add by guid"))
+        {
+            addMemberError = module.TryAddMemberByGuid(groupId, (uint)addMemberGuid);
+            addMemberErrorGroup = groupId;
+            if (addMemberError == null)
+                addMemberGuid = 0;
+        }
+        ImGui.EndDisabled();
+        if (addMemberError != null && addMemberErrorGroup == groupId)
+            ImGui.TextColored(EditorTheme.Warning, addMemberError);
+    }
+
     private void DrawFormation(SpawnGroupDetails d)
     {
-        ImGui.SeparatorText("Formation");
+        // "Group formation" - the standalone tool for creature_formations is "Creature formations";
+        // the two systems must not share one name
+        ImGui.SeparatorText("Group formation"u8);
 
         bool has = d.Formation != null;
         bool changed = false;
-        if (ImGui.Checkbox("Group moves in formation", ref has))
+        if (ImGui.Checkbox("Group moves in formation"u8, ref has))
         {
             d.Formation = has ? new SpawnGroupFormationData() : null;
             changed = true;
@@ -522,7 +575,8 @@ public sealed class SpawnGroupInspector : IInspectorSection
 
         if (d.Formation is { } f)
         {
-            if (ImGui.BeginCombo("Shape", SpawnGroupFormationMath.ShapeName(f.Shape)))
+            EditorWidgets.FitNextItem("Shape"u8);
+            if (ImGui.BeginCombo("Shape"u8, SpawnGroupFormationMath.ShapeName(f.Shape)))
             {
                 for (int i = 0; i <= 6; ++i)
                 {
@@ -537,24 +591,26 @@ public sealed class SpawnGroupInspector : IInspectorSection
             }
 
             float spread = f.Spread;
-            if (ImGui.SliderFloat("Spread", ref spread, -15f, 15f, "%.1f"))
+            EditorWidgets.FitNextItem("Spread"u8);
+            if (ImGui.SliderFloat("Spread"u8, ref spread, -15f, 15f, "%.1f"u8))
             {
                 f.Spread = spread;
                 changed = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Distance between formation members (core allows -15..15)");
+                ImGui.SetTooltip("Distance between formation members (core allows -15..15)"u8);
 
             bool keepCompact = (f.Options & 0x02) != 0;
-            if (ImGui.Checkbox("Keep compact", ref keepCompact))
+            if (ImGui.Checkbox("Keep compact"u8, ref keepCompact))
             {
                 f.Options = keepCompact ? f.Options | 0x02 : f.Options & ~0x02;
                 changed = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Dead members don't leave holes - the formation closes ranks");
+                ImGui.SetTooltip("Dead members don't leave holes - the formation closes ranks"u8);
 
-            if (ImGui.BeginCombo("Movement", SpawnGroupFormationMath.MovementTypeName(f.MovementType)))
+            EditorWidgets.FitNextItem("Movement"u8);
+            if (ImGui.BeginCombo("Movement"u8, SpawnGroupFormationMath.MovementTypeName(f.MovementType)))
             {
                 for (int i = 0; i <= 4; ++i)
                 {
@@ -572,7 +628,7 @@ public sealed class SpawnGroupInspector : IInspectorSection
             {
                 int pathId = f.PathId;
                 ImGui.SetNextItemWidth(120);
-                if (ImGui.InputInt("Path id", ref pathId))
+                if (ImGui.InputInt("Path id"u8, ref pathId))
                 {
                     f.PathId = Math.Max(0, pathId);
                     changed = true;
@@ -583,28 +639,29 @@ public sealed class SpawnGroupInspector : IInspectorSection
                     if (ImGui.SmallButton(f.PathId == 0 ? $"{Lucide.Route} Create path..." : $"{Lucide.Route} Edit path..."))
                         module.RequestOpenFormationPath(d);
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Opens the path in the waypoint editor (waypoint_path)");
+                        ImGui.SetTooltip("Opens the path in the waypoint editor (waypoint_path)"u8);
                 }
             }
 
             string comment = f.Comment ?? "";
-            if (ImGui.InputText("Comment", ref comment, 255))
+            EditorWidgets.FitNextItem("Comment"u8);
+            if (ImGui.InputText("Comment"u8, ref comment, 255))
             {
                 f.Comment = comment;
                 changed = true;
             }
 
             if (!d.MemberSlots.Values.Any(s => s.SlotId == 0))
-                ImGui.TextColored(EditorTheme.Warning, "No leader: set a member's slot to 0");
+                ImGui.TextColored(EditorTheme.Warning, "No leader: set a member's slot to 0"u8);
             else
             {
-                ImGui.TextDisabled("Translucent phantoms in the world preview the slots.");
+                EditorWidgets.WrappedHint("Translucent phantoms in the world preview the slots."u8);
                 ImGui.BeginDisabled(!module.CanMoveMembersToSlots);
-                if (ImGui.Button("Move spawns to formation slots", new Vector2(-1, 0)))
+                if (ImGui.Button("Move spawns to formation slots"u8, new Vector2(-1, 0)))
                     module.MoveMembersToSlots();
                 ImGui.EndDisabled();
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Teleports every slotted member onto its previewed position,\nfacing the leader's heading (a spawn move - the toolbar Undo\nreverts it; persisted on Save)");
+                    ImGui.SetTooltip("Teleports every slotted member onto its previewed position,\nfacing the leader's heading (a spawn move - the toolbar Undo\nreverts it; persisted on Save)"u8);
             }
         }
 
@@ -614,19 +671,19 @@ public sealed class SpawnGroupInspector : IInspectorSection
 
     private void DrawRandomEntries(SpawnGroupDetails d)
     {
-        ImGui.SeparatorText("Random entries");
+        ImGui.SeparatorText("Random entries"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Members spawned with entry 0 roll a random entry from this pool");
+            ImGui.SetTooltip("Members spawned with entry 0 roll a random entry from this pool"u8);
 
         bool changed = false;
         if (d.RandomEntries.Count > 0 &&
-            ImGui.BeginTable("randentries", 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
+            ImGui.BeginTable("randentries"u8, 5, ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchProp))
         {
-            ImGui.TableSetupColumn("Entry", ImGuiTableColumnFlags.WidthStretch, 1f);
-            ImGui.TableSetupColumn("Min", ImGuiTableColumnFlags.WidthFixed, 44);
-            ImGui.TableSetupColumn("Max", ImGuiTableColumnFlags.WidthFixed, 44);
-            ImGui.TableSetupColumn("Chance", ImGuiTableColumnFlags.WidthFixed, 52);
-            ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 28);
+            ImGui.TableSetupColumn("Entry"u8, ImGuiTableColumnFlags.WidthStretch, 1f);
+            ImGui.TableSetupColumn("Min"u8, ImGuiTableColumnFlags.WidthFixed, 44);
+            ImGui.TableSetupColumn("Max"u8, ImGuiTableColumnFlags.WidthFixed, 44);
+            ImGui.TableSetupColumn("Chance"u8, ImGuiTableColumnFlags.WidthFixed, 52);
+            ImGui.TableSetupColumn(""u8, ImGuiTableColumnFlags.WidthFixed, 28);
             ImGui.TableHeadersRow();
 
             int removeAt = -1;
@@ -642,7 +699,7 @@ public sealed class SpawnGroupInspector : IInspectorSection
                 ImGui.TableNextColumn();
                 int min = (int)e.MinCount;
                 ImGui.SetNextItemWidth(-1);
-                if (ImGui.InputInt("##min", ref min, 0, 0))
+                if (ImGui.InputInt("##min"u8, ref min, 0, 0))
                 {
                     e.MinCount = (uint)Math.Max(0, min);
                     d.RandomEntries[i] = e;
@@ -652,7 +709,7 @@ public sealed class SpawnGroupInspector : IInspectorSection
                 ImGui.TableNextColumn();
                 int max = (int)e.MaxCount;
                 ImGui.SetNextItemWidth(-1);
-                if (ImGui.InputInt("##max", ref max, 0, 0))
+                if (ImGui.InputInt("##max"u8, ref max, 0, 0))
                 {
                     e.MaxCount = (uint)Math.Max(0, max);
                     d.RandomEntries[i] = e;
@@ -662,7 +719,7 @@ public sealed class SpawnGroupInspector : IInspectorSection
                 ImGui.TableNextColumn();
                 int chance = (int)e.Chance;
                 ImGui.SetNextItemWidth(-1);
-                if (ImGui.InputInt("##chance", ref chance, 0, 0))
+                if (ImGui.InputInt("##chance"u8, ref chance, 0, 0))
                 {
                     if (chance < 0)
                         clampNote.Set($"Chance can't be negative - {chance} was clamped to 0");
@@ -675,7 +732,7 @@ public sealed class SpawnGroupInspector : IInspectorSection
                 if (ImGui.SmallButton(Lucide.X))
                     removeAt = i;
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Remove this random entry (applied on Save)");
+                    ImGui.SetTooltip("Remove this random entry (applied on Save)"u8);
 
                 ImGui.PopID();
             }
@@ -688,11 +745,11 @@ public sealed class SpawnGroupInspector : IInspectorSection
             }
 
             if (d.RandomEntries.Any(e => e.MaxCount > 0 && e.MinCount > e.MaxCount))
-                ImGui.TextColored(EditorTheme.Warning, "An entry has min > max");
+                ImGui.TextColored(EditorTheme.Warning, "An entry has min > max"u8);
         }
 
         ImGui.SetNextItemWidth(120);
-        ImGui.InputInt("##newentry", ref newRandomEntry, 0, 0);
+        ImGui.InputInt("##newentry"u8, ref newRandomEntry, 0, 0);
         entryPicker.PickButton("picknewentry", d.Type == SpawnGroupTemplateType.Creature, newRandomEntry,
             picked => newRandomEntry = (int)picked);
         ImGui.SameLine();
@@ -709,26 +766,23 @@ public sealed class SpawnGroupInspector : IInspectorSection
 
     private void DrawLinkedGroups(SpawnGroupDetails d)
     {
-        ImGui.SeparatorText("Linked groups");
+        ImGui.SeparatorText("Linked groups"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Linked groups spawn/despawn together with this one");
+            ImGui.SetTooltip("Linked groups spawn/despawn together with this one"u8);
 
         bool changed = false;
         for (int i = 0; i < d.LinkedGroups.Count; ++i)
         {
             ImGui.PushID(i);
-            if (ImGui.SmallButton(Lucide.X))
+            var id = d.LinkedGroups[i];
+            ImGui.TextUnformatted(service.GroupNames.TryGetValue(id, out var n) ? $"{id} {n}" : id.ToString());
+            if (EditorWidgets.TrailingRemoveButton("Unlink this group (applied on Save)"))
             {
                 d.LinkedGroups.RemoveAt(i);
                 changed = true;
                 ImGui.PopID();
                 break;
             }
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Unlink this group (applied on Save)");
-            ImGui.SameLine();
-            var id = d.LinkedGroups[i];
-            ImGui.TextUnformatted(service.GroupNames.TryGetValue(id, out var n) ? $"{id} {n}" : id.ToString());
             ImGui.PopID();
         }
 
@@ -755,9 +809,9 @@ public sealed class SpawnGroupInspector : IInspectorSection
 
     private void DrawSquads(SpawnGroupDetails d)
     {
-        ImGui.SeparatorText("Squads");
+        ImGui.SeparatorText("Squads"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("A squad forces specific entries onto specific guids together\n(used with the random-entry pool)");
+            ImGui.SetTooltip("A squad forces specific entries onto specific guids together\n(used with the random-entry pool)"u8);
 
         bool changed = false;
         foreach (var squadId in d.Squads.Select(s => s.SquadId).Distinct().OrderBy(x => x).ToList())
@@ -771,33 +825,30 @@ public sealed class SpawnGroupInspector : IInspectorSection
                         continue;
                     var row = d.Squads[i];
                     ImGui.PushID(i);
-                    if (ImGui.SmallButton(Lucide.X))
-                    {
-                        d.Squads.RemoveAt(i);
-                        changed = true;
-                        ImGui.PopID();
-                        break;
-                    }
-                    if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Remove from the squad (applied on Save)");
-                    ImGui.SameLine();
                     var spawn = module.FindSpawn(new SpawnGroupMember(d.Type == SpawnGroupTemplateType.Creature, row.Guid));
                     ImGui.TextUnformatted(spawn != null ? SpawnGroupEditorModule.DescribeSpawn(spawn) : $"guid {row.Guid}");
                     ImGui.SameLine();
                     ImGui.SetNextItemWidth(90);
                     int entry = (int)row.Entry;
-                    if (ImGui.InputInt("##entry", ref entry, 0, 0))
+                    if (ImGui.InputInt("##entry"u8, ref entry, 0, 0))
                     {
                         row.Entry = (uint)Math.Max(0, entry);
                         d.Squads[i] = row;
                         changed = true;
                     }
                     if (ImGui.IsItemHovered())
-                        ImGui.SetTooltip("Entry forced onto this guid when the squad is picked");
+                        ImGui.SetTooltip("Entry forced onto this guid when the squad is picked"u8);
                     // the pick lands frames later - re-find the row by (squad, guid), the list
                     // may have changed (or the whole details object, after a reload) meanwhile
                     entryPicker.PickButton("pickentry", d.Type == SpawnGroupTemplateType.Creature, row.Entry,
                         MakeSquadEntrySetter(d.Id, row.SquadId, row.Guid));
+                    if (EditorWidgets.TrailingRemoveButton("Remove from the squad (applied on Save)"))
+                    {
+                        d.Squads.RemoveAt(i);
+                        changed = true;
+                        ImGui.PopID();
+                        break;
+                    }
                     ImGui.PopID();
                 }
 
@@ -821,8 +872,8 @@ public sealed class SpawnGroupInspector : IInspectorSection
         ImGui.EndDisabled();
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
             ImGui.SetTooltip(free.Guid != 0
-                ? "New squad, seeded with the first member not yet in a squad"
-                : "Every group member is already in a squad - add more members first");
+                ? "New squad, seeded with the first member not yet in a squad"u8
+                : "Every group member is already in a squad - add more members first"u8);
 
         if (changed)
             service.NotifyDetailsChanged(d.Id);
@@ -852,7 +903,7 @@ public sealed class SpawnGroupInspector : IInspectorSection
             return;
 
         if (ImGui.SmallButton($"{Lucide.Plus} Add member..."))
-            ImGui.OpenPopup("##addsquadmember");
+            ImGui.OpenPopup("##addsquadmember"u8);
         if (ImGuiEx.BeginPopup("##addsquadmember"))
         {
             foreach (var m in candidates)

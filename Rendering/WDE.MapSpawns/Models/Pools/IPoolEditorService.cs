@@ -46,6 +46,12 @@ public interface IPoolEditorService
     /// <summary>Merges an off-thread load into the live state. Call once per frame on the engine thread.</summary>
     void PumpPendingLoads();
 
+    /// <summary>The explicit membership pick mode: while armed (and the pool tool is active),
+    /// world clicks add/remove members instead of selecting. Armed/disarmed by the inspector
+    /// toggle and Esc/right-click in the tool module; the Escape step-out chain treats an armed
+    /// pick mode as "a tool interaction owns Escape".</summary>
+    bool MemberPickArmed { get; set; }
+
     /// <summary>The pool a spawn directly belongs to (pool_creature/pool_gameobject), if any.</summary>
     uint? PoolOf(PoolMember member);
 

@@ -51,6 +51,7 @@ public class SpawnGroupEditorModule : IGameModule
     private readonly RaycastSystem raycastSystem;
     private readonly ICachedDatabaseProvider cachedDatabase;
     private readonly IWorldSpawnEditService editService;
+    private readonly IGameNotificationService notifications;
     private readonly SpawnGroupInspector inspector;
 
     // internal: SpawnGroupInspector draws a legend with the exact same colors
@@ -121,9 +122,11 @@ public class SpawnGroupEditorModule : IGameModule
         ICachedDatabaseProvider cachedDatabase,
         IWorldSpawnEditService editService,
         EntryPickerService entryPicker,
-        ISpawnSelectionService spawnSelectionService)
+        ISpawnSelectionService spawnSelectionService,
+        IGameNotificationService notifications)
     {
         this.spawnSelectionService = spawnSelectionService;
+        this.notifications = notifications;
         this.engine = engine;
         this.gameContext = gameContext;
         this.toolService = toolService;
@@ -188,6 +191,7 @@ public class SpawnGroupEditorModule : IGameModule
         {
             if (pending.Count > 0)
                 pending.Clear();
+            service.MemberPickArmed = false;
             DisableDecalsFrom(0);
             ghostSlots.Clear();
             ClearPhantoms();
@@ -201,16 +205,49 @@ public class SpawnGroupEditorModule : IGameModule
         if (interaction.IsCaptured)
             return;
 
+        // Esc / right-click steps out of the armed pick mode (one level, before anything else
+        // reads those inputs; the Escape chain in SpawnViewer sees the armed flag as blocked)
+        if (service.MemberPickArmed &&
+            (inputManager.Keyboard.JustPressed(TheEngine.Input.Key.Escape) ||
+             inputManager.Mouse.HasJustClicked(MouseButton.Right)))
+        {
+            service.MemberPickArmed = false;
+            if (inputManager.Mouse.HasJustClicked(MouseButton.Right))
+                interaction.UsePointerThisFrame(); // the exit click must not also open the menu
+            return;
+        }
+
         if (inputManager.Mouse.HasJustClicked(MouseButton.Left))
         {
             var spawn = PickSpawnUnderCursor();
             if (spawn != null)
             {
                 var member = new SpawnGroupMember(spawn is CreatureSpawnInstance, spawn.Guid);
-                if (service.GroupOf(member) is { } groupId)
-                    SelectedGroupId = groupId; // clicking a grouped spawn edits its group
-                else
-                    Toggle(spawn);
+                var memberGroup = service.GroupOf(member);
+                if (service.MemberPickArmed)
+                {
+                    // armed: the click IS the membership verb
+                    if (SelectedGroupId != 0)
+                    {
+                        if (memberGroup == SelectedGroupId)
+                            service.RemoveMember(SelectedGroupId, member);
+                        else if (memberGroup == null)
+                            service.AddToGroup(SelectedGroupId, new[] { member });
+                        else
+                            notifications.Notify(GameNotificationType.Info,
+                                $"Already in group {memberGroup} - remove it from that group first");
+                    }
+                    else if (memberGroup is { } g)
+                        notifications.Notify(GameNotificationType.Info,
+                            $"Already in group {g} - stop picking and click it to edit that group");
+                    else
+                        Toggle(spawn);
+                }
+                else if (SelectedGroupId == 0 && memberGroup is { } groupId)
+                {
+                    SelectedGroupId = groupId; // clicking a grouped spawn opens its group
+                }
+                // not armed: the click otherwise just selects/inspects (below)
                 spawnSelectionService.SelectedSpawn.Value = spawn; // shared selection + highlight
                 interaction.UsePointerThisFrame();
             }
@@ -225,6 +262,28 @@ public class SpawnGroupEditorModule : IGameModule
             if (spawn != null)
                 spawnSelectionService.SelectedSpawn.Value = spawn;
         }
+    }
+
+    /// <summary>The inspector's "add member by guid" row: resolves the guid against the loaded
+    /// map's spawns (creature first when the group holds creatures) and adds it to the group.
+    /// Returns null on success, otherwise the error to show in the panel.</summary>
+    public string? TryAddMemberByGuid(uint groupId, uint guid)
+    {
+        var details = service.GetDetails(groupId);
+        bool preferCreature = details == null || details.Type == SpawnGroupTemplateType.Creature;
+        var spawn = FindSpawn(new SpawnGroupMember(preferCreature, guid))
+                    ?? FindSpawn(new SpawnGroupMember(!preferCreature, guid));
+        if (spawn == null)
+            return $"No spawn with guid {guid} on this map";
+        var member = new SpawnGroupMember(spawn is CreatureSpawnInstance, spawn.Guid);
+        if (details != null && member.IsCreature != (details.Type == SpawnGroupTemplateType.Creature))
+            return $"Guid {guid} is a {(member.IsCreature ? "creature" : "gameobject")}, but this is a {(details.Type == SpawnGroupTemplateType.Creature ? "creature" : "gameobject")} group";
+        if (service.GroupOf(member) is { } existing)
+            return existing == groupId
+                ? "Already a member of this group"
+                : $"Already in group {existing} - remove it from that group first";
+        service.AddToGroup(groupId, new[] { member });
+        return null;
     }
 
     public IEnumerable<(string, ICommand, object?)>? GenerateContextMenu()
@@ -601,6 +660,20 @@ public class SpawnGroupEditorModule : IGameModule
     private uint followersGroup;
     private Vector3 ghostLeaderPos;
 
+    // snapped slot positions are cached: the SnapToGroundZ raycast per follower is far too
+    // expensive to run every frame. Recomputed only when an input changes (leader moved/turned,
+    // formation edited, membership changed) plus a slow periodic refresh so terrain/WMOs that
+    // stream in under a stationary leader still get picked up.
+    private readonly List<Vector3> slotPosCache = new();
+    private Vector3 slotsCacheLeaderPos;
+    private float slotsCacheHeading;
+    private FormationShape slotsCacheShape;
+    private float slotsCacheSpread;
+    private int slotsCacheRevision = -1;
+    private uint slotsCacheGroup;
+    private int slotsRefreshCountdown;
+    private const int SlotsRefreshFrames = 30;
+
     // translucent preview models standing on the slots, keyed by member guid
     private RenderLayer phantomLayer;
     private readonly Dictionary<uint, CreatureInstance> phantoms = new();
@@ -650,20 +723,44 @@ public class SpawnGroupEditorModule : IGameModule
         }
         var followers = followersScratch;
 
-        foreach (var (guid, slot) in followers)
+        // ground-snap only when an input changed (or the periodic refresh is due) - the raycasts
+        // dominate the whole Update otherwise
+        bool slotsDirty = slotsCacheRevision != service.Revision || slotsCacheGroup != SelectedGroupId ||
+                          slotsCacheLeaderPos != leaderPos || slotsCacheHeading != heading ||
+                          slotsCacheShape != formation.Shape || slotsCacheSpread != formation.Spread ||
+                          slotPosCache.Count != followers.Count ||
+                          --slotsRefreshCountdown <= 0;
+        if (slotsDirty)
         {
-            var (angle, dist) = SpawnGroupFormationMath.FollowerOffset(
-                formation.Shape, slot.SlotId, followers.Count, formation.Spread);
-            float worldAngle = heading + angle;
-            var ghostPos = leaderPos + new Vector3(MathF.Cos(worldAngle) * dist, MathF.Sin(worldAngle) * dist, 0);
-            ghostPos.Z = SnapToGroundZ(ghostPos);
+            slotsCacheRevision = service.Revision;
+            slotsCacheGroup = SelectedGroupId;
+            slotsCacheLeaderPos = leaderPos;
+            slotsCacheHeading = heading;
+            slotsCacheShape = formation.Shape;
+            slotsCacheSpread = formation.Spread;
+            slotsRefreshCountdown = SlotsRefreshFrames;
+            slotPosCache.Clear();
+            foreach (var (_, slot) in followers)
+            {
+                var (angle, dist) = SpawnGroupFormationMath.FollowerOffset(
+                    formation.Shape, slot.SlotId, followers.Count, formation.Spread);
+                float worldAngle = heading + angle;
+                var ghostPos = leaderPos + new Vector3(MathF.Cos(worldAngle) * dist, MathF.Sin(worldAngle) * dist, 0);
+                ghostPos.Z = SnapToGroundZ(ghostPos);
+                slotPosCache.Add(ghostPos);
+            }
+        }
 
+        for (int idx = 0; idx < followers.Count; ++idx)
+        {
+            var (guid, slot) = followers[idx];
+            // the member lookup stays per-frame - guide lines must follow a dragged member live
             var member = FindSpawn(new SpawnGroupMember(true, guid)) as CreatureSpawnInstance;
             ghostSlots.Add(new GhostSlot
             {
                 Guid = guid,
                 SlotId = slot.SlotId,
-                Pos = ghostPos,
+                Pos = slotPosCache[idx],
                 Heading = heading,
                 MemberPos = member?.WorldObject?.Position ?? member?.Position,
                 MemberEntry = member?.Entry ?? 0,
@@ -845,7 +942,7 @@ public class SpawnGroupEditorModule : IGameModule
         if (ghostSlots.Count == 0 || toolService.ActiveTool != SpawnEditorTool.SpawnGroup)
             return;
 
-        if (!ImGui.Begin("3D"))
+        if (!ImGui.Begin("3D"u8))
         {
             ImGui.End();
             return;
