@@ -110,8 +110,10 @@ namespace TheEngine.Managers
         /// <summary>Fits one orthographic light frustum to each split of the camera's view frustum
         /// and fills the LightView/LightProj/LightViewProj/SplitDistances arrays. Uses bounding-sphere
         /// cascades with texel-grid snapping so the shadow edges don't shimmer as the camera moves.
-        /// The cascade far bounds and back-extrusion come from the resolved <see cref="CascadeShadowMap"/>.</summary>
-        public void ComputeCascades(ICamera camera, Vector3 lightDirection, in CascadeShadowMap settings)
+        /// The cascade far bounds and back-extrusion come from the resolved <see cref="CascadeShadowMap"/>.
+        /// <paramref name="casterReach"/> is the farthest any collected caster's bounds extend from the
+        /// camera (ObjectDrawRenderStage.ShadowCasterReach); the near plane is pulled back to cover it.</summary>
+        public void ComputeCascades(ICamera camera, Vector3 lightDirection, in CascadeShadowMap settings, float casterReach)
         {
             Vector3 lightDir = Vector3.Normalize(lightDirection);
 
@@ -195,9 +197,18 @@ namespace TheEngine.Managers
                 Matrix.Invert(lightRot, out Matrix lightRotInv);
                 center = Vector3.Transform(centerLS, lightRotInv);
 
-                Vector3 eye = center - lightDir * (radius + casterExtrusion);
+                // pull the near plane back far enough to contain every collected caster: caster
+                // geometry lies within casterReach of the camera (measured during collection), so it
+                // sits at most |camera->center| + casterReach from the slice center along the light
+                // direction. A fixed CasterExtrusion is not enough for the near cascades - their sphere
+                // is tiny, and a tall/behind-the-camera caster (low sun, long shadow) gets clipped by
+                // the near plane and its shadow pops off as the receiver moves into cascade 0.
+                // CasterExtrusion remains as a configurable minimum.
+                float pullback = MathF.Max(casterExtrusion,
+                    Vector3.Distance(center, camera.Transform.Position) + casterReach);
+                Vector3 eye = center - lightDir * (radius + pullback);
                 Matrix view = Matrix.CreateLookAt(eye, center, up);
-                float depthRange = radius * 2f + casterExtrusion;
+                float depthRange = radius * 2f + pullback;
                 Matrix proj = Matrix.CreateOrthographicOffCenter(-radius, radius, -radius, radius, 0f, depthRange);
 
                 LightView[c] = view;

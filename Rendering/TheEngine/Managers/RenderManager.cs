@@ -1366,7 +1366,7 @@ namespace TheEngine.Managers
 
         private void RenderShadowCascades(ICamera camera, in DirectionalLightData light, in CascadeShadowMap settings, in SceneData restoreData)
         {
-            csm.ComputeCascades(camera, light.Direction, settings);
+            csm.ComputeCascades(camera, light.Direction, settings, objectDrawStage.ShadowCasterReach);
 
             for (int i = 0; i < CascadedShadowMapManager.CascadeCount; i++)
             {

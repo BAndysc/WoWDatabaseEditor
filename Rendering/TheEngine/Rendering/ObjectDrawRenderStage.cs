@@ -74,9 +74,11 @@ internal sealed partial class ObjectDrawRenderStage : IRenderStage
     // true for the rest of the frame once PrepareSceneFrame built sceneSet; reset by PrepareFrame.
     private bool sceneSetActive;
 
-    // Shadow casters: a SEPARATE opaque set collected without the camera frustum cull (all enabled
-    // opaque renderers within the shadow distance of the camera), so objects behind/beside the
-    // camera still cast shadows into the view. Built in PrepareFrame alongside the camera set, with
+    // Shadow casters: a SEPARATE opaque set collected without ANY camera cull (all non-force-disabled
+    // opaque renderers whose bounds reach into the shadow distance of the camera), so objects
+    // behind/beside the camera - or distance-culled for the view - still cast shadows into the view.
+    // The jobs deliberately ignore RenderEnabledBit's culled bit (written by CollectInto for the
+    // camera) and test only explicit hiding. Built in PrepareFrame alongside the camera set, with
     // its own sort + instancing buffers, and drawn on RenderPoint.Shadow.
     private MeshRenderer[] shadowCasters = new MeshRenderer[1];
     private (LocalToWorld, Entity)[] shadowCastersData = new (LocalToWorld, Entity)[1];
@@ -86,6 +88,7 @@ internal sealed partial class ObjectDrawRenderStage : IRenderStage
     private uint[] shadowObjectIndicesArray = new uint[1];
     private Int4[] shadowDrawDataArray = new Int4[1];
     private int[] shadowMaterialIndexArray = new int[1];
+    private float shadowCasterReach;
     private bool shadowBuffersReady;
     private bool shadowBuffersUploaded;
     private INativeBuffer? shadowModelsBuffer;
@@ -136,6 +139,11 @@ internal sealed partial class ObjectDrawRenderStage : IRenderStage
             .WithComponentData<MeshRenderer>()
             .WithComponentData<LocalToWorld>();
     }
+
+    /// <summary>Max distance from the camera to the farthest bounds point of any collected shadow
+    /// caster this frame; the cascade fit uses it to pull the light near plane back far enough that
+    /// no collected caster is ever clipped (see CascadedShadowMapManager.ComputeCascades).</summary>
+    internal float ShadowCasterReach => shadowCasterReach;
 
     /// <summary>The number of renderers collected for the game camera this frame; indices below this are valid picking results.</summary>
     internal int TotalToDraw => mainSet.totalToDraw;
@@ -439,7 +447,7 @@ internal sealed partial class ObjectDrawRenderStage : IRenderStage
 
         // custom fields user want to use
         public Vector3 cameraPosition;
-        public float shadowDistSq;
+        public float shadowDist;
         public RenderLayerData[] layers;
         public int casterCount;
 
@@ -448,7 +456,10 @@ internal sealed partial class ObjectDrawRenderStage : IRenderStage
             int c = 0;
             for (int i = start; i < end; ++i)
             {
-                if (!renderBit[i])
+                // deliberately NOT the implicit bool (which includes the camera cull written by
+                // CollectInto): casters behind/beside the camera or distance-culled for the view must
+                // still cast into the visible cascades. Only explicit hiding excludes a caster.
+                if (renderBit[i].IsForceDisabled())
                     continue;
                 if (renderBit[i].Layer > 0 && layers[renderBit[i].Layer].IsDisabled)
                     continue;
@@ -457,7 +468,11 @@ internal sealed partial class ObjectDrawRenderStage : IRenderStage
                 {
                     if (span[j].Hidden || !span[j].Opaque)
                         continue;
-                    if ((span[j].WorldBounds.box.Center - cameraPosition).LengthSquared() > shadowDistSq)
+                    // closest-point test: a large object (city WMO) whose bounds CENTER is beyond the
+                    // shadow distance can still overlap the shadowed range and cast into it.
+                    ref readonly var box = ref span[j].WorldBounds.box;
+                    float maxDist = shadowDist + box.Size.Length() * 0.5f;
+                    if ((box.Center - cameraPosition).LengthSquared() > maxDist * maxDist)
                         continue;
                     c++;
                 }
@@ -483,18 +498,20 @@ internal sealed partial class ObjectDrawRenderStage : IRenderStage
 
         // custom fields user want to use
         public Vector3 cameraPosition;
-        public float shadowDistSq;
+        public float shadowDist;
         public RenderLayerData[] layers;
         public MeshRenderer[] shadowCasters;
         public (LocalToWorld, Entity)[] shadowCastersData;
         public int shadowCasterCount;
         public int casterIndex;
+        public float casterReach; // max distance from the camera to any accepted caster's farthest bounds point
 
         public void Execute(int start, int end)
         {
             for (int i = start; i < end; ++i)
             {
-                if (!render[i])
+                // matches FilterShadowsDistanceJob: no camera cull, only explicit hiding excludes a caster
+                if (render[i].IsForceDisabled())
                     continue;
                 if (render[i].Layer > 0 && layers[render[i].Layer].IsDisabled)
                     continue;
@@ -504,10 +521,14 @@ internal sealed partial class ObjectDrawRenderStage : IRenderStage
                     ref var renderer = ref span[j];
                     if (renderer.Hidden || !renderer.Opaque)
                         continue;
-                    if ((renderer.WorldBounds.box.Center - cameraPosition).LengthSquared() > shadowDistSq)
+                    ref readonly var box = ref renderer.WorldBounds.box;
+                    float radius = box.Size.Length() * 0.5f;
+                    float dist = (box.Center - cameraPosition).Length();
+                    if (dist - radius > shadowDist)
                         continue;
                     if (casterIndex >= shadowCasterCount)
                         continue; // a renderer toggled on between the count and fill passes - drop it
+                    casterReach = MathF.Max(casterReach, dist + radius);
                     shadowCasters[casterIndex] = renderer;
                     shadowCastersData[casterIndex++] = (localToWorld[i], itr[i]);
                 }
@@ -527,15 +548,15 @@ internal sealed partial class ObjectDrawRenderStage : IRenderStage
         shadowBuffersReady = false;
         shadowBuffersUploaded = false;
         shadowCasterCount = 0;
+        shadowCasterReach = 0;
 
         float shadowDist = renderManager.ShadowDistance;
-        float shadowDistSq = shadowDist * shadowDist;
 
         // count first (parallel), so the caster arrays can be sized once
         var preFilterJob = new FilterShadowsDistanceJob()
         {
             cameraPosition = cameraPosition,
-            shadowDistSq = shadowDistSq,
+            shadowDist = shadowDist,
             layers = layers,
         };
         preFilterJob.Run(toRenderArchetype);
@@ -553,7 +574,7 @@ internal sealed partial class ObjectDrawRenderStage : IRenderStage
         var job = new FillShadowsJob()
         {
             cameraPosition = cameraPosition,
-            shadowDistSq = shadowDistSq,
+            shadowDist = shadowDist,
             layers = layers,
             shadowCasters = shadowCasters,
             shadowCastersData = shadowCastersData,
@@ -562,6 +583,7 @@ internal sealed partial class ObjectDrawRenderStage : IRenderStage
         };
         job.Run(toRenderArchetype);
         shadowCasterCount = job.casterIndex;
+        shadowCasterReach = job.casterReach;
 
         if (shadowCasterCount == 0)
             return;

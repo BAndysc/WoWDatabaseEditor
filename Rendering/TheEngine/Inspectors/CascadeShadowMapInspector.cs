@@ -122,7 +122,8 @@ public class CascadeShadowMapInspector : IRefInspectorDrawer<CascadeShadowMap>
 
         Label("Constant Bias\0"u8);
         ImGui.SetNextItemWidth(-1);
-        ImGui.SliderFloat("##constantBias", ref component.ConstantBias, 0f, 0.02f);
+        // world units along the light (converted per cascade in the shader)
+        ImGui.SliderFloat("##constantBias", ref component.ConstantBias, 0f, 1f);
         ImGui.NextColumn();
 
         // PCF blur: radius is the kernel half-size (0 = hard shadows), blur the per-tap spacing.

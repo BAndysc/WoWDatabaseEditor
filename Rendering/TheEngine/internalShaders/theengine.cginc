@@ -386,6 +386,12 @@ float SampleCascadeLit(int cascade, vec3 biasedPos, float constBias)
 	if (lightClip.w <= 0.0)
 		return 1.0;
 	vec3 proj = lightClip.xyz / lightClip.w;
+	// constBias arrives in WORLD units; convert to this cascade's NDC depth scale (the world-space
+	// gradient of ndc z, = 1/depthRange for the ortho cascade). A bias fixed in NDC units would grow
+	// with the fitted depth range - the range varies per cascade and per frame (caster reach), and a
+	// deep fit silently erased every shadow thinner than the bias (small doodads cast nothing).
+	mat4 vp = cascadeViewProj[cascade];
+	float ndcBias = constBias * length(vec3(vp[0][2], vp[1][2], vp[2][2]));
 	// the cascade depth map is rendered with the engine's negative-height viewport (stored
 	// top-down, row 0 == top), so sampling it from light-space NDC needs the same Y flip as
 	// every other render-target reconstruct: uv.y = 0.5 - 0.5*ndc.y (see ssao.frag). Without
@@ -406,7 +412,7 @@ float SampleCascadeLit(int cascade, vec3 biasedPos, float constBias)
 		for (int x = -radius; x <= radius; ++x)
 		{
 			float stored = SAMPLE_BINDLESS(texIndex, uv + vec2(float(x), float(y)) * texel).r;
-			lit += (fragDepth - constBias > stored) ? 0.0 : 1.0;
+			lit += (fragDepth - ndcBias > stored) ? 0.0 : 1.0;
 			total += 1.0;
 		}
 	}

@@ -39,7 +39,8 @@ public struct CascadeShadowMap : IComponentData
 
     /// <summary>Shader-side sampling biases. NormalBias pushes the sample point out along the
     /// surface normal (scaled up at grazing angles) to keep acne off lit faces; ConstantBias is a
-    /// flat depth-compare epsilon.</summary>
+    /// flat depth-compare epsilon in WORLD units along the light (converted per cascade in the
+    /// shader, so it doesn't scale with the fitted depth range). Shadows thinner than it vanish.</summary>
     public float NormalBias;
     public float ConstantBias;
 
@@ -66,7 +67,7 @@ public struct CascadeShadowMap : IComponentData
         DepthBiasConstant = 1.5f,
         DepthBiasSlope = 3.0f,
         NormalBias = 0.08f,
-        ConstantBias = 0.0015f,
+        ConstantBias = 0.2f, // world units (see field doc); ~the old 0.0015 NDC at the old cascade-0 depth range
         PcfRadius = 1,
         Blur = 1.0f,
         CascadeBlend = 0.1f,
