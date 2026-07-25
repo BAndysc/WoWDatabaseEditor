@@ -105,7 +105,9 @@ public class SpawnPickerWindow
         ImGui.SetNextWindowSize(new System.Numerics.Vector2(560, 420), ImGuiCond.FirstUseEver);
         if (justOpened)
             ImGui.SetNextWindowFocus();
-        if (!ImGui.Begin("Spawn", ref IsOpen))
+        // "Add Spawn" - next to the docked "Spawns" tree the old title "Spawn" was a coin flip;
+        // ### keeps the ImGui window id (and thus saved layout/position) stable
+        if (!ImGui.Begin("Add Spawn###Spawn"u8, ref IsOpen))
         {
             ImGui.End();
             return;
@@ -122,27 +124,28 @@ public class SpawnPickerWindow
                 loading = true;
                 LoadTemplates().ListenErrors();
             }
-            ImGui.TextUnformatted("Loading templates...");
+            ImGui.TextUnformatted("Loading templates..."u8);
             ImGui.End();
             return;
         }
 
-        if (ImGui.Checkbox("Creatures", ref showCreatures)) filterDirty = true;
+        if (ImGui.Checkbox("Creatures"u8, ref showCreatures)) filterDirty = true;
         ImGui.SameLine();
-        if (ImGui.Checkbox("GameObjects", ref showGameObjects)) filterDirty = true;
+        if (ImGui.Checkbox("GameObjects"u8, ref showGameObjects)) filterDirty = true;
 
         if (justOpened)
         {
             ImGui.SetKeyboardFocusHere();
             justOpened = false;
         }
-        if (ImGui.InputText("Search", ref search, 256) || !string.Equals(search, appliedSearch, StringComparison.Ordinal))
+        EditorWidgets.FitNextItem("Search"u8);
+        if (ImGui.InputText("Search"u8, ref search, 256) || !string.Equals(search, appliedSearch, StringComparison.Ordinal))
         {
             appliedSearch = search;
             filterDirty = true;
         }
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Matches entry and name; words match independently\n(\"looter defias\" finds \"Defias Looter\")");
+            ImGui.SetTooltip("Matches entry and name; words match independently\n(\"looter defias\" finds \"Defias Looter\")"u8);
 
         DrawRecents();
 
@@ -161,7 +164,7 @@ public class SpawnPickerWindow
 
         // left: the template list
         int hovered = -1;
-        ImGui.BeginChild("list", new System.Numerics.Vector2(listWidth, bodyHeight));
+        ImGui.BeginChild("list"u8, new System.Numerics.Vector2(listWidth, bodyHeight));
         var lineHeight = ImGui.GetTextLineHeightWithSpacing();
         var clipper = new ImGuiListClipper();
         clipper.Begin(filtered.Count, lineHeight);
@@ -202,7 +205,7 @@ public class SpawnPickerWindow
 
         // right: the rendered 3D preview + selected template name
         ImGui.SameLine();
-        ImGui.BeginChild("preview", new System.Numerics.Vector2(previewWidth, bodyHeight));
+        ImGui.BeginChild("preview"u8, new System.Numerics.Vector2(previewWidth, bodyHeight));
         if (preview != null && preview.HasPreview)
         {
             unsafe
@@ -212,29 +215,29 @@ public class SpawnPickerWindow
         }
         else if (previewedIndex >= 0)
         {
-            ImGui.TextDisabled("rendering preview...");
+            ImGui.TextDisabled("rendering preview..."u8);
         }
         if (previewedIndex >= 0 && previewedIndex < filtered.Count)
             ImGui.TextWrapped(filtered[previewedIndex].Name);
         ImGui.EndChild();
 
         ImGui.BeginDisabled(!editService.IsAvailable || selectedIndex < 0 || selectedIndex >= filtered.Count);
-        if (ImGui.Button("Place in world"))
+        if (ImGui.Button("Place in world"u8))
             BeginPlacement();
         ImGui.EndDisabled();
         ImGui.SameLine();
-        ImGui.Checkbox("Pin", ref keepOpen);
+        ImGui.Checkbox("Pin"u8, ref keepOpen);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Keep the picker open after placing -\nhandy when alternating between entries");
+            ImGui.SetTooltip("Keep the picker open after placing -\nhandy when alternating between entries"u8);
         if (!editService.IsAvailable)
         {
             ImGui.SameLine();
-            ImGui.TextDisabled("(spawning available in the full editor)");
+            ImGui.TextDisabled("(spawning available in the full editor)"u8);
         }
         else
         {
             ImGui.SameLine();
-            ImGui.TextDisabled("click to place, Shift for multiple");
+            ImGui.TextDisabled("click to place, Shift for multiple"u8);
         }
 
         ImGui.End();
@@ -267,7 +270,7 @@ public class SpawnPickerWindow
         if (recents.Count == 0 || !editService.IsAvailable)
             return;
 
-        ImGui.TextDisabled("Recent:");
+        ImGui.TextDisabled("Recent:"u8);
         float right = ImGui.GetWindowWidth() - ImGui.GetStyle().WindowPadding.X;
         for (int i = 0; i < recents.Count; ++i)
         {

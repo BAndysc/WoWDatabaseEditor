@@ -242,7 +242,7 @@ public class SpawnEditorKeymap
         {
             new() { Keys = "1", Name = "Select tool", Execute = () => SelectTool(1) },
             new() { Keys = "2", Name = "Waypoints tool", Execute = () => SelectTool(2) },
-            new() { Keys = "3", Name = "Formations tool", Enabled = () => formationService.IsSupported, Execute = () => SelectTool(3) },
+            new() { Keys = "3", Name = "Creature formations tool", Enabled = () => formationService.IsSupported, Execute = () => SelectTool(3) },
             new() { Keys = "4", Name = "Spawn groups tool", Enabled = () => spawnGroupService.IsSupported, Execute = () => SelectTool(4) },
             new() { Keys = "5", Name = "Pools tool", Enabled = () => poolService.IsSupported, Execute = () => SelectTool(5) },
             new() { Keys = "6", Name = "Graveyards tool", Enabled = () => safeLocService.IsSupported, Execute = () => SelectTool(6) },
@@ -312,7 +312,7 @@ public class SpawnEditorKeymap
             new() { Keys = "Esc", Name = "Leave pen mode, then deselect the point, then back to Select" },
         }));
 
-        groups.Add(("Formations & creature links", new List<KeyBinding>
+        groups.Add(("Creature formations & links", new List<KeyBinding>
         {
             new() { Keys = "Drag creature -> creature", Name = "Create the link (member -> leader / slave -> master)" },
             new() { Keys = "Click an arrow", Name = "Select the link" },
@@ -351,13 +351,13 @@ public class SpawnEditorKeymap
         var viewport = ImGui.GetMainViewport();
         ImGui.SetNextWindowPos(viewport.Pos + viewport.Size * 0.5f, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
         ImGui.SetNextWindowSize(new Vector2(720, MathF.Min(640, viewport.Size.Y * 0.85f)), ImGuiCond.Appearing);
-        if (!ImGui.Begin("Keyboard shortcuts", ref cheatSheetOpen, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoCollapse))
+        if (!ImGui.Begin("Keyboard shortcuts"u8, ref cheatSheetOpen, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoCollapse))
         {
             ImGui.End();
             return;
         }
 
-        ImGui.TextDisabled("F1 toggles this overlay · every key the 3D spawn editor understands");
+        ImGui.TextDisabled("F1 toggles this overlay · every key the 3D spawn editor understands"u8);
         ImGui.Separator();
 
         foreach (var (group, bindings) in groups)
@@ -365,8 +365,8 @@ public class SpawnEditorKeymap
             ImGui.SeparatorText(group);
             if (ImGui.BeginTable($"##keys_{group}", 2, ImGuiTableFlags.SizingStretchProp))
             {
-                ImGui.TableSetupColumn("keys", ImGuiTableColumnFlags.WidthFixed, 190f);
-                ImGui.TableSetupColumn("action");
+                ImGui.TableSetupColumn("keys"u8, ImGuiTableColumnFlags.WidthFixed, 190f);
+                ImGui.TableSetupColumn("action"u8);
                 foreach (var b in bindings)
                 {
                     if (b.Keys.Length == 0)
@@ -384,10 +384,10 @@ public class SpawnEditorKeymap
         }
 
         ImGui.Separator();
-        if (ImGui.Button("Close", new Vector2(120, 0)))
+        if (ImGui.Button("Close"u8, new Vector2(120, 0)))
             cheatSheetOpen = false;
         ImGui.SameLine();
-        ImGui.TextDisabled("Esc closes too");
+        ImGui.TextDisabled("Esc closes too"u8);
         ImGui.End();
     }
 
@@ -400,7 +400,7 @@ public class SpawnEditorKeymap
         ImGui.SetNextWindowPos(new Vector2(viewport.Pos.X + viewport.Size.X * 0.5f, viewport.Pos.Y + viewport.Size.Y * 0.22f),
             ImGuiCond.Always, new Vector2(0.5f, 0f));
         ImGui.SetNextWindowSize(new Vector2(460, 0), ImGuiCond.Always);
-        if (!ImGui.Begin("##command_palette", ref paletteOpen,
+        if (!ImGui.Begin("##command_palette"u8, ref paletteOpen,
                 ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize))
         {
             ImGui.End();
@@ -410,7 +410,7 @@ public class SpawnEditorKeymap
         if (paletteJustOpened)
             ImGui.SetKeyboardFocusHere();
         ImGui.SetNextItemWidth(-1);
-        bool submitted = ImGui.InputTextWithHint("##palette_filter", "Type a command...", ref paletteFilter, 128,
+        bool submitted = ImGui.InputTextWithHint("##palette_filter"u8, "Type a command..."u8, ref paletteFilter, 128,
             ImGuiInputTextFlags.EnterReturnsTrue);
         paletteJustOpened = false;
 
@@ -431,7 +431,7 @@ public class SpawnEditorKeymap
 
         if (paletteMatches.Count == 0)
         {
-            ImGui.TextDisabled("No matching command");
+            ImGui.TextDisabled("No matching command"u8);
         }
         else
         {
@@ -442,7 +442,7 @@ public class SpawnEditorKeymap
                 paletteIndex = (paletteIndex - 1 + paletteMatches.Count) % paletteMatches.Count;
 
             float rowHeight = ImGui.GetTextLineHeightWithSpacing();
-            if (ImGui.BeginChild("##palette_list", new Vector2(0, MathF.Min(paletteMatches.Count, 10.5f) * rowHeight + 8)))
+            if (ImGui.BeginChild("##palette_list"u8, new Vector2(0, MathF.Min(paletteMatches.Count, 10.5f) * rowHeight + 8)))
             {
                 for (int i = 0; i < paletteMatches.Count; ++i)
                 {

@@ -49,12 +49,19 @@ public sealed class CreatureLinkInspector : IInspectorSection
     {
         if (!service.IsSupported)
         {
-            ImGui.TextDisabled("The current core has no\ncreature_linking table.");
+            ImGui.TextDisabled("The current core has no\ncreature_linking table."u8);
             return;
         }
 
         DrawModePicker();
         ImGui.Separator();
+
+        if (service.Selected != null &&
+            EditorWidgets.BackRow("Deselect link", "Stop editing this link (it stays in the world)"))
+        {
+            service.Selected = null;
+            return;
+        }
 
         switch (service.Selected)
         {
@@ -65,8 +72,8 @@ public sealed class CreatureLinkInspector : IInspectorSection
                 DrawTemplateLinkEditor(templateLink);
                 break;
             default:
-                ImGui.TextDisabled("No link selected.");
-                ImGui.TextDisabled("Drag a creature onto another to link it\n(slave -> master); click an arrow to edit.");
+                ImGui.TextDisabled("No link selected."u8);
+                ImGui.TextDisabled("Drag a creature onto another to link it\n(slave -> master); click an arrow to edit."u8);
                 break;
         }
 
@@ -78,20 +85,20 @@ public sealed class CreatureLinkInspector : IInspectorSection
 
     private void DrawModePicker()
     {
-        ImGui.TextUnformatted("New link creates:");
-        if (ImGui.RadioButton("creature_linking (guid)", service.Mode == CreatureLinkMode.Guid))
+        ImGui.TextUnformatted("New link creates:"u8);
+        if (ImGui.RadioButton("creature_linking (guid)"u8, service.Mode == CreatureLinkMode.Guid))
             service.Mode = CreatureLinkMode.Guid;
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Links one concrete slave spawn to one master spawn (by guid)");
+            ImGui.SetTooltip("Links one concrete slave spawn to one master spawn (by guid)"u8);
 
         ImGui.BeginDisabled(!service.SupportsTemplateLinks);
-        if (ImGui.RadioButton("creature_linking_template (entry)", service.Mode == CreatureLinkMode.Entry))
+        if (ImGui.RadioButton("creature_linking_template (entry)"u8, service.Mode == CreatureLinkMode.Entry))
             service.Mode = CreatureLinkMode.Entry;
         ImGui.EndDisabled();
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
             ImGui.SetTooltip(service.SupportsTemplateLinks
-                ? "Links every spawn of the slave entry on this map to the master entry"
-                : "The current core has no creature_linking_template table");
+                ? "Links every spawn of the slave entry on this map to the master entry"u8
+                : "The current core has no creature_linking_template table"u8);
     }
 
     // ------------------------------------------------------------------ selected editors ---------
@@ -109,10 +116,10 @@ public sealed class CreatureLinkInspector : IInspectorSection
 
         int range = (int)link.SearchRange;
         ImGui.SetNextItemWidth(120);
-        if (ImGui.InputInt("Search range", ref range))
+        if (ImGui.InputInt("Search range"u8, ref range))
             link.SetSearchRange((uint)Math.Max(0, range));
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Range (from spawn coordinates) master and slave are paired within.\n0 = whole map (the master entry must have exactly one spawn).");
+            ImGui.SetTooltip("Range (from spawn coordinates) master and slave are paired within.\n0 = whole map (the master entry must have exactly one spawn)."u8);
 
         DrawFlags(link.Flag, link.SetFlag);
         DrawRemoveButton(() => service.RemoveTemplateLink(link));
@@ -146,7 +153,7 @@ public sealed class CreatureLinkInspector : IInspectorSection
         bool clicked = ImGui.SmallButton($"{Lucide.Trash2} Remove link");
         ImGui.PopStyleColor(3);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Remove this link.\nPending until Save - Revert restores it.");
+            ImGui.SetTooltip("Remove this link.\nPending until Save - Revert restores it."u8);
         if (clicked)
             remove();
     }

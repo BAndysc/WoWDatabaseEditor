@@ -1,6 +1,7 @@
 using TheEngine;
 using System.Numerics;
 using Hexa.NET.ImGui;
+using WDE.MapRenderer.Managers;
 using WDE.MapSpawns.Models;
 using WDE.MapSpawns.Models.Formations;
 
@@ -16,6 +17,7 @@ namespace WDE.MapSpawns.Rendering.Formations;
 public sealed class FormationInspector : IInspectorSection
 {
     private readonly IFormationEditorService service;
+    private readonly IGameContext gameContext;
 
     private bool openPropsPopup;
     private Vector2 propsAnchor;
@@ -24,12 +26,15 @@ public sealed class FormationInspector : IInspectorSection
     // reused each frame; holds the filtered rows shown in the list (selected spawn's group + dirty)
     private readonly List<EditableFormation> listed = new();
 
-    public FormationInspector(IFormationEditorService service)
+    public FormationInspector(IFormationEditorService service, IGameContext gameContext)
     {
         this.service = service;
+        this.gameContext = gameContext;
     }
 
-    public string Title => "Formations";
+    // "Creature formations" - the spawn-group editor has its own "Group formation" section
+    // (a different table and system); the two must not share one name
+    public string Title => "Creature formations";
 
     public bool IsDirty => service.IsSupported && service.AnyDirty;
 
@@ -62,20 +67,25 @@ public sealed class FormationInspector : IInspectorSection
     {
         if (!service.IsSupported)
         {
-            ImGui.TextDisabled("The current core has no\ncreature_formations table.");
+            ImGui.TextDisabled("The current core has no\ncreature_formations table."u8);
             return;
         }
 
         if (service.Selected is { } selected)
         {
+            if (EditorWidgets.BackRow("Deselect link", "Stop editing this link (it stays in the world)"))
+            {
+                service.Selected = null;
+                return;
+            }
             ImGui.TextUnformatted($"member {selected.MemberGuid}  {Lucide.ArrowRight}  leader {selected.LeaderGuid}");
             if (DrawParams(selected))
                 return; // removed
         }
         else
         {
-            ImGui.TextDisabled("No link selected.");
-            ImGui.TextDisabled("Create a link by dragging a creature onto\nits leader in the world; click an arrow\nto edit an existing one.");
+            ImGui.TextDisabled("No link selected."u8);
+            ImGui.TextDisabled("Create a link by dragging a creature onto\nits leader in the world; click an arrow\nto edit an existing one."u8);
         }
 
         DrawManualAdd();
@@ -92,18 +102,18 @@ public sealed class FormationInspector : IInspectorSection
     // typing the guids covers pairs the drag gesture can't reach (distant, occluded, inside buildings)
     private void DrawManualAdd()
     {
-        ImGui.SeparatorText("New link by guid");
+        ImGui.SeparatorText("New link by guid"u8);
         ImGui.SetNextItemWidth(90);
-        ImGui.InputInt("##addmember", ref addMemberGuid, 0, 0);
+        ImGui.InputInt("##addmember"u8, ref addMemberGuid, 0, 0);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Member creature guid");
+            ImGui.SetTooltip("Member creature guid"u8);
         ImGui.SameLine();
         ImGui.TextDisabled(Lucide.ArrowRight);
         ImGui.SameLine();
         ImGui.SetNextItemWidth(90);
-        ImGui.InputInt("##addleader", ref addLeaderGuid, 0, 0);
+        ImGui.InputInt("##addleader"u8, ref addLeaderGuid, 0, 0);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Leader creature guid");
+            ImGui.SetTooltip("Leader creature guid"u8);
         ImGui.SameLine();
         ImGui.BeginDisabled(addMemberGuid <= 0 || addLeaderGuid <= 0 || addMemberGuid == addLeaderGuid);
         if (ImGui.SmallButton($"{Lucide.Link} Link"))
@@ -120,10 +130,10 @@ public sealed class FormationInspector : IInspectorSection
         ImGui.EndDisabled();
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
             ImGui.SetTooltip(addMemberGuid == addLeaderGuid && addMemberGuid > 0
-                ? "A creature can't lead itself"
-                : "Creates the member -> leader link (applied on Save)");
+                ? "A creature can't lead itself"u8
+                : "Creates the member -> leader link (applied on Save)"u8);
         if (addError != null)
-            ImGui.TextColored(EditorTheme.Warning, addError);
+            EditorWidgets.WrappedWarning(addError);
     }
 
     /// <summary>Drawn unconditionally from the module's RenderGUI, so a world double-click opens
@@ -142,25 +152,30 @@ public sealed class FormationInspector : IInspectorSection
 
         // drag-scrub: the world arrow follows live, so scrubbing while watching it is the natural
         // way to tune these (Ctrl+click still types an exact value)
-        changed |= ImGui.DragFloat("Dist", ref dist, 0.05f, 0f, 100f, "%.3f");
+        EditorWidgets.FitNextItem("Dist"u8);
+        changed |= ImGui.DragFloat("Dist"u8, ref dist, 0.05f, 0f, 100f, "%.3f"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Follow distance from the leader.\nDrag to scrub while watching the arrow; Ctrl+click to type.");
-        changed |= ImGui.DragFloat("Angle (deg)", ref angle, 0.5f, -360f, 360f, "%.3f");
+            ImGui.SetTooltip("Follow distance from the leader.\nDrag to scrub while watching the arrow; Ctrl+click to type."u8);
+        EditorWidgets.FitNextItem("Angle (deg)"u8);
+        changed |= ImGui.DragFloat("Angle (deg)"u8, ref angle, 0.5f, -360f, 360f, "%.3f"u8);
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip($"Follow angle relative to the leader's facing ({angle * MathF.PI / 180f:0.###} rad).\nThe formation table stores this column in degrees - unlike\norientations, which are radians everywhere else.\nDrag to scrub while watching the arrow; Ctrl+click to type.");
-        changed |= ImGui.InputInt("groupAI", ref groupAi);
-        changed |= ImGui.InputInt("point_1", ref point1);
-        changed |= ImGui.InputInt("point_2", ref point2);
+        EditorWidgets.FitNextItem("groupAI"u8);
+        changed |= ImGui.InputInt("groupAI"u8, ref groupAi);
+        EditorWidgets.FitNextItem("point_1"u8);
+        changed |= ImGui.InputInt("point_1"u8, ref point1);
+        EditorWidgets.FitNextItem("point_2"u8);
+        changed |= ImGui.InputInt("point_2"u8, ref point2);
 
         if (changed)
             f.SetParams(dist, angle, (uint)Math.Max(0, groupAi), (uint)Math.Max(0, point1), (uint)Math.Max(0, point2));
 
         // destructive-styled like the other editors' deletes; it's a pending change, not a DB write
         EditorTheme.PushDestructiveButton();
-        bool remove = ImGui.SmallButton("Remove link");
+        bool remove = ImGui.SmallButton($"{Lucide.Trash2} Remove link");
         ImGui.PopStyleColor(3);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Unlink this creature from its leader.\nPending until Save - Revert restores it.");
+            ImGui.SetTooltip("Unlink this creature from its leader.\nPending until Save - Revert restores it."u8);
         if (remove)
         {
             service.Remove(f);
@@ -173,15 +188,16 @@ public sealed class FormationInspector : IInspectorSection
     {
         var tableFlags = ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY |
                          ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingStretchProp;
-        if (!ImGui.BeginTable("formations", 5, tableFlags, new Vector2(0, 160)))
+        if (!ImGui.BeginTable("formations"u8, 6, tableFlags, new Vector2(0, 160)))
             return;
 
         ImGui.TableSetupScrollFreeze(0, 1);
-        ImGui.TableSetupColumn("Member");
-        ImGui.TableSetupColumn("Leader");
-        ImGui.TableSetupColumn("Dist");
-        ImGui.TableSetupColumn("Angle");
-        ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 24);
+        ImGui.TableSetupColumn("Member"u8);
+        ImGui.TableSetupColumn("Leader"u8);
+        ImGui.TableSetupColumn("Dist"u8);
+        ImGui.TableSetupColumn("Angle"u8);
+        ImGui.TableSetupColumn(""u8, ImGuiTableColumnFlags.WidthFixed, 24);
+        ImGui.TableSetupColumn(""u8, ImGuiTableColumnFlags.WidthFixed, 24);
         ImGui.TableHeadersRow();
 
         EditableFormation? removeTarget = null;
@@ -199,10 +215,15 @@ public sealed class FormationInspector : IInspectorSection
             ImGui.SetNextItemAllowOverlap();
             if (ImGui.Selectable(f.MemberGuid.ToString() + (f.IsDirty ? " *" : ""), selected, ImGuiSelectableFlags.SpanAllColumns))
                 service.Selected = f;
-            if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+            if (ImGui.IsItemHovered())
             {
-                service.Selected = f;
-                OpenProperties(f);
+                if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                {
+                    service.Selected = f;
+                    FlyTo(f);
+                }
+                else if (ImGui.IsItemHovered(ImGuiHoveredFlags.ForTooltip))
+                    ImGui.SetTooltip("Click: select · double-click: fly camera to it"u8);
             }
 
             ImGui.TableNextColumn();
@@ -213,10 +234,19 @@ public sealed class FormationInspector : IInspectorSection
             ImGui.Text(f.Angle.ToString("0.#"));
 
             ImGui.TableNextColumn();
+            if (ImGui.SmallButton(Lucide.Ellipsis))
+            {
+                service.Selected = f;
+                OpenProperties(f);
+            }
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("All link properties"u8);
+
+            ImGui.TableNextColumn();
             if (ImGui.SmallButton(Lucide.X))
                 removeTarget = f;
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Remove this member-leader formation link (applied on Save)");
+                ImGui.SetTooltip("Remove this member-leader formation link (applied on Save)"u8);
 
             ImGui.PopID();
         }
@@ -227,13 +257,19 @@ public sealed class FormationInspector : IInspectorSection
             service.Remove(removeTarget);
     }
 
+    private void FlyTo(EditableFormation f)
+    {
+        if (service.TryGetEndpoints(f, out _, out var memberPos))
+            gameContext.CameraManager.Relocate(memberPos, flyHere: true);
+    }
+
     // Non-modal, anchored at the double-click position so the arrow stays visible while editing;
     // clicking anywhere else dismisses it, edits apply live.
     private void DrawPropertiesPopover()
     {
         if (openPropsPopup)
         {
-            ImGui.OpenPopup("##formation_props");
+            ImGui.OpenPopup("##formation_props"u8);
             openPropsPopup = false;
         }
 

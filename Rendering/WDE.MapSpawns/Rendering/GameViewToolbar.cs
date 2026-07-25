@@ -47,6 +47,9 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
     private readonly SpawnEditorTutorial tutorial;
 
     private const float ButtonSize = 28f;
+    private const float BackdropPad = 6f;
+    // backdrop's outer edge sits ViewMargin from the view corner, same as the top-right strip
+    private const float Margin = WDE.MapRenderer.Utils.ImGuiIconButtons.ViewMargin + BackdropPad;
     private static readonly Vector4 ActiveColor = EditorTheme.Accent;
     private static readonly Vector4 UnsavedColor = EditorTheme.Warning;
 
@@ -95,7 +98,7 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
     {
         // append into the engine's game-view window (drawn earlier this frame) - the strip lives
         // in the 3D view itself and moves/hides with it
-        if (!ImGui.Begin("3D"))
+        if (!ImGui.Begin("3D"u8))
         {
             ImGui.End();
             return;
@@ -106,7 +109,7 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
         dl.ChannelsSetCurrent(1); // buttons first; the backdrop is drawn under them afterwards
 
         var contentTop = ImGui.GetCursorStartPos();
-        ImGui.SetCursorPos(contentTop + new Vector2(10, 10));
+        ImGui.SetCursorPos(contentTop + new Vector2(Margin, Margin));
 
         ImGui.BeginGroup();
 
@@ -117,10 +120,10 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
             "Waypoints - pen tool: click terrain to append points to the selected path", 2);
         ImGui.SameLine(0, 4);
         ToolButton("##tool_formation", ToolIcon.Formation, SpawnEditorTool.Formation, formationService.IsSupported,
-            formationService.IsSupported ? "Formations - drag a creature onto its leader to link them"
+            formationService.IsSupported ? "Creature formations - drag a creature onto its leader to link them"
                 : spawnGroupService is { IsSupported: true, SupportsFormations: true }
-                    ? "Formations - on this core formations are part of spawn groups;\nuse the Spawn group tool (formation shape + slots)"
-                    : "Formations - not supported for this database core", 3);
+                    ? "Creature formations - on this core formations are part of spawn groups;\nuse the Spawn group tool (\"Group formation\": shape + slots)"
+                    : "Creature formations - not supported for this database core", 3);
         ImGui.SameLine(0, 4);
         ToolButton("##tool_group", ToolIcon.SpawnGroup, SpawnEditorTool.SpawnGroup, spawnGroupService.IsSupported,
             spawnGroupService.IsSupported
@@ -176,15 +179,15 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
                 "Keyboard shortcuts (F1)", keymap != null))
             keymap!.OpenCheatSheet();
         ImGui.SameLine(0, 4);
-        if (ImGui.Button("?", new Vector2(ButtonSize, ButtonSize)))
+        if (ImGui.Button("?"u8, new Vector2(ButtonSize, ButtonSize)))
             tutorial.Open();
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Quick tour of the spawn editor");
+            ImGui.SetTooltip("Quick tour of the spawn editor"u8);
 
         ImGui.EndGroup();
 
-        var stripMin = ImGui.GetItemRectMin() - new Vector2(6, 6);
-        var stripMax = ImGui.GetItemRectMax() + new Vector2(6, 6);
+        var stripMin = ImGui.GetItemRectMin() - new Vector2(BackdropPad, BackdropPad);
+        var stripMax = ImGui.GetItemRectMax() + new Vector2(BackdropPad, BackdropPad);
         dl.ChannelsSetCurrent(0);
         WDE.MapRenderer.Utils.ImGuiIconButtons.Backdrop(dl, stripMin, stripMax);
         dl.ChannelsMerge();
@@ -244,7 +247,7 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
         };
         if (ToolIcons.IconButton("##gizmomode", icon, ButtonSize, false,
                 anySupported ? tooltip : "The active tool has no transform gizmo", anySupported))
-            ImGui.OpenPopup("##gizmo_mode_menu");
+            ImGui.OpenPopup("##gizmo_mode_menu"u8);
 
         // dropdown caret in the button's corner
         var max = ImGui.GetItemRectMax();
@@ -260,10 +263,10 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
             GizmoModeRow(ToolIcon.Scale, "Scale", null, GizmoMode.Scale);
             ImGui.Separator();
             bool showHandles = toolService.ShowGizmoHandles;
-            if (ImGui.MenuItem("Show gizmo handles", "", ref showHandles))
+            if (ImGui.MenuItem("Show gizmo handles"u8, ""u8, ref showHandles))
                 toolService.ShowGizmoHandles = showHandles;
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Hide the on-screen arrows/rings if you edit with G/R -\nthe keyboard grabs keep working");
+                ImGui.SetTooltip("Hide the on-screen arrows/rings if you edit with G/R -\nthe keyboard grabs keep working"u8);
             ImGui.EndPopup();
         }
     }
@@ -282,8 +285,8 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
         ImGui.EndDisabled();
         if (!supported && ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
             ImGui.SetTooltip(mode == GizmoMode.Scale
-                ? "Spawns have no scale column in the database - there would be nothing to save"
-                : "The active tool doesn't support this mode");
+                ? "Spawns have no scale column in the database - there would be nothing to save"u8
+                : "The active tool doesn't support this mode"u8);
     }
 
     private void VerticalSeparator(ImDrawListPtr dl)
@@ -375,7 +378,7 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
         }
 
         if (formationService.AnyDirty)
-            Section("Formations", formationService.BuildSaveQuery());
+            Section("Creature formations", formationService.BuildSaveQuery());
         if (spawnGroupService.AnyDirty)
             Section("Spawn groups", spawnGroupService.BuildSaveQuery());
         if (poolService.AnyDirty)
@@ -443,7 +446,7 @@ public class GameViewToolbar : WDE.MapRenderer.Managers.ISavable
         }
 
         if (formationService.AnyDirty)
-            await TrySave("Formations", formationService.Save);
+            await TrySave("Creature formations", formationService.Save);
         if (spawnGroupService.AnyDirty)
             await TrySave("Spawn groups", spawnGroupService.Save);
         if (poolService.AnyDirty)

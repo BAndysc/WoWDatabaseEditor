@@ -97,12 +97,19 @@ public sealed class TransformDragger
     /// <summary>Where the in-flight grab started - the anchor the axis guide line runs through.</summary>
     public Vector3 GrabOrigin => planeDragOriginalPos;
 
-    // hint rebuilt only when the state it narrates changes (the hint bar reads it every frame)
+    // static tail rebuilt only when the state it narrates changes; the live numbers in front are
+    // formatted fresh each read - only while a drag is actually in flight, never at idle
     private string? cachedHint;
     private (bool rotating, bool vertical, DragAxis axis, string numeric) hintKey = (false, false, DragAxis.None, "");
 
+    // the target's transform as of the last Update, so the hint can read it without a target ref
+    private Vector3 livePosition;
+    private float liveOrientation;
+
     /// <summary>Hint-bar line while a drag/rotation is in flight (null otherwise) - the state-
-    /// sensitive replacement for the owning tool's idle hints.</summary>
+    /// sensitive replacement for the owning tool's idle hints. Leads with the live numbers
+    /// (Blender's delta readout): absolute facing while rotating, position + distance moved
+    /// (per-axis delta under an axis lock) while grabbing.</summary>
     public string? ActiveHint
     {
         get
@@ -115,23 +122,44 @@ public sealed class TransformDragger
                 hintKey = key;
                 cachedHint = BuildHint();
             }
-            return cachedHint;
+            if (numericEntry.Length > 0)
+                return cachedHint; // the typed value IS the readout
+            if (rotating)
+                return $"Facing {NormalizedDegrees(liveOrientation):0.0}° · {cachedHint}";
+            var delta = livePosition - planeDragOriginalPos;
+            if (axisLock != DragAxis.None)
+            {
+                float along = axisLock switch
+                {
+                    DragAxis.X => delta.X,
+                    DragAxis.Y => delta.Y,
+                    _ => delta.Z,
+                };
+                return $"{AxisName(axisLock)} {along:+0.00;-0.00} yd · {cachedHint}";
+            }
+            return $"{livePosition.X:0.00}, {livePosition.Y:0.00}, {livePosition.Z:0.00} · moved {delta.Length():0.00} yd · {cachedHint}";
         }
+    }
+
+    private static float NormalizedDegrees(float radians)
+    {
+        float deg = radians * (180f / MathF.PI) % 360f;
+        return deg < 0 ? deg + 360f : deg;
     }
 
     private string BuildHint()
     {
         if (numericEntry.Length > 0)
             return rotating
-                ? $"Rotate by: {numericEntry}° · Enter/click: apply · Backspace: edit · Esc: cancel"
+                ? $"Set facing: {numericEntry}° · Enter/click: apply · Backspace: edit · Esc: cancel"
                 : $"Move {AxisName(axisLock == DragAxis.None ? DragAxis.Z : axisLock)}: {numericEntry} yd · Enter/click: apply · Backspace: edit · Esc: cancel";
         if (rotating)
-            return "Rotating · faces the cursor · click: drop · Esc: cancel · Ctrl: 15° steps · Shift: precise · type degrees for an exact turn";
+            return "faces the cursor · click: drop · Esc: cancel · Ctrl: 15° steps · Shift: precise · type degrees for an exact facing";
         if (axisLock != DragAxis.None)
-            return $"Grabbing along {AxisName(axisLock)} · click: drop · {AxisName(axisLock)}: unlock · type a distance for an exact move · Ctrl: grid snap · Shift: precise";
+            return $"click: drop · {AxisName(axisLock)}: unlock · type a distance for an exact move · Ctrl: grid snap · Shift: precise";
         return verticalDragging
-            ? "Raising/lowering · click: drop · Esc: cancel · release Alt: move horizontally · Ctrl: grid snap · Shift: precise"
-            : "Grabbing · click: drop · Esc: cancel · G: snap to ground · X/Y/Z: lock to an axis · hold Alt: raise/lower · Ctrl: grid snap · Shift: precise";
+            ? "click: drop · Esc: cancel · release Alt: move horizontally · Ctrl: grid snap · Shift: precise"
+            : "click: drop · Esc: cancel · G: snap to ground · X/Y/Z: lock to an axis · hold Alt: raise/lower · Ctrl: grid snap · Shift: precise";
     }
 
     private static string AxisName(DragAxis axis) => axis switch
@@ -218,12 +246,14 @@ public sealed class TransformDragger
         if (rotating)
         {
             UpdateRotation(target);
+            liveOrientation = target.Orientation;
             return true;
         }
 
         if (planeDragging)
         {
             UpdatePlaneDrag(target);
+            livePosition = target.Position;
             return true;
         }
 
@@ -449,8 +479,9 @@ public sealed class TransformDragger
 
         if (numericEntry.Length > 0 && TryParseNumericEntry(out float degrees))
         {
-            // typed exact rotation: degrees relative to where the rotation started
-            target.Orientation = rotateStartOrientation + degrees * (MathF.PI / 180f);
+            // typed exact rotation: an ABSOLUTE facing in degrees ("face 90") - a relative turn
+            // would need the current unknown angle computed first, which is never what's asked
+            target.Orientation = degrees * (MathF.PI / 180f);
         }
         else
         {
@@ -502,7 +533,7 @@ public sealed class TransformDragger
         if (!planeDragging || axisLock == DragAxis.None)
             return;
 
-        if (!ImGui.Begin("3D"))
+        if (!ImGui.Begin("3D"u8))
         {
             ImGui.End();
             return;

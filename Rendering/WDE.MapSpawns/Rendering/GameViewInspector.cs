@@ -37,7 +37,7 @@ public class GameViewInspector
     private const float DefaultPanelWidth = 320f;
     private const float MinPanelWidth = 240f;
     private const float MaxPanelWidth = 560f;
-    private const float Margin = 10f;
+    private const float Margin = WDE.MapRenderer.Utils.ImGuiIconButtons.ViewMargin;
     // fallback when WDE.MapRenderer's view-settings strip hasn't drawn yet (its actual bottom
     // edge is preferred - a hardcoded height overlaps when the strip's size changes)
     private const float FallbackTopOffset = 28f + 2 * 6f + 8f;
@@ -76,7 +76,7 @@ public class GameViewInspector
 
         var section = overlays.GetSection(toolService.ActiveTool);
 
-        if (!ImGui.Begin("3D"))
+        if (!ImGui.Begin("3D"u8))
         {
             ImGui.End();
             return;
@@ -112,21 +112,27 @@ public class GameViewInspector
         ImGui.SetNextWindowSizeConstraints(new Vector2(width, 0), new Vector2(width, maxHeight));
         ImGui.PushStyleColor(ImGuiCol.ChildBg, ImGui.GetColorU32(ImGuiCol.WindowBg, 0.85f));
         ImGui.PushStyleVar(ImGuiStyleVar.ChildRounding, 6f);
-        if (ImGui.BeginChild("##inspector", new Vector2(width, 0),
+        if (ImGui.BeginChild("##inspector"u8, new Vector2(width, 0),
                 ImGuiChildFlags.Borders | ImGuiChildFlags.AutoResizeY | ImGuiChildFlags.AlwaysUseWindowPadding))
         {
+            // the panel must never scroll sideways: there is no horizontal scrollbar, but focusing
+            // a row wider than the panel makes ImGui auto-scroll to it, shifting everything left
+            // with no way back - a too-wide row clips instead
+            if (ImGui.GetScrollX() != 0)
+                ImGui.SetScrollX(0);
+
             // header: section title (+ dirty badge and save/revert) + right-aligned collapse arrow
             ImGui.TextDisabled(section.Title);
             if (section.IsDirty)
             {
                 ImGui.SameLine();
-                ImGui.TextColored(EditorTheme.Warning, "•"); // bullet - the font has no U+25CF
+                ImGui.TextColored(EditorTheme.Warning, "•"u8); // bullet - the font has no U+25CF
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("This editor has unsaved changes - Save in the toolbar applies them");
+                    ImGui.SetTooltip("This editor has unsaved changes - Save in the toolbar applies them"u8);
                 DrawSaveRevert(section);
             }
             ImGui.SameLine(ImGui.GetWindowWidth() - ImGui.GetFrameHeight() - 8);
-            if (ImGui.ArrowButton("##collapse", ImGuiDir.Right))
+            if (ImGui.ArrowButton("##collapse"u8, ImGuiDir.Right))
             {
                 collapsed = true;
                 PersistUi();
@@ -147,7 +153,7 @@ public class GameViewInspector
 
         // left-edge resize handle (the panel is right-docked, so only this edge can move)
         ImGui.SetCursorScreenPos(new Vector2(panelMin.X - 4, panelMin.Y));
-        ImGui.InvisibleButton("##inspector_resize", new Vector2(8, MathF.Max(8, panelMax.Y - panelMin.Y)));
+        ImGui.InvisibleButton("##inspector_resize"u8, new Vector2(8, MathF.Max(8, panelMax.Y - panelMin.Y)));
         bool resizing = ImGui.IsItemActive();
         if (ImGui.IsItemHovered() || resizing)
             ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeEw);
@@ -208,7 +214,7 @@ public class GameViewInspector
     {
         if (openRevertPopup)
         {
-            ImGui.OpenPopup("Revert changes");
+            ImGui.OpenPopup("Revert changes"u8);
             openRevertPopup = false;
         }
 
@@ -216,10 +222,10 @@ public class GameViewInspector
         if (!ImGuiEx.BeginPopupModal("Revert changes", ref open, ImGuiWindowFlags.AlwaysAutoResize))
             return;
 
-        ImGui.TextUnformatted($"Discard the unsaved {section.Title} changes?");
-        ImGui.TextDisabled("The editor reloads from the database. This cannot be undone.");
+        ImGui.TextUnformatted($"Discard {section.RevertScope}?");
+        ImGui.TextDisabled("The editor reloads from the database. This cannot be undone."u8);
         ImGui.Separator();
-        if (ImGui.Button("Revert", new Vector2(120, 0)))
+        if (ImGui.Button("Revert"u8, new Vector2(120, 0)))
         {
             var revert = section.RevertSelf;
             string title = section.Title;
@@ -235,7 +241,7 @@ public class GameViewInspector
             ImGui.CloseCurrentPopup();
         }
         ImGui.SameLine();
-        if (ImGui.Button("Cancel", new Vector2(120, 0)))
+        if (ImGui.Button("Cancel"u8, new Vector2(120, 0)))
             ImGui.CloseCurrentPopup();
         ImGui.EndPopup();
     }
@@ -252,14 +258,14 @@ public class GameViewInspector
         var min = new Vector2(view.Right - size.X - Margin, view.Y + Margin + topOffset);
 
         ImGui.SetCursorScreenPos(min);
-        if (ImGui.InvisibleButton("##expand", size))
+        if (ImGui.InvisibleButton("##expand"u8, size))
         {
             collapsed = false;
             PersistUi();
         }
         bool hovered = ImGui.IsItemHovered();
         if (hovered)
-            ImGui.SetTooltip(section.IsDirty ? "Show the panel (unsaved changes)" : "Show the panel");
+            ImGui.SetTooltip(section.IsDirty ? "Show the panel (unsaved changes)"u8 : "Show the panel"u8);
 
         var dl = ImGui.GetWindowDrawList();
         var max = min + size;
@@ -315,6 +321,21 @@ public class GameViewInspector
         var size = textSize + pad * 2;
         var min = new Vector2(view.X + (view.Width - size.X) * 0.5f, view.Bottom - size.Y - Margin);
         var max = min + size;
+
+        // a wide pill would draw over the camera coordinates box (bottom left) or the stats
+        // panel (bottom right) - lift it just above whichever it touches (rects are last
+        // frame's, one frame of lag is invisible)
+        float clearBottom = max.Y;
+        void Dodge(RectangleF r)
+        {
+            if (r.Width > 0 && min.X < r.Right && max.X > r.X && min.Y < r.Bottom && max.Y > r.Y)
+                clearBottom = MathF.Min(clearBottom, r.Y - Margin);
+        }
+        Dodge(WDE.MapRenderer.Managers.CameraManager.LastCoordBoxRect);
+        Dodge(WDE.MapRenderer.Modules.DebugInfoGameModule.LastStatsRect);
+        min.Y += clearBottom - max.Y;
+        max.Y = clearBottom;
+
         float rounding = MathF.Min(size.Y * 0.5f, ImGui.GetTextLineHeight()); // stays a pill for one line
 
         var dl = ImGui.GetWindowDrawList();

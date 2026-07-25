@@ -28,6 +28,11 @@ public interface IInspectorSection
     /// to hide the header Revert button. The inspector confirms before calling it.</summary>
     Func<Task>? RevertSelf => null;
 
+    /// <summary>What <see cref="RevertSelf"/> actually throws away, spelled out in the confirm
+    /// dialog ("Discard {RevertScope}?"). Most tools reload the whole map's data, so the default
+    /// says so; a tool with a narrower revert (waypoints: only the open path) overrides this.</summary>
+    string RevertScope => $"ALL unsaved {Title} changes on this map";
+
     /// <summary>One-line keymap/status shown in the hint bar at the bottom of the 3D view.
     /// Re-read every frame, so it can react to the current state; null hides the bar.</summary>
     string? Hints { get; }

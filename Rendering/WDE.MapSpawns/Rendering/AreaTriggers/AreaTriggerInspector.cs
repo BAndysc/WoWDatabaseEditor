@@ -67,7 +67,7 @@ public sealed class AreaTriggerInspector : IInspectorSection
     {
         if (!service.IsSupported)
         {
-            ImGui.TextDisabled("The current core has no\nareatrigger_teleport table.");
+            ImGui.TextDisabled("The current core has no\nareatrigger_teleport table."u8);
             return;
         }
 
@@ -81,12 +81,12 @@ public sealed class AreaTriggerInspector : IInspectorSection
     {
         ImGui.TextDisabled($"{module.Triggers.Count} triggers on this map");
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Trigger shapes come from AreaTrigger.dbc (client data)\nand cannot be added or moved - only their database\neffects (teleport, tavern, quest, script) are editable.");
+            ImGui.SetTooltip("Trigger shapes come from AreaTrigger.dbc (client data)\nand cannot be added or moved - only their database\neffects (teleport, tavern, quest, script) are editable."u8);
 
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##filter", "filter by id or name", ref filter, 100);
+        ImGui.InputTextWithHint("##filter"u8, "filter by id or name"u8, ref filter, 100);
 
-        if (ImGui.BeginChild("##triggers"))
+        if (ImGui.BeginChild("##triggers"u8))
         {
             int shown = 0;
             foreach (var trigger in module.Triggers)
@@ -102,11 +102,11 @@ public sealed class AreaTriggerInspector : IInspectorSection
                 {
                     if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                         module.FlyTo((uint)module.CurrentMapId, trigger.Position);
-                    ImGui.SetTooltip("Click: edit · double-click: fly camera to it");
+                    ImGui.SetTooltip("Click: edit · double-click: fly camera to it"u8);
                 }
             }
             if (module.Triggers.Count == 0)
-                ImGui.TextDisabled("No area triggers on this map.");
+                ImGui.TextDisabled("No area triggers on this map."u8);
             else if (shown == 0)
                 ImGui.TextDisabled($"No triggers match \"{filter}\"");
         }
@@ -115,7 +115,7 @@ public sealed class AreaTriggerInspector : IInspectorSection
 
     private void DrawEditor(uint key)
     {
-        if (ImGui.SmallButton("< back"))
+        if (EditorWidgets.BackRow("All triggers", "Back to the trigger list (a shape click reopens the editor)"))
         {
             module.SelectedKey = null;
             return;
@@ -127,12 +127,12 @@ public sealed class AreaTriggerInspector : IInspectorSection
             ImGui.TextDisabled(shape.IsBox
                 ? $"Box {shape.BoxHalf.X * 2:0.#} × {shape.BoxHalf.Y * 2:0.#} × {shape.BoxHalf.Z * 2:0.#}"
                 : $"Sphere, radius {shape.Radius:0.#}");
-            if (ImGui.SmallButton("Fly to trigger"))
+            if (EditorWidgets.FlyToButton("trigger"))
                 module.FlyTo((uint)module.CurrentMapId, shape.Position);
         }
         else
         {
-            ImGui.TextDisabled("The trigger is on another map (its destination is here).");
+            EditorWidgets.WrappedHint("The trigger is on another map (its destination is here)."u8);
         }
 
         DrawTeleport(key);
@@ -143,10 +143,10 @@ public sealed class AreaTriggerInspector : IInspectorSection
 
     private void DrawTeleport(uint key)
     {
-        ImGui.SeparatorText("Teleport");
+        ImGui.SeparatorText("Teleport"u8);
         if (!service.Teleports.TryGetValue(key, out var row))
         {
-            ImGui.TextDisabled("Entering this trigger teleports nobody.");
+            ImGui.TextDisabled("Entering this trigger teleports nobody."u8);
             if (module.PlacementArmed)
             {
                 if (ImGui.Button($"{Lucide.X} Cancel placement"))
@@ -154,12 +154,12 @@ public sealed class AreaTriggerInspector : IInspectorSection
             }
             else
             {
-                if (ImGui.Button("Place destination by click"))
+                if (ImGui.Button("Place destination (click world)"u8))
                     module.PlacementArmed = true;
                 if (ImGui.IsItemHovered())
-                    ImGui.SetTooltip("Then click the world where entering the trigger should teleport to");
+                    ImGui.SetTooltip("Then click the world where entering the trigger should teleport to"u8);
                 ImGui.SameLine();
-                if (ImGui.Button("Create at camera"))
+                if (ImGui.Button("Create at camera"u8))
                     module.CreateTeleportAtCamera(key);
             }
             return;
@@ -168,7 +168,8 @@ public sealed class AreaTriggerInspector : IInspectorSection
         bool changed = false;
 
         string name = row.Name ?? "";
-        if (ImGui.InputText("Name", ref name, 127))
+        EditorWidgets.FitNextItem("Name"u8);
+        if (ImGui.InputText("Name"u8, ref name, 127))
         {
             row.Name = name;
             changed = true;
@@ -179,13 +180,14 @@ public sealed class AreaTriggerInspector : IInspectorSection
 
         int targetMap = (int)row.Map;
         ImGui.SetNextItemWidth(90);
-        if (ImGui.InputInt("Target map", ref targetMap, 0, 0))
+        if (ImGui.InputInt("Target map"u8, ref targetMap, 0, 0))
         {
             row.Map = (uint)Math.Max(0, targetMap);
             changed = true;
         }
 
         var pos = new System.Numerics.Vector3(row.Position.X, row.Position.Y, row.Position.Z);
+        EditorWidgets.FitNextItem("Position"u8);
         if (ImGui.InputFloat3("Position", ref pos))
         {
             row.Position = new Vector3(pos.X, pos.Y, pos.Z);
@@ -193,7 +195,8 @@ public sealed class AreaTriggerInspector : IInspectorSection
         }
 
         float orientation = row.Orientation;
-        if (ImGui.SliderFloat("Facing", ref orientation, 0f, MathF.Tau, "%.3f rad"))
+        EditorWidgets.FitNextItem("Facing"u8);
+        if (ImGui.SliderFloat("Facing"u8, ref orientation, 0f, MathF.Tau, "%.3f rad"u8))
         {
             row.Orientation = orientation;
             changed = true;
@@ -210,7 +213,7 @@ public sealed class AreaTriggerInspector : IInspectorSection
             }
             ImGui.SameLine();
         }
-        if (ImGui.SmallButton("Fly to destination"))
+        if (EditorWidgets.FlyToButton("destination"))
             module.FlyTo(row.Map, row.Position);
         ImGui.SameLine();
         if (module.PlacementArmed)
@@ -220,10 +223,10 @@ public sealed class AreaTriggerInspector : IInspectorSection
         }
         else
         {
-            if (ImGui.SmallButton("Move by click"))
+            if (ImGui.SmallButton("Move destination (click world)"u8))
                 module.PlacementArmed = true;
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Click the world to move the destination there (always on the current map)");
+                ImGui.SetTooltip("Click the world to move the destination there (always on the current map)"u8);
         }
 
         changed |= DrawRequirements(row);
@@ -242,11 +245,11 @@ public sealed class AreaTriggerInspector : IInspectorSection
 
         if ((columns & AreaTriggerTeleportColumns.Requirements) != 0)
         {
-            ImGui.SeparatorText("Requirements");
+            ImGui.SeparatorText("Requirements"u8);
 
             int level = (int)row.RequiredLevel;
             ImGui.SetNextItemWidth(90);
-            if (ImGui.InputInt("Level", ref level, 0, 0))
+            if (ImGui.InputInt("Level"u8, ref level, 0, 0))
             {
                 row.RequiredLevel = (uint)Math.Max(0, level);
                 changed = true;
@@ -268,20 +271,20 @@ public sealed class AreaTriggerInspector : IInspectorSection
         {
             int condition = (int)row.ConditionId;
             ImGui.SetNextItemWidth(90);
-            if (ImGui.InputInt("Condition id", ref condition, 0, 0))
+            if (ImGui.InputInt("Condition id"u8, ref condition, 0, 0))
             {
                 row.ConditionId = (uint)Math.Max(0, condition);
                 changed = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("mangos_conditions entry checked on the entering player (0 = none)");
+                ImGui.SetTooltip("mangos_conditions entry checked on the entering player (0 = none)"u8);
         }
 
         if ((columns & AreaTriggerTeleportColumns.Status) != 0)
         {
             int status = (int)row.Status;
             ImGui.SetNextItemWidth(90);
-            if (ImGui.InputInt("Status", ref status, 0, 0))
+            if (ImGui.InputInt("Status"u8, ref status, 0, 0))
             {
                 row.Status = (uint)Math.Max(0, status);
                 changed = true;
@@ -291,13 +294,14 @@ public sealed class AreaTriggerInspector : IInspectorSection
         if ((columns & AreaTriggerTeleportColumns.StatusFailedText) != 0)
         {
             string failedText = row.StatusFailedText ?? "";
-            if (ImGui.InputText("Failed text", ref failedText, 255))
+            EditorWidgets.FitNextItem("Failed text"u8);
+            if (ImGui.InputText("Failed text"u8, ref failedText, 255))
             {
                 row.StatusFailedText = failedText;
                 changed = true;
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Message shown to the player when the requirements are not met");
+                ImGui.SetTooltip("Message shown to the player when the requirements are not met"u8);
         }
 
         return changed;
@@ -343,25 +347,25 @@ public sealed class AreaTriggerInspector : IInspectorSection
 
     private void DrawDeleteTeleport(AreaTriggerTeleportData row)
     {
-        if (ImGui.Button("Delete teleport...", new System.Numerics.Vector2(-1, 0)))
-            ImGui.OpenPopup("Delete areatrigger teleport");
+        if (ImGui.Button($"{Lucide.Trash2} Delete teleport...", new System.Numerics.Vector2(-1, 0)))
+            ImGui.OpenPopup("Delete areatrigger teleport"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Deletes the areatrigger_teleport row. Applied on Save.\nThe trigger stops teleporting players!");
+            ImGui.SetTooltip("Deletes the areatrigger_teleport row. Applied on Save.\nThe trigger stops teleporting players!"u8);
 
         bool open = true;
         if (!ImGuiEx.BeginPopupModal("Delete areatrigger teleport", ref open, ImGuiWindowFlags.AlwaysAutoResize))
             return;
 
         ImGui.TextUnformatted($"Delete the teleport of areatrigger {row.Id}?");
-        ImGui.TextDisabled("The database row is removed when you Save.");
+        ImGui.TextDisabled("The database row is removed when you Save."u8);
         ImGui.Separator();
-        if (ImGui.Button("Delete", new System.Numerics.Vector2(120, 0)))
+        if (ImGui.Button("Delete"u8, new System.Numerics.Vector2(120, 0)))
         {
             service.DeleteTeleport(row.Id);
             ImGui.CloseCurrentPopup();
         }
         ImGui.SameLine();
-        if (ImGui.Button("Cancel", new System.Numerics.Vector2(120, 0)))
+        if (ImGui.Button("Cancel"u8, new System.Numerics.Vector2(120, 0)))
             ImGui.CloseCurrentPopup();
         ImGui.EndPopup();
     }
@@ -371,17 +375,18 @@ public sealed class AreaTriggerInspector : IInspectorSection
         if (!service.SupportsTavern)
             return;
 
-        ImGui.SeparatorText("Tavern");
+        ImGui.SeparatorText("Tavern"u8);
         bool isTavern = service.Taverns.TryGetValue(key, out var tavernName);
-        if (ImGui.Checkbox("Rest area (tavern)", ref isTavern))
+        if (ImGui.Checkbox("Rest area (tavern)"u8, ref isTavern))
             service.SetTavern(key, isTavern, isTavern ? tavernName ?? "" : null);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Players inside the trigger rest as if in an inn (areatrigger_tavern)");
+            ImGui.SetTooltip("Players inside the trigger rest as if in an inn (areatrigger_tavern)"u8);
 
         if (isTavern && service.Taverns.ContainsKey(key))
         {
             string name = tavernName ?? "";
-            if (ImGui.InputText("Tavern name", ref name, 127))
+            EditorWidgets.FitNextItem("Tavern name"u8);
+            if (ImGui.InputText("Tavern name"u8, ref name, 127))
                 service.SetTavern(key, true, name);
         }
     }
@@ -391,23 +396,23 @@ public sealed class AreaTriggerInspector : IInspectorSection
         if (!service.SupportsQuestRelation)
             return;
 
-        ImGui.SeparatorText("Exploration quest");
+        ImGui.SeparatorText("Exploration quest"u8);
         if (service.QuestRelations.TryGetValue(key, out var quest))
         {
             int q = (int)quest;
             ImGui.SetNextItemWidth(90);
-            if (ImGui.InputInt("Quest", ref q, 0, 0))
+            if (ImGui.InputInt("Quest"u8, ref q, 0, 0))
                 service.SetQuestRelation(key, (uint)Math.Max(0, q));
             entryPicker.PickButton("##at_quest", "QuestParameter", "Pick a quest from the list", (int)quest,
                 picked => service.SetQuestRelation(key, (uint)Math.Max(0, picked)));
             if (service.GetQuestName(quest) is { } questName)
-                ImGui.TextDisabled(questName);
-            if (ImGui.SmallButton("Unlink quest"))
+                EditorWidgets.WrappedHint(questName);
+            if (ImGui.SmallButton("Unlink quest"u8))
                 service.SetQuestRelation(key, null);
         }
         else
         {
-            ImGui.TextDisabled("Entering the trigger completes no quest.");
+            ImGui.TextDisabled("Entering the trigger completes no quest."u8);
             entryPicker.PickButton("##at_quest_add", "QuestParameter",
                 "Link a quest: entering the trigger completes its exploration objective\n(areatrigger_involvedrelation)", 0,
                 picked =>
@@ -423,11 +428,12 @@ public sealed class AreaTriggerInspector : IInspectorSection
         if (!service.SupportsScript)
             return;
 
-        ImGui.SeparatorText("Script");
+        ImGui.SeparatorText("Script"u8);
         string script = service.ScriptNames.TryGetValue(key, out var s) ? s : "";
-        if (ImGui.InputText("ScriptName", ref script, 127))
+        EditorWidgets.FitNextItem("ScriptName"u8);
+        if (ImGui.InputText("ScriptName"u8, ref script, 127))
             service.SetScriptName(key, script);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("scripted_areatrigger: the name must match a script in the core's\nscript library. Empty removes the row.");
+            ImGui.SetTooltip("scripted_areatrigger: the name must match a script in the core's\nscript library. Empty removes the row."u8);
     }
 }

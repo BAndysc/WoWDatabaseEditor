@@ -66,7 +66,7 @@ public sealed class SpellTargetInspector : IInspectorSection
     {
         if (!service.IsSupported)
         {
-            ImGui.TextDisabled("The current core has no\nspell_target_position table.");
+            ImGui.TextDisabled("The current core has no\nspell_target_position table."u8);
             return;
         }
 
@@ -80,9 +80,9 @@ public sealed class SpellTargetInspector : IInspectorSection
     {
         // add flow: spell id -> name preview -> arm placement
         ImGui.SetNextItemWidth(110);
-        ImGui.InputInt("##newspell", ref newSpellId, 0, 0);
+        ImGui.InputInt("##newspell"u8, ref newSpellId, 0, 0);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Spell id (the spell must use target TARGET_LOCATION_DATABASE / 17)");
+            ImGui.SetTooltip("Spell id (the spell must use target TARGET_LOCATION_DATABASE / 17)"u8);
         entryPicker.PickButton("pickspell", "SpellParameter", "Pick a spell from the list",
             newSpellId, picked => newSpellId = (int)picked);
         ImGui.SameLine();
@@ -99,7 +99,7 @@ public sealed class SpellTargetInspector : IInspectorSection
         else
         {
             ImGui.BeginDisabled(newSpellId <= 0 || exists);
-            if (ImGui.Button("Place in world"))
+            if (ImGui.Button("Place destination (click world)"u8))
             {
                 module.PendingSpellId = (uint)newSpellId;
                 module.PlacementArmed = true;
@@ -111,20 +111,20 @@ public sealed class SpellTargetInspector : IInspectorSection
         {
             var name = service.GetSpellName((uint)newSpellId);
             if (exists)
-                ImGui.TextDisabled("This spell already has a destination - select its marker.");
+                EditorWidgets.WrappedHint("This spell already has a destination - select its marker."u8);
             else if (name != null)
                 ImGui.TextDisabled(name);
             else
-                ImGui.TextColored(EditorTheme.Warning, "Unknown spell id");
+                ImGui.TextColored(EditorTheme.Warning, "Unknown spell id"u8);
         }
 
-        ImGui.SeparatorText("Destinations on this map");
+        ImGui.SeparatorText("Destinations on this map"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Destinations on other maps: open their map first");
+            ImGui.SetTooltip("Destinations on other maps: open their map first"u8);
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##filter", "filter by spell name or id", ref filter, 100);
+        ImGui.InputTextWithHint("##filter"u8, "filter by spell name or id"u8, ref filter, 100);
 
-        if (ImGui.BeginChild("##rows"))
+        if (ImGui.BeginChild("##rows"u8))
         {
             int total = 0, shown = 0;
             foreach (var row in service.Positions.Values
@@ -143,11 +143,11 @@ public sealed class SpellTargetInspector : IInspectorSection
                 {
                     if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                         module.FlyTo(row.Map, row.Position);
-                    ImGui.SetTooltip("Click: edit · double-click: fly camera to it");
+                    ImGui.SetTooltip("Click: edit · double-click: fly camera to it"u8);
                 }
             }
             if (total == 0)
-                ImGui.TextDisabled("No spell destinations on this map.");
+                ImGui.TextDisabled("No spell destinations on this map."u8);
             else if (shown == 0)
                 ImGui.TextDisabled($"No destinations match \"{filter}\"");
         }
@@ -156,21 +156,22 @@ public sealed class SpellTargetInspector : IInspectorSection
 
     private void DrawEditor(SpellTargetData row)
     {
-        if (ImGui.SmallButton("< back"))
+        if (EditorWidgets.BackRow("All destinations", "Back to the destination list (a marker click reopens the editor)"))
         {
             module.SelectedKey = null;
             return;
         }
 
-        ImGui.TextUnformatted(module.DescribeSpell(row.SpellId));
+        EditorWidgets.WrappedLabel(module.DescribeSpell(row.SpellId));
         if (service.GetSpellName(row.SpellId) == null)
-            ImGui.TextColored(EditorTheme.Warning, "Unknown spell id - the core skips this row");
+            EditorWidgets.WrappedWarning("Unknown spell id - the core skips this row"u8);
         var dbc = gameContext.DbcManager;
         ImGui.TextDisabled(WorldPointNames.MapName(dbc, (int)row.Map));
 
         bool changed = false;
 
         var pos = new Vector3(row.Position.X, row.Position.Y, row.Position.Z);
+        EditorWidgets.FitNextItem("Position"u8);
         if (ImGui.InputFloat3("Position", ref pos))
         {
             row.Position = new Vector3(pos.X, pos.Y, pos.Z);
@@ -178,7 +179,8 @@ public sealed class SpellTargetInspector : IInspectorSection
         }
 
         float orientation = row.Orientation;
-        if (ImGui.SliderFloat("Facing", ref orientation, 0f, MathF.Tau, "%.3f rad"))
+        EditorWidgets.FitNextItem("Facing"u8);
+        if (ImGui.SliderFloat("Facing"u8, ref orientation, 0f, MathF.Tau, "%.3f rad"u8))
         {
             row.Orientation = orientation;
             changed = true;
@@ -192,7 +194,7 @@ public sealed class SpellTargetInspector : IInspectorSection
             changed = true;
         }
         ImGui.SameLine();
-        if (ImGui.SmallButton($"{Lucide.Video} Fly camera here"))
+        if (EditorWidgets.FlyToButton("destination"))
             module.FlyTo(row.Map, row.Position);
 
         ImGui.Separator();
@@ -204,26 +206,26 @@ public sealed class SpellTargetInspector : IInspectorSection
 
     private void DrawDelete(SpellTargetData row)
     {
-        if (ImGui.Button("Delete destination...", new Vector2(-1, 0)))
-            ImGui.OpenPopup("Delete spell target");
+        if (ImGui.Button($"{Lucide.Trash2} Delete destination...", new Vector2(-1, 0)))
+            ImGui.OpenPopup("Delete spell target"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Deletes the spell_target_position row. Applied on Save.\nThe spell will fail to resolve its destination!");
+            ImGui.SetTooltip("Deletes the spell_target_position row. Applied on Save.\nThe spell will fail to resolve its destination!"u8);
 
         bool open = true;
         if (!ImGuiEx.BeginPopupModal("Delete spell target", ref open, ImGuiWindowFlags.AlwaysAutoResize))
             return;
 
         ImGui.TextUnformatted($"Delete the destination of {module.DescribeSpell(row.SpellId)}?");
-        ImGui.TextDisabled("The database row is removed when you Save.");
+        ImGui.TextDisabled("The database row is removed when you Save."u8);
         ImGui.Separator();
-        if (ImGui.Button("Delete", new Vector2(120, 0)))
+        if (ImGui.Button("Delete"u8, new Vector2(120, 0)))
         {
             service.DeletePosition(row.SpellId);
             module.SelectedKey = null;
             ImGui.CloseCurrentPopup();
         }
         ImGui.SameLine();
-        if (ImGui.Button("Cancel", new Vector2(120, 0)))
+        if (ImGui.Button("Cancel"u8, new Vector2(120, 0)))
             ImGui.CloseCurrentPopup();
         ImGui.EndPopup();
     }

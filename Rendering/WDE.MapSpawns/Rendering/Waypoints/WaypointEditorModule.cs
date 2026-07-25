@@ -128,7 +128,7 @@ public class WaypointEditorModule : IGameModule
         this.interaction = interaction;
         this.spawnsContainer = spawnsContainer;
         this.overlays = overlays;
-        inspector = new WaypointInspector(service, spawnScriptsService, notifications);
+        inspector = new WaypointInspector(service, spawnScriptsService, notifications, gameContext);
         pointDragger = new TransformDragger(engine, inputManager, raycastSystem, interaction, toolService);
     }
 
@@ -354,7 +354,7 @@ public class WaypointEditorModule : IGameModule
         if (toolService.ActiveTool != SpawnEditorTool.Waypoint || service.SelectedPath is not { } path || path.Points.Count == 0)
             return;
 
-        if (!ImGui.Begin("3D"))
+        if (!ImGui.Begin("3D"u8))
         {
             ImGui.End();
             return;

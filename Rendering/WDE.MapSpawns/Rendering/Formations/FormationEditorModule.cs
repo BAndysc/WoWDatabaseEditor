@@ -52,7 +52,8 @@ public class FormationEditorModule : IGameModule
         IEntityManager entityManager,
         IRenderManager renderManager,
         IWorldInteractionService interaction,
-        IGameViewOverlayService overlays)
+        IGameViewOverlayService overlays,
+        IGameContext gameContext)
     {
         this.engine = engine;
         this.service = service;
@@ -64,7 +65,7 @@ public class FormationEditorModule : IGameModule
         this.renderManager = renderManager;
         this.interaction = interaction;
         this.overlays = overlays;
-        inspector = new FormationInspector(service);
+        inspector = new FormationInspector(service, gameContext);
     }
 
     private void ReleaseCapture()

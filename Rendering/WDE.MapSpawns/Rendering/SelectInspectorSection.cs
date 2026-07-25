@@ -123,8 +123,8 @@ public class SelectInspectorSection : IInspectorSection
     {
         if (selectionService.SelectedSpawn.Value is not { IsSpawned: true } spawn)
         {
-            ImGui.TextDisabled("Nothing selected.");
-            ImGui.TextDisabled("Click a spawn in the world.");
+            ImGui.TextDisabled("Nothing selected."u8);
+            ImGui.TextDisabled("Click a spawn in the world."u8);
             DrawAreaSection();
             return;
         }
@@ -142,13 +142,13 @@ public class SelectInspectorSection : IInspectorSection
         // unsaved state must be legible right where the user is looking (matches the world dither)
         if (editService.IsPendingDelete(creature != null, spawn.Guid))
         {
-            ImGui.TextColored(EditorTheme.DangerText, "Marked for deletion");
-            ImGui.TextDisabled("Save deletes it from the database - Del restores it.");
+            ImGui.TextColored(EditorTheme.DangerText, "Marked for deletion"u8);
+            EditorWidgets.WrappedHint("Save deletes it from the database - Del restores it."u8);
         }
         else if (editService.NewSpawns.Any(n => n.IsCreature == (creature != null) && n.Guid == spawn.Guid))
         {
-            ImGui.TextColored(EditorTheme.Warning, "Not saved yet");
-            ImGui.TextDisabled("Save inserts it into the database.");
+            ImGui.TextColored(EditorTheme.Warning, "Not saved yet"u8);
+            ImGui.TextDisabled("Save inserts it into the database."u8);
         }
 
         DrawTransform(spawn, creature, go);
@@ -176,7 +176,7 @@ public class SelectInspectorSection : IInspectorSection
     /// its own creature/gameobject row, its template, and the template's gossip menu.</summary>
     private void DrawEditorJumps(SpawnInstance spawn, CreatureSpawnInstance? creature, GameObjectSpawnInstance? go)
     {
-        ImGui.SeparatorText("Editors");
+        ImGui.SeparatorText("Editors"u8);
         string noun = creature != null ? "creature" : "gameobject";
 
         if (spawnContextMenu is { } menu)
@@ -293,14 +293,16 @@ public class SelectInspectorSection : IInspectorSection
         if (!editService.IsAvailable || spawnDragger == null)
         {
             var position = worldObject.Position;
-            ImGui.LabelText("Position", $"{position.X:0.##}, {position.Y:0.##}, {position.Z:0.##}");
+            ImGui.LabelText("Position"u8, $"{position.X:0.##}, {position.Y:0.##}, {position.Z:0.##}");
             if (creature?.Creature != null)
-                ImGui.LabelText("Orientation", creature.Creature.Orientation.ToString("0.###") + " rad");
+                ImGui.LabelText("Orientation"u8, creature.Creature.Orientation.ToString("0.###") + " rad");
             else if (go?.GameObject != null)
             {
                 var euler = go.GameObject.Rotation.ToEulerDeg();
-                ImGui.LabelText("Orientation", go.GameObject.Orientation.ToString("0.###") + " rad");
-                ImGui.LabelText("Rotation", $"{euler.X:0.#}° {euler.Y:0.#}° {euler.Z:0.#}°");
+                EditorWidgets.FitNextItem("Orientation"u8);
+                ImGui.LabelText("Orientation"u8, go.GameObject.Orientation.ToString("0.###") + " rad");
+                EditorWidgets.FitNextItem("Rotation"u8);
+                ImGui.LabelText("Rotation"u8, $"{euler.X:0.#}° {euler.Y:0.#}° {euler.Z:0.#}°");
             }
             return;
         }
@@ -308,17 +310,19 @@ public class SelectInspectorSection : IInspectorSection
         bool commit = false;
 
         var numPos = new System.Numerics.Vector3(worldObject.Position.X, worldObject.Position.Y, worldObject.Position.Z);
+        EditorWidgets.FitNextItem("Position"u8);
         if (ImGui.DragFloat3("Position", ref numPos, 0.05f, 0f, 0f, "%.2f"))
         {
             worldObject.Position = new Vector3(numPos.X, numPos.Y, numPos.Z);
             transformEdited = true;
         }
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Drag to nudge, Ctrl+click to type exact coordinates.\nOne undo step per edit, persisted on Save.");
+            ImGui.SetTooltip("Drag to nudge, Ctrl+click to type exact coordinates.\nOne undo step per edit, persisted on Save."u8);
         commit |= ImGui.IsItemDeactivatedAfterEdit();
 
         float orientation = creature?.Creature?.Orientation ?? go?.GameObject?.Orientation ?? 0f;
-        if (ImGui.DragFloat("Orientation", ref orientation, 0.01f, 0f, 0f, "%.3f rad"))
+        EditorWidgets.FitNextItem("Orientation"u8);
+        if (ImGui.DragFloat("Orientation"u8, ref orientation, 0.01f, 0f, 0f, "%.3f rad"u8))
         {
             if (creature?.Creature != null)
                 creature.Creature.Orientation = orientation;
@@ -335,7 +339,7 @@ public class SelectInspectorSection : IInspectorSection
         if (go?.GameObject != null)
         {
             var euler = go.GameObject.Rotation.ToEulerDeg();
-            ImGui.LabelText("Rotation", $"{euler.X:0.#}° {euler.Y:0.#}° {euler.Z:0.#}°");
+            ImGui.LabelText("Rotation"u8, $"{euler.X:0.#}° {euler.Y:0.#}° {euler.Z:0.#}°");
         }
 
         if (commit && transformEdited)
@@ -355,7 +359,7 @@ public class SelectInspectorSection : IInspectorSection
         if (zone == null && area == null)
             return;
 
-        ImGui.SeparatorText("Area");
+        ImGui.SeparatorText("Area"u8);
         bool markerDrawn = false;
         // the resolver only reads the terrain (ADT) area ids - inside WMOs (buildings, caves,
         // instances) the id belongs to the terrain underneath, not the interior area; the note
@@ -406,7 +410,7 @@ public class SelectInspectorSection : IInspectorSection
         if (!scriptsService.IsAvailable && !haveTemplateInfo)
             return;
 
-        ImGui.SeparatorText("Scripts");
+        ImGui.SeparatorText("Scripts"u8);
 
         // local template facts, no round-trip needed
         if (!string.IsNullOrEmpty(aiName))
@@ -418,12 +422,12 @@ public class SelectInspectorSection : IInspectorSection
             return;
         if (state == null)
         {
-            ImGui.TextDisabled("Loading...");
+            ImGui.TextDisabled("Loading..."u8);
             return;
         }
 
         if (state.Slots.Count == 0 && !haveTemplateInfo)
-            ImGui.TextDisabled("No script slots on this core.");
+            ImGui.TextDisabled("No script slots on this core."u8);
 
         // attached scripts first, then the "create" offers for the empty slots
         var fullWidth = new Vector2(ImGui.GetContentRegionAvail().X, 0);
@@ -448,7 +452,7 @@ public class SelectInspectorSection : IInspectorSection
             // a C++ ScriptName owns this spawn's behavior - creating an EventAI/dbscript for it
             // would silently never run, so the create offers disable instead of misleading
             bool cppScriptBlocks = !string.IsNullOrEmpty(scriptName);
-            ImGui.TextDisabled("Create new:");
+            ImGui.TextDisabled("Create new:"u8);
             ImGui.BeginDisabled(cppScriptBlocks);
             for (int i = 0; i < state.Slots.Count; ++i)
             {
@@ -468,7 +472,7 @@ public class SelectInspectorSection : IInspectorSection
         if (ImGui.SmallButton($"{Lucide.RefreshCw} Refresh##scripts"))
             scriptsService.Refresh(owner);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Re-check which scripts exist for this spawn\n(after saving a script in its own editor, the buttons here may be stale)");
+            ImGui.SetTooltip("Re-check which scripts exist for this spawn\n(after saving a script in its own editor, the buttons here may be stale)"u8);
     }
 
     private static void InfoRow(string label, string value)
@@ -480,7 +484,7 @@ public class SelectInspectorSection : IInspectorSection
 
     private void DrawMemberships(SpawnInstance spawn, CreatureSpawnInstance? creature)
     {
-        ImGui.SeparatorText("Memberships");
+        ImGui.SeparatorText("Memberships"u8);
         bool any = false;
 
         // spawn group
@@ -495,7 +499,7 @@ public class SelectInspectorSection : IInspectorSection
             });
             if (spawnGroupVisualizer?.CapNotice is { } capNotice)
             {
-                ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(1f, 0.75f, 0.3f, 1f));
+                ImGui.PushStyleColor(ImGuiCol.Text, EditorTheme.Warning);
                 ImGui.TextWrapped(capNotice);
                 ImGui.PopStyleColor();
             }
@@ -624,20 +628,24 @@ public class SelectInspectorSection : IInspectorSection
         }
 
         if (!any)
-            ImGui.TextDisabled("None.");
+            ImGui.TextDisabled("None."u8);
         if (canAddPath && ImGui.SmallButton($"{Lucide.Plus} Add waypoint path"))
             waypointService.RequestEditCreaturePath(creature!);
         if (canAddTemplatePath && ImGui.SmallButton($"{Lucide.Plus} Add template path"))
             waypointService.RequestEditCreatureTemplatePath(creature!);
     }
 
+    // link-styled like LinkRow above - "clickable jump" must read the same everywhere in this panel
     private static void MembershipRow(string label, string value, string editId, Action edit)
     {
         ImGui.TextDisabled(label + ":");
         ImGui.SameLine();
-        ImGui.TextUnformatted(value);
-        ImGui.SameLine();
-        if (ImGui.SmallButton($"Edit{editId}"))
+        ImGui.PushStyleColor(ImGuiCol.Text, EditorTheme.LinkText);
+        bool clicked = ImGui.Selectable($"{value}{editId}");
+        ImGui.PopStyleColor();
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip("Opens it in the matching tool"u8);
+        if (clicked)
             edit();
     }
 }

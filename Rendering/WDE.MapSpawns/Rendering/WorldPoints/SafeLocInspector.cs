@@ -60,7 +60,7 @@ public sealed class SafeLocInspector : IInspectorSection
                 return "Click the world to place the graveyard · pick a marker: edit it";
             if (module.SelectedKey != null)
                 return "G grab · G again snap to ground · R rotate (spirit healer facing) · Del: delete · Esc cancel · click empty ground: deselect";
-            return "Click a marker to edit it · \"Add graveyard\" then click the world to create one";
+            return "Click a marker to edit it · \"Place graveyard\" then click the world to create one";
         }
     }
 
@@ -68,7 +68,7 @@ public sealed class SafeLocInspector : IInspectorSection
     {
         if (!service.IsSupported)
         {
-            ImGui.TextDisabled("The current core has no\nworld_safe_locs table.");
+            ImGui.TextDisabled("The current core has no\nworld_safe_locs table."u8);
             return;
         }
 
@@ -76,9 +76,8 @@ public sealed class SafeLocInspector : IInspectorSection
         // an open editor gets a back row instead
         if (module.SelectedKey is { } key && service.Locs.TryGetValue(key, out var loc))
         {
-            bool back = ImGui.SmallButton($"{Lucide.ArrowLeft} All graveyards");
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Back to the graveyard list (a marker click reopens the editor)");
+            bool back = EditorWidgets.BackRow("All graveyards",
+                "Back to the graveyard list (a marker click reopens the editor)");
             ImGui.Separator();
             if (back)
             {
@@ -100,24 +99,18 @@ public sealed class SafeLocInspector : IInspectorSection
         {
             if (ImGui.Button($"{Lucide.X} Cancel placement", new Vector2(-1, 0)))
                 module.PlacementArmed = false;
-            ImGui.TextDisabled("Click the world to place the new graveyard.");
+            ImGui.TextDisabled("Click the world to place the new graveyard."u8);
         }
-        else if (ImGui.Button($"{Lucide.Plus} Add graveyard", new Vector2(-1, 0)))
+        else if (ImGui.Button($"{Lucide.Plus} Place graveyard (click world)", new Vector2(-1, 0)))
             module.PlacementArmed = true;
 
-        if (!service.AnyDirty)
-        {
-            if (ImGui.SmallButton($"{Lucide.RefreshCw} Reload from database"))
-                module.Reload();
-        }
-
-        ImGui.SeparatorText("Graveyards on this map");
+        ImGui.SeparatorText("Graveyards on this map"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Graveyards on other maps: open their map first");
+            ImGui.SetTooltip("Graveyards on other maps: open their map first"u8);
         ImGui.SetNextItemWidth(-1);
-        ImGui.InputTextWithHint("##gyfilter", "filter by name or id", ref overviewFilter, 100);
+        ImGui.InputTextWithHint("##gyfilter"u8, "filter by name or id"u8, ref overviewFilter, 100);
 
-        if (ImGui.BeginChild("##gyrows"))
+        if (ImGui.BeginChild("##gyrows"u8))
         {
             int total = 0, shown = 0;
             foreach (var loc in service.Locs.Values.Where(l => l.Map == (uint)module.CurrentMapId).OrderBy(l => l.Id))
@@ -133,11 +126,11 @@ public sealed class SafeLocInspector : IInspectorSection
                 {
                     if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                         module.FlyTo(loc.Map, loc.Position);
-                    ImGui.SetTooltip("Click: edit · double-click: fly camera to it");
+                    ImGui.SetTooltip("Click: edit · double-click: fly camera to it"u8);
                 }
             }
             if (total == 0)
-                ImGui.TextDisabled("No graveyards on this map.");
+                ImGui.TextDisabled("No graveyards on this map."u8);
             else if (shown == 0)
                 ImGui.TextDisabled($"No graveyards match \"{overviewFilter}\"");
         }
@@ -152,7 +145,8 @@ public sealed class SafeLocInspector : IInspectorSection
         var dbc = gameContext.DbcManager;
 
         string name = loc.Name;
-        if (ImGui.InputText("Name", ref name, 50))
+        EditorWidgets.FitNextItem("Name"u8);
+        if (ImGui.InputText("Name"u8, ref name, 50))
         {
             loc.Name = name;
             changed = true;
@@ -161,6 +155,7 @@ public sealed class SafeLocInspector : IInspectorSection
         ImGui.TextDisabled($"Id {loc.Id} · {WorldPointNames.MapName(dbc, (int)loc.Map)}");
 
         var pos = new Vector3(loc.Position.X, loc.Position.Y, loc.Position.Z);
+        EditorWidgets.FitNextItem("Position"u8);
         if (ImGui.InputFloat3("Position", ref pos))
         {
             loc.Position = new Vector3(pos.X, pos.Y, pos.Z);
@@ -168,7 +163,8 @@ public sealed class SafeLocInspector : IInspectorSection
         }
 
         float orientation = loc.Orientation;
-        if (ImGui.SliderFloat("Facing", ref orientation, 0f, MathF.Tau, "%.3f rad"))
+        EditorWidgets.FitNextItem("Facing"u8);
+        if (ImGui.SliderFloat("Facing"u8, ref orientation, 0f, MathF.Tau, "%.3f rad"u8))
         {
             loc.Orientation = orientation;
             changed = true;
@@ -182,7 +178,7 @@ public sealed class SafeLocInspector : IInspectorSection
             changed = true;
         }
         ImGui.SameLine();
-        if (ImGui.SmallButton($"{Lucide.Video} Fly camera here"))
+        if (EditorWidgets.FlyToButton("graveyard"))
             module.FlyTo(loc.Map, loc.Position);
 
         DrawLinks(loc, ref changed);
@@ -196,9 +192,9 @@ public sealed class SafeLocInspector : IInspectorSection
 
     private void DrawLinks(SafeLocData loc, ref bool changed)
     {
-        ImGui.SeparatorText("Death links");
+        ImGui.SeparatorText("Death links"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Players dying in a linked area/zone (or anywhere on a linked map)\nresurrect here. An unlinked graveyard is never chosen on death.");
+            ImGui.SetTooltip("Players dying in a linked area/zone (or anywhere on a linked map)\nresurrect here. An unlinked graveyard is never chosen on death."u8);
 
         var dbc = gameContext.DbcManager;
 
@@ -207,12 +203,6 @@ public sealed class SafeLocInspector : IInspectorSection
         {
             var link = loc.Links[i];
             ImGui.PushID(i);
-
-            if (ImGui.SmallButton(Lucide.X))
-                removeAt = i;
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Remove the death link - players from this area stop\nresurrecting here (applied on Save)");
-            ImGui.SameLine();
 
             string where = link.Kind == GraveyardLinkKind.Map
                 ? WorldPointNames.MapName(dbc, (int)link.GhostLoc)
@@ -232,6 +222,9 @@ public sealed class SafeLocInspector : IInspectorSection
                 changed = true;
             }
 
+            if (EditorWidgets.TrailingRemoveButton("Remove the death link - players from this area stop\nresurrecting here (applied on Save)"))
+                removeAt = i;
+
             ImGui.PopID();
         }
 
@@ -242,7 +235,7 @@ public sealed class SafeLocInspector : IInspectorSection
         }
 
         if (loc.Links.Count == 0)
-            ImGui.TextColored(EditorTheme.Warning, "Not linked: never chosen on death");
+            ImGui.TextColored(EditorTheme.Warning, "Not linked: never chosen on death"u8);
 
         // quick links for the location under the graveyard itself
         var (zone, area) = WorldPointNames.ZoneAndArea(dbc, gameContext.ZoneAreaManager, (int)loc.Map, loc.Position);
@@ -263,7 +256,7 @@ public sealed class SafeLocInspector : IInspectorSection
         ImGui.Combo("##newkind", ref newLinkKind, KindNames, KindNames.Length);
         ImGui.SameLine();
         ImGui.SetNextItemWidth(80);
-        ImGui.InputInt("##newloc", ref newLinkLoc, 0, 0);
+        ImGui.InputInt("##newloc"u8, ref newLinkLoc, 0, 0);
         ImGui.SameLine();
         ImGui.SetNextItemWidth(86);
         ImGui.Combo("##newfaction", ref newLinkFaction, FactionNames, FactionNames.Length);
@@ -288,25 +281,25 @@ public sealed class SafeLocInspector : IInspectorSection
     private void DrawDelete(SafeLocData loc)
     {
         if (ImGui.Button($"{Lucide.Trash2} Delete graveyard...", new Vector2(-1, 0)))
-            ImGui.OpenPopup("Delete graveyard");
+            ImGui.OpenPopup("Delete graveyard"u8);
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Deletes the safe loc and all its death links.\nApplied on Save. Battlegrounds/scripts referencing the id keep the dangling reference!");
+            ImGui.SetTooltip("Deletes the safe loc and all its death links.\nApplied on Save. Battlegrounds/scripts referencing the id keep the dangling reference!"u8);
 
         bool open = true;
         if (!ImGuiEx.BeginPopupModal("Delete graveyard", ref open, ImGuiWindowFlags.AlwaysAutoResize))
             return;
 
         ImGui.TextUnformatted($"Delete graveyard {loc.Id} \"{loc.Name}\"?");
-        ImGui.TextDisabled("The database rows are removed when you Save.");
+        ImGui.TextDisabled("The database rows are removed when you Save."u8);
         ImGui.Separator();
-        if (ImGui.Button("Delete", new Vector2(120, 0)))
+        if (ImGui.Button("Delete"u8, new Vector2(120, 0)))
         {
             service.DeleteLoc(loc.Id);
             module.SelectedKey = null;
             ImGui.CloseCurrentPopup();
         }
         ImGui.SameLine();
-        if (ImGui.Button("Cancel", new Vector2(120, 0)))
+        if (ImGui.Button("Cancel"u8, new Vector2(120, 0)))
             ImGui.CloseCurrentPopup();
         ImGui.EndPopup();
     }
