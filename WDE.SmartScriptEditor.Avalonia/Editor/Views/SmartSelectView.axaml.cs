@@ -54,7 +54,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
             SearchTextBox.Focus(NavigationMethod.Tab);
         }
 
-        private void OnGlobalGotFocus(InputElement arg1, GotFocusEventArgs arg2)
+        private void OnGlobalGotFocus(InputElement arg1, FocusChangedEventArgs arg2)
         {
             if (!isActivated)
                 return;

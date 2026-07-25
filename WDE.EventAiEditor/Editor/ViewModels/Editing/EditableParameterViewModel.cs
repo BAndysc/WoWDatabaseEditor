@@ -55,6 +55,7 @@ namespace WDE.EventAiEditor.Editor.ViewModels.Editing
         public ParameterValueHolder<T> Parameter { get; set; }
 
         public string Group { get; }
+        public int Order { get; set; }
         
         public bool SpecialCopying { get; }
         

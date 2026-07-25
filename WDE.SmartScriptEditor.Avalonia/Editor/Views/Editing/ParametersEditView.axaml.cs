@@ -36,7 +36,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing
             forceFocusFirstOnNextGotFocus = true;
         }
 
-        protected override void OnGotFocus(GotFocusEventArgs e)
+        protected override void OnGotFocus(FocusChangedEventArgs e)
         {
             base.OnGotFocus(e);
             DispatcherTimer.RunOnce(() =>

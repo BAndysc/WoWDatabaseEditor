@@ -80,6 +80,36 @@ namespace WDE.SmartScriptEditor.Data
                 var actor = parameterFactory.Register("ActorParameter", containerProvider.Resolve<VariableContextualParameter>(
                     (typeof(GlobalVariableType), GlobalVariableType.Actor), (typeof(string), "actor")));
                 parameterFactory.Register("StoredTargetOrActorParameter", new StoredTargetOrActorParameter(storedTarget, actor));
+                // SMART_ACTION_FOLLOW/_AC "Credit": creature entry when Credit Type (param index 4) = 0 (Monster kill),
+                // quest id when Credit Type = 1 (Event) — see RewardPlayerAndGroupAtEvent(uint32 creature_id, ...) vs
+                // GroupEventHappens(uint32 questId, ...) in SmartAI::StopFollow.
+                parameterFactory.RegisterCombined("FollowCreditParameter", new[] { "CreatureParameter", "QuestParameter" },
+                    prams => new SwitchedByParameter(4, new Dictionary<long, IParameter<long>> { [0] = prams[0], [1] = prams[1] }, prams[0]));
+                // SMART_ACTION_SET_UNIT_FLAG/REMOVE_UNIT_FLAG(+_HIDDEN) "Flags": bitmask is against UNIT_FIELD_FLAGS
+                // when sibling "Type" (param index 1) = 0, or UNIT_FIELD_FLAGS_2 when Type = 1.
+                parameterFactory.RegisterCombined("UnitFlagsSwitchedParameter", new[] { "UnitFlagParameter", "UnitFlags2Parameter" },
+                    prams => new SwitchedByParameter(1, new Dictionary<long, IParameter<long>> { [0] = prams[0], [1] = prams[1] }, prams[0]));
+                // SMART_EVENT_NEAR_UNIT_AC/NEAR_UNIT_NEGATION_AC "Entry": a creature entry when sibling
+                // "Type" (param index 0) = 0, or a gameobject entry when Type = 1.
+                parameterFactory.RegisterCombined("NearUnitEntryParameter", new[] { "CreatureParameter", "GameobjectParameter" },
+                    prams => new SwitchedByParameter(0, new Dictionary<long, IParameter<long>> { [0] = prams[0], [1] = prams[1] }, prams[0]));
+                // SMART_ACTION_SET_UNIT_FIELD_BYTES_1 "Value": meaning depends on sibling "Type" (param index 1) —
+                // 0=stand state, 1=pet talents (no-op), 2=vis flag (raw), 3=anim tier.
+                parameterFactory.RegisterCombined("UnitFieldBytes1ValueParameter", new[] { "StandStateParameter", "Parameter", "AnimTierParameter" },
+                    prams => new SwitchedByParameter(1, new Dictionary<long, IParameter<long>> { [0] = prams[0], [1] = prams[1], [2] = prams[1], [3] = prams[2] }, prams[0]));
+                // SMART_ACTION_REMOVE_UNIT_FIELD_BYTES_1 "Bytes": only meaningful when sibling "Type" (param index 1) = 2 (vis flag);
+                // Type 0/1/3 ignore this value entirely on TrinityCore.
+                parameterFactory.RegisterCombined("UnitFieldBytes1RemoveValueParameter", new[] { "UnusedParameter", "Parameter" },
+                    prams => new SwitchedByParameter(1, new Dictionary<long, IParameter<long>> { [0] = prams[0], [1] = prams[0], [2] = prams[1], [3] = prams[0] }, prams[0]));
+                // SMART_ACTION_ADD_IMMUNITY_AC/REMOVE_IMMUNITY_AC "Value": Unit::ApplySpellImmune's `type` (SpellImmunity
+                // category, param index 0) selects which enum the "Value" field is read against.
+                parameterFactory.RegisterCombined("SpellImmunityValueParameter",
+                    new[] { "SpellEffectTypeParameter", "AuraTypeParameter", "SpellSchoolMaskParameter", "DispelTypeParameter", "MechanicsParameter", "SpellParameter", "Parameter" },
+                    prams => new SwitchedByParameter(0, new Dictionary<long, IParameter<long>>
+                    {
+                        [0] = prams[0], [1] = prams[1], [2] = prams[2], [3] = prams[2],
+                        [4] = prams[3], [5] = prams[4], [6] = prams[5], [7] = prams[5]
+                    }, prams[6]));
             }
         }
 
@@ -422,7 +452,7 @@ namespace WDE.SmartScriptEditor.Data
             }
             else
             {
-                for (var i = 0; i < data.Parameters.Count; ++i)
+                for (var i = 0; i < data.Parameters.Count && i < element.ParametersCount; ++i)
                 {
                     string key = data.Parameters[i].Type;
                     if (!parameterFactory.IsRegisteredLong(key))
@@ -493,7 +523,7 @@ namespace WDE.SmartScriptEditor.Data
             
             if (data.Parameters != null)
             {
-                for (var i = 0; i < data.Parameters.Count; ++i)
+                for (var i = 0; i < data.Parameters.Count && i < element.ParametersCount; ++i)
                 {
                     string key = data.Parameters[i].Type;
                     if (!parameterFactory.IsRegisteredLong(key))

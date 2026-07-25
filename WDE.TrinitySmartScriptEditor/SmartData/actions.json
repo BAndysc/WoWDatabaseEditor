@@ -19,7 +19,7 @@
             {
                 "name": "Delay",
                 "description": "Duration to wait before TEXT_OVER event is triggered",
-                "type": "Parameter"
+                "type": "MillisecondsParameter"
             },
             {
                 "name": "UseTalkTarget",
@@ -30,7 +30,45 @@
         "description": "{pram3value:choose(0):{sourceid:choose(0):[s]Self[/s]|{source}}: Talk {pram1} to invoker|[s]Self[/s]: Talk {pram1} to {source}}",
         "target_types": "Unit",
         "target_is_source": true,
-        "flags": "Async"
+        "flags": "Async",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 1,
+        "name": "SMART_ACTION_TALK_AC",
+        "name_readable": "Talk",
+        "parameters": [
+            {
+                "name": "Group ID",
+                "description": "Group id from table creature_text. Random text will be said if multiple rows share the same group",
+                "type": "CreatureTextParameter"
+            },
+            {
+                "name": "Duration",
+                "description": "Duration to wait before TEXT_OVER event is triggered",
+                "type": "MillisecondsParameter"
+            },
+            {
+                "name": "Use Talk Target",
+                "description": "Use target from targetlist as talk target",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Delay",
+                "description": "Delay before the text is said",
+                "type": "MillisecondsParameter"
+            }
+        ],
+        "description": "{pram3value:choose(0):{sourceid:choose(0):[s]Self[/s]|{source}}: Talk {pram1} to invoker|[s]Self[/s]: Talk {pram1} to {source}}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Unit",
+        "target_is_source": true
     },
     {
         "id": 2,
@@ -84,10 +122,48 @@
             },
             {
                 "name": "Distance",
+                "type": "BoolParameter",
+                "description": "False - direct sound, true - distance sound"
+            },
+            {
+                "name": "Key broadcast text ID",
+                "description": "Optional broadcast text id (used for subtitles when playing the sound directly)",
+                "type": "BroadcastTextParameter"
+            }
+        ],
+        "description": "{source}: Play {pram3value:choose(0):direct|distance} sound {pram1} to {pram2value:choose(0):every player in visibility range of {source}|{source}}",
+        "target_types": "Unit",
+        "target_is_source": true,
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 4,
+        "name": "SMART_ACTION_SOUND_AC",
+        "name_readable": "Sound",
+        "parameters": [
+            {
+                "name": "Sound",
+                "type": "SoundParameter"
+            },
+            {
+                "name": "Only Self",
+                "description": "True - only target will hear the sound, false - everyone in visibility range will hear it",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Distance",
+                "description": "False - direct sound, true - distance sound",
                 "type": "BoolParameter"
             }
         ],
         "description": "{source}: Play {pram3value:choose(0):direct|distance} sound {pram1} to {pram2value:choose(0):every player in visibility range of {source}|{source}}",
+        "tags": [
+            "Azeroth"
+        ],
         "target_types": "Unit",
         "target_is_source": true
     },
@@ -270,7 +346,6 @@
         ],
         "description": "{source}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}'s position, moved by offset {targetcoords}} as summon type {pram2}{pram2value:choose(8):| with duration {pram3} seconds}{pram4value:choose(0):| and attack action invoker}",
         "tags": [
-            "Azeroth",
             "TrinityCata"
         ],
         "target_types": "GameObject,Unit,Position",
@@ -300,8 +375,9 @@
                 "type": "FloatParameter"
             },
             {
-                "name": "Attack Invoker",
-                "type": "BoolParameter"
+                "name": "Stored target id",
+                "description": "Store the summoned creature in this target slot",
+                "type": "StoredTargetParameter"
             },
             {
                 "name": "Flags",
@@ -310,9 +386,17 @@
                     "1": "personal spawn",
                     "2": "use invoker as summoner"
                 }
+            },
+            {
+                "name": "Count",
+                "type": "Parameter"
+            },
+            {
+                "name": "Created by spell",
+                "type": "SpellParameter"
             }
         ],
-        "description": "{pram5value:choose(0|1|2|3):{source}|{source}|[s]Action invoker[/s]|[s]Action invoker[/s]|{source}}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}'s position, moved by offset {targetcoords}} as summon type {pram2}{pram2value:choose(8):| with duration {pram3} seconds}{pram5value:choose(0|1|2|3):|, as personal spawn||, as personal spawn|}{pram4value:choose(0):| and attack action invoker}",
+        "description": "{pram5value:choose(0|1|2|3):{source}|{source}|[s]Action invoker[/s]|[s]Action invoker[/s]|{source}}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}'s position, moved by offset {targetcoords}} as summon type {pram2}{pram2value:choose(8):| with duration {pram3} seconds}{pram5value:choose(0|1|2|3):|, as personal spawn||, as personal spawn|}",
         "tags": [
             "TrinityMaster"
         ],
@@ -363,6 +447,53 @@
         "description": "{pram5value:choose(2|3):[s]Invoker[/s]|[s]Invoker[/s]|{source}}: Summon {pram6value:choose(0|1):creature|creature|{pram6} creatures} {pram1} at {targetid:choose(8):{targetcoords}|{target}'s position, moved by offset {targetcoords}} as summon type {pram2}{pram2value:choose(8):| with duration {pram3} seconds}{pram4value:choose(0):| and attack action invoker}{pram5value:choose(1|3): as personal spawn| as personal spawn|}",
         "tags": [
             "TrinityWrath"
+        ],
+        "target_types": "GameObject,Unit,Position",
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
+        "id": 12,
+        "name": "SMART_ACTION_SUMMON_CREATURE_AC",
+        "name_readable": "Summon creature",
+        "parameters": [
+            {
+                "name": "Creature",
+                "type": "CreatureParameter"
+            },
+            {
+                "name": "Type",
+                "description": "Temp summon type",
+                "type": "SummonTypeParameter"
+            },
+            {
+                "name": "Duration",
+                "type": "MillisecondsParameter"
+            },
+            {
+                "name": "Attack Invoker",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Attack Script Owner",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Flags",
+                "type": "FlagParameter",
+                "values": {
+                    "1": {
+                        "name": "Personal spawn"
+                    },
+                    "2": {
+                        "name": "Prefer unit as summoner"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}'s position, moved by offset {targetcoords}} as summon type {pram2}{pram2value:choose(8):| with duration {pram3} seconds}{pram4value:choose(0):| and attack action invoker}",
+        "tags": [
+            "Azeroth"
         ],
         "target_types": "GameObject,Unit,Position",
         "implicit_source": "SMART_TARGET_SELF",
@@ -470,7 +601,7 @@
         "parameters": [
             {
                 "name": "Flags",
-                "type": "UnitFlagParameter"
+                "type": "UnitFlagsSwitchedParameter"
             },
             {
                 "name": "Type",
@@ -497,7 +628,7 @@
         "parameters": [
             {
                 "name": "Flags",
-                "type": "UnitFlagParameter"
+                "type": "UnitFlagsSwitchedParameter"
             },
             {
                 "name": "Type",
@@ -522,7 +653,7 @@
         "parameters": [
             {
                 "name": "Flags",
-                "type": "UnitFlagParameter"
+                "type": "UnitFlagsSwitchedParameter"
             },
             {
                 "name": "Type",
@@ -549,7 +680,7 @@
         "parameters": [
             {
                 "name": "Flags",
-                "type": "UnitFlagParameter"
+                "type": "UnitFlagsSwitchedParameter"
             },
             {
                 "name": "Type",
@@ -638,8 +769,8 @@
         "parameters": [
             {
                 "name": "Mode",
-                "type": "SwitchParameter", 
-                "values": { 
+                "type": "SwitchParameter",
+                "values": {
                     "0": "Set home position to respawn position",
                     "1": "Don't set home position to respawn position"
                 }
@@ -705,7 +836,9 @@
         "parameters": [
             {
                 "name": "Quest",
-                "type": "QuestParameter"
+                "description": "Trigger quest group event",
+                "type": "QuestParameter",
+                "required": true
             }
         ],
         "description": "{source}: Call group event happened from quest {pram1}",
@@ -744,6 +877,34 @@
         ],
         "description": "{source}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell [spell={pram1value}] {pram1}}",
         "target_types": "Unit",
+        "target_is_source": true,
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 28,
+        "name": "SMART_ACTION_REMOVEAURASFROMSPELL_AC",
+        "name_readable": "Remove aura",
+        "parameters": [
+            {
+                "name": "Spell",
+                "description": "Spell id to remove aura, if 0 all auras are removed",
+                "type": "SpellParameter"
+            },
+            {
+                "name": "Charges",
+                "description": "If 0 the whole aura is removed, otherwise removes this many charges",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell [spell={pram1value}] {pram1}}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Unit",
         "target_is_source": true
     },
     {
@@ -767,7 +928,8 @@
             },
             {
                 "name": "Credit",
-                "type": "Parameter"
+                "type": "FollowCreditParameter",
+                "description": "Kill credit given when the end creature is reached (Credit Type 0), or Quest ID for GroupEventHappens (Credit Type 1)"
             },
             {
                 "name": "Credit Type",
@@ -785,6 +947,62 @@
             }
         ],
         "description": "{source}: Follow {target} by distance {pram1}, angle {pram2}",
+        "target_types": "Unit",
+        "implicit_source": "SMART_TARGET_SELF",
+        "usable_with_script_types": "Creature,TimedActionList",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 29,
+        "name": "SMART_ACTION_FOLLOW_AC",
+        "name_readable": "Follow",
+        "parameters": [
+            {
+                "name": "Dist",
+                "description": "0 = default",
+                "type": "Parameter"
+            },
+            {
+                "name": "Angle",
+                "description": "0 = default",
+                "type": "Parameter"
+            },
+            {
+                "name": "Entry",
+                "description": "End creature entry, stop following once reached",
+                "type": "CreatureParameter"
+            },
+            {
+                "name": "Credit",
+                "description": "Kill credit given when the end creature is reached (Credit Type 0), or Quest ID for GroupEventHappens (Credit Type 1)",
+                "type": "FollowCreditParameter"
+            },
+            {
+                "name": "Credit Type",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "Monster kill"
+                    },
+                    "1": {
+                        "name": "Event"
+                    }
+                }
+            },
+            {
+                "name": "Alive State",
+                "description": "Whether the followed target must be alive",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Follow {target} by distance {pram1}, angle {pram2}",
+        "tags": [
+            "Azeroth"
+        ],
         "target_types": "Unit",
         "implicit_source": "SMART_TARGET_SELF",
         "usable_with_script_types": "Creature,TimedActionList"
@@ -928,6 +1146,29 @@
         "name_readable": "Die",
         "description": "{source}: Die",
         "implicit_source": "SMART_TARGET_SELF",
+        "usable_with_script_types": "Creature,TimedActionList",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 37,
+        "name": "SMART_ACTION_DIE_AC",
+        "name_readable": "Die",
+        "parameters": [
+            {
+                "name": "Milliseconds",
+                "description": "Delay before dying",
+                "type": "MillisecondsParameter"
+            }
+        ],
+        "description": "{source}: Die{pram1value:choose(0):| after {pram1}}",
+        "tags": [
+            "Azeroth"
+        ],
+        "implicit_source": "SMART_TARGET_SELF",
         "usable_with_script_types": "Creature,TimedActionList"
     },
     {
@@ -1019,14 +1260,49 @@
         "parameters": [
             {
                 "name": "Delay",
-                "type": "FloatParameter"
+                "type": "FloatParameter",
+                "description": "In ms"
             },
             {
                 "name": "Force respawn timer",
-                "type": "Parameter"
+                "type": "Parameter",
+                "description": "In seconds"
             }
         ],
         "description": "{source}: Despawn {pram1value:choose(0):instantly|in {pram1} s}{pram2value:choose(0):| respawn in {pram2} seconds}",
+        "target_types": "Creature,GameObject",
+        "target_is_source": true,
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 41,
+        "name": "SMART_ACTION_FORCE_DESPAWN_AC",
+        "name_readable": "Force despawn",
+        "parameters": [
+            {
+                "name": "Delay",
+                "description": "Delay before despawn",
+                "type": "MillisecondsParameter"
+            },
+            {
+                "name": "Force Respawn Timer",
+                "description": "Respawn timer in seconds (0 = default)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Remove Object From World",
+                "description": "Delete the object from the world instead of just despawning it",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{source}: Despawn {pram1value:choose(0):instantly|in {pram1} s}{pram2value:choose(0):| respawn in {pram2} seconds}",
+        "tags": [
+            "Azeroth"
+        ],
         "target_types": "Creature,GameObject",
         "target_is_source": true
     },
@@ -1041,7 +1317,7 @@
             },
             {
                 "name": "Percent",
-                "type": "Parameter"
+                "type": "PercentageParameter"
             }
         ],
         "description": "{source}: Set invincibility to {pram2value:choose(0):{pram1}|{pram2}%} HP",
@@ -1059,7 +1335,7 @@
             },
             {
                 "name": "Model Id",
-                "type": "Parameter"
+                "type": "CreatureModelDataParameter"
             }
         ],
         "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Dismount|Mount to model {pram2}}|{pram2value:choose(0):Mount to creature {pram1}|Invalid mount ({pram1}, {pram2}}}",
@@ -1132,6 +1408,7 @@
         "parameters": [
             {
                 "name": "Distance",
+                "description": "Distance in yards to move forward",
                 "type": "Parameter"
             }
         ],
@@ -1202,7 +1479,7 @@
             },
             {
                 "name": "Despawn Time",
-                "description": "In ms",
+                "description": "In seconds",
                 "type": "Parameter"
             },
             {
@@ -1215,6 +1492,86 @@
             }
         ],
         "description": "{source}: Summon gameobject {pram1} at {targetid:choose(8):{targetcoords}|my position, moved by offset {targetcoords}} and despawn in {pram2} ms",
+        "target_types": "GameObject,Unit,Position",
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true,
+        "tags": [
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 50,
+        "name": "SMART_ACTION_SUMMON_GO_TC_MASTER",
+        "name_readable": "Summon gameobject",
+        "parameters": [
+            {
+                "name": "Game Object",
+                "type": "GameobjectParameter"
+            },
+            {
+                "name": "Despawn Time",
+                "description": "In seconds",
+                "type": "Parameter"
+            },
+            {
+                "name": "Type",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": "GO_SUMMON_TIMED_OR_CORPSE_DESPAWN",
+                    "1": "GO_SUMMON_TIMED_DESPAWN"
+                }
+            },
+            {
+                "name": "Stored target id",
+                "description": "Store the summoned gameobject in this target slot",
+                "type": "StoredTargetParameter"
+            }
+        ],
+        "description": "{source}: Summon gameobject {pram1} at {targetid:choose(8):{targetcoords}|my position, moved by offset {targetcoords}} and despawn in {pram2} ms",
+        "target_types": "GameObject,Unit,Position",
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true,
+        "tags": [
+            "TrinityMaster"
+        ]
+    },
+    {
+        "id": 50,
+        "name": "SMART_ACTION_SUMMON_GO_AC",
+        "name_readable": "Summon gameobject",
+        "parameters": [
+            {
+                "name": "Game Object",
+                "type": "GameobjectParameter"
+            },
+            {
+                "name": "Despawn Time",
+                "description": "In seconds",
+                "type": "Parameter"
+            },
+            {
+                "name": "Use target position",
+                "description": "If set, summon at the target's position instead of the summoner",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Type",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "GO_SUMMON_TIMED_OR_CORPSE_DESPAWN"
+                    },
+                    "1": {
+                        "name": "GO_SUMMON_TIMED_DESPAWN"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Summon gameobject {pram1}{pram3value:choose(0):| at target position} and despawn in {pram2} ms",
+        "tags": [
+            "Azeroth"
+        ],
         "target_types": "GameObject,Unit,Position",
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
@@ -1271,12 +1628,17 @@
             },
             {
                 "name": "Despawn time",
-                "description": "Despawn time after finishing the path",
-                "type": "Parameter"
+                "description": "Despawn time after finishing the path. In ms",
+                "type": "MillisecondsParameter"
             },
             {
                 "name": "React State",
                 "type": "ReactStateParameter"
+            },
+            {
+                "name": "Fade object duration",
+                "type": "MillisecondsParameter",
+                "description": "In ms"
             }
         ],
         "description": "{source}: Start path #{pram2}, {pram1value:choose(0):walk|run}, {pram3value:choose(0):do not repeat|repeat}, {pram6}",
@@ -1320,8 +1682,8 @@
             },
             {
                 "name": "Despawn time",
-                "description": "Despawn time after finishing the path",
-                "type": "Parameter"
+                "description": "Despawn time after finishing the path. In ms",
+                "type": "MillisecondsParameter"
             },
             {
                 "name": "React State",
@@ -1349,8 +1711,8 @@
         "parameters": [
             {
                 "name": "Duration",
-                "description": "Miliseconds to wait before resuming path",
-                "type": "Parameter"
+                "description": "Milliseconds to wait before resuming path",
+                "type": "MillisecondsParameter"
             }
         ],
         "description": "{source}: Pause path for {pram1} ms",
@@ -1364,8 +1726,8 @@
         "parameters": [
             {
                 "name": "Despawn Time",
-                "description": "Time to wait before despawn",
-                "type": "Parameter"
+                "description": "Time to wait before despawn, in ms",
+                "type": "MillisecondsParameter"
             },
             {
                 "name": "Quest",
@@ -1431,27 +1793,27 @@
         "parameters": [
             {
                 "name": "AITemplateID",
+                "type": "AITemplateParameter"
+            },
+            {
+                "name": "Parameter",
                 "type": "Parameter"
             },
             {
                 "name": "Parameter",
-                "type": "AI parameter 1"
+                "type": "Parameter"
             },
             {
                 "name": "Parameter",
-                "type": "AI parameter 2"
+                "type": "Parameter"
             },
             {
                 "name": "Parameter",
-                "type": "AI parameter 3"
+                "type": "Parameter"
             },
             {
                 "name": "Parameter",
-                "type": "AI parameter 4"
-            },
-            {
-                "name": "Parameter",
-                "type": "AI parameter 5"
+                "type": "Parameter"
             }
         ],
         "description": "{source}: Install AI Template {pram1}",
@@ -1605,6 +1967,44 @@
         ],
         "description": "{source}: {pram3value:choose(0):Add {pram2} to [p=0]counter_[/p]{pram1}|Set script [p=0]counter_[/p]{pram1} to {pram2}}",
         "target_types": "Creature,GameObject",
+        "target_is_source": true,
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 63,
+        "name": "SMART_ACTION_SET_COUNTER_AC",
+        "name_readable": "Set counter",
+        "parameters": [
+            {
+                "name": "Counter Id",
+                "description": "Counter id to modify",
+                "type": "Parameter"
+            },
+            {
+                "name": "Value",
+                "description": "Value to set/add",
+                "type": "Parameter"
+            },
+            {
+                "name": "Reset",
+                "description": "True - set the counter to value, false - add value to the counter",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Subtract",
+                "description": "If true, subtract Value from the counter instead of adding it (ignored if Reset is true)",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{source}: {pram3value:choose(0):Add {pram2} to [p=0]counter_[/p]{pram1}|Set script [p=0]counter_[/p]{pram1} to {pram2}}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature,GameObject",
         "target_is_source": true
     },
     {
@@ -1657,6 +2057,11 @@
             {
                 "name": "Random",
                 "type": "BoolParameter"
+            },
+            {
+                "name": "Turn angle",
+                "description": "Angle to turn by, in degrees (used when not instant/random/target based)",
+                "type": "Parameter"
             }
         ],
         "description": "{source}: {pram2value:choose(0):{targetid:choose(1|8):Set orientation to home position orientation|Set orientation to {target_o}|Look at {target}}|Set random orientation}{pram1value:choose(0):| (instant change)}",
@@ -1679,22 +2084,22 @@
             },
             {
                 "name": "Initial Min",
-                "description": "In miliseconds",
+                "description": "In ms",
                 "type": "Parameter"
             },
             {
                 "name": "Initial Max",
-                "description": "In miliseconds",
+                "description": "In ms",
                 "type": "Parameter"
             },
             {
                 "name": "Repeat Min",
-                "description": "(only if it repeats)",
+                "description": "In ms (only if it repeats)",
                 "type": "Parameter"
             },
             {
                 "name": "Repeat Max",
-                "description": "(only if it repeats)",
+                "description": "In ms (only if it repeats)",
                 "type": "Parameter"
             },
             {
@@ -1749,7 +2154,131 @@
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true,
         "flags": "Async",
+        "usable_with_script_types": "Creature,TimedActionList",
+        "tags": [
+            "TrinityWrath"
+        ]
+    },
+    {
+        "id": 69,
+        "name": "SMART_ACTION_MOVE_TO_POS_TC_MASTER",
+        "name_readable": "Move to position",
+        "parameters": [
+            {
+                "name": "PointId",
+                "type": "Parameter"
+            },
+            {
+                "name": "IsTransport",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Disable Pathfinding",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Contact Distance",
+                "description": "If > 0 contact distance + combatreach",
+                "type": "Parameter"
+            },
+            {
+                "name": "Fade object duration",
+                "type": "MillisecondsParameter",
+                "description": "In ms"
+            }
+        ],
+        "description": "{source}: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target}{hascoords: with offset {targetcoords}|}{pram4value:choose(0):| in {pram4} yd distance}}{pram1value:choose(0):| (point id {pram1})}{pram3value:choose(0):| without pathfinding}",
+        "target_types": "GameObject,Unit,Position",
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true,
+        "flags": "Async",
+        "usable_with_script_types": "Creature,TimedActionList",
+        "tags": [
+            "TrinityMaster"
+        ]
+    },
+    {
+        "id": 69,
+        "name": "SMART_ACTION_MOVE_TO_POS_AC",
+        "name_readable": "Move to position",
+        "parameters": [
+            {
+                "name": "Point Id",
+                "description": "Optional movement point id",
+                "type": "Parameter"
+            },
+            {
+                "name": "Transport",
+                "description": "Position is relative to the transport",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Controlled",
+                "description": "Use controlled (walk) movement",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Contact Distance",
+                "description": "Stop at this distance from destination",
+                "type": "Parameter"
+            },
+            {
+                "name": "Combat Reach",
+                "description": "If true, use the target's combat reach + Contact Distance as the stop radius instead of just Contact Distance (the numeric value itself is not used, only whether it is non-zero)",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Disable Force Destination",
+                "description": "Disable forcing the destination (uses pathfinding)",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{source}: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target}{hascoords: with offset {targetcoords}|}}{pram1value:choose(0):| (point id {pram1})}{pram6value:choose(0):| without forced destination}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "GameObject,Unit,Position",
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true,
         "usable_with_script_types": "Creature,TimedActionList"
+    },
+    {
+        "id": 69,
+        "name": "SMART_ACTION_MOVE_TO_POS_TC_CATA",
+        "name_readable": "Move to position",
+        "parameters": [
+            {
+                "name": "PointId",
+                "type": "Parameter"
+            },
+            {
+                "name": "IsTransport",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Disable Pathfinding",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Contact Distance",
+                "description": "If > 0 contact distance + combatreach",
+                "type": "Parameter"
+            },
+            {
+                "name": "Speed",
+                "description": "Movement speed, actual value used is this / 10 (0 = default speed)",
+                "type": "DecifloatParameter"
+            }
+        ],
+        "description": "{source}: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target}{hascoords: with offset {targetcoords}|}{pram4value:choose(0):| in {pram4} yd distance}}{pram1value:choose(0):| (point id {pram1})}{pram3value:choose(0):| without pathfinding}{pram5value:choose(0):| at speed {pram5}}",
+        "target_types": "GameObject,Unit,Position",
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true,
+        "flags": "Async",
+        "usable_with_script_types": "Creature,TimedActionList",
+        "tags": [
+            "TrinityCata"
+        ]
     },
     {
         "id": 70,
@@ -1758,10 +2287,11 @@
         "parameters": [
             {
                 "name": "Duration",
+                "description": "In seconds. Only applies to gameobjects not spawned by default (creatures and default-spawned gameobjects respawn immediately, ignoring this value)",
                 "type": "Parameter"
             }
         ],
-        "description": "{source}: Set respawn timer to {pram1} ms",
+        "description": "{source}: Set respawn timer to {pram1} s",
         "tags": [
             "Azeroth"
         ],
@@ -1775,10 +2305,11 @@
         "parameters": [
             {
                 "name": "Duration",
+                "description": "In seconds",
                 "type": "Parameter"
             }
         ],
-        "description": "{source}: Enable for {pram1} ms",
+        "description": "{source}: Enable for {pram1} s",
         "tags": [
             "TrinityWrath",
             "TrinityCata",
@@ -1834,7 +2365,61 @@
                 "description": "{source}: Equip items {pram2value:choose(0|1|3|5|7):|{pram3}|{pram3}|{pram3}|{pram3}|} {pram2value:choose(0|2|3|6|7):{pram4}|{pram4}|{pram4}|{pram4}|{pram4}|} {pram2value:choose(0|4|5|6|7):{pram5}|{pram5}|{pram5}|{pram5}|{pram5}|}",
                 "condition": "action.param(1) == 0 && action.param(2) != 0"
             }
+        ],
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
         ]
+    },
+    {
+        "id": 71,
+        "name": "SMART_ACTION_EQUIP_AC",
+        "name_readable": "Equip item",
+        "parameters": [
+            {
+                "name": "Entry",
+                "description": "Entry from table creature_equip_template",
+                "type": "Parameter"
+            },
+            {
+                "name": "Mask",
+                "description": "Only slots with the bit set are sent to the client (0 defaults to 7, send all)",
+                "type": "FlagParameter",
+                "values": {
+                    "1": {
+                        "name": "slot 1"
+                    },
+                    "2": {
+                        "name": "slot 2"
+                    },
+                    "4": {
+                        "name": "slot 3"
+                    }
+                }
+            },
+            {
+                "name": "Slot 1",
+                "description": "Only used if entry is 0",
+                "type": "ItemParameter"
+            },
+            {
+                "name": "Slot 2",
+                "description": "Only used if entry is 0",
+                "type": "ItemParameter"
+            },
+            {
+                "name": "Slot 3",
+                "description": "Only used if entry is 0",
+                "type": "ItemParameter"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Equip items {pram3}, {pram4}, {pram5}|Equip equipment set {pram1}}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true
     },
     {
         "id": 72,
@@ -1856,6 +2441,53 @@
             }
         ],
         "description": "Trigger timed event {pram1}",
+        "implicit_source": "SMART_TARGET_NONE",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 73,
+        "name": "SMART_ACTION_TRIGGER_TIMED_EVENT_AC",
+        "name_readable": "Trigger timed event",
+        "parameters": [
+            {
+                "name": "Id",
+                "description": "Timed event id to trigger (>1). Only this field is used",
+                "type": "TimedEventParameter"
+            },
+            {
+                "name": "Min",
+                "description": "Unused",
+                "type": "Parameter"
+            },
+            {
+                "name": "Max",
+                "description": "Unused",
+                "type": "Parameter"
+            },
+            {
+                "name": "Repeat Min",
+                "description": "Unused",
+                "type": "Parameter"
+            },
+            {
+                "name": "Repeat Max",
+                "description": "Unused",
+                "type": "Parameter"
+            },
+            {
+                "name": "Chance",
+                "description": "Unused",
+                "type": "Parameter"
+            }
+        ],
+        "description": "Trigger timed event {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
         "implicit_source": "SMART_TARGET_NONE"
     },
     {
@@ -1870,6 +2502,53 @@
             }
         ],
         "description": "Remove timed event {pram1}",
+        "implicit_source": "SMART_TARGET_NONE",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 74,
+        "name": "SMART_ACTION_REMOVE_TIMED_EVENT_AC",
+        "name_readable": "Remove timed event",
+        "parameters": [
+            {
+                "name": "Id",
+                "description": "Timed event id to remove (>1). Only this field is used",
+                "type": "TimedEventParameter"
+            },
+            {
+                "name": "Min",
+                "description": "Unused",
+                "type": "Parameter"
+            },
+            {
+                "name": "Max",
+                "description": "Unused",
+                "type": "Parameter"
+            },
+            {
+                "name": "Repeat Min",
+                "description": "Unused",
+                "type": "Parameter"
+            },
+            {
+                "name": "Repeat Max",
+                "description": "Unused",
+                "type": "Parameter"
+            },
+            {
+                "name": "Chance",
+                "description": "Unused",
+                "type": "Parameter"
+            }
+        ],
+        "description": "Remove timed event {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
         "implicit_source": "SMART_TARGET_NONE"
     },
     {
@@ -2042,7 +2721,35 @@
         "description": "{source}: Talk {pram1}",
         "target_types": "Unit",
         "target_is_source": true,
-        "flags": "Async"
+        "flags": "Async",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 84,
+        "name": "SMART_ACTION_SIMPLE_TALK_AC",
+        "name_readable": "Simple talk",
+        "parameters": [
+            {
+                "name": "Group ID",
+                "description": "Group id from table creature_text (target units will say the text)",
+                "type": "CreatureTextParameter"
+            },
+            {
+                "name": "Duration",
+                "description": "Unused: this field has no effect in AzerothCore (TEXT_OVER is only delayed for SMART_ACTION_TALK, not SIMPLE_TALK)",
+                "type": "MillisecondsParameter"
+            }
+        ],
+        "description": "{source}: Talk {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Unit",
+        "target_is_source": true
     },
     {
         "id": 85,
@@ -2099,7 +2806,52 @@
         "sources": "GameObject,Unit",
         "target_types": "Unit",
         "source_in_action": true,
-        "flags": "Async"
+        "flags": "Async",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 86,
+        "name": "SMART_ACTION_CROSS_CAST_AC",
+        "name_readable": "Cross cast",
+        "parameters": [
+            {
+                "name": "Spell",
+                "type": "SpellParameter"
+            },
+            {
+                "name": "Cast Flags",
+                "type": "SmartCastFlagsParameter"
+            },
+            {
+                "name": "Caster Target Type",
+                "description": "SMART_TARGET type used to select the casters",
+                "type": "Parameter"
+            },
+            {
+                "name": "Caster Target Param1",
+                "description": "Caster target param 1 (depends on caster target type)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Caster Target Param2",
+                "description": "Caster target param 2 (depends on caster target type)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Caster Target Param3",
+                "description": "Caster target param 3 (depends on caster target type)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Cast spell [spell={pram1value}] {pram1}{pram2value:choose(0):| with flags {pram2}} at {target}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Unit"
     },
     {
         "id": 87,
@@ -2155,6 +2907,34 @@
         ],
         "description": "{source}: Call random timed action list between range {pram1} and {pram2} {pram2value:choose(0|1):(update out of combat)|(update in combat)|(update always)}",
         "target_types": "Creature,GameObject",
+        "target_is_source": true,
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 88,
+        "name": "SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST_AC",
+        "name_readable": "Call random range timed actionlist",
+        "parameters": [
+            {
+                "name": "Id Min",
+                "description": "Minimum timed action list id",
+                "type": "TimedActionListParameter"
+            },
+            {
+                "name": "Id Max",
+                "description": "Maximum timed action list id",
+                "type": "TimedActionListParameter"
+            }
+        ],
+        "description": "{source}: Call random timed action list between range {pram1} and {pram2} {pram2value:choose(0|1):(update out of combat)|(update in combat)|(update always)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature,GameObject",
         "target_is_source": true
     },
     {
@@ -2179,7 +2959,8 @@
         "parameters": [
             {
                 "name": "Value",
-                "type": "StandStateParameter"
+                "description": "Meaning depends on Type: stand state (Type=0), pet talent points (Type=1, no-op on TrinityCore), vis flag (Type=2), or anim tier (Type=3)",
+                "type": "UnitFieldBytes1ValueParameter"
             },
             {
                 "name": "Type",
@@ -2213,7 +2994,8 @@
         "parameters": [
             {
                 "name": "Bytes",
-                "type": "StandStateParameter"
+                "description": "Only used when Type=2 (vis flag, RemoveVisFlag(value)); for Type=0 stand state always resets to UNIT_STAND_STATE_STAND and Type=3 anim tier always resets to Ground regardless of this value (TrinityCore). Type=1 is a no-op",
+                "type": "UnitFieldBytes1RemoveValueParameter"
             },
             {
                 "name": "Type",
@@ -2226,16 +3008,16 @@
                 }
             }
         ],
-        "description": "{source}: Remove {pram1value} bytes from UNIT_FIELD_BYTES_1 with type {pram2}",
+        "description": "{source}: Remove UNIT_FIELD_BYTES_1 with type {pram2} (value {pram1value} only used for vis flag type)",
         "target_types": "Unit",
         "target_is_source": true,
         "description_rules": [
             {
-                "description": "{source}: Remove stand state {pram1}",
+                "description": "{source}: Reset stand state (value ignored)",
                 "condition": "action.param(2) == 0"
             },
             {
-                "description": "{source}: Remove anim tier {pram1value}",
+                "description": "{source}: Reset anim tier to Ground (value ignored)",
                 "condition": "action.param(2) == 3"
             }
         ]
@@ -2385,8 +3167,7 @@
         "description": "{source}: Jump to pos {targetcoords} with speed XY {pram1} and speed Z {pram2}",
         "tags": [
             "TrinityWrath",
-            "TrinityCata",
-            "Azeroth"
+            "TrinityCata"
         ],
         "target_types": "Creature",
         "uses_target_position": true,
@@ -2402,17 +3183,19 @@
                 "type": "Parameter"
             },
             {
-                "name": "Speed Z",
+                "name": "Min Height",
+                "description": "Minimum height of the jump arc, 0 = engine default",
                 "type": "Parameter"
             },
             {
-                "name": "Gravity",
+                "name": "Max Height",
+                "description": "Maximum height of the jump arc, 0 = engine default",
                 "type": "Parameter"
             },
             {
-                "name": "Use default gravity",
-                "type": "BoolParameter",
-                "defaultVal": 1
+                "name": "Unused",
+                "description": "Unused (legacy gravity toggle; no longer read by the core)",
+                "type": "UnusedParameter"
             },
             {
                 "name": "Point id",
@@ -2423,7 +3206,7 @@
                 "type": "Parameter"
             }
         ],
-        "description": "{source}: Jump to pos {target_position} with speed XY {pram1}, speed Z {pram2}{pram4value:choose(0):| and gravity {pram3}}",
+        "description": "{source}: Jump to pos {target_position} with speed XY {pram1}{pram2value:choose(0):|, min height {pram2}}{pram3value:choose(0):|, max height {pram3}}",
         "tags": [
             "TrinityMaster"
         ],
@@ -2431,6 +3214,35 @@
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true,
         "flags": "Async"
+    },
+    {
+        "id": 97,
+        "name": "SMART_ACTION_JUMP_TO_POS_AC",
+        "name_readable": "Jump to pos",
+        "parameters": [
+            {
+                "name": "Speed XY",
+                "description": "Horizontal jump speed",
+                "type": "Parameter"
+            },
+            {
+                "name": "Speed Z",
+                "description": "Vertical jump speed",
+                "type": "Parameter"
+            },
+            {
+                "name": "Self Jump",
+                "description": "Jump relative to the source's own position (uses target coords as offset)",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{source}: Jump to pos {targetcoords} with speed XY {pram1} and speed Z {pram2}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true,
+        "uses_target_position": true
     },
     {
         "id": 98,
@@ -2459,13 +3271,7 @@
         "parameters": [
             {
                 "name": "State",
-                "type": "SwitchParameter",
-                "values": {
-                    "0": "GO_NOT_READY",
-                    "1": "GO_READY",
-                    "2": "GO_ACTIVATED",
-                    "3": "GO_JUST_DEACTIVATED"
-                }
+                "type": "GameobjectLootStateParameter"
             }
         ],
         "description": "{source}: Set gameobjects loot state {pram1}",
@@ -2493,7 +3299,31 @@
         "description": "{source}: Set home position to {sourceid:choose(1|8):current position|{targetcoords}|current position}",
         "target_types": "Creature",
         "uses_target_position": true,
-        "target_is_source": true
+        "target_is_source": true,
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 101,
+        "name": "SMART_ACTION_SET_HOME_POS_AC",
+        "name_readable": "Set home position",
+        "parameters": [
+            {
+                "name": "Spawn Pos",
+                "description": "True - use the creature's respawn (spawn) position, false - use target/position",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{source}: Set home position to {sourceid:choose(1|8):current position|{targetcoords}|current position}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true,
+        "uses_target_position": true
     },
     {
         "id": 102,
@@ -2580,6 +3410,61 @@
             }
         ],
         "description": "{source}: Summon creature group {pram1}",
+        "implicit_source": "SMART_TARGET_SELF",
+        "tags": [
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 107,
+        "name": "SMART_ACTION_SUMMON_CREATURE_GROUP_TC_MASTER",
+        "name_readable": "Summon creature group",
+        "parameters": [
+            {
+                "name": "Summon group",
+                "type": "Parameter"
+            },
+            {
+                "name": "Attack invoker",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Stored target id",
+                "description": "Store the summoned creatures in this target slot",
+                "type": "StoredTargetParameter"
+            }
+        ],
+        "description": "{source}: Summon creature group {pram1}",
+        "implicit_source": "SMART_TARGET_SELF",
+        "tags": [
+            "TrinityMaster"
+        ]
+    },
+    {
+        "id": 107,
+        "name": "SMART_ACTION_SUMMON_CREATURE_GROUP_AC",
+        "name_readable": "Summon creature group",
+        "parameters": [
+            {
+                "name": "Summon group",
+                "type": "Parameter"
+            },
+            {
+                "name": "Attack invoker",
+                "description": "Summoned creatures attack the event invoker",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Attack script owner",
+                "description": "Summoned creatures attack the script owner (the summoner)",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{source}: Summon creature group {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
         "implicit_source": "SMART_TARGET_SELF"
     },
     {
@@ -2671,33 +3556,93 @@
         "parameters": [
             {
                 "name": "Path 1",
-                "type": "Parameter"
+                "type": "PathParameter"
             },
             {
                 "name": "Path 2",
-                "type": "Parameter"
+                "type": "PathParameter"
             },
             {
                 "name": "Path 3",
-                "type": "Parameter"
+                "type": "PathParameter"
             },
             {
                 "name": "Path 4",
-                "type": "Parameter"
+                "type": "PathParameter"
             },
             {
                 "name": "Path 5",
-                "type": "Parameter"
+                "type": "PathParameter"
             },
             {
                 "name": "Path 6",
-                "type": "Parameter"
+                "type": "PathParameter"
             }
         ],
         "description": "{source}: Start closest path: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
         "target_types": "Creature",
         "target_is_source": true,
-        "flags": "Async"
+        "flags": "Async",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 113,
+        "name": "SMART_ACTION_START_CLOSEST_WAYPOINT_AC",
+        "name_readable": "Start closest path",
+        "parameters": [
+            {
+                "name": "Path Id 1",
+                "description": "First path id of the range to search the closest path in",
+                "type": "PathParameter"
+            },
+            {
+                "name": "Path Id 2",
+                "description": "Last path id of the range to search the closest path in",
+                "type": "PathParameter"
+            },
+            {
+                "name": "Repeat",
+                "description": "Repeat the path when it ends",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Forced Movement",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "None"
+                    },
+                    "1": {
+                        "name": "Walk"
+                    },
+                    "2": {
+                        "name": "Run"
+                    }
+                }
+            },
+            {
+                "name": "Path Source",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "Waypoint manager (waypoint_data)"
+                    },
+                    "1": {
+                        "name": "SmartAI waypoint manager (waypoints)"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Start closest path in range {pram1} - {pram2}{pram3value:choose(0):| (repeat)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true
     },
     {
         "id": 114,
@@ -2771,7 +3716,8 @@
         "parameters": [
             {
                 "name": "Decay time",
-                "type": "FloatParameter"
+                "description": "In seconds",
+                "type": "Parameter"
             },
             {
                 "name": "Multiply by decay ratio",
@@ -2779,6 +3725,29 @@
             }
         ],
         "description": "{source}: Sets corpse delay to {pram1} s{pram2value:choose(0):| (multiplied by server corpse decay ratio)}",
+        "target_types": "Creature",
+        "target_is_source": true,
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 116,
+        "name": "SMART_ACTION_SET_CORPSE_DELAY_AC",
+        "name_readable": "Set corpse delay",
+        "parameters": [
+            {
+                "name": "Timer",
+                "description": "Corpse delay in seconds",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Sets corpse delay to {pram1} s",
+        "tags": [
+            "Azeroth"
+        ],
         "target_types": "Creature",
         "target_is_source": true
     },
@@ -2829,9 +3798,33 @@
         ],
         "description": "{source}: Set {pram1value:choose(0):can not|can} Fly",
         "tags": [
-            "Azeroth",
-            "TrinityCata",
-            "TrinityMaster"
+            "TrinityCata"
+        ],
+        "implicit_source": "SMART_TARGET_SELF",
+        "usable_with_script_types": "Creature,TimedActionList"
+    },
+    {
+        "id": 119,
+        "name": "SMART_ACTION_SET_CAN_FLY_AC",
+        "name_readable": "Set can fly",
+        "parameters": [
+            {
+                "name": "Fly",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Speed",
+                "description": "Fly speed",
+                "type": "DecifloatParameter"
+            },
+            {
+                "name": "Disable Gravity",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{source}: Set {pram1value:choose(0):can not|can} Fly",
+        "tags": [
+            "Azeroth"
         ],
         "implicit_source": "SMART_TARGET_SELF",
         "usable_with_script_types": "Creature,TimedActionList"
@@ -2848,9 +3841,7 @@
         ],
         "description": "{source}: Remove Auras with Auratype  {pram1}",
         "tags": [
-            "Azeroth",
-            "TrinityCata",
-            "TrinityMaster"
+            "TrinityCata"
         ],
         "target_types": "Unit",
         "target_is_source": true
@@ -2868,8 +3859,7 @@
         "description": "{source}: Sight distance set to {pram1} yards",
         "tags": [
             "Azeroth",
-            "TrinityCata",
-            "TrinityMaster"
+            "TrinityCata"
         ],
         "target_types": "Creature",
         "target_is_source": true
@@ -2887,8 +3877,7 @@
         "description": "{source}: Flee for {pram1} ms",
         "tags": [
             "Azeroth",
-            "TrinityCata",
-            "TrinityMaster"
+            "TrinityCata"
         ],
         "target_types": "Creature",
         "target_is_source": true
@@ -2988,7 +3977,12 @@
         "parameters": [
             {
                 "name": "Movement slot",
-                "type": "Parameter"
+                "type": "SwitchParameter",
+                "values": {
+                    "0": "Default",
+                    "1": "Active",
+                    "2": "Controlled"
+                }
             },
             {
                 "name": "Pause time",
@@ -3042,7 +4036,7 @@
         "parameters": [
             {
                 "name": "SceneId",
-                "type": "Parameter"
+                "type": "SceneTemplateParameter"
             }
         ],
         "description": "{source}: Starts playing scene with Id: {pram1}",
@@ -3060,7 +4054,7 @@
         "parameters": [
             {
                 "name": "SceneId",
-                "type": "Parameter"
+                "type": "SceneTemplateParameter"
             }
         ],
         "description": "{source}: Stops playing scene with Id: {pram1}",
@@ -3100,6 +4094,37 @@
             }
         ],
         "description": "Spawn spawn group {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
+        "implicit_source": "SMART_TARGET_SELF",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 131,
+        "name": "SMART_ACTION_SPAWN_SPAWNGROUP_AC",
+        "name_readable": "Spawn Spawngroup",
+        "parameters": [
+            {
+                "name": "Group Id",
+                "type": "SpawnGroupTemplateParameter"
+            },
+            {
+                "name": "Ignore Respawn",
+                "description": "Spawn even if the respawn timer has not elapsed",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Force",
+                "description": "Force spawn even if the group is already spawned",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "Spawn spawn group {pram1}{pram2value:choose(0):| ignoring respawn}{pram3value:choose(0):| (forced)}",
+        "tags": [
+            "Azeroth"
+        ],
         "implicit_source": "SMART_TARGET_SELF"
     },
     {
@@ -3131,6 +4156,37 @@
             }
         ],
         "description": "Despawn spawn group {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
+        "implicit_source": "SMART_TARGET_SELF",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 132,
+        "name": "SMART_ACTION_DESPAWN_SPAWNGROUP_AC",
+        "name_readable": "Despawn Spawngroup",
+        "parameters": [
+            {
+                "name": "Group Id",
+                "type": "SpawnGroupTemplateParameter"
+            },
+            {
+                "name": "Delete Respawn Times",
+                "description": "Delete the stored respawn times for the group",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Force",
+                "description": "Unused",
+                "type": "Parameter"
+            }
+        ],
+        "description": "Despawn spawn group {pram1}{pram2value:choose(0):| and delete respawn times}",
+        "tags": [
+            "Azeroth"
+        ],
         "implicit_source": "SMART_TARGET_SELF"
     },
     {
@@ -3140,11 +4196,7 @@
         "parameters": [
             {
                 "name": "SpawnType",
-                "type": "SwitchParameter",
-                "values": {
-                    "0": "Creature",
-                    "1": "GameObject"
-                }
+                "type": "SpawnObjectTypeParameter"
             },
             {
                 "name": "SpawnId (DB GUID)",
@@ -3185,7 +4237,8 @@
         "tags": [
             "TrinityWrath",
             "TrinityCata",
-            "TrinityMaster"
+            "TrinityMaster",
+            "Azeroth"
         ],
         "target_types": "Unit",
         "implicit_source": "SMART_TARGET_ACTION_INVOKER",
@@ -3210,7 +4263,8 @@
         "description": "{source}: Plays Cinematic with Entry: {pram1}",
         "tags": [
             "TrinityWrath",
-            "TrinityCata"
+            "TrinityCata",
+            "Azeroth"
         ],
         "target_types": "Player",
         "target_is_source": true
@@ -3248,7 +4302,8 @@
         "tags": [
             "TrinityWrath",
             "TrinityCata",
-            "TrinityMaster"
+            "TrinityMaster",
+            "Azeroth"
         ],
         "target_types": "Creature",
         "target_is_source": true
@@ -3376,13 +4431,14 @@
         "parameters": [
             {
                 "name": "Percent",
-                "type": "Parameter"
+                "type": "PercentageParameter"
             }
         ],
         "description": "{source}: Set current health to {pram1}%",
         "tags": [
             "TrinityWrath",
-            "TrinityMaster"
+            "TrinityMaster",
+            "Azeroth"
         ],
         "target_types": "Unit",
         "target_is_source": true
@@ -3487,6 +4543,7 @@
         ],
         "description": "{source}: Add {target} to {pram1}",
         "tags": [
+            "TrinityWrath",
             "TrinityMaster"
         ],
         "target_types": "GameObject,Unit",
@@ -3505,7 +4562,7 @@
             },
             {
                 "name": "Duration",
-                "description": "In ms",
+                "description": "In seconds",
                 "type": "FloatParameter"
             }
         ],
@@ -3545,6 +4602,172 @@
         ]
     },
     {
+        "id": 151,
+        "name": "SMART_ACTION_DO_ACTION",
+        "name_readable": "Do action",
+        "parameters": [
+            {
+                "name": "Action ID",
+                "type": "DoActionParameter"
+            }
+        ],
+        "description": "{target}: Do AI action {pram1}",
+        "tags": [
+            "TrinityMaster"
+        ],
+        "target_types": "GameObject,Unit",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 152,
+        "name": "SMART_ACTION_COMPLETE_QUEST",
+        "name_readable": "Complete quest",
+        "parameters": [
+            {
+                "name": "Quest ID",
+                "description": "Only quests with QUEST_FLAGS_COMPLETION_EVENT, QUEST_FLAGS_COMPLETION_AREA_TRIGGER or QUEST_FLAGS_TRACKING_EVENT can be completed this way",
+                "type": "QuestParameter",
+                "required": true
+            }
+        ],
+        "description": "{target}: Complete quest {pram1}",
+        "tags": [
+            "TrinityMaster"
+        ],
+        "target_types": "Player"
+    },
+    {
+        "id": 153,
+        "name": "SMART_ACTION_CREDIT_QUEST_OBJECTIVE_TALK_TO",
+        "name_readable": "Credit talk-to quest objective",
+        "description": "{source}: Give talk-to quest objective credit to {target}",
+        "tags": [
+            "TrinityMaster"
+        ],
+        "target_types": "Player",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 154,
+        "name": "SMART_ACTION_DESTROY_CONVERSATION",
+        "name_readable": "Destroy conversation",
+        "parameters": [
+            {
+                "name": "Conversation template id",
+                "type": "ConversationParameter",
+                "required": true
+            },
+            {
+                "name": "Is private",
+                "description": "If set, only private conversations owned by the target are destroyed",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Range",
+                "description": "Search range in yards",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Destroy conversation {pram1} in {pram3} yards",
+        "tags": [
+            "TrinityMaster"
+        ],
+        "target_types": "Player",
+        "target_is_source": true
+    },
+    {
+        "id": 155,
+        "name": "SMART_ACTION_ENTER_VEHICLE",
+        "name_readable": "Enter vehicle",
+        "parameters": [
+            {
+                "name": "Seat",
+                "description": "Seat id (-1 for any free seat)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Enter vehicle {target} on seat {pram1}",
+        "tags": [
+            "TrinityMaster"
+        ],
+        "target_types": "Unit",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 156,
+        "name": "SMART_ACTION_BOARD_PASSENGER",
+        "name_readable": "Board passenger",
+        "parameters": [
+            {
+                "name": "Seat",
+                "description": "Seat id (-1 for any free seat)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Board {target} as passenger on seat {pram1}",
+        "tags": [
+            "TrinityMaster"
+        ],
+        "target_types": "Unit",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 157,
+        "name": "SMART_ACTION_EXIT_VEHICLE",
+        "name_readable": "Exit vehicle",
+        "description": "{target}: Exit vehicle",
+        "tags": [
+            "TrinityMaster"
+        ],
+        "target_types": "Unit",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 158,
+        "name": "SMART_ACTION_RESUME_MOVEMENT",
+        "name_readable": "Resume movement",
+        "parameters": [
+            {
+                "name": "Movement slot",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": "Default",
+                    "1": "Active",
+                    "2": "Controlled"
+                }
+            },
+            {
+                "name": "Resume timer",
+                "description": "In ms",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{target}: Resume movement",
+        "tags": [
+            "TrinityWrath",
+            "TrinityMaster"
+        ],
+        "target_types": "Unit",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 159,
+        "name": "SMART_ACTION_FALL",
+        "name_readable": "Fall",
+        "parameters": [
+            {
+                "name": "Point ID",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{target}: Fall (point {pram1})",
+        "tags": [
+            "TrinityMaster"
+        ],
+        "target_types": "Unit",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
         "id": 201,
         "name": "SMART_ACTION_MOVE_TO_POS_TARGET_AC",
         "name_readable": "Move to position (any source)",
@@ -3552,6 +4775,10 @@
             {
                 "name": "Point ID",
                 "type": "Parameter"
+            },
+            {
+                "name": "Disable force destination",
+                "type": "BoolParameter"
             }
         ],
         "description": "{source}: Move to position {targetcoords}{pram1value:choose(0):| with point ID {pram1}}",
@@ -3639,19 +4866,9 @@
     },
     {
         "id": 206,
-        "name": "SMART_ACTION_SET_CASTER_COMBAT_DIST_AC",
-        "name_readable": "Set caster combat distance",
-        "parameters": [
-            {
-                "name": "Distance",
-                "type": "Parameter"
-            },
-            {
-                "name": "Reset distance",
-                "type": "BoolParameter"
-            }
-        ],
-        "description": "{source}: {pram2value:choose(0):Set caster combat distance to {pram1} yd|Reset caster combat distance}",
+        "name": "SMART_ACTION_DISMOUNT_AC",
+        "name_readable": "Dismount",
+        "description": "{source}: Dismount",
         "tags": [
             "Azeroth"
         ],
@@ -3689,7 +4906,8 @@
             },
             {
                 "name": "Value",
-                "type": "Parameter"
+                "description": "Meaning depends on 'type': mechanic id, spell school mask, dispel type, spell effect id or aura type id, or (for Id/Allow Id) a spell id",
+                "type": "SpellImmunityValueParameter"
             }
         ],
         "description": "{source}: Apply immunity {pram1} to {pram3}{pram2value:choose(0):| with spell [spell={pram2value}] {pram2}}",
@@ -3714,7 +4932,8 @@
             },
             {
                 "name": "Value",
-                "type": "Parameter"
+                "description": "Meaning depends on 'type': mechanic id, spell school mask, dispel type, spell effect id or aura type id, or (for Id/Allow Id) a spell id",
+                "type": "SpellImmunityValueParameter"
             }
         ],
         "description": "{source}: Remove immunity {pram1} value {pram3}{pram2value:choose(0):| with spell [spell={pram2value}] {pram2}}",
@@ -3812,7 +5031,8 @@
         "parameters": [
             {
                 "name": "Music",
-                "type": "Parameter"
+                "description": "Sound/music id to play",
+                "type": "SoundParameter"
             },
             {
                 "name": "Only to target",
@@ -3822,9 +5042,15 @@
                 "name": "Targets of music play",
                 "type": "SwitchParameter",
                 "values": {
-                    "0": "Action targets",
-                    "1": "All players in zone",
-                    "2": "All players in area"
+                    "0": {
+                        "name": "Action targets"
+                    },
+                    "1": {
+                        "name": "All players in zone"
+                    },
+                    "2": {
+                        "name": "All players in area"
+                    }
                 }
             }
         ],
@@ -3842,19 +5068,19 @@
         "parameters": [
             {
                 "name": "Music 1",
-                "type": "Parameter"
+                "type": "SoundParameter"
             },
             {
                 "name": "Music 2",
-                "type": "Parameter"
+                "type": "SoundParameter"
             },
             {
                 "name": "Music 3",
-                "type": "Parameter"
+                "type": "SoundParameter"
             },
             {
                 "name": "Music 4",
-                "type": "Parameter"
+                "type": "SoundParameter"
             },
             {
                 "name": "Only to target",
@@ -3864,9 +5090,15 @@
                 "name": "Targets of music play",
                 "type": "SwitchParameter",
                 "values": {
-                    "0": "Action targets",
-                    "1": "All players in zone",
-                    "2": "All players in area"
+                    "0": {
+                        "name": "Action targets"
+                    },
+                    "1": {
+                        "name": "All players in zone"
+                    },
+                    "2": {
+                        "name": "All players in area"
+                    }
                 }
             }
         ],
@@ -3953,11 +5185,13 @@
         "name_readable": "Make player talk",
         "parameters": [
             {
-                "name": "acore_string.entry",
+                "name": "Acore string entry",
+                "description": "Text entry from the acore_string table",
                 "type": "Parameter"
             },
             {
                 "name": "Yell",
+                "description": "False - say, true - yell",
                 "type": "BoolParameter"
             }
         ],
@@ -3987,7 +5221,8 @@
             },
             {
                 "name": "Spiral appearance",
-                "type": "Parameter"
+                "description": "Growth rate k (raw value / 1000; r(phi) = a * e^(k * phi))",
+                "type": "FloatParameter"
             },
             {
                 "name": "Range max",
@@ -3995,6 +5230,7 @@
             },
             {
                 "name": "Phi delta",
+                "description": "In degrees",
                 "type": "Parameter"
             }
         ],
@@ -4015,6 +5251,512 @@
         ],
         "target_types": "Player",
         "target_is_source": true
+    },
+    {
+        "id": 223,
+        "name": "SMART_ACTION_DO_ACTION_AC",
+        "name_readable": "Do action",
+        "parameters": [
+            {
+                "name": "Action ID",
+                "type": "DoActionParameter"
+            },
+            {
+                "name": "Is negative",
+                "description": "Negate the action id before calling DoAction",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Instance target",
+                "description": "If set, calls the action on the instance script",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{target}: Do AI action {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "GameObject,Unit",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 224,
+        "name": "SMART_ACTION_ATTACK_STOP_AC",
+        "name_readable": "Attack stop",
+        "description": "{source}: Stop attacking",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Unit",
+        "target_is_source": true
+    },
+    {
+        "id": 225,
+        "name": "SMART_ACTION_SET_GUID_AC",
+        "name_readable": "Set guid",
+        "parameters": [
+            {
+                "name": "Use invoker GUID",
+                "description": "0 = base object's GUID, 1 = invoker's GUID",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Index",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{target}: Store {pram1value:choose(0):source|invoker} GUID at data index {pram2}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Unit",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 226,
+        "name": "SMART_ACTION_SCRIPTED_SPAWN_AC",
+        "name_readable": "Scripted spawn",
+        "parameters": [
+            {
+                "name": "State",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "Disable respawn",
+                        "description": "Disable respawning (and despawn unless 'Don't despawn' is set)"
+                    },
+                    "1": {
+                        "name": "Respawn once"
+                    },
+                    "2": {
+                        "name": "Enable respawning"
+                    }
+                }
+            },
+            {
+                "name": "Spawn timer min",
+                "description": "Minimum respawn time in seconds (used with state = enable respawning)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Spawn timer max",
+                "description": "Maximum respawn time in seconds (0 = respawn immediately)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Respawn delay",
+                "description": "Respawn delay in seconds (0 = use DB value)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Corpse delay",
+                "description": "Corpse delay in seconds (0 = use default)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Don't despawn",
+                "description": "When disabling respawn, do not despawn the creature",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{source}: Scripted spawn ({pram1value:choose(0|1):disable respawn|respawn once|enable respawning})",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true
+    },
+    {
+        "id": 227,
+        "name": "SMART_ACTION_SET_SCALE_AC",
+        "name_readable": "Set scale",
+        "parameters": [
+            {
+                "name": "Scale",
+                "description": "Scale in percent (100 = default)",
+                "type": "PercentageParameter"
+            }
+        ],
+        "description": "{source}: Set scale to {pram1}%",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Unit",
+        "target_is_source": true
+    },
+    {
+        "id": 228,
+        "name": "SMART_ACTION_SUMMON_RADIAL_AC",
+        "name_readable": "Summon radial",
+        "parameters": [
+            {
+                "name": "Creature",
+                "type": "CreatureParameter"
+            },
+            {
+                "name": "Duration",
+                "description": "In ms, 0 = permanent",
+                "type": "Parameter"
+            },
+            {
+                "name": "Repetitions",
+                "type": "Parameter"
+            },
+            {
+                "name": "Start angle",
+                "type": "Parameter"
+            },
+            {
+                "name": "Step angle",
+                "type": "Parameter"
+            },
+            {
+                "name": "Distance",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Summon {pram3} rings of creature {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true
+    },
+    {
+        "id": 229,
+        "name": "SMART_ACTION_PLAY_SPELL_VISUAL_AC",
+        "name_readable": "Play spell visual",
+        "parameters": [
+            {
+                "name": "Visual ID",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Play spell visual {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Unit",
+        "target_is_source": true
+    },
+    {
+        "id": 230,
+        "name": "SMART_ACTION_FOLLOW_GROUP_AC",
+        "name_readable": "Follow group",
+        "parameters": [
+            {
+                "name": "Follow state",
+                "description": "False - stop following (move idle), true - follow",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Follow type",
+                "type": "SwitchParameter",
+                "values": {
+                    "1": {
+                        "name": "Circle",
+                        "description": "360 degrees around leader"
+                    },
+                    "2": {
+                        "name": "Semi circle behind",
+                        "description": "180 degrees behind leader"
+                    },
+                    "3": {
+                        "name": "Semi circle front",
+                        "description": "180 degrees in front of leader"
+                    },
+                    "4": {
+                        "name": "Line",
+                        "description": "front -> back -> front -> back"
+                    },
+                    "5": {
+                        "name": "Column",
+                        "description": "left -> right -> left -> right"
+                    },
+                    "6": {
+                        "name": "Angular",
+                        "description": "geese-like formation behind leader"
+                    }
+                }
+            },
+            {
+                "name": "Distance",
+                "description": "Follow distance (in 0.01 yd units)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Stop following group|Follow group (type {pram2}, distance {pram3})}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true
+    },
+    {
+        "id": 231,
+        "name": "SMART_ACTION_SET_ORIENTATION_TARGET_AC",
+        "name_readable": "Set orientation to target",
+        "parameters": [
+            {
+                "name": "Type",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "Reset",
+                        "description": "Reset orientation to home position orientation"
+                    },
+                    "1": {
+                        "name": "Target orientation",
+                        "description": "Face the target position orientation (target.o)"
+                    },
+                    "2": {
+                        "name": "Face source",
+                        "description": "Face the script source object"
+                    },
+                    "3": {
+                        "name": "Face parameter target",
+                        "description": "Face the target selected by the target fields below"
+                    }
+                }
+            },
+            {
+                "name": "Target type",
+                "description": "SMART_TARGET type used when Type = face parameter target",
+                "type": "Parameter"
+            },
+            {
+                "name": "Target param 1",
+                "description": "Target param 1 (depends on target type)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Target param 2",
+                "description": "Target param 2 (depends on target type)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Target param 3",
+                "description": "Target param 3 (depends on target type)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Target param 4",
+                "description": "Target param 4 (depends on target type)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Set orientation ({pram1value:choose(0|1|2):reset to home|to target orientation|face source|face parameter target})",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Unit",
+        "target_is_source": true
+    },
+    {
+        "id": 233,
+        "name": "SMART_ACTION_WAYPOINT_DATA_RANDOM_AC",
+        "name_readable": "Start random waypoint path",
+        "parameters": [
+            {
+                "name": "Path ID 1",
+                "type": "Parameter"
+            },
+            {
+                "name": "Path ID 2",
+                "type": "Parameter"
+            },
+            {
+                "name": "Repeat",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{source}: Start random waypoint path between {pram1} and {pram2}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true
+    },
+    {
+        "id": 234,
+        "name": "SMART_ACTION_MOVEMENT_STOP_AC",
+        "name_readable": "Movement stop",
+        "description": "{source}: Stop movement",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true
+    },
+    {
+        "id": 235,
+        "name": "SMART_ACTION_MOVEMENT_PAUSE_AC",
+        "name_readable": "Movement pause",
+        "parameters": [
+            {
+                "name": "Timer",
+                "description": "Pause duration",
+                "type": "MillisecondsParameter"
+            }
+        ],
+        "description": "{source}: Pause movement for {pram1} ms",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true
+    },
+    {
+        "id": 236,
+        "name": "SMART_ACTION_MOVEMENT_RESUME_AC",
+        "name_readable": "Movement resume",
+        "parameters": [
+            {
+                "name": "Timer override",
+                "description": "Override the movement timer (0 = keep current)",
+                "type": "MillisecondsParameter"
+            }
+        ],
+        "description": "{source}: Resume movement",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true
+    },
+    {
+        "id": 237,
+        "name": "SMART_ACTION_WORLD_SCRIPT_AC",
+        "name_readable": "World script",
+        "parameters": [
+            {
+                "name": "Event ID",
+                "type": "Parameter"
+            },
+            {
+                "name": "Param",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Trigger world script event {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Unit",
+        "target_is_source": true
+    },
+    {
+        "id": 238,
+        "name": "SMART_ACTION_DISABLE_REWARD_AC",
+        "name_readable": "Disable reward",
+        "parameters": [
+            {
+                "name": "Disable reputation",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Disable loot",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{source}: Disable {pram1value:choose(0):|reputation }{pram2value:choose(0):|loot }reward",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true
+    },
+    {
+        "id": 239,
+        "name": "SMART_ACTION_SET_ANIM_TIER_AC",
+        "name_readable": "Set anim tier",
+        "parameters": [
+            {
+                "name": "Anim tier",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "Ground"
+                    },
+                    "1": {
+                        "name": "Swim"
+                    },
+                    "2": {
+                        "name": "Hover"
+                    },
+                    "3": {
+                        "name": "Fly"
+                    },
+                    "4": {
+                        "name": "Submerged"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Set anim tier to {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Unit",
+        "target_is_source": true
+    },
+    {
+        "id": 240,
+        "name": "SMART_ACTION_SET_GOSSIP_MENU_AC",
+        "name_readable": "Set gossip menu",
+        "parameters": [
+            {
+                "name": "Gossip menu ID",
+                "type": "GossipMenuParameter"
+            }
+        ],
+        "description": "{source}: Set gossip menu id to {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "Creature",
+        "target_is_source": true
+    },
+    {
+        "id": 241,
+        "name": "SMART_ACTION_SUMMON_GAMEOBJECT_GROUP_AC",
+        "name_readable": "Summon gameobject group",
+        "parameters": [
+            {
+                "name": "Group",
+                "description": "Gameobject summon group id",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{source}: Summon gameobject group {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "GameObject",
+        "target_is_source": true
+    },
+    {
+        "id": 242,
+        "name": "SMART_ACTION_INC_DATA_AC",
+        "name_readable": "Increment data",
+        "parameters": [
+            {
+                "name": "Field",
+                "description": "SmartAI data field to increment",
+                "type": "DataVariableParameter"
+            },
+            {
+                "name": "Increment",
+                "description": "Value added to the current field value",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{target}: Increment data field {pram1} by {pram2}",
+        "tags": [
+            "Azeroth"
+        ],
+        "target_types": "GameObject,Unit",
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 9992,

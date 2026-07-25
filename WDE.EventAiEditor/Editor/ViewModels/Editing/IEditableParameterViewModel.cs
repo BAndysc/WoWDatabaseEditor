@@ -8,5 +8,6 @@ namespace WDE.EventAiEditor.Editor.ViewModels.Editing
         string Group { get; }
         string Name { get; }
         bool FocusFirst { get; }
+        int Order { get; set; }
     }
 }

@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:settings="clr-namespace:WDE.MangosEventAiEditor.Settings"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="settings:CMangosConfigurationViewModel"
+             x:Class="WDE.MangosEventAiEditor.Settings.CMangosConfigurationView">
+  <ScrollViewer>
+    <StackPanel>
+      <SettingItem Header="Database repository path" Help="Path to your cmangos database repository checkout (e.g. wotlk-db). The ACID file is expected at ACID/*.sql inside that folder.">
+        <DockPanel LastChildFill="True">
+          <Button DockPanel.Dock="Right" Margin="5,0,0,0" Command="{CompiledBinding PickFolderCommand}">Choose folder...</Button>
+          <TextBox Text="{CompiledBinding DbRepositoryPath}" />
+        </DockPanel>
+      </SettingItem>
+
+      <SettingItem Header="Update the ACID file on save" Help="When enabled, saving an EventAI script to the database will also add, update or remove the script rows in the ACID .sql file, so the change is ready to be committed to the repository.">
+        <ToggleSwitch IsChecked="{CompiledBinding UpdateAcidFileOnSave}" />
+      </SettingItem>
+
+      <SettingItem Header="ACID file">
+        <TextBlock Text="{CompiledBinding AcidFileStatus}" TextWrapping="Wrap" VerticalAlignment="Center" Opacity="0.7" />
+      </SettingItem>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

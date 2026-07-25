@@ -86,8 +86,8 @@
                                   Header="Toggle non-breakable link flag">
                             <MenuItem.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                    <CompiledBinding Path="AnySelected" />
-                                    <CompiledBinding Path="SupportsNonBreakableLinks" />
+                                    <ReflectionBinding Path="AnySelected" />
+                                    <ReflectionBinding Path="SupportsNonBreakableLinks" />
                                 </MultiBinding>
                             </MenuItem.IsVisible>
                         </MenuItem>
@@ -97,16 +97,16 @@
                         <MenuItem WdeImage.MenuIcon="Icons/icon_edit.png" Header="Edit event definition" Command="{CompiledBinding OpenSelectedEventDefinitionEditor}">
                             <MenuItem.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                    <CompiledBinding Path="AnyEventSelected" />
-                                    <CompiledBinding Path="SupportsDefinitionEditor" />
+                                    <ReflectionBinding Path="AnyEventSelected" />
+                                    <ReflectionBinding Path="SupportsDefinitionEditor" />
                                 </MultiBinding>
                             </MenuItem.IsVisible>
                         </MenuItem>
                         <MenuItem WdeImage.MenuIcon="Icons/icon_edit.png" Header="Edit definition">
                             <MenuItem.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                    <CompiledBinding Path="AnyActionExclusiveSelected" />
-                                    <CompiledBinding Path="SupportsDefinitionEditor" />
+                                    <ReflectionBinding Path="AnyActionExclusiveSelected" />
+                                    <ReflectionBinding Path="SupportsDefinitionEditor" />
                                 </MultiBinding>
                             </MenuItem.IsVisible>
                             <MenuItem Header="Edit action" Command="{CompiledBinding OpenSelectedActionDefinitionEditor}" />

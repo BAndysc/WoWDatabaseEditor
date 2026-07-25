@@ -60,8 +60,11 @@ public abstract class EventAiBaseFindAnywhereSource : IFindAnywhereSource
     private IEnumerable<(EventAiPropertyType what, int whatValue, int parameterIndex, long valueToSearch)> PrepareCondition(IReadOnlyList<string> parameterName, long parameterValue)
     {
         foreach (var propertyType in Enum.GetValues<EventAiPropertyType>())
-            foreach (var thing in PrepareConditionForType(parameterName, parameterValue, EventOrAction.Event, propertyType))
+        {
+            var type = propertyType == EventAiPropertyType.Event ? EventOrAction.Event : EventOrAction.Action;
+            foreach (var thing in PrepareConditionForType(parameterName, parameterValue, type, propertyType))
                 yield return thing;
+        }
     }
     
     private IEnumerable<(EventAiPropertyType what, int whatValue, int parameterIndex, long valueToSearch)> PrepareConditionForType(IReadOnlyList<string> parameterNames, long parameterValue, EventOrAction type, EventAiPropertyType dbType)

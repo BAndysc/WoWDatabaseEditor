@@ -34,7 +34,7 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="viewModels:IEditableParameterViewModel">
                                         <editing:ParameterEditorView utils:FocusUtils.FocusFirst="{CompiledBinding FocusFirst}"
-                                                                     SpecialCopying="{Binding SpecialCopying}"
+                                                                     SpecialCopying="{ReflectionBinding SpecialCopying}"
                                                                      Tag="{Binding #Root.((viewModels:ParametersEditViewModel)DataContext).SpecialCopyValue}"
                                                                      Margin="0,0,0,5" />
                                     </DataTemplate>

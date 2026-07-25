@@ -68,6 +68,16 @@ namespace WDE.EventAiEditor.Editor.ViewModels.Editing
                 foreach (var parameter in stringParameters)
                     allParameters.Add(AutoDispose(new EditableParameterViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion, parameterPickerService){FocusFirst=focusFirst}));
 
+            // Rows hide/unhide live while editing and DynamicData's GroupOn appends new items
+            // regardless of the source position, so the authored build order is captured here and
+            // both the group headers and the rows inside each group re-sort by it.
+            var groupOrder = new Dictionary<string, int>();
+            for (var i = 0; i < allParameters.Count; i++)
+            {
+                allParameters[i].Order = i;
+                groupOrder.TryAdd(allParameters[i].Group, groupOrder.Count);
+            }
+
             foreach (IEditableParameterViewModel parameter in allParameters)
             {
                 AutoDispose(parameter.Subscribe(p => p.IsHidden,
@@ -98,7 +108,10 @@ namespace WDE.EventAiEditor.Editor.ViewModels.Editing
             visibleParameters
                 .Connect()
                 .GroupOn(t => t.Group)
-                .Transform(group => new Grouping<string, IEditableParameterViewModel>(group))
+                .Transform(group => new Grouping<string, IEditableParameterViewModel>(group,
+                    Comparer<IEditableParameterViewModel>.Create((x, y) => x.Order.CompareTo(y.Order))))
+                .Sort(Comparer<Grouping<string, IEditableParameterViewModel>>.Create(
+                    (x, y) => groupOrder[x.Key].CompareTo(groupOrder[y.Key])))
                 .DisposeMany()
                 .Bind(out l)
                 .Subscribe();
@@ -125,14 +138,16 @@ namespace WDE.EventAiEditor.Editor.ViewModels.Editing
     {
         private readonly IDisposable disposable;
         
-        public Grouping(IGroup<TVal, TKey> group) 
+        public Grouping(IGroup<TVal, TKey> group, IComparer<TVal>? comparer = null)
         {
             if (group == null)
                 throw new ArgumentNullException(nameof(group));
 
             Key = group.GroupKey;
-            disposable = group.List
-                .Connect()
+            var connection = group.List.Connect();
+            if (comparer != null)
+                connection = connection.Sort(comparer);
+            disposable = connection
                 .Bind(this)
                 .Subscribe();
         }

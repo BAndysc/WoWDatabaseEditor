@@ -136,6 +136,7 @@ namespace WDE.SmartScriptEditor.Exporter
                     TargetParam1 = (int) a.Target.GetValueOrDefault(0),
                     TargetParam2 = (int) a.Target.GetValueOrDefault(1),
                     TargetParam3 = (int) a.Target.GetValueOrDefault(2),
+                    TargetParam4 = (int) a.Target.GetValueOrDefault(3),
                     TargetConditionId = (int)a.Target.Condition.Value,
                     TargetX = a.Target.GetFloatValueOrDefault(0),
                     TargetY = a.Target.GetFloatValueOrDefault(1),

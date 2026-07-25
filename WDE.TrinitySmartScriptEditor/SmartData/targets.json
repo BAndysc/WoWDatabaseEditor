@@ -29,7 +29,59 @@
         "name": "SMART_TARGET_HOSTILE_SECOND_AGGRO",
         "name_readable": "Second highest aggro",
         "help": "Creature with second highest aggro on the threat list",
-        "description": "Second highest aggro",
+        "description": "Second highest aggro{pram1value:choose(0):| within {pram1} yd}{pram2value:choose(0):| (players only)}{pram3value:choose(0):| using power {pram3}}{pram4value:choose(0):| missing aura {pram4}}",
+        "types": "Unit",
+        "usable_with_script_types": "Creature,TimedActionList",
+        "parameters": [
+            {
+                "name": "Max distance",
+                "description": "If 0, no distance limit",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player only",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Power type",
+                "description": "If set, only consider units using this power type",
+                "type": "PowerOrDisabledParameter"
+            }
+        ],
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 3,
+        "name": "SMART_TARGET_HOSTILE_SECOND_AGGRO_AC",
+        "name_readable": "Second highest aggro",
+        "parameters": [
+            {
+                "name": "Max Dist",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player Only",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Power Type",
+                "description": "If set, only consider units using this power type (0 = disabled)",
+                "type": "PowerOrDisabledParameter"
+            },
+            {
+                "name": "Aura",
+                "description": "If set, only consider units missing this aura",
+                "type": "SpellParameter"
+            }
+        ],
+        "description": "Second highest aggro{pram1value:choose(0):| within {pram1} yd}{pram2value:choose(0):| (players only)}{pram3value:choose(0):| using power {pram3}}{pram4value:choose(0):| missing aura {pram4}}",
+        "tags": [
+            "Azeroth"
+        ],
         "types": "Unit",
         "usable_with_script_types": "Creature,TimedActionList"
     },
@@ -38,7 +90,59 @@
         "name": "SMART_TARGET_HOSTILE_LAST_AGGRO",
         "name_readable": "Least aggro",
         "help": "Creature with least aggro on the threat list",
-        "description": "Least aggro",
+        "description": "Least aggro{pram1value:choose(0):| within {pram1} yd}{pram2value:choose(0):| (players only)}{pram3value:choose(0):| using power {pram3}}{pram4value:choose(0):| missing aura {pram4}}",
+        "types": "Unit",
+        "usable_with_script_types": "Creature,TimedActionList",
+        "parameters": [
+            {
+                "name": "Max distance",
+                "description": "If 0, no distance limit",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player only",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Power type",
+                "description": "If set, only consider units using this power type",
+                "type": "PowerOrDisabledParameter"
+            }
+        ],
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 4,
+        "name": "SMART_TARGET_HOSTILE_LAST_AGGRO_AC",
+        "name_readable": "Least aggro",
+        "parameters": [
+            {
+                "name": "Max Dist",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player Only",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Power Type",
+                "description": "If set, only consider units using this power type (0 = disabled)",
+                "type": "PowerOrDisabledParameter"
+            },
+            {
+                "name": "Aura",
+                "description": "If set, only consider units missing this aura",
+                "type": "SpellParameter"
+            }
+        ],
+        "description": "Least aggro{pram1value:choose(0):| within {pram1} yd}{pram2value:choose(0):| (players only)}{pram3value:choose(0):| using power {pram3}}{pram4value:choose(0):| missing aura {pram4}}",
+        "tags": [
+            "Azeroth"
+        ],
         "types": "Unit",
         "usable_with_script_types": "Creature,TimedActionList"
     },
@@ -47,7 +151,59 @@
         "name": "SMART_TARGET_HOSTILE_RANDOM",
         "name_readable": "Random hostile",
         "help": "Any random target on our threat list",
-        "description": "Random hostile",
+        "description": "Random hostile{pram1value:choose(0):| within {pram1} yd}{pram2value:choose(0):| (players only)}{pram3value:choose(0):| using power {pram3}}{pram4value:choose(0):| missing aura {pram4}}",
+        "types": "Unit",
+        "usable_with_script_types": "Creature,TimedActionList",
+        "parameters": [
+            {
+                "name": "Max distance",
+                "description": "If 0, no distance limit",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player only",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Power type",
+                "description": "If set, only consider units using this power type",
+                "type": "PowerOrDisabledParameter"
+            }
+        ],
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 5,
+        "name": "SMART_TARGET_HOSTILE_RANDOM_AC",
+        "name_readable": "Random hostile",
+        "parameters": [
+            {
+                "name": "Max Dist",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player Only",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Power Type",
+                "description": "If set, only consider units using this power type (0 = disabled)",
+                "type": "PowerOrDisabledParameter"
+            },
+            {
+                "name": "Aura",
+                "description": "If set, only consider units missing this aura",
+                "type": "SpellParameter"
+            }
+        ],
+        "description": "Random hostile{pram1value:choose(0):| within {pram1} yd}{pram2value:choose(0):| (players only)}{pram3value:choose(0):| using power {pram3}}{pram4value:choose(0):| missing aura {pram4}}",
+        "tags": [
+            "Azeroth"
+        ],
         "types": "Unit",
         "usable_with_script_types": "Creature,TimedActionList"
     },
@@ -56,7 +212,59 @@
         "name": "SMART_TARGET_HOSTILE_RANDOM_NOT_TOP",
         "name_readable": "Random hostile but top",
         "help": "Any random target except top threat",
-        "description": "Random hostile (not top)",
+        "description": "Random hostile (not top){pram1value:choose(0):| within {pram1} yd}{pram2value:choose(0):| (players only)}{pram3value:choose(0):| using power {pram3}}{pram4value:choose(0):| missing aura {pram4}}",
+        "types": "Unit",
+        "usable_with_script_types": "Creature,TimedActionList",
+        "parameters": [
+            {
+                "name": "Max distance",
+                "description": "If 0, no distance limit",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player only",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Power type",
+                "description": "If set, only consider units using this power type",
+                "type": "PowerOrDisabledParameter"
+            }
+        ],
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 6,
+        "name": "SMART_TARGET_HOSTILE_RANDOM_NOT_TOP_AC",
+        "name_readable": "Random hostile but top",
+        "parameters": [
+            {
+                "name": "Max Dist",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player Only",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Power Type",
+                "description": "If set, only consider units using this power type (0 = disabled)",
+                "type": "PowerOrDisabledParameter"
+            },
+            {
+                "name": "Aura",
+                "description": "If set, only consider units missing this aura",
+                "type": "SpellParameter"
+            }
+        ],
+        "description": "Random hostile (not top){pram1value:choose(0):| within {pram1} yd}{pram2value:choose(0):| (players only)}{pram3value:choose(0):| using power {pram3}}{pram4value:choose(0):| missing aura {pram4}}",
+        "tags": [
+            "Azeroth"
+        ],
         "types": "Unit",
         "usable_with_script_types": "Creature,TimedActionList"
     },
@@ -100,6 +308,82 @@
             }
         ],
         "description": "{pram1value:choose(0):Any creature|Creature {pram1}} in {pram2} - {pram3} yards",
+        "types": "Creature",
+        "tags": [
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 9,
+        "name": "SMART_TARGET_CREATURE_RANGE_AC",
+        "name_readable": "Creature in range",
+        "parameters": [
+            {
+                "name": "Creature",
+                "description": "Creature Entry to find",
+                "type": "CreatureParameter",
+                "required": true
+            },
+            {
+                "name": "Minimum distance",
+                "type": "Parameter"
+            },
+            {
+                "name": "Maximum distance",
+                "type": "Parameter"
+            },
+            {
+                "name": "Living state",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "alive and dead"
+                    },
+                    "1": {
+                        "name": "alive"
+                    },
+                    "2": {
+                        "name": "dead"
+                    }
+                }
+            }
+        ],
+        "description": "{pram1value:choose(0):Any creature|Creature {pram1}} in {pram2} - {pram3} yards{pram4value:choose(0|1|2):| (alive)| (dead)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "types": "Creature"
+    },
+    {
+        "id": 9,
+        "name": "SMART_TARGET_CREATURE_RANGE_TC",
+        "name_readable": "Creature in range",
+        "parameters": [
+            {
+                "name": "Creature",
+                "description": "Creature Entry to find",
+                "type": "CreatureParameter",
+                "required": true
+            },
+            {
+                "name": "Minimum distance",
+                "type": "Parameter"
+            },
+            {
+                "name": "Maximum distance",
+                "type": "Parameter"
+            },
+            {
+                "name": "Max targets",
+                "description": "Randomly keep at most this many targets (0 = all)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{pram1value:choose(0):Any creature|Creature {pram1}} in {pram2} - {pram3} yards{pram4value:choose(0):| (max {pram4} targets)}",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath"
+        ],
         "types": "Creature"
     },
     {
@@ -135,10 +419,76 @@
                 "name": "Distance",
                 "type": "Parameter",
                 "required": true
+            },
+            {
+                "name": "Max targets",
+                "description": "Randomly keep at most this many targets (0 = all)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{pram1value:choose(0):Any creature|Creature {pram1}} in {pram2} yd{pram3value:choose(0):| (max {pram3} targets)}",
+        "types": "Creature",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath"
+        ]
+    },
+    {
+        "id": 11,
+        "name": "SMART_TARGET_CREATURE_DISTANCE_AC",
+        "name_readable": "Creature in distance",
+        "parameters": [
+            {
+                "name": "Creature Entry",
+                "type": "CreatureParameter"
+            },
+            {
+                "name": "Distance",
+                "type": "Parameter"
+            },
+            {
+                "name": "Living state",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "alive and dead"
+                    },
+                    "1": {
+                        "name": "alive"
+                    },
+                    "2": {
+                        "name": "dead"
+                    }
+                }
+            }
+        ],
+        "description": "{pram1value:choose(0):Any creature|Creature {pram1}} in {pram2} yd{pram3value:choose(0|1|2):| (alive)| (dead)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "types": "Creature"
+    },
+    {
+        "id": 11,
+        "name": "SMART_TARGET_CREATURE_DISTANCE_TC_CATA",
+        "name_readable": "Creature in distance",
+        "parameters": [
+            {
+                "name": "Creature Entry",
+                "description": "Creature entry to find in given distance",
+                "type": "CreatureParameter"
+            },
+            {
+                "name": "Distance",
+                "type": "Parameter",
+                "required": true
             }
         ],
         "description": "{pram1value:choose(0):Any creature|Creature {pram1}} in {pram2} yd",
-        "types": "Creature"
+        "types": "Creature",
+        "tags": [
+            "TrinityCata"
+        ]
     },
     {
         "id": 12,
@@ -176,6 +526,42 @@
             }
         ],
         "description": "{pram1value:choose(0):Any gameobject|Gameobject {pram1}} in {pram2} - {pram3} yards",
+        "types": "GameObject",
+        "tags": [
+            "TrinityCata",
+            "Azeroth"
+        ]
+    },
+    {
+        "id": 13,
+        "name": "SMART_TARGET_GAMEOBJECT_RANGE_TC",
+        "name_readable": "Gameobject in range",
+        "parameters": [
+            {
+                "name": "Gameobject",
+                "description": "Gameobject Entry to find",
+                "type": "GameobjectParameter",
+                "required": true
+            },
+            {
+                "name": "Minimum distance",
+                "type": "Parameter"
+            },
+            {
+                "name": "Maximum distance",
+                "type": "Parameter"
+            },
+            {
+                "name": "Max targets",
+                "description": "Randomly keep at most this many targets (0 = all)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{pram1value:choose(0):Any gameobject|Gameobject {pram1}} in {pram2} - {pram3} yards{pram4value:choose(0):| (max {pram4} targets)}",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath"
+        ],
         "types": "GameObject"
     },
     {
@@ -211,10 +597,61 @@
                 "name": "Distance",
                 "type": "Parameter",
                 "required": true
+            },
+            {
+                "name": "Max targets",
+                "description": "Randomly keep at most this many targets (0 = all)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "{pram1value:choose(0):Any gameobject|Gameobject {pram1}} in {pram2} yd{pram3value:choose(0):| (max {pram3} targets)}",
+        "types": "GameObject",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath"
+        ]
+    },
+    {
+        "id": 15,
+        "name": "SMART_TARGET_GAMEOBJECT_DISTANCE_AC",
+        "name_readable": "Gameobject in distance",
+        "parameters": [
+            {
+                "name": "Gameobject Entry",
+                "type": "GameobjectParameter"
+            },
+            {
+                "name": "Distance",
+                "type": "Parameter"
             }
         ],
         "description": "{pram1value:choose(0):Any gameobject|Gameobject {pram1}} in {pram2} yd",
+        "tags": [
+            "Azeroth"
+        ],
         "types": "GameObject"
+    },
+    {
+        "id": 15,
+        "name": "SMART_TARGET_GAMEOBJECT_DISTANCE_TC_CATA",
+        "name_readable": "Gameobject in distance",
+        "parameters": [
+            {
+                "name": "Gameobject Entry",
+                "description": "Gameobject entry to find in given distance",
+                "type": "GameobjectParameter"
+            },
+            {
+                "name": "Distance",
+                "type": "Parameter",
+                "required": true
+            }
+        ],
+        "description": "{pram1value:choose(0):Any gameobject|Gameobject {pram1}} in {pram2} yd",
+        "types": "GameObject",
+        "tags": [
+            "TrinityCata"
+        ]
     },
     {
         "id": 16,
@@ -223,7 +660,28 @@
         "help": "If in group, target will be player who created a party, if not, it will be action invoker",
         "description": "{invoker}'s party",
         "types": "Player",
-        "is_invoker": true
+        "is_invoker": true,
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 16,
+        "name": "SMART_TARGET_INVOKER_PARTY_AC",
+        "name_readable": "Invoker's party",
+        "parameters": [
+            {
+                "name": "Include Pets",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "{invoker}'s party{pram1value:choose(0):| (including pets)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "types": "Player"
     },
     {
         "id": 17,
@@ -242,6 +700,35 @@
             }
         ],
         "description": "Players in {pram1} - {pram2} yards",
+        "types": "Player",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 17,
+        "name": "SMART_TARGET_PLAYER_RANGE_AC",
+        "name_readable": "Player in range",
+        "parameters": [
+            {
+                "name": "Min Dist",
+                "type": "Parameter"
+            },
+            {
+                "name": "Max Dist",
+                "type": "Parameter"
+            },
+            {
+                "name": "Max Count",
+                "type": "Parameter"
+            }
+        ],
+        "description": "Players in {pram1} - {pram2} yards{pram3value:choose(0):| (max {pram3} targets)}",
+        "tags": [
+            "Azeroth"
+        ],
         "types": "Player"
     },
     {
@@ -282,7 +769,54 @@
             }
         ],
         "description": "Closest {pram3value:choose(0):alive|dead} creature {pram1} in {pram2value:choose(0):100|{pram2}} yards",
-        "types": "Creature"
+        "types": "Creature",
+        "tags": [
+            "TrinityWrath",
+            "TrinityCata",
+            "Azeroth"
+        ]
+    },
+    {
+        "id": 19,
+        "name": "SMART_TARGET_CLOSEST_CREATURE_TC_MASTER",
+        "name_readable": "Closest creature",
+        "parameters": [
+            {
+                "name": "Creature",
+                "description": "Creature Entry to find",
+                "type": "CreatureParameter",
+                "required": true
+            },
+            {
+                "name": "Distance",
+                "description": "Maximum distance to check for creature. If 0, will find in 100 yards, but it is not recommended",
+                "type": "Parameter"
+            },
+            {
+                "name": "Alive state",
+                "description": "TrinityCore master's extended 4-state alive/dead filter (includes feign-death aware variants)",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "Alive (includes feign death)"
+                    },
+                    "1": {
+                        "name": "Dead (excludes feign death)"
+                    },
+                    "2": {
+                        "name": "Effectively alive (excludes feign death)"
+                    },
+                    "3": {
+                        "name": "Effectively dead (includes feign death)"
+                    }
+                }
+            }
+        ],
+        "description": "Closest {pram3value:choose(0|1|2|3):alive|dead|effectively alive|effectively dead} creature {pram1} in {pram2value:choose(0):100|{pram2}} yards",
+        "types": "Creature",
+        "tags": [
+            "TrinityMaster"
+        ]
     },
     {
         "id": 20,
@@ -302,6 +836,37 @@
             }
         ],
         "description": "Closest gameobject {pram1} in {pram2value:choose(0):100|{pram2}} yards",
+        "types": "GameObject",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 20,
+        "name": "SMART_TARGET_CLOSEST_GAMEOBJECT_AC",
+        "name_readable": "Closest gameobject",
+        "parameters": [
+            {
+                "name": "Entry",
+                "description": "Gameobject entry to find (0 = any)",
+                "type": "GameobjectParameter"
+            },
+            {
+                "name": "Dist",
+                "description": "Maximum distance to search (0 = 100 yards)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Only Spawned",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "Closest gameobject {pram1} in {pram2value:choose(0):100|{pram2}} yards{pram3value:choose(0):| (only spawned)}",
+        "tags": [
+            "Azeroth"
+        ],
         "types": "GameObject"
     },
     {
@@ -332,18 +897,32 @@
         "name": "SMART_TARGET_OWNER_OR_SUMMONER",
         "name_readable": "Owner or summoner",
         "help": "Unit's owner or summoner. Keep in mind in action Summon Creature, target is NOT summoner, the summoner is still scripted creature",
-        "description": "Owner/Summoner",
+        "description": "{pram1value:choose(0):Owner/Summoner|Owner of owner/summoner}",
         "types": "Unit",
-        "usable_with_script_types": "Creature,GameObject,TimedActionList"
+        "usable_with_script_types": "Creature,GameObject,TimedActionList",
+        "parameters": [
+            {
+                "name": "Owner of owner",
+                "description": "If set, targets the charmer/owner of the owner instead of the owner itself",
+                "type": "BoolParameter"
+            }
+        ]
     },
     {
         "id": 24,
         "name": "SMART_TARGET_THREAT_LIST",
         "name_readable": "All hostile",
         "help": "All units on creature's threat list",
-        "description": "Threat list",
+        "description": "Threat list{pram1value:choose(0):| within {pram1} yd}",
         "types": "Unit",
-        "usable_with_script_types": "Creature,TimedActionList"
+        "usable_with_script_types": "Creature,TimedActionList",
+        "parameters": [
+            {
+                "name": "Max distance",
+                "description": "If 0, no distance limit",
+                "type": "Parameter"
+            }
+        ]
     },
     {
         "id": 25,
@@ -417,6 +996,40 @@
         ],
         "description": "Farthest {pram2value:choose(0):creature|player} within {pram1} yards on the threat list",
         "types": "Unit",
+        "usable_with_script_types": "Creature,TimedActionList",
+        "tags": [
+            "TrinityMaster",
+            "TrinityWrath",
+            "TrinityCata"
+        ]
+    },
+    {
+        "id": 28,
+        "name": "SMART_TARGET_FARTHEST_AC",
+        "name_readable": "Farthest attacked unit",
+        "parameters": [
+            {
+                "name": "Max Dist",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player Only",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Is In Los",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Min Dist",
+                "type": "Parameter"
+            }
+        ],
+        "description": "Farthest {pram2value:choose(0):creature|player} within {pram1} yards on the threat list",
+        "tags": [
+            "Azeroth"
+        ],
+        "types": "Unit",
         "usable_with_script_types": "Creature,TimedActionList"
     },
     {
@@ -425,8 +1038,8 @@
         "name_readable": "Vehicle passenger",
         "parameters": [
             {
-                "name": "Seat",
-                "description": "SeatId of vehicle",
+                "name": "Seat mask",
+                "description": "Bitmask of seat IDs to match against the passenger's seat (bit N corresponds to seat N); 0 = any seat",
                 "type": "Parameter"
             }
         ],
@@ -438,6 +1051,48 @@
             "TrinityCata"
         ],
         "usable_with_script_types": "Creature,TimedActionList"
+    },
+    {
+        "id": 29,
+        "name": "SMART_TARGET_VEHICLE_ACCESSORY_AC",
+        "name_readable": "Vehicle passenger",
+        "parameters": [
+            {
+                "name": "Seat",
+                "description": "Single seat index of the vehicle passenger to fetch (NOT a bitmask, unlike other cores)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "Target unit in Seat {pram1}",
+        "types": "Unit",
+        "tags": [
+            "Azeroth"
+        ],
+        "usable_with_script_types": "Creature,TimedActionList"
+    },
+    {
+        "id": 30,
+        "name": "SMART_TARGET_CLOSEST_UNSPAWNED_GAMEOBJECT",
+        "name_readable": "Closest unspawned gameobject",
+        "parameters": [
+            {
+                "name": "Gameobject",
+                "description": "Gameobject Entry to find",
+                "type": "GameobjectParameter",
+                "required": true
+            },
+            {
+                "name": "Distance",
+                "description": "Maximum distance to check for gameobject. If 0, will find in 100 yards, but it is not recommended",
+                "type": "Parameter"
+            }
+        ],
+        "description": "Closest unspawned gameobject {pram1} in {pram2value:choose(0):100|{pram2}} yards",
+        "tags": [
+            "TrinityWrath",
+            "TrinityMaster"
+        ],
+        "types": "GameObject"
     },
     {
         "id": 201,
@@ -454,10 +1109,14 @@
             },
             {
                 "name": "Maximum distance",
-                "type": "Distance"
+                "type": "Parameter"
+            },
+            {
+                "name": "Minimum distance",
+                "type": "Parameter"
             }
         ],
-        "description": "Players {pram1}",
+        "description": "Players {pram2value:choose(0):with|without} aura {pram1}{pram3value:choose(0):| within {pram3} yd}",
         "types": "Player",
         "tags": [
             "Azeroth"
@@ -471,6 +1130,16 @@
             {
                 "name": "Range",
                 "type": "Parameter"
+            },
+            {
+                "name": "Amount",
+                "description": "Number of points (for summoning multiple creatures)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Self as center",
+                "description": "0 = use stored x/y/z, 1 = use self position as center",
+                "type": "BoolParameter"
             }
         ],
         "description": "random point withing {pram1} yd around ({x}, {y}, {z}{o:choose(0):|, {o}})",
@@ -493,9 +1162,15 @@
                 "name": "Role",
                 "type": "FlagParameter",
                 "values": {
-                    "1": "Tanks",
-                    "2": "Healers",
-                    "4": "Damage"
+                    "1": {
+                        "name": "Tanks"
+                    },
+                    "2": {
+                        "name": "Healers"
+                    },
+                    "4": {
+                        "name": "Damage"
+                    }
                 }
             },
             {
@@ -509,6 +1184,87 @@
             "Azeroth"
         ],
         "usable_with_script_types": "Creature,TimedActionList"
+    },
+    {
+        "id": 204,
+        "name": "SMART_TARGET_SUMMONED_CREATURES_AC",
+        "name_readable": "Summoned creatures",
+        "parameters": [
+            {
+                "name": "Creature",
+                "description": "0 = any summoned creature",
+                "type": "CreatureParameter"
+            }
+        ],
+        "description": "Summoned creatures{pram1value:choose(0):| with entry {pram1}}",
+        "tags": [
+            "Azeroth"
+        ],
+        "types": "Creature"
+    },
+    {
+        "id": 205,
+        "name": "SMART_TARGET_INSTANCE_STORAGE_AC",
+        "name_readable": "Instance storage",
+        "parameters": [
+            {
+                "name": "Instance data index",
+                "type": "Parameter"
+            },
+            {
+                "name": "Type",
+                "type": "SwitchParameter",
+                "values": {
+                    "1": {
+                        "name": "creature"
+                    },
+                    "2": {
+                        "name": "gameobject"
+                    }
+                }
+            }
+        ],
+        "description": "Object stored in instance data index {pram1}",
+        "tags": [
+            "Azeroth"
+        ],
+        "types": "Creature,GameObject"
+    },
+    {
+        "id": 206,
+        "name": "SMART_TARGET_FORMATION_AC",
+        "name_readable": "Formation",
+        "parameters": [
+            {
+                "name": "Type",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "members only"
+                    },
+                    "1": {
+                        "name": "leader only"
+                    },
+                    "2": {
+                        "name": "all"
+                    }
+                }
+            },
+            {
+                "name": "Creature entry",
+                "description": "0 = any",
+                "type": "CreatureParameter"
+            },
+            {
+                "name": "Exclude self",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "Formation {pram1value:choose(0|1|2):members|leader|members and leader}{pram2value:choose(0):| of {pram2}}{pram3value:choose(0):| (excluding self)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "types": "Creature"
     },
     {
         "id": 9999,

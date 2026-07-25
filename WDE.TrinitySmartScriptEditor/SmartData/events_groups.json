@@ -4,7 +4,10 @@
         "group_members": [
             "SMART_EVENT_UPDATE",
             "SMART_EVENT_UPDATE_IC",
-            "SMART_EVENT_UPDATE_OOC"
+            "SMART_EVENT_UPDATE_OOC",
+            "SMART_EVENT_UPDATE_AC",
+            "SMART_EVENT_UPDATE_IC_AC",
+            "SMART_EVENT_UPDATE_OOC_AC"
         ]
     },
     {
@@ -21,7 +24,9 @@
             "SMART_EVENT_CORPSE_REMOVED",
             "SMART_EVENT_EVADE",
             "SMART_EVENT_ACTION_DONE",
-            "SMART_EVENT_FRIENDLY_IS_CC"
+            "SMART_EVENT_FRIENDLY_IS_CC",
+            "SMART_EVENT_ON_DESPAWN",
+            "SMART_EVENT_ACTION_DONE_AC"
         ]
     },
     {
@@ -30,10 +35,11 @@
             "SMART_EVENT_ACCEPTED_QUEST",
             "SMART_EVENT_REWARD_QUEST",
             "SMART_EVENT_QUEST_ACCEPTED",
-            "SMART_EVENT_QUEST_OBJ_COPLETETION",
+            "SMART_EVENT_QUEST_OBJ_COMPLETION",
             "SMART_EVENT_QUEST_COMPLETION",
             "SMART_EVENT_QUEST_REWARDED",
-            "SMART_EVENT_QUEST_FAIL"
+            "SMART_EVENT_QUEST_FAIL",
+            "SMART_EVENT_QUEST_OBJ_COMPLETION_TC_MASTER"
         ]
     },
     {
@@ -47,7 +53,10 @@
             "SMART_EVENT_WAYPOINT_STOPPED",
             "SMART_EVENT_WAYPOINT_ENDED",
             "SMART_EVENT_REACHED_HOME",
-            "SMART_EVENT_FOLLOW_COMPLETED"
+            "SMART_EVENT_FOLLOW_COMPLETED",
+            "SMART_EVENT_WAYPOINT_REACHED_AC",
+            "SMART_EVENT_WAYPOINT_ENDED_AC",
+            "SMART_EVENT_MOVEMENTINFORM_AC"
         ]
     },
     {
@@ -64,7 +73,9 @@
             "SMART_EVENT_DUMMY_EFFECT",
             "SMART_EVENT_ON_SPELL_START",
             "SMART_EVENT_ON_SPELL_FAILED",
-            "SMART_EVENT_ON_SPELL_CAST"
+            "SMART_EVENT_ON_SPELL_CAST",
+            "SMART_EVENT_ON_AURA_APPLIED",
+            "SMART_EVENT_ON_AURA_REMOVED"
         ]
     },
     {
@@ -72,7 +83,8 @@
         "group_members": [
             "SMART_EVENT_SUMMONED_UNIT",
             "SMART_EVENT_SUMMON_DESPAWNED",
-            "SMART_EVENT_SUMMONED_UNIT_DIES"
+            "SMART_EVENT_SUMMONED_UNIT_DIES",
+            "SMART_EVENT_SUMMONED_UNIT_EVADE_AC"
         ]
     },
     {
@@ -81,7 +93,9 @@
             "SMART_EVENT_DAMAGED",
             "SMART_EVENT_DAMAGED_TARGET",
             "SMART_EVENT_CHARMED",
-            "SMART_EVENT_CHARMED_TARGET"
+            "SMART_EVENT_CHARMED_TARGET",
+            "SMART_EVENT_DAMAGED_AC",
+            "SMART_EVENT_DAMAGED_TARGET_AC"
         ]
     },
     {
@@ -89,7 +103,9 @@
         "group_members": [
             "SMART_EVENT_GOSSIP_SELECT",
             "SMART_EVENT_GOSSIP_HELLO",
-            "SMART_EVENT_GOSSIP_HELLO_TC_WRATH"
+            "SMART_EVENT_GOSSIP_HELLO_TC_WRATH",
+            "SMART_EVENT_GOSSIP_HELLO_TC_MASTER",
+            "SMART_EVENT_GOSSIP_HELLO_AC"
         ]
     },
     {
@@ -105,7 +121,9 @@
             "SMART_EVENT_RANGE",
             "SMART_EVENT_RANGE_AC",
             "SMART_EVENT_OOC_LOS",
+            "SMART_EVENT_OOC_LOS_TC_CATA",
             "SMART_EVENT_IC_LOS",
+            "SMART_EVENT_IC_LOS_TC_CATA",
             "SMART_EVENT_OOC_LOS_AC",
             "SMART_EVENT_IC_LOS_AC"
         ]
@@ -128,7 +146,8 @@
         "name": "Game events",
         "group_members": [
             "SMART_EVENT_GAME_EVENT_START",
-            "SMART_EVENT_GAME_EVENT_END"
+            "SMART_EVENT_GAME_EVENT_END",
+            "SMART_EVENT_SEND_EVENT_TRIGGER"
         ]
     },
     {
@@ -140,7 +159,8 @@
     {
         "name": "Areatrigger",
         "group_members": [
-            "SMART_EVENT_AREATRIGGER_ONTRIGGER"
+            "SMART_EVENT_AREATRIGGER_ONTRIGGER",
+            "SMART_EVENT_AREATRIGGER_EXIT"
         ]
     },
     {
@@ -154,21 +174,27 @@
             "SMART_EVENT_NEAR_UNIT_AC",
             "SMART_EVENT_NEAR_UNIT_NEGATION_AC",
             "SMART_EVENT_AREA_CASTING_AC",
-            "SMART_EVENT_AREA_RANGE_AC"
+            "SMART_EVENT_AREA_RANGE_AC",
+            "SMART_EVENT_IS_IN_MELEE_RANGE_AC",
+            "SMART_EVENT_IS_BEHIND_TARGET_AC"
         ]
     },
     {
         "name": "Health, mana",
         "group_members": [
             "SMART_EVENT_RECEIVE_HEAL",
-            "SMART_EVENT_HEALT_PCT",
+            "SMART_EVENT_HEALTH_PCT",
             "SMART_EVENT_MANA_PCT",
             "SMART_EVENT_TARGET_HEALTH_PCT",
             "SMART_EVENT_FRIENDLY_HEALTH",
             "SMART_EVENT_FRIENDLY_HEALTH_PCT",
             "SMART_EVENT_FRIENDLY_HEALTH_PCT_AC",
             "SMART_EVENT_FRIENDLY_HEALTH_PCT_TC_CATA",
-            "SMART_EVENT_TARGET_MANA_PCT"
+            "SMART_EVENT_TARGET_MANA_PCT",
+            "SMART_EVENT_TARGET_MANA_PCT_AC",
+            "SMART_EVENT_RECEIVE_HEAL_AC",
+            "SMART_EVENT_MANA_PCT_AC",
+            "SMART_EVENT_TARGET_HEALTH_PCT_AC"
         ]
     },
     {
@@ -198,7 +224,8 @@
         "group_members": [
             "SMART_EVENT_SCENE_START",
             "SMART_EVENT_SCENE_CANCEL",
-            "SMART_EVENT_SCENE_COMPLETE"
+            "SMART_EVENT_SCENE_COMPLETE",
+            "SMART_EVENT_SCENE_TRIGGER"
         ]
     }
 ]

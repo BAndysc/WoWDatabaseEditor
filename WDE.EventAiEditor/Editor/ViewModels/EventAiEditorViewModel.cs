@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,11 +26,10 @@ using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Utils;
-using WDE.Conditions.Data;
-using WDE.Conditions.Exporter;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
+using WDE.EventAiEditor.Acid;
 using WDE.EventAiEditor.Data;
 using WDE.EventAiEditor.Editor.UserControls;
 using WDE.EventAiEditor.Editor.ViewModels.Editing;
@@ -54,13 +54,12 @@ namespace WDE.EventAiEditor.Editor.ViewModels
         private readonly IEditorFeatures editorFeatures;
         private readonly ITeachingTipService teachingTipService;
         private readonly IMainThread mainThread;
-        private readonly IConditionEditService conditionEditService;
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly IEventAiInspectorService inspectorService;
         private readonly IParameterPickerService parameterPickerService;
         private readonly IMySqlExecutor mySqlExecutor;
+        private readonly IAcidFileService acidFileService;
         private readonly IEventAiDataManager eventAiDataManager;
-        private readonly IConditionDataManager conditionDataManager;
         private readonly IEventAiFactory eventAiFactory;
         private readonly IEventActionListProvider eventActionListProvider;
         private readonly IStatusBar statusbar;
@@ -94,7 +93,6 @@ namespace WDE.EventAiEditor.Editor.ViewModels
             IEventAggregator eventAggregator,
             IEventAiDataManager eventAiDataManager,
             IEventAiFactory eventAiFactory,
-            IConditionDataManager conditionDataManager,
             IItemFromListProvider itemFromListProvider,
             IEventActionListProvider eventActionListProvider,
             IStatusBar statusbar,
@@ -110,11 +108,11 @@ namespace WDE.EventAiEditor.Editor.ViewModels
             ITeachingTipService teachingTipService,
             IMainThread mainThread,
             ISolutionItemIconRegistry iconRegistry,
-            IConditionEditService conditionEditService,
             ICurrentCoreVersion currentCoreVersion,
             IEventAiInspectorService inspectorService,
             IParameterPickerService parameterPickerService,
-            IMySqlExecutor mySqlExecutor)
+            IMySqlExecutor mySqlExecutor,
+            IAcidFileService acidFileService)
         {
             History = history;
             this.database = databaseProvider;
@@ -134,12 +132,11 @@ namespace WDE.EventAiEditor.Editor.ViewModels
             this.editorFeatures = editorFeatures;
             this.teachingTipService = teachingTipService;
             this.mainThread = mainThread;
-            this.conditionEditService = conditionEditService;
             this.currentCoreVersion = currentCoreVersion;
             this.inspectorService = inspectorService;
             this.parameterPickerService = parameterPickerService;
             this.mySqlExecutor = mySqlExecutor;
-            this.conditionDataManager = conditionDataManager;
+            this.acidFileService = acidFileService;
             script = null!;
             this.item = null!;
             TeachingTips = null!;
@@ -780,6 +777,9 @@ namespace WDE.EventAiEditor.Editor.ViewModels
                 statusbar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));
 
                 History.MarkAsSaved();
+                USAGE.Count("document_saved", ("document", "EventAiEditor"));
+
+                await TryUpdateAcidFile();
             }
             catch (Exception e)
             {
@@ -787,6 +787,37 @@ namespace WDE.EventAiEditor.Editor.ViewModels
                 await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetTitle("Error")
                     .SetMainInstruction("Couldn't save to database")
+                    .SetContent(e.Message)
+                    .WithOkButton(true).Build());
+            }
+        }
+
+        private async Task TryUpdateAcidFile()
+        {
+            if (!acidFileService.IsEnabled)
+                return;
+
+            if (item.EntryOrGuid < 0)
+            {
+                statusbar.PublishNotification(new PlainNotification(NotificationType.Info,
+                    "ACID file not updated: per-guid scripts are not part of the ACID file"));
+                return;
+            }
+
+            try
+            {
+                var lines = EventAiExporter.ToDatabaseCompatibleEventAi(script);
+                var creatureName = (await database.GetCreatureTemplate((uint)item.EntryOrGuid))?.Name;
+                var path = await acidFileService.SaveScriptAsync(item.EntryOrGuid, creatureName, lines);
+                statusbar.PublishNotification(new PlainNotification(NotificationType.Success,
+                    $"Saved to database and updated {Path.GetFileName(path)}"));
+            }
+            catch (Exception e)
+            {
+                statusbar.PublishNotification(new PlainNotification(NotificationType.Error, "Failed to update the ACID file"));
+                await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetTitle("Error")
+                    .SetMainInstruction("Saved to database, but couldn't update the ACID file")
                     .SetContent(e.Message)
                     .WithOkButton(true).Build());
             }

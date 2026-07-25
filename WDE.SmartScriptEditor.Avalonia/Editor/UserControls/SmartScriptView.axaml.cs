@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -38,7 +40,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         }
 
         private List<object> temporaryMenuItems = new();
-        
+        private static PropertyInfo pointerOverElementProperty;
+
+        static SmartScriptView()
+        {
+            pointerOverElementProperty = typeof(IInputRoot).GetProperty("PointerOverElement",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) ?? throw new Exception("Can't find PointerOverElement:/");
+        }
+
         private void Control_OnContextRequested(object? sender, ContextRequestedEventArgs e)
         {
             var panel = this.FindControl<VirtualizedSmartScriptPanel>("SmartPanel");
@@ -58,8 +67,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 return;
 
             var smartDataManager = dataContext.SmartDataManager;
-            var topLevel = control.GetVisualRoot() as TopLevel;
-            var pointerOverElement = topLevel?.GetValue(TopLevel.PointerOverElementProperty);
+
+            var pointerOverElement = pointerOverElementProperty!.GetValue(control.GetPresentationSource());
 
             var dynamicMenuItems = dataContext.GetDynamicContextMenuForSelected();
             

@@ -16,9 +16,9 @@
         "group_members": [
             "ACTION_T_QUEST_EVENT",
             "ACTION_T_KILLED_MONSTER",
-            "ACTION_T_QUEST_CASTCREATUREGO",
+            "ACTION_T_CAST_EVENT",
             "ACTION_T_QUEST_EVENT_ALL",
-            "ACTION_T_CASTCREATUREGO_ALL"
+            "ACTION_T_CAST_EVENT_ALL"
         ]
     },
     {

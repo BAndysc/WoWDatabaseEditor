@@ -38,6 +38,14 @@ namespace WDE.EventAiEditor.Data
                 parameterFactory.Register("EventAiPhaseParameter", EventAiPhaseParameter.Instance);
                 parameterFactory.RegisterCombined("MangosEventAiEmoteParameter", "EmoteOneShotParameter", "EmoteStateParameter", (a, b) => new MangosEmoteParameter(a, b));
                 parameterFactory.RegisterCombined("EventAiSetFieldValueParameter", "ItemParameter", "DynamicFlagsParameter", "NpcFlagParameter", (a, b, c) => new EventAiSetFieldValueParameter(parameterPickerService, a, b, c));
+                // EVENT_T_SPAWNED "Map or zone/area id": meaning depends on sibling "Condition" (param index 0) —
+                // 0=Always (unused), 1=Map (SpawnedEventMode::SPAWNED_EVENT_MAP), 2=Zone (SPAWNED_EVENT_ZONE).
+                parameterFactory.RegisterCombined("SpawnedEventConditionValueParameter", new[] { "Parameter", "MapParameter", "ZoneAreaParameter" },
+                    prams => new SwitchedByParameter(0, new Dictionary<long, IParameter<long>> { [0] = prams[0], [1] = prams[1], [2] = prams[2] }, prams[0]));
+                // EVENT_T_FRIENDLY_HP "HP deficit": a raw HP amount when sibling "Is percent" (param index 4) = 0,
+                // or a percentage when Is percent = 1.
+                parameterFactory.RegisterCombined("FriendlyHpDeficitParameter", new[] { "Parameter", "PercentageParameter" },
+                    prams => new SwitchedByParameter(4, new Dictionary<long, IParameter<long>> { [0] = prams[0], [1] = prams[1] }, prams[0]));
             }
         }
 

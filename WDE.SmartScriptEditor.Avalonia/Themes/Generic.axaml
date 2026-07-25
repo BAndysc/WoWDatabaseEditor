@@ -205,8 +205,8 @@
                 <Border Name="PART_Var" BorderThickness="1" DockPanel.Dock="Top" Padding="5">
                     <DockPanel LastChildFill="True">
                         <Image MinWidth="15" Source="{StaticResource BoxIcons.RegularWorld}" Width="15" Height="15" Margin="0,0,5,0"/>
-                        <TextBlock TextWrapping="Wrap" IsVisible="{Binding Comment, Converter={StaticResource EmptyStringToBoolConverter}}" DockPanel.Dock="Right" Opacity="0.8" FontStyle="Italic" MaxWidth="300" MinWidth="60" Text="{Binding Comment, Mode=OneWay}" />
-                        <TextBlock TextWrapping="Wrap" MinWidth="60" Text="{Binding Readable, Mode=OneWay}" />
+                        <TextBlock TextWrapping="Wrap" IsVisible="{ReflectionBinding Comment, Converter={StaticResource EmptyStringToBoolConverter}}" DockPanel.Dock="Right" Opacity="0.8" FontStyle="Italic" MaxWidth="300" MinWidth="60" Text="{ReflectionBinding Comment, Mode=OneWay}" />
+                        <TextBlock TextWrapping="Wrap" MinWidth="60" Text="{ReflectionBinding Readable, Mode=OneWay}" />
                     </DockPanel>
                 </Border>
             </ControlTemplate>
@@ -254,7 +254,7 @@
                                     </views:ParameterDataTemplateSelector.Generic>
                                     <views:ParameterDataTemplateSelector.ButtonParameter>
                                         <DataTemplate>
-                                            <Button Command="{Binding Command}" Content="{Binding ActionName}" />
+                                            <Button Command="{ReflectionBinding Command}" Content="{ReflectionBinding ActionName}" />
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.ButtonParameter>
                                     <views:ParameterDataTemplateSelector.NumberedButtonParameter>

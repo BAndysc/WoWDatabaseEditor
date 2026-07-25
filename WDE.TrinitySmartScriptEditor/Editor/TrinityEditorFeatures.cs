@@ -23,7 +23,7 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public ParametersCount ConditionParametersCount { get; } = new ParametersCount(3, 0, 1);
         public ParametersCount EventParametersCount { get; } = new ParametersCount(5, 0, 0);
         public ParametersCount ActionParametersCount { get; } = new ParametersCount(7, 0, 0);
-        public ParametersCount TargetParametersCount { get; } = new ParametersCount(3, 4, 0);
+        public ParametersCount TargetParametersCount { get; } = new ParametersCount(4, 4, 0);
         public IParameter<long> ConditionTargetParameter { get; }
         public IParameter<long> EventFlagsParameter => SmartEventFlagParameter.Instance;
         public int TargetConditionId => -1;
@@ -41,7 +41,7 @@ namespace WDE.TrinitySmartScriptEditor.Editor
 
     [AutoRegister]
     [SingleInstance]
-    [RequiresCore("TrinityWrath", "TrinityCata")]
+    [RequiresCore("TrinityWrath")]
     public class TrinityWrathEditorFeatures : IEditorFeatures
     {
         public string Name => "TC";
@@ -51,7 +51,39 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public bool SupportsEventTimerId => false;
         public bool SourceHasPosition => false;
         public ParametersCount ConditionParametersCount { get; } = new ParametersCount(3, 0, 1);
-        public ParametersCount EventParametersCount { get; } = new ParametersCount(4, 0, 0);
+        // this (backported) TrinityWrath schema has event_param5, action_param1-6 and target_param4
+        public ParametersCount EventParametersCount { get; } = new ParametersCount(5, 0, 0);
+        public ParametersCount ActionParametersCount { get; } = new ParametersCount(6, 0, 0);
+        public ParametersCount TargetParametersCount { get; } = new ParametersCount(4, 4, 0);
+        public IParameter<long> ConditionTargetParameter { get; }
+        public IParameter<long> EventFlagsParameter => SmartEventFlagParameter.Instance;
+        public int TargetConditionId => -1;
+        public int? NonBreakableLinkFlag => null;
+
+        public TrinityWrathEditorFeatures(ICurrentCoreVersion coreVersion)
+        {
+            var conditionTargetParam = new Parameter();
+            conditionTargetParam.Items = new Dictionary<long, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
+            if (coreVersion.Current.SmartScriptFeatures.SupportsConditionTargetVictim)
+                conditionTargetParam.Items.Add(2, new SelectOption("Victim"));
+            ConditionTargetParameter = conditionTargetParam;
+        }
+    }
+
+    [AutoRegister]
+    [SingleInstance]
+    [RequiresCore("TrinityCata")]
+    public class TrinityCataEditorFeatures : IEditorFeatures
+    {
+        public string Name => "TC";
+        public bool SupportsSource => false;
+        public bool SupportsEventCooldown => false;
+        public bool SupportsTargetCondition => false;
+        public bool SupportsEventTimerId => false;
+        public bool SourceHasPosition => false;
+        public ParametersCount ConditionParametersCount { get; } = new ParametersCount(3, 0, 1);
+        // TrinityCata (CPP) smart_scripts has event_param5 (los.playerOnly, friendlyHealthPct.repeatMax)
+        public ParametersCount EventParametersCount { get; } = new ParametersCount(5, 0, 0);
         public ParametersCount ActionParametersCount { get; } = new ParametersCount(6, 0, 0);
         public ParametersCount TargetParametersCount { get; } = new ParametersCount(3, 4, 0);
         public IParameter<long> ConditionTargetParameter { get; }
@@ -59,7 +91,7 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public int TargetConditionId => -1;
         public int? NonBreakableLinkFlag => null;
 
-        public TrinityWrathEditorFeatures(ICurrentCoreVersion coreVersion)
+        public TrinityCataEditorFeatures(ICurrentCoreVersion coreVersion)
         {
             var conditionTargetParam = new Parameter();
             conditionTargetParam.Items = new Dictionary<long, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
@@ -83,7 +115,8 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public ParametersCount ConditionParametersCount { get; } = new ParametersCount(3, 0, 0);
         public ParametersCount EventParametersCount { get; } = new ParametersCount(6, 0, 0);
         public ParametersCount ActionParametersCount { get; } = new ParametersCount(6, 0, 0);
-        public ParametersCount TargetParametersCount { get; } = new ParametersCount(3, 4, 0);
+        // AzerothCore smart_scripts has target_param4
+        public ParametersCount TargetParametersCount { get; } = new ParametersCount(4, 4, 0);
         public IParameter<long> ConditionTargetParameter { get; }
         public IParameter<long> EventFlagsParameter => SmartEventFlagParameter.Instance;
         public int TargetConditionId => -1;

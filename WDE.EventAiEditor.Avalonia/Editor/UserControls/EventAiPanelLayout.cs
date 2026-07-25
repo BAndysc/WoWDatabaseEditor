@@ -219,6 +219,8 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
 
         private bool AnythingSelected()
         {
+            if (Script == null)
+                return false;
             foreach (var e in Script.Events)
             {
                 if (e.IsSelected)
@@ -258,6 +260,8 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
 
         public override void Render(DrawingContext dc)
         {
+            if (Script == null)
+                return;
             if (AnythingSelected())
             {
                 if (draggingActions)
@@ -458,7 +462,9 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
             {
                 addActionPresenter?.Arrange(new Rect(-5, -5, 1, 1));
             }
-            
+
+            if (Script == null)
+                return default;
             float lastHeight = 0;
             float selectedHeight = 0;
             int eventIndex = 0;
@@ -604,9 +610,9 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
             InvalidateArrange();
         }
 
-        public EventAiScript Script
+        public EventAiScript? Script
         {
-            get => (EventAiScript?) GetValue(ScriptProperty) ?? throw new NullReferenceException();
+            get => (EventAiScript?) GetValue(ScriptProperty);
             set => SetValue(ScriptProperty, value);
         }
 

@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.Common.Utils;
-using WDE.Conditions.Data;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WDE.EventAiEditor.Data;
@@ -91,12 +90,11 @@ namespace WDE.EventAiEditor.Editor.ViewModels
             Func<EventActionGenericJsonData, bool> predicate,
             List<(uint, string)>? customItems,
             IEventAiDataManager eventAiDataManager,
-            IConditionDataManager conditionDataManager,
             IFavouriteEventAiService favourites)
         {
             this.favourites = favourites;
             Title = title;
-            MakeItems(type, predicate, customItems, eventAiDataManager, conditionDataManager);
+            MakeItems(type, predicate, customItems, eventAiDataManager);
 
             AutoDispose(this.WhenValueChanged(t => t.SearchBox)!
                 .SubscribeAction(text =>
@@ -172,11 +170,10 @@ namespace WDE.EventAiEditor.Editor.ViewModels
             }
         }
         
-        private void MakeItems(EventOrAction type, 
-            Func<EventActionGenericJsonData, bool> predicate, 
+        private void MakeItems(EventOrAction type,
+            Func<EventActionGenericJsonData, bool> predicate,
             List<(uint id, string name)>? customItems,
-            IEventAiDataManager eventAiDataManager, 
-            IConditionDataManager conditionDataManager)
+            IEventAiDataManager eventAiDataManager)
         {
             int order = 0;
             foreach (var group in eventAiDataManager.GetGroupsData(type))

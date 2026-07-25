@@ -1840,6 +1840,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ApplySavedDatabaseEventId();
 
             History.MarkAsSaved();
+            USAGE.Count("document_saved", ("document", "SmartScriptEditor"));
 
             if (Breakpoints != null)
                 await Breakpoints.ResyncBreakpoints();

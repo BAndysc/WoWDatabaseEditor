@@ -22,7 +22,7 @@
             }
         ],
         "is_timed": true,
-        "description": "When in combat and timer at the beginning between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
+        "description": "When in combat and timer at the beginning between {pram1} and {pram2} seconds (and later repeats every {pram3} and {pram4} seconds)",
         "name_readable": "Every X seconds (in combat)",
         "builtin_rules": [
             "minmax(1, 2)",
@@ -64,11 +64,11 @@
         "search_tags": "timer ooc",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "FloatParameter",
                 "name": "InitialMin"
             },
             {
-                "type": "Parameter",
+                "type": "FloatParameter",
                 "name": "InitialMax"
             },
             {
@@ -81,7 +81,7 @@
             }
         ],
         "is_timed": true,
-        "description": "When out of combat and timer at the beginning between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
+        "description": "When out of combat and timer at the beginning between {pram1} and {pram2} seconds (and later repeats every {pram3} and {pram4} seconds)",
         "name_readable": "Every X seconds (out of combat)",
         "builtin_rules": [
             "minmax(1, 2)",
@@ -136,10 +136,14 @@
             {
                 "type": "FloatParameter",
                 "name": "Repeat Max"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Allow out of combat"
             }
         ],
         "is_timed": true,
-        "description": "When HP is between {pram2} and {pram1}",
+        "description": "When HP is between {pram2} and {pram1}{pram5value:choose(0):| (also checked out of combat)}",
         "name_readable": "When HP between",
         "builtin_rules": [
             "maxmin(1, 2)",
@@ -147,11 +151,11 @@
         ],
         "description_rules": [
             {
-                "description": "When HP is between {pram2} and {pram1} (once)",
+                "description": "When HP is between {pram2} and {pram1} (once){pram5value:choose(0):| (also OOC)}",
                 "condition": "event.param(3) == 0 && event.param(4) == 0"
             },
             {
-                "description": "When HP is between {pram2} and {pram1} (repeat every {pram3}-{pram4} seconds)",
+                "description": "When HP is between {pram2} and {pram1} (repeat every {pram3}-{pram4} seconds){pram5value:choose(0):| (also OOC)}",
                 "condition": "event.param(4) > 0"
             }
         ]
@@ -178,7 +182,7 @@
             }
         ],
         "is_timed": true,
-        "description": "When mana is between {pram2} and {pram1}%",
+        "description": "When mana is between {pram2} and {pram1}",
         "name_readable": "When mana between",
         "builtin_rules": [
             "maxmin(1, 2)",
@@ -186,11 +190,11 @@
         ],
         "description_rules": [
             {
-                "description": "When mana is between {pram2} and {pram1}% (once)",
+                "description": "When mana is between {pram2} and {pram1} (once)",
                 "condition": "event.param(3) == 0 && event.param(4) == 0"
             },
             {
-                "description": "When mana is between {pram2} and {pram1}% (repeat every {pram3}-{pram4} seconds}})",
+                "description": "When mana is between {pram2} and {pram1} (repeat every {pram3}-{pram4} seconds)",
                 "condition": "event.param(4) > 0"
             }
         ]
@@ -257,7 +261,7 @@
                 "name": "Spell"
             },
             {
-                "type": "SpellSchoolParameter",
+                "type": "SpellSchoolMaskParameter",
                 "name": "School mask"
             },
             {
@@ -337,7 +341,6 @@
                 "name": "ConditionId"
             }
         ],
-        "is_timed": true,
         "description": "When {pram1value:choose(0):hostile|friendly} {pram5value:choose(0):unit|player} in range {pram2} yd LOS{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
         "name_readable": "Unit in LOS (OOC)",
         "builtin_rules": [
@@ -349,12 +352,17 @@
         "name": "EVENT_T_SPAWNED",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "Condition"
+                "type": "SwitchParameter",
+                "name": "Condition",
+                "values": {
+                    "0": "always",
+                    "1": "map specific",
+                    "2": "zone/area specific"
+                }
             },
             {
-                "type": "Parameter",
-                "name": "Condition value"
+                "type": "SpawnedEventConditionValueParameter",
+                "name": "Map or zone/area id"
             }
         ],
         "description": "On spawned or respawned",
@@ -382,7 +390,7 @@
             }
         ],
         "is_timed": true,
-        "description": "When victim's HP between {pram2}-{pram1}%{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "description": "When victim's HP between {pram2}-{pram1}{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
         "name_readable": "Target's HP",
         "builtin_rules": [
             "maxmin(1, 2)",
@@ -414,7 +422,7 @@
         "name": "EVENT_T_FRIENDLY_HP",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "FriendlyHpDeficitParameter",
                 "name": "HP deficit"
             },
             {
@@ -447,7 +455,7 @@
         "parameters": [
             {
                 "type": "Parameter",
-                "name": "DispelType"
+                "name": "DispelType (unused)"
             },
             {
                 "type": "Parameter",
@@ -490,12 +498,17 @@
                 "name": "Cooldown max"
             },
             {
-                "type": "BoolParameter",
-                "name": "In combat"
+                "type": "SwitchParameter",
+                "name": "In combat",
+                "values": {
+                    "0": "only in combat",
+                    "1": "in and out of combat",
+                    "2": "only out of combat"
+                }
             }
         ],
         "is_timed": true,
-        "description": "When friendly unit within {pram2} yd has aura {pram1} missing [{pram5value:choose(0):OOC|IC}]{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "description": "When friendly unit within {pram2} yd has aura {pram1} missing [{pram5value:choose(0|1):IC only|IC/OOC|OOC only}]{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
         "name_readable": "Friendly is missing buff",
         "builtin_rules": [
             "minmax(3, 4)"
@@ -546,7 +559,7 @@
             }
         ],
         "is_timed": true,
-        "description": "When victim's mana between {pram2}-{pram1}%{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "description": "When victim's mana between {pram2}-{pram1}{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
         "name_readable": "Target's mana",
         "builtin_rules": [
             "maxmin(1, 2)",
@@ -566,6 +579,10 @@
             {
                 "type": "TextEmoteParameter",
                 "name": "Emote"
+            },
+            {
+                "type": "Parameter",
+                "name": "ConditionId"
             }
         ],
         "description": "On emote {pram1} received",
@@ -604,7 +621,7 @@
         "name": "EVENT_T_TARGET_AURA",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "SpellParameter",
                 "name": "SpellID"
             },
             {
@@ -752,7 +769,7 @@
             }
         ],
         "is_timed": true,
-        "description": "When timer at the beginning between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
+        "description": "When timer at the beginning between {pram1} and {pram2} seconds (and later repeats every {pram3} and {pram4} seconds)",
         "name_readable": "Every X seconds",
         "builtin_rules": [
             "minmax(1, 2)",
@@ -799,6 +816,14 @@
             {
                 "type": "CreatureParameter",
                 "name": "Sender"
+            },
+            {
+                "type": "Parameter",
+                "name": "(unused)"
+            },
+            {
+                "type": "Parameter",
+                "name": "(unused)"
             }
         ],
         "description": "On event {pram1}{pram2value:choose(0):| from creature {pram2}} received",
@@ -826,10 +851,10 @@
             }
         ],
         "is_timed": true,
-        "description": "When enery between {pram1value} and {pram2value}%{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "description": "When energy between {pram2}-{pram1}{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
         "name_readable": "Energy between",
         "builtin_rules": [
-            "minmax(1, 2)",
+            "maxmin(1, 2)",
             "minmax(3, 4)"
         ]
     },
@@ -911,7 +936,7 @@
                 "name": "Spell"
             },
             {
-                "type": "SpellSchoolParameter",
+                "type": "SpellSchoolMaskParameter",
                 "name": "School mask"
             },
             {

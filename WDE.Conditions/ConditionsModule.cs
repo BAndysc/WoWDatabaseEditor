@@ -5,8 +5,10 @@ using WDE.Common.Events;
 using WDE.Common.Parameters;
 using WDE.Conditions.ViewModels;
 using WDE.Module;
+using WDE.Module.Attributes;
 
 [assembly: InternalsVisibleTo("WDE.Conditions.Avalonia")]
+[assembly: ModuleRequiresCore("TrinityWrath", "TrinityCata", "TrinityMaster", "Azeroth")]
 namespace WDE.Conditions
 {
     public class ConditionsModule : ModuleBase
