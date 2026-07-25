@@ -112,8 +112,8 @@ namespace WDE.Common.Avalonia.Controls
                         Padding = new Thickness(7,5,7,5),
                         VerticalAlignment = VerticalAlignment.Stretch,
                         HorizontalAlignment = HorizontalAlignment.Stretch,
-                        [~ToggleButton.IsCheckedProperty] = new Binding("IsChecked", BindingMode.TwoWay),
-                        [!ToolTip.TipProperty] = new Binding("OptionValue") {Converter = IntToHexStringConverter.Instance}
+                        [~ToggleButton.IsCheckedProperty] = new ReflectionBinding("IsChecked"){Mode = BindingMode.TwoWay},
+                        [!ToolTip.TipProperty] = new ReflectionBinding("OptionValue") {Converter = IntToHexStringConverter.Instance}
                     };
 
                     return checkBox;

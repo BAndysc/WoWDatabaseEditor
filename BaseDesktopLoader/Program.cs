@@ -6,10 +6,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using AsyncAwaitBestPractices;
 using Avalonia;
-using Avalonia.ReactiveUI;
-using Avalonia.Threading;
-using Projektanker.Icons.Avalonia;
-using Projektanker.Icons.Avalonia.MaterialDesign;
+using Optris.Icons.Avalonia;
+using Optris.Icons.Avalonia.MaterialDesign;
+using ReactiveUI.Avalonia;
 using WDE.Common;
 using WDE.Common.Tasks;
 using WoWDatabaseEditorCore;
@@ -120,9 +119,9 @@ namespace BaseDesktopLoader
                 .UsePlatformDetect()
                 .With(new AvaloniaNativePlatformOptions()
                 {
-                    RenderingMode = new[] { /*AvaloniaNativeRenderingMode.Metal, */AvaloniaNativeRenderingMode.OpenGl, AvaloniaNativeRenderingMode.Software }
+                    RenderingMode = new[] { AvaloniaNativeRenderingMode.Metal /* AvaloniaNativeRenderingMode.OpenGl, AvaloniaNativeRenderingMode.Software 3D does not work without Metal */ }
                 })
-                .UseReactiveUI()
+                .UseReactiveUI(_ => { })
                 .LogToTrace();
 
             return configuration;

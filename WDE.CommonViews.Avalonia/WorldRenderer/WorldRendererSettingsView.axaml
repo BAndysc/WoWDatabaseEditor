@@ -3,10 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
-             xmlns:viewModels="clr-namespace:WDE.MPQ.ViewModels;assembly=WDE.MPQ"
+             xmlns:viewModels="clr-namespace:WDE.MapRenderer;assembly=WDE.MapRenderer"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:DataType="viewModels:MpqSettingsViewModel"
-             x:Class="WDE.CommonViews.Avalonia.Mpq.MpqSettingsView">
+             x:DataType="viewModels:WorldRendererSettingsViewModel"
+             x:Class="WDE.CommonViews.Avalonia.WorldRenderer.WorldRendererSettingsView">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical">
             <SettingsHeader Text="Client files" />
@@ -19,6 +19,12 @@
                 </SettingItem>
                 <SettingItem Header="Archive open mode" Help="Stormlib has better compatibility, but might be slower. Doesn't matter if you select > MoP client.">
                     <ComboBox ItemsSource="{CompiledBinding MpqOpenTypes}" SelectedItem="{CompiledBinding MpqOpenType}" />
+                </SettingItem>
+            </StackPanel>
+            <SettingsHeader Text="3D view" />
+            <StackPanel Grid.IsSharedSizeScope="True">
+                <SettingItem Header="Render mode" Help="Multithreaded is more experimental and error prone, but more performant. Avalonia Synchronized should be more reliable, but slower. Applies to newly opened 3D views.">
+                    <ComboBox ItemsSource="{CompiledBinding RenderPanelModes}" SelectedItem="{CompiledBinding RenderPanelMode}" />
                 </SettingItem>
             </StackPanel>
         </StackPanel>

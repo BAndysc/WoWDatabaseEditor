@@ -123,7 +123,7 @@ public class EditableTextBlock : TemplatedControl
         else
             textBox.SelectionStart = textBox.SelectionEnd = textBox.Text.Length;
 
-        if (this.GetVisualRoot() is TopLevel toplevel)
+        if (TopLevel.GetTopLevel(this) is { } toplevel)
         {
             clickDisposable = toplevel.AddDisposableHandler(PointerPressedEvent, (s, ev) =>
             {

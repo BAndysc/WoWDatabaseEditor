@@ -14,6 +14,7 @@
           xmlns:quickAccess="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.QuickAccess"
           xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
           xmlns:profiles1="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.Profiles"
+          xmlns:commonControls="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia"
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           mvvm:ViewModelLocator.AutoWireViewModel="True"
           x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindowWithDocking"
@@ -23,7 +24,6 @@
           Name="Root"
           MinWidth="1000"
           ExtendClientAreaToDecorationsHint="True"
-          Chrome="NoSystemChrome"
           SubTitle="{CompiledBinding Subtitle}"
           Classes="MainWindow"
           x:DataType="viewModels:MainWindowViewModel"
@@ -73,6 +73,9 @@
         </Style>
         <Style Selector="ExtendedWindow.win11 :is(Control).HideWin11">
             <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="commonControls|ToolBarButton">
+            <Setter Property="TextPlacement" Value="{DynamicResource ButtonImageTextPlacement}" />
         </Style>
 
         <Style Selector="FlyoutPresenter.global-search-flyout">

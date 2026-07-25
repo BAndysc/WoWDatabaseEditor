@@ -4,6 +4,6 @@
     <Style Selector="NativeMenuBar MenuItem">
         <Setter Property="HotKey" Value="{Binding Gesture}" /> 
         <Setter Property="IsChecked" Value="{Binding IsChecked}"></Setter>
-        <Setter Property="ToggleType" Value="{Binding ToggleType, Converter={x:Static converters:NativeMenuItemToggleTypeToMenuItemToggleTypeConverter.Instance}}" />
+        <Setter Property="ToggleType" Value="{Binding ToggleType}" />
     </Style>
 </Styles>

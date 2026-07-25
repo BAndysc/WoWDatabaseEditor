@@ -135,7 +135,7 @@ public partial class VirtualizedVeryFastTableView : RenderedPanel, ICustomKeyboa
     public VirtualizedVeryFastTableView()
     {
         UpdateKeyBindings();
-        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.SubpixelAntialias);
+        TextOptions.SetTextRenderingMode(this, TextRenderingMode.SubpixelAntialias);
     }
     
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -532,8 +532,7 @@ public partial class VirtualizedVeryFastTableView : RenderedPanel, ICustomKeyboa
             }
             if (Application.Current?.ApplicationLifetime is ISingleViewApplicationLifetime viewApp)
             {
-                var visualRoot = viewApp.MainView?.GetVisualRoot();
-                return visualRoot as TopLevel;
+                return viewApp.MainView != null ? TopLevel.GetTopLevel(viewApp.MainView) : null;
             }
             return null;
         }

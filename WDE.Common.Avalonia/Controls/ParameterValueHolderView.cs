@@ -48,7 +48,7 @@ namespace WDE.Common.Avalonia.Controls
             set => SetAndRaise(SpecialCopyingProperty, ref specialCopying, value);
         }
 
-        protected override void OnGotFocus(GotFocusEventArgs e)
+        protected override void OnGotFocus(FocusChangedEventArgs e)
         {
             base.OnGotFocus(e);
             if (ReferenceEquals(e.Source, this))

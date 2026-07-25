@@ -93,7 +93,7 @@
         </Template>
     </ClassicWindow.Resources>
     <Panel>
-        <gif:GifImage Width="124" Height="92" Source="avares://WoWDatabaseEditorCore.Avalonia.GUI/Clippy/clippy.gif" Name="Clippy">
+        <gif:GifImage Width="124" Height="92" Name="Clippy">
         </gif:GifImage>
     </Panel>
 </ClassicWindow>

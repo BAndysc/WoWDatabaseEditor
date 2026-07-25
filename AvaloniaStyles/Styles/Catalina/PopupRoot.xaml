@@ -6,7 +6,7 @@
         <ControlTemplate>
             <Panel>
                 <Border Name="PART_TransparencyFallback" IsHitTestVisible="False" Background="Transparent" />
-                <VisualLayerManager IsPopup="True">
+                <VisualLayerManager IsPopup="True" Name="PART_VisualLayerManager">
                     <ContentPresenter Name="PART_ContentPresenter"
                                       BorderThickness="0.5"
                                       BorderBrush="{DynamicResource TitleBarSeparatorBrush}"

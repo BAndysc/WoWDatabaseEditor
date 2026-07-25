@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:personalGuidService="clr-namespace:WoWDatabaseEditorCore.Services.PersonalGuidService;assembly=WoWDatabaseEditorCore"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="250"
+             x:DataType="personalGuidService:PersonalGuidRangeConfigurationViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.PersonalGuidService.PersonalGuidRangeConfigurationView">
+    <StackPanel>
+        <SettingItem Header="Start guid">
+            <TextBox Text="{CompiledBinding StartGuid, Mode=TwoWay}" />
+        </SettingItem>
+        <SettingItem Header="Current guid">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Command="{CompiledBinding ResetCounter}">Reset</Button>
+                <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="{CompiledBinding CurrentGuid}" />
+            </DockPanel>
+        </SettingItem>
+        <SettingItem Header="Guids count">
+            <TextBox Text="{CompiledBinding GuidCount, Mode=TwoWay}" />
+        </SettingItem>
+        <SettingItem Header="Last guid">
+            <TextBlock FontWeight="Bold" Text="{CompiledBinding LastGuid}" />
+        </SettingItem>
+    </StackPanel>
+</UserControl>

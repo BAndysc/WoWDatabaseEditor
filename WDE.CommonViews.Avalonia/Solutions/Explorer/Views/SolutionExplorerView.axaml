@@ -9,6 +9,7 @@
           xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
           xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
           xmlns:viewModels="clr-namespace:WDE.Solutions.Explorer.ViewModels;assembly=WDE.Solutions"
+          xmlns:common="clr-namespace:WDE.Common;assembly=WDE.Common"
           x:DataType="viewModels:SolutionExplorerViewModel"
           prism:ViewModelLocator.AutoWireViewModel="False" x:Name="UC">
     
@@ -84,14 +85,17 @@
                 <MenuItem Header="Generate query"
                           CommandParameter="{Binding #tv.SelectedItem}"
                           Command="{Binding #tv.DataContext.GenerateSQL, Mode=OneTime}"
+                          x:DataType="common:ISolutionItem"
                           IsEnabled="{Binding IsExportable}" />
                 <MenuItem Header="Save to database"
                           CommandParameter="{Binding #tv.SelectedItem}"
                           Command="{Binding #tv.DataContext.UpdateDatabase, Mode=OneTime}"
+                          x:DataType="common:ISolutionItem"
                           IsEnabled="{Binding IsExportable}" />
                 <MenuItem Header="Save to database and reload server"
                           CommandParameter="{Binding #tv.SelectedItem}"
                           Command="{Binding #tv.DataContext.ExportToServer, Mode=OneTime}"
+                          x:DataType="common:ISolutionItem"
                           IsEnabled="{Binding IsExportable}" />
             </FixedContextMenu>
         </TreeView.ContextMenu>

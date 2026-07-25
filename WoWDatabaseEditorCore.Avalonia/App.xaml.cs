@@ -12,6 +12,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Classic.Avalonia.Theme;
+using Dock.Settings;
 using Microsoft.Extensions.Logging;
 using Prism.Events;
 using Prism.Ioc;
@@ -19,6 +20,7 @@ using Prism.Modularity;
 using Prism.Unity;
 using Prism.Unity.Ioc;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
 using Unity;
@@ -50,12 +52,21 @@ using WoWDatabaseEditorCore.Services.DebugConsole;
 using WoWDatabaseEditorCore.Services.LoadingEvents;
 using WoWDatabaseEditorCore.Services.LogService.Logging;
 using WoWDatabaseEditorCore.Services.LogService.ReportErrorsToServer;
+using WoWDatabaseEditorCore.Services.AnalyticsUsage;
 using WoWDatabaseEditorCore.ViewModels;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using LogDataStore = WoWDatabaseEditorCore.Services.LogService.Logging.LogDataStore;
 
 namespace WoWDatabaseEditorCore.Avalonia
 {
+    public class ConsoleSink : ILogEventSink
+    {
+        public void Emit(LogEvent logEvent)
+        {
+            Console.WriteLine(logEvent.RenderMessage());
+        }
+    }
+
     public class App : PrismApplication
     {
         private IModulesManager? modulesManager;
@@ -67,17 +78,28 @@ namespace WoWDatabaseEditorCore.Avalonia
 
         public App()
         {
+            DockSettings.SelectorEnabled = false; // idk what this is for, but this causes memory leaks
             reportErrorsSink = new ReportErrorsSink();
 
             logDataStore = new LogDataStore();
-            Log.Logger = new LoggerConfiguration()
+            var sink = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.DataStoreLoggerSink(() => logDataStore)
-                .WriteTo.Sink(reportErrorsSink)
-                .CreateLogger();
+                .Enrich.FromLogContext();
+            if (OperatingSystem.IsBrowser())
+            {
+                Log.Logger = sink
+                    .WriteTo.Sink<ConsoleSink>()
+                    .CreateLogger();
+            }
+            else
+            {
+                Log.Logger = sink
+                    .WriteTo.Console()
+                    .WriteTo.DataStoreLoggerSink(() => logDataStore)
+                    .WriteTo.Sink(reportErrorsSink)
+                    .CreateLogger();
+            }
 
             loggerFactory = new SerilogLoggerFactory(Log.Logger);
             LOG.Initialize(loggerFactory);
@@ -436,6 +458,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             }
 
             Container.Resolve<ReportErrorsSinkManager>();
+            Container.Resolve<UsageManager>();
         }
         
         public override void OnFrameworkInitializationCompleted()
@@ -481,8 +504,11 @@ namespace WoWDatabaseEditorCore.Avalonia
     }
     public class MainThread : IMainThread
     {
+        private int mainThread;
+
         public MainThread()
         {
+            mainThread = Environment.CurrentManagedThreadId;
             Profiler.SetupMainThread(this);
         }
         
@@ -506,6 +532,30 @@ namespace WoWDatabaseEditorCore.Avalonia
         public IDisposable StartTimer(Func<bool> action, TimeSpan interval)
         {
             return DispatcherTimer.Run(action, interval);
+        }
+
+        public async Task<T> Schedule<T>(Func<Task<T>> func)
+        {
+            if (Environment.CurrentManagedThreadId == mainThread)
+            {
+                return await func();
+            }
+            else
+            {
+                return await Dispatcher.UIThread.InvokeAsync(func);
+            }
+        }
+
+        public async Task<T> Schedule<T>(Func<T> func)
+        {
+            if (Environment.CurrentManagedThreadId == mainThread)
+            {
+                return func();
+            }
+            else
+            {
+                return await Dispatcher.UIThread.InvokeAsync(func);
+            }
         }
 
         private async Task Do(Func<Task> action, TaskCompletionSource tcs)

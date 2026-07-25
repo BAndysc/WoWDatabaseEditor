@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <ApplicationIcon>../WoWDatabaseEditorCore.Avalonia/Icon.ico</ApplicationIcon>
@@ -29,6 +29,7 @@
       <ProjectReference Include="..\Modules\WDE.LootEditor\WDE.LootEditor.csproj" />
       <ProjectReference Include="..\Modules\WDE.PathPreviewTool\WDE.PathPreviewTool.csproj" />
       <ProjectReference Include="..\Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj" />
+      <ProjectReference Include="..\Modules\WDE.MapSpawns.Bridge\WDE.MapSpawns.Bridge.csproj" />
       <ProjectReference Include="..\Rendering\WDE.MapSpawns\WDE.MapSpawns.csproj" />
       <ProjectReference Include="..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
       <ProjectReference Include="..\WDE.CMaNGOS\WDE.CMaNGOS.csproj" />
@@ -40,6 +41,12 @@
       <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
       <ProjectReference Include="..\WDE.EventAiEditor.Avalonia\WDE.EventAiEditor.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.MangosEventAiEditor\WDE.MangosEventAiEditor.csproj" />
+      <ProjectReference Include="..\WDE.DbScriptsEditor\WDE.DbScriptsEditor.csproj" />
+      <ProjectReference Include="..\WDE.DbScriptsEditor.Avalonia\WDE.DbScriptsEditor.Avalonia.csproj" />
+      <ProjectReference Include="..\Modules\WDE.CMangosConditions\WDE.CMangosConditions.csproj" />
+      <ProjectReference Include="..\Modules\WDE.CMangosConditions.Avalonia\WDE.CMangosConditions.Avalonia.csproj" />
+      <ProjectReference Include="..\Modules\WDE.WorldStateExpressions\WDE.WorldStateExpressions.csproj" />
+      <ProjectReference Include="..\Modules\WDE.WorldStateExpressions.Avalonia\WDE.WorldStateExpressions.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
       <ProjectReference Include="..\WDE.SourceCodeIntegrationEditor\WDE.SourceCodeIntegrationEditor.csproj" />

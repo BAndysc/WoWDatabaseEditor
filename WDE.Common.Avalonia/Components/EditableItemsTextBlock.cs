@@ -176,7 +176,7 @@ public class EditableItemsTextBlock : TemplatedControl
 
     private void BindTopLevel()
     {
-        if (this.GetVisualRoot() is TopLevel toplevel)
+        if (TopLevel.GetTopLevel(this) is {} toplevel)
         {
             lostFocusDisposable = toplevel.GetPropertyChangedObservable(WindowBase.IsActiveProperty)
                 .SubscribeAction(e =>

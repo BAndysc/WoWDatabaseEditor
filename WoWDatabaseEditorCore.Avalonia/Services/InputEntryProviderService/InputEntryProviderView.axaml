@@ -6,8 +6,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.InputEntryProviderService.InputEntryProviderView">
     <UserControl.KeyBindings>
-        <KeyBinding Gesture="Escape" Command="{Binding Cancel}" />
-        <KeyBinding Gesture="Enter" Command="{Binding Save}" />
+        <KeyBinding Gesture="Escape" Command="{ReflectionBinding Cancel}" />
+        <KeyBinding Gesture="Enter" Command="{ReflectionBinding Save}" />
     </UserControl.KeyBindings>
     <DockPanel Margin="15" LastChildFill="True">
         <Image DockPanel.Dock="Left" Width="64" Height="64" VerticalAlignment="Center" Margin="0,0,10,0">
@@ -19,11 +19,11 @@
                 </DrawingImage>
             </Image.Source>
         </Image>
-        <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" Text="{Binding Title}" FontSize="16" FontWeight="Bold" TextWrapping="WrapWithOverflow" />
-        <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" Text="{Binding Description}" TextWrapping="WrapWithOverflow" />
+        <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" Text="{ReflectionBinding Title}" FontSize="16" FontWeight="Bold" TextWrapping="WrapWithOverflow" />
+        <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" Text="{ReflectionBinding Description}" TextWrapping="WrapWithOverflow" />
         <OkCancelButtons DockPanel.Dock="Bottom"
-                         AcceptCommand="{Binding Save}"
-                         CancelCommand="{Binding Cancel}" />
-        <TextBox utils:FocusUtils.FocusFirst="True" Margin="0,0,0,10" Text="{Binding Entry}" HorizontalAlignment="Stretch" AcceptsReturn="{Binding !Multiline}" AcceptsTab="False" />
+                         AcceptCommand="{ReflectionBinding Save}"
+                         CancelCommand="{ReflectionBinding Cancel}" />
+        <TextBox utils:FocusUtils.FocusFirst="True" Margin="0,0,0,10" Text="{ReflectionBinding Entry}" HorizontalAlignment="Stretch" AcceptsReturn="{Binding !Multiline}" AcceptsTab="False" />
     </DockPanel>
 </UserControl>

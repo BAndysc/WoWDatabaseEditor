@@ -233,13 +233,13 @@ public class VirtualizedGridView : TemplatedControl
 
     private void OnContentScroll(object? sender, ScrollChangedEventArgs e)
     {
-        if (contentScroll is not null && headerScroll is not null && !MathUtilities.IsZero(e.OffsetDelta.X))
+        if (contentScroll is not null && headerScroll is not null && e.OffsetDelta.X != 0)
             headerScroll.Offset = headerScroll.Offset.WithX(contentScroll.Offset.X);
     }
 
     private void OnHeaderScroll(object? sender, ScrollChangedEventArgs e)
     {
-        if (contentScroll is not null && headerScroll is not null && !MathUtilities.IsZero(e.OffsetDelta.X))
+        if (contentScroll is not null && headerScroll is not null && e.OffsetDelta.X != 0)
             contentScroll.Offset = contentScroll.Offset.WithX(headerScroll.Offset.X);
     }
 

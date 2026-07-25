@@ -35,7 +35,7 @@
             <CheckBox IsChecked="{x:Null}">Indetermine</CheckBox>
             <RadioButton>Radio</RadioButton>
             <RadioButton IsChecked="True">Checked radio</RadioButton>
-            <TextBox Watermark="Textbox" />
+            <TextBox PlaceholderText="Textbox" />
             <ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding CurrentTheme, Mode=TwoWay}" />
             <TabControl>
                 <TabItem Header="Main">

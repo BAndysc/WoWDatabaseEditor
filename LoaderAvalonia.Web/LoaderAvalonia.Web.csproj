@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net8.0-browser</TargetFramework>
+        <TargetFramework>net10.0-browser</TargetFramework>
         <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
         <WasmMainJSPath>AppBundle\main.js</WasmMainJSPath>
         <OutputType>Exe</OutputType>
@@ -20,23 +20,29 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia.Browser" Version="11.3.999-cibuild0055834-alpha"/>
+        <PackageReference Include="Avalonia.Browser" Version="12.0.5"/>
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
       <ProjectReference Include="..\Modules\WDE.AnniversaryInfo\WDE.AnniversaryInfo.csproj" />
+      <ProjectReference Include="..\Modules\WDE.CMangosConditions.Avalonia\WDE.CMangosConditions.Avalonia.csproj" />
+      <ProjectReference Include="..\Modules\WDE.CMangosConditions\WDE.CMangosConditions.csproj" />
+      <ProjectReference Include="..\Modules\WDE.WorldStateExpressions.Avalonia\WDE.WorldStateExpressions.Avalonia.csproj" />
+      <ProjectReference Include="..\Modules\WDE.WorldStateExpressions\WDE.WorldStateExpressions.csproj" />
       <ProjectReference Include="..\Modules\WDE.EventScriptsEditor\WDE.EventScriptsEditor.csproj" />
       <ProjectReference Include="..\Modules\WDE.HttpDatabase\WDE.HttpDatabase.csproj" />
       <ProjectReference Include="..\Modules\WDE.LootEditor\WDE.LootEditor.csproj" />
       <ProjectReference Include="..\Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj" />
       <ProjectReference Include="..\Modules\WDE.Sessions\WDE.Sessions.csproj" />
+      <ProjectReference Include="..\WDE.CMaNGOS\WDE.CMaNGOS.csproj" />
       <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.CommonViews.Avalonia\WDE.CommonViews.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
       <ProjectReference Include="..\WDE.DatabaseEditors.Avalonia\WDE.DatabaseEditors.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
       <ProjectReference Include="..\WDE.EventAiEditor.Avalonia\WDE.EventAiEditor.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.DbScriptsEditor.Avalonia\WDE.DbScriptsEditor.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.MapRenderer\WDE.MapRenderer.csproj" />
       <ProjectReference Include="..\WDE.MySqlDatabaseCommon\WDE.MySqlDatabaseCommon.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
@@ -101,6 +107,18 @@
             <CodeCompletionDataSource Include="$(OutputPath)CodeCompletionData\**\*.*" />
         </ItemGroup>
         <Copy SourceFiles="@(CodeCompletionDataSource)" DestinationFiles ="@(CodeCompletionDataSource->'$(OutputPath)AppBundle\CodeCompletionData\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+        <Message Text="Copying DbScriptData..." Importance="High" />
+        <ItemGroup>
+            <DbScriptDataSource Include="$(OutputPath)DbScriptData\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(DbScriptDataSource)" DestinationFiles ="@(DbScriptDataSource->'$(OutputPath)AppBundle\DbScriptData\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+        <Message Text="Copying MangosConditionsData..." Importance="High" />
+        <ItemGroup>
+            <MangosConditionsDataSource Include="$(OutputPath)MangosConditionsData\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(MangosConditionsDataSource)" DestinationFiles ="@(MangosConditionsDataSource->'$(OutputPath)AppBundle\MangosConditionsData\%(RecursiveDir)%(Filename)%(Extension)')" />
 
 
         <ProduceDirectoryListingTask BasePath="$(OutputPath)\AppBundle" Folder="Icons" />

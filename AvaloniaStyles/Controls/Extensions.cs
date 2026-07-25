@@ -175,7 +175,7 @@ namespace AvaloniaStyles.Controls
                             Padding = new Thickness(3,1,3,1),
                             VerticalAlignment = VerticalAlignment.Stretch,
                             HorizontalAlignment = HorizontalAlignment.Stretch,
-                            [~ToggleButton.IsCheckedProperty] = new Binding("IsChecked", BindingMode.TwoWay),
+                            [~ToggleButton.IsCheckedProperty] = new Binding("IsChecked") { Mode = BindingMode.TwoWay },
                             [!ToolTip.TipProperty] = new Binding("EnumInteger") {Converter = IntToHexStringConverter.Instance}
                         };
 

@@ -11,9 +11,9 @@
              MinHeight="150"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService.MessageBoxControlView">
   <UserControl.KeyBindings>
-    <KeyBinding Gesture="Escape" Command="{Binding CancelButtonCommand}" />
-    <KeyBinding Gesture="Y" Command="{Binding YesButtonCommand}" />
-    <KeyBinding Gesture="N" Command="{Binding NoButtonCommand}" />
+    <KeyBinding Gesture="Escape" Command="{ReflectionBinding CancelButtonCommand}" />
+    <KeyBinding Gesture="Y" Command="{ReflectionBinding YesButtonCommand}" />
+    <KeyBinding Gesture="N" Command="{ReflectionBinding NoButtonCommand}" />
   </UserControl.KeyBindings>
   <Border BorderThickness="0.5" BorderBrush="{DynamicResource OuterWindowBorderColor}" Name="PART_windowBorder">
     <Border BorderThickness="0.5" BorderBrush="{DynamicResource InnerWindowBorderColor}" Name="PART_windowBorder_inner">
@@ -26,7 +26,7 @@
                         BorderThickness="0,1,0,0"
                         Padding="20"
                         DockPanel.Dock="Bottom"
-                        ItemsSource="{Binding Buttons}" Name="ButtonsList">
+                        ItemsSource="{ReflectionBinding Buttons}" Name="ButtonsList">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="messageBoxService:MessageBoxButtonViewModel">
                 <Button Content="{CompiledBinding Name}"
@@ -44,8 +44,8 @@
           </ItemsControl>
 
           <DockPanel LastChildFill="True" Margin="25,30" IsHitTestVisible="False">
-            <TextBlock Text="{Binding Model.MainInstruction}" FontWeight="Bold" TextWrapping="WrapWithOverflow" FontSize="20" DockPanel.Dock="Top" Margin="0,0,0,12" />
-            <TextBlock Text="{Binding Model.Content}" TextWrapping="WrapWithOverflow" FontSize="14" />
+            <TextBlock Text="{ReflectionBinding Model.MainInstruction}" FontWeight="Bold" TextWrapping="WrapWithOverflow" FontSize="20" DockPanel.Dock="Top" Margin="0,0,0,12" />
+            <TextBlock Text="{ReflectionBinding Model.Content}" TextWrapping="WrapWithOverflow" FontSize="14" />
           </DockPanel>
         </DockPanel>
       </Panel>

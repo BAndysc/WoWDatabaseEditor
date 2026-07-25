@@ -80,8 +80,8 @@
                                      SelectionMode="Multiple"
                                      ItemsSource="{CompiledBinding  ExcludedGuids}">
                                 <ListBox.KeyBindings>
-                                    <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteExcludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
-                                    <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteExcludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
+                                    <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteExcludedGuid}" CommandParameter="{ReflectionBinding $self.SelectedItem}" />
+                                    <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteExcludedGuid}" CommandParameter="{ReflectionBinding $self.SelectedItem}" />
                                 </ListBox.KeyBindings>
                                 <ListBox.Styles>
                                     <Style Selector="ListBoxItem">
@@ -109,8 +109,8 @@
                                      SelectionMode="Multiple"
                                      ItemsSource="{CompiledBinding IncludedGuids}">
                                 <ListBox.KeyBindings>
-                                    <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteIncludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
-                                    <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteIncludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
+                                    <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteIncludedGuid}" CommandParameter="{ReflectionBinding $self.SelectedItem}" />
+                                    <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteIncludedGuid}" CommandParameter="{ReflectionBinding $self.SelectedItem}" />
                                 </ListBox.KeyBindings>
                                 <ListBox.Styles>
                                     <Style Selector="ListBoxItem">

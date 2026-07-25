@@ -347,6 +347,26 @@ public class HexViewPresenter : Control, ILogicalScrollable
 
     Size IScrollable.Viewport => viewport;
 
+    public bool CanHorizontallyScroll
+    {
+        get => canHorizontallyScroll;
+        set
+        {
+            canHorizontallyScroll = value;
+            InvalidateMeasure();
+        }
+    }
+
+    public bool CanVerticallyScroll
+    {
+        get => canVerticallyScroll;
+        set
+        {
+            canVerticallyScroll = value;
+            InvalidateMeasure();
+        }
+    }
+
     bool ILogicalScrollable.CanHorizontallyScroll
     {
         get => canHorizontallyScroll;
@@ -468,9 +488,8 @@ public class HexViewPresenter : Control, ILogicalScrollable
 
             if (clipboard == null)
                 return;
-            
-            var text = await clipboard.GetTextAsync();
-            if (text == null)
+
+            if (!(await clipboard.TryGetTextAsync() is { } text))
                 return;
 
             byte[] bytes;
@@ -548,13 +567,13 @@ public class HexViewPresenter : Control, ILogicalScrollable
         });
     }
     
-    protected override void OnGotFocus(GotFocusEventArgs e)
+    protected override void OnGotFocus(FocusChangedEventArgs e)
     {
         base.OnGotFocus(e);
         StartBlinkTimer();
     }
 
-    protected override void OnLostFocus(RoutedEventArgs e)
+    protected override void OnLostFocus(FocusChangedEventArgs e)
     {
         base.OnLostFocus(e);
         StopBlinkTimer();

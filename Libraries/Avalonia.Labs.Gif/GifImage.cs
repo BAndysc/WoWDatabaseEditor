@@ -1,12 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Numerics;
-using System.Threading;
 using Avalonia.Animation;
 using Avalonia.Controls;
-using Avalonia.Labs.Gif.Decoding;
 using Avalonia.Media;
-using Avalonia.Platform;
 using Avalonia.Rendering.Composition;
 
 namespace Avalonia.Labs.Gif;
@@ -19,12 +16,14 @@ public class GifImage : Control
     private CompositionCustomVisual? _customVisual;
 
     private double _gifWidth, _gifHeight;
+    private Stream? _lastSourceStream = null;
+    private MemoryStream _lastMemoryFromSourceStream = new();
 
     /// <summary>
     /// Defines the <see cref="Source"/> property.
     /// </summary>
-    public static readonly StyledProperty<object> SourceProperty =
-        AvaloniaProperty.Register<GifImage, object>(nameof(Source));
+    public static readonly StyledProperty<IGifSource?> SourceProperty =
+        AvaloniaProperty.Register<GifImage, IGifSource?>(nameof(Source));
 
     /// <summary>
     /// Defines the <see cref="IterationCount"/> property.
@@ -45,11 +44,10 @@ public class GifImage : Control
         AvaloniaProperty.Register<GifImage, Stretch>(nameof(Stretch));
 
     /// <summary>
-    /// Gets or sets the <see cref="Uri"/> or absolute uri <see cref="string"/> 
-    /// pointing to the GIF image resource or
-    /// <see cref="Stream"/> containing the GIF image.
+    /// Gets or sets the <see cref="IGifSource"/>
+    /// pointing to the GIF image.
     /// </summary>
-    public object Source
+    public IGifSource? Source
     {
         get => GetValue(SourceProperty);
         set => SetValue(SourceProperty, value);
@@ -177,36 +175,30 @@ public class GifImage : Control
 
         _customVisual.Size = new Vector2((float)Bounds.Size.Width, (float)Bounds.Size.Height);
 
-        Stream stream;
-        if (Source is Stream s)
+        Stream? stream, s = Source?.GetStream();
+        // only perform the copying if the stream has actually changed. 
+        // if the stream has not changed, seek our internal memory stream that matches the last stream source.
+        // This ensures that the gif data stream is at the right position, even with multiple reads. 
+        if (Object.ReferenceEquals(_lastSourceStream, s))
         {
-            stream = s;
+            _lastMemoryFromSourceStream.Seek(0, SeekOrigin.Begin);
+            stream = _lastMemoryFromSourceStream;
         }
-        else if (Source is Uri uri)
+        else if (s is not null)
         {
-            stream = AssetLoader.Open(uri);
-        }
-        else if (Source is string str)
-        {
-            if (Uri.TryCreate(str, UriKind.Absolute, out var uri2))
-            {
-                stream = AssetLoader.Open(uri2);
-            }
-            else
-            {
-                throw new ArgumentException(
-                    "Unsupported Source object: only Stream, Uri and absolute uri string are supported.");
-            }
+            _lastSourceStream = s;
+            _lastMemoryFromSourceStream = new();
+            s.CopyTo(_lastMemoryFromSourceStream);
+            _lastMemoryFromSourceStream.Seek(0, SeekOrigin.Begin);
+            stream = _lastMemoryFromSourceStream;
         }
         else
-        { 
-            throw new ArgumentException(
-                "Unsupported Source object: only Stream, Uri and absolute uri string are supported.");
+        {
+            stream = null;
         }
 
-        using var tempGifDecoder = new GifDecoder(stream, CancellationToken.None);
-        _gifHeight = tempGifDecoder.Size.Height;
-        _gifWidth = tempGifDecoder.Size.Width;
+        _gifWidth = Source?.Size.Width ?? 0.0;
+        _gifHeight = Source?.Size.Height ?? 0.0;
 
         _customVisual?.SendHandlerMessage(
             new GifDrawPayload(
@@ -217,7 +209,7 @@ public class GifImage : Control
                 Stretch,
                 StretchDirection,
                 IterationCount));
-        
+
         InvalidateVisual();
     }
 

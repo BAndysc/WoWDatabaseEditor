@@ -50,7 +50,7 @@ public abstract class PhantomControlBase<T> where T : Control
         element.VerticalAlignment = VerticalAlignment.Top;
         element.Margin = new Thickness(position.X, position.Y, 0, 0);
         
-        if (parent.GetVisualRoot() is TopLevel toplevel)
+        if (TopLevel.GetTopLevel(parent) is TopLevel toplevel)
         {
             clickDisposable = toplevel.AddDisposableHandler(InputElement.PointerPressedEvent, (s, ev) =>
             {

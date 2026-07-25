@@ -6,6 +6,7 @@ using WDE.Conditions;
 using WDE.DatabaseEditors;
 using WDE.DatabaseEditors.Avalonia;
 using WDE.DbcStore;
+using WDE.DbScriptsEditor.Avalonia;
 using WDE.EventAiEditor.Avalonia;
 using WDE.EventScriptsEditor;
 using WDE.History;
@@ -45,6 +46,7 @@ public class Application
         typeof(DbcStoreModule),
         typeof(HistoryModule),
         typeof(EventAiAvaloniaModule),
+        typeof(DbScriptsAvaloniaModule),
         typeof(SessionsModule),
         typeof(SolutionsModule),
         typeof(QueryGeneratorModule),

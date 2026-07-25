@@ -371,6 +371,6 @@ namespace AvaloniaStyles.Controls
             });
         }
 
-        private bool IsAttached() => ((Visual) this).GetVisualRoot() != null;
+        private bool IsAttached() => TopLevel.GetTopLevel(this) != null;
     }
 }

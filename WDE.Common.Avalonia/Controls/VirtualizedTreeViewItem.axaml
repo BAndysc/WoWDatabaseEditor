@@ -88,7 +88,7 @@
                           Classes="ExpandCollapseChevron"
                           Focusable="False"
                           Opacity="{Binding CanBeExpanded, Converter={StaticResource CanBeExpandedToOpacityConverter}}"
-                          IsChecked="{Binding  IsExpanded, Mode=TwoWay}" />
+                          IsChecked="{ReflectionBinding  IsExpanded, Mode=TwoWay}" />
             <ContentControl Content="{CompiledBinding .}" ContentTemplate="{TemplateBinding ContentTemplate}" />
           </DockPanel>
         </Border>

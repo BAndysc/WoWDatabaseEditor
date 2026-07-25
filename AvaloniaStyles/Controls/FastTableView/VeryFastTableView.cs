@@ -156,7 +156,7 @@ public partial class VeryFastTableView : RenderedPanel, IFastTableContext
             Gesture = new KeyGesture(Key.Delete),
             Command = openAndErase
         });
-        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.SubpixelAntialias);
+        TextOptions.SetTextRenderingMode(this, TextRenderingMode.SubpixelAntialias);
     }
 
     private ScrollViewer? boundScrollViewer;

@@ -46,7 +46,7 @@
                     <TextBlock Text="{CompiledBinding Name}">
                         <Interaction.Behaviors>
                             <DataTriggerBehavior Binding="{CompiledBinding IsFromFuture}" ComparisonCondition="Equal" Value="True">
-                                <ChangePropertyAction TargetObject="{Binding #TextBlock}" PropertyName="Foreground" Value="Gray"/>
+                                <ChangePropertyAction TargetObject="{ReflectionBinding #TextBlock}" PropertyName="Foreground" Value="Gray"/>
                             </DataTriggerBehavior>
                         </Interaction.Behaviors>
                     </TextBlock>

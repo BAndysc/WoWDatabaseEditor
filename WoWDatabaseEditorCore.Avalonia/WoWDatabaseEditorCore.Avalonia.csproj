@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Library</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>$(WarningsAsErrors),nullable</WarningsAsErrors>
         <AssemblyName>WoWDatabaseEditorCore.Avalonia.GUI</AssemblyName>
+        <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
     </PropertyGroup>
     <PropertyGroup>
         <SelfContained>false</SelfContained>
@@ -26,12 +27,14 @@
     </ItemGroup>
     <Import Project="..\Avalonia.props" />
     <ItemGroup>
+        <PackageReference Include="Dock.Avalonia" Version="12.0.0.2" />
+        <PackageReference Include="Dock.Avalonia.Themes.Fluent" Version="12.0.0.2" />
+        <PackageReference Include="Dock.Model.Mvvm" Version="12.0.0.2" />
         <PackageReference Include="PropertyChanged.SourceGenerator">
             <Version>1.0.8</Version>
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
         <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.7" />
         <PackageReference Include="SmartFormat.NET" Version="2.7.3" />
@@ -43,7 +46,6 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
-        <ProjectReference Include="..\Dock\src\Dock.Model.Mvvm\Dock.Model.Mvvm.csproj" />
         <ProjectReference Include="..\Libraries\Avalonia.Labs.Gif\Avalonia.Labs.Gif.csproj" />
         <ProjectReference Include="..\Prism.Avalonia\src\Prism.Unity.Avalonia\Prism.Unity.Avalonia.csproj" />
         <ProjectReference Include="..\Rendering\TheEngine\TheEngine.csproj" />
@@ -52,8 +54,6 @@
         <ProjectReference Include="..\WDE.SmartScriptEditor.Avalonia\WDE.SmartScriptEditor.Avalonia.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
-        <ProjectReference Include="..\Dock\src\Dock.Model\Dock.Model.csproj" />
-        <ProjectReference Include="..\Dock\src\Dock.Avalonia\Dock.Avalonia.csproj" />
     </ItemGroup>
     <ItemGroup>
       <Resource Include="Icon.ico" />

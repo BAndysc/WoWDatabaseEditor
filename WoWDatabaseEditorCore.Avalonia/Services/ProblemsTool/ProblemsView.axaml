@@ -51,7 +51,7 @@
                                 <DataTriggerBehavior.Value>
                                     <managers:DiagnosticSeverity>Error</managers:DiagnosticSeverity>
                                 </DataTriggerBehavior.Value>
-                                <ChangePropertyAction TargetObject="{Binding #Image}" 
+                                <ChangePropertyAction TargetObject="{Binding #Image}"
                                                       PropertyName="Source"
                                                       Value="{StaticResource IconError}" />
                             </DataTriggerBehavior>

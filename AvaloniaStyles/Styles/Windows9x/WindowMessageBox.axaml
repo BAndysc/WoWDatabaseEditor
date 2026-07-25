@@ -13,17 +13,16 @@
         <Setter Property="FontSize" Value="{DynamicResource FontSizeNormal}" />
         <Setter Property="MinWidth" Value="150" />
         <Setter Property="MinHeight" Value="50" />
-        <Setter Property="ExtendClientAreaChromeHints" Value="NoChrome" />
-        <Setter Property="SystemDecorations" Value="Full" /> <!-- with Full on Windows 11 we get rounded borders and shadow, which is bad, but unfortunately with None, dragging and resizing doesn't work -->
+        <Setter Property="WindowDecorations" Value="Full" /> <!-- with Full on Windows 11 we get rounded borders and shadow, which is bad, but unfortunately with None, dragging and resizing doesn't work -->
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
 
         <Style Selector="^.__classic_theme_is_mac">
-            <Setter Property="SystemDecorations" Value="None" /> <!-- on a mac None decorations work fine and we still can drag and resize the window -->
+            <Setter Property="WindowDecorations" Value="None" /> <!-- on a mac None decorations work fine and we still can drag and resize the window -->
         </Style>
         <Setter Property="Template">
             <ControlTemplate>
                 <Panel
-                    RenderOptions.TextRenderingMode="Alias"
+                    TextOptions.TextRenderingMode="Alias"
                     RenderOptions.EdgeMode="Aliased"
                     RenderOptions.BitmapInterpolationMode="None">
                     <Border Name="PART_TransparencyFallback"
@@ -37,11 +36,7 @@
 
                         <utils:AutoAttachTitleBar DockPanel.Dock="Top" />
 
-                        <VisualLayerManager>
-                            <VisualLayerManager.ChromeOverlayLayer>
-                                <TitleBar />
-                            </VisualLayerManager.ChromeOverlayLayer>
-
+                        <VisualLayerManager Name="PART_VisualLayerManager">
                             <DockPanel Margin="9,10">
                                 <ContentPresenter DockPanel.Dock="Bottom"
                                                   Content="{TemplateBinding Content}"

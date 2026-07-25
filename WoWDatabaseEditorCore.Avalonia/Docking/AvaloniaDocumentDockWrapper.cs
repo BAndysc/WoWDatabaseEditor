@@ -1,4 +1,5 @@
 ﻿using System.Reactive.Linq;
+using Dock.Avalonia.Controls;
 using Dock.Model.Mvvm.Controls;
 using WDE.Common.Managers;
 using WDE.MVVM;
@@ -10,7 +11,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
     public class AvaloniaDocumentDockWrapper : Document, IDockableFocusable
     {
         private readonly IDocumentManager documentManager;
-        public IDocument ViewModel { get; }
+        public IDocument? ViewModel { get; private set; }
         public bool CanReallyClose { get; set; }
 
         private static int uniqueId;
@@ -22,7 +23,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             Title = document.Title;
             ViewModel = document;
             CanClose = true;
-            CanFloat = false;
+            CanFloat = true;
             CanPin = false;
             
             var title = document.ToObservable(d => d.Title);
@@ -39,6 +40,13 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
         public override bool OnClose()
         {
             if (CanReallyClose)
+            {
+                ViewModel = null!; // there is memory leak in Dock, so at least free the underlying viewmodel...
+                OnPropertyChanged(nameof(ViewModel));
+                return true;
+            }
+
+            if (ViewModel == null)
                 return true;
             
             if (!ViewModel.CanClose)

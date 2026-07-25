@@ -31,7 +31,6 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <ClassicBorderDecorator BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{TemplateBinding CornerRadius}"
                         BorderStyle="Sunken"
                         BorderBrush="{TemplateBinding BorderBrush}">
                     <DockPanel LastChildFill="True" Grid.IsSharedSizeScope="True">

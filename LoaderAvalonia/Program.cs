@@ -1,10 +1,8 @@
 using System;
 using System.Reflection;
 using Avalonia;
-using Avalonia.ReactiveUI;
 using BaseDesktopLoader;
-using Projektanker.Icons.Avalonia;
-using Projektanker.Icons.Avalonia.MaterialDesign;
+using ReactiveUI.Avalonia;
 using WDE.AzerothCore;
 using WDE.CMaNGOS;
 using WDE.CMMySqlDatabase;
@@ -39,10 +37,17 @@ using WDE.WoWHeadConnector;
 using WDE.AnniversaryInfo;
 using WDE.DatabaseDefinitionEditor;
 using WDE.Debugger;
+using WDE.CMangosConditions;
+using WDE.CMangosConditions.Avalonia;
+using WDE.WorldStateExpressions;
+using WDE.WorldStateExpressions.Avalonia;
+using WDE.DbScriptsEditor;
+using WDE.DbScriptsEditor.Avalonia;
 using WDE.EventAiEditor.Avalonia;
 using WDE.EventScriptsEditor;
 using WDE.MangosEventAiEditor;
 using WDE.MapSpawns;
+using WDE.MapSpawns.Bridge;
 using WDE.PathPreviewTool;
 using WDE.FirstTimeWizard;
 using WDE.LootEditor;
@@ -92,9 +97,16 @@ namespace LoaderAvalonia
                 typeof(AnniversaryModule),
                 typeof(EventScriptsModule),
                 typeof(MapSpawnsModule),
+                typeof(MapSpawnsBridgeModule),
                 typeof(PathPreviewToolModule),
                 typeof(EventAiModule),
                 typeof(EventAiAvaloniaModule),
+                typeof(DbScriptsModule),
+                typeof(DbScriptsAvaloniaModule),
+                typeof(CMangosConditionsModule),
+                typeof(CMangosConditionsAvaloniaModule),
+                typeof(WorldStateExpressionsModule),
+                typeof(WorldStateExpressionsAvaloniaModule),
                 typeof(QueryGeneratorModule),
                 typeof(SessionsModule),
                 typeof(FirstTimeWizardModule),
@@ -112,7 +124,7 @@ namespace LoaderAvalonia
         {
             var configuration = AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .UseReactiveUI()
+                .UseReactiveUI(_ => { })
                 .LogToTrace();
 
             return configuration;

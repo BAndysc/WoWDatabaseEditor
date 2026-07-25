@@ -3,7 +3,7 @@
              xmlns:avaloniaStyles="clr-namespace:AvaloniaStyles"
              x:Class="AvaloniaStyles.App">
     <Application.Styles>
-        <avaloniaStyles:SystemTheme Mode="Windows9x" />
+        <avaloniaStyles:SystemTheme Mode="LightWindows11" />
     </Application.Styles>
     <Application.Resources>
         <ResourceDictionary>

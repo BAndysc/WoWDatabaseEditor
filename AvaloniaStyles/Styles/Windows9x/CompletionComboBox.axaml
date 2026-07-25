@@ -54,7 +54,7 @@
                                                 Padding="{DynamicResource AutoCompleteListMargin}"
                                                 Background="{DynamicResource {x:Static common:SystemColors.ControlBrushKey}}">
                             <DockPanel>
-                                <TextBox Name="PART_SearchTextBox" Watermark="{TemplateBinding Watermark}" Text="{TemplateBinding SearchText, Mode=TwoWay}" DockPanel.Dock="Top" />
+                                <TextBox Name="PART_SearchTextBox" PlaceholderText="{TemplateBinding Watermark}" Text="{TemplateBinding SearchText, Mode=TwoWay}" DockPanel.Dock="Top" />
                                 <ListBox Name="PART_SelectingItemsControl"
                                          ItemTemplate="{TemplateBinding ItemTemplate}"
                                          Margin="{DynamicResource AutoCompleteListPadding}" />

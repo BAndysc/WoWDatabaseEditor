@@ -58,7 +58,6 @@ namespace AvaloniaStyles.Controls
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
             base.OnApplyTemplate(e);
-            ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome;
             if (Background is ISolidColorBrush brush)
                 if (TryGetPlatformHandle() is { } handle)
                     Win32.SetTitleBarColor(handle.Handle, brush.Color);

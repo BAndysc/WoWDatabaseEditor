@@ -60,7 +60,7 @@
         <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <VisualLayerManager>
+                <VisualLayerManager Name="PART_VisualLayerManager">
                     <DockPanel LastChildFill="True" Margin="{TemplateBinding OffScreenMargin}">
                         <controls1:ExtendedTitleBar DockPanel.Dock="Top"
                                                     LeftContent="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}"
@@ -121,7 +121,7 @@
         <Setter Property="WindowStartupLocation" Value="CenterOwner" />
         <Setter Property="Template">
             <ControlTemplate>
-                <VisualLayerManager>
+                <VisualLayerManager Name="PART_VisualLayerManager">
                     <Border Background="{TemplateBinding Background}" Padding="15">
                         <DockPanel LastChildFill="True">
                             <ContentPresenter Content="{TemplateBinding Image}"

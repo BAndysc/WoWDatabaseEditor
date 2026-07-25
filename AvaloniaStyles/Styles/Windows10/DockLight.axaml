@@ -11,7 +11,7 @@
         <Style Selector="idc|ToolChromeControl /template/ TextBlock#PART_Title">
                 <Setter Property="Foreground" Value="{DynamicResource DockThemeForegroundBrush}" />
         </Style>
-        <Style Selector="idc|DocumentControl /template/ Border#PART_Border ContentControl#PART_ContentPresenter">
+        <Style Selector="idc|DocumentControl /template/ Border#PART_Border DeferredContentControl#PART_ContentPresenter">
                 <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         </Style>
         <Style Selector="idc|DocumentControl DocumentTabStripItem">

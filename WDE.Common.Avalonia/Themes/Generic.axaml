@@ -20,7 +20,7 @@
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <ContentControl Content="{Binding}">
+                <ContentControl Content="{ReflectionBinding}">
                     <ContentControl.ContentTemplate>
                         <themes:ParameterDataTemplateSelector>
                             <themes:ParameterDataTemplateSelector.Generic>
@@ -28,16 +28,16 @@
                                     <DockPanel LastChildFill="True">
                                         <Button DockPanel.Dock="Right" Content="  ...  "
                                                 Command="{Binding PickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}"
-                                                CommandParameter="{Binding }"
+                                                CommandParameter="{ReflectionBinding }"
                                                 Margin="3,0,0,0"
                                                 Focusable="False"
-                                                IsVisible="{Binding HasItems, FallbackValue=False}" />
+                                                IsVisible="{ReflectionBinding HasItems, FallbackValue=False}" />
                                         <controls:ParameterTextBox VerticalContentAlignment="Center"
                                                                    Focusable="True"
                                                                    Name="TextBox"
                                                                    Tag="{Binding Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}"
                                                                    SpecialCopying="{Binding SpecialCopying, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}"
-                                                                   Text="{Binding Value, Mode=TwoWay}"
+                                                                   Text="{ReflectionBinding Value, Mode=TwoWay}"
                                                                    FontFamily="Consolas,Menlo,Courier,Courier New"
                                                                    Classes="InnerContentWithPadding">
                                             <controls:ParameterTextBox.Styles>
@@ -52,7 +52,7 @@
                                             </controls:ParameterTextBox.Styles>
                                             <controls:ParameterTextBox.InnerLeftContent>
                                                 <Border Cursor="Ibeam">
-                                                    <TextBlock Text="{Binding String, Mode=OneWay, Converter={StaticResource StripTagConverter}}"
+                                                    <TextBlock Text="{ReflectionBinding String, Mode=OneWay, Converter={StaticResource StripTagConverter}}"
                                                                VerticalAlignment="Center"
                                                                Margin="0,0,0,0" />
                                                 </Border>
@@ -73,7 +73,7 @@
                             <themes:ParameterDataTemplateSelector.BoolParameter>
                                 <DataTemplate>
                                     <CheckBox Focusable="True" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"
-                                              IsChecked="{Binding Value, Converter={StaticResource LongToBoolConverter}}" />
+                                              IsChecked="{ReflectionBinding Value, Converter={StaticResource LongToBoolConverter}}" />
                                 </DataTemplate>
                             </themes:ParameterDataTemplateSelector.BoolParameter>
                         </themes:ParameterDataTemplateSelector>

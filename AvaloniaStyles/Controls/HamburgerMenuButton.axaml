@@ -38,14 +38,13 @@
           <Button.Styles>
             <Style Selector="MenuItem">
               <Setter Property="IsChecked" Value="{Binding IsChecked}"></Setter>
-              <Setter Property="ToggleType" Value="{Binding ToggleType, Converter={x:Static converters:NativeMenuItemToggleTypeToMenuItemToggleTypeConverter.Instance}}" />
+              <Setter Property="ToggleType" Value="{Binding ToggleType}" />
               <Setter Property="Header" Value="{Binding Header}" />
               <Setter Property="InputGesture" Value="{Binding Gesture}" />
               <Setter Property="HotKey" Value="{Binding Gesture}" />
               <Setter Property="ItemsSource" Value="{Binding Menu.Items}" />
               <Setter Property="Command" Value="{Binding Command}" />
               <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
-              <Setter Property="(NativeMenuBar.EnableMenuItemClickForwarding)" Value="True" />
             </Style>
           </Button.Styles>
         </Button>

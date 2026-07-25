@@ -124,7 +124,8 @@ public class CodeCompletionTextEditor : TemplatedControl
                     Type = x.type
                 }));
                 completionWindow.Show();
-                completionWindow.RefreshCompletion();
+                // todo: avalonia12 transition, using upstream AvaloniaEdit missing this method
+                //completionWindow.RefreshCompletion();
             }
         }
     }

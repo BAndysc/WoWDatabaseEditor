@@ -73,12 +73,15 @@
                 </DockPanel>
             </Border>
 
-            <InfoBar
-                Margin="0,10,0,0"
-                IsOpen="{CompiledBinding ShowAvalonia11Box, Mode=TwoWay}"
-                Title="The editor uses new UI framework version"
-                Message="The editor has been updated to use a new version of the UI framework (Avalonia 11). This release had many game breaking changes. In case you see some new UI bugs, please report them on GitHub."
-                Severity="Informational" />
+            <Border Classes="infoBox" Margin="0,10, 0,0" IsVisible="{CompiledBinding ShowAvalonia12Box}">
+                <StackPanel Orientation="Vertical" TextElement.FontSize="13">
+                    <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">The editor uses new UI framework version</TextBlock>
+                    <TextBlock TextWrapping="WrapWithOverflow">The editor has been updated to use a new version of the UI framework (Avalonia 12). This release had many game breaking changes. In case you see some new UI bugs, please report them on GitHub.</TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Command="{CompiledBinding DismissAvalonia12Command}">Understood!</Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
 
             <Border Classes="infoBox" Margin="0,10, 0,0" IsVisible="{CompiledBinding ShowGiveStarBox}">
                 <StackPanel Orientation="Vertical" TextElement.FontSize="13">

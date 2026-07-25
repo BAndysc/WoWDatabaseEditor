@@ -26,7 +26,6 @@
     </Style>-->
 
     <Style Selector="controls1|ExtendedWindow">
-        <Setter Property="RoundCorners" Value="True" />
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="24" />
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
@@ -39,11 +38,7 @@
                     <Border Name="PART_TransparencyFallback" IsHitTestVisible="False" />
                     <Border Background="{TemplateBinding Background}" IsHitTestVisible="False" />
                     <Panel Background="Transparent" Margin="{TemplateBinding WindowDecorationMargin}" />
-                    <VisualLayerManager>
-                        <VisualLayerManager.ChromeOverlayLayer>
-                            <TitleBar />
-                        </VisualLayerManager.ChromeOverlayLayer>
-                        
+                    <VisualLayerManager Name="PART_VisualLayerManager">
                         <Border BorderThickness="1" BorderBrush="{DynamicResource AccentColorBackground}" Name="PART_windowBorder">
                                 <DockPanel LastChildFill="True" Margin="{TemplateBinding OffScreenMargin}">
                                     <Panel DockPanel.Dock="Top">
@@ -58,14 +53,13 @@
                                                         <Menu.Styles>
                                                             <Style Selector="MenuItem">
                                                                 <Setter Property="IsChecked" Value="{Binding IsChecked}"></Setter>
-                                                                <Setter Property="ToggleType" Value="{Binding ToggleType, Converter={x:Static converters:NativeMenuItemToggleTypeToMenuItemToggleTypeConverter.Instance}}" />
+                                                                <Setter Property="ToggleType" Value="{Binding ToggleType}" />
                                                                 <Setter Property="Header" Value="{Binding Header}"/>
                                                                 <Setter Property="InputGesture" Value="{Binding Gesture}"/>
                                                                 <Setter Property="HotKey" Value="{Binding Gesture}" />
                                                                 <Setter Property="ItemsSource" Value="{Binding Menu.Items}"/>
                                                                 <Setter Property="Command" Value="{Binding Command}"/>
                                                                 <Setter Property="CommandParameter" Value="{Binding CommandParameter}"/>
-                                                                <Setter Property="(NativeMenuBar.EnableMenuItemClickForwarding)" Value="True"/>
                                                             </Style>
                                                         </Menu.Styles>
                                                     </Menu>

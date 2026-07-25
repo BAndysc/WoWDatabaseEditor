@@ -15,7 +15,7 @@
         
         <controls:FixedTextBox x:Name="SearchBox" 
                                Padding="2,4" 
-                               Text="{Binding SearchText}" 
+                               Text="{ReflectionBinding SearchText}"
                                utils:FocusUtils.FocusFirst="True"
                                Margin="0,0,0,6"
                                Watermark="Search"
@@ -23,14 +23,14 @@
                                HorizontalAlignment="Stretch" />
         
         <controls1:GridView Grid.Row="1"
-            SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
-            Items="{Binding FilteredItems}" Margin="0,0,0,6"
-            IsVisible="{Binding ShowItemsList}"
-            utils:DataGridColumns.ColumnsSource="{Binding  Columns}"
+            SelectedItem="{ReflectionBinding SelectedItem, Mode=TwoWay}"
+            Items="{ReflectionBinding FilteredItems}" Margin="0,0,0,6"
+            IsVisible="{ReflectionBinding ShowItemsList}"
+            utils:DataGridColumns.ColumnsSource="{ReflectionBinding  Columns}"
             Name="GridView">
             <Interaction.Behaviors>
                 <EventTriggerBehavior EventName="DoubleTapped">
-                    <InvokeCommandAction Command="{Binding Accept}" />
+                    <InvokeCommandAction Command="{ReflectionBinding Accept}" />
                 </EventTriggerBehavior>
             </Interaction.Behaviors>
         </controls1:GridView>
@@ -39,7 +39,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="80" />
             </Grid.ColumnDefinitions>
-            <Button Command="{Binding Accept}" Grid.Column="1" Content="Ok" />
+            <Button Command="{ReflectionBinding Accept}" Grid.Column="1" Content="Ok" />
         </Grid>
     </Grid>
 </controls:DialogViewBase>

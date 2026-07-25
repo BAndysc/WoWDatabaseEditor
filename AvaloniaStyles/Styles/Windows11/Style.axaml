@@ -13,6 +13,10 @@
                                 <!--<FontFamily x:Key="MainFontSans">avares://Avalonia.Themes.Fluent/Assets#Inter</FontFamily>-->
                                 <FontFamily x:Key="ContentControlThemeFontFamily">avares://AvaloniaStyles/Styles/Assets#Lato</FontFamily>
                                 <FontFamily x:Key="MainFontSans">avares://AvaloniaStyles/Styles/Assets#Lato</FontFamily>
+
+                                <ResourceDictionary.MergedDictionaries>
+                                        <MergeResourceInclude Source="../Windows10/TreeView.axaml" />
+                                </ResourceDictionary.MergedDictionaries>
                         </ResourceDictionary>
                 </Style.Resources>
         </Style>
@@ -57,6 +61,6 @@
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows11/Window.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/StatusBar.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/SettingItem.axaml" />
-        <StyleInclude Source="avares://Dock.Avalonia/Themes/DockFluentTheme.axaml"/>
+        <StyleInclude Source="avares://Dock.Avalonia.Themes.Fluent/DockFluentTheme.axaml"/>
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Dock.axaml" />
 </Styles>

@@ -6,6 +6,7 @@
                         <ResourceDictionary>
                                 <ResourceDictionary.MergedDictionaries>
                                         <MergeResourceInclude Source="avares://AvaloniaStyles/Styles/Windows10/WindowMessageBox.axaml" />
+                                        <MergeResourceInclude Source="TreeView.axaml" />
                                         <!-- <MergeResourceInclude Source="avares://AvaloniaStyles/Styles/Windows10/Window.xaml" /> -->
                                 </ResourceDictionary.MergedDictionaries>
                                 <system:Double x:Key="ControlContentThemeFontSize">12</system:Double>
@@ -52,6 +53,6 @@
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/StatusBar.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/SettingItem.axaml" />
         <!-- <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/WindowMessageBox.axaml" /> -->
-        <StyleInclude Source="avares://Dock.Avalonia/Themes/DockFluentTheme.axaml"/>
+        <DockFluentTheme />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Dock.axaml" />
 </Styles>

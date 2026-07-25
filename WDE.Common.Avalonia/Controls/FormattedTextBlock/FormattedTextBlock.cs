@@ -228,13 +228,13 @@ namespace WDE.Common.Avalonia.Controls
                     startIndex = index + 1;
                     state = State.Text;
                 } 
-                else if (s == ' ' && state == State.Text && toFulsh == null)
+                else if (s == ' ' && state == State.Text && toFulsh.IsEmpty)
                 {
                     toFulsh = text.AsSpan(startIndex, index - startIndex + 1);
                     if (index < text.Length - 1)
                         startIndex = index + 1;
                 }
-                else if ((s == '\n' || s == '\r') && state == State.Text && toFulsh == null)
+                else if ((s == '\n' || s == '\r') && state == State.Text && toFulsh.IsEmpty)
                 {
                     toFulsh = text.AsSpan(startIndex, index - startIndex);
                     if (index < text.Length - 1)
@@ -244,7 +244,7 @@ namespace WDE.Common.Avalonia.Controls
                 if (state == State.Text && index == text.Length - 1)
                     toFulsh = text.AsSpan(startIndex).TrimEnd();
 
-                if (toFulsh == null)
+                if (toFulsh.IsEmpty)
                     continue;
 
                 action(toFulsh.ToString(), partIndex, source, parameter, contextId, drawBitmap);

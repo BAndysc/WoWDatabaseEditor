@@ -2,9 +2,9 @@
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             Title="{Binding Model.Title}"
-             Header="{Binding Model.MainInstruction}"
-             Message="{Binding Model.Content}"
+             Title="{ReflectionBinding Model.Title}"
+             Header="{ReflectionBinding Model.MainInstruction}"
+             Message="{ReflectionBinding Model.Content}"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:messageBoxService="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
@@ -18,11 +18,11 @@
         <Image Source="../../Icon.png"></Image>
     </controls:BaseMessageBoxWindow.Image>
     <controls:BaseMessageBoxWindow.KeyBindings>
-        <KeyBinding Gesture="Escape" Command="{Binding CancelButtonCommand}" />
-        <KeyBinding Gesture="Y" Command="{Binding YesButtonCommand}" />
-        <KeyBinding Gesture="N" Command="{Binding NoButtonCommand}" />
+        <KeyBinding Gesture="Escape" Command="{ReflectionBinding CancelButtonCommand}" />
+        <KeyBinding Gesture="Y" Command="{ReflectionBinding YesButtonCommand}" />
+        <KeyBinding Gesture="N" Command="{ReflectionBinding NoButtonCommand}" />
     </controls:BaseMessageBoxWindow.KeyBindings>
-    <ItemsControl KeyboardNavigation.TabNavigation="Continue" ItemsSource="{Binding Buttons}" Name="ButtonsList">
+    <ItemsControl KeyboardNavigation.TabNavigation="Continue" ItemsSource="{ReflectionBinding Buttons}" Name="ButtonsList">
         <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="messageBoxService:MessageBoxButtonViewModel">
                 <Button Content="{CompiledBinding Name}" 

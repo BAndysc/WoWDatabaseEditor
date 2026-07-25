@@ -14,27 +14,4 @@ namespace WDE.Common.Avalonia.Controls;
 public class FixedContextMenu : ContextMenu
 {
     protected override Type StyleKeyOverride => typeof(ContextMenu);
-
-    private static FieldInfo? previousFocusField;
-    
-    static FixedContextMenu()
-    {
-        previousFocusField = typeof(ContextMenu).GetField("_previousFocus", BindingFlags.NonPublic | BindingFlags.Instance);
-    }
-    
-    public FixedContextMenu()
-    {
-        ((IPopupHostProvider)this).PopupHostChanged += OnPopupHostChanged; 
-    }
-
-    private void OnPopupHostChanged(IPopupHost? obj)
-    {
-        if (obj == null) // closed
-        {
-            if (previousFocusField != null)
-            {
-                previousFocusField.SetValue(this, null);
-            }
-        }
-    }
 }

@@ -196,15 +196,17 @@ namespace AvaloniaStyles.Controls
 
         private void OnContentScrollChanged(object? sender, ScrollChangedEventArgs e)
         {
-            if (contentScroll is not null && headerScroll is not null && !MathUtilities.IsZero(e.OffsetDelta.X))
+            if (contentScroll is not null && headerScroll is not null && !IsZero(e.OffsetDelta.X))
                 headerScroll.Offset = headerScroll.Offset.WithX(contentScroll.Offset.X);
         }
 
         private void OnHeaderScrollChanged(object? sender, ScrollChangedEventArgs e)
         {
-            if (contentScroll is not null && headerScroll is not null && !MathUtilities.IsZero(e.OffsetDelta.X))
+            if (contentScroll is not null && headerScroll is not null && !IsZero(e.OffsetDelta.X))
                 contentScroll.Offset = contentScroll.Offset.WithX(headerScroll.Offset.X);
         }
+
+        public static bool IsZero(double value) => Math.Abs(value) < 2.220446049250313E-15;
 
         private void BindFixMultiSelect()
         {

@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:idGeneratorService="clr-namespace:WoWDatabaseEditorCore.Services.IdGeneratorService;assembly=WoWDatabaseEditorCore"
+             xmlns:idGenerator="clr-namespace:WDE.Common.Services.IdGenerator;assembly=WDE.Common"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="idGeneratorService:IdGeneratorConfigurationViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.IdGeneratorService.IdGeneratorConfigurationView">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" Grid.IsSharedSizeScope="True">
+        <ItemsControl ItemsSource="{CompiledBinding IdTypes}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="idGeneratorService:IdTypeConfigViewModel">
+                    <StackPanel>
+                        <SettingItem Header="{CompiledBinding Name}">
+                            <StackPanel Spacing="4">
+                                <ComboBox HorizontalAlignment="Stretch"
+                                          ItemsSource="{CompiledBinding Sources}"
+                                          SelectedItem="{CompiledBinding SelectedSource, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="idGenerator:IIdSource">
+                                            <TextBlock Text="{CompiledBinding Name}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <TextBlock Foreground="Orange"
+                                           TextWrapping="Wrap"
+                                           IsVisible="{CompiledBinding SelectedSourceNeedsSetup}"
+                                           Text="This source needs to be configured below before it can generate ids." />
+                            </StackPanel>
+                        </SettingItem>
+                        <!-- the selected source's own settings, e.g. the personal guid range for this kind -->
+                        <ContentControl Margin="24,0,0,8"
+                                        IsVisible="{CompiledBinding SelectedSourceConfiguration, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                        Content="{CompiledBinding SelectedSourceConfiguration}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
+</UserControl>

@@ -24,7 +24,7 @@ internal class GifInstance : IDisposable
 
     internal GifInstance(object newValue) : this(newValue switch
     {
-        Stream s => s, 
+        Stream s => s,
         _ => throw new InvalidDataException("Unsupported source object")
     })
     {
@@ -68,7 +68,8 @@ internal class GifInstance : IDisposable
 
     public void Dispose()
     {
-        if (_isDisposed) return;
+        if (_isDisposed)
+            return;
 
         GC.SuppressFinalize(this);
 
@@ -104,7 +105,8 @@ internal class GifInstance : IDisposable
         var timeModulus = TimeSpan.FromTicks(elapsedTicks % totalTicks);
         var targetFrame = _frameTimes.FirstOrDefault(x => timeModulus < x);
         var currentFrame = _frameTimes.IndexOf(targetFrame);
-        if (currentFrame == -1) currentFrame = 0;
+        if (currentFrame == -1)
+            currentFrame = 0;
 
         if (_currentFrameIndex == currentFrame)
             return _targetBitmap;

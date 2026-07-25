@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Serilog;
 using WDE.Common;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService;
@@ -35,12 +36,24 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             
             var window = windows.SingleOrDefault(w => w.IsActive);
             if (window is MessageBoxView)
-                window = window.Owner as Window;
+                return window.Owner as Window;
             else if (window is SplashScreenWindow)
-                window = null;
+                return null;
 
-            window ??= windows.SingleOrDefault(w => w is MainWindowWithDocking);
-            return window;
+            foreach (var w in windows)
+            {
+                if (w is MainWindowWithDocking)
+                {
+                    return w;
+                }
+            }
+            LOG.LogWarning("No window is MainWindowWithDocking. Available windows:");
+            foreach (var w in windows)
+            {
+                LOG.LogWarning($" - {w.Title} ({w.GetType()}");
+            }
+
+            return windows.FirstOrDefault(x => x.IsActive) ?? windows.FirstOrDefault();
         }
         
         public Task<T> ShowDialog<T>(Window window)

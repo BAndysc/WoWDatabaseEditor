@@ -230,7 +230,7 @@
                                     </ListBox.ItemTemplate>
                                     <Interaction.Behaviors>
                                         <EventTriggerBehavior EventName="DoubleTapped">
-                                            <InvokeCommandAction CommandParameter="{Binding #ActionReasonsView.SelectedItem.PacketNumber, FallbackValue={x:Null}}" Command="{Binding JumpToPacketCommand}" />
+                                            <InvokeCommandAction CommandParameter="{ReflectionBinding #ActionReasonsView.SelectedItem.PacketNumber, FallbackValue={x:Null}}" Command="{Binding JumpToPacketCommand}" />
                                         </EventTriggerBehavior>
                                     </Interaction.Behaviors>
                                 </ListBox>
@@ -260,7 +260,7 @@
                                     </ListBox.ItemTemplate>
                                     <Interaction.Behaviors>
                                         <EventTriggerBehavior EventName="DoubleTapped">
-                                            <InvokeCommandAction CommandParameter="{Binding #PossibleActionsView.SelectedItem.PacketNumber, FallbackValue={x:Null}}" Command="{CompiledBinding JumpToPacketCommand}" />
+                                            <InvokeCommandAction CommandParameter="{ReflectionBinding #PossibleActionsView.SelectedItem.PacketNumber, FallbackValue={x:Null}}" Command="{CompiledBinding JumpToPacketCommand}" />
                                         </EventTriggerBehavior>
                                     </Interaction.Behaviors>
                                 </ListBox>

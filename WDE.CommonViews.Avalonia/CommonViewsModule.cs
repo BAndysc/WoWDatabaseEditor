@@ -2,7 +2,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Windows;
 using WDE.CommonViews.Avalonia.DbcStore.Views;
 using WDE.CommonViews.Avalonia.History.Views;
-using WDE.CommonViews.Avalonia.Mpq;
+using WDE.CommonViews.Avalonia.WorldRenderer;
 using WDE.CommonViews.Avalonia.Parameters;
 using WDE.CommonViews.Avalonia.Parameters.Views;
 using WDE.CommonViews.Avalonia.RemoteSOAP.Views;
@@ -15,7 +15,7 @@ using WDE.CommonViews.Avalonia.Updater.Views;
 using WDE.DbcStore.ViewModels;
 using WDE.HistoryWindow.ViewModels;
 using WDE.Module;
-using WDE.MPQ.ViewModels;
+using WDE.MapRenderer;
 using WDE.MySqlDatabaseCommon.Tools;
 using WDE.Parameters.ViewModels;
 using WDE.RemoteSOAP.ViewModels;
@@ -65,7 +65,7 @@ namespace WDE.CommonViews.Avalonia
             // remote soap
             viewLocator.Bind<SoapConfigViewModel, SoapConfigView>();
             //mpq
-            viewLocator.Bind<MpqSettingsViewModel, MpqSettingsView>();
+            viewLocator.Bind<WorldRendererSettingsViewModel, WorldRendererSettingsView>();
         }
     }
 }

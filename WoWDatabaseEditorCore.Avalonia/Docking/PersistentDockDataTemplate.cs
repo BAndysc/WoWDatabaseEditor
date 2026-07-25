@@ -31,6 +31,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             Bind();
             if (data is AvaloniaDocumentDockWrapper documentDockWrapper)
             {
+                if (documentDockWrapper.ViewModel == null)
+                {
+                    return new Label() { Content = "ViewModel is null" };
+                }
                 if (documents.TryGetValue(documentDockWrapper.ViewModel, out var view))
                 {
                     var parent = view.GetVisualParent();

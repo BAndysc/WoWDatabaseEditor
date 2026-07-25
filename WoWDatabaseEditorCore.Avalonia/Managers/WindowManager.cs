@@ -219,7 +219,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                     if (Application.Current!.ApplicationLifetime is ISingleViewApplicationLifetime viewApp)
                         visualRoot = viewApp.MainView;
                     else
-                        visualRoot = mainWindowHolder.RootWindow.GetLogicalChildren().FirstOrDefault() as MainWebView;
+                        visualRoot = mainWindowHolder.RootWindow.GetLogicalChildren().FirstOrDefault(x => x is MainWebView) as MainWebView;
 
                     var panel = visualRoot!.GetControl<PseudoWindowsPanel>("PART_WindowsContainer");
 
@@ -299,7 +299,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                     if (Application.Current!.ApplicationLifetime is ISingleViewApplicationLifetime viewApp)
                         visualRoot = viewApp.MainView;
                     else
-                        visualRoot = mainWindowHolder.RootWindow.GetLogicalChildren().FirstOrDefault() as MainWebView;
+                        visualRoot = mainWindowHolder.RootWindow.GetLogicalChildren().FirstOrDefault(x => x is MainWebView) as MainWebView;
 
                     var panel = visualRoot!.GetControl<PseudoWindowsPanel>("PART_WindowsContainer");
 
@@ -345,7 +345,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                             if (focusedElement != null &&
                                 focusedElement.TryGetTarget(out var focusedElement__))
                             {
-                                if (((Visual)focusedElement__).GetVisualRoot() == null)
+                                if ((TopLevel.GetTopLevel((Visual)focusedElement__)) == null)
                                     (parentWindow.GetLogicalChildren().FirstOrDefault(x => x is not ToolBar) as Control)?.Focus();
                                 else
                                     focusedElement__.Focus();

@@ -32,25 +32,23 @@
     </Style>-->
 
     <Style Selector="ExtendedWindow">
-        <Setter Property="RoundCorners" Value="True" />
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="24" />
+
+        <!-- this works on macos, need double check in Windows and Linux -->
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
-        <Setter Property="Chrome" Value="NoSystemChrome" />
+        <Setter Property="Chrome" Value="MacOsChrome" />
+        <Setter Property="WindowDecorations" Value="BorderOnly" />
+
         <Setter Property="Background" Value="{DynamicResource WindowContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
         <Setter Property="Template">
             <ControlTemplate>
+                <VisualLayerManager Name="PART_VisualLayerManager">
                 <Panel>
                     <Border Name="PART_TransparencyFallback" IsHitTestVisible="False" />
                     <Border Background="{TemplateBinding Background}" IsHitTestVisible="False" />
-                    <Panel Background="Transparent" Margin="{TemplateBinding WindowDecorationMargin}" />
-                    <VisualLayerManager>
-                        <VisualLayerManager.ChromeOverlayLayer>
-                            <TitleBar />
-                        </VisualLayerManager.ChromeOverlayLayer>
 
-                        
                 <Border BorderThickness="0" BorderBrush="{DynamicResource OuterWindowBorderColor}" Name="PART_windowBorder">
                     <Border ClipToBounds="True" BorderThickness="0" BorderBrush="{DynamicResource InnerWindowBorderColor}" Name="PART_windowBorder_inner">
                             <DockPanel LastChildFill="True" Margin="{TemplateBinding OffScreenMargin}">
@@ -115,8 +113,8 @@
                             </DockPanel>
                         </Border>
                     </Border>
-                        </VisualLayerManager>
                     </Panel>
+                </VisualLayerManager>
             </ControlTemplate>
         </Setter>
     </Style>
@@ -205,11 +203,12 @@
     <!--- dialog -->
 
     <Style Selector="BaseMessageBoxWindow">
-        <Setter Property="RoundCorners" Value="True" />
+        <!-- this works on macos, need double check in Windows and Linux -->
+        <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
+        <Setter Property="WindowDecorations" Value="BorderOnly" />
+
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
         <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
-        <Setter Property="ExtendClientAreaChromeHints" Value="NoChrome" />
-        <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
         <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
         <Setter Property="Title" Value="{DynamicResource Title}"/>
         <Setter Property="WindowStartupLocation" Value="CenterOwner" />
@@ -222,7 +221,7 @@
                     <Border BorderThickness="0.5" BorderBrush="{DynamicResource InnerWindowBorderColor}" Name="PART_windowBorder_inner">
                         <Panel>
                             <Panel Background="{TemplateBinding Background}" IsHitTestVisible="False" />
-                            <VisualLayerManager>
+                            <VisualLayerManager Name="PART_VisualLayerManager">
                                 <DockPanel LastChildFill="True">
                                     <ContentPresenter DockPanel.Dock="Bottom" 
                                                       Content="{TemplateBinding Content}"

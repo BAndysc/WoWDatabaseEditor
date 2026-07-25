@@ -1,12 +1,11 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace WDE.CommonViews.Avalonia.Mpq
+namespace WDE.CommonViews.Avalonia.WorldRenderer
 {
-    public partial class MpqSettingsView : UserControl
+    public partial class WorldRendererSettingsView : UserControl
     {
-        public MpqSettingsView()
+        public WorldRendererSettingsView()
         {
             InitializeComponent();
         }
@@ -15,5 +14,5 @@ namespace WDE.CommonViews.Avalonia.Mpq
         {
             AvaloniaXamlLoader.Load(this);
         }
-    }   
+    }
 }

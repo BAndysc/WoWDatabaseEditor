@@ -18,6 +18,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles;
 using AvaloniaStyles.Controls;
+using Classic.CommonControls;
 using Dock.Avalonia.Controls;
 using Newtonsoft.Json;
 using Prism.Events;
@@ -129,11 +130,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 this.Classes.Add("win10");
             }
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                ExtendClientAreaToDecorationsHint = true;
-                Chrome = ExtendedWindowChrome.NoSystemChrome;
-            }
             PersistentDockDataTemplate.DocumentManager = documentManager;
 
             tempToolbarButtonStyleService.ToObservable(x => x.Style)
@@ -141,6 +137,13 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 {
                     Application.Current!.Resources["DisplayButtonImageIcon"] = style is ToolBarButtonStyle.Icon or ToolBarButtonStyle.IconAndText;
                     Application.Current!.Resources["DisplayButtonImageText"] = style is ToolBarButtonStyle.Text or ToolBarButtonStyle.IconAndText;
+                    Application.Current!.Resources["ButtonImageTextPlacement"] = style switch
+                    {
+                        ToolBarButtonStyle.Icon => ToolbarTextPlacement.NoText,
+                        ToolBarButtonStyle.IconAndText => ToolbarTextPlacement.Right,
+                        ToolBarButtonStyle.Text => ToolbarTextPlacement.Right,
+                        _ => throw new ArgumentOutOfRangeException(nameof(style), style, null)
+                    };
                 });
 
             bool once = true;
@@ -360,11 +363,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
 
         private void Drop(object? sender, DragEventArgs e)
         {
-            if (!e.Data.Contains(DataFormats.Files) || !parserViewerSolutionItemService.Enabled)
-                return;
-
-            var files = e.Data.GetFiles();
-            if (files == null)
+            if (e.DataTransfer.TryGetFiles() is not {} files || !parserViewerSolutionItemService.Enabled)
                 return;
 
             foreach (var file in files.Select(x => x.TryGetLocalPath())
@@ -380,12 +379,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
 
         private void DragOver(object? sender, DragEventArgs e)
         {
-            e.DragEffects = e.Data.Contains(DataFormats.Files) && parserViewerSolutionItemService.Enabled ? DragDropEffects.Copy : DragDropEffects.None;
+            e.DragEffects = e.DataTransfer.Formats.Contains(DataFormat.File) && parserViewerSolutionItemService.Enabled ? DragDropEffects.Copy : DragDropEffects.None;
         }
 
         private void DragEnter(object? sender, DragEventArgs e)
         {
-            e.DragEffects = e.Data.Contains(DataFormats.Files) && parserViewerSolutionItemService.Enabled ? DragDropEffects.Copy : DragDropEffects.None;
+            e.DragEffects = e.DataTransfer.Formats.Contains(DataFormat.File) && parserViewerSolutionItemService.Enabled ? DragDropEffects.Copy : DragDropEffects.None;
         }
 
         public struct WindowLastSize : ISettings

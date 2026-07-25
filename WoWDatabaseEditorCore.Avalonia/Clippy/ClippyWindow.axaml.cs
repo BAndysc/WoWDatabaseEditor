@@ -4,7 +4,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using Avalonia.Labs.Gif;
 using Avalonia.Markup.Xaml.Templates;
+using Avalonia.Platform;
 using Classic.Avalonia.Theme;
 
 namespace WoWDatabaseEditorCore.Avalonia.Clippy;
@@ -19,6 +21,7 @@ public partial class ClippyWindow : ClassicWindow
     {
         InitializeComponent();
         this.AttachDevTools();
+        Clippy.Source = GifStreamSource.FromUriString("avares://WoWDatabaseEditorCore.Avalonia.GUI/Clippy/clippy.gif");
     }
 
     protected override void OnLoaded(RoutedEventArgs e)

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Library</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>
@@ -17,6 +17,7 @@
         <ProjectReference Include="..\Modules\WDE.Sessions\WDE.Sessions.csproj" />
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
         <ProjectReference Include="..\WDE.MPQ\WDE.MPQ.csproj" />
+        <ProjectReference Include="..\WDE.MapRenderer\WDE.MapRenderer.csproj" />
         <ProjectReference Include="..\WDE.MySqlDatabaseCommon\WDE.MySqlDatabaseCommon.csproj" />
         <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
         <ProjectReference Include="..\WDE.RemoteSOAP\WDE.RemoteSOAP.csproj" />

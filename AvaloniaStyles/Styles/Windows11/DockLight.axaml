@@ -2,6 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia">
         <Styles.Resources>
+                <SolidColorBrush x:Key="DockBorderSubtleBrush">#FF8E9BBC</SolidColorBrush>
+                <SolidColorBrush x:Key="DockDocumentContentBorderBrush">#FF8E9BBC</SolidColorBrush>
                 <SolidColorBrush Accent.BaseColor="#4D6082" x:Key="ToolChromeControl.Grip" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
                 <SolidColorBrush Accent.BaseColor="#515F7F" x:Key="DocumentControl.PART_TabStripItem" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
                 <SolidColorBrush Accent.BaseColor="#5F7096" x:Key="DocumentControl.PART_TabStrip.pointerover.not.selected" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
@@ -16,7 +18,7 @@
         <Style Selector="idc|ToolChromeControl /template/ TextBlock#PART_Title">
                 <Setter Property="Foreground" Value="{DynamicResource DockThemeForegroundBrush}" />
         </Style>
-        <Style Selector="idc|DocumentControl /template/ Border#PART_Border ContentControl#PART_ContentPresenter">
+        <Style Selector="idc|DocumentControl /template/ Border#PART_Border DeferredContentControl#PART_ContentPresenter">
                 <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         </Style>
         <Style Selector="idc|DocumentControl DocumentTabStripItem">
@@ -51,8 +53,10 @@
         <Style Selector="idc|DocumentControl:not(:active) DocumentTabStripItem:selected">
                 <Setter Property="Background" Value="{StaticResource DocumentControl.PART_TabStripItem}" />
         </Style>
-        
         <Style Selector="DocumentTabStripItem">
                 <Setter Property="Foreground" Value="#333333" />
+        </Style>
+        <Style Selector="ToolTabStrip">
+                <Setter Property="Margin" Value="0,-2,0,0" />
         </Style>
 </Styles>

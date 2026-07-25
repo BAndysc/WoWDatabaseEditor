@@ -23,8 +23,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        BorderStyle="Sunken"
-                        CornerRadius="{TemplateBinding CornerRadius}">
+                        BorderStyle="Sunken">
                     <DockPanel LastChildFill="True" Grid.IsSharedSizeScope="True">
                         <ScrollViewer HorizontalScrollBarVisibility="Hidden"
                                            VerticalScrollBarVisibility="Disabled"

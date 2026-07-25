@@ -91,11 +91,11 @@ namespace WDE.Common.Avalonia.Controls
         private async void PasteAsync()
         {
             var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
-            var text = clipboard == null ? null : await clipboard.GetTextAsync();
-
-            if (text is null) 
+            if (clipboard == null)
                 return;
-            
+            if (!(await clipboard.TryGetTextAsync() is { } text))
+                return;
+
             var coords = CoordsParser.ExtractCoords(text);
             if (coords.HasValue)
             {
@@ -169,7 +169,7 @@ namespace WDE.Common.Avalonia.Controls
             return FindPrev<T>(parent);
         }
         
-        protected override void OnGotFocus(GotFocusEventArgs e)
+        protected override void OnGotFocus(FocusChangedEventArgs e)
         {
             base.OnGotFocus(e);
             lastFocusTime = DateTime.Now;

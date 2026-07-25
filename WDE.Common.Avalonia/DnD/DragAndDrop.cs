@@ -77,6 +77,7 @@ namespace WDE.Common.Avalonia.DnD
 
         static DragAndDrop()
         {
+            _lastPointerPressed = null;
             platformCopyKeyModifier = KeyGestures.CommandModifier;
             adorner = new AdornerHelper();
             IsDropTargetProperty.Changed.Subscribe(args =>
@@ -85,18 +86,21 @@ namespace WDE.Common.Avalonia.DnD
                 {
                     args.Sender.SetValue(DragDrop.AllowDropProperty, true);
                     listBox.AddHandler(DragDrop.DropEvent, OnListDrop);
+                    listBox.AddHandler(DragDrop.DragEnterEvent, OnListDragOver);
                     listBox.AddHandler(DragDrop.DragOverEvent, OnListDragOver);
                 }
                 else if (args.Sender is TreeView treeView)
                 {
                     args.Sender.SetValue(DragDrop.AllowDropProperty, true);
                     treeView.AddHandler(DragDrop.DropEvent, OnTreeViewDrop);
+                    treeView.AddHandler(DragDrop.DragEnterEvent, OnTreeViewDragOver);
                     treeView.AddHandler(DragDrop.DragOverEvent, OnTreeViewDragOver);
                 }
                 else if (args.Sender is GridView gridView)
                 {
                     args.Sender.SetValue(DragDrop.AllowDropProperty, true);
                     gridView.AddHandler(DragDrop.DropEvent, OnGridViewDrop);
+                    gridView.AddHandler(DragDrop.DragEnterEvent, OnGridViewDragOver);
                     gridView.AddHandler(DragDrop.DragOverEvent, OnGridViewDragOver);
                 }
             });
@@ -121,9 +125,11 @@ namespace WDE.Common.Avalonia.DnD
         }
         
         private static bool dragging = false;
+        private static PointerPressedEventArgs? _lastPointerPressed;
 
-        private static void OnListPreviewMouseLeftButtonDown(object? sender, PointerEventArgs e)
+        private static void OnListPreviewMouseLeftButtonDown(object? sender, PointerPressedEventArgs e)
         {
+            _lastPointerPressed = e;
             dragging = false;
             m_cursorStartPos = e.GetPosition(null);
         }
@@ -149,14 +155,18 @@ namespace WDE.Common.Avalonia.DnD
                 return;
             
             dragging = true;
-            var data = new DataObject();
-            data.Set("", new DragInfo()
+            var data = IDataTransfer.Create(new DragInfo()
             {
-                draggedElement = new List<object?>(){treeView.SelectedItem},
-                draggedIndex = new List<int>(){0}
+                draggedElement = new List<object?>() { treeView.SelectedItem },
+                draggedIndex = new List<int>() { 0 }
             });
 
-            DoDrag(e, treeView, data).ListenErrors();
+            if (_lastPointerPressed == null)
+            {
+                Console.WriteLine("_lastPointerPressed is null, can't perform drag and drop!");
+                return;
+            }
+            DoDrag(_lastPointerPressed, treeView, data).ListenErrors();
         }
         
         private static void OnGridViewPreviewMouseMove(object? sender, PointerEventArgs e)
@@ -178,14 +188,18 @@ namespace WDE.Common.Avalonia.DnD
                 return;
             
             dragging = true;
-            var data = new DataObject();
-            data.Set("", new DragInfo()
+            var data = IDataTransfer.Create<DragInfo>(new DragInfo()
             {
                 draggedElement = listBox.ListBoxImpl!.Selection.SelectedItems,
                 draggedIndex = listBox.ListBoxImpl!.Selection.SelectedIndexes
             });
-                    
-            DoDrag(e, listBox.ListBoxImpl!, data).ListenErrors();
+
+            if (_lastPointerPressed == null)
+            {
+                Console.WriteLine("_lastPointerPressed is null, can't perform drag and drop!");
+                return;
+            }
+            DoDrag(_lastPointerPressed, listBox.ListBoxImpl!, data).ListenErrors();
         }
             
         private static void OnListPreviewMouseMove(object? sender, PointerEventArgs e)
@@ -207,27 +221,32 @@ namespace WDE.Common.Avalonia.DnD
                 return;
             
             dragging = true;
-            var data = new DataObject();
-            data.Set("", new DragInfo()
+            var data = IDataTransfer.Create<DragInfo>(new DragInfo()
             {
                 draggedElement = listBox.Selection.SelectedItems,
                 draggedIndex = listBox.Selection.SelectedIndexes
             });
-                    
-            DoDrag(e, listBox, data).ListenErrors();
+
+            if (_lastPointerPressed == null)
+            {
+                Console.WriteLine("_lastPointerPressed is null, can't perform drag and drop!");
+                return;
+            }
+            DoDrag(_lastPointerPressed, listBox, data).ListenErrors();
         }
 
-        private static async Task DoDrag(PointerEventArgs e, Visual listBox, DataObject data)
+        private static async Task DoDrag(PointerPressedEventArgs e, Visual listBox, IDataTransfer data)
         {
+            Console.WriteLine("Attempting to start drag and drop");
             adorner.AddAdorner(listBox);
-            await DragDrop.DoDragDrop(e, data, DragDropEffects.Move);
+            await DragDrop.DoDragDropAsync(e, data, DragDropEffects.Move);
             adorner.RemoveAdorner(listBox);
         }
 
-        public struct DragInfo 
+        public class DragInfo
         {
-            public IReadOnlyList<int> draggedIndex;
-            public IReadOnlyList<object?> draggedElement;
+            public IReadOnlyList<int> draggedIndex = new List<int>();
+            public IReadOnlyList<object?> draggedElement = new List<object?>();
         }
 
         public class DropInfo : IDropInfo
@@ -248,13 +267,12 @@ namespace WDE.Common.Avalonia.DnD
 
         private static void OnListDragOver(object? sender, DragEventArgs e)
         {
-            if (e.Data.Contains(DataFormats.Files))
+            if (!e.DataTransfer.TryGet<DragInfo>(out var dragInfo))
                 return;
 
             var listBox = sender as ListBox;
             var dropElement = FindVisualParent<ListBoxItem>(e.Source as Visual);
-            var dragInfo = e.Data.Get("") as DragInfo?;
-            if (dragInfo == null || dragInfo.Value.draggedElement.Count == 0)
+            if (dragInfo == null || dragInfo.draggedElement.Count == 0)
                 return;
             
             if (listBox == null)
@@ -264,7 +282,7 @@ namespace WDE.Common.Avalonia.DnD
             if (dropHandler == null)
                 return;
 
-            var indexOfDrop = dropElement != null ? listBox.ItemContainerGenerator.IndexFromContainer(dropElement) : -1;
+            var indexOfDrop = dropElement != null ? listBox.IndexFromContainer(dropElement) : -1;
             RelativeInsertPosition insertPosition = RelativeInsertPosition.None;
             
             if (dropElement != null)
@@ -281,7 +299,7 @@ namespace WDE.Common.Avalonia.DnD
             else
                 indexOfDrop = listBox.ItemCount;
 
-            var dropInfo = new DropInfo(dragInfo.Value.draggedElement[0]!)
+            var dropInfo = new DropInfo(dragInfo.draggedElement[0]!)
             {
                 InsertIndex = indexOfDrop,
                 InsertPosition = insertPosition,
@@ -308,13 +326,12 @@ namespace WDE.Common.Avalonia.DnD
 
         private static void OnListDrop(object? sender, DragEventArgs e)
         {
-            if (e.Data.Contains(DataFormats.Files))
+            if (!e.DataTransfer.TryGet<DragInfo>(out var dragInfo))
                 return;
 
             var listBox = sender as ListBox;
             var dropElement = FindVisualParent<ListBoxItem>(e.Source as Visual);
-            var dragInfo = e.Data.Get("") as DragInfo?;
-            if (dragInfo == null || dragInfo.Value.draggedElement.Count == 0)
+            if (dragInfo == null || dragInfo.draggedElement.Count == 0)
                 return;
             
             if (listBox == null)
@@ -326,7 +343,7 @@ namespace WDE.Common.Avalonia.DnD
             
             adorner.RemoveAdorner(listBox);
             
-            var indexOfDrop = dropElement != null ? listBox.ItemContainerGenerator.IndexFromContainer(dropElement) : -1;
+            var indexOfDrop = dropElement != null ? listBox.IndexFromContainer(dropElement) : -1;
             if (dropElement != null)
             {
                 var pos = e.GetPosition(dropElement);
@@ -338,7 +355,7 @@ namespace WDE.Common.Avalonia.DnD
             
             WrapTryCatch(() =>
             {
-                dropHandler.Drop(new DropInfo(dragInfo.Value.draggedElement[0]!)
+                dropHandler.Drop(new DropInfo(dragInfo.draggedElement[0]!)
                 {
                     InsertIndex = indexOfDrop,
                     TargetItem = listBox.Items,
@@ -354,13 +371,12 @@ namespace WDE.Common.Avalonia.DnD
         // Grid View
         private static void OnGridViewDragOver(object? sender, DragEventArgs e)
         {
-            if (e.Data.Contains(DataFormats.Files))
+            if (!e.DataTransfer.TryGet<DragInfo>(out var dragInfo))
                 return;
 
             var listBox = sender as GridView;
             var dropElement = FindVisualParent<ListBoxItem>(e.Source as Visual);
-            var dragInfo = e.Data.Get("") as DragInfo?;
-            if (dragInfo == null || dragInfo.Value.draggedElement.Count == 0)
+            if (dragInfo == null || dragInfo.draggedElement.Count == 0)
                 return;
             
             if (listBox == null)
@@ -370,7 +386,7 @@ namespace WDE.Common.Avalonia.DnD
             if (dropHandler == null)
                 return;
             
-            var indexOfDrop = dropElement != null ? listBox.ListBoxImpl!.ItemContainerGenerator.IndexFromContainer(dropElement) : -1;
+            var indexOfDrop = dropElement != null ? listBox.ListBoxImpl!.IndexFromContainer(dropElement) : -1;
             RelativeInsertPosition insertPosition = RelativeInsertPosition.None;
             
             if (dropElement != null)
@@ -387,7 +403,7 @@ namespace WDE.Common.Avalonia.DnD
             else
                 indexOfDrop = listBox.ListBoxImpl!.ItemCount;
 
-            var dropInfo = new DropInfo(listBox.ListBoxImpl?.SelectionMode == SelectionMode.Multiple ? dragInfo.Value.draggedElement : dragInfo.Value.draggedElement[0]!)
+            var dropInfo = new DropInfo(listBox.ListBoxImpl?.SelectionMode == SelectionMode.Multiple ? dragInfo.draggedElement : dragInfo.draggedElement[0]!)
             {
                 InsertIndex = indexOfDrop,
                 InsertPosition = insertPosition,
@@ -414,13 +430,12 @@ namespace WDE.Common.Avalonia.DnD
         
         private static void OnGridViewDrop(object? sender, DragEventArgs e)
         {
-            if (e.Data.Contains(DataFormats.Files))
+            if (!e.DataTransfer.TryGet<DragInfo>(out var dragInfo))
                 return;
 
             var listBox = sender as GridView;
             var dropElement = FindVisualParent<ListBoxItem>(e.Source as Visual);
-            var dragInfo = e.Data.Get("") as DragInfo?;
-            if (dragInfo == null || dragInfo.Value.draggedElement.Count == 0)
+            if (dragInfo == null || dragInfo.draggedElement.Count == 0)
                 return;
             
             if (listBox == null)
@@ -432,7 +447,7 @@ namespace WDE.Common.Avalonia.DnD
             
             adorner.RemoveAdorner(listBox.ListBoxImpl!);
             
-            var indexOfDrop = dropElement != null ? listBox.ListBoxImpl!.ItemContainerGenerator.IndexFromContainer(dropElement) : -1;
+            var indexOfDrop = dropElement != null ? listBox.ListBoxImpl!.IndexFromContainer(dropElement) : -1;
             if (dropElement != null)
             {
                 var pos = e.GetPosition(dropElement);
@@ -445,8 +460,8 @@ namespace WDE.Common.Avalonia.DnD
             WrapTryCatch(() =>
             {
                 dropHandler.Drop(new DropInfo(listBox.ListBoxImpl?.SelectionMode == SelectionMode.Multiple
-                    ? dragInfo.Value.draggedElement
-                    : dragInfo.Value.draggedElement[0]!)
+                    ? dragInfo.draggedElement
+                    : dragInfo.draggedElement[0]!)
                 {
                     InsertIndex = indexOfDrop,
                     TargetItem = listBox.Items,
@@ -462,13 +477,12 @@ namespace WDE.Common.Avalonia.DnD
 
         private static void OnTreeViewDragOver(object? sender, DragEventArgs e)
         {
-            if (e.Data.Contains(DataFormats.Files))
+            if (!e.DataTransfer.TryGet<DragInfo>(out var dragInfo))
                 return;
 
             var treeView = sender as TreeView;
             var dropElement = FindVisualParent<TreeViewItem>(e.Source as Visual);
-            var dragInfo = e.Data.Get("") as DragInfo?;
-            if (dragInfo == null || dragInfo.Value.draggedElement.Count == 0)
+            if (dragInfo == null || dragInfo.draggedElement.Count == 0)
                 return;
             
             if (treeView == null)
@@ -480,11 +494,11 @@ namespace WDE.Common.Avalonia.DnD
 
             var parent = dropElement == null ? treeView : FindVisualParent<TreeView, TreeViewItem>(dropElement);
             
-            ItemContainerGenerator treeItemContainerGenerator;
+            ItemsControl treeItemContainerGenerator;
             if (parent is TreeView tv)
-                treeItemContainerGenerator = tv.ItemContainerGenerator;
+                treeItemContainerGenerator = tv;
             else if (parent is TreeViewItem ti)
-                treeItemContainerGenerator = ti.ItemContainerGenerator;
+                treeItemContainerGenerator = ti;
             else
                 return;
             
@@ -518,7 +532,7 @@ namespace WDE.Common.Avalonia.DnD
                 dropElement = (TreeViewItem?) dropElement.ContainerFromIndex(0);
             }
             
-            dropInfo = new DropInfo(dragInfo.Value.draggedElement[0]!)
+            dropInfo = new DropInfo(dragInfo.draggedElement[0]!)
             {
                 InsertIndex = indexOfDrop,
                 InsertPosition = insertPosition,
@@ -551,13 +565,12 @@ namespace WDE.Common.Avalonia.DnD
 
         private static void OnTreeViewDrop(object? sender, DragEventArgs e)
         {
-            if (e.Data.Contains(DataFormats.Files))
+            if (!e.DataTransfer.TryGet<DragInfo>(out var dragInfo))
                 return;
 
             var treeView = sender as TreeView;
             var dropElement = FindVisualParent<TreeViewItem>(e.Source as Visual);
-            var dragInfo = e.Data.Get("") as DragInfo?;
-            if (dragInfo == null || dragInfo.Value.draggedElement.Count == 0)
+            if (dragInfo == null || dragInfo.draggedElement.Count == 0)
                 return;
             
             if (treeView == null)
@@ -684,7 +697,7 @@ namespace WDE.Common.Avalonia.DnD
         }
         
         
-        public void Update(TreeView treeView, ItemContainerGenerator itemContainerGenerator, IDropInfo dropInfo)
+        public void Update(TreeView treeView, ItemsControl itemContainerGenerator, IDropInfo dropInfo)
         {
             if (dropInfo.Effects == Common.Utils.DragDrop.DragDropEffects.None)
             {
@@ -758,38 +771,23 @@ namespace WDE.Common.Avalonia.DnD
 
         public void AddAdorner(Visual visual)
         {
-            var layer = AdornerLayer.GetAdornerLayer(visual);
-            if (layer is null)
-                return;
-            
             if (Adorner is { })
             {
-                layer.Children.Remove(Adorner);
+                AdornerLayer.SetAdorner(AdornerLayer.GetAdornedElement(Adorner)!, null);
                 Adorner = null;
             }
 
             Adorner = new DragAdorner
             {
-                [AdornerLayer.AdornedElementProperty] = visual,
             };
 
-            ((ISetLogicalParent) Adorner).SetParent(visual as ILogical);
-
-            layer.Children.Add(Adorner);
+            AdornerLayer.SetAdorner(visual, Adorner);
         }
 
         public void RemoveAdorner(Visual visual)
         {
-            var layer = AdornerLayer.GetAdornerLayer(visual);
-            if (layer is { })
-            {
-                if (Adorner is { })
-                {
-                    layer.Children.Remove(Adorner);
-                    ((ISetLogicalParent) Adorner).SetParent(null);
-                    Adorner = null;
-                }
-            }
+            AdornerLayer.SetAdorner(visual, null);
+            Adorner = null;
         }
     }
 }

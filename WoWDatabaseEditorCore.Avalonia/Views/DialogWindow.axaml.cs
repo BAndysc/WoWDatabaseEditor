@@ -145,7 +145,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             // https://github.com/AvaloniaUI/Avalonia/issues/14483
             if (visualLayerManager != null)
             {
-                var layer = visualLayerManager.TextSelectorLayer;
+                // todo: Avalonia 12 not needed?
+                // var layer = visualLayerManager.TextSelectorLayer;
             }
         }
     }

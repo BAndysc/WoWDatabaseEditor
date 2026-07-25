@@ -67,7 +67,7 @@
         <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <VisualLayerManager>
+                <VisualLayerManager Name="PART_VisualLayerManager">
                     <Grid Name="SidebarGrid" Margin="{TemplateBinding OffScreenMargin}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="300" MinWidth="200"/>
@@ -153,7 +153,7 @@
         <Setter Property="WindowStartupLocation" Value="CenterOwner" />
         <Setter Property="Template">
             <ControlTemplate>
-                <VisualLayerManager>
+                <VisualLayerManager Name="PART_VisualLayerManager">
                     <Panel>
                         <Border BorderThickness="0.5"
                                 BorderBrush="#80FFFFFF" 

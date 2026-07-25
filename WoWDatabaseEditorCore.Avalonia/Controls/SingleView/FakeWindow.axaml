@@ -22,7 +22,7 @@
 
               <TextBlock Margin="10,2" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{TemplateBinding Title}" />
             </DockPanel>
-            <ContentControl DockPanel.Dock="Top" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+            <ContentControl DockPanel.Dock="Top" Content="{ReflectionBinding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
             <ContentControl
               Content="{TemplateBinding Content}"
               ContentTemplate="{x:Static utils:ViewDataTemplate.Template}" />

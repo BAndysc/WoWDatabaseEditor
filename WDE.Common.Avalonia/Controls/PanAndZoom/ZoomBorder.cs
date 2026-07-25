@@ -1090,6 +1090,26 @@ namespace WDE.WorldMap.PanAndZoom
         /// <inheritdoc/>
         Size IScrollable.Viewport => _viewport;
 
+        public bool CanHorizontallyScroll
+        {
+            get => _canHorizontallyScroll;
+            set
+            {
+                _canHorizontallyScroll = value;
+                InvalidateMeasure();
+            }
+        }
+
+        public bool CanVerticallyScroll
+        {
+            get => _canVerticallyScroll;
+            set
+            {
+                _canVerticallyScroll = value;
+                InvalidateMeasure();
+            }
+        }
+
         bool ILogicalScrollable.CanHorizontallyScroll
         {
             get => _canHorizontallyScroll;

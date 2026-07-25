@@ -12,12 +12,11 @@ public static class ApplicationExtensions
     {
         if (app.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            return desktop.MainWindow;
+            return TopLevel.GetTopLevel(desktop.MainWindow);
         }
         if (app.ApplicationLifetime is ISingleViewApplicationLifetime viewApp)
         {
-            var visualRoot = viewApp.MainView?.GetVisualRoot();
-            return visualRoot as TopLevel;
+            return TopLevel.GetTopLevel(viewApp.MainView);
         }
         return null;
     }

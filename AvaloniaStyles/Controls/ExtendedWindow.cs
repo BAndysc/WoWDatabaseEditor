@@ -175,19 +175,6 @@ namespace AvaloniaStyles.Controls
 
         private void UpdateChromeHints(ExtendedWindowChrome chrome)
         {
-            var useSystemChrome = chrome == ExtendedWindowChrome.AlwaysSystemChrome ||
-                                  (chrome == ExtendedWindowChrome.MacOsChrome &&
-                                   RuntimeInformation.IsOSPlatform(OSPlatform.OSX));
-            
-            if (useSystemChrome) 
-            {
-                ExtendClientAreaChromeHints |= ExtendClientAreaChromeHints.SystemChrome;
-                ExtendClientAreaChromeHints &= ~ExtendClientAreaChromeHints.NoChrome;
-            }
-            else
-            {
-                ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome;
-            }
         }
 
         public ExtendedWindow()
@@ -257,7 +244,6 @@ namespace AvaloniaStyles.Controls
         {
             base.OnApplyTemplate(e);
             
-            ExtendClientAreaChromeHints |= ExtendClientAreaChromeHints.OSXThickTitleBar;
             UpdateChromeHints(Chrome);
 
             if (SideBar == null && e.NameScope.Find("SidebarGrid") is Grid grid)

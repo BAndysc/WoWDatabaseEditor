@@ -20,6 +20,7 @@ using Avalonia.VisualTree;
 using FuzzySharp;
 using WDE.Common.Utils;
 using WDE.MVVM.Utils;
+using VisualExtensions = Avalonia.VisualTree.VisualExtensions;
 
 namespace AvaloniaStyles.Controls
 {
@@ -236,7 +237,7 @@ namespace AvaloniaStyles.Controls
 
         private async Task Paste()
         {
-            var textTask = TopLevel.GetTopLevel(this)?.Clipboard?.GetTextAsync();
+            var textTask = TopLevel.GetTopLevel(this)?.Clipboard?.TryGetTextAsync();
             if (textTask == null)
                 return;
             var text = await textTask;
@@ -352,7 +353,7 @@ namespace AvaloniaStyles.Controls
                 return;
             if (watermark == null)
                 return;
-            foreach (var binding in TopLevel.GetTopLevel(this)!.PlatformSettings!.HotkeyConfiguration!.Copy)
+            foreach (var binding in VisualExtensions.GetPlatformSettings(TopLevel.GetTopLevel(this)!)!.HotkeyConfiguration!.Copy)
             {
                 if (binding.Matches(e))
                 {

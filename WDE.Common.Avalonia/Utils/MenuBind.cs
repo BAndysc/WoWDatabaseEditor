@@ -89,7 +89,7 @@ namespace WDE.Common.Avalonia.Utils
                         }
                         if (subItem is ICheckableMenuItem checkable)
                         {
-                            nativeMenuItem.ToggleType = NativeMenuItemToggleType.CheckBox;
+                            nativeMenuItem.ToggleType = MenuItemToggleType.CheckBox;
                             checkable.ToObservable(o => o.IsChecked)
                                 .SubscribeAction(@is => nativeMenuItem.IsChecked = @is);
                         }

@@ -91,7 +91,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 if (Application.Current!.ApplicationLifetime is ISingleViewApplicationLifetime viewApp)
                     visualRoot = viewApp.MainView;
                 else
-                    visualRoot = mainWindowHolder.RootWindow.GetLogicalChildren().FirstOrDefault() as MainWebView;
+                    visualRoot = mainWindowHolder.RootWindow.GetLogicalChildren().FirstOrDefault(x => x is MainWebView) as MainWebView;
 
                 var panel = visualRoot!.GetControl<PseudoWindowsPanel>("PART_WindowsContainer");
 

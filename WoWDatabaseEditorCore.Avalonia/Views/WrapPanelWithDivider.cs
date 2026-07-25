@@ -3,6 +3,7 @@
 // 
 // Licensed to The Avalonia Project under MIT License, courtesy of The .NET Foundation.
 
+using System;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Utilities;
@@ -131,6 +132,18 @@ namespace Avalonia.Controls
             }
         }
 
+        public static bool AreClose(double value1, double value2)
+        {
+            if (value1 == value2)
+                return true;
+            double num1 = (Math.Abs(value1) + Math.Abs(value2) + 10.0) * 2.220446049250313E-16;
+            double num2 = value1 - value2;
+            return -num1 < num2 && num1 > num2;
+        }
+        public static bool GreaterThan(double value1, double value2)
+        {
+            return value1 > value2 && !AreClose(value1, value2);
+        }
         /// <inheritdoc/>
         protected override Size MeasureOverride(Size constraint)
         {
@@ -163,13 +176,13 @@ namespace Avalonia.Controls
 
                     var forceNewLine = GetForceNewLine(child);
                     
-                    if (forceNewLine || MathUtilities.GreaterThan(curLineSize.U + sz.U, uvConstraint.U)) // Need to switch to another line
+                    if (forceNewLine || GreaterThan(curLineSize.U + sz.U, uvConstraint.U)) // Need to switch to another line
                     {
                         panelSize.U = Max(curLineSize.U, panelSize.U);
                         panelSize.V += curLineSize.V;
                         curLineSize = sz;
 
-                        if (MathUtilities.GreaterThan(sz.U, uvConstraint.U)) // The element is wider then the constraint - give it a separate line                    
+                        if (GreaterThan(sz.U, uvConstraint.U)) // The element is wider then the constraint - give it a separate line
                         {
                             panelSize.U = Max(sz.U, panelSize.U);
                             panelSize.V += sz.V;
@@ -219,14 +232,14 @@ namespace Avalonia.Controls
 
                     var forceNewLine = GetForceNewLine(child);
                     
-                    if (forceNewLine || MathUtilities.GreaterThan(curLineSize.U + sz.U, uvFinalSize.U)) // Need to switch to another line
+                    if (forceNewLine || GreaterThan(curLineSize.U + sz.U, uvFinalSize.U)) // Need to switch to another line
                     {
                         ArrangeLine(accumulatedV, curLineSize.V, firstInLine, i, useItemU, itemU);
 
                         accumulatedV += curLineSize.V;
                         curLineSize = sz;
 
-                        if (MathUtilities.GreaterThan(sz.U, uvFinalSize.U)) // The element is wider then the constraint - give it a separate line                    
+                        if (GreaterThan(sz.U, uvFinalSize.U)) // The element is wider then the constraint - give it a separate line
                         {
                             // Switch to next line which only contain one element
                             ArrangeLine(accumulatedV, sz.V, i, ++i, useItemU, itemU);

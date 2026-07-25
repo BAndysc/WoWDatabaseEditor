@@ -6,23 +6,24 @@
     <ControlTheme x:Key="{x:Type ExtendedWindow}" TargetType="ExtendedWindow" BasedOn="{StaticResource ClassicWindow}">
         <Setter Property="Template">
             <ControlTemplate>
+                <VisualLayerManager Name="PART_VisualLayerManager">
                 <Panel RenderOptions.EdgeMode="Aliased"
                        RenderOptions.BitmapInterpolationMode="None"
                        utils:FontUtils.FontAliasing="{DynamicResource {x:Static commonControls:SystemParameters.FontAliasingKey}}">
                     <Border Name="PART_TransparencyFallback"
                             IsHitTestVisible="False"
                             Margin="2" />
-                    <Border Background="{TemplateBinding Background}"
+                    <Border Background="{DynamicResource {x:Static commonControls:SystemColors.ControlBrushKey}}"
                             IsHitTestVisible="False"
                             Margin="2" />
-                    <VisualLayerManager>
-                        <VisualLayerManager.ChromeOverlayLayer>
-                            <TitleBar />
-                        </VisualLayerManager.ChromeOverlayLayer>
+                    <!-- <Border Background="{TemplateBinding Background}" -->
+                    <!--         IsHitTestVisible="False" -->
+                    <!--         Margin="2" /> -->
 
+                    <Border Margin="{TemplateBinding OffScreenMargin}">
                         <DockPanel Name="RootLayout" Margin="4" ClipToBounds="True">
 
-                            <utils:AutoAttachTitleBar DockPanel.Dock="Top" />
+                            <utils:AutoAttachTitleBar DockPanel.Dock="Top"  Margin="0,0,0,1" />
 
                             <Panel DockPanel.Dock="Top">
                                 <Menu
@@ -31,14 +32,13 @@
                                         <Style Selector="MenuItem">
                                             <Setter Property="IsChecked" Value="{Binding IsChecked}"></Setter>
                                             <Setter Property="ToggleType"
-                                                    Value="{Binding ToggleType, Converter={x:Static converters:NativeMenuItemToggleTypeToMenuItemToggleTypeConverter.Instance}}" />
+                                                    Value="{Binding ToggleType}" />
                                             <Setter Property="Header" Value="{Binding Header}" />
                                             <Setter Property="InputGesture" Value="{Binding Gesture}" />
                                             <Setter Property="HotKey" Value="{Binding Gesture}" />
                                             <Setter Property="ItemsSource" Value="{Binding Menu.Items}" />
                                             <Setter Property="Command" Value="{Binding Command}" />
                                             <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
-                                            <Setter Property="(NativeMenuBar.EnableMenuItemClickForwarding)" Value="True" />
                                         </Style>
                                     </Menu.Styles>
                                 </Menu>
@@ -76,13 +76,14 @@
                                 </Panel>
                             </Border>
                         </DockPanel>
-
-                    </VisualLayerManager>
+                        </Border>
 
                     <ClassicBorderDecorator Name="Bd"
                                             BorderStyle="AltRaised"
                                             IsHitTestVisible="False" />
                 </Panel>
+
+                </VisualLayerManager>
             </ControlTemplate>
         </Setter>
         <Style Selector="^ /template/ Separator#PART_ToolbarSeparator1">

@@ -23,7 +23,9 @@ public partial class SplashScreenWindow : Window
             PART_Modern.IsVisible = false;
             this.Width = 400;
             this.Height = 247;
-            this.SystemDecorations = SystemDecorations.None;
+            // waiting for https://github.com/AvaloniaUI/Avalonia/pull/21615/changes#diff-4f145a8afffe2e7471d689e046b841c087df73ce20ea18e6795e90a15be70a43
+            // Win32Properties.SetWindowCornerPreference(this, WindowCornerPreference.DoNotRound);
+            this.WindowDecorations = WindowDecorations.None;
         }
         else
         {
@@ -31,19 +33,7 @@ public partial class SplashScreenWindow : Window
             PART_Modern.IsVisible = true;
             this.Width = 512;
             this.Height = 512;
-            this.SystemDecorations = SystemDecorations.BorderOnly;
+            this.WindowDecorations = WindowDecorations.BorderOnly;
         }
     }
-
-    protected override void ExtendClientAreaToDecorationsChanged(bool isExtended)
-    {
-        base.ExtendClientAreaToDecorationsChanged(isExtended);
-
-        // Fix for Windows: disable rounded corners
-        if (SystemTheme.EffectiveTheme == SystemThemeOptions.Windows9x)
-        {
-            ClassicWindow.DisableRoundedCorners(this);
-        }
-    }
-
 }

@@ -3,10 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
              xmlns:tasks="clr-namespace:WDE.Common.Tasks;assembly=WDE.Common"
              xmlns:utils1="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
              mc:Ignorable="d"
+             x:DataType="viewModels:TasksViewModel"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -22,7 +23,7 @@
                                             <utils1:LoadingSpinner></utils1:LoadingSpinner>
                                         </ContentControl.Content>
                                         <Interaction.Behaviors>
-                                            <DataTriggerBehavior Binding="{Binding State}" ComparisonCondition="Equal">
+                                            <DataTriggerBehavior Binding="{ReflectionBinding State}" ComparisonCondition="Equal">
                                                 <DataTriggerBehavior.Value>
                                                     <tasks:TaskState>FinishedSuccess</tasks:TaskState>
                                                 </DataTriggerBehavior.Value>
@@ -43,10 +44,10 @@
                                     </ContentControl>
 
                                     <StackPanel HorizontalAlignment="Stretch" Margin="0,0,5,0">
-                                        <Label Content="{Binding TaskName}" FontWeight="Bold"></Label>
-                                        <ProgressBar Value="{Binding Percent}"></ProgressBar>
+                                        <Label Content="{ReflectionBinding TaskName}" FontWeight="Bold"></Label>
+                                        <ProgressBar Value="{ReflectionBinding Percent}"></ProgressBar>
 
-                                        <Label Content="{Binding CurrentTask, TargetNullValue={}}"></Label>
+                                        <Label Content="{ReflectionBinding CurrentTask, TargetNullValue={}}"></Label>
                                     </StackPanel>
                                 </DockPanel>
 

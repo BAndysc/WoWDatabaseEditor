@@ -2,11 +2,12 @@
 
     <PropertyGroup>
         <OutputType>Library</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>$(WarningsAsErrors),nullable</WarningsAsErrors>
+        <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
     </PropertyGroup>
     <PropertyGroup>
         <SelfContained>true</SelfContained>
@@ -16,8 +17,11 @@
     
     <Import Project="..\Avalonia.props" />
     <ItemGroup>
-        <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+<!--        <PackageReference Include="Avalonia.Desktop" Version="12.0.5" />-->
+        <PackageReference Include="Dock.Avalonia.Themes.Fluent" Version="12.0.0.2" />
         <PackageReference Include="FuzzySharp" Version="2.0.2" />
+        <PackageReference Include="ProDiagnostics" Version="12.0.4" />
+        <PackageReference Include="System.Drawing.Common" Version="10.0.9" />
     </ItemGroup>
     <ItemGroup>
       <AvaloniaResource Include="Styles\Assets\Lato\*.ttf" />
@@ -33,12 +37,16 @@
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />
-      <ProjectReference Include="..\Dock\src\Dock.Avalonia\Dock.Avalonia.csproj" />
       <ProjectReference Include="..\Libraries\Classic.Avalonia\src\Classic.Avalonia.Theme.DataGrid\Classic.Avalonia.Theme.DataGrid.csproj" />
       <ProjectReference Include="..\Libraries\Classic.Avalonia\src\Classic.Avalonia.Theme.Dock\Classic.Avalonia.Theme.Dock.csproj" />
       <ProjectReference Include="..\Libraries\Classic.Avalonia\src\Classic.Avalonia.Theme\Classic.Avalonia.Theme.csproj" />
       <ProjectReference Include="..\Libraries\Classic.Avalonia\src\Classic.CommonControls.Avalonia\Classic.CommonControls.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Reference Include="Dock.Avalonia.Themes.Fluent">
+        <HintPath>..\..\..\..\..\.nuget\packages\dock.avalonia.themes.fluent\12.0.0.2\lib\net10.0\Dock.Avalonia.Themes.Fluent.dll</HintPath>
+      </Reference>
     </ItemGroup>
 </Project>

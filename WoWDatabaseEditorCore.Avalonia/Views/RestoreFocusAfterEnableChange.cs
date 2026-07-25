@@ -26,7 +26,7 @@ public class RestoreFocusAfterEnableChange
     {
     }
 
-    private void OnGotFocus(Control control, GotFocusEventArgs e)
+    private void OnGotFocus(Control control, FocusChangedEventArgs e)
     {
         if (focusManager == null)
         {
