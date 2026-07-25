@@ -235,7 +235,7 @@ public class TestModule : IGameModule
             }
             int animIndex = validAnimationIds.IndexOf(lastSelectedAnimationId);
             if (animIndex < 0) animIndex = 0;
-            if (ImGui.Combo("Animation"u8, ref animIndex, validAnimationNames.ToArray(), validAnimationNames.Count))
+            if (ImGui.Combo("Animation", ref animIndex, validAnimationNames.ToArray(), validAnimationNames.Count))
             {
                 lastSelectedAnimationId = validAnimationIds[animIndex];
                 creatureInstance.Animation = (M2AnimationType)lastSelectedAnimationId;
