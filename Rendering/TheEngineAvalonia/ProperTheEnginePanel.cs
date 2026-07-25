@@ -168,6 +168,12 @@ public class ProperTheEnginePanel : DrawingSurfaceDemoBase, IWindowHost
         if (game == null)
             return;
 
+        // background fps cap: this runs on the compositor's cadence (UI-side), so never sleep -
+        // skipping the tick is enough, the compositor keeps ticking and re-checks next frame
+        engine.HostFocused = AppActivationTracker.IsEditorFocused(windowActive);
+        if (engine.ShouldThrottleFrame(out _))
+            return;
+
         try
         {
             var delta = (float)sw.Elapsed.TotalMilliseconds;
@@ -292,12 +298,27 @@ public class ProperTheEnginePanel : DrawingSurfaceDemoBase, IWindowHost
     private IDisposable? globalKeyDownDisposable;
     private IDisposable? globalKeyUpDisposable;
 
+    // window-activation signal for the background fps cap (Engine.UnfocusedFpsLimit); both the
+    // events and RenderFrame run on the UI thread here
+    private bool windowActive = true;
+    private Window? attachedWindow;
+    private void OnWindowActivated(object? sender, EventArgs e) => windowActive = true;
+    private void OnWindowDeactivated(object? sender, EventArgs e) => windowActive = false;
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         sw.Restart();
         globalKeyDownDisposable = ((Control)e.Root).AddDisposableHandler(KeyDownEvent, GlobalKeyDown, RoutingStrategies.Tunnel);
         globalKeyUpDisposable = ((Control)e.Root).AddDisposableHandler(KeyUpEvent, GlobalKeyUp, RoutingStrategies.Tunnel);
+        AppActivationTracker.EnsureInitialized();
+        if (e.Root is Window window)
+        {
+            attachedWindow = window;
+            windowActive = window.IsActive;
+            window.Activated += OnWindowActivated;
+            window.Deactivated += OnWindowDeactivated;
+        }
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -306,6 +327,13 @@ public class ProperTheEnginePanel : DrawingSurfaceDemoBase, IWindowHost
         globalKeyDownDisposable?.Dispose();
         globalKeyUpDisposable = null;
         globalKeyDownDisposable = null;
+        if (attachedWindow != null)
+        {
+            attachedWindow.Activated -= OnWindowActivated;
+            attachedWindow.Deactivated -= OnWindowDeactivated;
+            attachedWindow = null;
+        }
+        windowActive = true;
         sw.Stop();
         base.OnDetachedFromVisualTree(e);
     }

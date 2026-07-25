@@ -26,7 +26,7 @@ public class ViewSettingsToolbar : IGameModule
     public object? ViewModel => null;
 
     private const float ButtonSize = 28f;
-    private const float Margin = 10f;
+    private const float Margin = Utils.ImGuiIconButtons.ViewMargin;
     private const float BackdropPad = 6f;
     // toggle + 4 + toggle + 4 + npc-icons dropdown + separator (8 gap, line, 9 gap) + settings
     // button - fixed so the strip can be right-aligned before anything is drawn
@@ -40,6 +40,9 @@ public class ViewSettingsToolbar : IGameModule
 
     private bool textureQualityChanged;
     private bool dontLoadDoodadsChanged;
+
+    private static readonly int[] backgroundFpsValues = { 0, 1, 5, 10, 15, 30 };
+    private static readonly string[] backgroundFpsLabels = { "Off", "1 fps", "5 fps", "10 fps", "15 fps", "30 fps" };
 
     public ViewSettingsToolbar(Engine engine, IGameProperties properties)
     {
@@ -57,6 +60,7 @@ public class ViewSettingsToolbar : IGameModule
         // checkbox setter keeps the two in sync (no-op on the composition panel)
         if (engine.SupportsVSyncControl)
             engine.VSync = properties.VSync;
+        engine.UnfocusedFpsLimit = properties.UnfocusedFpsLimit;
     }
 
     public void Update(float delta)
@@ -67,7 +71,7 @@ public class ViewSettingsToolbar : IGameModule
     {
         // append into the engine's game-view window (drawn earlier this frame) - the strip lives
         // in the 3D view itself and moves/hides with it
-        if (!ImGui.Begin("3D"))
+        if (!ImGui.Begin("3D"u8))
         {
             ImGui.End();
             return;
@@ -90,7 +94,7 @@ public class ViewSettingsToolbar : IGameModule
             properties.ShowGrid = !properties.ShowGrid;
         ImGui.SameLine(0, 4);
         if (IconButton("##npc_status_icons", Icon.NpcIcons, properties.ShowStatusIcons, "NPC status icons (quest, gossip, AI)"))
-            ImGui.OpenPopup("##status_icons_popup");
+            ImGui.OpenPopup("##status_icons_popup"u8);
         var npcIconsMax = ImGui.GetItemRectMax();
         Utils.ImGuiIconButtons.DropdownCaret(dl, npcIconsMax, ImGui.GetColorU32(ImGuiCol.Text, 0.8f));
         DrawStatusIconsPopup(npcIconsMax);
@@ -98,7 +102,7 @@ public class ViewSettingsToolbar : IGameModule
         VerticalSeparator(dl);
 
         if (IconButton("##view_settings", Icon.Settings, false, "Time & display settings"))
-            ImGui.OpenPopup("##view_settings_popup");
+            ImGui.OpenPopup("##view_settings_popup"u8);
         // dropdown caret in the button's corner
         var settingsMax = ImGui.GetItemRectMax();
         Utils.ImGuiIconButtons.DropdownCaret(dl, settingsMax, ImGui.GetColorU32(ImGuiCol.Text, 0.8f));
@@ -129,7 +133,7 @@ public class ViewSettingsToolbar : IGameModule
             return;
 
         bool show = properties.ShowStatusIcons;
-        if (ImGui.Checkbox("NPC status icons", ref show))
+        if (ImGui.Checkbox("NPC status icons"u8, ref show))
             properties.ShowStatusIcons = show;
 
         ImGui.Separator();
@@ -158,40 +162,40 @@ public class ViewSettingsToolbar : IGameModule
 
         ImGui.PushItemWidth(-115);
 
-        ImGui.TextDisabled("Time");
+        ImGui.TextDisabled("Time"u8);
 
         bool paused = properties.DisableTimeFlow;
-        if (ImGui.Checkbox("Pause time flow", ref paused))
+        if (ImGui.Checkbox("Pause time flow"u8, ref paused))
             properties.DisableTimeFlow = paused;
 
         ImGui.BeginDisabled(paused);
         int speed = properties.TimeSpeedMultiplier;
-        if (ImGui.SliderInt("Time speed", ref speed, 0, 6))
+        if (ImGui.SliderInt("Time speed"u8, ref speed, 0, 6))
             properties.TimeSpeedMultiplier = speed;
         ImGui.EndDisabled();
 
         int minutes = properties.CurrentTime.TotalMinutes;
-        if (ImGui.SliderInt("Time", ref minutes, 0, 1439, $"{minutes / 60:00}:{minutes % 60:00}"))
+        if (ImGui.SliderInt("Time"u8, ref minutes, 0, 1439, $"{minutes / 60:00}:{minutes % 60:00}"))
             properties.CurrentTime = Time.FromMinutes(minutes);
 
         bool overrideLighting = properties.OverrideLighting;
-        if (ImGui.Checkbox("Disable lighting", ref overrideLighting))
+        if (ImGui.Checkbox("Disable lighting"u8, ref overrideLighting))
             properties.OverrideLighting = overrideLighting;
 
         bool disableShadows = properties.DisableShadows;
-        if (ImGui.Checkbox("Disable shadows", ref disableShadows))
+        if (ImGui.Checkbox("Disable shadows"u8, ref disableShadows))
             properties.DisableShadows = disableShadows;
 
         ImGui.Spacing();
         ImGui.Separator();
-        ImGui.TextDisabled("Display");
+        ImGui.TextDisabled("Display"u8);
 
         float viewDistance = properties.ViewDistanceModifier;
-        if (ImGui.SliderFloat("View distance", ref viewDistance, 1, 64, "%.1f"))
+        if (ImGui.SliderFloat("View distance"u8, ref viewDistance, 1, 64, "%.1f"u8))
             properties.ViewDistanceModifier = viewDistance;
 
         float dynamicResolution = properties.DynamicResolution;
-        if (ImGui.SliderFloat("Resolution scale", ref dynamicResolution, 0.1f, 1f, "%.2f"))
+        if (ImGui.SliderFloat("Resolution scale"u8, ref dynamicResolution, 0.1f, 1f, "%.2f"u8))
             properties.DynamicResolution = dynamicResolution;
 
         // the composition panel presents through the Avalonia compositor: always vsynced,
@@ -199,31 +203,42 @@ public class ViewSettingsToolbar : IGameModule
         bool canControlVSync = engine.SupportsVSyncControl;
         bool vsync = !canControlVSync || properties.VSync;
         ImGui.BeginDisabled(!canControlVSync);
-        if (ImGui.Checkbox("VSync", ref vsync))
+        if (ImGui.Checkbox("VSync"u8, ref vsync))
         {
             properties.VSync = vsync;
             engine.VSync = vsync;
         }
         ImGui.EndDisabled();
         if (!canControlVSync && ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            ImGui.SetTooltip("The composition 3D panel is paced by the Avalonia compositor,\nvsync can't be turned off there (switch the panel type in the settings)");
+            ImGui.SetTooltip("The composition 3D panel is paced by the Avalonia compositor,\nvsync can't be turned off there (switch the panel type in the settings)"u8);
+
+        int bgFpsIndex = Array.IndexOf(backgroundFpsValues, properties.UnfocusedFpsLimit);
+        if (bgFpsIndex < 0)
+            bgFpsIndex = 0;
+        if (ImGui.Combo("Background FPS", ref bgFpsIndex, backgroundFpsLabels, backgroundFpsLabels.Length))
+        {
+            properties.UnfocusedFpsLimit = backgroundFpsValues[bgFpsIndex];
+            engine.UnfocusedFpsLimit = backgroundFpsValues[bgFpsIndex];
+        }
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip("Limits the frame rate while the editor window is in the background,\nto save energy. Rendering resumes at full speed when the window is focused."u8);
 
         int quality = properties.TextureQuality;
-        if (ImGui.SliderInt("Texture quality", ref quality, 0, 6))
+        if (ImGui.SliderInt("Texture quality"u8, ref quality, 0, 6))
         {
             properties.TextureQuality = quality;
             textureQualityChanged = true;
         }
 
         bool dontLoadDoodads = properties.DontLoadDoodads;
-        if (ImGui.Checkbox("Don't load WMO doodads", ref dontLoadDoodads))
+        if (ImGui.Checkbox("Don't load WMO doodads"u8, ref dontLoadDoodads))
         {
             properties.DontLoadDoodads = dontLoadDoodads;
             dontLoadDoodadsChanged = true;
         }
 
         if (textureQualityChanged || dontLoadDoodadsChanged)
-            ImGui.TextDisabled("Restart the game view to apply the change");
+            ImGui.TextDisabled("Restart the game view to apply the change"u8);
 
         ImGui.PopItemWidth();
         ImGui.EndPopup();

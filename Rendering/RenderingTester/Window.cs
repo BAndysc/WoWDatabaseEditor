@@ -97,6 +97,7 @@ public class DummyGameProperties : IGameProperties
     public bool VSync { get; set; } = false;
     public bool DontLoadDoodads { get; set; } = false;
     public bool DisableShadows { get; set; } = false;
+    public int UnfocusedFpsLimit { get; set; } = 0;
     public float DynamicResolution { get; set; } = 1;
     public bool RenderGui { get; set; } = true;
     public bool LoadWorld { get; set; } = true;

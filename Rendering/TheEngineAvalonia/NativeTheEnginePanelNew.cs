@@ -137,12 +137,28 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
 
     private IDisposable? globalKeyDownDisposable;
     private IDisposable? globalKeyUpDisposable;
+
+    // window-activation signal for the background fps cap (Engine.UnfocusedFpsLimit): written on
+    // the UI thread, read by the render thread each frame (plain bool per threading policy)
+    private volatile bool windowActive = true;
+    private Window? attachedWindow;
+    private void OnWindowActivated(object? sender, EventArgs e) => windowActive = true;
+    private void OnWindowDeactivated(object? sender, EventArgs e) => windowActive = false;
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         sw.Restart();
         globalKeyDownDisposable = ((Control)e.Root).AddDisposableHandler(KeyDownEvent, GlobalKeyDown, RoutingStrategies.Tunnel);
         globalKeyUpDisposable = ((Control)e.Root).AddDisposableHandler(KeyUpEvent, GlobalKeyUp, RoutingStrategies.Tunnel);
+        AppActivationTracker.EnsureInitialized();
+        if (e.Root is Window window)
+        {
+            attachedWindow = window;
+            windowActive = window.IsActive;
+            window.Activated += OnWindowActivated;
+            window.Deactivated += OnWindowDeactivated;
+        }
     }
 
     private bool IsModifierKey(Key key) => key is Key.LeftShift or Key.LeftCtrl or Key.LeftAlt or Key.LWin;
@@ -228,6 +244,14 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
         globalKeyDownDisposable?.Dispose();
         globalKeyUpDisposable = null;
         globalKeyDownDisposable = null;
+        if (attachedWindow != null)
+        {
+            attachedWindow.Activated -= OnWindowActivated;
+            attachedWindow.Deactivated -= OnWindowDeactivated;
+            attachedWindow = null;
+        }
+        // don't keep throttling while detached - hidden/detached rendering has its own handling
+        windowActive = true;
         sw.Stop();
     }
 
@@ -355,6 +379,16 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
         {
             if (parent.engine == null)
                 return;
+
+            // background fps cap: in thread mode this loop is the only pacer, so sleep the slice
+            // here; in timer mode the dispatcher timer paces and sleeping would block the UI thread
+            parent.engine.HostFocused = AppActivationTracker.IsEditorFocused(parent.windowActive);
+            if (parent.engine.ShouldThrottleFrame(out var throttleSleepMs))
+            {
+                if (UseThreadRendering)
+                    Thread.Sleep(throttleSleepMs);
+                return;
+            }
 
             var engine = parent.engine;
             var gameRunner = parent.gameRunner;

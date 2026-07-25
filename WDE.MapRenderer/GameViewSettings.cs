@@ -156,6 +156,16 @@ namespace WDE.MapRenderer
             }
         }
 
+        public int UnfocusedFpsLimit
+        {
+            get => current.UnfocusedFpsLimit;
+            set
+            {
+                current.UnfocusedFpsLimit = value;
+                settings.Update(current);
+            }
+        }
+
         /// <summary>true = ProperTheEnginePanel (renders through the Avalonia compositor);
         /// false = NativeTheEnginePanel (a native child window). Read when a 3D view opens.</summary>
         public bool UseCompositionPanel
@@ -197,6 +207,9 @@ namespace WDE.MapRenderer
             // only honored by the native panel (a real Vulkan swapchain: Fifo vs Immediate);
             // the composition panel is compositor-paced, i.e. always vsynced
             public bool VSync;
+
+            // frame cap while the editor window is in the background (0 = off)
+            public int UnfocusedFpsLimit;
         }
     }
 }

@@ -39,6 +39,41 @@ namespace TheEngine
             set => Backend.VSync = value;
         }
 
+        /// <summary>Frame-rate cap applied while <see cref="HostFocused"/> is false (0 = no cap).
+        /// Saves energy when the editor window is in the background.</summary>
+        public int UnfocusedFpsLimit { get; set; }
+
+        /// <summary>Whether the hosting window is active/focused; pushed by the host (UI thread /
+        /// window event loop), read by the render loop - plain bool, safe per threading policy.</summary>
+        public bool HostFocused { get; set; } = true;
+
+        private long lastUnthrottledFrameTs;
+
+        /// <summary>Frame gate for the background fps cap: true = the caller should skip this
+        /// frame (and, when it owns a dedicated render thread, sleep <paramref name="sleepMs"/> ms -
+        /// capped at 50 so focus changes and teardown stay responsive). Compositor/timer-driven
+        /// loops must NOT sleep (they run on the UI thread), just skip. When it returns false the
+        /// frame is counted as rendered.</summary>
+        public bool ShouldThrottleFrame(out int sleepMs)
+        {
+            sleepMs = 0;
+            if (HostFocused || UnfocusedFpsLimit <= 0)
+            {
+                lastUnthrottledFrameTs = 0;
+                return false;
+            }
+            long now = System.Diagnostics.Stopwatch.GetTimestamp();
+            double periodMs = 1000.0 / UnfocusedFpsLimit;
+            double elapsedMs = (now - lastUnthrottledFrameTs) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+            if (lastUnthrottledFrameTs != 0 && elapsedMs < periodMs)
+            {
+                sleepMs = (int)Math.Min(50, periodMs - elapsedMs);
+                return true;
+            }
+            lastUnthrottledFrameTs = now;
+            return false;
+        }
+
         internal IConfiguration Configuration { get; }
 
         internal ShaderManager shaderManager { get; }

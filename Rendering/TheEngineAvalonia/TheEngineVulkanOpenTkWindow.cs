@@ -80,6 +80,15 @@ public class TheEngineVulkanOpenTkWindow : NativeWindow, IWindowHost
         double previous = 0;
         while (!GLFW.WindowShouldClose(WindowPtr))
         {
+            // background fps cap: skipping NextFrame also skips SyncInputState, so pump events
+            // here or the focus-regained signal (and window close) would never arrive
+            engine.HostFocused = IsFocused;
+            if (engine.ShouldThrottleFrame(out var throttleSleepMs))
+            {
+                Thread.Sleep(throttleSleepMs);
+                ProcessWindowEvents(false);
+                continue;
+            }
             var now = stopwatch.Elapsed.TotalSeconds;
             var delta = (float)(now - previous);
             previous = now;

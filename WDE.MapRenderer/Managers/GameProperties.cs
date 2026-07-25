@@ -29,6 +29,9 @@ public interface IGameProperties
     /// <summary>Persisted vsync wish. Only effective when the engine's present target supports
     /// control (the native panel / standalone window); the composition panel is always vsynced.</summary>
     bool VSync { get; set; }
+    /// <summary>Frame-rate cap applied while the editor window is in the background (0 = off).
+    /// Saves energy when the 3D view keeps running unattended.</summary>
+    int UnfocusedFpsLimit { get; set; }
     float DynamicResolution { get; set; }
     bool RenderGui { get; set; }
     bool LoadWorld { get; }
@@ -54,6 +57,7 @@ public class GameProperties : IGameProperties
     private bool showStatusIcons;
     private uint statusIconsHiddenMask;
     private bool vSync;
+    private int unfocusedFpsLimit;
 
     public GameProperties(GameViewSettings settings, IMainThread mainThread)
     {
@@ -72,6 +76,7 @@ public class GameProperties : IGameProperties
         showStatusIcons = settings.ShowStatusIcons;
         statusIconsHiddenMask = settings.StatusIconsHiddenMask;
         vSync = settings.VSync;
+        unfocusedFpsLimit = settings.UnfocusedFpsLimit;
     }
 
     // setters run on the game thread (the in-view ImGui toolbar); the settings file write must
@@ -206,6 +211,16 @@ public class GameProperties : IGameProperties
         {
             vSync = value;
             Persist(() => settings.VSync = value);
+        }
+    }
+
+    public int UnfocusedFpsLimit
+    {
+        get => unfocusedFpsLimit;
+        set
+        {
+            unfocusedFpsLimit = value;
+            Persist(() => settings.UnfocusedFpsLimit = value);
         }
     }
 
