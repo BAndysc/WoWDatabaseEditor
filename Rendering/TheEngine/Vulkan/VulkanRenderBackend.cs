@@ -145,9 +145,7 @@ internal sealed unsafe class VulkanRenderBackend : IRenderBackend
     public float LastFenceWaitMs { get; private set; }
     /// <summary>CPU ms spent in BeginFrame's AcquireNextImage (present/vsync sync). Profile-only.</summary>
     public float LastAcquireMs { get; private set; }
-    /// <summary>CPU ms spent in BeginFrame's low-latency vsync throttle (vkWaitForPresentKHR).
-    /// Always measured; high values here with vsync on mean the throttle is doing its job
-    /// (idle-waiting for the previous present to hit the display instead of queueing frames).</summary>
+    /// <summary>CPU ms spent in BeginFrame's low-latency vsync throttle (vkWaitForPresentKHR). Always measured.</summary>
     public float LastPresentWaitMs { get; private set; }
     /// <summary>CPU ms spent reading back the GPU timestamp query (profiling-only artifact).</summary>
     public float LastQueryReadbackMs { get; private set; }
@@ -1002,11 +1000,41 @@ internal sealed unsafe class VulkanRenderBackend : IRenderBackend
     private int presentWaitRelaxedCooldown;
     private int consecutiveHighIntervals;
 
+    private static readonly string? throttleOverride = Environment.GetEnvironmentVariable("THEENGINE_VK_THROTTLE");
+
+    // THEENGINE_VK_PACING=1: print raw per-present timings (interval between vkQueuePresentKHR calls
+    // and time blocked inside it) every 240 frames - for diagnosing vsync pacing issues
+    private static readonly bool pacingDebug = Environment.GetEnvironmentVariable("THEENGINE_VK_PACING") == "1";
+    private long lastPresentReturn;
+    private readonly List<(float intervalMs, float blockMs)> pacingSamples = new();
+
+    private void RecordPacingSample(long presentStart)
+    {
+        long now = System.Diagnostics.Stopwatch.GetTimestamp();
+        double toMs = 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+        if (lastPresentReturn != 0)
+            pacingSamples.Add(((float)((now - lastPresentReturn) * toMs), (float)((now - presentStart) * toMs)));
+        lastPresentReturn = now;
+        if (pacingSamples.Count >= 240)
+        {
+            var intervals = pacingSamples.Select(s => s.intervalMs).OrderBy(x => x).ToArray();
+            var blocks = pacingSamples.Select(s => s.blockMs).OrderBy(x => x).ToArray();
+            float P(float[] a, double p) => a[(int)(p * (a.Length - 1))];
+            Console.WriteLine($"[pacing] interval p10={P(intervals, 0.1):0.0} p50={P(intervals, 0.5):0.0} p90={P(intervals, 0.9):0.0} max={intervals[^1]:0.0} | presentBlock p10={P(blocks, 0.1):0.0} p50={P(blocks, 0.5):0.0} p90={P(blocks, 0.9):0.0} max={blocks[^1]:0.0} | raw: {string.Join(",", pacingSamples.Take(40).Select(s => s.intervalMs.ToString("0.0")))}");
+            pacingSamples.Clear();
+        }
+    }
+
     private void ThrottleLatency()
     {
-        if (!presentTarget.CanThrottlePresentQueue)
+        if (!presentTarget.CanThrottlePresentQueue || throttleOverride == "off")
         {
             lastPresentWaitReturn = 0;
+            return;
+        }
+        if (throttleOverride == "relaxed")
+        {
+            presentTarget.ThrottlePresentQueue(1);
             return;
         }
         bool aggressive = presentWaitRelaxedCooldown <= 0;
@@ -1155,7 +1183,12 @@ internal sealed unsafe class VulkanRenderBackend : IRenderBackend
         frame.Submitted = true;
 
         if (HasImage)
+        {
+            long presentStart = System.Diagnostics.Stopwatch.GetTimestamp();
             presentTarget.Present(CurrentImageIndex);
+            if (pacingDebug)
+                RecordPacingSample(presentStart);
+        }
 
         frameIndex = (frameIndex + 1) % FramesInFlight;
         // cleared only now (not at EndFrame entry): the submit/present teardown above is still part of

@@ -55,6 +55,12 @@ internal unsafe class VulkanContext : IDisposable
     /// reached the display (vkWaitForPresentKHR) - the low-latency vsync throttle.</summary>
     public bool SupportsPresentWait;
     public KhrPresentWait? PresentWaitExt;
+
+    /// <summary>True when VK_GOOGLE_display_timing is enabled: presents can carry a desired display
+    /// time (MoltenVK: presentDrawable:atTime:), giving vsynced presents a stable cadence.</summary>
+    public bool SupportsDisplayTiming;
+    public unsafe delegate* unmanaged[Cdecl]<Device, SwapchainKHR, RefreshCycleDurationGOOGLE*, Result> GetRefreshCycleDurationGoogle;
+    public unsafe delegate* unmanaged[Cdecl]<Device, SwapchainKHR, uint*, PastPresentationTimingGOOGLE*, Result> GetPastPresentationTimingGoogle;
     public PhysicalDeviceProperties DeviceProperties;
     /// <summary>Native VMA allocator (libvma): sub-allocates buffers and images from pooled device
     /// memory blocks instead of one vkAllocateMemory per resource. Created in PickDeviceAndCreate,
@@ -336,6 +342,16 @@ internal unsafe class VulkanContext : IDisposable
             }
         }
 
+        // VK_GOOGLE_display_timing: schedule presents at explicit display times. On MoltenVK this
+        // maps to presentDrawable:atTime:, which gives CoreAnimation a plannable cadence - without
+        // it, FIFO presents on adaptive-refresh (ProMotion) displays thrash between refresh rates
+        // (drawables get held back unpredictably and the frame rate collapses to ~45 fps).
+        if (availableDeviceExtensions.Contains("VK_GOOGLE_display_timing"))
+        {
+            deviceExtensions.Add("VK_GOOGLE_display_timing");
+            SupportsDisplayTiming = true;
+        }
+
         // Get a dedicated transfer queue so uploads run parallel to rendering. Preferred: a separate
         // transfer-capable family (needed when every family exposes only one queue). Fallback: a second
         // queue in the graphics family. Otherwise share the graphics queue. The cross-family case puts
@@ -461,6 +477,17 @@ internal unsafe class VulkanContext : IDisposable
                 SupportsPresentWait = false;
         }
         Console.WriteLine($"[vk] low-latency vsync (VK_KHR_present_wait): {(SupportsPresentWait ? "enabled" : "unavailable")}");
+
+        if (SupportsDisplayTiming)
+        {
+            GetRefreshCycleDurationGoogle = (delegate* unmanaged[Cdecl]<Device, SwapchainKHR, RefreshCycleDurationGOOGLE*, Result>)
+                vk.GetDeviceProcAddr(Device, "vkGetRefreshCycleDurationGOOGLE").Handle;
+            GetPastPresentationTimingGoogle = (delegate* unmanaged[Cdecl]<Device, SwapchainKHR, uint*, PastPresentationTimingGOOGLE*, Result>)
+                vk.GetDeviceProcAddr(Device, "vkGetPastPresentationTimingGOOGLE").Handle;
+            if (GetRefreshCycleDurationGoogle == null)
+                SupportsDisplayTiming = false;
+        }
+        Console.WriteLine($"[vk] scheduled presents (VK_GOOGLE_display_timing): {(SupportsDisplayTiming ? "enabled" : "unavailable")}");
 
         var poolInfo = new CommandPoolCreateInfo
         {

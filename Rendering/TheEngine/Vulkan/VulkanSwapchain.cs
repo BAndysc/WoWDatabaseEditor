@@ -177,6 +177,8 @@ internal unsafe class VulkanSwapchain : IDisposable
             VulkanContext.Check(ctx.SwapchainExt.CreateSwapchain(ctx.Device, in info, null, out Swapchain), "vkCreateSwapchainKHR");
         }
 
+        Console.WriteLine($"[vk] swapchain: {Extent.Width}x{Extent.Height} mode={presentMode} switchable=[{string.Join(",", SwitchableModes)}] vsyncWish={VSync} images={imageCount}");
+
         uint count = 0;
         ctx.SwapchainExt.GetSwapchainImages(ctx.Device, Swapchain, ref count, null);
         Images = new Image[count];

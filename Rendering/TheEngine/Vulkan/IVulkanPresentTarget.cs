@@ -154,6 +154,57 @@ internal sealed unsafe class KhrSwapchainPresentTarget : IVulkanPresentTarget
     public ImageLayout GetLayout(uint imageIndex) => swapchain.Layouts[imageIndex];
     public void SetLayout(uint imageIndex, ImageLayout layout) => swapchain.Layouts[imageIndex] = layout;
 
+    // ---- scheduled presents (VK_GOOGLE_display_timing) ----
+    // With plain FIFO the presentation engine only learns about a frame when it is submitted, so on
+    // adaptive-refresh displays (macOS ProMotion) the panel keeps re-guessing the cadence: drawables
+    // are held back unpredictably, QueueSubmit blocks on nextDrawable and the frame rate collapses
+    // to ~45 fps even though the frame fits in a refresh. Giving every present an explicit desired
+    // display time (MoltenVK: presentDrawable:atTime:) hands CoreAnimation a plannable schedule.
+    // The schedule advances by one refresh period per present; when the engine falls behind, it
+    // reanchors to "now + margin" (the present then lands on the next reachable vblank).
+    private long nextDesiredPresentNs;
+    private ulong refreshPeriodNs;
+    private int refreshPeriodRequery;
+    private uint presentTimingId;
+
+    private ulong NextScheduledPresentTimeNs()
+    {
+        if (!ctx.SupportsDisplayTiming || !swapchain.PacedByVBlank)
+        {
+            nextDesiredPresentNs = 0;
+            return 0;
+        }
+        // the refresh period can change without a swapchain recreate (window moved to another
+        // monitor), so re-query it once in a while
+        if (refreshPeriodNs == 0 || --refreshPeriodRequery <= 0)
+        {
+            RefreshCycleDurationGOOGLE cycle;
+            if (ctx.GetRefreshCycleDurationGoogle(ctx.Device, swapchain.Swapchain, &cycle) == Result.Success)
+            {
+                if (cycle.RefreshDuration != refreshPeriodNs)
+                    Console.WriteLine($"[vk] display refresh period: {cycle.RefreshDuration / 1e6:0.00}ms ({1e9 / cycle.RefreshDuration:0.#}Hz)");
+                refreshPeriodNs = cycle.RefreshDuration;
+            }
+            refreshPeriodRequery = 240;
+        }
+        if (refreshPeriodNs == 0)
+            return 0;
+        long period = (long)refreshPeriodNs;
+        long now = (long)(System.Diagnostics.Stopwatch.GetTimestamp() * (1_000_000_000.0 / System.Diagnostics.Stopwatch.Frequency));
+        long t = nextDesiredPresentNs + period;
+        // margin: CoreAnimation needs the request a bit ahead of the target to hit it
+        long min = now + period / 3;
+        if (nextDesiredPresentNs == 0 || t > now + 3 * period)
+            t = min; // first frame, or schedule far ahead (clock/estimate drift): re-anchor
+        else if (t < min)
+            // running slower than the refresh rate: skip whole slots but KEEP the schedule's phase,
+            // so a too-slow engine settles on a clean divisor (120Hz panel -> steady 60) instead of
+            // re-anchoring at an arbitrary phase every frame (which reads as judder)
+            t += (min - t + period - 1) / period * period;
+        nextDesiredPresentNs = t;
+        return (ulong)t;
+    }
+
     public void Present(uint imageIndex)
     {
         var swapchainHandle = swapchain.Swapchain;
@@ -169,8 +220,21 @@ internal sealed unsafe class KhrSwapchainPresentTarget : IVulkanPresentTarget
             PPresentModes = &presentMode,
         };
         void* pNext = swapchain.SwitchableModes.Length > 0 ? &presentModeInfo : null;
-        // tag the present with a monotonically increasing id so ThrottlePresentQueue can
-        // vkWaitForPresentKHR on it later
+        ulong desiredPresentTime = NextScheduledPresentTimeNs();
+        var presentTime = new PresentTimeGOOGLE
+        {
+            PresentID = ++presentTimingId,
+            DesiredPresentTime = desiredPresentTime,
+        };
+        var presentTimesInfo = new PresentTimesInfoGOOGLE
+        {
+            SType = StructureType.PresentTimesInfoGoogle,
+            PNext = pNext,
+            SwapchainCount = 1,
+            PTimes = &presentTime,
+        };
+        if (desiredPresentTime != 0)
+            pNext = &presentTimesInfo;
         ulong presentId = swapchain.LastPresentId + 1;
         var presentIdInfo = new PresentIdKHR
         {
