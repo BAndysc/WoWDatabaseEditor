@@ -6,6 +6,31 @@
     </Border>
   </Design.PreviewWith>
 
+  <!-- Restore pre-scrollviewer tab behavior: wrap document tabs into multiple
+       rows instead of a single scrollable row (Dock commits cd9ebdf3 + 0f2d9170) -->
+  <Styles.Resources>
+    <ItemsPanelTemplate x:Key="DockDocumentTabStripHorizontalItemsPanel">
+      <WrapPanel Orientation="Horizontal" ClipToBounds="False" />
+    </ItemsPanelTemplate>
+  </Styles.Resources>
+
+  <Style Selector="DocumentTabStrip[Orientation=Horizontal] /template/ ScrollViewer#PART_ScrollViewer">
+    <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+  </Style>
+
+  <Style Selector="ToolTabStrip">
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <WrapPanel Orientation="Horizontal" ClipToBounds="False" />
+      </ItemsPanelTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="ToolTabStrip /template/ ScrollViewer#PART_ScrollViewer">
+    <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
+  </Style>
+
   <Style Selector="ToolControl /template/ Border#PART_Border">
     <Setter Property="BorderThickness" Value="1 0 1 1" />
   </Style>
