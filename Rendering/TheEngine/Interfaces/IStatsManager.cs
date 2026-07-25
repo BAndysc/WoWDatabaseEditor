@@ -32,6 +32,10 @@ namespace TheEngine.Interfaces
         // idle-waiting (vsync/present-bound or back-pressured), not doing real render work.
         public RollingAverage GpuFenceWait;
         public RollingAverage GpuAcquire;
+        // CPU time blocked in the low-latency vsync throttle (vkWaitForPresentKHR): waiting for the
+        // previous present to reach the display before sampling this frame's input. High here with
+        // vsync on is expected and healthy - it's latency moved out of the present queue.
+        public RollingAverage GpuPresentWait;
         // Per-phase CPU time of the render section (the same buckets THEENGINE_PROFILE prints). The
         // bounds/culling/sorting/drawing counters above are only sub-slices of the object stage; these
         // cover the whole frame so unaccounted render time is attributable to a concrete phase.

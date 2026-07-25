@@ -29,6 +29,8 @@ internal interface IRenderBackend : IDisposable
     float LastFenceWaitMs => 0;
     /// <summary>CPU ms blocked in BeginFrame's AcquireNextImage (present/vsync). Profile-only.</summary>
     float LastAcquireMs => 0;
+    /// <summary>CPU ms blocked in BeginFrame's low-latency vsync throttle (vkWaitForPresentKHR).</summary>
+    float LastPresentWaitMs => 0;
     /// <summary>CPU ms reading back the GPU timestamp query (profiling artifact). Profile-only.</summary>
     float LastQueryReadbackMs => 0;
     /// <summary>CPU ms in ProcessPendingDestroys. Profile-only.</summary>

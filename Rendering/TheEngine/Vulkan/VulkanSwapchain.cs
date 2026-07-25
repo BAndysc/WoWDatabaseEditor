@@ -30,6 +30,21 @@ internal unsafe class VulkanSwapchain : IDisposable
     public ImageLayout[] Layouts = Array.Empty<ImageLayout>();
     public Format Format;
     public Extent2D Extent;
+    /// <summary>Id of the last present tagged with VK_KHR_present_id (0 = none yet). Ids must be
+    /// monotonically increasing per swapchain, so the counter restarts when the swapchain is
+    /// recreated - vkWaitForPresentKHR targets must never mix ids across swapchain handles.</summary>
+    public ulong LastPresentId;
+    /// <summary>The present mode the swapchain was created with (per-present switching may override
+    /// it - see <see cref="CurrentSwitchableMode"/>).</summary>
+    public PresentModeKHR CreatedPresentMode;
+
+    /// <summary>Whether presents are currently paced by the display (Fifo) - the condition for the
+    /// low-latency present-wait throttle. Tracks the actual mode, not the <see cref="VSync"/> wish:
+    /// they diverge when THEENGINE_VK_PRESENT pins a mode and when vsync-off falls back to Fifo
+    /// because neither Immediate nor Mailbox is supported.</summary>
+    public bool PacedByVBlank => SwitchableModes.Length > 0
+        ? CurrentSwitchableMode() == PresentModeKHR.FifoKhr
+        : CreatedPresentMode == PresentModeKHR.FifoKhr;
 
     public VulkanSwapchain(VulkanContext ctx, SurfaceKHR surface, uint width, uint height)
     {
@@ -50,6 +65,7 @@ internal unsafe class VulkanSwapchain : IDisposable
 
     private void Create(uint width, uint height, SwapchainKHR oldSwapchain = default)
     {
+        LastPresentId = 0;
         ctx.SurfaceExt.GetPhysicalDeviceSurfaceCapabilities(ctx.PhysicalDevice, surface, out var caps);
 
         uint formatCount = 0;
@@ -95,12 +111,15 @@ internal unsafe class VulkanSwapchain : IDisposable
         {
             case "fifo":
                 presentMode = PresentModeKHR.FifoKhr;
+                VSync = true; // keep the wish flag consistent with the pinned mode
                 break;
             case "mailbox" when Supports(PresentModeKHR.MailboxKhr):
                 presentMode = PresentModeKHR.MailboxKhr;
+                VSync = false;
                 break;
             case "immediate" when Supports(PresentModeKHR.ImmediateKhr):
                 presentMode = PresentModeKHR.ImmediateKhr;
+                VSync = false;
                 break;
             default:
                 pinnedByEnv = false;
@@ -110,6 +129,7 @@ internal unsafe class VulkanSwapchain : IDisposable
                     : PresentModeKHR.FifoKhr;
                 break;
         }
+        CreatedPresentMode = presentMode;
 
         // With VK_EXT_swapchain_maintenance1, declare every mode the vsync toggle may want up
         // front so presents can switch between them without a recreate. Only modes the surface

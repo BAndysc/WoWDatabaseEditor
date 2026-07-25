@@ -34,6 +34,7 @@ public unsafe class VulkanContext : IDisposable
 
     public static (VulkanContext? result, string info) TryCreate(ICompositionGpuInterop gpuInterop)
     {
+        TheEngine.Vulkan.MoltenVkIcdFallback.EnsureVulkanDriverDiscoverable();
         using var appName = new ByteString("GpuInterop");
         using var engineName = new ByteString("Test");
         var applicationInfo = new ApplicationInfo

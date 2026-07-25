@@ -106,7 +106,7 @@ public class DebugInfoGameModule : IGameModule
             ImGui.Text($"Total frame time: {counters.FrameTime.Average:0.00} ms");
             ImGui.Text($" - Update time: {counters.UpdateTime.Average:0.00} ms");
             ImGui.Text($" - Render time: {counters.TotalRender.Average:0.00} ms");
-            ImGui.Text($"   - Wait (fence/acquire): {counters.GpuFenceWait.Average:0.00}/{counters.GpuAcquire.Average:0.00} ms");
+            ImGui.Text($"   - Wait (fence/presentwait/acquire): {counters.GpuFenceWait.Average:0.00}/{counters.GpuPresentWait.Average:0.00}/{counters.GpuAcquire.Average:0.00} ms");
             ImGui.Text($"   - Bounds: {counters.BoundsCalc.Average:0.00}ms");
             ImGui.Text($"   - Culling: {counters.Culling.Average:0.00}ms");
             ImGui.Text($"   - Sorting: {counters.Sorting.Average:0.00}ms");

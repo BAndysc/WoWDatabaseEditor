@@ -43,6 +43,11 @@ internal interface IVulkanPresentTarget : IDisposable
     /// recreate); the external target ignores the setter and always reports true.</summary>
     bool VSync { get; set; }
 
+    /// <summary>Whether presents are currently display-paced (Fifo) AND <see cref="ThrottlePresentQueue"/>
+    /// can actually throttle - the condition for running the low-latency wait and its pacing telemetry.
+    /// False for the external target (the compositor paces; nothing to wait on).</summary>
+    bool CanThrottlePresentQueue { get; }
+
     /// <summary>Match the target to the desired size (KHR recreate-on-resize; external no-op).</summary>
     void EnsureSize(uint width, uint height);
 
@@ -57,6 +62,13 @@ internal interface IVulkanPresentTarget : IDisposable
 
     /// <summary>Hand the rendered image to the consumer (KHR: vkQueuePresentKHR; external: no-op).</summary>
     void Present(uint imageIndex);
+
+    /// <summary>Blocks until at most <paramref name="maxPendingPresents"/> queued presents remain
+    /// undisplayed (VK_KHR_present_wait). 0 = wait until the most recent present reached the display
+    /// (lowest latency, serializes the frame to the refresh cadence); 1 = allow one queued present
+    /// (keeps cross-frame CPU/GPU pipelining). No-op when present_wait is unavailable, vsync is off,
+    /// or presentation is externally paced.</summary>
+    void ThrottlePresentQueue(int maxPendingPresents);
 }
 
 /// <summary>Present target backed by a real VK_KHR_surface swapchain (standalone window mode).</summary>
@@ -156,10 +168,23 @@ internal sealed unsafe class KhrSwapchainPresentTarget : IVulkanPresentTarget
             SwapchainCount = 1,
             PPresentModes = &presentMode,
         };
+        void* pNext = swapchain.SwitchableModes.Length > 0 ? &presentModeInfo : null;
+        // tag the present with a monotonically increasing id so ThrottlePresentQueue can
+        // vkWaitForPresentKHR on it later
+        ulong presentId = swapchain.LastPresentId + 1;
+        var presentIdInfo = new PresentIdKHR
+        {
+            SType = StructureType.PresentIDKhr,
+            PNext = pNext,
+            SwapchainCount = 1,
+            PPresentIds = &presentId,
+        };
+        if (ctx.SupportsPresentWait)
+            pNext = &presentIdInfo;
         var presentInfo = new PresentInfoKHR
         {
             SType = StructureType.PresentInfoKhr,
-            PNext = swapchain.SwitchableModes.Length > 0 ? &presentModeInfo : null,
+            PNext = pNext,
             WaitSemaphoreCount = 1,
             PWaitSemaphores = &renderFinished,
             SwapchainCount = 1,
@@ -167,8 +192,26 @@ internal sealed unsafe class KhrSwapchainPresentTarget : IVulkanPresentTarget
             PImageIndices = &idx,
         };
         var result = ctx.SwapchainExt.QueuePresent(ctx.Queue, in presentInfo);
+        if (ctx.SupportsPresentWait && result is Result.Success or Result.SuboptimalKhr)
+            swapchain.LastPresentId = presentId;
         if (result is not (Result.Success or Result.SuboptimalKhr or Result.ErrorOutOfDateKhr))
             VulkanContext.Check(result, "present");
+    }
+
+    public bool CanThrottlePresentQueue => ctx.SupportsPresentWait && swapchain.PacedByVBlank;
+
+    public void ThrottlePresentQueue(int maxPendingPresents)
+    {
+        if (!CanThrottlePresentQueue)
+            return;
+        ulong last = swapchain.LastPresentId;
+        if (last <= (ulong)maxPendingPresents)
+            return;
+        // 250ms timeout: never hang on a stalled presentation engine (occluded window, display
+        // sleep) - timing out just means the throttle degrades to today's queue-depth pacing
+        var result = ctx.PresentWaitExt!.WaitForPresent(ctx.Device, swapchain.Swapchain, last - (ulong)maxPendingPresents, 250_000_000);
+        if (result is not (Result.Success or Result.Timeout or Result.SuboptimalKhr or Result.ErrorOutOfDateKhr))
+            VulkanContext.Check(result, "vkWaitForPresentKHR");
     }
 
     public void Dispose() => swapchain.Dispose();
@@ -209,6 +252,7 @@ internal sealed class ExternalImagePresentTarget : IVulkanPresentTarget
     // the compositor paces presentation - effectively always vsynced, nothing to control here
     public bool SupportsVSyncControl => false;
     public bool VSync { get => true; set { } }
+    public bool CanThrottlePresentQueue => false;
 
     public void EnsureSize(uint width, uint height) { }
 
@@ -223,5 +267,6 @@ internal sealed class ExternalImagePresentTarget : IVulkanPresentTarget
     public ImageLayout GetLayout(uint imageIndex) => layout;
     public void SetLayout(uint imageIndex, ImageLayout layout) => this.layout = layout;
     public void Present(uint imageIndex) { }
+    public void ThrottlePresentQueue(int maxPendingPresents) { }
     public void Dispose() { }
 }

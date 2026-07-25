@@ -78,6 +78,8 @@
       <PackageReference Include="Silk.NET.Shaderc" Version="2.22.0" />
       <PackageReference Include="Silk.NET.Shaderc.Native" Version="2.22.0" />
       <PackageReference Include="Silk.NET.Vulkan" Version="2.22.0" />
+      <PackageReference Include="Silk.NET.Vulkan.Loader.Native" Version="2025.9.12" />
+      <PackageReference Include="Silk.NET.MoltenVK.Native" Version="2.23.0" />
       <PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.22.0" />
       <PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.22.0" />
       <PackageReference Include="System.CodeDom" Version="9.0.8" />

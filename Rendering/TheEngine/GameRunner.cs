@@ -136,6 +136,7 @@ public class GameRunner
         // clear how much of the render time is idle-waiting rather than CPU/GPU work
         engine.statsManager.Counters.GpuFenceWait.Add(engine.Backend.LastFenceWaitMs);
         engine.statsManager.Counters.GpuAcquire.Add(engine.Backend.LastAcquireMs);
+        engine.statsManager.Counters.GpuPresentWait.Add(engine.Backend.LastPresentWaitMs);
         // whole-frame phase breakdown (begin includes the fence/acquire wait above)
         engine.statsManager.Counters.RenderBegin.Add(beginElapsed.TotalMilliseconds);
         engine.statsManager.Counters.RenderPrepare.Add(prepElapsed.TotalMilliseconds);
@@ -152,7 +153,7 @@ public class GameRunner
         {
             var c = engine.statsManager.Counters;
             var s = engine.statsManager.RenderStats;
-            Console.WriteLine($"[prof] frame={c.FrameTime.Average:0.0}ms update={c.UpdateTime.Average:0.0} render={c.TotalRender.Average:0.0} GPU={engine.Backend.LastGpuMs:0.0} | begin={beginElapsed.TotalMilliseconds:0.0}(fence={engine.Backend.LastFenceWaitMs:0.0} acquire={engine.Backend.LastAcquireMs:0.0} qreadback={engine.Backend.LastQueryReadbackMs:0.0} destroy={engine.Backend.LastDestroyMs:0.0} ndestroy={engine.Backend.LastDestroyedCount} qlen={engine.Backend.PendingDestroyQueueLength}) prep={prepElapsed.TotalMilliseconds:0.0} opaque={opaqueElapsed.TotalMilliseconds:0.0} transp={transpElapsed.TotalMilliseconds:0.0} post={ppElapsed.TotalMilliseconds:0.0} gui={guiElapsed.TotalMilliseconds:0.0} finalize={finalizeElapsed.TotalMilliseconds:0.0} end={endElapsed.TotalMilliseconds:0.0} | batches={s.NonInstancedDraws + s.InstancedDraws} set1 {s.Set1CacheHits}/{s.Set1CacheMisses} views[game={engine.GameView.IsVisible} scene={engine.SceneView.IsVisible}]");
+            Console.WriteLine($"[prof] frame={c.FrameTime.Average:0.0}ms update={c.UpdateTime.Average:0.0} render={c.TotalRender.Average:0.0} GPU={engine.Backend.LastGpuMs:0.0} | begin={beginElapsed.TotalMilliseconds:0.0}(fence={engine.Backend.LastFenceWaitMs:0.0} presentwait={engine.Backend.LastPresentWaitMs:0.0} acquire={engine.Backend.LastAcquireMs:0.0} qreadback={engine.Backend.LastQueryReadbackMs:0.0} destroy={engine.Backend.LastDestroyMs:0.0} ndestroy={engine.Backend.LastDestroyedCount} qlen={engine.Backend.PendingDestroyQueueLength}) prep={prepElapsed.TotalMilliseconds:0.0} opaque={opaqueElapsed.TotalMilliseconds:0.0} transp={transpElapsed.TotalMilliseconds:0.0} post={ppElapsed.TotalMilliseconds:0.0} gui={guiElapsed.TotalMilliseconds:0.0} finalize={finalizeElapsed.TotalMilliseconds:0.0} end={endElapsed.TotalMilliseconds:0.0} | batches={s.NonInstancedDraws + s.InstancedDraws} set1 {s.Set1CacheHits}/{s.Set1CacheMisses} views[game={engine.GameView.IsVisible} scene={engine.SceneView.IsVisible}]");
         }
         // if (frameCounter == 160)
         // {

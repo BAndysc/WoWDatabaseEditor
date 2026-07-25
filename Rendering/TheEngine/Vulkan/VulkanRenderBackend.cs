@@ -145,6 +145,10 @@ internal sealed unsafe class VulkanRenderBackend : IRenderBackend
     public float LastFenceWaitMs { get; private set; }
     /// <summary>CPU ms spent in BeginFrame's AcquireNextImage (present/vsync sync). Profile-only.</summary>
     public float LastAcquireMs { get; private set; }
+    /// <summary>CPU ms spent in BeginFrame's low-latency vsync throttle (vkWaitForPresentKHR).
+    /// Always measured; high values here with vsync on mean the throttle is doing its job
+    /// (idle-waiting for the previous present to hit the display instead of queueing frames).</summary>
+    public float LastPresentWaitMs { get; private set; }
     /// <summary>CPU ms spent reading back the GPU timestamp query (profiling-only artifact).</summary>
     public float LastQueryReadbackMs { get; private set; }
     /// <summary>CPU ms spent in ProcessPendingDestroys (vkFree/vkDestroy of retired resources). Profile-only.</summary>
@@ -971,10 +975,87 @@ internal sealed unsafe class VulkanRenderBackend : IRenderBackend
         frame.PoolIndex = 0;
         frame.RingOffset = 0;
 
+        var swThrottle = CheapStopWatch.StartNew();
+        ThrottleLatency();
+        LastPresentWaitMs = (float)swThrottle.Elapsed.TotalMilliseconds;
+
         var swAcquire = CheapStopWatch.StartNew();
         AcquireImage(frame);
         LastAcquireMs = (float)swAcquire.Elapsed.TotalMilliseconds;
         executor?.OnBackendFrameBegin();
+    }
+
+    // ---- low-latency vsync (VK_KHR_present_wait) ----
+    // With FIFO and N swapchain images the driver buffers up to N-1 finished frames; the spinning
+    // render loop keeps that queue full, so input sampled this frame shows up ~2 vsyncs later.
+    // Waiting until the PREVIOUS present actually reached the display (maxPending=0) caps the queue:
+    // input is sampled ~one refresh before it can appear. The cost: once the previous frame is on
+    // glass its GPU work is done, so nothing overlaps - the whole frame (CPU+GPU) must fit in one
+    // refresh interval or vblanks get missed that the deeper queue would still have made. Hence the
+    // throttle self-monitors: consecutive waits return ~one refresh period apart when every vblank
+    // is hit; intervals well above the rolling estimate are missed vblanks, and repeated misses back
+    // off to maxPending=1 (the old pipelined pacing) for a cooldown before probing again.
+    private long lastPresentWaitReturn;
+    private double refreshPeriodEstimateMs;
+    private int presentWaitMisses;
+    private int presentWaitWindow;
+    private int presentWaitRelaxedCooldown;
+    private int consecutiveHighIntervals;
+
+    private void ThrottleLatency()
+    {
+        if (!presentTarget.CanThrottlePresentQueue)
+        {
+            lastPresentWaitReturn = 0;
+            return;
+        }
+        bool aggressive = presentWaitRelaxedCooldown <= 0;
+        if (!aggressive)
+            presentWaitRelaxedCooldown--;
+        presentTarget.ThrottlePresentQueue(aggressive ? 0 : 1);
+
+        // pacing telemetry: in either mode a saturated present queue completes one wait per vblank,
+        // so the interval between consecutive returns estimates the refresh period
+        long now = System.Diagnostics.Stopwatch.GetTimestamp();
+        long prev = lastPresentWaitReturn;
+        lastPresentWaitReturn = now;
+        if (prev == 0)
+            return;
+        double intervalMs = (now - prev) * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+        if (intervalMs is <= 2 or >= 100)
+            return; // hidden-window spins, loading hitches, debugger pauses - not pacing samples
+        if (refreshPeriodEstimateMs == 0)
+        {
+            refreshPeriodEstimateMs = intervalMs;
+            return;
+        }
+        bool missedVblank = intervalMs >= refreshPeriodEstimateMs * 1.4;
+        if (!missedVblank)
+        {
+            refreshPeriodEstimateMs = refreshPeriodEstimateMs * 0.9 + intervalMs * 0.1;
+            consecutiveHighIntervals = 0;
+        }
+        else if (++consecutiveHighIntervals >= 120)
+        {
+            // seconds of uniformly long intervals isn't frame misses - the refresh rate itself
+            // changed (window moved to another monitor); drop the estimate and re-learn
+            refreshPeriodEstimateMs = 0;
+            consecutiveHighIntervals = 0;
+            presentWaitMisses = 0;
+            presentWaitWindow = 0;
+            return;
+        }
+        if (!aggressive)
+            return;
+        if (missedVblank)
+            presentWaitMisses++;
+        if (++presentWaitWindow >= 60)
+        {
+            if (presentWaitMisses >= 6)
+                presentWaitRelaxedCooldown = 240; // ~4s of pipelined pacing before probing again
+            presentWaitMisses = 0;
+            presentWaitWindow = 0;
+        }
     }
 
     public bool InFrame { get; set; }

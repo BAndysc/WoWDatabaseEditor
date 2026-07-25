@@ -49,6 +49,7 @@ public class TheEngineVulkanOpenTkWindow : NativeWindow, IWindowHost
     public unsafe void Run()
     {
         var ctx = new VulkanContext();
+        GLFW.InitVulkanLoader(ctx.LoaderVkGetInstanceProcAddr);
         ctx.CreateInstance(GLFW.GetRequiredInstanceExtensions());
 
         VulkanContext.Check(
@@ -63,8 +64,14 @@ public class TheEngineVulkanOpenTkWindow : NativeWindow, IWindowHost
         // native top-down memory: the final swapchain blit no longer needs to flip
         engine = new Engine(backend, new Configuration(), this, false);
         gameRunner = new GameRunner(engine);
+        // events are pumped here, inside the frame, not at the top of the loop: SyncInputState runs
+        // after BeginFrame's blocking fence/present waits, so polling now (instead of before the
+        // block) picks up input that arrived during the wait - up to a full vsync fresher
         gameRunner.SyncInputState += () =>
         {
+            NewInputFrame();
+            ProcessWindowEvents(false);
+            UpdateSizes();
             UpdateKeyboard();
             UpdateMouse();
         };
@@ -73,10 +80,6 @@ public class TheEngineVulkanOpenTkWindow : NativeWindow, IWindowHost
         double previous = 0;
         while (!GLFW.WindowShouldClose(WindowPtr))
         {
-            NewInputFrame();
-            ProcessWindowEvents(false);
-            UpdateSizes();
-
             var now = stopwatch.Elapsed.TotalSeconds;
             var delta = (float)(now - previous);
             previous = now;

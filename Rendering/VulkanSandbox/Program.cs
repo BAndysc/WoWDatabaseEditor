@@ -28,6 +28,41 @@ internal static unsafe class Program
     private static Vk vk = null!;
     private static int validationErrors;
 
+    /// <summary>Without a Vulkan SDK install macOS has no ICD manifests, so the loader
+    /// (Silk.NET.Vulkan.Loader.Native) finds no driver; point it at the bundled MoltenVK
+    /// (Silk.NET.MoltenVK.Native) unless a system manifest or explicit override exists.
+    /// Same logic as TheEngine.Vulkan.MoltenVkIcdFallback (this spike doesn't reference TheEngine).</summary>
+    private static void SetupMoltenVkIcdFallback()
+    {
+        if (!OperatingSystem.IsMacOS() ||
+            Environment.GetEnvironmentVariable("VK_ICD_FILENAMES") != null ||
+            Environment.GetEnvironmentVariable("VK_DRIVER_FILES") != null)
+            return;
+
+        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        string[] systemDirs =
+        {
+            Path.Combine(home, ".config/vulkan/icd.d"),
+            "/etc/xdg/vulkan/icd.d",
+            "/usr/local/etc/vulkan/icd.d",
+            "/etc/vulkan/icd.d",
+            Path.Combine(home, ".local/share/vulkan/icd.d"),
+            "/usr/local/share/vulkan/icd.d",
+            "/usr/share/vulkan/icd.d",
+        };
+        if (systemDirs.Any(dir => Directory.Exists(dir) && Directory.EnumerateFiles(dir, "*.json").Any()))
+            return;
+
+        var baseDir = AppContext.BaseDirectory;
+        var manifest = new[]
+        {
+            Path.Combine(baseDir, "runtimes", "osx", "native", "MoltenVK_icd.json"),
+            Path.Combine(baseDir, "MoltenVK_icd.json"),
+        }.FirstOrDefault(File.Exists);
+        if (manifest != null)
+            Environment.SetEnvironmentVariable("VK_DRIVER_FILES", manifest);
+    }
+
     public static int Main(string[] args)
     {
         long maxFrames = long.MaxValue;
@@ -51,15 +86,18 @@ internal static unsafe class Program
         };
         using var window = new NativeWindow(windowSettings);
 
+        SetupMoltenVkIcdFallback();
+        vk = Vk.GetApi();
+        // point GLFW at the loader Silk.NET loaded (shipped by Silk.NET.Vulkan.Loader.Native);
+        // a second loader instance in the process rejects our instance handles
+        if (vk.Context.TryGetProcAddress("vkGetInstanceProcAddr", out var vkGetInstanceProcAddr))
+            GLFW.InitVulkanLoader(vkGetInstanceProcAddr);
+
         if (!GLFW.VulkanSupported())
         {
             Console.WriteLine("GLFW says Vulkan is not supported (loader not found).");
-            Console.WriteLine("Hint: the loader lives in ~/VulkanSDK/1.4.350.0/macOS/lib/libvulkan.dylib;");
-            Console.WriteLine("try DYLD_LIBRARY_PATH=$HOME/VulkanSDK/1.4.350.0/macOS/lib");
             return 1;
         }
-
-        vk = Vk.GetApi();
 
         // ---- instance ----
         var availableLayers = GetInstanceLayers();

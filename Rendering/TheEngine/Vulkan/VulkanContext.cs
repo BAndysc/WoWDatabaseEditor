@@ -50,6 +50,11 @@ internal unsafe class VulkanContext : IDisposable
     /// switched per-present (vsync toggle without recreating the swapchain - the recreate path is
     /// fragile on MoltenVK's embedded CAMetalLayer, which stops presenting until a resize).</summary>
     public bool SupportsSwapchainMaintenance1;
+    /// <summary>True when VK_KHR_present_id + VK_KHR_present_wait are enabled: presents are tagged
+    /// with monotonically increasing ids and the CPU can block until a given present actually
+    /// reached the display (vkWaitForPresentKHR) - the low-latency vsync throttle.</summary>
+    public bool SupportsPresentWait;
+    public KhrPresentWait? PresentWaitExt;
     public PhysicalDeviceProperties DeviceProperties;
     /// <summary>Native VMA allocator (libvma): sub-allocates buffers and images from pooled device
     /// memory blocks instead of one vkAllocateMemory per resource. Created in PickDeviceAndCreate,
@@ -78,8 +83,17 @@ internal unsafe class VulkanContext : IDisposable
 
     public VulkanContext()
     {
+        MoltenVkIcdFallback.EnsureVulkanDriverDiscoverable();
         vk = Vk.GetApi();
     }
+
+    /// <summary>The exported vkGetInstanceProcAddr of the Vulkan loader Silk.NET loaded (the one
+    /// Silk.NET.Vulkan.Loader.Native ships next to the app). Windowing layers that dlopen Vulkan
+    /// themselves (GLFW) must be pointed at this (glfwInitVulkanLoader) - a second loader instance
+    /// in the process rejects handles created by ours, so surface creation fails. Zero when the
+    /// export cannot be resolved (GLFW then falls back to its own search).</summary>
+    public nint LoaderVkGetInstanceProcAddr =>
+        vk.Context.TryGetProcAddress("vkGetInstanceProcAddr", out var addr) ? addr : 0;
 
     /// <summary>Adopts an externally-created instance/device/queue (e.g. the device the Avalonia
     /// compositor GPU-interop path created and matched to the compositor's GPU). This context does
@@ -293,6 +307,35 @@ internal unsafe class VulkanContext : IDisposable
             }
         }
 
+        // VK_KHR_present_id + VK_KHR_present_wait: lets BeginFrame block until the previous frame
+        // is actually on screen, capping the FIFO present queue for low-latency vsync.
+        if (Environment.GetEnvironmentVariable("THEENGINE_VK_NO_PRESENT_WAIT") != "1"
+            && availableDeviceExtensions.Contains("VK_KHR_present_id")
+            && availableDeviceExtensions.Contains(KhrPresentWait.ExtensionName))
+        {
+            var presentIdQuery = new PhysicalDevicePresentIdFeaturesKHR
+            {
+                SType = StructureType.PhysicalDevicePresentIDFeaturesKhr,
+            };
+            var presentWaitQuery = new PhysicalDevicePresentWaitFeaturesKHR
+            {
+                SType = StructureType.PhysicalDevicePresentWaitFeaturesKhr,
+                PNext = &presentIdQuery,
+            };
+            var features2Query = new PhysicalDeviceFeatures2
+            {
+                SType = StructureType.PhysicalDeviceFeatures2,
+                PNext = &presentWaitQuery,
+            };
+            vk.GetPhysicalDeviceFeatures2(PhysicalDevice, &features2Query);
+            if (presentIdQuery.PresentId && presentWaitQuery.PresentWait)
+            {
+                deviceExtensions.Add("VK_KHR_present_id");
+                deviceExtensions.Add(KhrPresentWait.ExtensionName);
+                SupportsPresentWait = true;
+            }
+        }
+
         // Get a dedicated transfer queue so uploads run parallel to rendering. Preferred: a separate
         // transfer-capable family (needed when every family exposes only one queue). Fallback: a second
         // queue in the graphics family. Otherwise share the graphics queue. The cross-family case puts
@@ -370,11 +413,27 @@ internal unsafe class VulkanContext : IDisposable
             SwapchainMaintenance1 = true,
         };
 
+        void* featureChain = SupportsSwapchainMaintenance1 ? &maintFeatures : (void*)&features12;
+        var presentIdFeatures = new PhysicalDevicePresentIdFeaturesKHR
+        {
+            SType = StructureType.PhysicalDevicePresentIDFeaturesKhr,
+            PNext = featureChain,
+            PresentId = true,
+        };
+        var presentWaitFeatures = new PhysicalDevicePresentWaitFeaturesKHR
+        {
+            SType = StructureType.PhysicalDevicePresentWaitFeaturesKhr,
+            PNext = &presentIdFeatures,
+            PresentWait = true,
+        };
+        if (SupportsPresentWait)
+            featureChain = &presentWaitFeatures;
+
         var extensionsPtr = (byte**)SilkMarshal.StringArrayToPtr(deviceExtensions.ToArray());
         var deviceInfo = new DeviceCreateInfo
         {
             SType = StructureType.DeviceCreateInfo,
-            PNext = SupportsSwapchainMaintenance1 ? &maintFeatures : (void*)&features12,
+            PNext = featureChain,
             QueueCreateInfoCount = queueInfoCount,
             PQueueCreateInfos = queueInfos,
             EnabledExtensionCount = (uint)deviceExtensions.Count,
@@ -393,6 +452,15 @@ internal unsafe class VulkanContext : IDisposable
 
         if (!vk.TryGetDeviceExtension(Instance, Device, out SwapchainExt))
             throw new Exception("VK_KHR_swapchain not available");
+
+        if (SupportsPresentWait)
+        {
+            if (vk.TryGetDeviceExtension(Instance, Device, out KhrPresentWait presentWaitExt))
+                PresentWaitExt = presentWaitExt;
+            else
+                SupportsPresentWait = false;
+        }
+        Console.WriteLine($"[vk] low-latency vsync (VK_KHR_present_wait): {(SupportsPresentWait ? "enabled" : "unavailable")}");
 
         var poolInfo = new CommandPoolCreateInfo
         {
