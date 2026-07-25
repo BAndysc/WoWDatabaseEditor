@@ -120,7 +120,7 @@ public class GameViewInspector
             if (section.IsDirty)
             {
                 ImGui.SameLine();
-                ImGui.TextColored(EditorTheme.Warning, "●");
+                ImGui.TextColored(EditorTheme.Warning, "•"); // bullet - the font has no U+25CF
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("This editor has unsaved changes - Save in the toolbar applies them");
                 DrawSaveRevert(section);
@@ -174,7 +174,7 @@ public class GameViewInspector
         {
             ImGui.SameLine();
             ImGui.BeginDisabled(busy);
-            if (ImGui.SmallButton("Save##section"))
+            if (ImGui.SmallButton($"{Lucide.Save} Save##section"))
             {
                 bool quiet = section.SaveReportsItself;
                 string title = section.Title;
@@ -196,7 +196,7 @@ public class GameViewInspector
         {
             ImGui.SameLine();
             ImGui.BeginDisabled(busy);
-            if (ImGui.SmallButton("Revert##section"))
+            if (ImGui.SmallButton($"{Lucide.Undo2} Revert##section"))
                 openRevertPopup = true;
             ImGui.EndDisabled();
             if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))

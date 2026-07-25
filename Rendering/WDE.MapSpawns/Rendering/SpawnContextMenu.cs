@@ -30,6 +30,7 @@ public class SpawnContextMenu
     private readonly IQueryGenerator<GameObjectDiff> gameObjectQueryGenerator;
 
     private ICommand CopyGuidCommand { get; }
+    private ICommand CopyEntryCommand { get; }
     private ICommand CopyPositionCommand { get; }
     private ICommand CopyOrientationCommand { get; }
     private ICommand UpdateValuesCommand { get; }
@@ -39,6 +40,9 @@ public class SpawnContextMenu
 
     /// <summary>Opens the row 1:1 table editor for the spawn (public: the double-click path uses it too).</summary>
     public ICommand EditRowCommand { get; }
+
+    /// <summary>Opens the creature_template/gameobject_template 1:1 editor for the spawn's entry.</summary>
+    private ICommand EditTemplateCommand { get; }
 
     // spawns whose editor was closed - SpawnViewer reloads them from the DB on the engine thread
     private readonly ConcurrentQueue<SpawnInstance> reloadRequests = new();
@@ -133,6 +137,12 @@ public class SpawnContextMenu
         });
 
         CopyGuidCommand = new DelegateCommand<SpawnInstance>(inst => clipboardService.SetText(inst.Guid.ToString()));
+        CopyEntryCommand = new DelegateCommand<SpawnInstance>(inst => clipboardService.SetText(inst.Entry.ToString()));
+        EditTemplateCommand = new AsyncAutoCommand<SpawnInstance>(async spawn =>
+        {
+            var table = DatabaseTable.WorldTable(spawn is CreatureSpawnInstance ? "creature_template" : "gameobject_template");
+            await tableEditorPickerService.ShowForeignKey1To1(table, new DatabaseKey(spawn.Entry));
+        });
         CopyPositionCommand = new DelegateCommand<SpawnInstance>(inst =>
         {
             if (selectedSpawnTransform is { } transform)
@@ -241,9 +251,11 @@ public class SpawnContextMenu
             yield break;
 
         yield return (spawn is CreatureSpawnInstance ? "Edit creature" : "Edit gameobject", EditRowCommand, spawn);
+        yield return ("Edit template", EditTemplateCommand, spawn);
         if (editService.IsAvailable)
             yield return ("Duplicate (Ctrl+D)", DuplicateCommand, spawn);
         yield return ("Copy guid", CopyGuidCommand, spawn);
+        yield return ("Copy entry", CopyEntryCommand, spawn);
         yield return ("Copy position", CopyPositionCommand, spawn);
         yield return ("Copy orientation", CopyOrientationCommand, spawn);
         yield return ("Update values", UpdateValuesCommand, spawn);
@@ -259,9 +271,14 @@ public class SpawnContextMenu
                 if (attached)
                     yield return ("Remove all waypoints", RemoveWaypointsCommand, creature);
             }
-            // the entry-shared creature_movement_template path (CMaNGOS) - a separate editing target
+            // the entry-shared creature_movement_template path (CMaNGOS) - a separate editing
+            // target; "Edit" only when the entry really has rows (null = check in flight - say
+            // "Add", the action is create-or-edit either way)
             if (waypointService.SupportsCreatureTemplatePaths)
-                yield return ("Edit template waypoints", EditTemplateWaypointsCommand, creature);
+            {
+                bool hasTemplate = waypointService.HasCreatureTemplatePath(creature.Entry) == true;
+                yield return (hasTemplate ? "Edit template waypoints" : "Add template waypoints", EditTemplateWaypointsCommand, creature);
+            }
         }
     }
 }

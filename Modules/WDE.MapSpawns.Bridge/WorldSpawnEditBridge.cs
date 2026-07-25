@@ -53,6 +53,7 @@ public class WorldSpawnEditBridge
     private readonly IStatusBar statusBar;
     private readonly IMessageBoxService messageBoxService;
     private readonly Lazy<ITableEditorPickerService> tableEditorPicker;
+    private readonly Lazy<ILootService> lootService;
     private readonly Lazy<WDE.Common.Services.QueryParser.IQueryParserService> queryParser;
     private readonly Lazy<IDatabaseTableDataProvider> tableDataProvider;
     private readonly Lazy<WDE.DatabaseEditors.Services.ITableOpenService> tableOpenService;
@@ -93,6 +94,7 @@ public class WorldSpawnEditBridge
         IStatusBar statusBar,
         IMessageBoxService messageBoxService,
         Lazy<ITableEditorPickerService> tableEditorPicker,
+        Lazy<ILootService> lootService,
         Lazy<WDE.Common.Services.QueryParser.IQueryParserService> queryParser,
         Lazy<IDatabaseTableDataProvider> tableDataProvider,
         Lazy<WDE.DatabaseEditors.Services.ITableOpenService> tableOpenService,
@@ -108,6 +110,7 @@ public class WorldSpawnEditBridge
         this.statusBar = statusBar;
         this.messageBoxService = messageBoxService;
         this.tableEditorPicker = tableEditorPicker;
+        this.lootService = lootService;
         this.queryParser = queryParser;
         this.tableDataProvider = tableDataProvider;
         this.tableOpenService = tableOpenService;
@@ -156,6 +159,10 @@ public class WorldSpawnEditBridge
             .Subscribe(r => Run(() => OnOpenTemplateEditor(r)), ThreadOption.UIThread, true);
         eventAggregator.GetEvent<OpenGossipMenuEditorEvent>()
             .Subscribe(id => Run(() => OnOpenGossipMenuEditor(id)), ThreadOption.UIThread, true);
+        eventAggregator.GetEvent<OpenLootEditorEvent>()
+            .Subscribe(r => Run(() => OnOpenLootEditor(r)), ThreadOption.UIThread, true);
+        eventAggregator.GetEvent<OpenSpawnRelatedTableEvent>()
+            .Subscribe(r => Run(() => OnOpenSpawnRelatedTable(r)), ThreadOption.UIThread, true);
         eventAggregator.GetEvent<WorldEditGenerateQueryRequestedEvent>()
             .Subscribe(r => Run(() => OnGenerateQuery(r)), ThreadOption.UIThread, true);
 
@@ -473,6 +480,47 @@ public class WorldSpawnEditBridge
     {
         await tableEditorPicker.Value.ShowTable(DatabaseTable.WorldTable("gossip_menu"), null, new DatabaseKey(menuId));
     }
+
+    /// <summary>Opens the standalone loot editor for the entry - the loot service resolves the
+    /// per-core loot-id indirection and editing mode itself.</summary>
+    private Task OnOpenLootEditor(OpenLootEditorRequest r)
+    {
+        USAGE.Count("3d_action", ("action", "open_loot_editor"));
+        lootService.Value.OpenStandaloneLootEditor(r.Type, r.Entry, 0);
+        return Task.CompletedTask;
+    }
+
+    /// <summary>Opens the generic editor of an entry-keyed side table (vendor/trainer/spellclick/
+    /// quest relations), filtered to the entry by the table's index key. The semantic kind maps to
+    /// per-core candidate table names; the first one the active core defines wins.</summary>
+    private async Task OnOpenSpawnRelatedTable(OpenSpawnRelatedTableRequest r)
+    {
+        USAGE.Count("3d_action", ("action", "open_related_table"));
+        foreach (var name in CandidateTables(r))
+        {
+            var table = DatabaseTable.WorldTable(name);
+            if (definitionProvider.GetDefinitionByTableName(table) == null)
+                continue;
+            await tableEditorPicker.Value.ShowTable(table, null, new DatabaseKey(r.Entry));
+            return;
+        }
+        statusBar.PublishNotification(new PlainNotification(NotificationType.Warning,
+            $"The current core has no editor definition for the {r.Table} table"));
+    }
+
+    private static string[] CandidateTables(OpenSpawnRelatedTableRequest r) => r.Table switch
+    {
+        SpawnRelatedTable.Vendor => new[] { "npc_vendor" },
+        SpawnRelatedTable.Trainer => new[] { "npc_trainer" },
+        SpawnRelatedTable.SpellClick => new[] { "npc_spellclick_spells" },
+        SpawnRelatedTable.QuestStarter => r.IsCreature
+            ? new[] { "creature_queststarter", "creature_questrelation" }
+            : new[] { "gameobject_queststarter", "gameobject_questrelation" },
+        SpawnRelatedTable.QuestEnder => r.IsCreature
+            ? new[] { "creature_questender", "creature_involvedrelation" }
+            : new[] { "gameobject_questender", "gameobject_involvedrelation" },
+        _ => Array.Empty<string>(),
+    };
 
     /// <summary>Sets arbitrary row fields (plain or foreign-table-flattened columns like
     /// "creature_addon.path_id") on the spawn's document row — same coalescing row reuse as moves,

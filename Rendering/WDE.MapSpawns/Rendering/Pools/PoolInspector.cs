@@ -68,7 +68,7 @@ public sealed class PoolInspector : IInspectorSection
                 return "Click a pooled spawn: select its pool · click unpooled spawns: pick members to add";
             return module.Pending.Count == 0
                 ? "Click spawns in the world to select them · click a pooled spawn to edit its pool"
-                : "Click: add/remove from the selection · describe it in the panel to create a pool";
+                : "Click: add/remove from the selection · \"New pool...\" in the panel creates a pool";
         }
     }
 
@@ -117,28 +117,22 @@ public sealed class PoolInspector : IInspectorSection
 
     private void DrawPoolPicker()
     {
+        // no permanent combo: an open pool shows a back row, otherwise one "Load existing"
+        // button opens the filterable picker popup
         uint selected = module.SelectedPoolId;
-        string preview = selected != 0 && service.PoolNames.TryGetValue(selected, out var n)
-            ? $"{selected} {n}"
-            : "Select a pool to edit...";
-        FieldWidth(selected != 0 ? 26 : 0);
-        if (ImGui.BeginCombo("##poolpick", preview))
-        {
-            foreach (var (id, name) in service.PoolNames.OrderBy(kv => kv.Key))
-            {
-                if (ImGui.Selectable($"{id} {name}", id == selected))
-                    module.SelectedPoolId = id;
-            }
-            ImGui.EndCombo();
-        }
         if (selected != 0)
         {
-            ImGui.SameLine();
-            if (ImGui.SmallButton("x##deselect"))
+            if (ImGui.SmallButton($"{Lucide.ArrowLeft}##stopeditpool"))
                 module.SelectedPoolId = 0;
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Stop editing this pool");
+            ImGui.SameLine();
+            string name = service.PoolNames.TryGetValue(selected, out var n) ? n : "";
+            ImGui.TextColored(EditorTheme.SelectionGold, $"{selected} {name}");
         }
+        else if (EditorWidgets.LoadExistingPopup($"{Lucide.FolderOpen} Load existing...", "Load spawn pool",
+                     service.PoolNames.OrderBy(kv => kv.Key).Select(kv => (kv.Key, kv.Value)), out var picked))
+            module.SelectedPoolId = picked;
         ImGui.Separator();
     }
 
@@ -153,53 +147,39 @@ public sealed class PoolInspector : IInspectorSection
         {
             var s = pending[i];
             ImGui.PushID(i);
-            if (ImGui.SmallButton("x"))
+            if (ImGui.SmallButton(Lucide.X))
                 pending.RemoveAt(i);
             ImGui.SameLine();
             ImGui.TextUnformatted(PoolEditorModule.DescribeSpawn(s));
             ImGui.PopID();
         }
 
-        ImGui.SeparatorText("New pool");
-        ImGui.BeginDisabled(pending.Count == 0);
-        FieldWidth(64);
-        ImGui.InputTextWithHint("##description", "pool description", ref descriptionBuffer, 128);
-        ImGui.SameLine();
-        bool descriptionEmpty = string.IsNullOrWhiteSpace(descriptionBuffer);
-        ImGui.BeginDisabled(descriptionEmpty);
-        if (ImGui.Button("Create"))
+        ImGui.Spacing();
+        if (EditorWidgets.CreateNamePopup($"{Lucide.Plus} New pool...", "Create spawn pool", "pool description",
+                ref descriptionBuffer, pending.Count > 0, "Select spawns in the world first", fullWidthButton: true) is { } description)
         {
-            var id = service.CreatePool(descriptionBuffer, module.CollectPending());
+            var id = service.CreatePool(description, module.CollectPending());
             pending.Clear();
-            descriptionBuffer = "";
             module.SelectedPoolId = id; // jump straight into the full editor
         }
-        ImGui.EndDisabled();
-        if (descriptionEmpty && pending.Count > 0 && ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            ImGui.SetTooltip("Type a pool description first");
-        ImGui.EndDisabled();
 
-        ImGui.SeparatorText("Existing pool");
-        ImGui.BeginDisabled(pending.Count == 0 || service.PoolNames.Count == 0);
-        string preview = addToPoolId != 0 && service.PoolNames.TryGetValue(addToPoolId, out var n)
-            ? $"{addToPoolId} {n}" : "Add to existing pool...";
-        FieldWidth(64);
-        if (ImGui.BeginCombo("##addpool", preview))
+        // only offered once there is a selection to add - an always-visible disabled row is clutter
+        if (pending.Count > 0 && service.PoolNames.Count > 0)
         {
-            foreach (var (id, name) in service.PoolNames.OrderBy(kv => kv.Key))
+            string preview = addToPoolId != 0 && service.PoolNames.TryGetValue(addToPoolId, out var n)
+                ? $"{addToPoolId} {n}" : "Add to existing pool...";
+            FieldWidth(64);
+            if (EditorWidgets.IdNameCombo("##addpool", preview,
+                    service.PoolNames.OrderBy(kv => kv.Key).Select(kv => (kv.Key, kv.Value)),
+                    addToPoolId, out var pickedPool, service.PoolNames.Count))
+                addToPoolId = pickedPool;
+            ImGui.SameLine();
+            if (ImGui.Button($"{Lucide.Plus} Add") && addToPoolId != 0)
             {
-                if (ImGui.Selectable($"{id} {name}", id == addToPoolId))
-                    addToPoolId = id;
+                service.AddToPool(addToPoolId, module.CollectPending());
+                pending.Clear();
             }
-            ImGui.EndCombo();
         }
-        ImGui.SameLine();
-        if (ImGui.Button("Add") && addToPoolId != 0)
-        {
-            service.AddToPool(addToPoolId, module.CollectPending());
-            pending.Clear();
-        }
-        ImGui.EndDisabled();
     }
 
     // ---------------------------------------------------------------- pool editor ----------------
@@ -318,7 +298,7 @@ public sealed class PoolInspector : IInspectorSection
             if (ImGui.SmallButton(changingMother ? "Cancel##mother" : "Change...##mother"))
                 changingMother = !changingMother;
             ImGui.SameLine();
-            if (ImGui.SmallButton("x##unmother"))
+            if (ImGui.SmallButton($"{Lucide.X}##unmother"))
                 service.TrySetMotherPool(d.Id, null);
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Detach from the mother pool (becomes top-level)");
@@ -334,19 +314,14 @@ public sealed class PoolInspector : IInspectorSection
         if (changingMother)
         {
             FieldWidth(0);
-            if (ImGui.BeginCombo("##motherpick", "Pick the new mother pool..."))
+            if (EditorWidgets.IdNameCombo("##motherpick", "Pick the new mother pool...",
+                    service.PoolNames.OrderBy(kv => kv.Key)
+                        .Where(kv => CanBeMotherOf(d.Id, kv.Key))
+                        .Select(kv => (kv.Key, kv.Value)),
+                    d.MotherPool ?? 0, out var pickedMother, service.PoolNames.Count))
             {
-                foreach (var (id, name) in service.PoolNames.OrderBy(kv => kv.Key))
-                {
-                    if (!CanBeMotherOf(d.Id, id))
-                        continue;
-                    if (ImGui.Selectable($"{id} {name}", id == d.MotherPool))
-                    {
-                        service.TrySetMotherPool(d.Id, id);
-                        changingMother = false;
-                    }
-                }
-                ImGui.EndCombo();
+                service.TrySetMotherPool(d.Id, pickedMother);
+                changingMother = false;
             }
         }
 
@@ -400,7 +375,7 @@ public sealed class PoolInspector : IInspectorSection
         {
             ImGui.TableSetupColumn("Member");
             ImGui.TableSetupColumn("Chance", ImGuiTableColumnFlags.WidthFixed, 52);
-            ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 22);
+            ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 28);
 
             PoolMember? removeTarget = null;
             foreach (var m in members)
@@ -448,7 +423,7 @@ public sealed class PoolInspector : IInspectorSection
                     ImGui.SetTooltip("Explicit roll chance in percent (0 = equal-chance member)");
 
                 ImGui.TableNextColumn();
-                if (ImGui.SmallButton("x"))
+                if (ImGui.SmallButton(Lucide.X))
                     removeTarget = m;
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Remove from the pool (the spawn stays in the world; applied on Save)");
@@ -495,7 +470,7 @@ public sealed class PoolInspector : IInspectorSection
         {
             ImGui.TableSetupColumn("Entry");
             ImGui.TableSetupColumn("Chance", ImGuiTableColumnFlags.WidthFixed, 52);
-            ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 22);
+            ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 28);
 
             PoolEntryKey? removeTarget = null;
             foreach (var (entry, data) in d.EntryMembers.OrderBy(kv => kv.Key.Entry).ToList())
@@ -530,7 +505,7 @@ public sealed class PoolInspector : IInspectorSection
                     ImGui.SetTooltip("Explicit roll chance in percent (0 = equal-chance member)");
 
                 ImGui.TableNextColumn();
-                if (ImGui.SmallButton("x"))
+                if (ImGui.SmallButton(Lucide.X))
                     removeTarget = entry;
                 if (ImGui.IsItemHovered())
                     ImGui.SetTooltip("Remove this entry from the pool (applied on Save)");
@@ -552,7 +527,7 @@ public sealed class PoolInspector : IInspectorSection
         ImGui.InputInt("##newentry", ref newEntryId, 0, 0);
         entryPicker.PickButton("picknewentry", newEntryIsCreature, newEntryId, picked => newEntryId = (int)picked);
         ImGui.SameLine();
-        if (ImGui.SmallButton("Add entry") && newEntryId > 0)
+        if (ImGui.SmallButton($"{Lucide.Plus} Add entry") && newEntryId > 0)
         {
             service.AddEntryMember(d.Id, new PoolEntryKey(newEntryIsCreature, (uint)newEntryId));
             newEntryId = 0;
@@ -595,7 +570,7 @@ public sealed class PoolInspector : IInspectorSection
         {
             ImGui.PushID((int)childId);
 
-            if (ImGui.SmallButton("x"))
+            if (ImGui.SmallButton(Lucide.X))
             {
                 service.TrySetMotherPool(childId, null);
                 ImGui.PopID();

@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Hexa.NET.ImGui;
+using TheEngine;
 using WDE.MapSpawns.Models;
 using WDE.MapSpawns.Models.CreatureLinking;
 
@@ -37,7 +38,7 @@ public sealed class CreatureLinkInspector : IInspectorSection
             if (!service.IsSupported)
                 return "The current core has no creature_linking table";
             if (service.Selected != null)
-                return "Del: remove link · drag a creature onto another: link it as slave → master";
+                return "Del: remove link · drag a creature onto another: link it as slave -> master";
             return service.Mode == CreatureLinkMode.Entry
                 ? "By entry: drag a creature onto another to link their entries · click an arrow to select"
                 : "By guid: drag a creature onto another to link them · click an arrow to select";
@@ -65,7 +66,7 @@ public sealed class CreatureLinkInspector : IInspectorSection
                 break;
             default:
                 ImGui.TextDisabled("No link selected.");
-                ImGui.TextDisabled("Drag a creature onto another to link it\n(slave → master); click an arrow to edit.");
+                ImGui.TextDisabled("Drag a creature onto another to link it\n(slave -> master); click an arrow to edit.");
                 break;
         }
 
@@ -97,14 +98,14 @@ public sealed class CreatureLinkInspector : IInspectorSection
 
     private void DrawGuidLinkEditor(EditableCreatureLink link)
     {
-        ImGui.TextUnformatted($"slave {link.Guid}  →  master {link.MasterGuid}");
+        ImGui.TextUnformatted($"slave {link.Guid}  {Lucide.ArrowRight}  master {link.MasterGuid}");
         DrawFlags(link.Flag, link.SetFlag);
         DrawRemoveButton(() => service.RemoveGuidLink(link));
     }
 
     private void DrawTemplateLinkEditor(EditableCreatureLinkTemplate link)
     {
-        ImGui.TextUnformatted($"entry {link.Entry} (map {link.Map})  →  master entry {link.MasterEntry}");
+        ImGui.TextUnformatted($"entry {link.Entry} (map {link.Map})  {Lucide.ArrowRight}  master entry {link.MasterEntry}");
 
         int range = (int)link.SearchRange;
         ImGui.SetNextItemWidth(120);
@@ -142,7 +143,7 @@ public sealed class CreatureLinkInspector : IInspectorSection
     private static void DrawRemoveButton(Action remove)
     {
         EditorTheme.PushDestructiveButton();
-        bool clicked = ImGui.SmallButton("Remove link");
+        bool clicked = ImGui.SmallButton($"{Lucide.Trash2} Remove link");
         ImGui.PopStyleColor(3);
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip("Remove this link.\nPending until Save - Revert restores it.");

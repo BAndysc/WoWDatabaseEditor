@@ -302,6 +302,45 @@ public class WaypointEditorService : IWaypointEditorService
         }
     }
 
+    private static readonly IReadOnlyDictionary<uint, string> NoPathNames = new Dictionary<uint, string>();
+
+    public async Task<IReadOnlyDictionary<uint, string>> EnumeratePathNames(WaypointSource source)
+    {
+        // per-path display text: the cmangos waypoint_path_name row, or TC master's
+        // waypoint_path.Comment - whichever the source's schema actually has
+        var columns = ColumnsFor(source);
+        DatabaseTable? table;
+        string nameCol;
+        if (columns.HasFlagFast(WaypointColumns.PathName))
+            (table, nameCol) = (pathNameGen.TableName, "Name");
+        else if (columns.HasFlagFast(WaypointColumns.PathHeader))
+            (table, nameCol) = (pathHeaderGen.TableName, "Comment");
+        else
+            return NoPathNames;
+        if (table == null)
+            return NoPathNames;
+
+        var sql = $"SELECT `PathId`, `{nameCol}` FROM `{table.Value.Table}`";
+        try
+        {
+            var result = await mainThread.Schedule(() => mySqlExecutor.ExecuteSelectSql(sql));
+            var names = new Dictionary<uint, string>(result.Rows);
+            for (int row = 0; row < result.Rows; ++row)
+            {
+                if (result.IsNull(row, 1))
+                    continue;
+                var name = result.Value<string>(row, 1);
+                if (!string.IsNullOrWhiteSpace(name))
+                    names[result.Value<uint>(row, 0)] = name;
+            }
+            return names;
+        }
+        catch (Exception)
+        {
+            return NoPathNames;
+        }
+    }
+
     public bool AnyDirty => LoadedPaths.Any(p => p.IsDirty);
 
     public async Task SaveAllDirty()
@@ -327,6 +366,43 @@ public class WaypointEditorService : IWaypointEditorService
     // creature_movement_template is entry-shared (keyed by entry + pathId), separate from the per-guid
     // creature_movement path - available whenever the active core supports the template source
     public bool SupportsCreatureTemplatePaths => AvailableSources.Contains(WaypointSource.MangosCreatureMovementTemplate);
+
+    // entry -> the entry has creature_movement_template rows (null = check in flight). Filled by
+    // async checks kicked off from HasCreatureTemplatePath, dropped on template-path saves, so the
+    // inspector can tell "edit the existing path" from "add one" without per-frame queries.
+    private readonly ConcurrentDictionary<uint, bool?> templatePathExists = new();
+
+    public bool? HasCreatureTemplatePath(uint entry)
+    {
+        if (!SupportsCreatureTemplatePaths)
+            return false;
+        if (templatePathExists.TryGetValue(entry, out var exists))
+            return exists;
+        if (templatePathExists.TryAdd(entry, null))
+            CheckTemplatePathExists(entry).ListenErrors();
+        return null;
+    }
+
+    private async Task CheckTemplatePathExists(uint entry)
+    {
+        var table = TableFor(WaypointSource.MangosCreatureMovementTemplate)?.Table;
+        var entryCol = schemaInfo?.PathIdColumn(WaypointSource.MangosCreatureMovementTemplate.ToFlag());
+        if (table == null || entryCol == null)
+        {
+            templatePathExists[entry] = false;
+            return;
+        }
+        try
+        {
+            var sql = $"SELECT 1 FROM `{table}` WHERE `{entryCol}` = {entry} LIMIT 1";
+            var result = await mainThread.Schedule(() => mySqlExecutor.ExecuteSelectSql(sql));
+            templatePathExists[entry] = result.Rows > 0;
+        }
+        catch (Exception)
+        {
+            templatePathExists[entry] = false;
+        }
+    }
 
     // paths attached this session (creature.Addon only reflects the DB state from map load).
     // Concurrent: written on the engine thread, read by ResolveCreaturePath from the UI thread (menu).
@@ -523,6 +599,11 @@ public class WaypointEditorService : IWaypointEditorService
         // reference - the exported query re-reads the path's rows from the DB at generate time.
         eventAggregator.GetEvent<WaypointsSavedEvent>()
             .Publish(new WaypointsSolutionItem { Source = (int)path.Source, Key = path.Key, Key2 = path.Key2 });
+
+        // the save may have created the entry's first template rows or deleted its last ones -
+        // drop the cached existence so the inspector re-checks
+        if (path.Source == WaypointSource.MangosCreatureMovementTemplate)
+            templatePathExists.TryRemove(path.Key, out _);
 
         path.ClearDirty();
     }

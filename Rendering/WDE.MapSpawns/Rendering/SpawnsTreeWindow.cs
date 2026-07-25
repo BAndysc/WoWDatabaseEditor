@@ -204,7 +204,7 @@ public class SpawnsTreeWindow
             ImGui.TextColored(new Vector4(1, 0.4f, 0.4f, 1), buildError);
             ImGui.PopTextWrapPos();
             ImGui.SameLine();
-            if (ImGui.SmallButton("x##builderr"))
+            if (ImGui.SmallButton($"{Lucide.X}##builderr"))
                 buildError = null;
         }
 
@@ -273,12 +273,12 @@ public class SpawnsTreeWindow
 
     private void DrawToolbar()
     {
-        if (ImGui.Button(building ? "Loading..." : (roots == null ? "Load" : "Reload")) && !building)
+        if (ImGui.Button(building ? "Loading..." : (roots == null ? $"{Lucide.FolderOpen} Load" : $"{Lucide.RefreshCw} Reload")) && !building)
             StartBuild();
         if (roots != null)
         {
             ImGui.SameLine();
-            if (ImGui.Button("+##expandall"))
+            if (ImGui.Button($"{Lucide.ChevronsUpDown}##expandall"))
             {
                 foreach (var r in roots)
                     SetExpandRecursive(r, ExpandState.Expanded);
@@ -290,7 +290,7 @@ public class SpawnsTreeWindow
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Expand all");
             ImGui.SameLine(0, 2);
-            if (ImGui.Button("-##collapseall"))
+            if (ImGui.Button($"{Lucide.ChevronsDownUp}##collapseall"))
             {
                 foreach (var r in roots)
                 {
@@ -659,13 +659,13 @@ public class SpawnsTreeWindow
     {
         var items = new List<(string, ICommand, object?)>
         {
-            ("Expand all inside", GameCommand(() =>
+            ($"{Lucide.ChevronsUpDown} Expand all inside", GameCommand(() =>
             {
                 SetExpandRecursive(node, ExpandState.Expanded);
                 flatDirty = true;
                 expandChanged = true;
             }), null),
-            ("Collapse all inside", GameCommand(() =>
+            ($"{Lucide.ChevronsDownUp} Collapse all inside", GameCommand(() =>
             {
                 SetExpandRecursive(node, ExpandState.Collapsed);
                 flatDirty = true;

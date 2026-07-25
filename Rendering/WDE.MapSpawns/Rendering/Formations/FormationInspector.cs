@@ -68,7 +68,7 @@ public sealed class FormationInspector : IInspectorSection
 
         if (service.Selected is { } selected)
         {
-            ImGui.TextUnformatted($"member {selected.MemberGuid}  →  leader {selected.LeaderGuid}");
+            ImGui.TextUnformatted($"member {selected.MemberGuid}  {Lucide.ArrowRight}  leader {selected.LeaderGuid}");
             if (DrawParams(selected))
                 return; // removed
         }
@@ -98,7 +98,7 @@ public sealed class FormationInspector : IInspectorSection
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip("Member creature guid");
         ImGui.SameLine();
-        ImGui.TextDisabled("→");
+        ImGui.TextDisabled(Lucide.ArrowRight);
         ImGui.SameLine();
         ImGui.SetNextItemWidth(90);
         ImGui.InputInt("##addleader", ref addLeaderGuid, 0, 0);
@@ -106,7 +106,7 @@ public sealed class FormationInspector : IInspectorSection
             ImGui.SetTooltip("Leader creature guid");
         ImGui.SameLine();
         ImGui.BeginDisabled(addMemberGuid <= 0 || addLeaderGuid <= 0 || addMemberGuid == addLeaderGuid);
-        if (ImGui.SmallButton("Link"))
+        if (ImGui.SmallButton($"{Lucide.Link} Link"))
         {
             // Add computes dist/angle from the live positions and re-links an already-linked member
             var created = service.Add((uint)addMemberGuid, (uint)addLeaderGuid);
@@ -121,7 +121,7 @@ public sealed class FormationInspector : IInspectorSection
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
             ImGui.SetTooltip(addMemberGuid == addLeaderGuid && addMemberGuid > 0
                 ? "A creature can't lead itself"
-                : "Creates the member → leader link (applied on Save)");
+                : "Creates the member -> leader link (applied on Save)");
         if (addError != null)
             ImGui.TextColored(EditorTheme.Warning, addError);
     }
@@ -213,7 +213,7 @@ public sealed class FormationInspector : IInspectorSection
             ImGui.Text(f.Angle.ToString("0.#"));
 
             ImGui.TableNextColumn();
-            if (ImGui.SmallButton("x"))
+            if (ImGui.SmallButton(Lucide.X))
                 removeTarget = f;
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Remove this member-leader formation link (applied on Save)");
@@ -249,7 +249,7 @@ public sealed class FormationInspector : IInspectorSection
             return;
         }
 
-        ImGui.TextDisabled($"member {f.MemberGuid}  →  leader {f.LeaderGuid}");
+        ImGui.TextDisabled($"member {f.MemberGuid}  {Lucide.ArrowRight}  leader {f.LeaderGuid}");
         ImGui.Separator();
         if (DrawParams(f))
             ImGui.CloseCurrentPopup();

@@ -90,7 +90,7 @@ public sealed class SpellTargetInspector : IInspectorSection
         bool exists = newSpellId > 0 && service.Positions.ContainsKey((uint)newSpellId);
         if (module.PlacementArmed)
         {
-            if (ImGui.Button("Cancel placement"))
+            if (ImGui.Button($"{Lucide.X} Cancel placement"))
             {
                 module.PlacementArmed = false;
                 module.PendingSpellId = 0;
@@ -186,13 +186,13 @@ public sealed class SpellTargetInspector : IInspectorSection
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip($"The teleported unit lands facing this way ({orientation * 180f / MathF.PI:0.#}°)\nCtrl+click to type an exact value");
 
-        if (ImGui.SmallButton("Snap to ground"))
+        if (ImGui.SmallButton($"{Lucide.ArrowDownToLine} Snap to ground"))
         {
             row.Position = module.SnapToGround(row.Position);
             changed = true;
         }
         ImGui.SameLine();
-        if (ImGui.SmallButton("Fly camera here"))
+        if (ImGui.SmallButton($"{Lucide.Video} Fly camera here"))
             module.FlyTo(row.Map, row.Position);
 
         ImGui.Separator();

@@ -22,6 +22,19 @@ public static class EditorTheme
     /// <summary>Error/deleted text (readable on the dark background, not a pure red).</summary>
     public static readonly Vector4 DangerText = new(1f, 0.5f, 0.5f, 1f);
 
+    /// <summary>Clickable jump-to-editor text rows (a light accent so they read as links).</summary>
+    public static readonly Vector4 LinkText = new(0.55f, 0.75f, 1f, 1f);
+
+    /// <summary>A small dimmed "(?)" whose tooltip carries explanatory text that would otherwise
+    /// permanently occupy panel space. Call right after the element it explains (same line).</summary>
+    public static void HelpMarker(string text)
+    {
+        ImGui.SameLine();
+        ImGui.TextDisabled(TheEngine.Lucide.CircleHelp);
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+            ImGui.SetTooltip(text);
+    }
+
     /// <summary>Armed/confirmed "go" state (waypoint pen mode's active button).</summary>
     public static readonly Vector4 ArmedGreen = new(0.16f, 0.55f, 0.25f, 1f);
     public static readonly Vector4 ArmedGreenHovered = new(0.20f, 0.65f, 0.30f, 1f);

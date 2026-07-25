@@ -2,11 +2,13 @@ using Hexa.NET.ImGui;
 using Prism.Events;
 using TheEngine;
 using TheMaths;
+using WDE.Common.Database;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.MapRenderer.Managers;
 using WDE.MapSpawns.Models;
+using WDE.MapSpawns.Models.CreatureLinking;
 using WDE.MapSpawns.Models.Formations;
 using WDE.MapSpawns.Models.Solution;
 using WDE.MapSpawns.Models.SpawnGroups;
@@ -27,6 +29,7 @@ public class SelectInspectorSection : IInspectorSection
     private readonly ISpawnEditorToolService toolService;
     private readonly ISpawnGroupEditorService spawnGroupService;
     private readonly IFormationEditorService formationService;
+    private readonly ICreatureLinkEditorService creatureLinkService;
     private readonly IWaypointEditorService waypointService;
     private readonly ISpawnScriptsService scriptsService;
     private readonly IWorldSpawnEditService editService;
@@ -48,6 +51,7 @@ public class SelectInspectorSection : IInspectorSection
         ISpawnEditorToolService toolService,
         ISpawnGroupEditorService spawnGroupService,
         IFormationEditorService formationService,
+        ICreatureLinkEditorService creatureLinkService,
         IWaypointEditorService waypointService,
         ISpawnScriptsService scriptsService,
         IWorldSpawnEditService editService,
@@ -60,6 +64,7 @@ public class SelectInspectorSection : IInspectorSection
         this.toolService = toolService;
         this.spawnGroupService = spawnGroupService;
         this.formationService = formationService;
+        this.creatureLinkService = creatureLinkService;
         this.waypointService = waypointService;
         this.scriptsService = scriptsService;
         this.editService = editService;
@@ -154,38 +159,118 @@ public class SelectInspectorSection : IInspectorSection
         DrawAreaSection();
     }
 
+    /// <summary>A compact one-line editor jump: link-colored clickable text instead of a full-width
+    /// button, so the many-jump sections stay scannable (one visual weight per section).</summary>
+    private static void LinkRow(string text, string tooltip, Action open)
+    {
+        ImGui.PushStyleColor(ImGuiCol.Text, EditorTheme.LinkText);
+        bool clicked = ImGui.Selectable(text);
+        ImGui.PopStyleColor();
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip(tooltip);
+        if (clicked)
+            open();
+    }
+
     /// <summary>One-click jumps into the app-side editors for everything this spawn is made of:
     /// its own creature/gameobject row, its template, and the template's gossip menu.</summary>
     private void DrawEditorJumps(SpawnInstance spawn, CreatureSpawnInstance? creature, GameObjectSpawnInstance? go)
     {
         ImGui.SeparatorText("Editors");
-        var fullWidth = new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, 0);
         string noun = creature != null ? "creature" : "gameobject";
 
         if (spawnContextMenu is { } menu)
-        {
-            if (ImGui.Button($"Edit {noun} row (guid {spawn.Guid})", fullWidth))
-                mainThread.Dispatch(() => menu.EditRowCommand.Execute(spawn));
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip($"Opens this spawn's {noun} table row in the 1:1 editor\n(the spawn reloads from the database when it closes)");
-        }
+            LinkRow($"{Lucide.SquarePen} {noun} row (guid {spawn.Guid})##editrow",
+                $"Opens this spawn's {noun} table row in the 1:1 editor\n(the spawn reloads from the database when it closes)",
+                () => mainThread.Dispatch(() => menu.EditRowCommand.Execute(spawn)));
 
-        if (ImGui.Button($"Edit {noun}_template {spawn.Entry}", fullWidth))
-            eventAggregator.GetEvent<OpenTemplateEditorEvent>().Publish(new OpenTemplateEditorRequest
+        LinkRow($"{Lucide.FileCog} {noun}_template {spawn.Entry}##edittemplate",
+            "Opens the template editor for this entry in a new document\n(shared by every spawn of the entry)",
+            () => eventAggregator.GetEvent<OpenTemplateEditorEvent>().Publish(new OpenTemplateEditorRequest
             {
                 IsCreature = creature != null,
                 Entry = spawn.Entry,
-            });
-        if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Opens the template editor for this entry in a new document\n(shared by every spawn of the entry)");
+            }));
 
         if (creature != null && creature.CreatureTemplate.GossipMenuId != 0)
         {
             uint menuId = creature.CreatureTemplate.GossipMenuId;
-            if (ImGui.Button($"Edit gossip menu {menuId}", fullWidth))
-                eventAggregator.GetEvent<OpenGossipMenuEditorEvent>().Publish(menuId);
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Opens the gossip_menu editor for the template's gossip menu");
+            LinkRow($"{Lucide.MessageSquare} gossip menu {menuId}##editgossip",
+                "Opens the gossip_menu editor for the template's gossip menu",
+                () => eventAggregator.GetEvent<OpenGossipMenuEditorEvent>().Publish(menuId));
+        }
+
+        DrawLootJumps(spawn, creature, go);
+        DrawRelatedTableJumps(spawn, creature, go);
+    }
+
+    private void DrawLootJumps(SpawnInstance spawn, CreatureSpawnInstance? creature, GameObjectSpawnInstance? go)
+    {
+        void LootRow(string label, string tooltip, LootSourceType type)
+        {
+            LinkRow(label, tooltip, () =>
+                eventAggregator.GetEvent<OpenLootEditorEvent>().Publish(new OpenLootEditorRequest
+                {
+                    Type = type,
+                    Entry = spawn.Entry,
+                }));
+        }
+
+        if (creature != null)
+        {
+            LootRow($"{Lucide.Gem} loot##lootkill", "Opens the loot editor for this creature's kill loot", LootSourceType.Creature);
+            if (creature.CreatureTemplate.SkinningLootId != 0)
+                LootRow($"{Lucide.Gem} skinning loot##lootskin", "Opens the loot editor for this creature's skinning loot", LootSourceType.Skinning);
+            if (creature.CreatureTemplate.PickpocketLootId != 0)
+                LootRow($"{Lucide.Gem} pickpocket loot##lootpick", "Opens the loot editor for this creature's pickpocketing loot", LootSourceType.Pickpocketing);
+        }
+        else if (go != null && go.GameObjectTemplate.GetLootId() != null)
+        {
+            LootRow($"{Lucide.Gem} loot##lootgo", "Opens the loot editor for this gameobject's chest/gathering loot", LootSourceType.GameObject);
+        }
+    }
+
+    /// <summary>Entry-keyed side tables (vendor stock, trainer spells, spellclick, quest relations).
+    /// Buttons show by npcflag / GO type; the bridge resolves the semantic kind to the active core's
+    /// table name and opens the generic editor filtered to the entry.</summary>
+    private void DrawRelatedTableJumps(SpawnInstance spawn, CreatureSpawnInstance? creature,
+        GameObjectSpawnInstance? go)
+    {
+        void TableButton(string label, string tooltip, SpawnRelatedTable table)
+        {
+            LinkRow(label, tooltip, () =>
+                eventAggregator.GetEvent<OpenSpawnRelatedTableEvent>().Publish(new OpenSpawnRelatedTableRequest
+                {
+                    Table = table,
+                    IsCreature = creature != null,
+                    Entry = spawn.Entry,
+                }));
+        }
+
+        const GameDefines.NpcFlags vendorMask = GameDefines.NpcFlags.Vendor | GameDefines.NpcFlags.VendorAmmo |
+                                                GameDefines.NpcFlags.VendorFood | GameDefines.NpcFlags.VendorPoison |
+                                                GameDefines.NpcFlags.VendorReagent;
+        const GameDefines.NpcFlags trainerMask = GameDefines.NpcFlags.Trainer | GameDefines.NpcFlags.TrainerClass |
+                                                 GameDefines.NpcFlags.TrainerProfession;
+
+        var npcFlags = creature?.CreatureTemplate.NpcFlags ?? 0;
+        if (creature != null)
+        {
+            if ((npcFlags & vendorMask) != 0)
+                TableButton($"{Lucide.ShoppingCart} vendor items##related", "Opens the vendor stock table filtered to this entry", SpawnRelatedTable.Vendor);
+            if ((npcFlags & trainerMask) != 0)
+                TableButton($"{Lucide.GraduationCap} trainer spells##related", "Opens the trainer spell list filtered to this entry", SpawnRelatedTable.Trainer);
+            if ((npcFlags & GameDefines.NpcFlags.SpellClick) != 0)
+                TableButton($"{Lucide.MousePointerClick} spellclick spells##related", "Opens the spellclick spells table filtered to this entry", SpawnRelatedTable.SpellClick);
+        }
+
+        bool questGiver = creature != null
+            ? (npcFlags & GameDefines.NpcFlags.QuestGiver) != 0
+            : go != null && go.GameObjectTemplate.Type == GameobjectType.QuestGiver;
+        if (questGiver)
+        {
+            TableButton($"{Lucide.CircleAlert} started quests (!)##related", "Which quests this spawn's entry offers\n(quest starter relation table)", SpawnRelatedTable.QuestStarter);
+            TableButton($"{Lucide.CircleHelp} ended quests (?)##related", "Which quests this spawn's entry accepts turn-ins for\n(quest ender relation table)", SpawnRelatedTable.QuestEnder);
         }
     }
 
@@ -271,37 +356,41 @@ public class SelectInspectorSection : IInspectorSection
             return;
 
         ImGui.SeparatorText("Area");
-        if (area.HasValue)
-            InfoRow("Area", $"{WorldPointNames.AreaName(dbc, (uint)area.Value)} ({area.Value})");
-        if (zone.HasValue)
-            InfoRow("Zone", $"{WorldPointNames.AreaName(dbc, (uint)zone.Value)} ({zone.Value})");
+        bool markerDrawn = false;
         // the resolver only reads the terrain (ADT) area ids - inside WMOs (buildings, caves,
-        // instances) the id belongs to the terrain underneath, not the interior area
-        ImGui.PushFont(default, ImGui.GetFontSize() * 0.85f);
-        ImGui.TextDisabled("Interior areas can't be detected - inside buildings and caves\nthis is the terrain area underneath.");
-        ImGui.PopFont();
+        // instances) the id belongs to the terrain underneath, not the interior area; the note
+        // rides a (?) on the first row instead of permanently occupying panel space
+        const string interiorNote = "Interior areas can't be detected - inside buildings\nand caves this is the terrain area underneath.";
+        if (area.HasValue)
+        {
+            InfoRow("Area", $"{WorldPointNames.AreaName(dbc, (uint)area.Value)} ({area.Value})");
+            EditorTheme.HelpMarker(interiorNote);
+            markerDrawn = true;
+        }
+        if (zone.HasValue)
+        {
+            InfoRow("Zone", $"{WorldPointNames.AreaName(dbc, (uint)zone.Value)} ({zone.Value})");
+            if (!markerDrawn)
+                EditorTheme.HelpMarker(interiorNote);
+        }
 
         // spell_area.area accepts a subarea id just as well as a zone id (the column name lies),
         // so each gets its own filtered editor jump
         if (area.HasValue)
-            SpellAreaButton("area", (uint)area.Value, dbc);
+            SpellAreaRow("area", (uint)area.Value, dbc);
         if (zone.HasValue && zone != area)
-            SpellAreaButton("zone", (uint)zone.Value, dbc);
+            SpellAreaRow("zone", (uint)zone.Value, dbc);
     }
 
-    private void SpellAreaButton(string kind, uint id, DbcManager dbc)
+    private void SpellAreaRow(string kind, uint id, DbcManager dbc)
     {
-        if (ImGui.Button($"Edit spell_area for {WorldPointNames.AreaName(dbc, id)}##spellarea_{kind}",
-                new Vector2(ImGui.GetContentRegionAvail().X, 0)))
-        {
-            eventAggregator.GetEvent<OpenSpellAreaEditorEvent>().Publish(new OpenSpellAreaEditorRequest
+        LinkRow($"{Lucide.Sparkles} spell_area: {WorldPointNames.AreaName(dbc, id)}##spellarea_{kind}",
+            $"Opens the spell_area table editor filtered to this {kind} ({id})\n(spells auto-applied/allowed while in it)",
+            () => eventAggregator.GetEvent<OpenSpellAreaEditorEvent>().Publish(new OpenSpellAreaEditorRequest
             {
                 AreaId = (int)id,
-                ZoneId = 0, // exact filter - each button targets its own id
-            });
-        }
-        if (ImGui.IsItemHovered())
-            ImGui.SetTooltip($"Opens the spell_area table editor filtered to this {kind} ({id})\n(spells auto-applied/allowed while in it)");
+                ZoneId = 0, // exact filter - each row targets its own id
+            }));
     }
 
     private void DrawScripts(SpawnInstance spawn, CreatureSpawnInstance? creature, GameObjectSpawnInstance? go)
@@ -356,19 +445,27 @@ public class SelectInspectorSection : IInspectorSection
 
         if (anyMissing)
         {
+            // a C++ ScriptName owns this spawn's behavior - creating an EventAI/dbscript for it
+            // would silently never run, so the create offers disable instead of misleading
+            bool cppScriptBlocks = !string.IsNullOrEmpty(scriptName);
             ImGui.TextDisabled("Create new:");
+            ImGui.BeginDisabled(cppScriptBlocks);
             for (int i = 0; i < state.Slots.Count; ++i)
             {
                 var slot = state.Slots[i];
                 if (!slot.CanOpen || slot.Exists)
                     continue;
-                if (ImGui.Button($"+ {slot.Name}##script{i}", fullWidth))
+                ImGui.SameLine();
+                if (ImGui.SmallButton($"+ {slot.Name}##script{i}"))
                     scriptsService.Open(owner, i);
+                if (cppScriptBlocks && ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+                    ImGui.SetTooltip($"This spawn is scripted in C++ (\"{scriptName}\") -\nscripts are mutually exclusive");
             }
+            ImGui.EndDisabled();
         }
 
         // scripts are edited in their own documents - offer a re-check after coming back
-        if (ImGui.SmallButton("Refresh##scripts"))
+        if (ImGui.SmallButton($"{Lucide.RefreshCw} Refresh##scripts"))
             scriptsService.Refresh(owner);
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip("Re-check which scripts exist for this spawn\n(after saving a script in its own editor, the buttons here may be stale)");
@@ -391,7 +488,7 @@ public class SelectInspectorSection : IInspectorSection
         if (spawnGroupService.IsSupported && spawnGroupService.GroupOf(member) is { } groupId)
         {
             var name = spawnGroupService.GroupNames.TryGetValue(groupId, out var n) ? n : "";
-            MembershipRow("Group", $"{groupId} {name}", "##editgroup", () =>
+            MembershipRow($"{Lucide.Boxes} Group", $"{groupId} {name}", "##editgroup", () =>
             {
                 spawnGroupService.RequestedEditGroup = groupId;
                 toolService.ActiveTool = SpawnEditorTool.SpawnGroup;
@@ -422,7 +519,7 @@ public class SelectInspectorSection : IInspectorSection
 
             if (asMember != null)
             {
-                MembershipRow("Formation", $"follows leader {asMember.LeaderGuid}", "##editformation", () =>
+                MembershipRow($"{Lucide.Users} Formation", $"follows leader {asMember.LeaderGuid}", "##editformation", () =>
                 {
                     formationService.Selected = asMember;
                     toolService.ActiveTool = SpawnEditorTool.Formation;
@@ -431,8 +528,65 @@ public class SelectInspectorSection : IInspectorSection
             }
             if (leads > 0)
             {
-                MembershipRow("Formation", $"leads {leads} creature{(leads > 1 ? "s" : "")}", "##editformationlead",
+                MembershipRow($"{Lucide.Users} Formation", $"leads {leads} creature{(leads > 1 ? "s" : "")}", "##editformationlead",
                     () => toolService.ActiveTool = SpawnEditorTool.Formation);
+                any = true;
+            }
+        }
+
+        // creature linking (creatures only): the per-guid creature_linking row this creature is the
+        // slave or a master of, plus the entry-wide creature_linking_template rows on this map
+        if (creature != null && creatureLinkService.IsSupported)
+        {
+            EditableCreatureLink? asSlave = null;
+            int slaves = 0;
+            foreach (var link in creatureLinkService.GuidLinks)
+            {
+                if (link.Guid == creature.Guid)
+                    asSlave = link;
+                if (link.MasterGuid == creature.Guid)
+                    slaves++;
+            }
+
+            if (asSlave != null)
+            {
+                MembershipRow($"{Lucide.Link} Link", $"slave of guid {asSlave.MasterGuid}", "##editlinkslave", () =>
+                {
+                    creatureLinkService.Selected = asSlave;
+                    toolService.ActiveTool = SpawnEditorTool.CreatureLink;
+                });
+                any = true;
+            }
+            if (slaves > 0)
+            {
+                MembershipRow($"{Lucide.Link} Link", $"master of {slaves} creature{(slaves > 1 ? "s" : "")}", "##editlinkmaster",
+                    () => toolService.ActiveTool = SpawnEditorTool.CreatureLink);
+                any = true;
+            }
+
+            EditableCreatureLinkTemplate? entryAsSlave = null;
+            int entrySlaves = 0;
+            foreach (var link in creatureLinkService.TemplateLinks)
+            {
+                if (link.Entry == creature.Entry)
+                    entryAsSlave = link;
+                if (link.MasterEntry == creature.Entry)
+                    entrySlaves++;
+            }
+
+            if (entryAsSlave != null)
+            {
+                MembershipRow($"{Lucide.Link2} Entry link", $"slave of entry {entryAsSlave.MasterEntry}", "##editentrylinkslave", () =>
+                {
+                    creatureLinkService.Selected = entryAsSlave;
+                    toolService.ActiveTool = SpawnEditorTool.CreatureLink;
+                });
+                any = true;
+            }
+            if (entrySlaves > 0)
+            {
+                MembershipRow($"{Lucide.Link2} Entry link", $"master of {entrySlaves} entr{(entrySlaves > 1 ? "ies" : "y")}", "##editentrylinkmaster",
+                    () => toolService.ActiveTool = SpawnEditorTool.CreatureLink);
                 any = true;
             }
         }
@@ -443,7 +597,7 @@ public class SelectInspectorSection : IInspectorSection
         {
             if (waypointService.ResolveCreaturePath(creature) is { } attached)
             {
-                MembershipRow("Path", $"{attached.source.ToName()} #{attached.key}", "##editpath",
+                MembershipRow($"{Lucide.Route} Path", $"{attached.source.ToName()} #{attached.key}", "##editpath",
                     () => waypointService.RequestEditCreaturePath(creature));
                 any = true;
             }
@@ -451,19 +605,30 @@ public class SelectInspectorSection : IInspectorSection
                 canAddPath = true;
         }
 
-        // the entry-shared creature_movement_template path (CMaNGOS), separate from the per-guid one
-        bool canEditTemplate = creature != null && waypointService.SupportsCreatureTemplatePaths;
-        if (canEditTemplate)
+        // the entry-shared creature_movement_template path (CMaNGOS), separate from the per-guid
+        // one - only a membership when the entry really has rows (or one was just created in-editor)
+        bool canAddTemplatePath = false;
+        if (creature != null && waypointService.SupportsCreatureTemplatePaths)
         {
-            MembershipRow("Template path", "creature_movement_template", "##edittemplatepath",
-                () => waypointService.RequestEditCreatureTemplatePath(creature!));
-            any = true;
+            bool hasUnsavedNew = waypointService.FindLoaded(WaypointSource.MangosCreatureMovementTemplate, creature.Entry) != null;
+            bool? hasInDb = waypointService.HasCreatureTemplatePath(creature.Entry);
+            if (hasInDb == true || hasUnsavedNew)
+            {
+                MembershipRow($"{Lucide.Route} Template path", "creature_movement_template", "##edittemplatepath",
+                    () => waypointService.RequestEditCreatureTemplatePath(creature!));
+                any = true;
+            }
+            else if (hasInDb == false)
+                canAddTemplatePath = true;
+            // hasInDb == null: the existence check is still in flight - show neither yet
         }
 
         if (!any)
             ImGui.TextDisabled("None.");
-        if (canAddPath && ImGui.SmallButton("Add waypoint path"))
+        if (canAddPath && ImGui.SmallButton($"{Lucide.Plus} Add waypoint path"))
             waypointService.RequestEditCreaturePath(creature!);
+        if (canAddTemplatePath && ImGui.SmallButton($"{Lucide.Plus} Add template path"))
+            waypointService.RequestEditCreatureTemplatePath(creature!);
     }
 
     private static void MembershipRow(string label, string value, string editId, Action edit)

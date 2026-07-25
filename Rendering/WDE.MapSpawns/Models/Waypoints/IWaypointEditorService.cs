@@ -69,6 +69,11 @@ public interface IWaypointEditorService
     /// pairs of creature_movement_template), for the load picker. Empty for single-key sources.</summary>
     Task<IReadOnlyList<(uint key, uint key2)>> EnumerateCompoundKeys(WaypointSource source);
 
+    /// <summary>Path display names for the source, when it stores any (cmangos waypoint_path_name,
+    /// TC master's waypoint_path.Comment), keyed by path id - so the load picker can show names next
+    /// to the raw ids. Empty for nameless sources.</summary>
+    Task<IReadOnlyDictionary<uint, string>> EnumeratePathNames(WaypointSource source);
+
     /// <summary>Loads a path's points from the DB as plain positions for a read-only overlay (the
     /// selected creature's route preview), without touching any editor state. Null if empty/missing.</summary>
     Task<IReadOnlyList<Vector3>?> LoadPointsPreview(WaypointSource source, uint key, uint key2 = 0);
@@ -94,6 +99,11 @@ public interface IWaypointEditorService
     /// <summary>True when the active core supports the entry-shared creature_movement_template path
     /// (CMaNGOS) - a separate editing target from the per-guid <see cref="SupportsCreaturePaths"/>.</summary>
     bool SupportsCreatureTemplatePaths { get; }
+
+    /// <summary>Whether the creature ENTRY actually has creature_movement_template rows in the
+    /// database (any PathId). Cached per entry; the first ask kicks off an async DB check and
+    /// returns null until it resolves. Safe to call every frame.</summary>
+    bool? HasCreatureTemplatePath(uint entry);
 
     /// <summary>The path attached to this creature, or null. Trinity: the addon path id (including
     /// paths attached earlier this session); CMaNGOS: (guid, creature_movement) when the creature's

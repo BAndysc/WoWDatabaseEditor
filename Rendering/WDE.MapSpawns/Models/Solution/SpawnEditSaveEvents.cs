@@ -85,3 +85,38 @@ public class OpenTemplateEditorEvent : PubSubEvent<OpenTemplateEditorRequest> { 
 /// <summary>Game -> app: open the gossip_menu editor for the given menu id. Handled by the bridge
 /// on the UI thread; inert in headless hosts.</summary>
 public class OpenGossipMenuEditorEvent : PubSubEvent<uint> { }
+
+/// <summary>Game -> app: open the loot editor for the entry (creature/GO/skinning/pickpocket loot -
+/// the loot service reconciles the per-core loot-id indirection). Handled by the bridge on the UI
+/// thread; inert in headless hosts.</summary>
+public class OpenLootEditorRequest
+{
+    public WDE.Common.Database.LootSourceType Type { get; init; }
+    public uint Entry { get; init; }
+}
+
+public class OpenLootEditorEvent : PubSubEvent<OpenLootEditorRequest> { }
+
+/// <summary>Which per-entry side table of a spawn to open. The game side stays table-name-agnostic -
+/// the bridge resolves the semantic kind to the active core's table (cmangos and Trinity name the
+/// quest relation tables differently).</summary>
+public enum SpawnRelatedTable
+{
+    Vendor,
+    Trainer,
+    SpellClick,
+    QuestStarter,
+    QuestEnder,
+}
+
+/// <summary>Game -> app: open the generic editor of an entry-keyed side table (vendor items,
+/// trainer spells, spellclick spells, quest starter/ender relations), filtered to the entry.
+/// Handled by the bridge on the UI thread; inert in headless hosts.</summary>
+public class OpenSpawnRelatedTableRequest
+{
+    public SpawnRelatedTable Table { get; init; }
+    public bool IsCreature { get; init; }
+    public uint Entry { get; init; }
+}
+
+public class OpenSpawnRelatedTableEvent : PubSubEvent<OpenSpawnRelatedTableRequest> { }

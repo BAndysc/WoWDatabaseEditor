@@ -33,7 +33,9 @@ public sealed class WaypointInspector : IInspectorSection
     private WaypointSource loadSource;
     private Task<IReadOnlyList<uint>>? loadIdsTask;
     private Task<IReadOnlyList<(uint key, uint key2)>>? loadCompoundTask; // compound-keyed sources only
+    private Task<IReadOnlyDictionary<uint, string>>? loadNamesTask; // per-path names, when the source has them
     private int newPathId;
+    private bool newPathIdAutoFill; // pre-fill "New path" with the next free id once ids arrive
     private int newPathId2; // secondary key (PathId) for compound sources
     private string loadFilter = "";
 
@@ -90,7 +92,7 @@ public sealed class WaypointInspector : IInspectorSection
             if (DragHint != null)
                 return DragHint;
             if (service.SelectedPath == null)
-                return "Load a path, or right-click a creature → Edit waypoints";
+                return "Load a path, or right-click a creature -> Edit waypoints";
             if (service.EditingPath != null)
                 return "ADDING POINTS — click terrain: add · click line: insert · Esc/P: stop";
             return "Click a point: select · double-click: properties · click a line: insert · G grab · Del delete · P: add points";
@@ -119,8 +121,8 @@ public sealed class WaypointInspector : IInspectorSection
 
         if (service.SelectedPath is not { } path)
         {
-            ImGui.TextDisabled("No path open.");
-            ImGui.TextDisabled("Load a path here, or right-click a\ncreature and pick \"Edit waypoints\".");
+            // the header already says "Load..." - one line of guidance is enough here
+            ImGui.TextDisabled("Right-click a creature and pick \"Edit\nwaypoints\", or load a path above.");
             return;
         }
 
@@ -132,14 +134,14 @@ public sealed class WaypointInspector : IInspectorSection
         if (editing)
         {
             EditorTheme.PushArmedButton();
-            if (ImGui.Button("Adding points — click terrain  (Esc)", new Vector2(-1, 0)))
+            if (ImGui.Button($"{Lucide.PenLine} Adding points — click terrain  (Esc)", new Vector2(-1, 0)))
                 service.EditingPath = null;
             EditorTheme.PopButtonColors();
         }
-        else if (ImGui.Button("Add points  (P)", new Vector2(-1, 0)))
+        else if (ImGui.Button($"{Lucide.PenLine} Add points  (P)", new Vector2(-1, 0)))
             service.EditingPath = path;
 
-        if (ImGui.SmallButton("Close"))
+        if (ImGui.SmallButton($"{Lucide.X} Close"))
         {
             // stop editing this path; unsaved edits stay pending (saved by the unified Save)
             service.SelectedPath = null;
@@ -193,7 +195,7 @@ public sealed class WaypointInspector : IInspectorSection
     private void DrawPathHeader()
     {
         var current = service.SelectedPath;
-        if (ImGui.SmallButton(current == null ? "Load..." : "Load"))
+        if (ImGui.SmallButton(current == null ? $"{Lucide.FolderOpen} Load..." : $"{Lucide.FolderOpen} Load"))
         {
             openLoadPopup = true;
             StartEnumerate();
@@ -202,11 +204,11 @@ public sealed class WaypointInspector : IInspectorSection
             ImGui.SetTooltip(current == null
                 ? "Open a waypoint path for editing"
                 : "Open a different path (this one's unsaved edits stay pending)");
-        ImGui.SameLine();
-        if (current == null)
-            ImGui.TextDisabled("(no path open)");
-        else
+        if (current != null)
+        {
+            ImGui.SameLine();
             ImGui.TextUnformatted(current.DisplayName + (current.IsDirty ? "  *" : ""));
+        }
     }
 
     /// <summary>Path-LEVEL data some sources carry next to the points: the cmangos
@@ -218,11 +220,13 @@ public sealed class WaypointInspector : IInspectorSection
 
         if (columns.HasFlagFast(WaypointColumns.PathName))
         {
+            // full-width field (a right-side label would eat ~40% of the panel and truncate the value)
             string name = path.PathName ?? "";
-            if (ImGui.InputTextWithHint("Path name", "(no name)", ref name, 128))
+            ImGui.SetNextItemWidth(-1);
+            if (ImGui.InputTextWithHint("##pathname", "path name", ref name, 128))
                 path.UpdatePathName(name);
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("waypoint_path_name row for this path - empty removes it");
+                ImGui.SetTooltip("Path name (the waypoint_path_name row) - empty removes it");
         }
 
         if (columns.HasFlagFast(WaypointColumns.PathHeader) && path.Header is { } header)
@@ -317,10 +321,10 @@ public sealed class WaypointInspector : IInspectorSection
             path.MarkDirty();
         }
 
-        if (ImGui.SmallButton("More..."))
+        if (ImGui.SmallButton($"{Lucide.Ellipsis} More..."))
             OpenProperties(path, idx);
         ImGui.SameLine();
-        if (ImGui.SmallButton("Delete point"))
+        if (ImGui.SmallButton($"{Lucide.Trash2} Delete point"))
             RemovePoint(path, idx);
     }
 
@@ -416,21 +420,20 @@ public sealed class WaypointInspector : IInspectorSection
 
     private void DrawPointsTable(EditablePath path)
     {
-        // no orientation column for tables that don't store one (script_waypoint)
+        // READ-ONLY overview: per-cell number inputs squeezed coordinates into unreadable slivers.
+        // Numbers are edited in the "Point" section above (or by dragging in the world) - this list
+        // is for scanning and picking. No orientation column for tables without one (script_waypoint).
         bool hasOrientation = service.ColumnsFor(path.Source).HasFlagFast(WaypointColumns.Orientation);
-        var tableFlags = ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY |
-                         ImGuiTableFlags.Resizable | ImGuiTableFlags.SizingStretchProp;
-        if (!ImGui.BeginTable("points", hasOrientation ? 6 : 5, tableFlags, new Vector2(0, 180)))
+        var tableFlags = ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY | ImGuiTableFlags.SizingStretchProp;
+        if (!ImGui.BeginTable("points", hasOrientation ? 4 : 3, tableFlags, new Vector2(0, 180)))
             return;
 
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableSetupColumn("#", ImGuiTableColumnFlags.WidthFixed, 28);
-        ImGui.TableSetupColumn("X");
-        ImGui.TableSetupColumn("Y");
-        ImGui.TableSetupColumn("Z");
+        ImGui.TableSetupColumn("Position", ImGuiTableColumnFlags.WidthStretch, 1f);
         if (hasOrientation)
-            ImGui.TableSetupColumn("O (rad)");
-        ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 24);
+            ImGui.TableSetupColumn("O", ImGuiTableColumnFlags.WidthFixed, 44);
+        ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 28);
         ImGui.TableHeadersRow();
 
         int removeAt = -1;
@@ -443,12 +446,10 @@ public sealed class WaypointInspector : IInspectorSection
 
             ImGui.TableNextColumn();
             bool rowSelected = service.SelectedPointIndex == i;
-            // the row selectable spans every column, so without AllowOverlap it eats the clicks meant
-            // for the X/Y/Z/O input cells and the delete ("x") button drawn on top of it
+            // AllowOverlap so the delete ("x") button drawn on top still gets its clicks
             ImGui.SetNextItemAllowOverlap();
             if (ImGui.Selectable((i + 1).ToString(), rowSelected, ImGuiSelectableFlags.SpanAllColumns))
-                service.SelectedPointIndex = i;
-            // double-click the row (its number cell) to open the property popover
+                service.SelectedPointIndex = i; // selecting fills the editable "Point" section above
             if (ImGui.IsItemHovered())
             {
                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
@@ -457,34 +458,25 @@ public sealed class WaypointInspector : IInspectorSection
                     OpenProperties(path, i);
                 }
                 else if (ImGui.IsItemHovered(ImGuiHoveredFlags.ForTooltip))
-                    ImGui.SetTooltip("Double-click: point properties (delay, orientation, ...)");
+                    ImGui.SetTooltip("Click: select (edit in the Point section) · double-click: all properties");
             }
 
             ImGui.TableNextColumn();
-            float x = p.X;
-            ImGui.SetNextItemWidth(-1);
-            if (ImGui.InputFloat("##x", ref x, 0, 0, "%.3f")) { p.X = x; path.Points[i] = p; path.MarkDirty(); }
-
-            ImGui.TableNextColumn();
-            float y = p.Y;
-            ImGui.SetNextItemWidth(-1);
-            if (ImGui.InputFloat("##y", ref y, 0, 0, "%.3f")) { p.Y = y; path.Points[i] = p; path.MarkDirty(); }
-
-            ImGui.TableNextColumn();
-            float z = p.Z;
-            ImGui.SetNextItemWidth(-1);
-            if (ImGui.InputFloat("##z", ref z, 0, 0, "%.3f")) { p.Z = z; path.Points[i] = p; path.MarkDirty(); }
+            ImGui.TextUnformatted($"{p.X:0.0}, {p.Y:0.0}, {p.Z:0.0}");
 
             if (hasOrientation)
             {
                 ImGui.TableNextColumn();
-                float o = p.Orientation ?? 0f;
-                ImGui.SetNextItemWidth(-1);
-                if (ImGui.InputFloat("##o", ref o, 0, 0, "%.3f")) { p.Orientation = o; path.Points[i] = p; path.MarkDirty(); }
+                // null = no facing stored; cmangos also uses 100 as its "ignore" sentinel - both
+                // render as "-" instead of masquerading as a real angle
+                if (p.Orientation is { } o && o is >= 0f and < 6.2832f)
+                    ImGui.TextUnformatted($"{o:0.00}");
+                else
+                    ImGui.TextDisabled("-");
             }
 
             ImGui.TableNextColumn();
-            if (ImGui.SmallButton("x"))
+            if (ImGui.SmallButton(Lucide.X))
                 removeAt = i;
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Remove this waypoint (applied on Save)");
@@ -564,12 +556,16 @@ public sealed class WaypointInspector : IInspectorSection
         {
             loadCompoundTask = service.EnumerateCompoundKeys(loadSource);
             loadIdsTask = null;
+            loadNamesTask = null;
         }
         else
         {
             loadIdsTask = service.EnumeratePathIds(loadSource);
             loadCompoundTask = null;
+            loadNamesTask = service.EnumeratePathNames(loadSource);
         }
+        newPathId = 0;
+        newPathIdAutoFill = true;
     }
 
     private void DrawLoadPopup()
@@ -615,27 +611,46 @@ public sealed class WaypointInspector : IInspectorSection
         ImGui.SeparatorText("Existing");
         if (loadIdsTask is { IsCompletedSuccessfully: true } t)
         {
-            ImGui.SetNextItemWidth(260);
-            ImGui.InputTextWithHint("##loadfilter", "Filter ids...", ref loadFilter, 32);
-            if (ImGui.BeginListBox("##ids", new Vector2(260, 220)))
+            // names arrive with the ids (waypoint_path_name / waypoint_path.Comment) so the list
+            // shows "14  Alterac Mountains - ..." instead of naked numbers; the filter matches both
+            IReadOnlyDictionary<uint, string>? names =
+                loadNamesTask is { IsCompletedSuccessfully: true } nt && nt.Result.Count > 0 ? nt.Result : null;
+
+            ImGui.SetNextItemWidth(340);
+            ImGui.InputTextWithHint("##loadfilter", names != null ? "Filter by id or name..." : "Filter ids...", ref loadFilter, 64);
+            if (ImGui.BeginListBox("##ids", new Vector2(340, 220)))
             {
+                float availX = ImGui.GetContentRegionAvail().X;
                 int shown = 0;
                 foreach (var id in t.Result)
                 {
-                    var idText = id.ToString();
-                    if (loadFilter.Length > 0 && !idText.Contains(loadFilter, StringComparison.Ordinal))
+                    string? name = null;
+                    names?.TryGetValue(id, out name);
+                    var label = name != null ? $"{id}  {name}" : id.ToString();
+                    if (loadFilter.Length > 0 && !label.Contains(loadFilter, StringComparison.OrdinalIgnoreCase))
                         continue;
                     shown++;
                     bool alreadyOpen = service.FindLoaded(loadSource, id) != null;
-                    if (ImGui.Selectable(alreadyOpen ? $"{idText}  (open)" : idText))
+                    var shownLabel = alreadyOpen ? $"{label}  (open)" : label;
+                    if (ImGui.Selectable(shownLabel))
                     {
                         service.LoadPath(loadSource, id).ListenErrors(notifications, $"Failed to load path {id}");
                         ImGui.CloseCurrentPopup();
                     }
+                    // a clipped long name rides a tooltip
+                    if (ImGui.IsItemHovered() && ImGui.CalcTextSize(shownLabel).X > availX)
+                        ImGui.SetTooltip(shownLabel);
                 }
                 if (shown == 0)
-                    ImGui.TextDisabled(t.Result.Count == 0 ? "No existing paths for this source" : $"No ids contain \"{loadFilter}\"");
+                    ImGui.TextDisabled(t.Result.Count == 0 ? "No existing paths for this source" : $"Nothing matches \"{loadFilter}\"");
                 ImGui.EndListBox();
+            }
+
+            // pre-fill the "new path" id with the next free one - typing over it is still possible
+            if (newPathIdAutoFill && !loadSource.IsKeyedByGuid())
+            {
+                newPathId = t.Result.Count == 0 ? 1 : (int)(t.Result.Max() + 1);
+                newPathIdAutoFill = false;
             }
         }
         else
@@ -646,6 +661,8 @@ public sealed class WaypointInspector : IInspectorSection
         ImGui.SeparatorText("New path");
         ImGui.SetNextItemWidth(160);
         ImGui.InputInt(loadSource.IsKeyedByGuid() ? "Creature guid" : "Path id", ref newPathId);
+        if (!loadSource.IsKeyedByGuid() && ImGui.IsItemHovered())
+            ImGui.SetTooltip("Pre-filled with the next free id");
 
         // creating a "new" path under an id that already has rows would silently collide on save
         // (the save is DELETE-whole-path + INSERT) - guard it and offer the load instead
@@ -653,7 +670,7 @@ public sealed class WaypointInspector : IInspectorSection
                        done.Result.Contains((uint)newPathId);
         ImGui.SameLine();
         ImGui.BeginDisabled(idTaken);
-        if (ImGui.Button("Create") && newPathId > 0)
+        if (ImGui.Button($"{Lucide.Plus} Create") && newPathId > 0)
         {
             var path = service.CreateNew(loadSource, (uint)newPathId);
             service.SelectedPath = path;
@@ -666,7 +683,7 @@ public sealed class WaypointInspector : IInspectorSection
         {
             ImGui.TextColored(EditorTheme.Warning, $"Id {newPathId} already exists - saving a new empty path would overwrite it.");
             ImGui.SameLine();
-            if (ImGui.SmallButton("Load it instead"))
+            if (ImGui.SmallButton($"{Lucide.FolderOpen} Load it instead"))
             {
                 service.LoadPath(loadSource, (uint)newPathId).ListenErrors(notifications, $"Failed to load path {newPathId}");
                 ImGui.CloseCurrentPopup();
@@ -718,7 +735,7 @@ public sealed class WaypointInspector : IInspectorSection
         bool keyTaken = newPathId > 0 && loadCompoundTask is { IsCompletedSuccessfully: true } done &&
                         done.Result.Contains(((uint)newPathId, (uint)Math.Max(0, newPathId2)));
         ImGui.BeginDisabled(keyTaken);
-        if (ImGui.Button("Create") && newPathId > 0)
+        if (ImGui.Button($"{Lucide.Plus} Create") && newPathId > 0)
         {
             var path = service.CreateNew(loadSource, (uint)newPathId, (uint)Math.Max(0, newPathId2));
             service.SelectedPath = path;
@@ -730,7 +747,7 @@ public sealed class WaypointInspector : IInspectorSection
         if (keyTaken)
         {
             ImGui.TextColored(EditorTheme.Warning, $"Entry {newPathId} / path {newPathId2} already exists - saving a new empty path would overwrite it.");
-            if (ImGui.SmallButton("Load it instead"))
+            if (ImGui.SmallButton($"{Lucide.FolderOpen} Load it instead"))
             {
                 service.LoadPath(loadSource, (uint)newPathId, 0, (uint)Math.Max(0, newPathId2))
                     .ListenErrors(notifications, $"Failed to load path {newPathId}:{newPathId2}");
