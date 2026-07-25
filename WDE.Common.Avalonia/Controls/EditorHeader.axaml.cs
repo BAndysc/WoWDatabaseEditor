@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -14,6 +15,7 @@ public class EditorHeader : TemplatedControl
 {
     public static readonly StyledProperty<long> EntryProperty = AvaloniaProperty.Register<EditorHeader, long>(nameof(Entry));
     public static readonly StyledProperty<string> DisplayNameProperty = AvaloniaProperty.Register<EditorHeader, string>(nameof(DisplayName));
+    public static readonly StyledProperty<string> SubNameProperty = AvaloniaProperty.Register<EditorHeader, string>(nameof(SubName));
     public static readonly StyledProperty<object?> ToolBarContentProperty = AvaloniaProperty.Register<EditorHeader, object?>(nameof(ToolBarContent));
     public static readonly StyledProperty<object?> RightContentProperty = AvaloniaProperty.Register<EditorHeader, object?>(nameof(RightContent));
     public static readonly StyledProperty<object?> BottomContentProperty = AvaloniaProperty.Register<EditorHeader, object?>(nameof(BottomContent));
@@ -28,6 +30,12 @@ public class EditorHeader : TemplatedControl
     {
         get => GetValue(DisplayNameProperty);
         set => SetValue(DisplayNameProperty, value);
+    }
+
+    public string SubName
+    {
+        get => GetValue(SubNameProperty);
+        set => SetValue(SubNameProperty, value);
     }
 
     public object? ToolBarContent
@@ -56,6 +64,7 @@ public class EditorHeader : TemplatedControl
 
     private TextBlock? idTextBlock;
     private TextBlock? displayNameTextBlock;
+    private TextBlock? subNameTextBlock;
     public static readonly StyledProperty<bool> SuccessProperty = AvaloniaProperty.Register<EditorHeader, bool>(nameof(Success));
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -67,12 +76,25 @@ public class EditorHeader : TemplatedControl
 
         if (displayNameTextBlock != null)
             displayNameTextBlock.PointerReleased -= OnDisplayNamePointerReleased;
-        
+
+        if (subNameTextBlock != null)
+            subNameTextBlock.PointerReleased -= OnSubNamePointerReleased;
+
         idTextBlock = e.NameScope.Get<TextBlock>("PART_IdTextBlock");
         displayNameTextBlock = e.NameScope.Get<TextBlock>("PART_DisplayNameTextBlock");
+        subNameTextBlock = e.NameScope.Get<TextBlock>("PART_SubNameTextBlock");
 
         idTextBlock.PointerReleased += OnIdPointerReleased;
         displayNameTextBlock.PointerReleased += OnDisplayNamePointerReleased;
+        subNameTextBlock.PointerReleased += OnSubNamePointerReleased;
+    }
+
+    private void OnSubNamePointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (e.InitialPressMouseButton.HasFlagFast(MouseButton.Right))
+        {
+            DoCopy(SubName).ListenErrors();
+        }
     }
 
     private void OnDisplayNamePointerReleased(object? sender, PointerReleasedEventArgs e)

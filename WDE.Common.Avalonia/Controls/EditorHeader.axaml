@@ -30,7 +30,16 @@
                        FontWeight="Bold"
                        VerticalAlignment="Center"
                        Background="Transparent"
-                       Padding="0,0,10,0" Text="{TemplateBinding DisplayName}"/>
+                       Padding="0,0,5,0" Text="{TemplateBinding DisplayName}"/>
+
+            <TextBlock Foreground="{TemplateBinding Success, Converter={StaticResource BoolToBrushConverter}}"
+                       x:Name="PART_SubNameTextBlock"
+                       TextTrimming="CharacterEllipsis"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       Background="Transparent"
+                       Padding="0,0,5,0" Text="{TemplateBinding SubName}"/>
 
             <ContentControl ClipToBounds="{TemplateBinding ClipToBounds}" Content="{TemplateBinding ToolBarContent}" />
 
