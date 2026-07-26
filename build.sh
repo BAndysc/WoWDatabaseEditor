@@ -5,7 +5,7 @@ dotnet --list-sdks
 echo $APPVEYOR_PULL_REQUEST_NUMBER
 
 if [ -z "$APPVEYOR_PULL_REQUEST_NUMBER" ]; then
-    git clone -b avalonia11 https://$REPO_TOKEN@github.com/BAndysc/WoWDatabaseEditorExtras --recurse-submodules
+    git clone -b avalonia12 https://$REPO_TOKEN@github.com/BAndysc/WoWDatabaseEditorExtras --recurse-submodules
     
     cd WoWDatabaseEditorExtras/WoWDatabaseEditor
     git checkout $APPVEYOR_REPO_COMMIT
