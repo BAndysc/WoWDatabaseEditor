@@ -91,9 +91,8 @@
           "can_be_null": true
         },
         {
-          "name": "Gossip menu ID",
-          "db_column_name": "gossip_menu_id",
-          "value_type": "GossipMenuParameter"
+          "name": "Gossip menus",
+          "meta": "tableByKey:creature_template_gossip;entry"
         }
       ]
     },
@@ -117,7 +116,7 @@
         },
         {
           "name": "Expansion",
-          "db_column_name": "exp",
+          "db_column_name": "HealthScalingExpansion",
           "value_type": "ExpansionParameter"
         },
         {
@@ -171,9 +170,34 @@
           "value_type": "UnitFlags2Parameter"
         },
         {
-          "name": "Dynamic Flags",
-          "db_column_name": "dynamicflags",
-          "value_type": "DynamicFlagsParameter"
+          "name": "Static Flags",
+          "db_column_name": "StaticFlags",
+          "value_type": "CreatureStaticFlags1Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags 2",
+          "db_column_name": "StaticFlags2",
+          "value_type": "CreatureStaticFlags2Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags 3",
+          "db_column_name": "StaticFlags3",
+          "value_type": "CreatureStaticFlags3Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags 4",
+          "db_column_name": "StaticFlags4",
+          "value_type": "CreatureStaticFlags4Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Static Flags 5",
+          "db_column_name": "StaticFlags5",
+          "value_type": "CreatureStaticFlags5Parameter",
+          "zero_is_blank": true
         },
         {
           "name": "Type Flags",
@@ -318,29 +342,15 @@
           "value_type": "uint"
         },
         {
-          "name": "Ground",
-          "db_column_name": "Ground",
-          "value_type": "MovementGroundStateParameter",
-          "foreign_table": "creature_template_movement",
-          "can_be_null": true
-        },
-        {
-          "name": "Swim",
-          "db_column_name": "Swim",
+          "name": "Hover Initially Enabled",
+          "db_column_name": "HoverInitiallyEnabled",
           "value_type": "BoolParameter",
           "foreign_table": "creature_template_movement",
           "can_be_null": true
         },
         {
-          "name": "Flight",
-          "db_column_name": "Flight",
-          "value_type": "MovementFlightStateParameter",
-          "foreign_table": "creature_template_movement",
-          "can_be_null": true
-        },
-        {
-          "name": "Rooted",
-          "db_column_name": "Rooted",
+          "name": "Gravity Initially Disabled",
+          "db_column_name": "GravityInitiallyDisabled",
           "value_type": "BoolParameter",
           "foreign_table": "creature_template_movement",
           "can_be_null": true

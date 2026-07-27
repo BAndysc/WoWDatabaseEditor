@@ -1,0 +1,45 @@
+{
+  "id": "creature_template_gossip",
+  "compatibility": [
+    "TrinityMaster",
+    "TrinityCata"
+  ],
+  "name": "Creature Gossip",
+  "description": "Assigns gossip menus to a creature template",
+  "single_solution_name": "Creature {key} gossip menus",
+  "multi_solution_name": "Multiple creatures gossip menus",
+  "table_name": "creature_template_gossip",
+  "table_index_name": "CreatureID",
+  "record_mode": "MultiRecord",
+  "skip_quick_load": true,
+  "group_name": "Templates",
+  "icon_path": "Icons/gossip.png",
+  "primary_key": [
+    "CreatureID",
+    "MenuID"
+  ],
+  "sort_by": ["CreatureID", "MenuID"],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature",
+          "db_column_name": "CreatureID",
+          "value_type": "CreatureParameter",
+          "read_only": true
+        },
+        {
+          "name": "Menu ID",
+          "db_column_name": "MenuID",
+          "value_type": "GossipMenuParameter"
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

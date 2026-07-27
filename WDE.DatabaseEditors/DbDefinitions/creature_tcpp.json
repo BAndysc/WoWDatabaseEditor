@@ -272,10 +272,11 @@
           "zero_is_blank": true
         },
         {
-          "name": "Dynamic flags",
-          "db_column_name": "dynamicflags",
-          "value_type": "DynamicFlagsParameter",
-          "zero_is_blank": true
+          "name": "Unit Flags 2",
+          "db_column_name": "unit_flags2",
+          "value_type": "UnitFlags2Parameter",
+          "zero_is_blank": true,
+          "can_be_null": true
         }
       ]
     }

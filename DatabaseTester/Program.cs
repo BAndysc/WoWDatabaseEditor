@@ -183,6 +183,7 @@ public class Program
         ioc.RegisterInstance<IUserSettings>(Substitute.For<IUserSettings>());
 
         ioc.RegisterInstance<IMySqlWorldConnectionStringProvider>(databaseConn);
+        ioc.RegisterInstance<IRuntimeDataService>(new FileRuntimeDataService());
         ioc.RegisterInstance<IMainThread>(new SyncMainThread());
         ioc.RegisterSingleton<DatabaseLogger>();
         ioc.RegisterInstance<IQueryEvaluator>(Substitute.For<IQueryEvaluator>());
@@ -206,11 +207,25 @@ public class Program
         ioc.RegisterInstance<IDatabaseProvider>(worldDb);
         ioc.RegisterInstance<ICachedDatabaseProvider>(worldDb);
 
-        var allDefinitions = ioc.Resolve<ITableDefinitionProvider>().Definitions;
+        var definitionProvider = ioc.Resolve<ITableDefinitionProvider>();
+        // definitions load lazily via the global async initializer - without this the
+        // definition-vs-schema check below silently iterates an empty list
+        if (definitionProvider is WDE.Common.Modules.IGlobalAsyncInitializer definitionInitializer)
+            await definitionInitializer.Initialize();
+        var allDefinitions = definitionProvider.Definitions;
+        if (!allDefinitions.Any())
+            Console.WriteLine(" [ WARNING ] No table definitions loaded, the definition check is not checking anything!");
         var loader = ioc.Resolve<IDatabaseTableDataProvider>();
         var sqlExecutor = ioc.Resolve<WorldMySqlExecutor>();
         foreach (var definition in allDefinitions)
         {
+            // conditions-only definitions are virtual - their table_name doesn't exist in the db
+            if (definition.IsOnlyConditionsTable == OnlyConditionMode.IgnoreTableCompletely)
+            {
+                Console.WriteLine("Table editor: " + definition.TableName + " (conditions only, skipping schema check)");
+                continue;
+            }
+
             Console.WriteLine("Table editor: " + definition.TableName);
             
             

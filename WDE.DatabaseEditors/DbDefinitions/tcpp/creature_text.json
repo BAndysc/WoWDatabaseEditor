@@ -1,7 +1,7 @@
 {
   "id": "creature_text",
   "compatibility": [
-    "TrinityWrath", "Azeroth"
+    "TrinityCata"
   ],
   "name": "Creature texts",
   "description": "Creature texts that can be spoken via custom creature scripts",
@@ -86,6 +86,12 @@
           "name": "Sound",
           "db_column_name": "Sound",
           "value_type": "SoundParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Sound type",
+          "db_column_name": "SoundType",
+          "value_type": "CreatureTextSoundTypeParameter",
           "zero_is_blank": true
         },
         {

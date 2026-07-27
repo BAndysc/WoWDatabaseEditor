@@ -1,4 +1,4 @@
-{
+﻿{
   "id": "quest_template",
   "compatibility": ["TrinityCata"],
   "name": "Quest Template",
@@ -87,6 +87,12 @@
           "help": "Maximum player level at which a character can get the quest"
         },
         {
+          "name": "Quest max scaling level",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "QuestMaxScalingLevel",
+          "value_type": "uint"
+        },
+        {
           "name": "Quest sort ID",
           "db_column_name": "QuestSortID",
           "value_type": "ZoneOrQuestSortParameter",
@@ -122,6 +128,13 @@
           "foreign_table": "quest_template_addon",
           "value_type": "SpellParameter",
           "help": "The spell ID cast on player upon starting the quest."
+        },
+        {
+          "name": "Cast spell on abandon",
+          "db_column_name": "AbandonSpellID",
+          "foreign_table": "quest_template_addon",
+          "value_type": "SpellParameter",
+          "help": "The spell ID cast on player upon abandoning the quest."
         },
         {
           "name": "Time allowed",
@@ -301,6 +314,52 @@
           "name": "Required faction value 2",
           "db_column_name": "RequiredFactionValue2",
           "value_type": "int"
+        },
+        {
+          "name": "Required currency id 1",
+          "db_column_name": "RequiredCurrencyId1",
+          "value_type": "CurrencyTypeParameter"
+        },
+        {
+          "name": "Required currency count 1",
+          "db_column_name": "RequiredCurrencyCount1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required currency id 2",
+          "db_column_name": "RequiredCurrencyId2",
+          "value_type": "CurrencyTypeParameter"
+        },
+        {
+          "name": "Required currency count 2",
+          "db_column_name": "RequiredCurrencyCount2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required currency id 3",
+          "db_column_name": "RequiredCurrencyId3",
+          "value_type": "CurrencyTypeParameter"
+        },
+        {
+          "name": "Required currency count 3",
+          "db_column_name": "RequiredCurrencyCount3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required currency id 4",
+          "db_column_name": "RequiredCurrencyId4",
+          "value_type": "CurrencyTypeParameter"
+        },
+        {
+          "name": "Required currency count 4",
+          "db_column_name": "RequiredCurrencyCount4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required money",
+          "db_column_name": "RequiredMoney",
+          "foreign_table": "quest_template_addon",
+          "value_type": "MoneyParameter"
         },
         {
           "name": "Required skill",
@@ -524,6 +583,18 @@
           "help": "The money a character at level 80 would get when they complete this quest."
         },
         {
+          "name": "Reward money difficulty",
+          "db_column_name": "RewardMoneyDifficulty",
+          "foreign_table": "quest_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Reward money multiplier",
+          "db_column_name": "RewardMoneyMultiplier",
+          "foreign_table": "quest_template_addon",
+          "value_type": "float"
+        },
+        {
           "name": "Reward display spell",
           "db_column_name": "RewardDisplaySpell",
           "value_type": "SpellParameter"
@@ -654,7 +725,7 @@
         {
           "name": "Reward Currency Id 1",
           "db_column_name": "RewardCurrencyId1",
-          "value_type": "uint"
+          "value_type": "CurrencyTypeParameter"
         },
         {
           "name": "Reward Currency Count 1",
@@ -664,7 +735,7 @@
         {
           "name": "Reward Currency Id 2",
           "db_column_name": "RewardCurrencyId2",
-          "value_type": "uint"
+          "value_type": "CurrencyTypeParameter"
         },
         {
           "name": "Reward Currency Count 2",
@@ -674,7 +745,7 @@
         {
           "name": "Reward Currency Id 3",
           "db_column_name": "RewardCurrencyId3",
-          "value_type": "uint"
+          "value_type": "CurrencyTypeParameter"
         },
         {
           "name": "Reward Currency Count 3",
@@ -684,7 +755,7 @@
         {
           "name": "Reward Currency Id 4",
           "db_column_name": "RewardCurrencyId4",
-          "value_type": "uint"
+          "value_type": "CurrencyTypeParameter"
         },
         {
           "name": "Reward Currency Count 4",

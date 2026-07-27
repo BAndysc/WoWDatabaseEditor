@@ -38,8 +38,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "scale")]
         public float Scale { get; set; }
 
-        [Column(Name = "gossip_menu_id")] 
-        public uint GossipMenuId { get; set; }
+        [Column(Name = "gossip_menu_id")]
+        public virtual uint GossipMenuId { get; set; }
 
         [Column(Name = "minlevel")]
         public short MinLevel { get; set; }
@@ -158,13 +158,17 @@ namespace WDE.TrinityMySqlDatabase.Models
         public uint GetLootId(int index) => LootId;
     }
 
-    // Cataclysm creature_template renamed the `exp` column to `HealthScalingExpansion`;
-    // everything else matches the Wrath schema.
+    // Cataclysm creature_template renamed the `exp` column to `HealthScalingExpansion`
+    // and moved `gossip_menu_id` into the creature_template_gossip 1-to-many table
+    // (like master); everything else matches the Wrath schema.
     [Table(Name = "creature_template")]
     public class MySqlCreatureTemplateCata : MySqlCreatureTemplateWrath
     {
         [Column(Name = "HealthScalingExpansion")]
         public override short RequiredExpansion { get; set; }
+
+        [NotColumn]
+        public override uint GossipMenuId { get; set; }
     }
 
     [Table(Name = "creature_template")]

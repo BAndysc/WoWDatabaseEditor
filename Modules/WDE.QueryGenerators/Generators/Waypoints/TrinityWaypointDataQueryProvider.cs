@@ -52,8 +52,9 @@ public class TrinityCataWaypointDataQueryProvider : BaseInsertQueryProvider<IWay
         move_type = wp.MoveType,
         action = wp.Action,
         action_chance = wp.ActionChance,
-        velocity = wp.Velocity,
-        smoothTransition = wp.SmoothTransition,
+        // NOT NULL columns with a 0 default on TCPP - coalesce, never write NULL
+        velocity = wp.Velocity ?? 0,
+        smoothTransition = wp.SmoothTransition ?? false,
     };
 
     public IQuery Delete(IWaypointData wp) =>

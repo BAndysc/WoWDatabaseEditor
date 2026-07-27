@@ -1,7 +1,7 @@
 {
   "id": "quest_poi_points",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Quest Poi Points",
   "single_solution_name": "{name} poi points",

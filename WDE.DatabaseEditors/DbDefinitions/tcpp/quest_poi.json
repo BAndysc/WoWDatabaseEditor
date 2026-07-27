@@ -1,7 +1,7 @@
 {
   "id": "quest_poi",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityCata"
   ],
   "name": "Quest Poi",
   "single_solution_name": "Quest Poi",
@@ -17,7 +17,8 @@
   "picker": "",
   "primary_key": [
     "QuestID",
-    "id"
+    "BlobIndex",
+    "Idx1"
   ],
   "groups": [
     {
@@ -30,8 +31,14 @@
           "preferred_width": 245.0
         },
         {
-          "name": "Id",
-          "db_column_name": "id",
+          "name": "Blob Index",
+          "db_column_name": "BlobIndex",
+          "value_type": "int",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Idx",
+          "db_column_name": "Idx1",
           "value_type": "TableReference(quest_poi_points#Idx1)Parameter",
           "preferred_width": 40.0
         },
@@ -49,7 +56,7 @@
         },
         {
           "name": "Zone or Area",
-          "db_column_name": "WorldMapAreaId",
+          "db_column_name": "WorldMapAreaID",
           "value_type": "ZoneAreaParameter",
           "preferred_width": 130.0
         },

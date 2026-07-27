@@ -1235,6 +1235,12 @@ namespace TheEngine.Managers
 
         public void DrawRenderers(EngineCommandList cl, ReadOnlySpan<(LocalToWorld, MeshRenderer)> renderers)
         {
+            // one instance per draw; each buffer holds a single element addressed at firstInstance 0
+            Span<Matrix> models = stackalloc Matrix[1];
+            Span<Matrix> invModels = stackalloc Matrix[1];
+            Span<uint> objIdx = stackalloc uint[1];
+            Span<Int4> drawData = stackalloc Int4[1];
+            Span<int> matIdx = stackalloc int[1];
             for (int i = 0; i < renderers.Length; i++)
             {
                 var l2w = renderers[i].Item1;
@@ -1245,12 +1251,11 @@ namespace TheEngine.Managers
                 if (pass == null)
                     continue;
 
-                // one instance per draw; each buffer holds a single element addressed at firstInstance 0
-                Span<Matrix> models = stackalloc Matrix[1]; models[0] = l2w.Matrix;
-                Span<Matrix> invModels = stackalloc Matrix[1]; invModels[0] = l2w.Inverse;
-                Span<uint> objIdx = stackalloc uint[1]; objIdx[0] = 0u;
-                Span<Int4> drawData = stackalloc Int4[1]; drawData[0] = mr.InstanceData ?? new Int4(-1, -1, -1, -1);
-                Span<int> matIdx = stackalloc int[1]; matIdx[0] = material.MaterialArrayIndex;
+                models[0] = l2w.Matrix;
+                invModels[0] = l2w.Inverse;
+                objIdx[0] = 0u;
+                drawData[0] = mr.InstanceData ?? new Int4(-1, -1, -1, -1);
+                matIdx[0] = material.MaterialArrayIndex;
 
                 cl.SetBuffer(ShaderUniforms.InstancingModels, cl.UploadTransientBuffer((ReadOnlySpan<Matrix>)models));
                 cl.SetBuffer(ShaderUniforms.InstancingInverseModels, cl.UploadTransientBuffer((ReadOnlySpan<Matrix>)invModels));
