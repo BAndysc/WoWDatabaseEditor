@@ -15,6 +15,10 @@ public interface ILootEntry
     uint Entry { get; }
     int ItemOrCurrencyId { get; }
     uint Reference { get; }
+    /// <summary>AzerothCore stores some references negated (negative Reference column = reference
+    /// processed without the group-amount rate multiplier); Reference is always the absolute id,
+    /// this flag preserves the sign so saving doesn't flip such rows.</summary>
+    bool ReferenceIsNegative => false;
     float Chance { get; }
     bool QuestRequired { get; }
     uint LootMode { get; }
@@ -39,6 +43,7 @@ public struct AbstractLootEntry : ILootEntry
     public uint Entry { get; set; }
     public int ItemOrCurrencyId { get; set; }
     public uint Reference { get; set; }
+    public bool ReferenceIsNegative { get; set; }
     public float Chance { get; set; }
     public uint LootMode { get; set; }
     public bool QuestRequired { get; set; }
@@ -59,6 +64,7 @@ public struct AbstractLootEntry : ILootEntry
         Entry = x.Entry;
         ItemOrCurrencyId = x.ItemOrCurrencyId;
         Reference = x.Reference;
+        ReferenceIsNegative = x.ReferenceIsNegative;
         Chance = x.Chance;
         LootMode = x.LootMode;
         QuestRequired = x.QuestRequired;

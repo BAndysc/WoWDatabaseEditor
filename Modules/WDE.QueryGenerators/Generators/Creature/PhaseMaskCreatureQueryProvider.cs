@@ -40,7 +40,7 @@ internal class AzerothCreatureQueryProvider : BaseInsertQueryProvider<CreatureSp
         return new
         {
             guid = t.Guid,
-            id1 = t.Entry,
+            id = t.Entry,
             map = t.Map,
             spawnMask = t.SpawnMask,
             phaseMask = t.PhaseMask,

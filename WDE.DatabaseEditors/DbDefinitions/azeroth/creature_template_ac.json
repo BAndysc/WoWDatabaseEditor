@@ -169,26 +169,6 @@
           "name": "Extra Flags",
           "db_column_name": "flags_extra",
           "value_type": "ExtraFlagParameter"
-        },
-        {
-          "name": "Trainer Type",
-          "db_column_name": "trainer_type",
-          "value_type": "uint"
-        },
-        {
-          "name": "Trainer Spell",
-          "db_column_name": "trainer_spell",
-          "value_type": "uint"
-        },
-        {
-          "name": "Trainer Class",
-          "db_column_name": "trainer_class",
-          "value_type": "uint"
-        },
-        {
-          "name": "Trainer Race",
-          "db_column_name": "trainer_race",
-          "value_type": "uint"
         }
 
       ]
@@ -283,16 +263,6 @@
           "name": "Movement ID",
           "db_column_name": "movementId",
           "value_type": "uint"
-        }
-      ]
-    },
-    {
-      "group_name": "Visual",
-      "fields": [        
-        {
-          "name": "Model scale",
-          "db_column_name": "scale",
-          "value_type": "float"
         }
       ]
     },
@@ -436,14 +406,9 @@
       "group_name": "Immunities",
       "fields": [
         {
-          "name": "Mechanic immune mask",
-          "db_column_name": "mechanic_immune_mask",
-          "value_type": "SpellMechanicMaskParameter"
-        },
-        {
-          "name": "School immune mask",
-          "db_column_name": "spell_school_immune_mask",
-          "value_type": "SpellSchoolMaskParameter"
+          "name": "Creature Immunities Id",
+          "db_column_name": "CreatureImmunitiesId",
+          "value_type": "int"
         }
       ]
     },

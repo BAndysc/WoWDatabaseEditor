@@ -366,7 +366,10 @@ public class Program
             "GetConditionsForAsync",
             "GetEventScript",
             "GetCreaturesAsync",
-            "GetGameObjectsAsync"
+            "GetGameObjectsAsync",
+            // these query the table whose name is passed in - the reflection loop would pass "a"
+            "GetDbScript",
+            "GetDbScriptIds"
         };
 
         foreach (var method in allMethods)
@@ -401,6 +404,12 @@ public class Program
         await worldDb.GetCreaturesAsync(new SpawnKey[]{new SpawnKey(0, 0)});
         await worldDb.GetGameObjectsAsync();
         await worldDb.GetGameObjectsAsync(new SpawnKey[]{new SpawnKey(0, 0)});
+        // a real dbscripts table name (the query runs against the passed table)
+        if (worldDb is IMangosDatabaseProvider mangosDb)
+        {
+            await mangosDb.GetDbScript("dbscripts_on_creature_death", 0);
+            await mangosDb.GetDbScriptIds("dbscripts_on_creature_death");
+        }
         
         foreach (var type in Enum.GetValues<EventScriptType>())
         {

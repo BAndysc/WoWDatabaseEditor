@@ -64,6 +64,11 @@
           "name": "Cast bar caption",
           "db_column_name": "castBarCaption",
           "value_type": "GameObjectCastBarCaptionParameter"
+        },
+        {
+          "name": "Unk 1",
+          "db_column_name": "unk1",
+          "value_type": "string"
         }
       ]
     },

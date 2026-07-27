@@ -1003,7 +1003,14 @@
 		"isflag": true,
 		"name": "Type flags 2",
 		"values": {
-			"1": "unknown"
+			"1": "predictive power regen",
+			"2": "hide level info in tooltip",
+			"4": "hide health bar under tooltip",
+			"8": "never display emote or chat text in a chat bubble",
+			"16": "no death thud",
+			"32": "no interact on left click",
+			"64": "unknown 7",
+			"128": "unknown 8"
 		}
 	},
 	"TypeFlagsParameter": {

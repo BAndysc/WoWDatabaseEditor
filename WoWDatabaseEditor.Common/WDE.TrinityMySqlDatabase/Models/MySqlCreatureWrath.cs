@@ -60,7 +60,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "guid")]
         public uint Guid { get; set; }
 
-        [Column(Name = "id1")]
+        [Column(Name = "id")]
         public uint Entry { get; set; }
 
         [Column(Name = "map")]

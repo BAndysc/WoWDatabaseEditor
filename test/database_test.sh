@@ -56,7 +56,10 @@ for index in ${!URLs[*]}; do
                 "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < "${i}"
             done
         else
-            cat data/sql/base/db_world/updates.sql | awk '/INSERT INTO `updates`/ {flag=1; next}/;/ {flag=0}flag {print $1}' | tr -d \'\' | tr -d \(\, | xargs -I {} rm "data/sql/updates/db_world/{}" || true
+            # updates.sql lists applied updates as ('2026_01_01_00.sql','<hash>','RELEASED',...) tuples
+            grep -oE "[0-9]{4}_[0-9]{2}_[0-9]{2}_[0-9]+\.sql" data/sql/base/db_world/updates.sql | sort -u | while read -r applied; do
+                rm -f "data/sql/updates/db_world/$applied"
+            done
 
             rm -rf data/sql/updates/db_world/2024_03_04_00.sql || true
 

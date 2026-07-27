@@ -1,7 +1,7 @@
 ﻿{
   "id": "quest_request_items",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityCata"
   ],
   "name": "Quest Request Items",
   "single_solution_name": "Quest Request Items Table",
@@ -35,22 +35,10 @@
           "preferred_width": 190.0
         },
         {
-          "name": "Emote On Complete Delay",
-          "db_column_name": "EmoteOnCompleteDelay",
-          "value_type": "uint",
-          "zero_is_blank": true
-        },
-        {
           "name": "Emote On Incomplete",
           "db_column_name": "EmoteOnIncomplete",
           "value_type": "EmoteParameter",
           "preferred_width": 235.0
-        },
-        {
-          "name": "Emote On Incomplete Delay",
-          "db_column_name": "EmoteOnIncompleteDelay",
-          "value_type": "uint",
-          "zero_is_blank": true
         },
         {
           "name": "Completion Text",

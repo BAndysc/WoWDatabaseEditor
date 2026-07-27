@@ -76,6 +76,11 @@
           "name": "Cast bar caption",
           "db_column_name": "castBarCaption",
           "value_type": "GameObjectCastBarCaptionParameter"
+        },
+        {
+          "name": "Unk 1",
+          "db_column_name": "unk1",
+          "value_type": "string"
         }
       ]
     },
@@ -1529,6 +1534,12 @@
           "name": "Script name",
           "db_column_name": "ScriptName",
           "value_type": "string"
+        },
+        {
+          "name": "String Id",
+          "db_column_name": "StringId",
+          "value_type": "string",
+          "can_be_null": true
         },
         {
           "name": "Verified build",

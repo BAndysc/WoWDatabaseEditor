@@ -104,6 +104,12 @@
           "can_be_null": true
         },
         {
+          "name": "String Id",
+          "db_column_name": "StringId",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
           "name": "Verified Build",
           "db_column_name": "VerifiedBuild",
           "value_type": "int",

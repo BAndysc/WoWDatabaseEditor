@@ -1,6 +1,6 @@
 ﻿{
   "compatibility": [
-    "TrinityWrath"
+    "Azeroth"
   ],
   "name": "Item Template",
   "single_solution_name": "{name} Item Template",
@@ -185,12 +185,6 @@
           "db_column_name": "delay",
           "value_type": "uint",
           "default": 1000
-        },
-        {
-          "name": "Stats Count",
-          "help": "When an item has entries in stat_type, this must be updated to display those entries (Unknown how this works)",
-          "db_column_name": "StatsCount",
-          "value_type": "uint"
         },
         {
           "name": "Scaling Stat Distribution",

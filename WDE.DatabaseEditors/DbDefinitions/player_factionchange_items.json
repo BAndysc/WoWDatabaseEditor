@@ -29,10 +29,20 @@
           "preferred_width": 295.0
         },
         {
+          "name": "Alliance Race",
+          "db_column_name": "race_A",
+          "value_type": "RaceParameter"
+        },
+        {
           "name": "Horde Item",
           "db_column_name": "horde_id",
           "value_type": "ItemParameter",
           "preferred_width": 280.0
+        },
+        {
+          "name": "Horde Race",
+          "db_column_name": "race_H",
+          "value_type": "RaceParameter"
         },
         {
           "name": "Comment Alliance",

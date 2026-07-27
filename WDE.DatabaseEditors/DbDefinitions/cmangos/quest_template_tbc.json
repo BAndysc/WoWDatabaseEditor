@@ -1,4 +1,4 @@
-{
+﻿{
   "id": "quest_template_tbc",
   "compatibility": [
     "CMaNGOS-TBC"
@@ -812,11 +812,11 @@
           "help": "Reputation cap: the reward will not push the reputation with this faction above this value."
         },
         {
-          "name": "Reputation Spillover Mask",
-          "db_column_name": "ReputationSpilloverMask",
+          "name": "Reward Faction Flags",
+          "help": "Reward faction slots whose reputation reward is NOT spilled over to allied factions (bit per reward faction slot).",
+          "db_column_name": "RewFactionFlags",
           "value_type": "CmangosRepSpilloverMaskParameter",
-          "zero_is_blank": true,
-          "help": "Reward faction slots whose reputation reward is NOT spilled over to allied factions."
+          "zero_is_blank": true
         }
       ]
     },

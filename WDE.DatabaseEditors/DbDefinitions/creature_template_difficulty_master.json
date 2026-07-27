@@ -92,12 +92,20 @@
         {
           "name": "Type Flags",
           "db_column_name": "TypeFlags",
-          "value_type": "uint"
+          "value_type": "TypeFlagsParameter",
+          "zero_is_blank": true
         },
         {
           "name": "Type Flags 2",
           "db_column_name": "TypeFlags2",
-          "value_type": "uint"
+          "value_type": "TypeFlags2Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Type Flags 3",
+          "db_column_name": "TypeFlags3",
+          "value_type": "uint",
+          "zero_is_blank": true
         },
         {
           "name": "Loot ID",

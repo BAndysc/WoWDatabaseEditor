@@ -549,18 +549,18 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
         await using var database = Database();
         var loot = new[]
         {
-            await database.CreatureLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.GameObjectLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.ItemLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.FishingLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.PickpocketingLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.SkinningLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.DisenchantLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.ProspectingLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.MillingLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.MailLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.SpellLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.ReferenceLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+            await database.CreatureLootTemplateWithCurrency.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
+            await database.GameObjectLootTemplateWithCurrency.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
+            await database.ItemLootTemplateWithCurrency.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
+            await database.FishingLootTemplateWithCurrency.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
+            await database.PickpocketingLootTemplateWithCurrency.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
+            await database.SkinningLootTemplateWithCurrency.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
+            await database.DisenchantLootTemplateWithCurrency.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
+            await database.ProspectingLootTemplateWithCurrency.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
+            await database.MillingLootTemplateWithCurrency.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
+            await database.MailLootTemplateWithCurrency.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
+            await database.SpellLootTemplateWithCurrency.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
+            await database.ReferenceLootTemplate.Where(x => x.RawReference == lootId || x.RawReference == -(long)lootId).ToListAsync<ILootEntry>(),
         };
         return loot.SelectMany(x => x).ToList();
     }

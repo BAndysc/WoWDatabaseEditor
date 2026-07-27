@@ -188,8 +188,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "difficulty_entry_3")]
         public uint DifficultyEntry3 { get; set; }
 
-        [Column(Name = "scale")]
-        public float Scale { get; set; }
+        // AzerothCore dropped the scale column - per-model DisplayScale (creature_template_model) is used instead
+        [NotColumn]
+        public float Scale { get; set; } = 1;
 
         [Column(Name = "gossip_menu_id")]
         public uint GossipMenuId { get; set; }

@@ -192,6 +192,12 @@
           "value_type": "CreatureParameter"
         },
         {
+          "name": "Mount Creature",
+          "db_column_name": "MountCreatureID",
+          "foreign_table": "creature_template_addon",
+          "value_type": "CreatureParameter"
+        },
+        {
           "name": "Stand state",
           "db_column_name": "StandState",
           "value_type": "StandStateParameter",
@@ -515,6 +521,12 @@
           "name": "Script name",
           "db_column_name": "ScriptName",
           "value_type": "string"
+        },
+        {
+          "name": "String Id",
+          "db_column_name": "StringId",
+          "value_type": "string",
+          "can_be_null": true
         },
         {
           "name": "Verified build",

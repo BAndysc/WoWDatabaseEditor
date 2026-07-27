@@ -1,8 +1,7 @@
 {
   "id": "spell_target_position",
   "compatibility": [
-    "TrinityWrath",
-    "TrinityCata"
+    "TrinityMaster"
   ],
   "name": "Spell Target Position",
   "single_solution_name": "{name} target position editor",
@@ -32,6 +31,11 @@
           "name": "Effect Index",
           "db_column_name": "EffectIndex",
           "value_type": "SpellEffectIndexParameter"
+        },
+        {
+          "name": "Order Index",
+          "db_column_name": "OrderIndex",
+          "value_type": "uint"
         },
         {
           "name": "Map ID",

@@ -1,4 +1,4 @@
-{
+﻿{
   "id": "creature",
   "compatibility": [
     "TrinityWrath"
@@ -88,6 +88,12 @@
           "db_column_name": "ScriptName",
           "value_type": "string",
           "default": "",
+          "can_be_null": true
+        },
+        {
+          "name": "String Id",
+          "db_column_name": "StringId",
+          "value_type": "string",
           "can_be_null": true
         },
         {

@@ -369,8 +369,8 @@
           "can_be_null": true
         },
         {
-          "name": "Unknown 0",
-          "db_column_name": "Unknown0",
+          "name": "Reward faction flags",
+          "db_column_name": "RewardFactionFlags",
           "value_type": "uint"
         },
         {

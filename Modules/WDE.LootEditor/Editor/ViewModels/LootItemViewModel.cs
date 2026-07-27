@@ -68,6 +68,10 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
         }
     }
 
+    // AzerothCore stores some references negated in the Reference column (a rate-multiplier flag);
+    // not editable, only preserved from load so saving doesn't flip the sign
+    public bool ReferenceIsNegative { get; private set; }
+
     [Notify] private bool isModified;
     [Notify] private bool isDuplicate;
 
@@ -183,6 +187,7 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
         LootMode.SetValueFromHistory(loot.Loot.LootMode);
         GroupId.SetValueFromHistory(loot.Loot.GroupId);
         MinCountOrRef.SetValueFromHistory(loot.Loot.IsReference() ? -(int)loot.Loot.Reference : loot.Loot.MinCount);
+        ReferenceIsNegative = loot.Loot.ReferenceIsNegative;
         MaxCount.SetValueFromHistory(loot.Loot.MaxCount);
         BadLuckProtectionId.SetValueFromHistory(loot.Loot.BadLuckProtectionId);
         Build.SetValueFromHistory(loot.Loot.Build);
@@ -258,6 +263,7 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
             LootMode = (uint)LootMode.Value,
             GroupId = (ushort)GroupId.Value,
             Reference = IsReference ? ReferenceEntry : 0,
+            ReferenceIsNegative = IsReference && ReferenceIsNegative,
             MinCount = IsReference ? 1 : (int)MinCountOrRef.Value,
             MaxCount = (uint)MaxCount.Value,
             BadLuckProtectionId = (int)BadLuckProtectionId.Value,

@@ -15,8 +15,14 @@ public abstract class BaseMySqlLootEntry : ILootEntry
 
     public abstract int ItemOrCurrencyId { get; }
 
+    // TC declares Reference as int unsigned, AzerothCore as signed int with negative values
+    // (negative = same reference, quest-drop semantics) - read via long, expose the absolute id
     [Column(Name = "Reference")]
-    public uint Reference { get; set; }
+    public long RawReference { get; set; }
+
+    public uint Reference => RawReference < 0 ? (uint)-RawReference : (uint)RawReference;
+
+    public bool ReferenceIsNegative => RawReference < 0;
     
     [Column(Name = "Chance")]
     public float Chance { get; set; }

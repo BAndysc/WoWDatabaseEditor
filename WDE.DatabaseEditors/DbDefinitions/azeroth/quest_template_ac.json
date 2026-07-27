@@ -1,4 +1,4 @@
-{
+﻿{
   "id": "quest_template",
   "compatibility": ["Azeroth"],
   "name": "Quest Template",
@@ -148,6 +148,12 @@
           "name": "Next quest",
           "foreign_table": "quest_template_addon",
           "db_column_name": "NextQuestID",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Breadcrumb for quest",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "BreadcrumbForQuestId",
           "value_type": "QuestParameter"
         },
         {
@@ -517,12 +523,6 @@
           "name": "Reward money difficulty",
           "db_column_name": "RewardMoneyDifficulty",
           "value_type": "MoneyParameter"
-        },
-        {
-          "name": "Reward bonus money",
-          "db_column_name": "RewardBonusMoney",
-          "value_type": "MoneyParameter",
-          "help": "The money a character at level 80 would get when they complete this quest."
         },
         {
           "name": "Reward display spell",

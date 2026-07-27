@@ -144,7 +144,7 @@ public class TrinityLootQueryGenerator : BaseTrinityLootQueryGenerator
         {
             Entry = x.Loot.Entry,
             Item = x.Loot.IsReference() && x.Loot.ItemOrCurrencyId == 0 ? (long)x.Loot.Reference : x.Loot.ItemOrCurrencyId,
-            Reference = x.Loot.Reference,
+            Reference = x.Loot.ReferenceIsNegative ? -(long)x.Loot.Reference : x.Loot.Reference,
             Chance = x.Loot.Chance,
             QuestRequired = x.Loot.QuestRequired,
             LootMode = x.Loot.LootMode,
@@ -199,7 +199,7 @@ public class TrinityCataLootQueryGenerator : BaseTrinityLootQueryGenerator
             Entry = x.Loot.Entry,
             Item = x.Loot.IsReference() && x.Loot.ItemOrCurrencyId == 0 ? (long)x.Loot.Reference : Math.Abs(x.Loot.ItemOrCurrencyId),
             IsCurrency = x.Loot.ItemOrCurrencyId < 0,
-            Reference = x.Loot.Reference,
+            Reference = x.Loot.ReferenceIsNegative ? -(long)x.Loot.Reference : x.Loot.Reference,
             Chance = x.Loot.Chance,
             QuestRequired = x.Loot.QuestRequired,
             LootMode = x.Loot.LootMode,

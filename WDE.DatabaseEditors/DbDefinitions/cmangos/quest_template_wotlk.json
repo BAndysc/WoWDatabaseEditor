@@ -1,4 +1,4 @@
-{
+﻿{
   "compatibility": [
     "CMaNGOS-WoTLK"
   ],
@@ -735,6 +735,18 @@
           "value_type": "float"
         },
         {
+          "name": "Reward Arena Points",
+          "db_column_name": "RewArenaPoints",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Reward Unk",
+          "db_column_name": "RewUnk",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
           "name": "Reward Spell",
           "help": "Spell shown as reward in the quest log and cast on the player at reward (unless Reward Spell Cast is set).",
           "db_column_name": "RewSpell",
@@ -908,9 +920,9 @@
           "default": 42999
         },
         {
-          "name": "Reputation Spillover Mask",
-          "help": "Reward faction slots whose reputation reward is NOT spilled over to allied factions.",
-          "db_column_name": "ReputationSpilloverMask",
+          "name": "Reward Faction Flags",
+          "help": "Reward faction slots whose reputation reward is NOT spilled over to allied factions (bit per reward faction slot).",
+          "db_column_name": "RewFactionFlags",
           "value_type": "CmangosRepSpilloverMaskParameter",
           "zero_is_blank": true
         }
