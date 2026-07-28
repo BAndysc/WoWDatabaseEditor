@@ -37,7 +37,7 @@
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="24" />
 
-        <!-- this works on macos, need double check in Windows and Linux -->
+        <!-- this works on macos and windows, need to double-check Linux -->
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
         <Setter Property="Chrome" Value="MacOsChrome" />
         <Setter Property="WindowDecorations" Value="BorderOnly" />

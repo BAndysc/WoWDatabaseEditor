@@ -96,7 +96,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
                         serializedDock.Horizontal ? Orientation.Horizontal : Orientation.Vertical;
                     proportionalDock.Proportion = serializedDock.Proportion;
                     proportionalDock.VisibleDockables = dockFactory.CreateList<IDockable>();
-                    DeserializeChildren(proportionalDock.VisibleDockables, serializedDock.Children, true);
+                    DeserializeChildren(proportionalDock.VisibleDockables, serializedDock.Children, true, false);
                     return proportionalDock;
                 case SerializedDockableType.DocumentDock:
                     IDocumentDock documentDock = dockFactory.CreateDocumentDock();
@@ -113,7 +113,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
                     toolDock.Alignment = serializedDock.ToolAlignment;
                     toolDock.Proportion = serializedDock.Proportion;
                     toolDock.VisibleDockables = dockFactory.CreateList<IDockable>();
-                    DeserializeChildren(toolDock.VisibleDockables, serializedDock.Children, false);
+                    DeserializeChildren(toolDock.VisibleDockables, serializedDock.Children, false, true);
                     return toolDock;
                 case SerializedDockableType.Tool:
                     var tool = layoutViewModelResolver.ResolveTool(serializedDock.UniqueId);
@@ -122,7 +122,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
                     IRootDock rootDock = dockFactory.CreateRootDock();
                     rootDock.Proportion = serializedDock.Proportion;
                     rootDock.VisibleDockables = dockFactory.CreateList<IDockable>();
-                    DeserializeChildren(rootDock.VisibleDockables, serializedDock.Children, false);
+                    DeserializeChildren(rootDock.VisibleDockables, serializedDock.Children, false, false);
                     if (rootDock.VisibleDockables?.Count > 0)
                     {
                         rootDock.ActiveDockable = rootDock.VisibleDockables[0];
@@ -134,7 +134,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
             }
         }
 
-        private void DeserializeChildren(IList<IDockable> dockables, List<SerializedDock>? children, bool addSplitters)
+        private void DeserializeChildren(IList<IDockable> dockables, List<SerializedDock>? children, bool addSplitters, bool skipSplitters)
         {
             if (children == null)
                 return;
@@ -147,6 +147,9 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
             {
                 var deserialized = DeserializeDockable(dockable);
 
+                if (skipSplitters && deserialized is IProportionalDockSplitter)
+                    continue;
+                
                 if (deserialized is IDock d)
                 {
                     totalProportion += d.Proportion;
@@ -162,10 +165,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
                             dockables.Add(dockFactory.CreateProportionalDockSplitter());
                         }
                     }
-
+                    
                     dockables.Add(deserialized);
 
-                    nextMustBeSplitter = deserialized is not IProportionalDockSplitter;
+                    nextMustBeSplitter = !skipSplitters && deserialized is not IProportionalDockSplitter;
 
                     if (dockable.IsPinned)
                         tempPinnedDockables.Add(deserialized);

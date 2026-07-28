@@ -3,7 +3,8 @@
         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls"
         xmlns:converters="clr-namespace:AvaloniaStyles.Converters"
         xmlns:utils="clr-namespace:Classic.Avalonia.Theme.Utils;assembly=Classic.Avalonia.Theme"
-        xmlns:common="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia">
+        xmlns:common="clr-namespace:Classic.CommonControls;assembly=Classic.CommonControls.Avalonia"
+        xmlns:utils1="clr-namespace:AvaloniaStyles.Utils">
     <Style Selector="controls1|ExtendedTitleBar">
         <Setter Property="Height" Value="32" />
         <Setter Property="Template">
@@ -28,8 +29,11 @@
     <Style Selector="controls1|ExtendedWindow">
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="24" />
+        <!-- this works on macos and windows, need to double-check Linux -->
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
-        <Setter Property="Chrome" Value="NoSystemChrome" />
+        <Setter Property="Chrome" Value="MacOsChrome" />
+        <Setter Property="WindowDecorations" Value="BorderOnly" />
+        
         <Setter Property="Background" Value="{DynamicResource WindowContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
         <Setter Property="Template">
@@ -42,7 +46,10 @@
                         <Border BorderThickness="1" BorderBrush="{DynamicResource AccentColorBackground}" Name="PART_windowBorder">
                                 <DockPanel LastChildFill="True" Margin="{TemplateBinding OffScreenMargin}">
                                     <Panel DockPanel.Dock="Top">
-                                        <Border Background="{DynamicResource TitleBarBackground}" IsHitTestVisible="False" Name="PART_titlebarBorder"/>
+                                        <Border Background="{DynamicResource TitleBarBackground}" 
+                                                IsHitTestVisible="{x:Static utils1:OperatingSystemEx.IsWindows}"
+                                                Win32Properties.NonClientHitTestResult="Caption"
+                                                Name="PART_titlebarBorder"/>
                                         <StackPanel>
                                             <ThreeSidesPanel Margin="6,0,0,0" Height="30">
                                                 <DockPanel LastChildFill="False" ClipToBounds="True">
