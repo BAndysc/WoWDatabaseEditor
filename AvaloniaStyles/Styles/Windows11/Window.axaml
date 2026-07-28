@@ -1,6 +1,8 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:converters="clr-namespace:AvaloniaStyles.Converters">
+        xmlns:converters="clr-namespace:AvaloniaStyles.Converters"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
+        xmlns:utils="clr-namespace:AvaloniaStyles.Utils">
     <Design.PreviewWith>
         <Border Padding="20">
             <!-- Add Controls for Previewer Here -->
@@ -53,7 +55,10 @@
                     <Border ClipToBounds="True" BorderThickness="0" BorderBrush="{DynamicResource InnerWindowBorderColor}" Name="PART_windowBorder_inner">
                             <DockPanel LastChildFill="True" Margin="{TemplateBinding OffScreenMargin}">
                                 <Panel DockPanel.Dock="Top">
-                                    <Border Background="{DynamicResource TitleBarBackground}" IsHitTestVisible="False" Name="PART_titlebarBorder"/>
+                                    <Border Background="{DynamicResource TitleBarBackground}" 
+                                            IsHitTestVisible="{x:Static utils:OperatingSystemEx.IsWindows}"
+                                            Win32Properties.NonClientHitTestResult="Caption"
+                                            Name="PART_titlebarBorder"/>
                                     <StackPanel>
 
                                         <ThreeSidesPanel Margin="6,0,0,0" Height="39">

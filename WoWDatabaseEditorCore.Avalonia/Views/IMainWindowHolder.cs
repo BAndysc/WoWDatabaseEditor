@@ -39,6 +39,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 return window.Owner as Window;
             else if (window is SplashScreenWindow)
                 return null;
+            else if (window != null)
+                return window;
 
             foreach (var w in windows)
             {
