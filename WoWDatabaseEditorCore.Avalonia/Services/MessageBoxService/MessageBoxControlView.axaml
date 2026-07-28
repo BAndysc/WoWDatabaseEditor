@@ -16,8 +16,7 @@
     <KeyBinding Gesture="N" Command="{ReflectionBinding NoButtonCommand}" />
   </UserControl.KeyBindings>
   <Border BorderThickness="0.5" BorderBrush="{DynamicResource OuterWindowBorderColor}" Name="PART_windowBorder">
-    <Border BorderThickness="0.5" BorderBrush="{DynamicResource InnerWindowBorderColor}" Name="PART_windowBorder_inner"
-            Background="Transparent" Win32Properties.NonClientHitTestResult="Caption">
+    <Border BorderThickness="0.5" BorderBrush="{DynamicResource InnerWindowBorderColor}" Name="PART_windowBorder_inner">
       <Panel>
         <Panel Background="{DynamicResource SystemControlBackgroundAltHighBrush}" IsHitTestVisible="False" />
         <DockPanel LastChildFill="True">

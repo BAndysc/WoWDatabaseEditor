@@ -211,6 +211,7 @@
         <!-- this works on macos, need double check in Windows and Linux -->
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
         <Setter Property="WindowDecorations" Value="BorderOnly" />
+        <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="24" />
 
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
         <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
@@ -225,7 +226,8 @@
                 <Border BorderThickness="0.5" BorderBrush="{DynamicResource OuterWindowBorderColor}" Name="PART_windowBorder">
                     <Border BorderThickness="0.5" BorderBrush="{DynamicResource InnerWindowBorderColor}" Name="PART_windowBorder_inner">
                         <Panel>
-                            <Panel Background="{TemplateBinding Background}" IsHitTestVisible="False" />
+                            <Panel Background="{TemplateBinding Background}" IsHitTestVisible="{x:Static utils:OperatingSystemEx.IsWindows}"
+                                   Win32Properties.NonClientHitTestResult="Caption" />
                             <VisualLayerManager Name="PART_VisualLayerManager">
                                 <DockPanel LastChildFill="True">
                                     <ContentPresenter DockPanel.Dock="Bottom" 
