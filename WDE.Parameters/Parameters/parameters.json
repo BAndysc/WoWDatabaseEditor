@@ -184,7 +184,8 @@
 			"134217728": {"name": "MOUNT"},
 			"268435456": {"name": "UNK_28"},
 			"536870912": {"name": "UNK_29"},
-			"1073741824": {"name": "SHEATHE"}
+			"1073741824": {"name": "SHEATHE"},
+			"2147483648": {"name": "IMMUNE"}
 		}
 	},
 	"UnitFlags2Parameter": {
@@ -1544,7 +1545,7 @@
 			"3": {"name": "SLEEP"},
 			"4": {"name": "SIT_LOW_CHAIR"},
 			"5": {"name": "SIT_MEDIUM_CHAIR"},
-			"6": {"name": "SIT_HIGH_CHAIR power"},
+			"6": {"name": "SIT_HIGH_CHAIR"},
 			"7": {"name": "DEAD"},
 			"8": {"name": "KNEEL"},
 			"9": {"name": "SUBMERGED"}

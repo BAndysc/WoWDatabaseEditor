@@ -29,6 +29,9 @@ namespace WDE.DbScriptsEditor.Models
                 if (buddy.Entry == 0 && buddy.Mode is BuddyFindMode.NearestByEntry or BuddyFindMode.Pet
                         or BuddyFindMode.BySpawnGroup or BuddyFindMode.ByStringId)
                     warnings.Add("The buddy search never runs when buddy_entry is 0.");
+                if (buddy.Entry != 0 && buddy.SearchValue == 0 &&
+                    buddy.Mode is BuddyFindMode.NearestByEntry or BuddyFindMode.Pet)
+                    warnings.Add("Buddy search radius is 0; the server skips this row at load.");
             }
 
             if (command != null)
@@ -40,8 +43,10 @@ namespace WDE.DbScriptsEditor.Models
                     else if (!command.Buddy.AllowsCreature() && !buddy.IsGameObject)
                         warnings.Add("This command's buddy must be a gameobject, not a creature.");
 
-                    if (buddy.Mode == BuddyFindMode.ByPool && !command.Buddy.AllowsCreature())
-                        warnings.Add("Pool lookup only finds creatures, but this command needs a gameobject buddy.");
+                    // The runtime pool branch only resolves creatures (GO pools pass the load
+                    // check but the buddy is never found).
+                    if (buddy.Mode == BuddyFindMode.ByPool && buddy.IsGameObject)
+                        warnings.Add("Pool lookup only resolves creatures at runtime; a gameobject pool buddy is never found.");
                 }
 
                 if (command.Id == RespawnCommandId && buddy.Provided && !buddy.IncludeDespawned)

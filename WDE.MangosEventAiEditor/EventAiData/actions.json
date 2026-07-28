@@ -162,12 +162,13 @@
                     "8": {"name": "NO_MELEE_IF_OOM", "description": "Prevents creature from entering melee if out of mana or out of range"},
                     "16": {"name": "FORCE_TARGET_SELF", "description": "Forces the target to cast this spell on itself"},
                     "32": {"name": "AURA_NOT_PRESENT", "description": "Only casts the spell on the target if the target does not have the aura from that spell on itself already."},
-                    "64": {"name": "IGNORE_UNSELECTABLE_TARGET", "description": "Can target UNIT_FLAG_NOT_SELECTABLE - Needed in some scripts"},
+                    "64": {"name": "IGNORE_UNSELECTABLE_TARGET", "description": "Can target UNIT_FLAG_UNINTERACTIBLE (not selectable) - Needed in some scripts"},
                     "128": {"name": "SWITCH_CASTER_TARGET", "description": "Switches target and caster for spell cast"},
                     "256": {"name": "MAIN_SPELL", "description": "Marks main spell for AI Type = Action 57 ACTION_T_SET_RANGED_MODE"},
                     "512": {"name": "PLAYER_ONLY", "description": "Selects only player targets - substitution for EAI not having more params"},
                     "1024": {"name": "DISTANCE_YOURSELF", "description": "If spell with this cast flag hits main aggro target, caster distances himself - EAI only"},
-                    "2048": {"name": "TARGET_CASTING", "description": "Selects only targets that are casting - EAI only"}
+                    "2048": {"name": "TARGET_CASTING", "description": "Selects only targets that are casting - EAI only"},
+                    "4096": {"name": "ONLY_XYZ", "description": "Targets only coords of target and not the unit itself"}
                 }
             }
         ],
@@ -598,7 +599,19 @@
             }
         ],
         "description": "Set instance data field {pram1} to data {pram2}",
-        "name_readable": "Set instance data"
+        "name_readable": "Set instance data",
+        "rules": [
+            {
+                "rule": "(event.flags & 30) != 0",
+                "level": "Warning",
+                "description": "The server requires at least one difficulty event flag (Difficulty 0-3) on the event to set instance data"
+            },
+            {
+                "rule": "action.param(2) <= 4",
+                "level": "Info",
+                "description": "Value above encounter state 4 (SPECIAL) - make sure this is a custom case"
+            }
+        ]
     },
     {
         "id": 35,
@@ -615,6 +628,13 @@
         ],
         "description": "Set instance guid data field {pram1} to guid {pram2}",
         "name_readable": "Set instance guid data",
+        "rules": [
+            {
+                "rule": "(event.flags & 30) != 0",
+                "level": "Warning",
+                "description": "The server requires at least one difficulty event flag (Difficulty 0-3) on the event to set instance data"
+            }
+        ],
         "implicit_source": "SELF"
     },
     {
@@ -756,6 +776,13 @@
         ],
         "description": "Send event {pram1} to all creatures in {pram2} yd with {pram3} invoker",
         "name_readable": "Throw AI event",
+        "rules": [
+            {
+                "rule": "action.param(2) > 0",
+                "level": "Info",
+                "description": "Radius 0 is replaced with the server's creature family assistance radius config at load"
+            }
+        ],
         "implicit_source": "SELF"
     },
     {
@@ -960,6 +987,13 @@
         ],
         "description": "{source}: Set ranged mode {pram1} with distance {pram2} yd",
         "name_readable": "Set ranged move",
+        "rules": [
+            {
+                "rule": "action.param(2) <= 200",
+                "level": "Warning",
+                "description": "Chase distance above 200 is replaced with 30 by the server at load"
+            }
+        ],
         "implicit_source": "SELF"
     },
     {

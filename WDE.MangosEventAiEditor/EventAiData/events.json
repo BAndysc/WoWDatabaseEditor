@@ -512,6 +512,13 @@
         "name_readable": "Friendly is missing buff",
         "builtin_rules": [
             "minmax(3, 4)"
+        ],
+        "rules": [
+            {
+                "rule": "event.param(2) > 0",
+                "level": "Error",
+                "description": "Radius must be greater than 0, otherwise the server skips this event at load"
+            }
         ]
     },
     {
@@ -965,5 +972,114 @@
         "name": "EVENT_T_TARGET_NOT_REACHABLE",
         "description": "On target unreachable",
         "name_readable": "On target unreachable"
+    },
+    {
+        "id": 37,
+        "name": "EVENT_T_SPELL_CAST",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            }
+        ],
+        "description": "On spell {pram1} cast",
+        "name_readable": "On spell cast"
+    },
+    {
+        "id": 38,
+        "name": "EVENT_T_BOARD_VEHICLE",
+        "search_tags": "vehicle mount board",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Board/unboard",
+                "values": {
+                    "0": "on unboard",
+                    "1": "on board",
+                    "2": "on board and unboard"
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "Seat (-1 = any)"
+            }
+        ],
+        "description": "{pram1value:choose(0|1):On unboarding a vehicle|On boarding a vehicle|On boarding or unboarding a vehicle} (seat {pram2})",
+        "name_readable": "On board vehicle"
+    },
+    {
+        "id": 39,
+        "name": "EVENT_T_PASSENGER_BOARDED",
+        "search_tags": "vehicle passenger board",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Board/unboard",
+                "values": {
+                    "0": "on unboard",
+                    "1": "on board",
+                    "2": "on board and unboard"
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "Seat (-1 = any)"
+            }
+        ],
+        "description": "{pram1value:choose(0|1):On passenger unboarded|On passenger boarded|On passenger boarded or unboarded} (seat {pram2})",
+        "name_readable": "On passenger boarded"
+    },
+    {
+        "id": 40,
+        "name": "EVENT_T_VEHICLE_RETURN",
+        "search_tags": "vehicle",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Seat (-1 = any)"
+            }
+        ],
+        "description": "On vehicle return (seat {pram1})",
+        "name_readable": "On vehicle return"
+    },
+    {
+        "id": 41,
+        "name": "EVENT_T_PASSENGER_SPAWN",
+        "search_tags": "vehicle passenger",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Seat (-1 = any)"
+            }
+        ],
+        "description": "On passenger spawn (seat {pram1})",
+        "name_readable": "On passenger spawn",
+        "rules": [
+            {
+                "rule": "false",
+                "level": "Warning",
+                "description": "Core bug: the wotlk core fires EVENT_T_VEHICLE_RETURN in OnPassengerSpawn, so this event never triggers"
+            }
+        ]
+    },
+    {
+        "id": 42,
+        "name": "EVENT_T_PASSENGER_CONTROL_END",
+        "search_tags": "vehicle passenger",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Seat (-1 = any)"
+            }
+        ],
+        "description": "On passenger control end (seat {pram1})",
+        "name_readable": "On passenger control end",
+        "rules": [
+            {
+                "rule": "false",
+                "level": "Warning",
+                "description": "Core bug: the wotlk core fires EVENT_T_VEHICLE_RETURN in OnPassengerControlEnd, so this event never triggers"
+            }
+        ]
     }
 ]

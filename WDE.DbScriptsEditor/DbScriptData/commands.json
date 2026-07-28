@@ -92,7 +92,7 @@
     "id": 2,
     "name": "SCRIPT_COMMAND_FIELD_SET",
     "name_readable": "Set field",
-    "help": "Sets a raw update field of the source object to the given value. Advanced — prefer a dedicated command when one exists.",
+    "help": "Sets a raw update field of the source object to the given value. Advanced — prefer a dedicated command when one exists. In item-use scripts (dbscripts_on_item_use) the used item itself is the source, so item fields can be modified too.",
     "search_tags": "field set update raw",
     "group": "Advanced/Raw",
     "source_types": [
@@ -185,14 +185,36 @@
         "destination": "dataint2"
       }
     ],
-    "description": "{source}: Move to ({x}, {y}, {z})",
+    "description": "{source}: Move to ({x}, {y}, {z}){datalongValue:choose(0):|, then start relay {datalong}}",
     "variants": [
       {
         "name_readable": "Teleport to position",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "{source}: Teleport to ({x}, {y}, {z})"
+        "description": "{source}: Teleport to ({x}, {y}, {z})",
+        "parameters": [
+          {
+            "name": "X",
+            "type": "FloatParameter",
+            "destination": "x"
+          },
+          {
+            "name": "Y",
+            "type": "FloatParameter",
+            "destination": "y"
+          },
+          {
+            "name": "Z",
+            "type": "FloatParameter",
+            "destination": "z"
+          },
+          {
+            "name": "O",
+            "type": "FloatParameter",
+            "destination": "o"
+          }
+        ]
       },
       {
         "name_readable": "Move to respawn position",
@@ -226,7 +248,10 @@
             "destination": "dataint2"
           }
         ],
-        "description": "{source}: Move to its respawn position"
+        "description": "{source}: Move to its respawn position{datalongValue:choose(0):|, then start relay {datalong}}",
+        "source_types": [
+          "Creature"
+        ]
       },
       {
         "name_readable": "Move group members home",
@@ -234,7 +259,10 @@
           "dataint": "2"
         },
         "parameters": [],
-        "description": "{source}: Move its creature group members to their home positions"
+        "description": "{source}: Move its creature group members to their home positions",
+        "source_types": [
+          "Creature"
+        ]
       }
     ]
   },
@@ -242,7 +270,7 @@
     "id": 4,
     "name": "SCRIPT_COMMAND_FLAG_SET",
     "name_readable": "Set raw flag",
-    "help": "ORs the bitmask into a raw update field of the source object. Advanced — prefer 'Modify NPC flags' or 'Modify unit flags' when possible.",
+    "help": "ORs the bitmask into a raw update field of the source object. Advanced — prefer 'Modify NPC flags' or 'Modify unit flags' when possible. In item-use scripts (dbscripts_on_item_use) the used item itself is the source, so item fields can be modified too.",
     "search_tags": "flag set bitmask raw",
     "group": "Advanced/Raw",
     "source_types": [
@@ -271,7 +299,7 @@
     "id": 5,
     "name": "SCRIPT_COMMAND_FLAG_REMOVE",
     "name_readable": "Remove raw flag",
-    "help": "Clears the bitmask from a raw update field of the source object. Advanced — prefer 'Modify NPC flags' or 'Modify unit flags' when possible.",
+    "help": "Clears the bitmask from a raw update field of the source object. Advanced — prefer 'Modify NPC flags' or 'Modify unit flags' when possible. In item-use scripts (dbscripts_on_item_use) the used item itself is the source, so item fields can be modified too.",
     "search_tags": "flag remove clear bitmask raw",
     "group": "Advanced/Raw",
     "source_types": [
@@ -518,14 +546,14 @@
         "destination": "o"
       }
     ],
-    "description": "{source}: Summon creature {datalong} at ({x}, {y}, {z})",
+    "description": "{source}: Summon creature {datalong} at ({x}, {y}, {z}){datalong2Value:choose(0):| (despawn after {datalong2})}",
     "variants": [
       {
         "name_readable": "Summon creature (as active object)",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "{source}: Summon creature {datalong} at ({x}, {y}, {z}) as active object"
+        "description": "{source}: Summon creature {datalong} at ({x}, {y}, {z}) as active object{datalong2Value:choose(0):| (despawn after {datalong2})}"
       }
     ]
   },
@@ -562,14 +590,14 @@
         "destination": "datalong3"
       }
     ],
-    "description": "{datalong}: Open door",
+    "description": "{datalong}: Open door{datalong2Value:choose(0):| (reset after {datalong2}s)}",
     "variants": [
       {
         "name_readable": "Open the source door",
         "preset": {
           "datalong": "0"
         },
-        "description": "{source}: Open door"
+        "description": "{source}: Open door{datalong2Value:choose(0):| (reset after {datalong2}s)}"
       }
     ]
   },
@@ -606,14 +634,14 @@
         "destination": "datalong3"
       }
     ],
-    "description": "{datalong}: Close door",
+    "description": "{datalong}: Close door{datalong2Value:choose(0):| (reset after {datalong2}s)}",
     "variants": [
       {
         "name_readable": "Close the source door",
         "preset": {
           "datalong": "0"
         },
-        "description": "{source}: Close door"
+        "description": "{source}: Close door{datalong2Value:choose(0):| (reset after {datalong2}s)}"
       }
     ]
   },
@@ -708,7 +736,15 @@
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "{source}: Remove aura {datalong} cast by {target}"
+        "description": "{source}: Remove aura {datalong} cast by {target}",
+        "parameters": [
+          {
+            "name": "Spell",
+            "type": "SpellParameter",
+            "destination": "datalong",
+            "required": true
+          }
+        ]
       }
     ]
   },
@@ -716,7 +752,7 @@
     "id": 15,
     "name": "SCRIPT_COMMAND_CAST_SPELL",
     "name_readable": "Cast spell",
-    "help": "The resulting source casts the spell at the resulting target. If random spells are given, one is chosen at random (equally chanced with the main spell). Script casts never trigger procs. With the additional flag the spell is cast without a target.",
+    "help": "The resulting source casts the spell at the resulting target. If random spells are given, one is chosen at random (equally chanced with the main spell). Script casts never trigger procs. With the additional flag the spell is cast without a target. With a gameobject source, the target casts the spell on itself (always triggered, trigger flags ignored). Random spell slots are read until the first empty one.",
     "search_tags": "cast spell trigger",
     "group": "Spells & Auras",
     "source_types": [
@@ -766,14 +802,14 @@
         "destination": "dataint4"
       }
     ],
-    "description": "{source}: Cast {datalong}{dataintValue:choose(0):| or {dataint}}{dataint2Value:choose(0):| or {dataint2}}{dataint3Value:choose(0):| or {dataint3}}{dataint4Value:choose(0):| or {dataint4}} on {target}",
+    "description": "{source}: Cast {datalong}{dataintValue:choose(0):| or {dataint}}{dataint2Value:choose(0):| or {dataint2}}{dataint3Value:choose(0):| or {dataint3}}{dataint4Value:choose(0):| or {dataint4}} on {target}{datalong2Value:choose(0):| with flags {datalong2}}",
     "variants": [
       {
         "name_readable": "Cast spell (without target)",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "{source}: Cast {datalong} without a target"
+        "description": "{source}: Cast {datalong}{dataintValue:choose(0):| or {dataint}}{dataint2Value:choose(0):| or {dataint2}}{dataint3Value:choose(0):| or {dataint3}}{dataint4Value:choose(0):| or {dataint4}} without a target{datalong2Value:choose(0):| with flags {datalong2}}"
       }
     ]
   },
@@ -781,7 +817,7 @@
     "id": 16,
     "name": "SCRIPT_COMMAND_PLAY_SOUND",
     "name_readable": "Play sound",
-    "help": "Plays a sound from the source. The flags control who hears it: 'only to target player' and 'distance dependent' can be combined, but not with the map/zone/area-wide flags. For zone/area wide, the zone or area id can be set explicitly, otherwise the source's current one is used. With the additional flag, music is played instead of a sound.",
+    "help": "Plays a sound from the source. The flags control who hears it: 'only to target player' and 'distance dependent' can be combined, but not with the map/zone/area-wide flags. For zone/area wide, the zone or area id can be set explicitly, otherwise the source's current one is used. With the additional flag, music is played instead of a sound; music honours only the target-player and zone/area-wide flags (distance-dependent and map-wide are ignored).",
     "search_tags": "play sound music noise",
     "group": "Texts & Emotes",
     "source_types": [
@@ -928,7 +964,7 @@
     "id": 20,
     "name": "SCRIPT_COMMAND_MOVEMENT",
     "name_readable": "Set movement",
-    "help": "Changes the movement generator of the resulting source creature. Skipped while the source is in combat. Each movement type uses different parameters — pick a variant. For random movement the additional flag wanders around the current position instead of the respawn position.",
+    "help": "Changes the movement generator of the resulting source creature. Skipped while the source is in combat. Each movement type uses different parameters — pick a variant. For random movement the additional flag wanders around the current position instead of the respawn position. For a spline path with vertical speed > 0, the timer/flags value and anim tier are ignored.",
     "search_tags": "movement idle random waypoint path linear jump fall generator",
     "group": "Movement",
     "source_types": [
@@ -1047,7 +1083,7 @@
             "destination": "dataint2"
           }
         ],
-        "description": "{source}: Wander randomly within {datalong2} yd{dataint2Value:choose(0):| replacing current movement}"
+        "description": "{source}: Wander randomly {datalong2Value:choose(0):(template wander distance)|within {datalong2} yd}{dataint2Value:choose(0):| replacing current movement}"
       },
       {
         "name_readable": "Movement: Waypoint",
@@ -1181,7 +1217,7 @@
             "destination": "datalong2"
           }
         ],
-        "description": "{source}: Jump to ({x}, {y}, {z})"
+        "description": "{source}: Jump to ({x}, {y}, {z}){datalong2Value:choose(0):|, then start relay {datalong2}}"
       },
       {
         "name_readable": "Movement: Fall",
@@ -1195,7 +1231,7 @@
             "destination": "datalong2"
           }
         ],
-        "description": "{source}: Fall to the ground"
+        "description": "{source}: Fall to the ground{datalong2Value:choose(0):|, then start relay {datalong2}}"
       }
     ]
   },
@@ -1249,14 +1285,15 @@
         "destination": "datalong2"
       }
     ],
-    "description": "{source}: Set faction {datalong}",
+    "description": "{source}: Set faction {datalong}{datalong2Value:choose(0):| ({datalong2})}",
     "variants": [
       {
         "name_readable": "Reset faction",
         "preset": {
           "datalong": "0"
         },
-        "description": "{source}: Reset faction to default"
+        "description": "{source}: Reset faction to default",
+        "parameters": []
       }
     ]
   },
@@ -1316,7 +1353,7 @@
     "id": 24,
     "name": "SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL",
     "name_readable": "Mount",
-    "help": "Mounts the resulting source creature on the model of the given creature entry (or a display id directly, with the additional flag). Entry/model 0 dismounts. With 'Apply mount speed' set, the mount's speed from the creature template is applied too.",
+    "help": "Mounts the resulting source creature on the model of the given creature entry (or a display id directly, with the additional flag). Entry/model 0 dismounts. With 'Apply mount speed' set, the mount's speed from the creature template is applied too. Mount speed only works with a creature entry: when it is set, the core always treats the value as a creature entry, even with the display-id flag.",
     "search_tags": "mount dismount model ride",
     "group": "Unit State & Flags",
     "source_types": [
@@ -1363,11 +1400,6 @@
             "name": "Display id",
             "type": "Parameter",
             "destination": "datalong"
-          },
-          {
-            "name": "Apply mount speed",
-            "type": "BoolParameter",
-            "destination": "datalong2"
           }
         ],
         "description": "{source}: Mount on model {datalong}"
@@ -1455,8 +1487,41 @@
     "parameters": [
       {
         "name": "Stand state",
-        "type": "StandStateParameter",
-        "destination": "datalong"
+        "type": "Parameter",
+        "destination": "datalong",
+        "values": {
+          "0": {
+            "name": "STAND"
+          },
+          "1": {
+            "name": "SIT"
+          },
+          "2": {
+            "name": "SIT_CHAIR"
+          },
+          "3": {
+            "name": "SLEEP"
+          },
+          "4": {
+            "name": "SIT_LOW_CHAIR"
+          },
+          "5": {
+            "name": "SIT_MEDIUM_CHAIR"
+          },
+          "6": {
+            "name": "SIT_HIGH_CHAIR"
+          },
+          "7": {
+            "name": "DEAD"
+          },
+          "8": {
+            "name": "KNEEL"
+          },
+          "9": {
+            "name": "CUSTOM",
+            "description": "Depends on model animation: submerge, freeze, hide, hibernate, rest"
+          }
+        }
       }
     ],
     "description": "{source}: Set stand state {datalong}"
@@ -1478,7 +1543,7 @@
     "parameters": [
       {
         "name": "NPC flags",
-        "type": "NpcFlagParameter",
+        "type": "CmangosNpcFlagsParameter",
         "destination": "datalong",
         "required": true
       },
@@ -1570,14 +1635,72 @@
         "destination": "dataint"
       }
     ],
-    "description": "Terminate script{datalongValue:choose(0):| unless {datalong} is alive}{datalong2Value:choose(0):| within {datalong2} yd}{datalong3Value:choose(0):| (unless pool {datalong3} has a live creature)}",
+    "description": "Terminate script{datalongValue:choose(0):| unless {datalong} is alive}{datalong2Value:choose(0):| within {datalong2} yd}{datalong3Value:choose(0):| (unless pool {datalong3} has a live creature)}{dataintValue:choose(0):| (adjust waypoint wait by {dataint})}",
     "variants": [
+      {
+        "name_readable": "Terminate script if gameobject found",
+        "preset": {
+          "data_flags": "|0x408"
+        },
+        "parameters": [
+          {
+            "name": "Search gameobject",
+            "type": "GameobjectParameter",
+            "destination": "datalong"
+          },
+          {
+            "name": "Search distance",
+            "type": "Parameter",
+            "destination": "datalong2"
+          },
+          {
+            "name": "Pool id",
+            "type": "Parameter",
+            "destination": "datalong3"
+          },
+          {
+            "name": "Waypoint wait change",
+            "type": "MillisecondsParameter",
+            "destination": "dataint"
+          }
+        ],
+        "description": "Terminate script{datalongValue:choose(0):| if gameobject {datalong} is spawned}{datalong2Value:choose(0):| within {datalong2} yd}{dataintValue:choose(0):| (adjust waypoint wait by {dataint})}"
+      },
+      {
+        "name_readable": "Terminate script unless gameobject found",
+        "preset": {
+          "data_flags": "|0x400"
+        },
+        "parameters": [
+          {
+            "name": "Search gameobject",
+            "type": "GameobjectParameter",
+            "destination": "datalong"
+          },
+          {
+            "name": "Search distance",
+            "type": "Parameter",
+            "destination": "datalong2"
+          },
+          {
+            "name": "Pool id",
+            "type": "Parameter",
+            "destination": "datalong3"
+          },
+          {
+            "name": "Waypoint wait change",
+            "type": "MillisecondsParameter",
+            "destination": "dataint"
+          }
+        ],
+        "description": "Terminate script{datalongValue:choose(0):| unless gameobject {datalong} is spawned}{datalong2Value:choose(0):| within {datalong2} yd}{dataintValue:choose(0):| (adjust waypoint wait by {dataint})}"
+      },
       {
         "name_readable": "Terminate script if creature found",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "Terminate script{datalongValue:choose(0):| if {datalong} is alive}{datalong2Value:choose(0):| within {datalong2} yd}{datalong3Value:choose(0):| (if pool {datalong3} has a live creature)}"
+        "description": "Terminate script{datalongValue:choose(0):| if {datalong} is alive}{datalong2Value:choose(0):| within {datalong2} yd}{datalong3Value:choose(0):| (if pool {datalong3} has a live creature)}{dataintValue:choose(0):| (adjust waypoint wait by {dataint})}"
       }
     ]
   },
@@ -1649,7 +1772,7 @@
     "id": 34,
     "name": "SCRIPT_COMMAND_TERMINATE_COND",
     "name_readable": "Terminate on condition",
-    "help": "Terminates the remaining steps of this script when the conditions-table entry is satisfied (or, with the additional flag, when it is NOT satisfied). If a fail quest is set, that quest is failed for the player and their group members when the script terminates.",
+    "help": "Terminates the remaining steps of this script when the conditions-table entry is satisfied (or, with the additional flag, when it is NOT satisfied). If a fail quest is set, that quest is failed for the player and their group members when the script terminates. The player for the condition is taken from the target if it is a player, otherwise from the source; the other object is passed as the condition target.",
     "search_tags": "terminate condition stop quest fail",
     "group": "Script Flow",
     "source_types": [
@@ -1657,6 +1780,7 @@
       "None"
     ],
     "target_types": [
+      "Player",
       "None"
     ],
     "buddy": "creature",
@@ -1679,14 +1803,14 @@
         "destination": "datalong2"
       }
     ],
-    "description": "Terminate script when {datalong} is true",
+    "description": "Terminate script when {datalong} is true{datalong2Value:choose(0):| and fail quest {datalong2}}",
     "variants": [
       {
         "name_readable": "Terminate when condition is false",
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "Terminate script when {datalong} is false"
+        "description": "Terminate script when {datalong} is false{datalong2Value:choose(0):| and fail quest {datalong2}}"
       }
     ]
   },
@@ -1694,7 +1818,7 @@
     "id": 35,
     "name": "SCRIPT_COMMAND_SEND_AI_EVENT",
     "name_readable": "Send AI event",
-    "help": "The resulting source creature sends an AI event. With a radius, it is sent to all friendly creatures around; with radius 0 and a creature target, it is sent directly to the target; between a creature and a player it is delivered to the creature side directly.",
+    "help": "The resulting source creature sends an AI event. With a radius, standard (health) events are sent to nearby assisting friendly creatures, while custom events are sent to ALL creatures around; with radius 0 and a creature target, it is sent directly to the target; between a creature and a player it is delivered to the creature side directly. Event ids outside the listed ones (13, 100-104, 1000+) are also valid for sending.",
     "search_tags": "ai event send trigger custom",
     "group": "Script Flow",
     "source_types": [
@@ -1722,7 +1846,7 @@
         "destination": "datalong3"
       }
     ],
-    "description": "{source}: Send AI event {datalong} {datalong2Value:choose(0):to {target}|to friendly units within {datalong2} yd}"
+    "description": "{source}: Send AI event {datalong} {datalong2Value:choose(0):to {target}|to creatures within {datalong2} yd}"
   },
   {
     "id": 36,
@@ -1761,7 +1885,7 @@
     "id": 37,
     "name": "SCRIPT_COMMAND_MOVE_DYNAMIC",
     "name_readable": "Move relative to target",
-    "help": "Moves the resulting source creature relative to the resulting target. With max distance 0, the source moves into contact with the target (at the fixed distance, if given). Otherwise it moves to a random point between min and max distance around the target; if O is set, the point is taken in that direction (with the additional flag, relative to the target's current orientation). When the movement finishes, the relay script is started. Skipped while the source is in combat.",
+    "help": "Moves the resulting source creature relative to the resulting target. With max distance 0, the source moves into contact with the target (at the fixed distance, if given). Otherwise it moves to a random point between min and max distance around the target; if O is set, the point is taken in that direction (with the additional flag, relative to the source's current orientation). When the movement finishes, the relay script is started. Skipped while the source is in combat.",
     "search_tags": "move dynamic random around target approach",
     "group": "Movement",
     "source_types": [
@@ -1809,7 +1933,7 @@
         "destination": "o"
       }
     ],
-    "description": "{source}: {datalongValue:choose(0):Move next to {target}|Move to a random point {datalong2}-{datalong} yd from {target}}"
+    "description": "{source}: {datalongValue:choose(0):Move next to {target}{datalong3Value:choose(0):| (distance {datalong3} yd)}|Move to a random point {datalong2}-{datalong} yd from {target}}"
   },
   {
     "id": 38,
@@ -1849,13 +1973,13 @@
         "destination": "dataint"
       }
     ],
-    "description": "Send mail {datalong} to {target}"
+    "description": "Send mail {datalong} to {target}{datalong2Value:choose(0):| from creature {datalong2}}{datalong3Value:choose(0):| with {datalong3} copper}{dataintValue:choose(0):| after {dataint}s}"
   },
   {
     "id": 39,
     "name": "SCRIPT_COMMAND_SET_HOVER",
     "name_readable": "Set hover",
-    "help": "Enables or disables hovering (and levitation) on the resulting source creature. With the additional flag, the hover animation byte flag is set/removed too.",
+    "help": "Enables or disables hovering (and levitation) on the resulting source creature. With the additional flag, the hover animation byte flag is set too when enabling (due to a core quirk it is NOT removed when disabling).",
     "search_tags": "hover levitate fly anim float",
     "group": "Unit State & Flags",
     "source_types": [
@@ -1885,7 +2009,7 @@
         "preset": {
           "data_flags": "|0x008"
         },
-        "description": "{source}: {datalongValue:choose(0):Disable|Enable} hovering and fly animation"
+        "description": "{source}: {datalongValue:choose(0):Disable hovering (fly animation kept)|Enable hovering and fly animation}"
       }
     ]
   },
@@ -2089,7 +2213,7 @@
         "destination": "dataint3"
       }
     ],
-    "description": "{source}: Cast {datalong} on {target} with custom values"
+    "description": "{source}: Cast {datalong} on {target} with base points {dataint}/{dataint2}/{dataint3}{datalong2Value:choose(0):| with flags {datalong2}}"
   },
   {
     "id": 47,
@@ -2118,10 +2242,10 @@
             "name": "generic"
           },
           "2": {
-            "name": "channeled"
+            "name": "autorepeat"
           },
           "3": {
-            "name": "autorepeat"
+            "name": "channeled"
           }
         }
       }
@@ -2218,7 +2342,7 @@
     "id": 51,
     "name": "SCRIPT_COMMAND_SPAWN_GROUP",
     "name_readable": "Spawn group / formation",
-    "help": "Controls spawn-group formations. The target creature must be in (or lead) the affected formation; for create/remove, spawn group 0 uses the target's own creature group. Spread must be between 0.5 and 15. Pick a variant for the specific subcommand.",
+    "help": "Controls spawn-group formations. The target creature must be in (or lead) the affected formation; for create, spawn group 0 uses the target's own creature group (remove requires an existing spawn group id — the server load-rejects 0). The 'set spread' subcommand rejects spread above 15.",
     "search_tags": "spawn group formation shape spread options",
     "group": "Spawning & Despawning",
     "source_types": [
@@ -2257,11 +2381,6 @@
         "name": "Data 1",
         "type": "Parameter",
         "destination": "datalong2"
-      },
-      {
-        "name": "Data 2",
-        "type": "Parameter",
-        "destination": "datalong3"
       }
     ],
     "description": "{target}: Spawn group subcommand {datalong}",
@@ -2307,7 +2426,7 @@
             "destination": "datalong2"
           }
         ],
-        "description": "{target}: Remove formation from {datalong2Value:choose(0):its own creature group|spawn group {datalong2}}"
+        "description": "{target}: Remove formation from spawn group {datalong2}"
       },
       {
         "name_readable": "Formation: switch shape",

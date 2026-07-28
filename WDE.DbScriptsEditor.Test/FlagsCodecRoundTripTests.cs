@@ -45,7 +45,9 @@ namespace WDE.DbScriptsEditor.Test
                         continue;
 
                     // Buddy region (0xFF0), the command-additional bit and any unmodeled bits must be
-                    // bit-identical. Only the low 3 direction bits may canonicalize (combo 4 alias).
+                    // bit-identical. Only the low 3 direction bits may canonicalize (combo 4 with a
+                    // buddy is an alias of 7; combo 5 without a buddy is a load-invalid row the
+                    // encoder repairs to 4).
                     Assert.AreEqual(flags & DbScriptFlags.BuddyRegionMask, flags2 & DbScriptFlags.BuddyRegionMask,
                         $"flags=0x{flags:X3} kind={kind}: buddy region not preserved (got 0x{flags2:X3})");
                     Assert.AreEqual(flags & DbScriptFlags.CommandAdditional, flags2 & DbScriptFlags.CommandAdditional,
@@ -56,8 +58,13 @@ namespace WDE.DbScriptsEditor.Test
                     var combo = flags & DbScriptFlags.DirectionMask;
                     var combo2 = flags2 & DbScriptFlags.DirectionMask;
                     if (combo == 4)
-                        Assert.That(combo2, Is.EqualTo(5u).Or.EqualTo(7u),
-                            $"flags=0x{flags:X3}: combo 4 must canonicalize to 5 or 7, got {combo2}");
+                        Assert.AreEqual(decoded.Buddy.Provided ? 7u : 4u, combo2,
+                            $"flags=0x{flags:X3}: combo 4 canonicalization wrong");
+                    else if (combo == 5 && !decoded.Buddy.Provided)
+                        // BUDDY_AS_TARGET without a buddy is rejected by LoadScripts; the encoder
+                        // repairs the row to the load-valid self form.
+                        Assert.AreEqual(4u, combo2,
+                            $"flags=0x{flags:X3}: buddy-less combo 5 must be repaired to 4, got {combo2}");
                     else
                         Assert.AreEqual(combo, combo2, $"flags=0x{flags:X3} kind={kind}: direction combo changed");
 
@@ -101,6 +108,19 @@ namespace WDE.DbScriptsEditor.Test
                     Assert.AreEqual(e2, e3);
                     Assert.AreEqual(r2, r3);
                 }
+            }
+        }
+
+        [Test]
+        public void NoBuddyDirections_NeverSetBuddyAsTarget()
+        {
+            // LoadScripts skips any row with SCRIPT_FLAG_BUDDY_AS_TARGET (0x1) and no buddy
+            // locator, so every buddy-less direction must encode without that bit.
+            foreach (var dir in DbScriptFlagsCodec.AllowedDirections(buddyProvided: false))
+            {
+                Assert.IsTrue(DbScriptFlagsCodec.TryEncodeDirection(dir, false, out var combo));
+                Assert.AreEqual(0u, combo & DbScriptFlags.BuddyAsTarget,
+                    $"({dir.Source},{dir.Target}): buddy-less direction must not set BUDDY_AS_TARGET");
             }
         }
 

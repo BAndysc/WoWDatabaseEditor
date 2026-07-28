@@ -53,10 +53,12 @@ namespace WDE.DbScriptsEditor.Models
             _ => false,
         };
 
-        // Whether the closest-vs-all (ALL_ELIGIBLE_BUDDIES) toggle has any effect. GUID / pool / pet
-        // always yield a single object; by-entry, spawn group and string id can yield many.
+        // Whether the closest-vs-all (ALL_ELIGIBLE_BUDDIES) toggle has any effect. GUID / pool
+        // always yield a single object; by-entry, pet, spawn group and string id can yield many
+        // (the core's all-eligible searcher visits all objects and explicitly includes pets).
         public bool SupportsAllEligible =>
-            Mode is BuddyFindMode.NearestByEntry or BuddyFindMode.BySpawnGroup or BuddyFindMode.ByStringId;
+            Mode is BuddyFindMode.NearestByEntry or BuddyFindMode.Pet
+                or BuddyFindMode.BySpawnGroup or BuddyFindMode.ByStringId;
 
         // Whether search_radius is a yard distance (by entry / pet always, string id optionally).
         // GUID and pool reinterpret the column as an id; spawn group never reads it.

@@ -32,7 +32,7 @@ namespace WDE.DbScriptsEditor.Test
         {
             int Count(DbScriptBuddyCapability cap) => DbScriptBuddyLeaves.All.Count(l => l.ValidFor(cap));
             // creature: everything except the three GO-only leaves
-            Assert.AreEqual(15, Count(DbScriptBuddyCapability.Creature));
+            Assert.AreEqual(16, Count(DbScriptBuddyCapability.Creature));
             // gameobject: the GO leaves + kind-agnostic spawn-group / string-id
             Assert.AreEqual(9, Count(DbScriptBuddyCapability.GameObject));
             Assert.AreEqual(DbScriptBuddyLeaves.All.Count, Count(DbScriptBuddyCapability.Both));

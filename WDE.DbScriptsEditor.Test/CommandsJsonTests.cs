@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -149,6 +150,43 @@ namespace WDE.DbScriptsEditor.Test
             var def = manager.GetCommand(15);
             var (_, _, variant) = def.Resolve(new FakeLine { Command = 15, DataLong = 100 });
             Assert.IsNull(variant);
+        }
+
+        [Test]
+        public void AllDescriptionTemplates_RenderWithoutParseErrors()
+        {
+            // An all-zero row and an everything-set row together exercise both sides of every
+            // choose() branch. A template that fails to parse is returned verbatim by
+            // DbScriptSmartFormat.Format, so leftover braces mean a broken template.
+            var zero = new FakeLine();
+            var set = new FakeLine
+            {
+                DataLong = 3, DataLong2 = 3, DataLong3 = 3, BuddyEntry = 3, SearchRadius = 3,
+                DataFlags = 3, DataInt = 3, DataInt2 = 3, DataInt3 = 3, DataInt4 = 3,
+                DataFloat = 1.5f, X = 1.5f, Y = 1.5f, Z = 1.5f, O = 1.5f, Speed = 1.5f,
+            };
+
+            foreach (var command in manager.AllCommands)
+            {
+                var templates = new List<(string what, string template)> { ("base", command.Description) };
+                foreach (var variant in command.Variants)
+                    if (variant.Description != null)
+                        templates.Add(($"variant '{variant.NameReadable}'", variant.Description));
+
+                foreach (var (what, template) in templates)
+                foreach (var line in new[] { zero, set })
+                {
+                    var data = new Dictionary<string, object>
+                    {
+                        ["source"] = "Source", ["target"] = "Target",
+                        ["player"] = "Player", ["creature"] = "Creature",
+                    };
+                    DbScriptSmartFormat.SeedColumns(data, line);
+                    var rendered = DbScriptSmartFormat.Format(template, data);
+                    Assert.IsFalse(rendered.Contains('{'),
+                        $"command {command.Id} {what}: template did not render:\n  {template}\n  -> {rendered}");
+                }
+            }
         }
 
         private class FakeLine : IDbScriptLine

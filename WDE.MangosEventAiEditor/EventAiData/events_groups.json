@@ -28,7 +28,8 @@
         "name": "Spells",
         "group_members": [
             "EVENT_T_SPELLHIT",
-            "EVENT_T_SPELLHIT_TARGET"
+            "EVENT_T_SPELLHIT_TARGET",
+            "EVENT_T_SPELL_CAST"
         ]
     },
     {
@@ -57,6 +58,16 @@
             "EVENT_T_FACING_TARGET",
             "EVENT_T_AURA",
             "EVENT_T_TARGET_AURA"
+        ]
+    },
+    {
+        "name": "Vehicle",
+        "group_members": [
+            "EVENT_T_BOARD_VEHICLE",
+            "EVENT_T_PASSENGER_BOARDED",
+            "EVENT_T_VEHICLE_RETURN",
+            "EVENT_T_PASSENGER_SPAWN",
+            "EVENT_T_PASSENGER_CONTROL_END"
         ]
     }
 ]

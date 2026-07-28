@@ -102,10 +102,12 @@ namespace WDE.DbScriptsEditor.Models
             };
         }
 
-        // Inverse of DecodeDirection. The (Source, Target) kind pair alone determines the combo
-        // (all 9 pairs are representable). Canonical: never emits combo 4 (an alias of 5/7); self
-        // forms use 5/6/7. buddyProvided is unused for combo selection (it only matters at decode
-        // time, where the buddy descriptor keeps it consistent) but kept for a symmetric signature.
+        // Inverse of DecodeDirection. The (Source, Target) kind pair determines the combo
+        // (all 9 pairs are representable). (S,S) needs buddyProvided: without a buddy it MUST be
+        // combo 4 — combos 5/7 carry SCRIPT_FLAG_BUDDY_AS_TARGET (0x1), which LoadScripts rejects
+        // when no buddy is defined (ScriptMgr.cpp "buddy required in data_flags ... but no buddy
+        // defined, skipping"). With a buddy, 5 keeps the dangling condition buddy representable
+        // (combo 4 with a buddy would decode to (B,B)).
         public static bool TryEncodeDirection(ScriptDirection dir, bool buddyProvided, out uint combo)
         {
             var S = SourceTargetKind.OriginalSource;
@@ -120,7 +122,7 @@ namespace WDE.DbScriptsEditor.Models
                 _ when dir.Source == T && dir.Target == S => 2u,
                 _ when dir.Source == T && dir.Target == B => 2u,
                 _ when dir.Source == B && dir.Target == S => 3u,
-                _ when dir.Source == S && dir.Target == S => 5u,
+                _ when dir.Source == S && dir.Target == S => buddyProvided ? 5u : 4u,
                 _ when dir.Source == T && dir.Target == T => 6u,
                 _ => 7u, // (B, B)
             };
