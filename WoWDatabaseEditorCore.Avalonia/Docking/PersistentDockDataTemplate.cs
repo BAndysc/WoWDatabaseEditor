@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
 using Avalonia.VisualTree;
+using Dock.Controls.DeferredContentControl;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Managers;
 using WDE.Common.Windows;
@@ -40,7 +41,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     var parent = view.GetVisualParent();
                     if (parent?.GetVisualChildren() is AvaloniaList<Visual> children)
                     {
-                        Console.WriteLine("Bandy: avalonia 11 fishy thing, to investigate [571XXA]");
+                        // Console.WriteLine("Bandy: avalonia 11 fishy thing, to investigate [571XXA]");
                         children.Remove(view);
                     }
                     ((ISetLogicalParent)(view)).SetParent(null);
@@ -62,9 +63,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     var parent = view.GetVisualParent();
                     if (parent?.GetVisualChildren() is AvaloniaList<Visual> children)
                     {
-                        Console.WriteLine("Bandy: avalonia 11 fishy thing, to investigate [571XXA]");
+                        // Console.WriteLine("Bandy: avalonia 11 fishy thing, to investigate [571XXA]");
                         children.Remove(view);
                     }
+                    ((ISetLogicalParent)(view)).SetParent(null);
                     return view;
                 }
 
@@ -75,8 +77,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     return control;
                 }
             }
-
-            return new Panel();
+            return new Panel() { Children = { new TextBlock() { Text = "fallback. " } } };
         }
 
         public Control Build(object? data)
