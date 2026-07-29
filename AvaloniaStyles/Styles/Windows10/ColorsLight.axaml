@@ -44,6 +44,17 @@
         <SolidColorBrush Color="#FFF29D" x:Key="DockThemeAccentBrush" />
         <SolidColorBrush Color="#FFF29D" x:Key="DockApplicationAccentBrushLow" />
         <SolidColorBrush Color="#DDD185" x:Key="DockApplicationAccentBrushMed" />
+        <!-- the stock Dock theme resolves the keys below via StaticResource aliases to its own
+             hardcoded VS blue / raw SystemAccentColor, so each consumed key must be re-pointed
+             at the accent palette above -->
+        <SolidColorBrush Color="#FFF29D" x:Key="DockTabActiveBackgroundBrush" />
+        <SolidColorBrush Color="#FFF29D" x:Key="DockTabActiveIndicatorBrush" />
+        <SolidColorBrush Color="#DDD185" x:Key="DockTabHoverBackgroundBrush" />
+        <SolidColorBrush Color="#DDD185" x:Key="DockTabSelectedForegroundBrush" />
+        <SolidColorBrush Color="#DDD185" x:Key="DockTabCloseHoverBackgroundBrush" />
+        <SolidColorBrush Color="#DDD185" x:Key="DockChromeButtonDangerHoverBrush" />
+        <SolidColorBrush Color="#FFF29D" x:Key="DockTargetIndicatorBrush" />
+        <SolidColorBrush Color="#FFF29D" x:Key="DockSurfaceHeaderActiveBrush" />
         
         <!-- textbox -->
         <SolidColorBrush Color="White" x:Key="TextControlBackground" />

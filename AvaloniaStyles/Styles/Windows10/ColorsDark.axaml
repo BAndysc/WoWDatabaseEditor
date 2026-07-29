@@ -83,6 +83,25 @@
                      Accent.Hue="{DynamicResource AccentHue}" />
     <SolidColorBrush x:Key="DockApplicationAccentBrushIndicator" Accent.BaseColor="#007ACC" Accent.L="0.4,0.6"
                      Accent.Hue="{DynamicResource AccentHue}" />
+    <!-- the stock Dock theme resolves the keys below via StaticResource aliases to its own
+         hardcoded VS blue / raw SystemAccentColor, so the accent-family overrides above never
+         reached them; each consumed key must be re-pointed here -->
+    <SolidColorBrush x:Key="DockTabActiveBackgroundBrush" Accent.BaseColor="#007ACC" Accent.L="0.4,0.6"
+                     Accent.Hue="{DynamicResource AccentHue}" />
+    <SolidColorBrush x:Key="DockTabActiveIndicatorBrush" Accent.BaseColor="#007ACC" Accent.L="0.4,0.6"
+                     Accent.Hue="{DynamicResource AccentHue}" />
+    <SolidColorBrush x:Key="DockTabHoverBackgroundBrush" Accent.BaseColor="#1C97EA" Accent.L="0.4,0.6"
+                     Accent.Hue="{DynamicResource AccentHue}" />
+    <SolidColorBrush x:Key="DockTabSelectedForegroundBrush" Accent.BaseColor="#1C97EA" Accent.L="0.4,0.6"
+                     Accent.Hue="{DynamicResource AccentHue}" />
+    <SolidColorBrush x:Key="DockTabCloseHoverBackgroundBrush" Accent.BaseColor="#52B0EF" Accent.L="0.4,0.6"
+                     Accent.Hue="{DynamicResource AccentHue}" />
+    <SolidColorBrush x:Key="DockChromeButtonDangerHoverBrush" Accent.BaseColor="#52B0EF" Accent.L="0.4,0.6"
+                     Accent.Hue="{DynamicResource AccentHue}" />
+    <SolidColorBrush x:Key="DockTargetIndicatorBrush" Accent.BaseColor="#007ACC" Accent.L="0.4,0.6"
+                     Accent.Hue="{DynamicResource AccentHue}" />
+    <SolidColorBrush x:Key="DockSurfaceHeaderActiveBrush" Accent.BaseColor="#007ACC" Accent.L="0.4,0.6"
+                     Accent.Hue="{DynamicResource AccentHue}" />
 
     <!-- wizard -->
     <SolidColorBrush x:Key="NumberIndicatorBackground" Color="#34495e" />

@@ -4,6 +4,23 @@
         <Styles.Resources>
                 <SolidColorBrush x:Key="DockBorderSubtleBrush">#FF8E9BBC</SolidColorBrush>
                 <SolidColorBrush x:Key="DockDocumentContentBorderBrush">#FF8E9BBC</SolidColorBrush>
+
+                <!-- unify Dock accents with the app accent hue: the stock theme mixes hardcoded
+                     VS blue (document tabs) with raw SystemAccentColor (tool headers) -->
+                <SolidColorBrush Color="#007ACC" x:Key="DockApplicationAccentBrushLow" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Color="#1C97EA" x:Key="DockApplicationAccentBrushMed" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Color="#52B0EF" x:Key="DockApplicationAccentBrushHigh" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Color="#007ACC" x:Key="DockApplicationAccentBrushIndicator" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <!-- the theme aliases below resolve via StaticResource inside Dock, so they must be re-pointed here too -->
+                <SolidColorBrush Color="#007ACC" x:Key="DockTabActiveBackgroundBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Color="#007ACC" x:Key="DockTabActiveIndicatorBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Color="#1C97EA" x:Key="DockTabHoverBackgroundBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Color="#1C97EA" x:Key="DockTabSelectedForegroundBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Color="#52B0EF" x:Key="DockTabCloseHoverBackgroundBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Color="#52B0EF" x:Key="DockChromeButtonDangerHoverBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <SolidColorBrush Color="#007ACC" x:Key="DockTargetIndicatorBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+                <!-- active tool-window header: same hue-shifted accent as tabs instead of raw SystemAccentColor -->
+                <SolidColorBrush Color="#007ACC" x:Key="DockSurfaceHeaderActiveBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
                 <SolidColorBrush Accent.BaseColor="#4D6082" x:Key="ToolChromeControl.Grip" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
                 <SolidColorBrush Accent.BaseColor="#515F7F" x:Key="DocumentControl.PART_TabStripItem" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
                 <SolidColorBrush Accent.BaseColor="#5F7096" x:Key="DocumentControl.PART_TabStrip.pointerover.not.selected" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />

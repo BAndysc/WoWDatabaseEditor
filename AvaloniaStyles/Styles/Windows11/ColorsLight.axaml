@@ -55,7 +55,16 @@
         <SolidColorBrush x:Key="PrimaryButtonBackgroundPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         <SolidColorBrush x:Key="PrimaryButtonBorderBrushPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         <SolidColorBrush x:Key="PrimaryButtonForeground" Color="White" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
-        
+
+        <!-- checked toggle buttons (incl. ButtonImage/ToolBarButton toggle mode) follow the accent
+             hue instead of Fluent's raw accent blue -->
+        <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="#118aed" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="ToggleButtonBorderBrushChecked" Color="#118aed" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="#1494FF" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="ToggleButtonBorderBrushCheckedPointerOver" Color="#1494FF" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="ToggleButtonBorderBrushCheckedPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+
         <!-- textbox -->
         <Thickness x:Key="TextControlBorderThemeThickness">0,0,0,1</Thickness>
         <Thickness x:Key="TextControlBorderThemeThicknessFocused">0,0,0,2</Thickness>

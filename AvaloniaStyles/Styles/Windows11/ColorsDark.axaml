@@ -46,7 +46,16 @@
         <SolidColorBrush x:Key="PrimaryButtonBackgroundPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         <SolidColorBrush x:Key="PrimaryButtonBorderBrushPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
         <SolidColorBrush x:Key="PrimaryButtonForeground" Color="White" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
-        
+
+        <!-- checked toggle buttons (incl. ButtonImage/ToolBarButton toggle mode) follow the accent
+             hue instead of Fluent's raw accent blue -->
+        <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="#118aed" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="ToggleButtonBorderBrushChecked" Color="#118aed" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="#1494FF" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="ToggleButtonBorderBrushCheckedPointerOver" Color="#1494FF" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="ToggleButtonBorderBrushCheckedPressed" Color="#0F74C7" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+
         <!-- textbox -->
         <Thickness x:Key="TextControlBorderThemeThickness">0,0,0,1</Thickness>
         <Thickness x:Key="TextControlBorderThemeThicknessFocused">0,0,0,2</Thickness>
@@ -84,6 +93,21 @@
         
         <!-- dock -->
         <SolidColorBrush Accent.BaseColor="{DynamicResource SystemAccentColor}" x:Key="DockThemeAccentBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <!-- unify Dock accents with the app accent hue; the stock theme resolves the keys below
+             via StaticResource aliases to hardcoded VS blue / raw SystemAccentColor, so each
+             consumed key must be re-pointed here -->
+        <SolidColorBrush Accent.BaseColor="#007ACC" x:Key="DockApplicationAccentBrushLow" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="#1C97EA" x:Key="DockApplicationAccentBrushMed" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="#52B0EF" x:Key="DockApplicationAccentBrushHigh" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="#007ACC" x:Key="DockApplicationAccentBrushIndicator" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="#007ACC" x:Key="DockTabActiveBackgroundBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="#007ACC" x:Key="DockTabActiveIndicatorBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="#1C97EA" x:Key="DockTabHoverBackgroundBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="#1C97EA" x:Key="DockTabSelectedForegroundBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="#52B0EF" x:Key="DockTabCloseHoverBackgroundBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="#52B0EF" x:Key="DockChromeButtonDangerHoverBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="#007ACC" x:Key="DockTargetIndicatorBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Accent.BaseColor="#007ACC" x:Key="DockSurfaceHeaderActiveBrush" Accent.L="0.4,0.6" Accent.Hue="{DynamicResource AccentHue}" />
 
         <!-- listboxitem -->
         <SolidColorBrush x:Key="ListBoxItem_Background" Color="Transparent" />
