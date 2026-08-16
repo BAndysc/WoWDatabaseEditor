@@ -1,6 +1,5 @@
 {
   "compatibility": [
-    "CMaNGOS-Classic",
     "CMaNGOS-WoTLK"
   ],
   "name": "Spell Threat",

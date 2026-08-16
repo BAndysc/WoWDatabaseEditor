@@ -1,6 +1,7 @@
 {
   "id": "spell_threat_tbc",
   "compatibility": [
+    "CMaNGOS-Classic",
     "CMaNGOS-TBC"
   ],
   "name": "Spell Threat",

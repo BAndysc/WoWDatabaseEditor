@@ -463,6 +463,20 @@
           "name": "Damage School",
           "db_column_name": "DamageSchool",
           "value_type": "SpellSchoolParameter"
+        },
+        {
+          "name": "Damage Multiplier (OLD)",
+          "db_column_name": "DamageMultiplierOLD",
+          "value_type": "float",
+          "default": 1.0,
+          "help": "Deprecated column kept during damage rework migration."
+        },
+        {
+          "name": "Damage Variance (OLD)",
+          "db_column_name": "DamageVarianceOLD",
+          "value_type": "float",
+          "default": 1.0,
+          "help": "Deprecated column kept during damage rework migration."
         }
       ]
     },

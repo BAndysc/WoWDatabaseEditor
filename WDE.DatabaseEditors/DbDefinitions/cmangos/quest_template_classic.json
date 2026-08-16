@@ -763,11 +763,11 @@
           "help": "Reputation gained/lost with the corresponding faction. On WotLK the DB value is 100x the actual reputation (25000 = 250)."
         },
         {
-          "name": "Reputation Spillover Mask",
-          "db_column_name": "ReputationSpilloverMask",
+          "name": "Reward Faction Flags",
+          "db_column_name": "RewFactionFlags",
           "value_type": "CmangosRepSpilloverMaskParameter",
           "zero_is_blank": true,
-          "help": "Reward faction slots whose reputation reward is NOT spilled over to allied factions."
+          "help": "Reward faction slots whose reputation reward is NOT spilled over to allied factions (bit per reward faction slot)."
         }
       ]
     },
