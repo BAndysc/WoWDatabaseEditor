@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:core="clr-namespace:Dock.Model.Core;assembly=Dock.Model">
   <Design.PreviewWith>
     <Border Padding="20">
       <!-- Add Controls for Previewer Here -->
@@ -12,6 +13,106 @@
     <ItemsPanelTemplate x:Key="DockDocumentTabStripHorizontalItemsPanel">
       <WrapPanel Orientation="Horizontal" ClipToBounds="False" />
     </ItemsPanelTemplate>
+    
+    <StaticResource x:Key="DockDocumentTabSelectedForegroundBrush" ResourceKey="DockTabActiveForegroundBrush" />
+    
+    <!-- very annoying, but we have to replace DockPanel with a Grid, to do so, I had to do the whole copy paste of
+    https://github.com/wieslawsoltes/Dock/blob/master/src/Dock.Avalonia.Themes.Fluent/Controls/ToolChromeControl.axaml
+    or until https://github.com/wieslawsoltes/Dock/pull/1131 gets merged, then it can be removed -->
+  <ControlTheme x:Key="{x:Type ToolChromeControl}" TargetType="ToolChromeControl" BasedOn="{StaticResource {x:Type ToolChromeControl}}">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid RowDefinitions="Auto,*">
+          <DeferredContentPresenter x:Name="PART_ContentPresenter"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    Padding="{TemplateBinding Padding}"
+                                    Grid.Row="1" />
+          <Border x:Name="PART_Border"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  VerticalAlignment="Top"
+                  ContextFlyout="{TemplateBinding ToolFlyout}"
+                  Grid.Row="{Binding GripMode, Converter={x:Static GripModeConverters.GridRowAutoHideConverter}}">
+            <Grid x:Name="PART_Grip">
+              <Grid ColumnDefinitions="*,Auto" Margin="{DynamicResource DockToolChromeHeaderMargin}"> <!-- change -->
+                <Panel DockPanel.Dock="Left">
+                  <TextBlock x:Name="PART_Title"
+                             Text="{Binding ActiveDockable.Title, FallbackValue=TITLE}" />
+                </Panel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" 
+                            Grid.Column="1"> <!-- change -->
+                  <Button x:Name="PART_MenuButton"
+                          Theme="{TemplateBinding MenuButtonTheme}"
+                          Flyout="{TemplateBinding ToolFlyout}">
+                    <Viewbox Margin="{DynamicResource DockToolChromeMenuIconMargin}">
+                      <Path x:Name="PART_MenuPath" />
+                    </Viewbox>
+                  </Button>
+                  <Button x:Name="PART_PinButton"
+                          Command="{Binding Owner.Factory.PinDockable}"
+                          CommandParameter="{Binding ActiveDockable}"
+                          Theme="{TemplateBinding PinButtonTheme}">
+                    <Button.IsVisible>
+                      <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <MultiBinding Converter="{x:Static DockCapabilityConverters.CanPinMultiConverter}">
+                          <Binding Path="ActiveDockable" />
+                          <Binding Path="ActiveDockable.CanPin" />
+                          <Binding Path="ActiveDockable.DockCapabilityOverrides.CanPin" />
+                          <Binding Path="(core:IDock).DockCapabilityPolicy.CanPin" />
+                        </MultiBinding>
+                        <TemplateBinding Property="IsFloating" Converter="{x:Static BoolConverters.Not}" />
+                      </MultiBinding>
+                    </Button.IsVisible>
+                    <Viewbox>
+                      <Path x:Name="PART_PinPath" />
+                    </Viewbox>
+                  </Button>
+                  <Button x:Name="PART_MaximizeRestoreButton"
+                          IsVisible="{TemplateBinding IsFloating}"
+                          Theme="{TemplateBinding MaximizeButtonTheme}">
+                    <Viewbox>
+                      <Path x:Name="PART_MaximizeRestorePath" />
+                    </Viewbox>
+                  </Button>
+                  <Button x:Name="PART_CloseButton"
+                          Command="{Binding Owner.Factory.CloseDockable}"
+                          CommandParameter="{Binding ActiveDockable}"
+                          Theme="{TemplateBinding CloseButtonTheme}">
+                    <Button.IsVisible>
+                      <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <MultiBinding Converter="{x:Static DockCapabilityConverters.CanCloseMultiConverter}">
+                          <Binding Path="ActiveDockable" />
+                          <Binding Path="ActiveDockable.CanClose" />
+                          <Binding Path="ActiveDockable.DockCapabilityOverrides.CanClose" />
+                          <Binding Path="(core:IDock).DockCapabilityPolicy.CanClose" />
+                        </MultiBinding>
+                        <MultiBinding Converter="{x:Static CanRemoveDockableConverter.Instance}">
+                          <Binding Path="(core:IDock).CanCloseLastDockable" FallbackValue="{x:True}" />
+                          <Binding Path="(core:IDock).VisibleDockables.Count" FallbackValue="0" />
+                        </MultiBinding>
+                      </MultiBinding>
+                    </Button.IsVisible>
+                    <Viewbox>
+                      <Path x:Name="PART_ClosePath" />
+                    </Viewbox>
+                  </Button>
+                </StackPanel>
+                <Grid x:Name="PART_Grid" />
+              </Grid>
+            </Grid>
+          </Border>
+          <Panel x:Name="PART_Panel"
+                 Background="{TemplateBinding BorderBrush}"
+                 Height="{DynamicResource DockToolChromeDividerThickness}"
+                 VerticalAlignment="Top"
+                 Grid.Row="{Binding GripMode, Converter={x:Static GripModeConverters.GridRowAutoHideConverter}}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
   </Styles.Resources>
 
   <Style Selector="DocumentTabStrip[Orientation=Horizontal] /template/ ScrollViewer#PART_ScrollViewer">

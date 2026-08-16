@@ -49,6 +49,9 @@
                 <Setter Property="Background" Value="{StaticResource DocumentControl.PART_TabStrip.pointerover.not.selected}"/>
                 <Setter Property="Foreground" Value="White" />
         </Style>
+        <Style Selector="idc|ToolControl /template/ Border#PART_Border DeferredContentControl#PART_ContentPresenter">
+                <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        </Style>
         <Style Selector="idc|ToolControl ToolTabStripItem">
                 <Setter Property="Foreground" Value="White" />
                 <Setter Property="Background" Value="{StaticResource DocumentControl.PART_TabStripItem}" />
