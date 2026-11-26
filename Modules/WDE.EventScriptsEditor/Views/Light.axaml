@@ -2,6 +2,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Styles.Resources>
         <SolidColorBrush Color="#ffcc00" x:Key="EventScript_WarningBackground" />
-        <SolidColorBrush Color="#ff9900" x:Key="EventScript_WarningBorderBrusn" />
+        <SolidColorBrush Color="#ff9900" x:Key="EventScript_WarningBorderBrush" />
     </Styles.Resources>
 </Styles>
